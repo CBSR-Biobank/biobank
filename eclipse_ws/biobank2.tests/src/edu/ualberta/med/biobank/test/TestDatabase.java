@@ -55,8 +55,8 @@ public class TestDatabase {
     @After
     public void tearDown() throws Exception {
         try {
-            StudyHelper.deleteCreatedStudies();
             SiteHelper.deleteCreatedSites();
+            StudyHelper.deleteCreatedStudies();
             ClinicHelper.deleteCreatedClinics();
             SpecimenTypeHelper.deleteCreatedSpecimenTypes();
             ShippingMethodHelper.deleteCreateShippingMethods();
@@ -73,6 +73,7 @@ public class TestDatabase {
         for (Method method : methods) {
             if (method.getName().startsWith("get")
                 && !method.getName().equals("getClass")
+                && !method.getName().equals("getId")
                 && !IGNORE_RETURN_TYPES.contains(method.getReturnType())
                 && !Collection.class.isAssignableFrom(method.getReturnType())
                 && !Map.class.isAssignableFrom(method.getReturnType())

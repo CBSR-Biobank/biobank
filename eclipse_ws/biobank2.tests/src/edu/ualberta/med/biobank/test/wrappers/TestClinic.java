@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -93,19 +94,54 @@ public class TestClinic extends TestDatabase {
     public void testRemoveContacts() throws Exception {
         String name = "testRemoveContacts" + r.nextInt();
         ClinicWrapper clinic = ClinicHelper.addClinic(name);
-        int nber = r.nextInt(5) + 1;
+        int nber = r.nextInt(5) + 5;
         for (int i = 0; i < nber; i++) {
             ContactHelper.addContact(clinic, name + i);
         }
         clinic.reload();
         List<ContactWrapper> contacts = clinic.getContactCollection(false);
         ContactWrapper contact = DbHelper.chooseRandomlyInList(contacts);
+        // direct deletion
         contact.delete();
 
         clinic.reload();
-        // one contact added
-        Assert
-            .assertEquals(nber - 1, clinic.getContactCollection(false).size());
+        // one contact less
+        contacts = clinic.getContactCollection(false);
+        Assert.assertEquals(nber - 1, contacts.size());
+
+        contact = DbHelper.chooseRandomlyInList(contacts);
+        // remove through clinic persist
+        clinic.removeFromContactCollection(Arrays.asList(contact));
+        clinic.persist();
+        clinic.reload();
+        contacts = clinic.getContactCollection(false);
+        Assert.assertEquals(nber - 2, contacts.size());
+
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "_2");
+        ContactWrapper otherContact = ContactHelper.addContact(clinic2, name
+            + "_clinic2");
+        try {
+            // try to remove but check should fail
+            clinic.removeFromContactCollectionWithCheck(Arrays
+                .asList(otherContact));
+            Assert
+                .fail("Should throw an exception if the contact is not in the list");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        clinic.removeFromContactCollection(Arrays.asList(otherContact));
+        Assert.assertTrue(true);
+
+        contact = DbHelper.chooseRandomlyInList(contacts);
+        try {
+            // try to remove but check should fail
+            clinic.removeFromContactCollectionWithCheck(Arrays.asList(contact));
+            Assert.assertTrue(true);
+        } catch (BiobankCheckException bce) {
+            Assert
+                .fail("Should not throw an exception : the contact is in the list");
+        }
     }
 
     @Test
@@ -378,17 +414,18 @@ public class TestClinic extends TestDatabase {
 
         PatientWrapper patient;
         List<ClinicWrapper> clinics = Arrays.asList(clinic1, clinic2);
-        Map<ClinicWrapper, List<PatientWrapper>> patientMap = new HashMap<ClinicWrapper, List<PatientWrapper>>();
-
+        Map<Integer, List<PatientWrapper>> patientMap = new HashMap<Integer, List<PatientWrapper>>();
         for (ClinicWrapper clinic : clinics) {
-            patientMap.put(clinic, new ArrayList<PatientWrapper>());
+            patientMap.put(clinic.getId(), new ArrayList<PatientWrapper>());
         }
 
         // add patients
         for (int i = 0, n = r.nextInt(10) + 1; i < n; ++i) {
             patient = PatientHelper.addPatient(name + "_p" + i, study);
             ClinicWrapper clinic = clinics.get(i & 1);
-            patientMap.get(clinic).add(patient);
+            List<PatientWrapper> patientsForClinic = patientMap.get(clinic
+                .getId());
+            patientsForClinic.add(patient);
             OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
             originInfo.setCenter(clinic);
             originInfo.persist();
@@ -396,28 +433,177 @@ public class TestClinic extends TestDatabase {
                 .getAllSpecimenTypes(appService, false).get(0));
             CollectionEventHelper.addCollectionEvent(clinic, patient, i,
                 originInfo, sv);
-            Assert.assertEquals(patientMap.get(clinic).size(),
+            Assert.assertEquals(patientsForClinic.size(),
                 clinic.getPatientCount());
         }
 
         // delete patients
         for (ClinicWrapper clinic : clinics) {
-            while (patientMap.get(clinic).size() > 0) {
-                patient = patientMap.get(clinic).get(0);
+            List<PatientWrapper> patientsForClinic = patientMap.get(clinic
+                .getId());
+            while (patientsForClinic.size() > 0) {
+                patient = patientsForClinic.get(0);
                 patient.reload();
-                // if (patient.getSourceVesselCollection(false) != null) {
-                // for (SpecimenWrapper s : patient
-                // .getSourceVesselCollection(false)) {
-                // s.delete();
-                // }
-                // patient.reload();
-                // }
+                DbHelper.deleteCollectionEvents(patient
+                    .getCollectionEventCollection(false));
+                patient.reload();
                 patient.delete();
-                patientMap.get(clinic).remove(0);
+                patientsForClinic.remove(0);
                 clinic.reload();
-                Assert.assertEquals(patientMap.get(clinic).size(),
+                Assert.assertEquals(patientsForClinic.size(),
                     clinic.getPatientCount());
             }
         }
+    }
+
+    @Test
+    public void testGetPatientCountForStudy() throws Exception {
+        String name = "testGetPatientCountForStudy" + r.nextInt();
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(name);
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name);
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "_2");
+        ContactWrapper contact2 = ContactHelper
+            .addContact(clinic2, name + "_2");
+
+        StudyWrapper study1 = StudyHelper.addStudy(name);
+        study1.addToContactCollection(Arrays.asList(contact1));
+        study1.persist();
+
+        StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
+        study2.addToContactCollection(Arrays.asList(contact2));
+        study2.persist();
+
+        List<ClinicWrapper> clinics = Arrays.asList(clinic1, clinic2);
+        List<StudyWrapper> studies = Arrays.asList(study1, study2);
+
+        // ClinicID = {StudyID = patientCOunt}
+        Map<Integer, Map<Integer, List<PatientWrapper>>> patientMap = new HashMap<Integer, Map<Integer, List<PatientWrapper>>>();
+
+        for (ClinicWrapper clinic : clinics) {
+            Map<Integer, List<PatientWrapper>> studyMap = new HashMap<Integer, List<PatientWrapper>>();
+            for (StudyWrapper study : studies) {
+                studyMap.put(study.getId(), new ArrayList<PatientWrapper>());
+            }
+            patientMap.put(clinic.getId(), studyMap);
+        }
+        // add patients
+        for (int i = 0, n = r.nextInt(10) + 3; i < n; ++i) {
+            StudyWrapper study = studies.get(i & 1);
+            ClinicWrapper clinic = clinics.get(i & 1);
+            PatientWrapper patient = PatientHelper.addPatient(name + "_p" + i,
+                study);
+            Map<Integer, List<PatientWrapper>> studyMap = patientMap.get(clinic
+                .getId());
+            List<PatientWrapper> patientsForClinicForStudy = studyMap.get(study
+                .getId());
+            patientsForClinicForStudy.add(patient);
+            OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
+            originInfo.setCenter(clinic);
+            originInfo.persist();
+            SpecimenWrapper sv = SpecimenHelper.newSpecimen(SpecimenTypeWrapper
+                .getAllSpecimenTypes(appService, false).get(0));
+            CollectionEventHelper.addCollectionEvent(clinic, patient, i,
+                originInfo, sv);
+            Assert.assertEquals(patientsForClinicForStudy.size(),
+                clinic.getPatientCountForStudy(study));
+        }
+
+        // delete patients
+        for (ClinicWrapper clinic : clinics) {
+            Map<Integer, List<PatientWrapper>> studyMap = patientMap.get(clinic
+                .getId());
+            for (StudyWrapper study : studies) {
+                List<PatientWrapper> patientsForClinicForStudy = studyMap
+                    .get(study.getId());
+                while (patientsForClinicForStudy.size() > 0) {
+                    PatientWrapper patient = patientsForClinicForStudy.get(0);
+                    patient.reload();
+                    DbHelper.deleteCollectionEvents(patient
+                        .getCollectionEventCollection(false));
+                    patient.reload();
+                    patient.delete();
+                    patientsForClinicForStudy.remove(0);
+                    clinic.reload();
+                    Assert.assertEquals(patientsForClinicForStudy.size(),
+                        clinic.getPatientCount());
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testGetCount() throws Exception {
+        String name = "testGetCount" + r.nextInt();
+        ClinicHelper.addClinics(name, r.nextInt(10) + 3, true);
+        // don't use the above number, just in case clinics of others test cases
+        // where not removed
+        int total = appService.search(Clinic.class, new Clinic()).size();
+        Assert.assertEquals(total, ClinicWrapper.getCount(appService));
+    }
+
+    @Test
+    public void testCollectionEventCount() throws Exception {
+        String name = "testCollectionEventCount" + r.nextInt();
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(name);
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name);
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "_2");
+        ContactWrapper contact2 = ContactHelper
+            .addContact(clinic2, name + "_2");
+
+        StudyWrapper study1 = StudyHelper.addStudy(name);
+        study1.addToContactCollection(Arrays.asList(contact1));
+        study1.persist();
+
+        StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
+        study2.addToContactCollection(Arrays.asList(contact2));
+        study2.persist();
+
+        List<ClinicWrapper> clinics = Arrays.asList(clinic1, clinic2);
+        List<StudyWrapper> studies = Arrays.asList(study1, study2);
+
+        // ClinicID = {StudyID = patientCOunt}
+        Map<Integer, Map<Integer, List<CollectionEventWrapper>>> cEventMap = new HashMap<Integer, Map<Integer, List<CollectionEventWrapper>>>();
+
+        for (ClinicWrapper clinic : clinics) {
+            Map<Integer, List<CollectionEventWrapper>> studyMap = new HashMap<Integer, List<CollectionEventWrapper>>();
+            for (StudyWrapper study : studies) {
+                studyMap.put(study.getId(),
+                    new ArrayList<CollectionEventWrapper>());
+            }
+            cEventMap.put(clinic.getId(), studyMap);
+        }
+        // add patients and collection events
+        for (int i = 0, n = r.nextInt(10) + 3; i < n; ++i) {
+            StudyWrapper study = studies.get(i & 1);
+            ClinicWrapper clinic = clinics.get(i & 1);
+            Map<Integer, List<CollectionEventWrapper>> studyMap = cEventMap
+                .get(clinic.getId());
+            List<CollectionEventWrapper> cEventForClinicForStudy = studyMap
+                .get(study.getId());
+
+            PatientWrapper patient = PatientHelper.addPatient(name + "_" + i,
+                study);
+            OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
+            originInfo.setCenter(clinic);
+            originInfo.persist();
+            for (int eventNb = 0; eventNb < r.nextInt(10) + 3; eventNb++) {
+                SpecimenWrapper originSpecimen = SpecimenHelper
+                    .newSpecimen(SpecimenTypeWrapper.getAllSpecimenTypes(
+                        appService, false).get(0));
+                CollectionEventWrapper cEvent = CollectionEventHelper
+                    .addCollectionEvent(clinic, patient, eventNb, originInfo,
+                        originSpecimen);
+                cEventForClinicForStudy.add(cEvent);
+            }
+            // count specific to study
+            Assert.assertEquals(cEventForClinicForStudy.size(),
+                clinic.getCollectionEventCountForStudy(study));
+            int clinicTotal = 0;
+            for (StudyWrapper s : studies)
+                clinicTotal += studyMap.get(s.getId()).size();
+            // count for the whole clinic
+            Assert.assertEquals(clinicTotal, clinic.getCollectionEventCount());
+        }
+
     }
 }

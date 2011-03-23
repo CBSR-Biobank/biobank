@@ -124,7 +124,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         List<CollectionEventWrapper> pvs = getCollectionEventCollection(false);
         if (pvs != null && !pvs.isEmpty()) {
             throw new BiobankDeleteException(
-                "Processing events are still linked to this patient."
+                "Collection events are still linked to this patient."
                     + " Delete them before attempting to remove the patient.");
         }
     }
