@@ -180,28 +180,14 @@ public class TestDatabase {
             // maxlength for varchar test
             if (returnType.equals(java.lang.String.class)) {
                 String attrName = getterInfo.getMethod.getName().substring(3);
+                attrName = attrName.substring(0, 1).toLowerCase()
+                    + attrName.substring(1);
                 if (VarCharLengths.getMaxSize(w.getWrappedClass(), attrName) == null)
                     continue;
 
                 try {
                     // 512 char string
-                    String longString = "12345678901234567890123456789012"
-                        + "12345678901234567890123456789012"
-                        + "12345678901234567890123456789012"
-                        + "12345678901234567890123456789012"
-                        + "12345678901234567890123456789012"
-                        + "12345678901234567890123456789012"
-                        + "12345678901234567890123456789012"
-                        + "12345678901234567890123456789012"
-                        + "12345678901234567890123456789012"
-                        + "12345678901234567890123456789012"
-                        + "12345678901234567890123456789012"
-                        + "12345678901234567890123456789012"
-                        + "12345678901234567890123456789012"
-                        + "12345678901234567890123456789012"
-                        + "12345678901234567890123456789012"
-                        + "12345678901234567890123456789012";
-
+                    String longString = Utils.getRandomString(511, 512);
                     getterInfo.setMethod.invoke(w, longString);
                     w.persist();
                     Assert.fail("VARCHAR limits not enforced on field: "
