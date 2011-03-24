@@ -2,10 +2,7 @@ package edu.ualberta.med.biobank.export;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.supercsv.io.CsvListWriter;
@@ -31,17 +28,10 @@ public class CsvDataExporter extends GuiDataExporter {
             writer = new CsvListWriter(new FileWriter(path),
                 CsvPreference.EXCEL_PREFERENCE);
 
-            List<String> headers = new ArrayList<String>();
-            headers.add("title: " + data.getTitle());
-            headers.add("columns: "
-                + StringUtils.join(data.getColumnNames(), ","));
-
-            if (data.getDescription() != null) {
-                headers.add("description:");
-                headers.addAll(data.getDescription());
-            }
-
-            writer.writeHeader(headers.toArray(new String[0]));
+            // can only write column names to a CSV, no comments, title, etc.
+            // are allowed b/c cannot have comments in the file, only headers
+            // (column names) and data
+            writer.writeHeader(data.getColumnNames().toArray(new String[0]));
 
             int numHeaders = data.getColumnNames().size();
 

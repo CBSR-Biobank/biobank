@@ -29,10 +29,13 @@ import net.sf.jasperreports.engine.export.JRPrintServiceExporter;
 import net.sf.jasperreports.engine.export.JRPrintServiceExporterParameter;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.printing.PrintDialog;
 import org.eclipse.swt.printing.PrinterData;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import ar.com.fdvs.dj.core.DynamicJasperHelper;
@@ -46,6 +49,7 @@ import ar.com.fdvs.dj.domain.constants.Transparency;
 import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.util.Holder;
 
 public class ReportingUtils {
 
@@ -66,9 +70,12 @@ public class ReportingUtils {
                 .setUseFullPageWidth(true);
         }
 
+        String infos = StringUtils.join(description,
+            System.getProperty("line.separator"));
+
         Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("title", reportName);
-        fields.put("infos", description);
+        fields.put("infos", infos);
         URL reportURL = ReportingUtils.class.getResource("BasicReport.jrxml");
         if (reportURL == null) {
             throw new Exception("No report available with name BasicReport");
@@ -214,28 +221,49 @@ public class ReportingUtils {
         }
     }
 
-    public static void printReport(JasperPrint jasperPrint) throws Exception {
+    public static void printReport(final JasperPrint jasperPrint)
+        throws Exception {
         // Use SWT PrintDialog instead of the JasperReport method that use java
         // swing gui.
-        PrintDialog dialog = new PrintDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        PrinterData data = dialog.open();
+        final Display display = Display.getDefault();
+        final Holder<Exception> exception = new Holder<Exception>(null);
 
-        // if data is null : user cancled print.
+        display.syncExec(new Runnable() {
+            @Override
+            public void run() {
+                Shell shell = display.getActiveShell();
+                PrintDialog dialog = new PrintDialog(shell, SWT.NONE);
+                PrinterData data = dialog.open();
 
-        if (data != null) {
-            if (data.printToFile == true) {
-                printViaFile(data, jasperPrint);
-            } else {
-                try {
-                    printViaPrinter(data, jasperPrint);
-                } catch (Exception e) {
-                    BiobankPlugin.openAsyncError("Printing Error", "Error: "
-                        + e.toString() + "\n\n"
-                        + "Select a file location to export the printed page.");
-                    printViaFile(data, jasperPrint);
+                // if data is null : user cancled print.
+
+                if (data != null) {
+                    try {
+                        if (data.printToFile == true) {
+                            printViaFile(data, jasperPrint);
+                            // TODO Auto-generated catch block
+                        } else {
+                            try {
+                                printViaPrinter(data, jasperPrint);
+                            } catch (Exception e) {
+                                BiobankPlugin.openAsyncError(
+                                    "Printing Error",
+                                    "Error: "
+                                        + e.toString()
+                                        + "\n\n"
+                                        + "Select a file location to export the printed page.");
+                                printViaFile(data, jasperPrint);
+                            }
+                        }
+                    } catch (Exception e) {
+                        exception.setValue(e);
+                    }
                 }
             }
+        });
+
+        if (exception.getValue() != null) {
+            throw exception.getValue();
         }
     }
 }

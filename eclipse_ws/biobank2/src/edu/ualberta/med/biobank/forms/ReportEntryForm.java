@@ -662,9 +662,22 @@ public class ReportEntryForm extends BiobankEntryForm {
     private List<String> getComments(ReportWrapper report) {
         List<String> comments = new ArrayList<String>();
 
-        comments.add(report.getDescription());
+        if (report.getDescription() != null) {
+            comments.add(report.getDescription());
+        }
 
-        for (ReportFilter filter : report.getReportFilterCollection()) {
+        Report nakedReport = report.getWrappedObject();
+        List<ReportFilter> reportFilters = new ArrayList<ReportFilter>(
+            nakedReport.getReportFilterCollection());
+
+        Collections.sort(reportFilters, new Comparator<ReportFilter>() {
+            @Override
+            public int compare(ReportFilter lhs, ReportFilter rhs) {
+                return lhs.getPosition() - rhs.getPosition();
+            }
+        });
+
+        for (ReportFilter filter : reportFilters) {
             StringBuilder sb = new StringBuilder();
             sb.append(filter.getEntityFilter().getName());
 

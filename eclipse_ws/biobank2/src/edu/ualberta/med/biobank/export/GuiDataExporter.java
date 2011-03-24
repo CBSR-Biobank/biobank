@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.util.Holder;
 
 public abstract class GuiDataExporter implements DataExporter {
     private final String name;
@@ -74,30 +75,40 @@ public abstract class GuiDataExporter implements DataExporter {
      * @param exts
      * @return selected/ entered path
      */
-    public static String getPath(Data data, String[] exts) {
-        String path = null;
+    public static String getPath(Data data, final String[] exts) {
+        final Holder<String> path = new Holder<String>(null);
 
         if (exts != null) {
-            String defaultFilename = "output";
+            final Holder<String> defaultFilename = new Holder<String>("output");
 
             if (data.getTitle() != null) {
-                defaultFilename = data.getTitle().replaceAll(" ", "_");
+                defaultFilename.setValue(data.getTitle().replaceAll("[^\\w]",
+                    "_"));
             }
 
-            defaultFilename += "_" + DateFormatter.formatAsDate(new Date());
+            defaultFilename.setValue(defaultFilename.getValue()
+                + "_"
+                + DateFormatter.formatAsDate(new Date()).replaceAll("_{2,}",
+                    "_"));
 
-            Shell shell = Display.getDefault().getActiveShell();
-            if (shell != null) {
-                FileDialog fd = new FileDialog(shell, SWT.SAVE);
-                fd.setOverwrite(true);
-                fd.setText("Export as");
-                fd.setFilterExtensions(exts);
-                fd.setFileName(defaultFilename);
+            Display display = Display.getDefault();
+            display.syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    Shell shell = Display.getDefault().getActiveShell();
+                    if (shell != null) {
+                        FileDialog fd = new FileDialog(shell, SWT.SAVE);
+                        fd.setOverwrite(true);
+                        fd.setText("Export as");
+                        fd.setFilterExtensions(exts);
+                        fd.setFileName(defaultFilename.getValue());
 
-                path = fd.open();
-            }
+                        path.setValue(fd.open());
+                    }
+                }
+            });
         }
 
-        return path;
+        return path.getValue();
     }
 }
