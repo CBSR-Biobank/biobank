@@ -124,15 +124,15 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     private void createReceiverCombo(Composite client) {
         if (dispatch.isInTransitState()) {
             BiobankText receiverLabel = createReadOnlyLabelledField(client,
-                SWT.NONE, "Receiver Center");
+                SWT.NONE, "Receiver");
             setTextValue(receiverLabel, dispatch.getReceiverCenter()
                 .getNameShort());
         } else {
             try {
-                destSiteComboViewer = createComboViewer(client,
-                    "Receiver Site", CenterWrapper.getOtherCenters(appService,
-                        SessionManager.getUser().getCurrentWorkingCenter()),
-                    null, "Dispatch must have an associated study",
+                destSiteComboViewer = createComboViewer(client, "Receiver",
+                    CenterWrapper.getOtherCenters(appService, SessionManager
+                        .getUser().getCurrentWorkingCenter()), null,
+                    "Dispatch must have a receiver",
                     new ComboSelectionUpdate() {
                         @Override
                         public void doSelection(Object selectedObject) {

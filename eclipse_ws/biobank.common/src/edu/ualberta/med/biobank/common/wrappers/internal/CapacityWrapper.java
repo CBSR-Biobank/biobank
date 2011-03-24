@@ -1,10 +1,8 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.CapacityBaseWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class CapacityWrapper extends CapacityBaseWrapper {
@@ -24,12 +22,6 @@ public class CapacityWrapper extends CapacityBaseWrapper {
 
     public void setCol(Integer colCapacity) {
         setColCapacity(colCapacity);
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
-        // do nothing
     }
 
     @Override

@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
  *
  *  BioBank2 MySQL upgrade script for model version 1.3.1 to 1.4.0
- *FK28D36ACF2A2464F
+ *
  *----------------------------------------------------------------------------*/
 
 
@@ -136,12 +136,15 @@ activity_status_id,original_collection_event_id,pv_id)
 
 -- add a source specimen for each patient visit
 --
--- if the pvsv.time_drawn is null the specimen created at time is the date from pv.date_drawn,
--- if the pvsv.time_drawn is not null specimen created at time is the date from pv.date_drawn
--- plus the time from pvsv.time_drawn
+-- if the pvsv.time_drawn is null the specimen created at time is the date from
+-- pv.date_drawn,
+--
+-- if the pvsv.time_drawn is not null specimen created at time is the date from
+-- pv.date_drawn plus the time from pvsv.time_drawn
 
-INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,collection_event_id,
-original_collection_event_id,specimen_type_id,parent_specimen_id,origin_info_id,pv_id,pv_sv_id)
+INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,
+       collection_event_id,original_collection_event_id,specimen_type_id,
+       parent_specimen_id,origin_info_id,pv_id,pv_sv_id)
        SELECT concat("sw upgrade ",pvsv.id),volume,
        if(pvsv.time_drawn is null,pv.date_drawn,
                addtime(timestamp(date(pv.date_drawn)), time(pvsv.time_drawn))),
@@ -268,20 +271,23 @@ CREATE TABLE dispatch (
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-INSERT INTO shipment_info (aship_id,received_at,sent_at,waybill,box_number,shipping_method_id)
-SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id FROM abstract_shipment
-WHERE discriminator='DispatchShipment';
+INSERT INTO shipment_info (aship_id,received_at,sent_at,waybill,box_number,
+       shipping_method_id)
+       SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id
+       FROM abstract_shipment
+       WHERE discriminator='DispatchShipment';
 
-INSERT INTO dispatch (sender_center_id,receiver_center_id,state,comment,shipment_info_id,aship_id)
-SELECT sender_center.id,receiver_center.id,state,abstract_shipment.comment,
-shipment_info.id,abstract_shipment.id
-	FROM abstract_shipment
-        JOIN site as sender_site on sender_site.id=abstract_shipment.dispatch_sender_id
-        JOIN center as sender_center on sender_center.name=sender_site.name
-        JOIN site as receiver_site on receiver_site.id=abstract_shipment.dispatch_receiver_id
-        JOIN center as receiver_center on receiver_center.name=receiver_site.name
-	JOIN shipment_info on shipment_info.aship_id=abstract_shipment.id
-        WHERE abstract_shipment.discriminator='DispatchShipment';
+INSERT INTO dispatch (sender_center_id,receiver_center_id,state,comment,shipment_info_id,
+       aship_id)
+       SELECT sender_center.id,receiver_center.id,state,abstract_shipment.comment,
+       shipment_info.id,abstract_shipment.id
+       FROM abstract_shipment
+       JOIN site as sender_site on sender_site.id=abstract_shipment.dispatch_sender_id
+       JOIN center as sender_center on sender_center.name=sender_site.name
+       JOIN site as receiver_site on receiver_site.id=abstract_shipment.dispatch_receiver_id
+       JOIN center as receiver_center on receiver_center.name=receiver_site.name
+       JOIN shipment_info on shipment_info.aship_id=abstract_shipment.id
+       WHERE abstract_shipment.discriminator='DispatchShipment';
 
 CREATE TABLE dispatch_specimen (
     ID INT(11) NOT NULL auto_increment,
@@ -384,18 +390,31 @@ CREATE TABLE collection_event (
     PATIENT_ID INT(11) NOT NULL,
     ACTIVITY_STATUS_ID INT(11) NOT NULL,
     PV_ID INT(11) NOT NULL,
+    PV_DATE_DRAWN datetime NOT NULL,
     INDEX FKEDAD8999C449A4 (ACTIVITY_STATUS_ID),
     INDEX FKEDAD8999B563F38F (PATIENT_ID),
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-INSERT INTO collection_event (visit_number,comment,patient_id,activity_status_id,pv_id)
+INSERT INTO collection_event (visit_number,comment,patient_id,activity_status_id,pv_id,
+       pv_date_drawn)
        SELECT -1,pv.comment,csp.patient_id,
-       (select id from activity_status where name='Active'),pv.id
+       (select id from activity_status where name='Active'),pv.id,pv.date_drawn
        FROM patient_visit as pv
        join clinic_shipment_patient as csp on csp.id=pv.CLINIC_SHIPMENT_PATIENT_ID;
 
 create index pv_id_idx on collection_event(pv_id);
+
+-- number the collection event 'visit number' according the patient visit 'date drawn'
+-- in chronological order
+
+select @pp = null;
+select @pv = null;
+
+update collection_event ce
+       set ce.visit_number = if(@pp <> ce.patient_id or @pp is null,
+           if(@pp := ce.patient_id, @pv := 1, @pv := 1), @pv := @pv + 1)
+       order by patient_id, pv_date_drawn;
 
 -- set specimen.original_collection_event_id for source specimens
 
@@ -409,7 +428,9 @@ update specimen,collection_event as ce
        set specimen.collection_event_id=ce.id,specimen.original_collection_event_id=null
        where ce.pv_id=specimen.pv_id and specimen.pv_sv_id is null;
 
-ALTER TABLE collection_event MODIFY COLUMN ID INT(11) NOT NULL;
+ALTER TABLE collection_event
+      MODIFY COLUMN ID INT(11) NOT NULL,
+      drop column PV_DATE_DRAWN;
 
 /*****************************************************
  *  EVENT ATTRIBUTES

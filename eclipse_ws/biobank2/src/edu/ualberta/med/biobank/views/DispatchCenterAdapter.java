@@ -8,36 +8,36 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.dispatch.IncomingNode;
 import edu.ualberta.med.biobank.treeview.dispatch.OutgoingNode;
 
-public class DispatchSiteAdapter extends AdapterBase {
+public class DispatchCenterAdapter extends AdapterBase {
 
     private OutgoingNode out;
     private IncomingNode inc;
 
-    public DispatchSiteAdapter(AdapterBase parent, SiteWrapper site) {
-        super(parent, site, false);
-        out = new OutgoingNode(this, 0, site);
+    public DispatchCenterAdapter(AdapterBase parent, CenterWrapper<?> center) {
+        super(parent, center, false);
+        out = new OutgoingNode(this, 0, center);
         out.setParent(this);
         this.addChild(out);
 
-        inc = new IncomingNode(this, 1, site);
+        inc = new IncomingNode(this, 1, center);
         inc.setParent(this);
         this.addChild(inc);
     }
 
-    public SiteWrapper getWrapper() {
-        return (SiteWrapper) modelObject;
+    public CenterWrapper<?> getWrapper() {
+        return (CenterWrapper<?>) modelObject;
     }
 
     @Override
     protected String getLabelInternal() {
-        SiteWrapper site = getWrapper();
+        CenterWrapper<?> site = getWrapper();
         Assert.isNotNull(site, "site is null");
         return site.getNameShort();
     }

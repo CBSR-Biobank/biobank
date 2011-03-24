@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.internal;
 
 import java.util.Arrays;
 
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
@@ -14,16 +15,18 @@ public class CollectionEventHelper extends DbHelper {
 
     public static CollectionEventWrapper newCollectionEvent(
         CenterWrapper<?> center, PatientWrapper patient, int visitNumber,
-        OriginInfoWrapper oi, SpecimenWrapper... spcs) throws Exception {
+        OriginInfoWrapper oi, SpecimenWrapper... originSpecimens) throws Exception {
         CollectionEventWrapper cevent = new CollectionEventWrapper(appService);
         cevent.setPatient(patient);
         cevent.setVisitNumber(visitNumber);
-
-        if ((spcs != null) && (spcs.length != 0)) {
-            cevent.addToOriginalSpecimenCollection(Arrays.asList(spcs));
-            for (SpecimenWrapper spc : spcs) {
+        cevent.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
+        if ((originSpecimens != null) && (originSpecimens.length != 0)) {
+            cevent.addToOriginalSpecimenCollection(Arrays.asList(originSpecimens));
+            for (SpecimenWrapper spc : originSpecimens) {
                 spc.setOriginInfo(oi);
                 spc.setCollectionEvent(cevent);
+                spc.setOriginalCollectionEvent(cevent);
                 spc.setCurrentCenter(center);
             }
         }
@@ -32,9 +35,10 @@ public class CollectionEventHelper extends DbHelper {
 
     public static CollectionEventWrapper addCollectionEvent(
         CenterWrapper<?> center, PatientWrapper patient, int visitNumber,
-        OriginInfoWrapper oi, SpecimenWrapper... svs) throws Exception {
+        OriginInfoWrapper oi, SpecimenWrapper... originSpecimens)
+        throws Exception {
         CollectionEventWrapper ce = newCollectionEvent(center, patient,
-            visitNumber, oi, svs);
+            visitNumber, oi, originSpecimens);
         ce.persist();
         return ce;
     }
@@ -45,13 +49,13 @@ public class CollectionEventHelper extends DbHelper {
         study.persist();
 
         PatientWrapper patient = PatientHelper.addPatient(name, study);
-        SpecimenWrapper sv = SpecimenHelper.newSpecimen(SpecimenTypeWrapper
+        SpecimenWrapper originSpecimen = SpecimenHelper.newSpecimen(SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, false).get(0));
 
         OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
         originInfo.setCenter(center);
         originInfo.persist();
-        return addCollectionEvent(center, patient, 1, originInfo, sv);
+        return addCollectionEvent(center, patient, 1, originInfo, originSpecimen);
     }
 
 }

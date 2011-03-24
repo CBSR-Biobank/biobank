@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -114,15 +115,15 @@ public class PatientWrapper extends PatientBaseWrapper {
     protected void deleteChecks() throws BiobankException, ApplicationException {
         checkNoMoreCollectionEvents();
         if (getAllSpecimensCount(false) > 0)
-            throw new BiobankCheckException("Unable to delete patient "
+            throw new BiobankDeleteException("Unable to delete patient "
                 + getPnumber()
                 + " because patient has specimens stored in database.");
     }
 
-    private void checkNoMoreCollectionEvents() throws BiobankCheckException {
+    private void checkNoMoreCollectionEvents() throws BiobankDeleteException {
         List<CollectionEventWrapper> pvs = getCollectionEventCollection(false);
         if (pvs != null && !pvs.isEmpty()) {
-            throw new BiobankCheckException(
+            throw new BiobankDeleteException(
                 "Processing events are still linked to this patient."
                     + " Delete them before attempting to remove the patient.");
         }
@@ -136,8 +137,8 @@ public class PatientWrapper extends PatientBaseWrapper {
         + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
         + "=?";
 
-    public long getAllSpecimensCount(boolean fast) throws BiobankException,
-        ApplicationException {
+    public long getAllSpecimensCount(boolean fast) throws ApplicationException,
+        BiobankException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(ALL_SPECIMEN_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
@@ -339,12 +340,39 @@ public class PatientWrapper extends PatientBaseWrapper {
         if (getStudy().equals(patient2.getStudy())) {
             List<CollectionEventWrapper> cevents = patient2
                 .getCollectionEventCollection(false);
+
             if (!cevents.isEmpty()) {
                 patient2.removeFromCollectionEventCollection(cevents);
-                addToCollectionEventCollection(cevents);
-                for (CollectionEventWrapper cevent : cevents) {
-                    cevent.setPatient(this);
-                    cevent.persist();
+                Set<CollectionEventWrapper> toAdd = new HashSet<CollectionEventWrapper>();
+                List<CollectionEventWrapper> toDelete = new ArrayList<CollectionEventWrapper>();
+                boolean merged = false;
+                for (CollectionEventWrapper p2event : cevents) {
+                    for (CollectionEventWrapper p1event : getCollectionEventCollection(false))
+                        if (p1event.getVisitNumber().equals(
+                            p2event.getVisitNumber())) {
+                            p1event.addToOriginalSpecimenCollection(p2event
+                                .getOriginalSpecimenCollection(false));
+                            p1event.addToAllSpecimenCollection(p2event
+                                .getAllSpecimenCollection(false));
+                            for (SpecimenWrapper spec : p2event
+                                .getAllSpecimenCollection(false))
+                                spec.setCollectionEvent(p1event);
+                            toDelete.add(p2event);
+                            p1event.persist();
+                            merged = true;
+                        }
+                    if (!merged)
+                        toAdd.add(p2event);
+                    merged = false;
+                }
+
+                for (CollectionEventWrapper addMe : toAdd) {
+                    addMe.setPatient(this);
+                    addMe.persist();
+                }
+                for (CollectionEventWrapper deleteMe : toDelete) {
+                    deleteMe.persist();
+                    deleteMe.delete();
                 }
                 patient2.delete();
                 persist();

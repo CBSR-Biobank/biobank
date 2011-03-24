@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.wrappers.base.ContactBaseWrapper;
 import edu.ualberta.med.biobank.model.Contact;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -30,10 +30,10 @@ public class ContactWrapper extends ContactBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
+    protected void deleteChecks() throws BiobankDeleteException,
         ApplicationException {
         if (!deleteAllowed()) {
-            throw new BiobankCheckException("Unable to delete contact "
+            throw new BiobankDeleteException("Unable to delete contact "
                 + getName() + ". No more study reference should exist.");
         }
     }

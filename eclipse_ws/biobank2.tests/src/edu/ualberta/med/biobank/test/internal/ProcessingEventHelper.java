@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.internal;
 
 import java.util.Date;
 
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
@@ -21,6 +22,8 @@ public class ProcessingEventHelper extends DbHelper {
         ProcessingEventWrapper pevent = new ProcessingEventWrapper(appService);
         pevent.setCenter(center);
         pevent.setCreatedAt(createdAt);
+        pevent.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
         return pevent;
     }
 

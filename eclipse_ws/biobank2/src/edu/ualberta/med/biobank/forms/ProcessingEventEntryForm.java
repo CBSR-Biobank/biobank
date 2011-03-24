@@ -61,7 +61,11 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         pEventAdapter = (ProcessingEventAdapter) adapter;
-        pEvent = pEventAdapter.getWrapper();
+        if (pEventAdapter.getWrapper().isNew())
+            pEvent = pEventAdapter.getWrapper();
+        else
+            pEvent = (ProcessingEventWrapper) pEventAdapter.getWrapper()
+                .getDatabaseClone();
         retrieve();
         String tabName;
         if (pEvent.isNew()) {

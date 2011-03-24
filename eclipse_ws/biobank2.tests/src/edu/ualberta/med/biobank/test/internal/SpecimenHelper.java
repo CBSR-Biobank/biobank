@@ -1,83 +1,97 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import java.util.Date;
 import java.util.Random;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
 public class SpecimenHelper extends DbHelper {
 
     public static SpecimenWrapper newSpecimen(SpecimenTypeWrapper specimenType,
-        String activityStatus) throws Exception {
-        SpecimenWrapper Specimen = new SpecimenWrapper(appService);
-        Specimen.setSpecimenType(specimenType);
-        Specimen.setInventoryId(TestCommon.getNewInventoryId(new Random()));
+        String activityStatus, Date createdAt) throws Exception {
+        SpecimenWrapper specimen = new SpecimenWrapper(appService);
+        specimen.setSpecimenType(specimenType);
+        specimen.setInventoryId(TestCommon.getNewInventoryId(new Random()));
         if (activityStatus != null) {
-            Specimen.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            specimen.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
                 appService, activityStatus));
         }
-        return Specimen;
+        specimen.setCreatedAt(createdAt);
+        return specimen;
     }
 
     public static SpecimenWrapper newSpecimen(SpecimenTypeWrapper specimenType)
         throws Exception {
         return newSpecimen(specimenType,
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, Utils.getRandomDate());
     }
 
     public static SpecimenWrapper newSpecimen(String specimenTypeName)
         throws Exception {
-        return newSpecimen(
-            SpecimenTypeHelper.addSpecimenType(specimenTypeName),
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        return newSpecimen(SpecimenTypeHelper.addSpecimenType(specimenTypeName));
     }
 
     public static SpecimenWrapper newSpecimen(SpecimenTypeWrapper specimenType,
         String activityStatus, ContainerWrapper container,
-        CollectionEventWrapper cevent, Integer row, Integer col)
-        throws Exception {
-        SpecimenWrapper Specimen = newSpecimen(specimenType, activityStatus);
+        CollectionEventWrapper cevent, Integer row, Integer col,
+        OriginInfoWrapper oi) throws Exception {
+        SpecimenWrapper specimen = newSpecimen(specimenType, activityStatus,
+            Utils.getRandomDate());
         if (container != null) {
-            Specimen.setParent(container);
+            specimen.setParent(container);
         }
-        Specimen.setCollectionEvent(cevent);
+        specimen.setCollectionEvent(cevent);
         if ((row != null) && (col != null)) {
-            Specimen.setPosition(new RowColPos(row, col));
+            specimen.setPosition(new RowColPos(row, col));
         }
-        return Specimen;
+        specimen.setOriginInfo(oi);
+        return specimen;
     }
 
     public static SpecimenWrapper newSpecimen(SpecimenTypeWrapper specimenType,
         ContainerWrapper container, CollectionEventWrapper cevent, Integer row,
-        Integer col) throws Exception {
+        Integer col, OriginInfoWrapper oi) throws Exception {
         return newSpecimen(specimenType,
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, cevent, row,
-            col);
+            col, oi);
     }
 
     public static SpecimenWrapper addSpecimen(SpecimenTypeWrapper specimenType,
         String activityStatus, ContainerWrapper container,
-        CollectionEventWrapper cevent, Integer row, Integer col)
-        throws Exception {
-        SpecimenWrapper Specimen = newSpecimen(specimenType, activityStatus,
-            container, cevent, row, col);
-        Specimen.persist();
-        return Specimen;
+        CollectionEventWrapper cevent, Integer row, Integer col,
+        OriginInfoWrapper oi) throws Exception {
+        SpecimenWrapper specimen = newSpecimen(specimenType, activityStatus,
+            container, cevent, row, col, oi);
+        specimen.persist();
+        return specimen;
     }
 
     public static SpecimenWrapper addSpecimen(SpecimenTypeWrapper specimenType,
         ContainerWrapper container, CollectionEventWrapper cevent, Integer row,
-        Integer col) throws Exception {
-        SpecimenWrapper Specimen = addSpecimen(specimenType,
+        Integer col, OriginInfoWrapper oi) throws Exception {
+        SpecimenWrapper specimen = addSpecimen(specimenType,
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, cevent, row,
-            col);
+            col, oi);
         if (container != null)
             container.reload();
-        return Specimen;
+        return specimen;
+    }
+
+    public static SpecimenWrapper addSpecimen(SpecimenTypeWrapper specimenType,
+        ContainerWrapper container, CollectionEventWrapper cevent, Integer row,
+        Integer col, CenterWrapper<?> center) throws Exception {
+        OriginInfoWrapper oi = new OriginInfoWrapper(appService);
+        oi.setCenter(center);
+        oi.persist();
+        return addSpecimen(specimenType, container, cevent, row, col, oi);
     }
 }

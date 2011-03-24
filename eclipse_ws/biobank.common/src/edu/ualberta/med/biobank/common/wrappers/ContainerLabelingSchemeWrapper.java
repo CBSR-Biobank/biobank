@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerLabelingSchemeBaseWrapper;
@@ -48,10 +49,10 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
+    protected void deleteChecks() throws BiobankDeleteException,
         ApplicationException {
         if (hasContainerTypes()) {
-            throw new BiobankCheckException(
+            throw new BiobankDeleteException(
                 "Can't delete this ContainerLabelingScheme: container types are using it.");
         }
     }

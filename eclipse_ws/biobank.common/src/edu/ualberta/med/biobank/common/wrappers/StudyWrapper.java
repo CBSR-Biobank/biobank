@@ -12,6 +12,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
@@ -52,7 +53,7 @@ public class StudyWrapper extends StudyBaseWrapper {
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
         if (hasPatients()) {
-            throw new BiobankCheckException("Unable to delete study "
+            throw new BiobankDeleteException("Unable to delete study "
                 + getName() + ". All defined patients must be removed first.");
         }
     }
@@ -342,7 +343,8 @@ public class StudyWrapper extends StudyBaseWrapper {
         + " as patient where study."
         + StudyPeer.ID.getName() + " = ?";
 
-    public boolean hasPatients() throws ApplicationException, BiobankException {
+    public boolean hasPatients() throws ApplicationException,
+        BiobankQueryResultSizeException {
         HQLCriteria criteria = new HQLCriteria(HAS_PATIENTS_QRY,
             Arrays.asList(new Object[] { getId() }));
         return getCountResult(appService, criteria) > 0;

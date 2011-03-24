@@ -88,8 +88,10 @@ public class StudyEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         studyAdapter = (StudyAdapter) adapter;
-        study = studyAdapter.getWrapper();
-        study.reload();
+        if (studyAdapter.getWrapper().isNew())
+            study = studyAdapter.getWrapper();
+        else
+            study = (StudyWrapper) studyAdapter.getWrapper().getDatabaseClone();
 
         String tabName;
         if (study.isNew()) {

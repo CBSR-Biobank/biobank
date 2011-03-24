@@ -63,12 +63,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
-        site = siteAdapter.getWrapper();
-        try {
-            site.reload();
-        } catch (Exception e) {
-            logger.error("Can't reload site", e); //$NON-NLS-1$
-        }
+        if (siteAdapter.getWrapper().isNew())
+            site = siteAdapter.getWrapper();
+        else
+            site = (SiteWrapper) siteAdapter.getWrapper().getDatabaseClone();
 
         String tabName;
         if (site.isNew()) {
@@ -106,16 +104,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        setFirstControl(createBoundWidgetWithLabel(
-            client,
-            BiobankText.class,
-            SWT.NONE,
-            Messages.getString("label.name"), //$NON-NLS-1$
-            null,
-            site,
-            SitePeer.NAME.getName(),
-            new NonEmptyStringValidator(Messages
-                .getString("SiteEntryForm.field.name.validation.msg")))); //$NON-NLS-1$
+        setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
+            SWT.NONE, Messages.getString("label.name"), //$NON-NLS-1$
+            null, site, SitePeer.NAME.getName(), new NonEmptyStringValidator(
+                Messages.getString("SiteEntryForm.field.name.validation.msg")))); //$NON-NLS-1$
 
         createBoundWidgetWithLabel(
             client,
@@ -128,7 +120,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             new NonEmptyStringValidator(Messages
                 .getString("SiteEntryForm.field.nameShort.validation.msg"))); //$NON-NLS-1$
 
-        activityStatusComboViewer = createComboViewer(client,
+        activityStatusComboViewer = createComboViewer(
+            client,
             Messages.getString("label.activity"), //$NON-NLS-1$
             ActivityStatusWrapper.getAllActivityStatuses(appService),
             site.getActivityStatus(),

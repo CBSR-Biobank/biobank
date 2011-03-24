@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -18,12 +17,10 @@ import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RequestState;
@@ -70,12 +67,12 @@ public class SiteWrapper extends SiteBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
+    protected void deleteChecks() throws BiobankDeleteException,
         ApplicationException {
         if (!getContainerCollection(false).isEmpty()
             || !getContainerTypeCollection(false).isEmpty()
             || !getProcessingEventCollection(false).isEmpty()) {
-            throw new BiobankCheckException(
+            throw new BiobankDeleteException(
                 "Unable to delete site "
                     + getName()
                     + ". All defined children (processing events, container types, and containers) must be removed first.");
@@ -183,40 +180,6 @@ public class SiteWrapper extends SiteBaseWrapper {
         return 0;
     }
 
-    private static final String PATIENT_COUNT_QRY = "select count(distinct patients) from "
-        + Site.class.getName()
-        + " as site join site."
-        + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as pevent join pevent."
-        + ProcessingEventPeer.SPECIMEN_COLLECTION.getName()
-        + " as spcs join spcs."
-        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-            CollectionEventPeer.PATIENT)
-        + " as patients where site."
-        + SitePeer.ID.getName() + "=?";
-
-    public Long getPatientCount() throws Exception {
-        HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
-            Arrays.asList(new Object[] { getId() }));
-        return getCountResult(appService, criteria);
-    }
-
-    private static final String CHILD_SPECIMENS_COUNT_QRY = "select count(childSpcs) from "
-        + Site.class.getName()
-        + " site left join site."
-        + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as pevent join pevent."
-        + ProcessingEventPeer.SPECIMEN_COLLECTION.getName()
-        + " as parentSpc join parentSpc."
-        + SpecimenPeer.CHILD_SPECIMEN_COLLECTION.getName()
-        + " as childSpcs where site." + SitePeer.ID.getName() + "=?";
-
-    public Long getAliquotedSpecimenCount() throws Exception {
-        HQLCriteria criteria = new HQLCriteria(CHILD_SPECIMENS_COUNT_QRY,
-            Arrays.asList(new Object[] { getId() }));
-        return getCountResult(appService, criteria);
-    }
-
     /**
      * get all site existing
      */
@@ -255,114 +218,8 @@ public class SiteWrapper extends SiteBaseWrapper {
         return getName();
     }
 
-    @SuppressWarnings("unchecked")
-    public List<DispatchWrapper> getInTransitSentDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("inTransitSentDispatchCollection");
-        if (shipCollection == null) {
-            List<DispatchWrapper> children = getSrcDispatchCollection(false);
-            if (children != null) {
-                shipCollection = new ArrayList<DispatchWrapper>();
-                for (DispatchWrapper dispatch : children) {
-                    if (DispatchState.IN_TRANSIT.equals(dispatch
-                        .getDispatchState())) {
-                        shipCollection.add(dispatch);
-                    }
-                }
-                propertiesMap.put("inTransitSentDispatchCollection",
-                    shipCollection);
-            }
-        }
-        return shipCollection;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<DispatchWrapper> getInTransitReceiveDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("inTransitReceiveDispatchCollection");
-        if (shipCollection == null) {
-            List<DispatchWrapper> children = getDstDispatchCollection(false);
-            if (children != null) {
-                shipCollection = new ArrayList<DispatchWrapper>();
-                for (DispatchWrapper dispatch : children) {
-                    if (DispatchState.IN_TRANSIT.equals(dispatch
-                        .getDispatchState())) {
-                        shipCollection.add(dispatch);
-                    }
-                }
-                propertiesMap.put("inTransitReceiveDispatchCollection",
-                    shipCollection);
-            }
-        }
-        return shipCollection;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<DispatchWrapper> getReceivingNoErrorsDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("receivingDispatchCollection");
-        if (shipCollection == null) {
-            List<DispatchWrapper> children = getDstDispatchCollection(false);
-            if (children != null) {
-                shipCollection = new ArrayList<DispatchWrapper>();
-                for (DispatchWrapper dispatch : children) {
-                    if (DispatchState.RECEIVED.equals(dispatch
-                        .getDispatchState()) && !dispatch.hasErrors()) {
-                        shipCollection.add(dispatch);
-                    }
-                }
-                propertiesMap
-                    .put("receivingDispatchCollection", shipCollection);
-            }
-        }
-        return shipCollection;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<DispatchWrapper> getReceivingWithErrorsDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("receivingWithErrorsDispatchCollection");
-        if (shipCollection == null) {
-            List<DispatchWrapper> children = getDstDispatchCollection(false);
-            if (children != null) {
-                shipCollection = new ArrayList<DispatchWrapper>();
-                for (DispatchWrapper dispatch : children) {
-                    if (DispatchState.RECEIVED.equals(dispatch
-                        .getDispatchState()) && dispatch.hasErrors()) {
-                        shipCollection.add(dispatch);
-                    }
-                }
-                propertiesMap.put("receivingWithErrorsDispatchCollection",
-                    shipCollection);
-            }
-        }
-        return shipCollection;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<DispatchWrapper> getInCreationDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("inCreationDispatchCollection");
-        if (shipCollection == null) {
-            List<DispatchWrapper> children = getSrcDispatchCollection(false);
-            if (children != null) {
-                shipCollection = new ArrayList<DispatchWrapper>();
-                for (DispatchWrapper dispatch : children) {
-                    if (DispatchState.CREATION.equals(dispatch
-                        .getDispatchState())) {
-                        shipCollection.add(dispatch);
-                    }
-                }
-                propertiesMap.put("inCreationDispatchCollection",
-                    shipCollection);
-            }
-        }
-        return shipCollection;
-    }
-
     @Override
     public void reload() {
-        propertiesMap.clear();
         try {
             super.reload();
         } catch (Exception e) {
@@ -413,53 +270,8 @@ public class SiteWrapper extends SiteBaseWrapper {
         return user.isSuperAdministrator();
     }
 
-    public static Collection<? extends ModelWrapper<?>> getInTransitReceiveDispatchCollection(
-        SiteWrapper site) {
-        return site.getInTransitReceiveDispatchCollection();
-    }
-
-    public static Collection<? extends ModelWrapper<?>> getReceivingNoErrorsDispatchCollection(
-        SiteWrapper site) {
-        return site.getReceivingNoErrorsDispatchCollection();
-    }
-
-    public static Collection<? extends ModelWrapper<?>> getInCreationDispatchCollection(
-        SiteWrapper site) {
-        return site.getInCreationDispatchCollection();
-    }
-
-    public static Collection<? extends ModelWrapper<?>> getReceivingWithErrorsDispatchCollection(
-        SiteWrapper site) {
-        return site.getReceivingWithErrorsDispatchCollection();
-    }
-
-    public static Collection<? extends ModelWrapper<?>> getInTransitSentDispatchCollection(
-        SiteWrapper site) {
-        return site.getInTransitSentDispatchCollection();
-    }
-
     public List<StudyWrapper> getStudyCollection() {
         return getStudyCollection(false);
-    }
-
-    public static final String COLLECTION_EVENT_COUNT_QRY = "select count(cevent) from "
-        + Site.class.getName()
-        + " as site join site."
-        + SitePeer.SPECIMEN_COLLECTION.getName()
-        + " as spcs join spcs."
-        + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cevent where site."
-        + SitePeer.ID.getName() + "=?";
-
-    /**
-     * Count events for specimen that are currently at this site
-     */
-    @Override
-    public long getCollectionEventCount() throws ApplicationException,
-        BiobankException {
-        HQLCriteria criteria = new HQLCriteria(COLLECTION_EVENT_COUNT_QRY,
-            Arrays.asList(new Object[] { getId() }));
-        return getCountResult(appService, criteria);
     }
 
     private static final String COLLECTION_EVENT_COUNT_FOR_STUDY_QRY = "select count(distinct cEvent) from "

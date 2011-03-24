@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview.dispatch;
 
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -43,7 +44,10 @@ public class OriginInfoSearchedNode extends AbstractSearchedNode {
 
     @Override
     public List<AdapterBase> search(Object searchedObject) {
-        return searchChildren(searchedObject);
+        if (searchedObject instanceof Date)
+            return findChildFromClass(searchedObject, Date.class);
+        else
+            return searchChildren(searchedObject);
     }
 
     @Override
