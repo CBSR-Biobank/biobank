@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
@@ -181,40 +180,6 @@ public class SiteWrapper extends SiteBaseWrapper {
         return 0;
     }
 
-    private static final String PATIENT_COUNT_QRY = "select count(distinct patients) from "
-        + Site.class.getName()
-        + " as site join site."
-        + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as pevent join pevent."
-        + ProcessingEventPeer.SPECIMEN_COLLECTION.getName()
-        + " as spcs join spcs."
-        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-            CollectionEventPeer.PATIENT)
-        + " as patients where site."
-        + SitePeer.ID.getName() + "=?";
-
-    public Long getPatientCount() throws Exception {
-        HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
-            Arrays.asList(new Object[] { getId() }));
-        return getCountResult(appService, criteria);
-    }
-
-    private static final String CHILD_SPECIMENS_COUNT_QRY = "select count(childSpcs) from "
-        + Site.class.getName()
-        + " site left join site."
-        + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as pevent join pevent."
-        + ProcessingEventPeer.SPECIMEN_COLLECTION.getName()
-        + " as parentSpc join parentSpc."
-        + SpecimenPeer.CHILD_SPECIMEN_COLLECTION.getName()
-        + " as childSpcs where site." + SitePeer.ID.getName() + "=?";
-
-    public Long getAliquotedSpecimenCount() throws Exception {
-        HQLCriteria criteria = new HQLCriteria(CHILD_SPECIMENS_COUNT_QRY,
-            Arrays.asList(new Object[] { getId() }));
-        return getCountResult(appService, criteria);
-    }
-
     /**
      * get all site existing
      */
@@ -307,26 +272,6 @@ public class SiteWrapper extends SiteBaseWrapper {
 
     public List<StudyWrapper> getStudyCollection() {
         return getStudyCollection(false);
-    }
-
-    public static final String COLLECTION_EVENT_COUNT_QRY = "select count(cevent) from "
-        + Site.class.getName()
-        + " as site join site."
-        + SitePeer.SPECIMEN_COLLECTION.getName()
-        + " as spcs join spcs."
-        + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cevent where site."
-        + SitePeer.ID.getName() + "=?";
-
-    /**
-     * Count events for specimen that are currently at this site
-     */
-    @Override
-    public long getCollectionEventCount() throws ApplicationException,
-        BiobankException {
-        HQLCriteria criteria = new HQLCriteria(COLLECTION_EVENT_COUNT_QRY,
-            Arrays.asList(new Object[] { getId() }));
-        return getCountResult(appService, criteria);
     }
 
     private static final String COLLECTION_EVENT_COUNT_FOR_STUDY_QRY = "select count(distinct cEvent) from "
