@@ -25,7 +25,6 @@ import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -703,17 +702,18 @@ public abstract class AdapterBase {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        if (modelObject != null) {
-                            getParent().removeChild(AdapterBase.this);
-                            getParent().notifyListeners();
+                    // the order is very important
+                    if (modelObject != null) {
+                        getParent().removeChild(AdapterBase.this);
+                        try {
                             modelObject.delete();
-                            notifyListeners();
+                        } catch (Exception e) {
+                            BiobankPlugin.openAsyncError("Delete failed", e);
+                            getParent().addChild(AdapterBase.this);
+                            return;
                         }
-                    } catch (BiobankCheckException bce) {
-                        BiobankPlugin.openAsyncError("Delete failed", bce);
-                    } catch (Exception e) {
-                        BiobankPlugin.openAsyncError("Delete failed", e);
+                        getParent().notifyListeners();
+                        notifyListeners();
                     }
                 }
             });
