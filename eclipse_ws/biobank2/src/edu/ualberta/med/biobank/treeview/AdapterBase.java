@@ -704,9 +704,14 @@ public abstract class AdapterBase {
                 public void run() {
                     // the order is very important
                     if (modelObject != null) {
-                        getParent().removeChild(AdapterBase.this);
+                        IWorkbenchPage page = PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage();
+                        IEditorPart part = page.findEditor(new FormInput(
+                            AdapterBase.this));
+                        getParent().removeChild(AdapterBase.this, false);
                         try {
                             modelObject.delete();
+                            page.closeEditor(part, true);
                         } catch (Exception e) {
                             BiobankPlugin.openAsyncError("Delete failed", e);
                             getParent().addChild(AdapterBase.this);
