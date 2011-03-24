@@ -1714,9 +1714,9 @@
             name="Reports Editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.ShippingMethodEntryForm"
+            class="edu.ualberta.med.biobank.forms.ShippingMethodViewForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.ShippingMethodEntryForm"
+            id="edu.ualberta.med.biobank.forms.ShippingMethodViewForm"
             name="Shipping Method Entry">
       </editor>
       <editor
@@ -1874,10 +1874,10 @@
             name="Aliquot Study Count">
             </editor>
 <editor
-            class="edu.ualberta.med.biobank.forms.ActivityStatusEntryForm"
+            class="edu.ualberta.med.biobank.forms.ActivityStatusViewForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.ActivityStatusMethodEntryForm"
-            name="Activity StatusMethod Entry">
+            id="edu.ualberta.med.biobank.forms.ActivityStatusViewForm"
+            name="Activity Status Entry">
       </editor>
 <editor
       class="edu.ualberta.med.biobank.forms.reports.ContainerCapacityEditor"

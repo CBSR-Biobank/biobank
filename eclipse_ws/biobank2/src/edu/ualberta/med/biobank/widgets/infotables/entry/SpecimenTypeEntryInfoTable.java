@@ -89,9 +89,11 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
                 reloadCollection(selectedSpecimenTypes);
                 return true;
             } else {
-                SpecimenTypeWrapper orig = dlg.getOrigSpecimenType();
-                specimenType.setName(orig.getName());
-                specimenType.setNameShort(orig.getNameShort());
+                try {
+                    specimenType.reload();
+                } catch (Exception e) {
+                    BiobankPlugin.openAsyncError("Refresh Failed", e);
+                }
                 reloadCollection(selectedSpecimenTypes);
             }
         }
