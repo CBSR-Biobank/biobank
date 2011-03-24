@@ -1,8 +1,11 @@
 package edu.ualberta.med.biobank.reporting;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +13,7 @@ import javax.print.DocFlavor;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 
+import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporter;
 import net.sf.jasperreports.engine.JRExporterParameter;
@@ -25,15 +29,27 @@ import net.sf.jasperreports.engine.export.JRPrintServiceExporter;
 import net.sf.jasperreports.engine.export.JRPrintServiceExporterParameter;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.printing.PrintDialog;
 import org.eclipse.swt.printing.PrinterData;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
+import ar.com.fdvs.dj.core.DynamicJasperHelper;
+import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
+import ar.com.fdvs.dj.domain.AutoText;
+import ar.com.fdvs.dj.domain.Style;
+import ar.com.fdvs.dj.domain.builders.FastReportBuilder;
+import ar.com.fdvs.dj.domain.constants.Border;
 import ar.com.fdvs.dj.domain.constants.Font;
+import ar.com.fdvs.dj.domain.constants.Transparency;
+import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.util.Holder;
 
 public class ReportingUtils {
 
@@ -42,6 +58,51 @@ public class ReportingUtils {
     public static Font sansSerifBold = new Font(Font.MEDIUM, "SansSerif", true);
 
     public static PrinterData data;
+
+    public static JasperPrint createDynamicReport(String reportName,
+        List<String> description, List<String> columnInfo, List<?> list)
+        throws Exception {
+
+        FastReportBuilder drb = new FastReportBuilder();
+        for (int i = 0; i < columnInfo.size(); i++) {
+            drb.addColumn(columnInfo.get(i), columnInfo.get(i), String.class,
+                40, false).setPrintBackgroundOnOddRows(true)
+                .setUseFullPageWidth(true);
+        }
+
+        String infos = StringUtils.join(description,
+            System.getProperty("line.separator"));
+
+        Map<String, Object> fields = new HashMap<String, Object>();
+        fields.put("title", reportName);
+        fields.put("infos", infos);
+        URL reportURL = ReportingUtils.class.getResource("BasicReport.jrxml");
+        if (reportURL == null) {
+            throw new Exception("No report available with name BasicReport");
+        }
+        drb.setTemplateFile(reportURL.getFile());
+        drb.addAutoText(AutoText.AUTOTEXT_PAGE_X_OF_Y,
+            AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_RIGHT, 200, 40);
+        drb.addAutoText(
+            "Printed on " + DateFormatter.formatAsDateTime(new Date()),
+            AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_LEFT, 200);
+
+        Style headerStyle = new Style();
+        headerStyle.setFont(ReportingUtils.sansSerifBold);
+        // headerStyle.setHorizontalAlign(HorizontalAlign.CENTER);
+        headerStyle.setBorderBottom(Border.THIN);
+        headerStyle.setVerticalAlign(VerticalAlign.MIDDLE);
+        headerStyle.setBackgroundColor(Color.LIGHT_GRAY);
+        headerStyle.setTransparency(Transparency.OPAQUE);
+        Style detailStyle = new Style();
+        detailStyle.setFont(ReportingUtils.sansSerif);
+        drb.setDefaultStyles(null, null, headerStyle, detailStyle);
+
+        JRDataSource ds = new JRBeanCollectionDataSource(list);
+        JasperPrint jp = DynamicJasperHelper.generateJasperPrint(drb.build(),
+            new ClassicLayoutManager(), ds, fields);
+        return jp;
+    }
 
     public static JasperPrint createStandardReport(String reportName,
         Map<String, Object> parameters, List<?> list) throws Exception {
@@ -160,28 +221,49 @@ public class ReportingUtils {
         }
     }
 
-    public static void printReport(JasperPrint jasperPrint) throws Exception {
+    public static void printReport(final JasperPrint jasperPrint)
+        throws Exception {
         // Use SWT PrintDialog instead of the JasperReport method that use java
         // swing gui.
-        PrintDialog dialog = new PrintDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        PrinterData data = dialog.open();
+        final Display display = Display.getDefault();
+        final Holder<Exception> exception = new Holder<Exception>(null);
 
-        // if data is null : user cancled print.
+        display.syncExec(new Runnable() {
+            @Override
+            public void run() {
+                Shell shell = display.getActiveShell();
+                PrintDialog dialog = new PrintDialog(shell, SWT.NONE);
+                PrinterData data = dialog.open();
 
-        if (data != null) {
-            if (data.printToFile == true) {
-                printViaFile(data, jasperPrint);
-            } else {
-                try {
-                    printViaPrinter(data, jasperPrint);
-                } catch (Exception e) {
-                    BiobankPlugin.openAsyncError("Printing Error", "Error: "
-                        + e.toString() + "\n\n"
-                        + "Select a file location to export the printed page.");
-                    printViaFile(data, jasperPrint);
+                // if data is null : user cancled print.
+
+                if (data != null) {
+                    try {
+                        if (data.printToFile == true) {
+                            printViaFile(data, jasperPrint);
+                            // TODO Auto-generated catch block
+                        } else {
+                            try {
+                                printViaPrinter(data, jasperPrint);
+                            } catch (Exception e) {
+                                BiobankPlugin.openAsyncError(
+                                    "Printing Error",
+                                    "Error: "
+                                        + e.toString()
+                                        + "\n\n"
+                                        + "Select a file location to export the printed page.");
+                                printViaFile(data, jasperPrint);
+                            }
+                        }
+                    } catch (Exception e) {
+                        exception.setValue(e);
+                    }
                 }
             }
+        });
+
+        if (exception.getValue() != null) {
+            throw exception.getValue();
         }
     }
 }
