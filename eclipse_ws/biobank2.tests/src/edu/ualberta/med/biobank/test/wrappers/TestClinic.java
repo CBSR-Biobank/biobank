@@ -396,7 +396,7 @@ public class TestClinic extends TestDatabase {
                 .getAllSpecimenTypes(appService, false).get(0));
             CollectionEventHelper.addCollectionEvent(clinic, patient, i,
                 originInfo, sv);
-            Assert.assertEquals(patientMap.get(clinic).size(),
+            Assert.assertEquals(new Long(patientMap.get(clinic).size()),
                 clinic.getPatientCount());
         }
 
@@ -415,7 +415,7 @@ public class TestClinic extends TestDatabase {
                 patient.delete();
                 patientMap.get(clinic).remove(0);
                 clinic.reload();
-                Assert.assertEquals(patientMap.get(clinic).size(),
+                Assert.assertEquals(new Long(patientMap.get(clinic).size()),
                     clinic.getPatientCount());
             }
         }
