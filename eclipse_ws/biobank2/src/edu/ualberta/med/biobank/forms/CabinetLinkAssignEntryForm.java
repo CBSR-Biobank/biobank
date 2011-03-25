@@ -474,9 +474,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 int cutIndex = fullLabel.length() - removeSize;
                 String binLabel = fullLabel.substring(0, cutIndex);
                 labelsTested.add(binLabel);
-                for (ContainerWrapper cont : ContainerWrapper
+                List<ContainerWrapper> containersInSite = ContainerWrapper
                     .getContainersInSite(appService,
-                        SessionManager.getCurrentSite(), binLabel)) {
+                        SessionManager.getCurrentSite(), binLabel);
+                for (ContainerWrapper cont : containersInSite) {
                     boolean canContainSamples = cont.getContainerType()
                         .getSampleTypeCollection() != null
                         && cont.getContainerType().getSampleTypeCollection()
@@ -493,7 +494,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                                     cont.getContainerType().getColCapacity());
                         } catch (Exception ex) {
                             // the test failed
-                            break;
+                            continue;
                         }
                         if (rcp != null) // the full position string is valid:
                             foundContainers.add(cont);
