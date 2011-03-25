@@ -1026,7 +1026,7 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.mainAdmin"
                   icon="icons/mainPerspective.png"
-                  label="Administration View"
+                  label="Site Administration View"
                   style="push">
             </command>
             <command
@@ -1117,7 +1117,7 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.mainAdmin"
                   icon="icons/mainPerspective.png"
-                  label="Open Administration View"
+                  label="Site Administration View"
                   style="push">
             </command>
             <command
@@ -2253,7 +2253,7 @@
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.SessionsView"
             id="edu.ualberta.med.biobank.views.SessionsView"
-            name="Administration"
+            name="Site Administration"
             restorable="true">
 	      </view>
 	      <view
