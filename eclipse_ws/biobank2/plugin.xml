@@ -2026,7 +2026,7 @@
             commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd"
             contextId="edu.ualberta.med.biobank.perspective.processing"
             schemeId="biobank2.scheme"
-            sequence="M3+V">
+            sequence="M3+E">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.patients.scanLink"
