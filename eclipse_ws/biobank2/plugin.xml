@@ -137,7 +137,7 @@
       <command
             categoryId="org.eclipse.ui.category.window"
             id="edu.ualberta.med.biobank.commands.processingAdmin"
-            name="Open Reports View">
+            name="Open Processing View">
       </command>
       <command
             categoryId="org.eclipse.ui.category.window"
@@ -1196,7 +1196,7 @@
                id="edu.ualberta.med.biobank.views.ProcessingView">
             <command
                   commandId="edu.ualberta.med.biobank.commands.ProcessingEventAdd"
-                  icon="icons/processingEvent.png"
+                  icon="icons/processing_add.png"
                   label="Add Processing Event"
                   style="push">
                <visibleWhen
@@ -1938,14 +1938,14 @@
 <editor
       class="edu.ualberta.med.biobank.forms.ProcessingEventEntryForm"
       default="false"
-      icon="icons/processingEvent.png"
+      icon="icons/processingPerspective.png"
       id="edu.ualberta.med.biobank.forms.ProcessingEventEntryForm"
       name="Processing Event Entry">
 </editor>
 <editor
       class="edu.ualberta.med.biobank.forms.ProcessingEventViewForm"
       default="false"
-      icon="icons/processingEvent.png"
+      icon="icons/processingPerspective.png"
       id="edu.ualberta.med.biobank.forms.ProcessingEventViewForm"
       name="Processing Event View">
 </editor>
@@ -2275,7 +2275,7 @@
       <view
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.ProcessingView"
-            icon="icons/processingPerspective.png"
+            icon="icons/processingView.png"
             id="edu.ualberta.med.biobank.views.ProcessingView"
             name="Processing"
             restorable="true">
