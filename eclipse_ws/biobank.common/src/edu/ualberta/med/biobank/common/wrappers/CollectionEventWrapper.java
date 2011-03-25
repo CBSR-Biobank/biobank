@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
+import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.CollectionEventBaseWrapper;
@@ -92,8 +93,21 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
-        // FIXME: how do we know what clinic this CE is for?
-        // checkPatientsStudy(clinic);
+        checkVisitNumberFree();
+    }
+
+    private void checkVisitNumberFree() throws BiobankCheckException,
+        ApplicationException {
+        HQLCriteria c = new HQLCriteria("select ce from "
+            + CollectionEvent.class.getName() + " ce where ce."
+            + CollectionEventPeer.VISIT_NUMBER.getName() + "=? and ce."
+            + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+            + "=?", Arrays.asList(getVisitNumber(), getPatient().getId()));
+        List<Object> result = appService.query(c);
+        if (result.size() != 0)
+            throw new BiobankCheckException("Visit #" + getVisitNumber()
+                + " has already been added for patient "
+                + getPatient().getPnumber() + ".");
     }
 
     @Override
