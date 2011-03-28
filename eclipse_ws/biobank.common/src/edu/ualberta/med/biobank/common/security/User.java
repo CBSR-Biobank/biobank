@@ -34,8 +34,17 @@ public class User implements Serializable, NotAProxy {
 
     private transient CenterWrapper<?> currentWorkingCenter;
 
+    private boolean needToChangePassword;
+
+    private List<Group> groups = new ArrayList<Group>();
+
+    private List<Integer> workingCenterIds;
+
+    private boolean inSuperAdminMode = false;
+
     /**
-     * [object type | privilege] = list of center class names
+     * [object type | privilege] = list of center class names. Specific rights
+     * applied on the center type.
      */
     private static transient Map<TypePrivilegeKey, List<String>> specificRightsMapping;
 
@@ -91,12 +100,6 @@ public class User implements Serializable, NotAProxy {
     public void setLockedOut(boolean isLockedOut) {
         this.isLockedOut = isLockedOut;
     }
-
-    private boolean needToChangePassword;
-
-    private List<Group> groups = new ArrayList<Group>();
-
-    private List<Integer> workingCenterIds;
 
     public Long getId() {
         return id;
@@ -186,12 +189,22 @@ public class User implements Serializable, NotAProxy {
      * Return true if this user is administrator for this center.
      */
     public boolean isAdministratorForCurrentCenter() {
+        if (currentWorkingCenter != null && isInSuperAdminMode())
+            return true;
         for (Group group : groups) {
             if (group.isAdministratorForCenter(currentWorkingCenter)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public boolean isInSuperAdminMode() {
+        return inSuperAdminMode;
+    }
+
+    public void setInSuperAdminMode(boolean inSuperAdminMode) {
+        this.inSuperAdminMode = inSuperAdminMode && isSuperAdministrator();
     }
 
     public boolean hasPrivilegeOnProtectionGroup(Privilege privilege,

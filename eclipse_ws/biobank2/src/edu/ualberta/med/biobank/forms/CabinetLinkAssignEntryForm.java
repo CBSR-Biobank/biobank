@@ -742,19 +742,8 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
             List<SpecimenTypeWrapper> binTypes = bin.getContainerType()
                 .getSpecimenTypeCollection();
             studiesAliquotedTypes = linkFormPatientManagement
-                .getStudyAliquotedTypes(binTypes);
+                .getStudyAliquotedTypes(binTypes, bin.getLabel());
 
-            if (studiesAliquotedTypes.size() == 0) {
-                String studyText = "unknown";
-                if (linkFormPatientManagement.getCurrentPatient() != null) {
-                    studyText = linkFormPatientManagement.getCurrentPatient()
-                        .getStudy().getNameShort();
-                }
-                BiobankPlugin.openError(Messages
-                    .getString("Cabinet.specimentype.error.title"), Messages
-                    .getString("Cabinet.specimentype.error.msg", studyText,
-                        bin.getLabel()));
-            }
             if (!radioNew.getSelection()) {
                 // Move
                 SpecimenTypeWrapper type = specimen.getSpecimenType();

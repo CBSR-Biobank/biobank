@@ -518,7 +518,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         List<SpecimenTypeWrapper> studiesAliquotedTypes = null;
         if (isFirstSuccessfulScan()) {
             studiesAliquotedTypes = linkFormPatientManagement
-                .getStudyAliquotedTypes(null);
+                .getStudyAliquotedTypes(null, null);
         }
         List<SpecimenWrapper> availableSourceSpecimens = linkFormPatientManagement
             .getSpecimenInCollectionEvent();

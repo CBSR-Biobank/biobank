@@ -366,7 +366,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
      */
     private void setTypeCombos() {
         List<SpecimenTypeWrapper> studiesAliquotedTypes = linkFormPatientManagement
-            .getStudyAliquotedTypes(null);
+            .getStudyAliquotedTypes(null, null);
         List<SpecimenWrapper> availableSourceSpecimens = linkFormPatientManagement
             .getSpecimenInCollectionEvent();
         for (int row = 0; row < specimenTypesWidgets.size(); row++) {

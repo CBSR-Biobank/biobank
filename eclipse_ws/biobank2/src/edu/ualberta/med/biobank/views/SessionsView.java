@@ -32,7 +32,7 @@ public class SessionsView extends AbstractViewWithAdapterTree {
         getTreeViewer().refresh();
         SessionAdapter session = (SessionAdapter) rootNode.getChild(0);
         if (session != null)
-            session.displayMainInformation();
+            session.rebuild();
     }
 
     @Override
@@ -40,7 +40,6 @@ public class SessionsView extends AbstractViewWithAdapterTree {
         SessionAdapter session = (SessionAdapter) rootNode.getChild(0);
         if (session != null) {
             session.rebuild();
-            session.displayMainInformation();
         }
     }
 

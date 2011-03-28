@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -21,8 +20,6 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
@@ -57,40 +54,35 @@ public class SessionAdapter extends AdapterBase {
         this.serverName = serverName;
         this.user = user;
 
-        addGroupNodes();
+        addSubNodes();
     }
 
-    private void addGroupNodes() {
-        if (SessionManager.isSuperAdminMode()) {
-            addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
-            addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
-            addChild(new SiteGroup(this, SITES_NODE_ID));
-        } else
-            addCurrentCenter();
-    }
-
-    private AdapterBase addCurrentCenter() {
+    private void addSubNodes() {
         if (SessionManager.getInstance().isConnected()) {
-            CenterWrapper<?> currentCenter = SessionManager.getUser()
-                .getCurrentWorkingCenter();
-            SiteWrapper clonedSite = new SiteWrapper(appService, new Site());
-            clonedSite.getWrappedObject().setId(currentCenter.getId());
-            clonedSite.reload();
-            if (clonedSite != null) {
-                AdapterBase child = AdapterFactory.getAdapter(currentCenter);
-                child.setParent(this);
-                addChild(child);
-                return child;
+            if (SessionManager.isSuperAdminMode()) {
+                addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
+                addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
+                SiteGroup siteGroup = new SiteGroup(this, SITES_NODE_ID);
+                addChild(siteGroup);
+                siteGroup.performExpand();
+            } else {
+                CenterWrapper<?> currentCenter = SessionManager.getUser()
+                    .getCurrentWorkingCenter();
+                CenterWrapper<?> clonedCenter = (CenterWrapper<?>) currentCenter
+                    .getDatabaseClone();
+                if (clonedCenter != null) {
+                    AdapterBase child = AdapterFactory.getAdapter(clonedCenter);
+                    addChild(child);
+                    child.performExpand();
+                }
             }
         }
-        return null;
     }
 
     @Override
     public void rebuild() {
-        for (AdapterBase child : new ArrayList<AdapterBase>(getChildren())) {
-            child.rebuild();
-        }
+        removeAll();
+        addSubNodes();
     }
 
     @Override
@@ -224,17 +216,6 @@ public class SessionAdapter extends AdapterBase {
         SiteGroup s = getSitesGroupNode();
         if (s != null)
             s.addSite();
-    }
-
-    public void displayMainInformation() {
-        AdapterBase adapter = getChild(SITES_NODE_ID);
-        if (adapter != null)
-            adapter.performExpand();
-        else {
-            AdapterBase res = addCurrentCenter();
-            if (res != null)
-                res.performExpand();
-        }
     }
 
 }

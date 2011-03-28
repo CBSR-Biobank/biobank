@@ -960,15 +960,16 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return sb.toString();
     }
 
-    public ModelWrapper<?> getDatabaseClone() {
-        ModelWrapper<?> wrapper = null;
+    @SuppressWarnings("unchecked")
+    public ModelWrapper<E> getDatabaseClone() {
+        ModelWrapper<E> wrapper = null;
 
         try {
             Constructor<?> c = getClass().getDeclaredConstructor(
                 WritableApplicationService.class);
             Object[] arglist = new Object[] { appService };
             try {
-                wrapper = (ModelWrapper<?>) c.newInstance(arglist);
+                wrapper = (ModelWrapper<E>) c.newInstance(arglist);
                 wrapper.setId(getId());
                 try {
                     wrapper.reload();
