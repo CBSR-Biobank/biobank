@@ -70,7 +70,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         super.removeFromOriginalSpecimenCollectionWithCheck(specimenCollection);
     }
 
-    private void deleteSourceVessels() throws Exception {
+    private void deleteSpecimens() throws Exception {
         // FIXME delete only if no children ??
         for (SpecimenWrapper sv : deletedSourceSpecimens) {
             if (!sv.isNew()) {
@@ -113,7 +113,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     @Override
     protected void persistDependencies(CollectionEvent origObject)
         throws Exception {
-        deleteSourceVessels();
+        deleteSpecimens();
         if (eventAttrMap != null) {
             setWrapperCollection(CollectionEventPeer.EVENT_ATTR_COLLECTION,
                 eventAttrMap.values());

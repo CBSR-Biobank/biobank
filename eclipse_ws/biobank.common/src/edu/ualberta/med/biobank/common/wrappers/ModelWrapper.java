@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
-import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
+import edu.ualberta.med.biobank.common.exception.CheckFieldLimitsException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
@@ -250,11 +250,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     protected void checkFieldLimits() throws BiobankCheckException,
-        BiobankStringLengthException {
+        CheckFieldLimitsException {
         String fieldValue = "";
         for (String field : getPropertyChangeNames()) {
-            Integer maxLen = VarCharLengths.getMaxSize(
-                wrappedObject.getClass(), field);
+            Integer maxLen = VarCharLengths
+                .getMaxSize(getWrappedClass(), field);
             if (maxLen == null)
                 continue;
 
@@ -266,9 +266,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 if (method.getReturnType().equals(String.class)) {
                     fieldValue = (String) method.invoke(this);
                     if ((fieldValue != null) && (fieldValue.length() > maxLen)) {
-                        throw new BiobankStringLengthException(
-                            "Field exceeds max length: field: " + field
-                                + ", value \"" + fieldValue + "\"");
+                        throw new CheckFieldLimitsException(field, maxLen,
+                            fieldValue);
                     }
                 }
             } catch (SecurityException e) {

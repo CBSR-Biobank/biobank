@@ -7,9 +7,11 @@ import org.hibernate.validator.InvalidStateException;
 import org.hibernate.validator.InvalidValue;
 import org.springframework.aop.ThrowsAdvice;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 import edu.ualberta.med.biobank.common.exception.ExceptionUtils;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.StringValueLengthServerException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -73,4 +75,15 @@ public class ExceptionInterceptor implements ThrowsAdvice {
         }
     }
 
+    public void afterThrowing(InvalidDataAccessResourceUsageException idarue)
+        throws BiobankServerException {
+        Throwable cause = ExceptionUtils.findCausesInThrowable(idarue,
+            BatchUpdateException.class);
+        if (cause != null && cause instanceof BatchUpdateException) {
+            BatchUpdateException bue = (BatchUpdateException) cause;
+            if (bue.getMessage().contains("Data too long for column")) {
+                throw new StringValueLengthServerException(bue.getMessage());
+            }
+        }
+    }
 }
