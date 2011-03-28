@@ -108,7 +108,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
             .getString("clinic.contact.title")); //$NON-NLS-1$
 
         contactsTable = new ContactInfoTable(client,
-            clinic.getContactCollection());
+            clinic.getContactCollection(false));
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
     }

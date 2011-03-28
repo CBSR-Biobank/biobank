@@ -84,7 +84,8 @@ public class SpecimenEntryWidget extends BiobankWidget {
         toolkit.paintBordersFor(this);
 
         if (editable) {
-            Label label = toolkit.createLabel(this, "Enter specimen to add:");
+            Label label = toolkit.createLabel(this,
+                "Enter specimen inventory ID to add:");
             GridData gd = new GridData();
             gd.horizontalSpan = 2;
             label.setLayoutData(gd);

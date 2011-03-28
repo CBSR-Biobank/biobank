@@ -44,7 +44,7 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
         List<SpecimenTypeWrapper> allSpecimenTypes,
         final CollectionEventWrapper cEvent, final Date defaultTimeDrawn) {
         NewSpecimenListener newSpecimenListener = null;
-        if (add)
+        if (add) {
             newSpecimenListener = new NewSpecimenListener() {
                 @Override
                 public void newSpecimenAdded(SpecimenWrapper spec) {
@@ -59,6 +59,7 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
                     notifyListeners();
                 }
             };
+        }
         CEventSourceSpecimenDialog dlg = new CEventSourceSpecimenDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             specimen, studySourceTypes, allSpecimenTypes, newSpecimenListener,
