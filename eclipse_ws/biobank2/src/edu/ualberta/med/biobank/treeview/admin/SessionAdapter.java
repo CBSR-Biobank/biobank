@@ -68,8 +68,13 @@ public class SessionAdapter extends AdapterBase {
             } else {
                 CenterWrapper<?> currentCenter = SessionManager.getUser()
                     .getCurrentWorkingCenter();
-                CenterWrapper<?> clonedCenter = (CenterWrapper<?>) currentCenter
-                    .getDatabaseClone();
+                CenterWrapper<?> clonedCenter;
+                try {
+                    clonedCenter = (CenterWrapper<?>) currentCenter
+                        .getDatabaseClone();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
                 if (clonedCenter != null) {
                     AdapterBase child = AdapterFactory.getAdapter(clonedCenter);
                     addChild(child);

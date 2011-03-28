@@ -220,6 +220,11 @@ public class User implements Serializable, NotAProxy {
 
     public boolean hasPrivilegeOnObject(Privilege privilege,
         Class<?> objectClazz) {
+        return hasPrivilegeOnObject(privilege, objectClazz, null);
+    }
+
+    public boolean hasPrivilegeOnObject(Privilege privilege,
+        Class<?> objectClazz, List<? extends CenterWrapper<?>> specificCenters) {
         String type = objectClazz.getName();
         if (ModelWrapper.class.isAssignableFrom(objectClazz)) {
             ModelWrapper<?> wrapper = null;
@@ -238,12 +243,17 @@ public class User implements Serializable, NotAProxy {
         boolean currentCenterRights = true;
         CenterWrapper<?> currentCenter = getCurrentWorkingCenter();
         if (currentCenter != null) {
+            // check object specific rights depending on center type
             List<String> centerSpecificRights = specificRightsMapping
                 .get(new TypePrivilegeKey(type, privilege));
             if (centerSpecificRights != null) {
                 currentCenterRights = centerSpecificRights
                     .contains(currentCenter.getWrappedClass().getName());
             }
+            // check object rights depending on centers set on object
+            if (specificCenters != null)
+                currentCenterRights = currentCenterRights
+                    && specificCenters.contains(currentCenter);
         }
         return currentCenterRights && hasPrivilegeOnObject(privilege, type);
     }
