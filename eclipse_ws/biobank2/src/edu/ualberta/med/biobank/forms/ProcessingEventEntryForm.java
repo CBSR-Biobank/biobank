@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -132,7 +133,9 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             Messages.getString("ProcessingEvent.field.worksheet.label"), null, //$NON-NLS-1$
-            pEvent, ProcessingEventPeer.WORKSHEET.getName(), null);
+            pEvent, ProcessingEventPeer.WORKSHEET.getName(),
+            (!pEvent.isNew() && pEvent.getWorksheet() == null) ? null
+                : new NonEmptyStringValidator("Worksheet cannot be null"));
 
         activityStatusComboViewer = createComboViewer(
             client,
