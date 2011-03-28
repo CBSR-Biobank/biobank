@@ -129,8 +129,8 @@
   -->
   <property file="${cacore.sdk.dir}/installer.properties" />
   <property file="${cacore.sdk.dir}/local.properties" />
-  <property file="${cacore.sdk.dir}/conf/deploy.properties" />
-  <property file="${cacore.sdk.dir}/build.properties" />
+  <property file="sdk_conf/deploy.properties" />
+  <property file="sdk_conf/build.properties" />
   <property file="${cacore.sdk.dir}/${codegen.dir}/build.properties"
             prefix="codegen" />
   <property file="${cacore.sdk.dir}/${codegen.validator.dir}/build.properties"
@@ -761,41 +761,42 @@
   </target>
 
   <target name="compile-generated-beans" description="REDO:: Compiles the generated beans">
-    <copy todir="${cacore.sdk.dir}\${output.src.dir}\edu/ualberta/med/biobank/model" overwrite="true">
+    <copy todir="${cacore.sdk.dir}/${output.src.dir}/edu/ualberta/med/biobank/model"
+      overwrite="true">
       <fileset dir="sdk_conf/specialSrc" />
     </copy>
-  	<delete>
-	  <fileset dir="${cacore.sdk.dir}\${build.classes.dir}"/>
+    <delete>
+      <fileset dir="${cacore.sdk.dir}/${build.classes.dir}"/>
     </delete>
 
-	<javac srcdir="${cacore.sdk.dir}\${output.src.dir}" destdir="${cacore.sdk.dir}\${build.classes.dir}"
-		debug="true" includeantruntime="false" >
-	  <classpath >
-	  	 <fileset dir="${cacore.sdk.dir}\${system.dir}\${system.lib.dir}">
-	  	            <include name="*.jar"/>
-	  	  </fileset>
-	  </classpath>
-	  <include name="**/*.java"/>
-	</javac>
+    <javac srcdir="${cacore.sdk.dir}/${output.src.dir}" destdir="${cacore.sdk.dir}/${build.classes.dir}"
+      debug="true" includeantruntime="false" >
+      <classpath >
+        <fileset dir="${cacore.sdk.dir}/${system.dir}/${system.lib.dir}">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+      <include name="**/*.java"/>
+    </javac>
   </target>
 
   <target name="package-codegen-orm" depends="compile-generated-beans"
           description="REDO:: Packages the generated ORM and bean artifacts">
-	<jar destfile="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}" basedir="${cacore.sdk.dir}\${build.classes.dir}">
+	<jar destfile="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}" basedir="${cacore.sdk.dir}/${build.classes.dir}">
 			<manifest>
 				<attribute name="Generated-By" value="caCORE SDK Code Generator"/>
 				<attribute name="Version" value="${VERSION}"/>
 			</manifest>
-			<fileset dir="${cacore.sdk.dir}\${output.src.dir}" includes="**/*.java" />
+			<fileset dir="${cacore.sdk.dir}/${output.src.dir}" includes="**/*.java" />
 	</jar>
-	<copy file="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}"
-		tofile="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib\${bean.file}"/>
-	<copy file="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}"
-		tofile="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib\${bean.file}"/>
-	<copy file="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}"
-		tofile="${cacore.sdk.dir}/output/biobank2/package/local-client/lib\${bean.file}"/>
-    <jar destfile="${cacore.sdk.dir}\${build.jar.dir}\${orm.file}"
-         basedir="${cacore.sdk.dir}\${output.src.dir}">
+	<copy file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
+		tofile="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/${bean.file}"/>
+	<copy file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
+		tofile="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib/${bean.file}"/>
+	<copy file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
+		tofile="${cacore.sdk.dir}/output/biobank2/package/local-client/lib/${bean.file}"/>
+    <jar destfile="${cacore.sdk.dir}/${build.jar.dir}/${orm.file}"
+         basedir="${cacore.sdk.dir}/${output.src.dir}">
       <manifest>
         <attribute name="Generated-By" value="caCORE SDK Code Generator" />
         <attribute name="Version" value="${VERSION}" />
@@ -810,22 +811,22 @@
   <!-- copied from sdk build.xml -->
   <target name="package-webapp-orm"
           depends="sdk-nodeps,sdk-files,package-codegen-orm,build-common-project">
-    <war destfile="${cacore.sdk.dir}\${package.system.dir}\${PROJECT_NAME}.war"
-         webxml="${cacore.sdk.dir}\${build.conf.web-inf.dir}\web.xml">
+    <war destfile="${cacore.sdk.dir}/${package.system.dir}/${PROJECT_NAME}.war"
+         webxml="${cacore.sdk.dir}/${build.conf.web-inf.dir}/web.xml">
       <manifest>
         <attribute name="Generated-By"
                    value="biobank2 caCORE SDK Code Generator" />
         <attribute name="Version" value="${VERSION}" />
       </manifest>
-      <lib dir="${cacore.sdk.dir}\${system.dir}\${system.dist.dir}"
+      <lib dir="${cacore.sdk.dir}/${system.dir}/${system.dist.dir}"
            includes="*.jar" />
-      <lib dir="${cacore.sdk.dir}\${writable-api.dir}\${writable-api.dist.dir}"
+      <lib dir="${cacore.sdk.dir}/${writable-api.dir}/${writable-api.dist.dir}"
            includes="*.jar">
         <exclude name="${read-api-exclude-list}" />
       </lib>
-      <lib dir="${cacore.sdk.dir}\${build.jar.dir}" includes="${bean.file}" />
-      <lib dir="${cacore.sdk.dir}\${build.jar.dir}" includes="${orm.file}" />
-      <lib dir="${cacore.sdk.dir}\${system.dir}\${system.lib.dir}"
+      <lib dir="${cacore.sdk.dir}/${build.jar.dir}" includes="${bean.file}" />
+      <lib dir="${cacore.sdk.dir}/${build.jar.dir}" includes="${orm.file}" />
+      <lib dir="${cacore.sdk.dir}/${system.dir}/${system.lib.dir}"
            includes="*.jar">
         <exclude name="${server-exclude-commons-logging}" />
         <exclude name="${server-exclude-log4j}" />
@@ -833,21 +834,21 @@
         <exclude name="xercesImpl*.*" />
         <exclude name="cog*.*" />
       </lib>
-      <lib dir="${cacore.sdk.dir}\${grid-jaas.dir}\${grid-jaas.dist.dir}"
+      <lib dir="${cacore.sdk.dir}/${grid-jaas.dir}/${grid-jaas.dist.dir}"
            includes="*.*"
            excludes="${grid-jaas.file.output.jaas.jndibinder.name}" />
-      <fileset dir="${cacore.sdk.dir}\${build.conf.system.web.dir}">
+      <fileset dir="${cacore.sdk.dir}/${build.conf.system.web.dir}">
         <include name="**/*" />
         <exclude name="**/web.xml" />
         <exclude name="${server-exclude-classes-list}" />
       </fileset>
-      <fileset dir="${cacore.sdk.dir}\${system.dir}\${system.web.dir}">
+      <fileset dir="${cacore.sdk.dir}/${system.dir}/${system.web.dir}">
         <include name="**/*" />
       </fileset>
-      <fileset dir="${cacore.sdk.dir}\${build.dir}">
+      <fileset dir="${cacore.sdk.dir}/${build.dir}">
         <include name="docs/**/*" />
       </fileset>
-      <classes dir="${cacore.sdk.dir}\${output.src.dir}">
+      <classes dir="${cacore.sdk.dir}/${output.src.dir}">
         <include name="${csm.security.config.file}" />
         <include name="${csm.ehcache.file}" />
         <include name="${clm.object.state.logger.config}" />
@@ -855,7 +856,7 @@
       <classes dir="${eclipse.proj.dir.common}/output">
         <exclude name="**/client/**" />
       </classes>
-      <webinf dir="${cacore.sdk.dir}\${output.src.dir}">
+      <webinf dir="${cacore.sdk.dir}/${output.src.dir}">
         <include name="server-config.wsdd" />
       </webinf>
     </war>
@@ -1101,8 +1102,8 @@
     </taskdef>
     <propertyregex property="featureVersion"
                    input="${featureJar}"
-                   regexp="biobank2.feature.core_(.*)\.jar"
-                   select="\1"
+                   regexp="biobank2.feature.core_(.*)/.jar"
+                   select="/1"
                    casesensitive="true" />
     <copy file="${product.dir}/site.xml"
           tofile="${updateSiteFolder}/site.xml" />
