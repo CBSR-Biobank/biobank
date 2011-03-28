@@ -192,7 +192,17 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     if (specimen == null)
                         throw new VetoException(
                             "No specimen found for that inventory id.");
-                    else if (specimen.isUsedInDispatch())
+                    else if (!SessionManager.getUser()
+                        .getCurrentWorkingCenter()
+                        .equals(specimen.getCurrentCenter())) {
+                        String centerName = "'none'";
+                        if (specimen.getCurrentCenter() != null)
+                            centerName = specimen.getCurrentCenter()
+                                .getNameShort();
+                        throw new VetoException(
+                            "Specimen is currently in center " + centerName
+                                + ". You can't process it.");
+                    } else if (specimen.isUsedInDispatch())
                         throw new VetoException(
                             "Specimen is currently listed in a dispatch.");
                     else if (specimen.getParentContainer() != null)
