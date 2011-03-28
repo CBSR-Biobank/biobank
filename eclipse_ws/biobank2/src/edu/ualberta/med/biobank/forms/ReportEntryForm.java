@@ -1,14 +1,12 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -16,7 +14,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -34,9 +31,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorPart;
@@ -45,16 +40,16 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
-import edu.ualberta.med.biobank.common.util.Holder;
 import edu.ualberta.med.biobank.common.util.ReportListProxy;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
-import edu.ualberta.med.biobank.exporters.CsvReportExporter;
-import edu.ualberta.med.biobank.exporters.ReportExporter;
-import edu.ualberta.med.biobank.exporters.ReportExporter.Data;
+import edu.ualberta.med.biobank.export.CsvDataExporter;
+import edu.ualberta.med.biobank.export.Data;
+import edu.ualberta.med.biobank.export.DataExporter;
+import edu.ualberta.med.biobank.export.PdfDataExporter;
+import edu.ualberta.med.biobank.export.PrintPdfDataExporter;
 import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
 import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.Report;
@@ -350,15 +345,15 @@ public class ReportEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(container);
 
         // TODO: printPDF and PdfExporter-s
-        createExporterButton(container, new CsvReportExporter());
-        createExporterButton(container, new CsvReportExporter());
-        createExporterButton(container, new CsvReportExporter());
+        createExporterButton(container, new CsvDataExporter());
+        createExporterButton(container, new PdfDataExporter());
+        createExporterButton(container, new PrintPdfDataExporter());
 
         return container;
     }
 
     private void createExporterButton(Composite parent,
-        final ReportExporter exporter) {
+        final DataExporter exporter) {
         Button button = new Button(parent, SWT.NONE);
         button.setText(exporter.getName());
         button.setEnabled(false);
@@ -628,12 +623,12 @@ public class ReportEntryForm extends BiobankEntryForm {
         form.updateToolBar();
     }
 
-    private void export(final ReportExporter exporter) {
+    private void export(final DataExporter exporter) {
         final Data data = new Data();
-        data.setHeaders(Arrays.asList(getHeaders()));
+        data.setColumnNames(Arrays.asList(getHeaders()));
         data.setTitle(report.getName());
-        data.setComments(getComments(report));
-        data.setResults(results);
+        data.setDescription(getComments(report));
+        data.setRows(results);
 
         // check if the exporter can export this data
         try {
@@ -653,68 +648,46 @@ public class ReportEntryForm extends BiobankEntryForm {
             return;
         }
 
-        // select an output path, if necessary
-        final Holder<String> path = new Holder<String>(null);
-        String[] exts = exporter.getPathFilterExtensions();
-        if (exts != null) {
-            String defaultFilename = report.getName().replaceAll(" ", "_")
-                + "_" + DateFormatter.formatAsDate(new Date());
-
-            FileDialog fd = new FileDialog(form.getShell(), SWT.SAVE);
-            fd.setOverwrite(true);
-            fd.setText("Export as");
-            fd.setFilterExtensions(exts);
-            fd.setFileName(defaultFilename);
-
-            path.setValue(fd.open());
-
-            if (path.getValue() == null) {
-                return;
-            }
-        }
-
-        IRunnableContext context = new ProgressMonitorDialog(Display
-            .getDefault().getActiveShell());
+        // export
         try {
-            context.run(true, true, new IRunnableWithProgress() {
-                @Override
-                public void run(final IProgressMonitor monitor) {
-                    monitor.beginTask("Preparing Report...",
-                        IProgressMonitor.UNKNOWN);
-                    try {
-                        exporter.export(data, path.getValue(),
-                            resultsTable.getLabelProvider(), monitor);
-                    } catch (Exception e) {
-                        BiobankPlugin.openAsyncError(
-                            "Error Exporting Report Results", e);
-                        return;
-                    }
-                }
-            });
-        } catch (InvocationTargetException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            exporter.export(data, resultsTable.getLabelProvider());
+        } catch (Exception e) {
+            MessageDialog.openError(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), "Error Exporting",
+                e.getMessage());
+            return;
         }
-
     }
 
     private List<String> getComments(ReportWrapper report) {
         List<String> comments = new ArrayList<String>();
 
-        comments.add(report.getDescription());
+        if (report.getDescription() != null) {
+            comments.add(report.getDescription());
+        }
 
-        for (ReportFilter filter : report.getReportFilterCollection()) {
+        Report nakedReport = report.getWrappedObject();
+        List<ReportFilter> reportFilters = new ArrayList<ReportFilter>(
+            nakedReport.getReportFilterCollection());
+
+        Collections.sort(reportFilters, new Comparator<ReportFilter>() {
+            @Override
+            public int compare(ReportFilter lhs, ReportFilter rhs) {
+                return lhs.getPosition() - rhs.getPosition();
+            }
+        });
+
+        for (ReportFilter filter : reportFilters) {
             StringBuilder sb = new StringBuilder();
             sb.append(filter.getEntityFilter().getName());
 
             Integer opId = filter.getOperator();
-            FilterOperator op = FilterOperator.getFilterOperator(opId);
-            if (op != null) {
-                sb.append(" ");
-                sb.append(op.getDisplayString());
+            if (opId != null) {
+                FilterOperator op = FilterOperator.getFilterOperator(opId);
+                if (op != null) {
+                    sb.append(" ");
+                    sb.append(op.getDisplayString());
+                }
             }
 
             Collection<ReportFilterValue> values = filter

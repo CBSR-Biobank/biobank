@@ -478,7 +478,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                                     cont.getContainerType().getColCapacity());
                         } catch (Exception ex) {
                             // the test failed
-                            break;
+                            continue;
                         }
                         if (rcp != null) // the full position string is valid:
                             foundContainers.add(cont);

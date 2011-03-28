@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.test;
 
 import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
@@ -22,6 +21,7 @@ import java.util.Random;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 public class TestDatabase {
     protected static WritableApplicationService appService;
@@ -193,7 +193,7 @@ public class TestDatabase {
                     w.persist();
                     Assert.fail("VARCHAR limits not enforced on field: "
                         + attrName);
-                } catch (BiobankStringLengthException e) {
+                } catch (InvalidDataAccessResourceUsageException e) {
                     Assert.assertTrue(true);
                 }
                 w.reload();

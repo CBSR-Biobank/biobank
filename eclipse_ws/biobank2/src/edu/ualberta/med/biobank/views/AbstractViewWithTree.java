@@ -5,6 +5,7 @@ import java.util.List;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -29,10 +30,24 @@ public abstract class AbstractViewWithTree<T> extends ViewPart {
         return null;
     }
 
-    public void setSelectedNode(T node) {
+    public void setSelectedNode(final T node) {
         if (getTreeViewer() != null) {
             getTreeViewer().setSelection(new StructuredSelection(node));
         }
+    }
+
+    // FIXME: converted this to asyncExec call due to issue #1039.
+    // not sure if this is the right solution
+    public void setSelectedNodeAsync(final T node) {
+        if (getTreeViewer() == null)
+            return;
+
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                getTreeViewer().setSelection(new StructuredSelection(node));
+            }
+        });
     }
 
     public abstract List<AdapterBase> searchNode(ModelWrapper<?> wrapper);

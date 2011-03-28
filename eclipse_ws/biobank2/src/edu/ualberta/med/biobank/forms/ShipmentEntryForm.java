@@ -233,6 +233,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 SpecimenWrapper specimen = event.getObject();
                 switch (event.getType()) {
                 case PRE_ADD:
+                    if (specimen == null)
+                        throw new VetoException(
+                            "No specimen found for that inventory id.");
+                    else if (specimen.isUsedInDispatch())
+                        throw new VetoException(
+                            "Specimen is currently listed in a dispatch.");
+                    else if (specimen.getParentContainer() != null)
+                        throw new VetoException(
+                            "Specimen is currently listed as stored in a container.");
                     break;
                 case POST_ADD:
                     shipment.addToSpecimenCollection(Arrays.asList(specimen));

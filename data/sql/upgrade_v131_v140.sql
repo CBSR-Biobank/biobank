@@ -408,8 +408,8 @@ create index pv_id_idx on collection_event(pv_id);
 -- number the collection event 'visit number' according the patient visit 'date drawn'
 -- in chronological order
 
-select @pp = null;
-select @pv = null;
+set @pp = null;
+set @pv = null;
 
 update collection_event ce
        set ce.visit_number = if(@pp <> ce.patient_id or @pp is null,

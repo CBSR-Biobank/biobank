@@ -1,20 +1,14 @@
 package edu.ualberta.med.biobank.forms.reports;
 
-import java.awt.Color;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
@@ -38,14 +32,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.PlatformUI;
 
-import ar.com.fdvs.dj.core.DynamicJasperHelper;
-import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
-import ar.com.fdvs.dj.domain.AutoText;
-import ar.com.fdvs.dj.domain.Style;
-import ar.com.fdvs.dj.domain.builders.FastReportBuilder;
-import ar.com.fdvs.dj.domain.constants.Border;
-import ar.com.fdvs.dj.domain.constants.Transparency;
-import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -458,11 +444,18 @@ public abstract class ReportsEditor extends BiobankFormBase {
 
     public void exportPDFOrPrint(List<?> listData, List<String> columnInfo,
         List<Object[]> params, String path, Boolean exportPDF) {
+
+        List<String> stringParams = new ArrayList<String>();
+        for (int i = 0; i < params.size(); i++) {
+            stringParams.add(params.get(i)[0] + " : " + params.get(i)[1]);
+        }
+
         if (exportPDF) {
             try {
-                ReportingUtils.saveReport(
-                    createDynamicReport(report.getName(), params, columnInfo,
-                        listData), path);
+                ReportingUtils
+                    .saveReport(ReportingUtils.createDynamicReport(
+                        report.getName(), stringParams, columnInfo, listData),
+                        path);
             } catch (Exception e) {
                 BiobankPlugin.openAsyncError("Error saving to PDF", e);
                 return;
@@ -474,8 +467,8 @@ public abstract class ReportsEditor extends BiobankFormBase {
             }
         } else {
             try {
-                ReportingUtils.printReport(createDynamicReport(
-                    report.getName(), params, columnInfo, listData));
+                ReportingUtils.printReport(ReportingUtils.createDynamicReport(
+                    report.getName(), stringParams, columnInfo, listData));
             } catch (Exception e) {
                 BiobankPlugin.openAsyncError("Printer Error", e);
                 return;
@@ -486,52 +479,6 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 BiobankPlugin.openAsyncError("Error logging print", e);
             }
         }
-    }
-
-    public JasperPrint createDynamicReport(String reportName,
-        List<Object[]> params, List<String> columnInfo, List<?> list)
-        throws Exception {
-
-        FastReportBuilder drb = new FastReportBuilder();
-        for (int i = 0; i < columnInfo.size(); i++) {
-            drb.addColumn(columnInfo.get(i), columnInfo.get(i), String.class,
-                40, false).setPrintBackgroundOnOddRows(true)
-                .setUseFullPageWidth(true);
-        }
-
-        Map<String, Object> fields = new HashMap<String, Object>();
-        String paramString = "";
-        for (int i = 0; i < params.size(); i++) {
-            paramString += params.get(i)[0] + " : " + params.get(i)[1] + "\n";
-        }
-        fields.put("title", reportName);
-        fields.put("infos", paramString);
-        URL reportURL = ReportingUtils.class.getResource("BasicReport.jrxml");
-        if (reportURL == null) {
-            throw new Exception("No report available with name BasicReport");
-        }
-        drb.setTemplateFile(reportURL.getFile());
-        drb.addAutoText(AutoText.AUTOTEXT_PAGE_X_OF_Y,
-            AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_RIGHT, 200, 40);
-        drb.addAutoText(
-            "Printed on " + DateFormatter.formatAsDateTime(new Date()),
-            AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_LEFT, 200);
-
-        Style headerStyle = new Style();
-        headerStyle.setFont(ReportingUtils.sansSerifBold);
-        // headerStyle.setHorizontalAlign(HorizontalAlign.CENTER);
-        headerStyle.setBorderBottom(Border.THIN);
-        headerStyle.setVerticalAlign(VerticalAlign.MIDDLE);
-        headerStyle.setBackgroundColor(Color.LIGHT_GRAY);
-        headerStyle.setTransparency(Transparency.OPAQUE);
-        Style detailStyle = new Style();
-        detailStyle.setFont(ReportingUtils.sansSerif);
-        drb.setDefaultStyles(null, null, headerStyle, detailStyle);
-
-        JRDataSource ds = new JRBeanCollectionDataSource(list);
-        JasperPrint jp = DynamicJasperHelper.generateJasperPrint(drb.build(),
-            new ClassicLayoutManager(), ds, fields);
-        return jp;
     }
 
     @Override
