@@ -23,7 +23,8 @@ public class StudyAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(StudyWrapper.class)
+        return SessionManager.isSuperAdminMode()
+            && SessionManager.canCreate(StudyWrapper.class)
             && SessionManager.getInstance().getSession() != null;
     }
 }
