@@ -251,7 +251,7 @@ public class User implements Serializable, NotAProxy {
                     .contains(currentCenter.getWrappedClass().getName());
             }
             // check object rights depending on centers set on object
-            if (specificCenters != null)
+            if (specificCenters != null && specificCenters.size() > 0)
                 currentCenterRights = currentCenterRights
                     && specificCenters.contains(currentCenter);
         }
