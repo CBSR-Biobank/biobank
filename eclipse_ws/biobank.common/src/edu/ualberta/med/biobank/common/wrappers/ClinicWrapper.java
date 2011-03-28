@@ -244,4 +244,5 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         super.removeFromContactCollectionWithCheck(contactCollection);
         deletedContacts.addAll(contactCollection);
     }
+
 }

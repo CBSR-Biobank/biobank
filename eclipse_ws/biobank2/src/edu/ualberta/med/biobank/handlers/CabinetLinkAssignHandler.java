@@ -17,6 +17,7 @@ public class CabinetLinkAssignHandler extends LinkAssignCommonHandler {
 
     @Override
     protected boolean canUserPerformAction(User user) {
-        return user.canPerformActions(Feature.ASSIGN, Feature.LINK);
+        return user.getCurrentWorkingSite() != null
+            && user.canPerformActions(Feature.ASSIGN, Feature.LINK);
     }
 }

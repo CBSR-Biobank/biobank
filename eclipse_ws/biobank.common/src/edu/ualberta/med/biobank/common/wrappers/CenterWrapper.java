@@ -352,4 +352,5 @@ public abstract class CenterWrapper<E extends Center> extends
             Arrays.asList(new Object[] { getId() }));
         return getCountResult(appService, criteria);
     }
+
 }

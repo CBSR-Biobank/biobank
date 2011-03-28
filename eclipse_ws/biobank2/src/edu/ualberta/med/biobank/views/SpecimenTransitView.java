@@ -21,6 +21,8 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -36,13 +38,16 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     public static final String ID = "edu.ualberta.med.biobank.views.SpecimenTransitView";
 
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(SpecimenTransitView.class.getName());
+
     private Button radioWaybill;
 
     private Composite dateComposite;
 
     private DateTimeWidget dateWidget;
 
-    DispatchCenterAdapter centerNode;
+    private DispatchCenterAdapter centerNode;
 
     private AbstractSearchedNode searchedNode;
 
@@ -60,12 +65,14 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         super.createPartControl(parent);
     }
 
-    public void createNodes() {
+    public void createNodes() throws Exception {
         // FIXME DD: I think this should be center based instead of site based.
         // getCurrentWorkingSite() will return null if the current center is a
         // clinic
-        if (SessionManager.getUser().getCurrentWorkingSite() != null) {
-            SessionManager.getUser().getCurrentWorkingSite().reload();
+        SiteWrapper currentSite = SessionManager.getUser()
+            .getCurrentWorkingSite();
+        if (currentSite != null) {
+            currentSite.reload();
             centerNode = new DispatchCenterAdapter(rootNode, SessionManager
                 .getUser().getCurrentWorkingSite());
             centerNode.setParent(rootNode);
@@ -162,7 +169,12 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     public void reload() {
         if (rootNode != null) {
             rootNode.removeAll();
-            createNodes();
+            try {
+                createNodes();
+            } catch (Exception e) {
+                logger.error("Error creating nodes", e);
+
+            }
             for (AdapterBase adaper : rootNode.getChildren()) {
                 adaper.rebuild();
             }
@@ -367,7 +379,8 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     @Override
     public void clear() {
-        rootNode.removeChild(centerNode);
+        if (centerNode != null)
+            rootNode.removeChild(centerNode);
         super.clear();
     }
 
