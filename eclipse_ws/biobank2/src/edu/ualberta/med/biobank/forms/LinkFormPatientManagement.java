@@ -271,8 +271,15 @@ public class LinkFormPatientManagement {
     }
 
     public List<SpecimenWrapper> getSpecimenInCollectionEvent() {
-        return getSelectedCollectionEvent()
+        List<SpecimenWrapper> specs = getSelectedCollectionEvent()
             .getSourceSpecimenCollectionInProcess(true);
+        if (specs.size() == 0) {
+            BiobankPlugin.openAsyncError(Messages
+                .getString("ScanLink.sourceSpecimenInProcess.error.title"),
+                Messages
+                    .getString("ScanLink.sourceSpecimenInProcess.error.msg"));
+        }
+        return specs;
     }
 
     /**
