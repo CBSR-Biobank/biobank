@@ -145,8 +145,9 @@ public class BiobankPlugin extends AbstractUIPlugin {
     public static final String IMG_WAND = "wand";
     public static final String IMG_HOURGLASS = "hourglass";
     public static final String IMG_LOGGING = "logging";
-    public static final String IMG_PROCESSING = "processingEvent";
+    public static final String IMG_PROCESSING = "processing";
     public static final String IMG_SAVE_AS_NEW = "saveAsNew";
+    public static final String IMG_PROCESSING_EVENT = "processingEvent";
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -210,7 +211,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
         classToImageKey.put(SpecimenAdapter.class.getName(),
             BiobankPlugin.IMG_ALIQUOT);
         classToImageKey.put(ProcessingEventAdapter.class.getName(),
-            BiobankPlugin.IMG_PROCESSING);
+            BiobankPlugin.IMG_PROCESSING_EVENT);
         classToImageKey.put(ProcessingEventGroup.class.getName(),
             BiobankPlugin.IMG_PROCESSING);
     };
@@ -334,7 +335,9 @@ public class BiobankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_WAND, "wand.png");
         registerImage(registry, IMG_HOURGLASS, "hourglass.png");
         registerImage(registry, IMG_LOGGING, "table_row_delete.png");
-        registerImage(registry, IMG_PROCESSING, "processingEvent.png");
+        registerImage(registry, IMG_PROCESSING, "processingView.png");
+        registerImage(registry, IMG_PROCESSING_EVENT,
+            "processingPerspective.png");
         registerImage(registry, IMG_SAVE_AS_NEW, "application_form_add.png");
     }
 

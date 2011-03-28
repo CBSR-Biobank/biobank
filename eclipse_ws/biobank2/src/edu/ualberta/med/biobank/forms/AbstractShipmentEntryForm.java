@@ -4,6 +4,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -66,6 +67,9 @@ public abstract class AbstractShipmentEntryForm extends BiobankEntryForm {
         toolkit.createLabel(addComposite, "Enter inventory ID to add:");
         final BiobankText newAliquotText = new BiobankText(addComposite,
             SWT.NONE, toolkit);
+        GridData gd = new GridData();
+        gd.widthHint = 100;
+        newAliquotText.setLayoutData(gd);
         newAliquotText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
