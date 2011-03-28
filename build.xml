@@ -230,10 +230,7 @@
     </uptodate>
   </target>
 
-  <target name="sdk"
-          depends="validators,check-cacore-sdk-uptodate,log4j-conf"
-          unless="cacore.sdk.uptodate"
-          description="builds the caCORE SDK from the data model">
+  <target name="sdk-nodeps">
     <copy file="sdk_conf/deploy.properties"
           tofile="${cacore.sdk.dir}/conf/deploy.properties" />
     <copy file="sdk_conf/build.properties"
@@ -251,6 +248,14 @@
     <delete file="${cacore.sdk.dir}/system/lib/mysql-connector-java-3.1.13-bin.jar" />
     <ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
   </target>
+
+  <target name="sdk"
+          depends="validators,check-cacore-sdk-uptodate,log4j-conf"
+          unless="cacore.sdk.uptodate"
+          description="builds the caCORE SDK from the data model">
+    <antcall target="sdk-nodeps" />
+  </target>
+
   <target name="log4j-conf">
     <copy file="security-logs/log4j.xml"
           tofile="${cacore.sdk.dir}/output/biobank2/conf/system/web/WEB-INF/classes/log4j.xml"
@@ -274,21 +279,17 @@
              id="sdk.jar.files">
       <include name="*.jar" />
     </fileset>
-    <pathconvert pathsep=","
-                 property="sdk.jar.files.basename"
-                 refid="sdk.jar.files">
+    <pathconvert pathsep="," property="sdk.jar.files.basename"
+      refid="sdk.jar.files">
       <map from="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/"
-           to="" />
+        to="" />
     </pathconvert>
-
     <fileset dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib"
              id="sdk.local.jar.files">
       <include name="*.jar" />
     </fileset>
-
-    <pathconvert pathsep=","
-                 property="sdk.local.jar.files.basename"
-                 refid="sdk.local.jar.files">
+    <pathconvert pathsep="," property="sdk.local.jar.files.basename"
+      refid="sdk.local.jar.files">
       <map from="${cacore.sdk.dir}/output/biobank2/package/local-client/lib/"
            to="" />
     </pathconvert>
@@ -435,7 +436,7 @@
           message="JBOSS_HOME environment variable not defined" />
   </target>
   <target name="deploy-jboss"
-          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostAicml5,hostCbsr,hostCbsrTraining,hostLocal,server-manifest"
+          depends="jboss.home.env,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostAicml5,hostCbsr,hostCbsrTraining,hostLocal,server-manifest"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
@@ -806,10 +807,9 @@
     </jar>
   </target>
 
-
   <!-- copied from sdk build.xml -->
   <target name="package-webapp-orm"
-          depends="package-codegen-orm,build-common-project">
+          depends="sdk-nodeps,sdk-files,package-codegen-orm,build-common-project">
     <war destfile="${cacore.sdk.dir}\${package.system.dir}\${PROJECT_NAME}.war"
          webxml="${cacore.sdk.dir}\${build.conf.web-inf.dir}\web.xml">
       <manifest>
