@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.server.reports;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
@@ -43,22 +44,19 @@ public class FTAReportImpl extends AbstractReport {
         // } catch (ApplicationException e) {
         // e.printStackTrace();
         // }
-        // String pnumber =
-        // a.getProcessingEvent().getPatient().getPnumber();
+        // String pnumber = a.getProcessingEvent().getPatient().getPnumber();
         // String inventoryId = a.getInventoryId();
         // String dateProcessed = DateFormatter.formatAsDate(a
         // .getProcessingEvent().getDateProcessed());
         // String stName = a.getSpecimenType().getNameShort();
-        // SpecimenWrapper aliquotWrapper = new SpecimenWrapper(appService,
-        // a);
-        // String aliquotLabel = aliquotWrapper.getPositionString(true,
-        // true);
+        // SpecimenWrapper aliquotWrapper = new SpecimenWrapper(appService, a);
+        // String aliquotLabel = aliquotWrapper.getPositionString(true, true);
         // modifiedResults.add(new Object[] { pnumber, dateProcessed,
         // inventoryId, stName,
         // aliquotWrapper.getParent().getSite().getNameShort(),
         // aliquotLabel });
         // }
         // return modifiedResults;
-        return null;
+        return new ArrayList<Object>();
     }
 }

@@ -34,11 +34,16 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     public SpecimenWrapper(WritableApplicationService appService,
         Specimen wrappedObject) {
         super(appService, wrappedObject);
-        initManagement();
+        init();
     }
 
     public SpecimenWrapper(WritableApplicationService appService) {
         super(appService);
+        init();
+    }
+
+    private void init() {
+        super.setTopSpecimen(this);
         initManagement();
     }
 
@@ -465,4 +470,30 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         objectWithPositionManagement.resetInternalFields();
     }
 
+    @Override
+    protected void persistDependencies(Specimen originalSpecimen)
+        throws Exception {
+        boolean parentChanged = (originalSpecimen != null && originalSpecimen
+            .getParentSpecimen().equals(getParentSpecimen()));
+
+        if (isNew() || parentChanged) {
+            for (SpecimenWrapper child : getChildSpecimenCollection(false)) {
+                child.setParentSpecimen(this);
+                child.persist();
+            }
+        }
+    }
+
+    @Override
+    public void setParentSpecimen(SpecimenWrapper specimen) {
+        super.setParentSpecimen(specimen);
+        super.setTopSpecimen(specimen != null ? specimen.getTopSpecimen()
+            : this);
+    }
+
+    @Override
+    public void setTopSpecimen(SpecimenWrapper specimen) {
+        // this method should never be called outside of the wrapper.
+        throw new IllegalArgumentException("this method should never be called");
+    }
 }
