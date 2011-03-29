@@ -56,8 +56,6 @@ public class SessionManager {
 
     private String currentAdministrationViewId;
 
-    private boolean superAdminMode = false;
-
     private Map<String, Boolean> perspectivesUpdateDone;
 
     private SessionManager() {
@@ -323,7 +321,7 @@ public class SessionManager {
     }
 
     public static boolean isSuperAdminMode() {
-        return getInstance().superAdminMode;
+        return getUser().isInSuperAdminMode();
     }
 
     public static void updateVisibility(IWorkbenchPage page) {
