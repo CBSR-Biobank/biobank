@@ -123,82 +123,6 @@
     <pathelement location="${eclipse.proj.dir.common}/conf" />
   </path>
 
-  <!--
-  files included in the sdk build.xml - necessary to be sure that we have
-  all the keys for the target we redefined
-  -->
-  <property file="${cacore.sdk.dir}/installer.properties" />
-  <property file="${cacore.sdk.dir}/local.properties" />
-  <property file="sdk_conf/deploy.properties" />
-  <property file="sdk_conf/build.properties" />
-  <property file="${cacore.sdk.dir}/${codegen.dir}/build.properties"
-            prefix="codegen" />
-  <property file="${cacore.sdk.dir}/${codegen.validator.dir}/build.properties"
-            prefix="validator" />
-  <property file="${cacore.sdk.dir}/${system.dir}/build.properties"
-            prefix="system" />
-  <property file="${cacore.sdk.dir}/${writable-api.dir}/build.properties"
-            prefix="writable-api" />
-  <property file="${cacore.sdk.dir}/${security.dir}/build.properties"
-            prefix="security" />
-  <property file="${cacore.sdk.dir}/${grid-remoting.dir}/build.properties"
-            prefix="grid-remoting" />
-  <property file="${cacore.sdk.dir}/${grid-jaas.dir}/build.properties"
-            prefix="grid-jaas" />
-  <condition property="server-exclude-commons-logging"
-             value="commons-logging*.*"
-             else="">
-    <equals arg1="${SERVER_TYPE}"
-            arg2="jboss"
-            casesensitive="false"
-            trim="true" />
-  </condition>
-  <condition property="server-exclude-log4j" value="log4j*.*" else="">
-    <equals arg1="${SERVER_TYPE}"
-            arg2="jboss"
-            casesensitive="false"
-            trim="true" />
-  </condition>
-  <condition property="server-exclude-classes-list" value="**/log4j*.*" else="">
-    <equals arg1="${SERVER_TYPE}"
-            arg2="jboss"
-            casesensitive="false"
-            trim="true" />
-  </condition>
-  <condition property="WRITABLE_API_EXTENSION_ENABLED"
-             value="true"
-             else="false">
-    <or>
-      <equals arg1="${ENABLE_WRITABLE_API_EXTENSION}"
-              arg2="true"
-              casesensitive="false"
-              trim="true" />
-      <equals arg1="${ENABLE_WRITABLE_API_EXTENSION}"
-              arg2="yes"
-              casesensitive="false"
-              trim="true" />
-    </or>
-  </condition>
-  <condition property="read-api-exclude-list" value="" else="*.jar">
-    <equals arg1="${WRITABLE_API_EXTENSION_ENABLED}"
-            arg2="true"
-            casesensitive="false"
-            trim="true" />
-  </condition>
-  <condition property="SECURITY_ENABLED" value="true" else="false">
-    <or>
-      <equals arg1="${ENABLE_SECURITY}"
-              arg2="true"
-              casesensitive="false"
-              trim="true" />
-      <equals arg1="${ENABLE_SECURITY}"
-              arg2="yes"
-              casesensitive="false"
-              trim="true" />
-    </or>
-  </condition>
-  <!-- end of copied part -->
-  <!-- caCORE SDK -->
   <target name="cacore-download"
           unless="cacore.sdk.tar.available"
           description="downloads caCORE SDK from the host machine">
@@ -436,7 +360,7 @@
           message="JBOSS_HOME environment variable not defined" />
   </target>
   <target name="deploy-jboss"
-          depends="jboss.home.env,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostAicml5,hostCbsr,hostCbsrTraining,hostLocal,server-manifest"
+          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostAicml5,hostCbsr,hostCbsrTraining,hostLocal,server-manifest"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
@@ -459,8 +383,9 @@
   </target>
 
   <target name="deploy" description="deploys to JBoss and Eclipse project">
-    <antcall target="deploy-eclipse" />
+    <!-- the order these are called in is important for now -->
     <antcall target="deploy-jboss" />
+    <antcall target="deploy-eclipse" />
   </target>
   <target name="schema"
           depends="sdk"
@@ -781,22 +706,22 @@
   </target>
 
   <target name="package-codegen-orm" depends="compile-generated-beans"
-          description="REDO:: Packages the generated ORM and bean artifacts">
-	<jar destfile="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}" basedir="${cacore.sdk.dir}/${build.classes.dir}">
-			<manifest>
-				<attribute name="Generated-By" value="caCORE SDK Code Generator"/>
-				<attribute name="Version" value="${VERSION}"/>
-			</manifest>
-			<fileset dir="${cacore.sdk.dir}/${output.src.dir}" includes="**/*.java" />
-	</jar>
-	<copy file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
-		tofile="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/${bean.file}"/>
-	<copy file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
-		tofile="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib/${bean.file}"/>
-	<copy file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
-		tofile="${cacore.sdk.dir}/output/biobank2/package/local-client/lib/${bean.file}"/>
+    description="REDO:: Packages the generated ORM and bean artifacts">
+    <jar destfile="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}" basedir="${cacore.sdk.dir}/${build.classes.dir}">
+      <manifest>
+        <attribute name="Generated-By" value="caCORE SDK Code Generator"/>
+        <attribute name="Version" value="${VERSION}"/>
+      </manifest>
+      <fileset dir="${cacore.sdk.dir}/${output.src.dir}" includes="**/*.java" />
+    </jar>
+    <copy overwrite="true" file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
+      tofile="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/${bean.file}"/>
+    <copy overwrite="true" file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
+      tofile="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib/${bean.file}"/>
+    <copy overwrite="true" file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
+      tofile="${cacore.sdk.dir}/output/biobank2/package/local-client/lib/${bean.file}"/>
     <jar destfile="${cacore.sdk.dir}/${build.jar.dir}/${orm.file}"
-         basedir="${cacore.sdk.dir}/${output.src.dir}">
+      basedir="${cacore.sdk.dir}/${output.src.dir}">
       <manifest>
         <attribute name="Generated-By" value="caCORE SDK Code Generator" />
         <attribute name="Version" value="${VERSION}" />
@@ -808,9 +733,88 @@
     </jar>
   </target>
 
+  <target name="prepare-webapp-orm" >
+    <!--
+    files included in the sdk build.xml - necessary to be sure that we have
+    all the keys for the target we redefined
+    -->
+    <property file="${cacore.sdk.dir}/installer.properties" />
+    <property file="${cacore.sdk.dir}/local.properties" />
+    <property file="sdk_conf/deploy.properties" />
+    <property file="sdk_conf/build.properties" />
+    <property file="${cacore.sdk.dir}/${codegen.dir}/build.properties"
+      prefix="codegen" />
+    <property file="${cacore.sdk.dir}/${codegen.validator.dir}/build.properties"
+      prefix="validator" />
+    <property file="${cacore.sdk.dir}/${system.dir}/build.properties"
+      prefix="system" />
+    <property file="${cacore.sdk.dir}/${writable-api.dir}/build.properties"
+      prefix="writable-api" />
+    <property file="${cacore.sdk.dir}/${security.dir}/build.properties"
+      prefix="security" />
+    <property file="${cacore.sdk.dir}/${grid-remoting.dir}/build.properties"
+      prefix="grid-remoting" />
+    <property file="${cacore.sdk.dir}/${grid-jaas.dir}/build.properties"
+      prefix="grid-jaas" />
+    <condition property="server-exclude-commons-logging"
+      value="commons-logging*.*"
+      else="">
+      <equals arg1="${SERVER_TYPE}"
+        arg2="jboss"
+        casesensitive="false"
+        trim="true" />
+    </condition>
+    <condition property="server-exclude-log4j" value="log4j*.*" else="">
+      <equals arg1="${SERVER_TYPE}"
+        arg2="jboss"
+        casesensitive="false"
+        trim="true" />
+    </condition>
+    <condition property="server-exclude-classes-list" value="**/log4j*.*" else="">
+      <equals arg1="${SERVER_TYPE}"
+        arg2="jboss"
+        casesensitive="false"
+        trim="true" />
+    </condition>
+    <condition property="WRITABLE_API_EXTENSION_ENABLED"
+      value="true"
+      else="false">
+      <or>
+        <equals arg1="${ENABLE_WRITABLE_API_EXTENSION}"
+          arg2="true"
+          casesensitive="false"
+          trim="true" />
+        <equals arg1="${ENABLE_WRITABLE_API_EXTENSION}"
+          arg2="yes"
+          casesensitive="false"
+          trim="true" />
+      </or>
+    </condition>
+    <condition property="read-api-exclude-list" value="" else="*.jar">
+      <equals arg1="${WRITABLE_API_EXTENSION_ENABLED}"
+        arg2="true"
+        casesensitive="false"
+        trim="true" />
+    </condition>
+    <condition property="SECURITY_ENABLED" value="true" else="false">
+      <or>
+        <equals arg1="${ENABLE_SECURITY}"
+          arg2="true"
+          casesensitive="false"
+          trim="true" />
+        <equals arg1="${ENABLE_SECURITY}"
+          arg2="yes"
+          casesensitive="false"
+          trim="true" />
+      </or>
+    </condition>
+    <!-- end of copied part -->
+    <!-- caCORE SDK -->
+  </target>
+
   <!-- copied from sdk build.xml -->
   <target name="package-webapp-orm"
-          depends="sdk-nodeps,sdk-files,package-codegen-orm,build-common-project">
+          depends="sdk-nodeps,sdk-files,prepare-webapp-orm,package-codegen-orm,build-common-project">
     <war destfile="${cacore.sdk.dir}/${package.system.dir}/${PROJECT_NAME}.war"
          webxml="${cacore.sdk.dir}/${build.conf.web-inf.dir}/web.xml">
       <manifest>
