@@ -21,8 +21,7 @@ public class ActivityStatusDialog extends BiobankDialog {
     public ActivityStatusDialog(Shell parent,
         ActivityStatusWrapper activityStatus, String message) {
         super(parent);
-        this.activityStatus = new ActivityStatusWrapper(null);
-        this.activityStatus.setName(activityStatus.getName());
+        this.activityStatus = activityStatus;
         this.message = message;
         currentTitle = (activityStatus.getName() == null ? "Add " : "Edit ")
             + TITLE;
@@ -53,9 +52,4 @@ public class ActivityStatusDialog extends BiobankDialog {
             "Name", null, activityStatus, "name", new NonEmptyStringValidator(
                 MSG_NO_ST_NAME));
     }
-
-    public ActivityStatusWrapper getActivityStatusCopy() {
-        return activityStatus;
-    }
-
 }

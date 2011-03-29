@@ -84,7 +84,8 @@ public class SpecimenEntryWidget extends BiobankWidget {
         toolkit.paintBordersFor(this);
 
         if (editable) {
-            Label label = toolkit.createLabel(this, "Enter specimen to add:");
+            Label label = toolkit.createLabel(this,
+                "Enter specimen inventory ID to add:");
             GridData gd = new GridData();
             gd.horizontalSpan = 2;
             label.setLayoutData(gd);
@@ -110,9 +111,11 @@ public class SpecimenEntryWidget extends BiobankWidget {
         }
 
         if (editable) {
-            specTable = new SpecimenEntryInfoTable(this, null, ColumnsShown.ALL);
+            specTable = new SpecimenEntryInfoTable(this, null,
+                ColumnsShown.CEVENT_FORM);
         } else {
-            specTable = new SpecimenInfoTable(this, null, ColumnsShown.ALL, 20);
+            specTable = new SpecimenInfoTable(this, null,
+                ColumnsShown.CEVENT_FORM, 20);
         }
 
         specTable.adaptToToolkit(toolkit, true);
@@ -138,11 +141,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
             try {
                 SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
                     appService, inventoryId, SessionManager.getUser());
-                if (specimen == null) {
-                    // TODO: create Specimen?
-                } else {
-                    addSpecimen(specimen);
-                }
+                addSpecimen(specimen);
             } catch (Exception e) {
                 BiobankPlugin.openAsyncError("Error while looking up specimen",
                     e);

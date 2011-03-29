@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.dialogs.startup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -10,20 +13,19 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class WorkingCenterSelectDialog extends BiobankDialog {
 
     private User user;
-    private BiobankApplicationService appService;
     private CenterWrapper<?> currentCenter;
+    private List<CenterWrapper<?>> availableCenters;
 
-    public WorkingCenterSelectDialog(Shell parentShell,
-        BiobankApplicationService appService, User user) {
+    public WorkingCenterSelectDialog(Shell parentShell, User user,
+        List<CenterWrapper<?>> availableCenters) {
         super(parentShell);
-        this.appService = appService;
         this.user = user;
+        this.availableCenters = availableCenters;
     }
 
     @Override
@@ -47,18 +49,21 @@ public class WorkingCenterSelectDialog extends BiobankDialog {
         GridLayout layout = new GridLayout(2, false);
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        widgetCreator
-            .createComboViewer(
-                contents,
-                Messages
-                    .getString("WorkingCenterSelectDialog.available.centers.label"), //$NON-NLS-1$
-                user.getWorkingCenters(appService), null, null,
-                new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
+        List<Object> objectList = new ArrayList<Object>(availableCenters);
+        String noCenterString = "-- no center selection --";
+        if (user.isInSuperAdminMode())
+            objectList.add(noCenterString);
+        widgetCreator.createComboViewer(contents, Messages
+            .getString("WorkingCenterSelectDialog.available.centers.label"), //$NON-NLS-1$
+            objectList, noCenterString, null, new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    if (selectedObject instanceof CenterWrapper<?>)
                         currentCenter = (CenterWrapper<?>) selectedObject;
-                    }
-                });
+                    else
+                        currentCenter = null;
+                }
+            });
     }
 
     @Override

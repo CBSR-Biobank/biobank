@@ -205,4 +205,8 @@ public class ProcessingView extends AbstractAdministrationView {
             }
         }
     }
+
+    public AdapterBase getProcessingNode() {
+        return processingNode;
+    }
 }

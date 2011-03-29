@@ -17,8 +17,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
 
     public static enum ColumnsShown {
         ALL(new String[] { "Inventory ID", "Type", "Patient", "Visit#",
-            "Position", "Time drawn", "Quantity (ml)", "Activity status",
-            "Comment" }) {
+            "Current Center", "Position", "Time drawn", "Quantity (ml)",
+            "Activity status", "Comment" }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -31,14 +31,16 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 3:
                     return row.pvNumber.toString();
                 case 4:
-                    return row.position;
+                    return row.center;
                 case 5:
-                    return row.createdAt;
+                    return row.position;
                 case 6:
-                    return row.quantity;
+                    return row.createdAt;
                 case 7:
-                    return row.activityStatus;
+                    return row.quantity;
                 case 8:
+                    return row.activityStatus;
+                case 9:
                     return row.comment;
                 default:
                     return "";
@@ -46,7 +48,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             }
         },
         CEVENT_FORM(new String[] { "Inventory ID", "Type", "Time drawn",
-            "Quantity (ml)", "Activity status" }) {
+            "Current Center", "Quantity (ml)", "Activity status" }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -57,8 +59,10 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 2:
                     return row.createdAt;
                 case 3:
-                    return row.quantity;
+                    return row.center;
                 case 4:
+                    return row.quantity;
+                case 5:
                     return row.activityStatus;
                 default:
                     return "";
@@ -86,6 +90,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         public String patient;
         public String pvNumber;
         public String createdAt;
+        public String center;
         public String quantity;
         public String position;
         public String activityStatus;
@@ -94,8 +99,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { inventoryId, type, patient,
-                pvNumber, createdAt, quantity, position, activityStatus,
-                comment }, "\t");
+                pvNumber, createdAt, center, quantity, position,
+                activityStatus, comment }, "\t");
         }
     }
 
@@ -146,6 +151,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         ActivityStatusWrapper status = specimen.getActivityStatus();
         info.activityStatus = (status == null) ? "" : status.getName();
         info.comment = specimen.getComment();
+        info.center = specimen.getCurrentCenter().getNameShort();
 
         return info;
     }

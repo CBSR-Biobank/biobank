@@ -271,8 +271,15 @@ public class LinkFormPatientManagement {
     }
 
     public List<SpecimenWrapper> getSpecimenInCollectionEvent() {
-        return getSelectedCollectionEvent()
+        List<SpecimenWrapper> specs = getSelectedCollectionEvent()
             .getSourceSpecimenCollectionInProcess(true);
+        if (specs.size() == 0) {
+            BiobankPlugin.openAsyncError(Messages
+                .getString("ScanLink.sourceSpecimenInProcess.error.title"),
+                Messages
+                    .getString("ScanLink.sourceSpecimenInProcess.error.msg"));
+        }
+        return specs;
     }
 
     /**
@@ -280,7 +287,8 @@ public class LinkFormPatientManagement {
      * container authorized
      */
     public List<SpecimenTypeWrapper> getStudyAliquotedTypes(
-        List<SpecimenTypeWrapper> authorizedSpecimenTypesInContainer) {
+        List<SpecimenTypeWrapper> authorizedSpecimenTypesInContainer,
+        String containerLabel) {
         StudyWrapper study = getCurrentPatient().getStudy();
         try {
             // need to reload study to avoid performance problem when using
@@ -304,10 +312,24 @@ public class LinkFormPatientManagement {
             }
         }
         if (studiesAliquotedTypes.size() == 0) {
-            BiobankPlugin.openAsyncError(Messages
-                .getString("ScanLink.aliquotedSpecimenTypes.error.title"), //$NON-NLS-1$
-                Messages.getString("ScanLink.aliquotedSpecimenTypes.error.msg", //$NON-NLS-1$
-                    getCurrentPatient().getStudy().getNameShort()));
+            String studyNameShort = "unknown";
+            if (getCurrentPatient() != null)
+                studyNameShort = getCurrentPatient().getStudy().getNameShort();
+            if (containerLabel == null)
+                BiobankPlugin.openAsyncError(Messages
+                    .getString("ScanLink.aliquotedSpecimenTypes.error.title"), //$NON-NLS-1$
+                    Messages.getString(
+                        "ScanLink.aliquotedSpecimenTypes.error.msg", //$NON-NLS-1$
+                        studyNameShort));
+            else
+                BiobankPlugin
+                    .openAsyncError(
+                        Messages
+                            .getString("ScanLink.aliquotedSpecimenTypes.error.title"), //$NON-NLS-1$
+                        Messages
+                            .getString(
+                                "ScanLink.aliquotedSpecimenTypes.error.msg.known.container", //$NON-NLS-1$
+                                studyNameShort, containerLabel));
         }
         return studiesAliquotedTypes;
     }

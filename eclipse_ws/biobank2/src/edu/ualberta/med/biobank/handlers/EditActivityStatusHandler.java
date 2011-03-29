@@ -8,7 +8,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.forms.ActivityStatusEntryForm;
+import edu.ualberta.med.biobank.forms.ActivityStatusViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 
@@ -26,7 +26,7 @@ public class EditActivityStatusHandler extends AbstractHandler {
                 .getActiveWorkbenchWindow()
                 .getActivePage()
                 .openEditor(new FormInput(sessionAdapter),
-                    ActivityStatusEntryForm.ID, false, 0);
+                    ActivityStatusViewForm.ID, false, 0);
         } catch (Exception e) {
             throw new ExecutionException("Could not execute handler.", e);
         }

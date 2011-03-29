@@ -604,18 +604,18 @@ public class TestSite extends TestDatabase {
         throws Exception {
         String name = site.getName();
 
-        List<CollectionEventWrapper> shipments = new ArrayList<CollectionEventWrapper>();
-        shipments.add(CollectionEventHelper
-            .addCollectionEventWithRandomPatient(site, name + "Study1"));
-        shipments.add(CollectionEventHelper
-            .addCollectionEventWithRandomPatient(site, name + "Study2"));
-        shipments.add(CollectionEventHelper
-            .addCollectionEventWithRandomPatient(site, name + "Study3"));
-        shipments.add(CollectionEventHelper
-            .addCollectionEventWithRandomPatient(site, name + "Study4"));
+        List<CollectionEventWrapper> cEvents = new ArrayList<CollectionEventWrapper>();
+        cEvents.add(CollectionEventHelper.addCollectionEventWithRandomPatient(
+            site, name + "Study1", 1));
+        cEvents.add(CollectionEventHelper.addCollectionEventWithRandomPatient(
+            site, name + "Study2", 2));
+        cEvents.add(CollectionEventHelper.addCollectionEventWithRandomPatient(
+            site, name + "Study3", 3));
+        cEvents.add(CollectionEventHelper.addCollectionEventWithRandomPatient(
+            site, name + "Study4", 4));
 
         site.reload();
-        return shipments;
+        return cEvents;
     }
 
     @Test

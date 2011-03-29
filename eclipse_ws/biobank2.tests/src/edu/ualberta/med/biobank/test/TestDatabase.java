@@ -2,8 +2,9 @@ package edu.ualberta.med.biobank.test;
 
 import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
+import edu.ualberta.med.biobank.common.exception.CheckFieldLimitsException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.StringValueLengthServerException;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -55,8 +56,8 @@ public class TestDatabase {
     @After
     public void tearDown() throws Exception {
         try {
-            StudyHelper.deleteCreatedStudies();
             SiteHelper.deleteCreatedSites();
+            StudyHelper.deleteCreatedStudies();
             ClinicHelper.deleteCreatedClinics();
             SpecimenTypeHelper.deleteCreatedSpecimenTypes();
             ShippingMethodHelper.deleteCreateShippingMethods();
@@ -73,6 +74,7 @@ public class TestDatabase {
         for (Method method : methods) {
             if (method.getName().startsWith("get")
                 && !method.getName().equals("getClass")
+                && !method.getName().equals("getId")
                 && !IGNORE_RETURN_TYPES.contains(method.getReturnType())
                 && !Collection.class.isAssignableFrom(method.getReturnType())
                 && !Map.class.isAssignableFrom(method.getReturnType())
@@ -182,20 +184,36 @@ public class TestDatabase {
                 String attrName = getterInfo.getMethod.getName().substring(3);
                 attrName = attrName.substring(0, 1).toLowerCase()
                     + attrName.substring(1);
-                if (VarCharLengths.getMaxSize(w.getWrappedClass(), attrName) == null)
-                    continue;
-
+                // 512 char string
+                String longString = Utils.getRandomString(511, 512);
                 try {
-                    // 512 char string
-                    String longString = Utils.getRandomString(511, 512);
                     getterInfo.setMethod.invoke(w, longString);
                     w.persist();
-                    Assert.fail("VARCHAR limits not enforced on field: "
-                        + attrName);
-                } catch (BiobankStringLengthException e) {
+                    // no specific error thrown
                     Assert.assertTrue(true);
+                } catch (StringValueLengthServerException e) {
+                    if (VarCharLengths
+                        .getMaxSize(w.getWrappedClass(), attrName) == null) {
+                        System.out
+                            .println("StringValueLengthServerException thrown but "
+                                + "no corresponding key in VarCharLengths map for "
+                                + w.getWrappedClass() + "." + attrName);
+                        continue;
+                    }
+                    // FIXME VarCharLength map does not contain information for
+                    // internal properties like street1 for centers or sub
+                    // classes like clinic
+                    Assert
+                        .fail("VARCHAR limits not checked with 'checkFieldLimits method' on field: "
+                            + w.getWrappedClass().getName() + "." + attrName);
+                } catch (CheckFieldLimitsException cfle) {
+                    if (VarCharLengths
+                        .getMaxSize(w.getWrappedClass(), attrName) == null)
+                        Assert
+                            .fail("CheckFieldLimitsException should not be thrown");
+                } finally {
+                    w.reload();
                 }
-                w.reload();
             }
         }
 

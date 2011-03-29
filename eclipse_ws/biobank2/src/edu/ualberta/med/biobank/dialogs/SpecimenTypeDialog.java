@@ -7,7 +7,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -18,9 +17,6 @@ public class SpecimenTypeDialog extends BiobankDialog {
 
     private static final String MSG_NO_ST_NAME = "Specimen type must have a name.";
     private static final String MSG_NO_ST_SNAME = "Specimen type must have a short name.";
-
-    private SpecimenTypeWrapper oldSpecimenType;
-    private SpecimenTypeWrapper origSpecimenType;
 
     // this is the object that is modified via the bound widgets
     private SpecimenTypeWrapper specimenType;
@@ -33,14 +29,9 @@ public class SpecimenTypeDialog extends BiobankDialog {
         String message) {
         super(parent);
         Assert.isNotNull(specimenType);
-        origSpecimenType = specimenType;
-        this.specimenType = new SpecimenTypeWrapper(null);
-        this.specimenType.setName(specimenType.getName());
-        this.specimenType.setNameShort(specimenType.getNameShort());
+        this.specimenType = specimenType;
         this.message = message;
-        oldSpecimenType = new SpecimenTypeWrapper(
-            SessionManager.getAppService());
-        currentTitle = ((origSpecimenType.getName() == null) ? "Add " : "Edit ")
+        currentTitle = ((specimenType.getName() == null) ? "Add " : "Edit ")
             + TITLE;
     }
 
@@ -76,15 +67,6 @@ public class SpecimenTypeDialog extends BiobankDialog {
 
     @Override
     protected void okPressed() {
-        oldSpecimenType.setName(origSpecimenType.getName());
-        oldSpecimenType.setNameShort(origSpecimenType.getNameShort());
-        origSpecimenType.setName(specimenType.getName());
-        origSpecimenType.setNameShort(specimenType.getNameShort());
         super.okPressed();
     }
-
-    public SpecimenTypeWrapper getOrigSpecimenType() {
-        return oldSpecimenType;
-    }
-
 }

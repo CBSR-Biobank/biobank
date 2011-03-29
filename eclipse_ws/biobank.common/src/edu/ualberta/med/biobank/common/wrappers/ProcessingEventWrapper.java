@@ -42,7 +42,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         ApplicationException {
         // TODO: new checks required
         // TODO at least one specimen added ?
-        if (getWorksheet() != null
+        if (isNew()
+            && getWorksheet() != null
             && getProcessingEventsWithWorksheetCount(appService, getWorksheet()) > 0) {
             throw new BiobankCheckException("Worksheet " + getWorksheet()
                 + " is already used.");
@@ -221,5 +222,13 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return ModelWrapper.wrapModelCollection(appService,
             appService.search(ProcessingEvent.class, new ProcessingEvent()),
             ProcessingEventWrapper.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
+        if (getCenter() != null)
+            return Arrays.asList(getCenter());
+        return super.getSecuritySpecificCenters();
     }
 }

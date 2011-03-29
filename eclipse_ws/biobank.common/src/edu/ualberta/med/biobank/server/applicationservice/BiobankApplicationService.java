@@ -41,19 +41,15 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public List<User> getSecurityUsers() throws ApplicationException;
 
-    public void persistUser(edu.ualberta.med.biobank.common.security.User user)
-        throws ApplicationException;
+    public User persistUser(User user) throws ApplicationException;
 
     public void deleteUser(String login) throws ApplicationException;
 
     public User getCurrentUser() throws ApplicationException;
 
-    public Group persistGroup(
-        edu.ualberta.med.biobank.common.security.Group group)
-        throws ApplicationException;
+    public Group persistGroup(Group group) throws ApplicationException;
 
-    public void deleteGroup(edu.ualberta.med.biobank.common.security.Group group)
-        throws ApplicationException;
+    public void deleteGroup(Group group) throws ApplicationException;
 
     public void unlockUser(String userName) throws ApplicationException;
 

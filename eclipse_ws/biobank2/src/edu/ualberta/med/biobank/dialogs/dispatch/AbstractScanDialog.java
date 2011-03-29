@@ -131,10 +131,10 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite contents = new Composite(parent, SWT.NONE);
-        contents.setLayout(new GridLayout(3, false));
+        contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createCustomDialogContents(contents);
+        createCustomDialogPreContents(contents);
 
         plateToScanText = (BiobankText) createBoundWidgetWithLabel(contents,
             BiobankText.class, SWT.NONE,
@@ -166,13 +166,13 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
         createScanTubeAloneButton(contents);
         GridData gd = new GridData();
-        gd.horizontalSpan = 3;
+        gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.RIGHT;
         scanTubeAloneSwitch.setLayoutData(gd);
 
         spw = new ScanPalletWidget(contents, getPalletCellStatus());
         gd = new GridData();
-        gd.horizontalSpan = 3;
+        gd.horizontalSpan = 2;
         spw.setLayoutData(gd);
 
         spw.addMouseListener(new MouseAdapter() {
@@ -195,7 +195,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     }
 
     @SuppressWarnings("unused")
-    protected void createCustomDialogContents(Composite parent) {
+    protected void createCustomDialogPreContents(Composite parent) {
     }
 
     protected abstract List<CellStatus> getPalletCellStatus();
@@ -409,7 +409,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     }
 
     protected void resetScan() {
-        spw.setCells(null);
+        if (spw != null)
+            spw.setCells(null);
         palletScanManagement.reset();
     }
 }

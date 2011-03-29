@@ -457,7 +457,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             return PalletCell.getRandomScanLink();
         }
         try {
-            return PalletCell.getRandomScanLinkWithAliquotsAlreadyLinked(
+            return PalletCell.getRandomScanLinkWithSpecimensAlreadyLinked(
                 appService, currentSelectedCenter.getId());
         } catch (Exception ex) {
             BiobankPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
@@ -518,7 +518,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         List<SpecimenTypeWrapper> studiesAliquotedTypes = null;
         if (isFirstSuccessfulScan()) {
             studiesAliquotedTypes = linkFormPatientManagement
-                .getStudyAliquotedTypes(null);
+                .getStudyAliquotedTypes(null, null);
         }
         List<SpecimenWrapper> availableSourceSpecimens = linkFormPatientManagement
             .getSpecimenInCollectionEvent();

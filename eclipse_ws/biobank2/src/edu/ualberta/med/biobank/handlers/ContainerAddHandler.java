@@ -23,6 +23,8 @@ public class ContainerAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(ContainerWrapper.class);
+        return SessionManager.getUser() != null
+            && SessionManager.getUser().getCurrentWorkingCenter() != null
+            && SessionManager.canCreate(ContainerWrapper.class);
     }
 }

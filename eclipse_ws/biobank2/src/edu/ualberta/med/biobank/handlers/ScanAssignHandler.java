@@ -17,6 +17,7 @@ public class ScanAssignHandler extends LinkAssignCommonHandler {
 
     @Override
     protected boolean canUserPerformAction(User user) {
-        return user.canPerformActions(Feature.ASSIGN);
+        return user.getCurrentWorkingSite() != null
+            && user.canPerformActions(Feature.ASSIGN);
     }
 }

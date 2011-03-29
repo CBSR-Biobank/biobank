@@ -68,7 +68,7 @@ public class ContainerLabelingSchemeWrapper extends
         return types.size() > 0;
     }
 
-    public static Map<Integer, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
+    public static synchronized Map<Integer, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
         WritableApplicationService appService) throws ApplicationException {
         if (allSchemes == null) {
             allSchemes = new HashMap<Integer, ContainerLabelingSchemeWrapper>();
@@ -146,12 +146,16 @@ public class ContainerLabelingSchemeWrapper extends
     @Override
     public void persist() throws Exception {
         super.persist();
-        allSchemes = null;
+        resetAllSchemes();
     }
 
     @Override
     public void delete() throws Exception {
         super.delete();
+        resetAllSchemes();
+    }
+
+    private static synchronized void resetAllSchemes() {
         allSchemes = null;
     }
 

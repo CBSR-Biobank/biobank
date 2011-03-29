@@ -8,7 +8,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.forms.ShippingMethodEntryForm;
+import edu.ualberta.med.biobank.forms.ShippingMethodViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 
@@ -26,7 +26,7 @@ public class EditShippingMethodsHandler extends AbstractHandler {
                 .getActiveWorkbenchWindow()
                 .getActivePage()
                 .openEditor(new FormInput(sessionAdapter),
-                    ShippingMethodEntryForm.ID, false, 0);
+                    ShippingMethodViewForm.ID, false, 0);
         } catch (Exception e) {
             throw new ExecutionException("Could not execute handler.", e);
         }

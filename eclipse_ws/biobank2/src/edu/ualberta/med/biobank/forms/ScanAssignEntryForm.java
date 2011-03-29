@@ -580,10 +580,10 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             return palletScanned;
         } else {
             if (isFakeScanLinkedOnly) {
-                return PalletCell.getRandomAliquotsNotAssigned(appService,
+                return PalletCell.getRandomSpecimensNotAssigned(appService,
                     currentPalletWrapper.getSite().getId());
             }
-            return PalletCell.getRandomAliquotsAlreadyAssigned(appService,
+            return PalletCell.getRandomSpecimensAlreadyAssigned(appService,
                 currentPalletWrapper.getSite().getId());
         }
     }

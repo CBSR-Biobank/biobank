@@ -137,7 +137,7 @@
       <command
             categoryId="org.eclipse.ui.category.window"
             id="edu.ualberta.med.biobank.commands.processingAdmin"
-            name="Open Reports View">
+            name="Open Processing View">
       </command>
       <command
             categoryId="org.eclipse.ui.category.window"
@@ -1026,7 +1026,7 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.mainAdmin"
                   icon="icons/mainPerspective.png"
-                  label="Administration View"
+                  label="Site Administration View"
                   style="push">
             </command>
             <command
@@ -1117,7 +1117,7 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.mainAdmin"
                   icon="icons/mainPerspective.png"
-                  label="Open Administration View"
+                  label="Site Administration View"
                   style="push">
             </command>
             <command
@@ -1196,7 +1196,7 @@
                id="edu.ualberta.med.biobank.views.ProcessingView">
             <command
                   commandId="edu.ualberta.med.biobank.commands.ProcessingEventAdd"
-                  icon="icons/processingEvent.png"
+                  icon="icons/processing_add.png"
                   label="Add Processing Event"
                   style="push">
                <visibleWhen
@@ -1666,9 +1666,9 @@
             name="Specimen Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.SpecimenTypesEntryForm"
+            class="edu.ualberta.med.biobank.forms.SpecimenTypesViewForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.SpecimenTypesEntryForm"
+            id="edu.ualberta.med.biobank.forms.SpecimenTypesViewForm"
             name="Specimen Types Entry">
       </editor>
       <editor
@@ -1714,9 +1714,9 @@
             name="Reports Editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.ShippingMethodEntryForm"
+            class="edu.ualberta.med.biobank.forms.ShippingMethodViewForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.ShippingMethodEntryForm"
+            id="edu.ualberta.med.biobank.forms.ShippingMethodViewForm"
             name="Shipping Method Entry">
       </editor>
       <editor
@@ -1874,10 +1874,10 @@
             name="Aliquot Study Count">
             </editor>
 <editor
-            class="edu.ualberta.med.biobank.forms.ActivityStatusEntryForm"
+            class="edu.ualberta.med.biobank.forms.ActivityStatusViewForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.ActivityStatusMethodEntryForm"
-            name="Activity StatusMethod Entry">
+            id="edu.ualberta.med.biobank.forms.ActivityStatusViewForm"
+            name="Activity Status Entry">
       </editor>
 <editor
       class="edu.ualberta.med.biobank.forms.reports.ContainerCapacityEditor"
@@ -1938,14 +1938,14 @@
 <editor
       class="edu.ualberta.med.biobank.forms.ProcessingEventEntryForm"
       default="false"
-      icon="icons/processingEvent.png"
+      icon="icons/processingPerspective.png"
       id="edu.ualberta.med.biobank.forms.ProcessingEventEntryForm"
       name="Processing Event Entry">
 </editor>
 <editor
       class="edu.ualberta.med.biobank.forms.ProcessingEventViewForm"
       default="false"
-      icon="icons/processingEvent.png"
+      icon="icons/processingPerspective.png"
       id="edu.ualberta.med.biobank.forms.ProcessingEventViewForm"
       name="Processing Event View">
 </editor>
@@ -2026,7 +2026,7 @@
             commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd"
             contextId="edu.ualberta.med.biobank.perspective.processing"
             schemeId="biobank2.scheme"
-            sequence="M3+V">
+            sequence="M3+E">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.patients.scanLink"
@@ -2253,7 +2253,7 @@
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.SessionsView"
             id="edu.ualberta.med.biobank.views.SessionsView"
-            name="Administration"
+            name="Site Administration"
             restorable="true">
 	      </view>
 	      <view
@@ -2275,7 +2275,7 @@
       <view
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.ProcessingView"
-            icon="icons/processingPerspective.png"
+            icon="icons/processingView.png"
             id="edu.ualberta.med.biobank.views.ProcessingView"
             name="Processing"
             restorable="true">

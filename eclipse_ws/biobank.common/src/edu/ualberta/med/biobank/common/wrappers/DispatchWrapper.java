@@ -459,4 +459,13 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return shipments;
     }
 
+    @Override
+    public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
+        List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>();
+        if (getSenderCenter() != null)
+            centers.add(getSenderCenter());
+        if (getReceiverCenter() != null)
+            centers.add(getReceiverCenter());
+        return centers;
+    }
 }

@@ -15,14 +15,16 @@ public class CollectionEventHelper extends DbHelper {
 
     public static CollectionEventWrapper newCollectionEvent(
         CenterWrapper<?> center, PatientWrapper patient, int visitNumber,
-        OriginInfoWrapper oi, SpecimenWrapper... originSpecimens) throws Exception {
+        OriginInfoWrapper oi, SpecimenWrapper... originSpecimens)
+        throws Exception {
         CollectionEventWrapper cevent = new CollectionEventWrapper(appService);
         cevent.setPatient(patient);
         cevent.setVisitNumber(visitNumber);
         cevent.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
         if ((originSpecimens != null) && (originSpecimens.length != 0)) {
-            cevent.addToOriginalSpecimenCollection(Arrays.asList(originSpecimens));
+            cevent.addToOriginalSpecimenCollection(Arrays
+                .asList(originSpecimens));
             for (SpecimenWrapper spc : originSpecimens) {
                 spc.setOriginInfo(oi);
                 spc.setCollectionEvent(cevent);
@@ -44,18 +46,21 @@ public class CollectionEventHelper extends DbHelper {
     }
 
     public static CollectionEventWrapper addCollectionEventWithRandomPatient(
-        CenterWrapper<?> center, String name) throws Exception {
+        CenterWrapper<?> center, String name, Integer visitNumber)
+        throws Exception {
         StudyWrapper study = StudyHelper.addStudy(name);
         study.persist();
 
         PatientWrapper patient = PatientHelper.addPatient(name, study);
-        SpecimenWrapper originSpecimen = SpecimenHelper.newSpecimen(SpecimenTypeWrapper
-            .getAllSpecimenTypes(appService, false).get(0));
+        SpecimenWrapper originSpecimen = SpecimenHelper
+            .newSpecimen(SpecimenTypeWrapper.getAllSpecimenTypes(appService,
+                false).get(0));
 
         OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
         originInfo.setCenter(center);
         originInfo.persist();
-        return addCollectionEvent(center, patient, 1, originInfo, originSpecimen);
+        return addCollectionEvent(center, patient, visitNumber, originInfo,
+            originSpecimen);
     }
 
 }
