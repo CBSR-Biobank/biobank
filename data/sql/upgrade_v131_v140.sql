@@ -105,6 +105,7 @@ CREATE TABLE specimen (
   SPECIMEN_TYPE_ID int(11) NOT NULL,
   COLLECTION_EVENT_ID int(11) NOT NULL,
   PARENT_SPECIMEN_ID int(11) DEFAULT NULL,
+  TOP_SPECIMEN_ID int(11) DEFAULT NULL,
   CURRENT_CENTER_ID int(11) DEFAULT NULL,
   PV_ID INT(11),
   PV_SV_ID INT(11),
@@ -117,7 +118,8 @@ CREATE TABLE specimen (
   KEY FKAF84F30861674F50 (PARENT_SPECIMEN_ID),
   KEY FKAF84F30833126C8 (PROCESSING_EVENT_ID),
   KEY FKAF84F308FBB79BBF (CURRENT_CENTER_ID),
-  KEY FKAF84F30838445996 (SPECIMEN_TYPE_ID)
+  KEY FKAF84F30838445996 (SPECIMEN_TYPE_ID),
+  KEY FKAF84F308C9EF5F7B (TOP_SPECIMEN_ID)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 
@@ -144,12 +146,12 @@ activity_status_id,original_collection_event_id,pv_id)
 
 INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,
        collection_event_id,original_collection_event_id,specimen_type_id,
-       parent_specimen_id,origin_info_id,pv_id,pv_sv_id)
+       parent_specimen_id,top_specimen_id,origin_info_id,pv_id,pv_sv_id)
        SELECT concat("sw upgrade ",pvsv.id),volume,
        if(pvsv.time_drawn is null,pv.date_drawn,
                addtime(timestamp(date(pv.date_drawn)), time(pvsv.time_drawn))),
        (select id from activity_status where name='Active'),0,0,specimen_type.id,
-       null,0,pv.id,pvsv.id
+       null,null,0,pv.id,pvsv.id
        FROM pv_source_vessel as pvsv
        join patient_visit as pv on pv.id=pvsv.patient_visit_id
        JOIN source_vessel as sv on sv.id=pvsv.source_vessel_id
@@ -185,7 +187,7 @@ update specimen spc, aliquot aq,dispatch_shipment_aliquot dsa,abstract_shipment 
 -- set the aliquoted specimens to point to their parent specimen
 
 update specimen as spc_a, specimen as spc_b
-       set spc_a.parent_specimen_id=spc_b.id
+       set spc_a.parent_specimen_id=spc_b.id, spc_a.top_specimen_id=spc_b.id
 	where spc_a.pv_id=spc_b.pv_id and spc_b.pv_sv_id is not null and spc_a.pv_sv_id is null;
 
 ALTER TABLE specimen MODIFY COLUMN ID INT(11) NOT NULL;
@@ -215,6 +217,9 @@ CREATE TABLE shipment_info (
     INDEX FK95BCA433DCA49682 (SHIPPING_METHOD_ID),
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
+
+create index WAYBILL_IDX on shipment_info(WAYBILL);
+create index RECEIVED_AT_IDX on shipment_info(RECEIVED_AT);
 
 INSERT INTO shipment_info (aship_id,received_at,sent_at,waybill,box_number,shipping_method_id)
 SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id FROM abstract_shipment
@@ -505,6 +510,8 @@ CREATE TABLE processing_event (
   KEY FK327B1E4EC449A4 (ACTIVITY_STATUS_ID),
   KEY FK327B1E4E92FAA705 (CENTER_ID)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+
+create index CREATED_AT_IDX on processing_event(CREATED_AT);
 
 -- add a processing event for each patient visit
 
@@ -1490,7 +1497,8 @@ ALTER TABLE specimen
       ADD CONSTRAINT FKAF84F308FBB79BBF FOREIGN KEY FKAF84F308FBB79BBF (CURRENT_CENTER_ID) REFERENCES center (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
       ADD CONSTRAINT FKAF84F30833126C8 FOREIGN KEY FKAF84F30833126C8 (PROCESSING_EVENT_ID) REFERENCES processing_event (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
       ADD CONSTRAINT FKAF84F30861674F50 FOREIGN KEY FKAF84F30861674F50 (PARENT_SPECIMEN_ID) REFERENCES specimen (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
-      ADD CONSTRAINT FKAF84F30812E55F12 FOREIGN KEY FKAF84F30812E55F12 (ORIGIN_INFO_ID) REFERENCES origin_info (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+      ADD CONSTRAINT FKAF84F30812E55F12 FOREIGN KEY FKAF84F30812E55F12 (ORIGIN_INFO_ID) REFERENCES origin_info (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FKAF84F308C9EF5F7B FOREIGN KEY FKAF84F308C9EF5F7B (TOP_SPECIMEN_ID) REFERENCES specimen (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 ALTER TABLE specimen_type_specimen_type
       ADD CONSTRAINT FKD9584463D9672259 FOREIGN KEY FKD9584463D9672259 (CHILD_SPECIMEN_TYPE_ID) REFERENCES specimen_type (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
