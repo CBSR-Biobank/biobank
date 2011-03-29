@@ -5,6 +5,8 @@ import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.util.linking.Cell;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
@@ -12,6 +14,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Application service interface obtained through
@@ -71,4 +74,10 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public List<Object> startQuery(QueryHandle qh) throws Exception;
 
     public void stopQuery(QueryHandle qh) throws Exception;
+
+    public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
+        boolean rescanMode, User user) throws ApplicationException;
+
+    public CellProcessResult processCellStatus(Cell cell, User user)
+        throws ApplicationException;
 }

@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.AliquotInfo;
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
@@ -73,10 +73,10 @@ public class DispatchReceiveScanDialog extends
         }
         switch (info.type) {
         case RECEIVED:
-            cell.setStatus(CellStatus.IN_SHIPMENT_RECEIVED);
+            cell.setStatus(UICellStatus.IN_SHIPMENT_RECEIVED);
             break;
         case DUPLICATE:
-            cell.setStatus(CellStatus.ERROR);
+            cell.setStatus(UICellStatus.ERROR);
             cell.setInformation(Messages
                 .getString("DispatchReceiveScanDialog.cell.duplicate.msg") //$NON-NLS-1$
                 + cell.getValue());
@@ -84,24 +84,24 @@ public class DispatchReceiveScanDialog extends
             errors++;
             break;
         case NOT_IN_DB:
-            cell.setStatus(CellStatus.ERROR);
+            cell.setStatus(UICellStatus.ERROR);
             cell.setInformation(Messages.getString(
                 "DispatchReceiveScanDialog.cell.notInDb.msg", cell.getValue())); //$NON-NLS-1$
             cell.setTitle("!"); //$NON-NLS-1$
             errors++;
             break;
         case NOT_IN_SHIPMENT:
-            cell.setStatus(CellStatus.EXTRA);
+            cell.setStatus(UICellStatus.EXTRA);
             cell.setInformation(Messages
                 .getString("DispatchReceiveScanDialog.cell.notInShipment.msg")); //$NON-NLS-1$
             pendingAliquotsNumber++;
             break;
         case OK:
-            cell.setStatus(CellStatus.IN_SHIPMENT_EXPECTED);
+            cell.setStatus(UICellStatus.IN_SHIPMENT_EXPECTED);
             pendingAliquotsNumber++;
             break;
         case EXTRA:
-            cell.setStatus(CellStatus.EXTRA);
+            cell.setStatus(UICellStatus.EXTRA);
             pendingAliquotsNumber++;
             break;
         }
@@ -133,7 +133,7 @@ public class DispatchReceiveScanDialog extends
                 }
                 PalletCell cell = cells.get(rcp);
                 processCellStatus(cell);
-                if (cell.getStatus() == CellStatus.EXTRA) {
+                if (cell.getStatus() == UICellStatus.EXTRA) {
                     newExtraAliquots.add(cell.getSpecimen());
                 }
             }
@@ -185,9 +185,9 @@ public class DispatchReceiveScanDialog extends
     protected void doProceed() {
         List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>();
         for (PalletCell cell : getCells().values()) {
-            if (cell.getStatus() == CellStatus.IN_SHIPMENT_EXPECTED) {
+            if (cell.getStatus() == UICellStatus.IN_SHIPMENT_EXPECTED) {
                 aliquots.add(cell.getSpecimen());
-                cell.setStatus(CellStatus.IN_SHIPMENT_RECEIVED);
+                cell.setStatus(UICellStatus.IN_SHIPMENT_RECEIVED);
             }
         }
         try {
@@ -213,8 +213,8 @@ public class DispatchReceiveScanDialog extends
     }
 
     @Override
-    protected List<CellStatus> getPalletCellStatus() {
-        return CellStatus.DEFAULT_PALLET_DISPATCH_RECEIVE_STATUS_LIST;
+    protected List<UICellStatus> getPalletCellStatus() {
+        return UICellStatus.DEFAULT_PALLET_DISPATCH_RECEIVE_STATUS_LIST;
     }
 
     @Override

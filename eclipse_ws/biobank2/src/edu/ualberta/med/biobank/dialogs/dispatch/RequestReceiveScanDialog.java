@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.AliquotInfo;
 import edu.ualberta.med.biobank.forms.RequestEntryFormBase;
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
@@ -71,33 +71,33 @@ public class RequestReceiveScanDialog extends
         }
         switch (info.type) {
         case RECEIVED:
-            cell.setStatus(CellStatus.IN_SHIPMENT_RECEIVED);
+            cell.setStatus(UICellStatus.IN_SHIPMENT_RECEIVED);
             break;
         case DUPLICATE:
-            cell.setStatus(CellStatus.ERROR);
+            cell.setStatus(UICellStatus.ERROR);
             cell.setInformation("Found more than one aliquot with inventoryId "
                 + cell.getValue());
             cell.setTitle("!");
             errors++;
             break;
         case NOT_IN_DB:
-            cell.setStatus(CellStatus.ERROR);
+            cell.setStatus(UICellStatus.ERROR);
             cell.setInformation("Aliquot " + cell.getValue()
                 + " not found in database");
             cell.setTitle("!");
             errors++;
             break;
         case NOT_IN_SHIPMENT:
-            cell.setStatus(CellStatus.EXTRA);
+            cell.setStatus(UICellStatus.EXTRA);
             cell.setInformation("Aliquot should not be in shipment");
             pendingAliquotsNumber++;
             break;
         case OK:
-            cell.setStatus(CellStatus.IN_SHIPMENT_EXPECTED);
+            cell.setStatus(UICellStatus.IN_SHIPMENT_EXPECTED);
             pendingAliquotsNumber++;
             break;
         case EXTRA:
-            cell.setStatus(CellStatus.EXTRA);
+            cell.setStatus(UICellStatus.EXTRA);
             pendingAliquotsNumber++;
             break;
         }
@@ -127,7 +127,7 @@ public class RequestReceiveScanDialog extends
                 }
                 PalletCell cell = cells.get(rcp);
                 processCellStatus(cell);
-                if (cell.getStatus() == CellStatus.EXTRA) {
+                if (cell.getStatus() == UICellStatus.EXTRA) {
                     newExtraAliquots.add(cell.getSpecimen());
                 }
             }
@@ -168,9 +168,9 @@ public class RequestReceiveScanDialog extends
     protected void doProceed() {
         List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>();
         for (PalletCell cell : getCells().values()) {
-            if (cell.getStatus() == CellStatus.IN_SHIPMENT_EXPECTED) {
+            if (cell.getStatus() == UICellStatus.IN_SHIPMENT_EXPECTED) {
                 aliquots.add(cell.getSpecimen());
-                cell.setStatus(CellStatus.IN_SHIPMENT_RECEIVED);
+                cell.setStatus(UICellStatus.IN_SHIPMENT_RECEIVED);
             }
         }
         try {
@@ -193,8 +193,8 @@ public class RequestReceiveScanDialog extends
     }
 
     @Override
-    protected List<CellStatus> getPalletCellStatus() {
-        return CellStatus.REQUEST_PALLET_STATUS_LIST;
+    protected List<UICellStatus> getPalletCellStatus() {
+        return UICellStatus.REQUEST_PALLET_STATUS_LIST;
     }
 
     @Override

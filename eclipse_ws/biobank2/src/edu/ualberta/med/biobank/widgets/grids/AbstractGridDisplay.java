@@ -14,7 +14,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.UICellStatus;
 
 /**
  * Draw a grid according to specific parameters : total number of rows, total
@@ -146,7 +146,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     protected Color getDefaultBackgroundColor(PaintEvent e,
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
         int indexRow, int indexCol) {
-        return CellStatus.EMPTY.getColor();
+        return UICellStatus.EMPTY.getColor();
     }
 
     @SuppressWarnings("unused")

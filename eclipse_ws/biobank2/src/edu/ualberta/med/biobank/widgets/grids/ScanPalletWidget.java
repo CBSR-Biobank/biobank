@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileSettings;
@@ -16,7 +16,7 @@ public class ScanPalletWidget extends ContainerDisplayWidget {
         this(parent, null);
     }
 
-    public ScanPalletWidget(Composite parent, List<CellStatus> cellStatus) {
+    public ScanPalletWidget(Composite parent, List<UICellStatus> cellStatus) {
         super(parent, cellStatus);
         setContainerDisplay(new ScanPalletDisplay(this));
     }

@@ -12,7 +12,7 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.ContainerCell;
 
 /**
@@ -44,7 +44,7 @@ public class Drawer36Display extends AbstractContainerDisplay {
     public static int LEGEND_HEIGHT = 20;
 
     @Override
-    public void initLegend(List<CellStatus> status) {
+    public void initLegend(List<UICellStatus> status) {
         super.initLegend(status);
         hasLegend = true;
     }
@@ -134,21 +134,21 @@ public class Drawer36Display extends AbstractContainerDisplay {
         }
         if (hasLegend) {
             for (int i = 0; i < legendStatus.size(); i++) {
-                CellStatus status = legendStatus.get(i);
+                UICellStatus status = legendStatus.get(i);
                 drawLegend(e, status.getColor(), i, status.getLegend());
             }
         }
     }
 
-    private CellStatus getStatus(Map<RowColPos, ? extends Cell> cells,
+    private UICellStatus getStatus(Map<RowColPos, ? extends Cell> cells,
         int boxIndex) {
-        CellStatus status = null;
+        UICellStatus status = null;
         if (cells != null) {
             status = ((ContainerCell) cells.get(new RowColPos(boxIndex - 1, 0)))
                 .getStatus();
         }
         if (status == null)
-            status = CellStatus.NOT_INITIALIZED;
+            status = UICellStatus.NOT_INITIALIZED;
         return status;
     }
 

@@ -33,7 +33,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
@@ -128,7 +128,7 @@ public class GenericAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         palletComposite.setLayoutData(new GridData());
         //        palletLabel = toolkit.createLabel(palletComposite, "Pallet"); //$NON-NLS-1$
         parentContainerWidget = new ScanPalletWidget(palletComposite,
-            CellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST);
+            UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST);
         toolkit.adapt(parentContainerWidget);
         parentContainerWidget.addMouseListener(new MouseAdapter() {
             @Override
@@ -403,9 +403,9 @@ public class GenericAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                     + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
                 PalletCell cell = getCells().get(rcp);
                 if (!isRescanMode() || cell == null || cell.getStatus() == null
-                    || cell.getStatus() == CellStatus.EMPTY
-                    || cell.getStatus() == CellStatus.ERROR
-                    || cell.getStatus() == CellStatus.MISSING) {
+                    || cell.getStatus() == UICellStatus.EMPTY
+                    || cell.getStatus() == UICellStatus.ERROR
+                    || cell.getStatus() == UICellStatus.MISSING) {
                     SpecimenWrapper expectedAliquot = null;
                     if (expectedAliquots != null) {
                         expectedAliquot = expectedAliquots.get(rcp);
@@ -455,7 +455,7 @@ public class GenericAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                 if (expectedAliquot != null) {
                     // aliquot scanned is already registered at this
                     // position (everything is ok !)
-                    scanCell.setStatus(CellStatus.FILLED);
+                    scanCell.setStatus(UICellStatus.FILLED);
                     scanCell.setTitle(foundAliquot.getCollectionEvent()
                         .getPatient().getPnumber());
                     scanCell.setSpecimen(expectedAliquot);

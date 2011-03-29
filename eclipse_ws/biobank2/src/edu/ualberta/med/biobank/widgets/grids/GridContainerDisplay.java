@@ -10,7 +10,7 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.ContainerCell;
 
 public class GridContainerDisplay extends AbstractGridDisplay {
@@ -20,7 +20,7 @@ public class GridContainerDisplay extends AbstractGridDisplay {
     /**
      * Default status when cell doesn't have any status
      */
-    private CellStatus defaultStatus = CellStatus.NOT_INITIALIZED;
+    private UICellStatus defaultStatus = UICellStatus.NOT_INITIALIZED;
 
     @Override
     protected void paintGrid(PaintEvent e, ContainerDisplayWidget displayWidget) {
@@ -30,7 +30,7 @@ public class GridContainerDisplay extends AbstractGridDisplay {
         }
         if (hasLegend) {
             for (int i = 0; i < legendStatus.size(); i++) {
-                CellStatus status = legendStatus.get(i);
+                UICellStatus status = legendStatus.get(i);
                 drawLegend(e, status.getColor(), i, status.getLegend());
             }
         }
@@ -46,7 +46,7 @@ public class GridContainerDisplay extends AbstractGridDisplay {
             if (cell == null) {
                 cell = new ContainerCell();
             }
-            CellStatus status = cell.getStatus();
+            UICellStatus status = cell.getStatus();
             if (status == null)
                 status = defaultStatus;
             return status.getColor();
@@ -100,7 +100,7 @@ public class GridContainerDisplay extends AbstractGridDisplay {
     // this.legendStatus = legendStatus;
     // }
 
-    public void setDefaultStatus(CellStatus status) {
+    public void setDefaultStatus(UICellStatus status) {
         this.defaultStatus = status;
     }
 

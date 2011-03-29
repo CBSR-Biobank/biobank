@@ -30,7 +30,7 @@ public class User implements Serializable, NotAProxy {
     private String email;
     private boolean isLockedOut;
 
-    private List<CenterWrapper<?>> workingCenters;
+    private transient List<CenterWrapper<?>> workingCenters;
 
     private transient CenterWrapper<?> currentWorkingCenter;
 

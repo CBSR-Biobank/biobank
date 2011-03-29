@@ -7,6 +7,8 @@ import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.util.linking.Cell;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.Site;
@@ -19,6 +21,7 @@ import gov.nih.nci.system.dao.Response;
 import gov.nih.nci.system.util.ClassCache;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -184,4 +187,25 @@ public class BiobankApplicationServiceImpl extends
         return BiobankVersionUtil.getServerVersion();
     }
 
+    @Override
+    public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
+        boolean rescanMode, User user) throws ApplicationException {
+        try {
+            return BiobankSpecimenProcessUtil.processScanLinkResult(this, cells,
+                rescanMode, user);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public CellProcessResult processCellStatus(Cell cell, User user)
+        throws ApplicationException {
+        try {
+            return BiobankSpecimenProcessUtil.processCellLinkStatus(this, cell,
+                user);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+    }
 }

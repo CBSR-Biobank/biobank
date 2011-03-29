@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -428,7 +428,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected boolean canScanTubeAlone(PalletCell cell) {
-        return cell == null || cell.getStatus() == CellStatus.EMPTY;
+        return cell == null || cell.getStatus() == UICellStatus.EMPTY;
     }
 
     protected abstract void postprocessScanTubeAlone(PalletCell cell)

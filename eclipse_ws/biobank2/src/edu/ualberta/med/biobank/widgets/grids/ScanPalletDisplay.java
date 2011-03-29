@@ -14,7 +14,7 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileSettings;
@@ -66,7 +66,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     }
 
     @Override
-    public void initLegend(List<CellStatus> status) {
+    public void initLegend(List<UICellStatus> status) {
         super.initLegend(status);
         hasLegend = true;
         legendWidth = PALLET_WIDTH / legendStatus.size();
@@ -84,7 +84,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         super.paintGrid(e, displayWidget);
         if (hasLegend) {
             for (int i = 0; i < legendStatus.size(); i++) {
-                CellStatus status = legendStatus.get(i);
+                UICellStatus status = legendStatus.get(i);
                 drawLegend(e, status.getColor(), i, status.getLegend());
             }
         }

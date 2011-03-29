@@ -40,7 +40,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
@@ -187,10 +187,10 @@ public class ContainerViewForm extends BiobankViewForm {
                     ContainerWrapper container = childrenMap.get(new RowColPos(
                         i, j));
                     if (container == null) {
-                        cell.setStatus(CellStatus.NOT_INITIALIZED);
+                        cell.setStatus(UICellStatus.NOT_INITIALIZED);
                     } else {
                         cell.setContainer(container);
-                        cell.setStatus(CellStatus.INITIALIZED);
+                        cell.setStatus(UICellStatus.INITIALIZED);
                     }
                 }
             }
@@ -236,7 +236,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 SWT.COLOR_RED));
         }
         containerWidget = new ContainerDisplayWidget(client,
-            CellStatus.DEFAULT_CONTAINER_STATUS_LIST);
+            UICellStatus.DEFAULT_CONTAINER_STATUS_LIST);
         containerWidget.setContainer(container);
         containerWidget.setCells(cells);
         toolkit.adapt(containerWidget);
@@ -474,7 +474,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void openFormFor(ContainerCell cell) {
         ContainerAdapter newAdapter = null;
-        if (cell.getStatus() == CellStatus.NOT_INITIALIZED) {
+        if (cell.getStatus() == UICellStatus.NOT_INITIALIZED) {
             if (canCreate) {
                 ContainerWrapper containerToOpen = cell.getContainer();
                 if (containerToOpen == null) {

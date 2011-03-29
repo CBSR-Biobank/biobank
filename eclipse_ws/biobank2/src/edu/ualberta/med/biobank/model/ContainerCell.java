@@ -10,7 +10,7 @@ public class ContainerCell extends Cell {
 
     private ContainerWrapper container;
 
-    private CellStatus status;
+    private UICellStatus status;
 
     public ContainerCell() {
     }
@@ -25,11 +25,11 @@ public class ContainerCell extends Cell {
         this(row, col, null);
     }
 
-    public CellStatus getStatus() {
+    public UICellStatus getStatus() {
         return status;
     }
 
-    public void setStatus(CellStatus status) {
+    public void setStatus(UICellStatus status) {
         this.status = status;
     }
 

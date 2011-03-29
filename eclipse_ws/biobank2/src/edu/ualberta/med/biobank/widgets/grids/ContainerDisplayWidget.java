@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionManager;
 
 /**
@@ -53,13 +53,13 @@ public class ContainerDisplayWidget extends Canvas {
      */
     protected int maxHeight = -1;
 
-    private List<CellStatus> cellStatus;
+    private List<UICellStatus> cellStatus;
 
     public ContainerDisplayWidget(Composite parent) {
         this(parent, null);
     }
 
-    public ContainerDisplayWidget(Composite parent, List<CellStatus> cellStatus) {
+    public ContainerDisplayWidget(Composite parent, List<UICellStatus> cellStatus) {
         super(parent, SWT.DOUBLE_BUFFERED);
         addPaintListener(new PaintListener() {
             @Override

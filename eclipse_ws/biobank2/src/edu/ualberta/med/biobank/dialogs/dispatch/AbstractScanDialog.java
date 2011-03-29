@@ -32,7 +32,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -198,7 +198,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     protected void createCustomDialogPreContents(Composite parent) {
     }
 
-    protected abstract List<CellStatus> getPalletCellStatus();
+    protected abstract List<UICellStatus> getPalletCellStatus();
 
     private void launchScan() {
         setScanOkValue(false);
@@ -389,8 +389,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     }
 
     protected boolean canScanTubeAlone(PalletCell cell) {
-        return cell == null || cell.getStatus() == CellStatus.EMPTY
-            || cell.getStatus() == CellStatus.MISSING;
+        return cell == null || cell.getStatus() == UICellStatus.EMPTY
+            || cell.getStatus() == UICellStatus.MISSING;
     }
 
     @SuppressWarnings("unused")

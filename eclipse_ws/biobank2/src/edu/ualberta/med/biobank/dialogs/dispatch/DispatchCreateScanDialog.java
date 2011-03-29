@@ -28,7 +28,7 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper.CheckStatus;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -147,8 +147,8 @@ public class DispatchCreateScanDialog extends
     }
 
     private boolean cellOk(PalletCell cell) {
-        return cell == null || cell.getStatus() == CellStatus.FILLED
-            || cell.getStatus() == CellStatus.IN_SHIPMENT_ADDED;
+        return cell == null || cell.getStatus() == UICellStatus.FILLED
+            || cell.getStatus() == UICellStatus.IN_SHIPMENT_ADDED;
     }
 
     private void processCell(IProgressMonitor monitor, RowColPos rcp,
@@ -180,7 +180,7 @@ public class DispatchCreateScanDialog extends
         SpecimenWrapper expectedAliquot = scanCell.getExpectedSpecimen();
         String value = scanCell.getValue();
         if (value == null) { // no aliquot scanned
-            scanCell.setStatus(CellStatus.MISSING);
+            scanCell.setStatus(UICellStatus.MISSING);
             scanCell.setInformation(Messages.getString(
                 "ScanAssign.scanStatus.aliquot.missing", //$NON-NLS-1$
                 expectedAliquot.getInventoryId()));
@@ -191,14 +191,14 @@ public class DispatchCreateScanDialog extends
                     SessionManager.getUser());
             if (foundAliquot == null) {
                 // not in database
-                scanCell.setStatus(CellStatus.ERROR);
+                scanCell.setStatus(UICellStatus.ERROR);
                 scanCell.setInformation(Messages
                     .getString("ScanAssign.scanStatus.aliquot.notlinked")); //$NON-NLS-1$
             } else {
                 if (expectedAliquot != null
                     && !foundAliquot.equals(expectedAliquot)) {
                     // Position taken
-                    scanCell.setStatus(CellStatus.ERROR);
+                    scanCell.setStatus(UICellStatus.ERROR);
                     scanCell
                         .setInformation(Messages
                             .getString("ScanAssign.scanStatus.aliquot.positionTakenError")); //$NON-NLS-1$
@@ -213,7 +213,7 @@ public class DispatchCreateScanDialog extends
                         if (check.ok) {
                             // aliquot scanned is already registered at this
                             // position (everything is ok !)
-                            scanCell.setStatus(CellStatus.FILLED);
+                            scanCell.setStatus(UICellStatus.FILLED);
                             scanCell.setTitle(foundAliquot.getCollectionEvent()
                                 .getPatient().getPnumber());
                             scanCell.setSpecimen(foundAliquot);
@@ -222,15 +222,15 @@ public class DispatchCreateScanDialog extends
                                 // was already added. Ok but just display the
                                 // right color
                                 scanCell
-                                    .setStatus(CellStatus.IN_SHIPMENT_ADDED);
+                                    .setStatus(UICellStatus.IN_SHIPMENT_ADDED);
                             }
                         } else {
-                            scanCell.setStatus(CellStatus.ERROR);
+                            scanCell.setStatus(UICellStatus.ERROR);
                             scanCell.setInformation(check.message);
                         }
                     } else {
                         // should not be there
-                        scanCell.setStatus(CellStatus.ERROR);
+                        scanCell.setStatus(UICellStatus.ERROR);
                         scanCell.setTitle(foundAliquot.getCollectionEvent()
                             .getPatient().getPnumber());
                         scanCell
@@ -266,9 +266,9 @@ public class DispatchCreateScanDialog extends
     protected void doProceed() throws Exception {
         List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>();
         for (PalletCell cell : getCells().values()) {
-            if (cell.getStatus() != CellStatus.MISSING) {
+            if (cell.getStatus() != UICellStatus.MISSING) {
                 aliquots.add(cell.getSpecimen());
-                cell.setStatus(CellStatus.IN_SHIPMENT_ADDED);
+                cell.setStatus(UICellStatus.IN_SHIPMENT_ADDED);
             }
         }
         (currentShipment).addAliquots(aliquots);
@@ -301,8 +301,8 @@ public class DispatchCreateScanDialog extends
     }
 
     @Override
-    protected List<CellStatus> getPalletCellStatus() {
-        return CellStatus.DEFAULT_PALLET_DISPATCH_CREATE_STATUS_LIST;
+    protected List<UICellStatus> getPalletCellStatus() {
+        return UICellStatus.DEFAULT_PALLET_DISPATCH_CREATE_STATUS_LIST;
     }
 
     @Override
@@ -337,7 +337,7 @@ public class DispatchCreateScanDialog extends
     @Override
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
         processCellStatus(cell);
-        if (cell.getStatus() == CellStatus.ERROR) {
+        if (cell.getStatus() == UICellStatus.ERROR) {
             Button okButton = getButton(IDialogConstants.PROCEED_ID);
             okButton.setEnabled(false);
         }

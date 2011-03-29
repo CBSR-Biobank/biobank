@@ -37,6 +37,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.util.linking.SpecimenHierarchy;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -889,10 +890,9 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
     protected void doBeforeSave() throws Exception {
         // can't acces the combos in another thread, so do it now
         if (aliquotMode == AliquotMode.NEW_ALIQUOT) {
-            specimen.setParentSpecimen((SpecimenWrapper) typeWidget
-                .getSelection()[0]);
-            specimen.setSpecimenType((SpecimenTypeWrapper) typeWidget
-                .getSelection()[1]);
+            SpecimenHierarchy selection = typeWidget.getSelection();
+            specimen.setParentSpecimen(selection.getParentSpecimen());
+            specimen.setSpecimenType(selection.getAliquotedSpecimenType());
         }
     }
 
