@@ -613,8 +613,8 @@ public class ReportEntryForm extends BiobankEntryForm {
 
         // TODO: Need to add a command (and handler) for a shortcut to work, but
         // it won't be able to invoke the Action's run method.
-        saveAsNewAction
-            .setActionDefinitionId("edu.ualberta.med.biobank.commands.saveAsNew");
+        // saveAsNewAction
+        // .setActionDefinitionId("edu.ualberta.med.biobank.commands.saveAsNew");
 
         saveAsNewAction.setImageDescriptor(SAVE_AS_NEW_ACTION_IMAGE);
         saveAsNewAction.setToolTipText("Save As New Report");

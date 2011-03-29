@@ -135,11 +135,17 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         propertiesMap.clear();
         propertyMap.clear();
         resetInternalFields();
+
+        E oldValue = wrappedObject;
+
         if (!isNew()) {
-            E oldValue = wrappedObject;
             wrappedObject = getObjectFromDatabase();
-            firePropertyChanges(oldValue, wrappedObject);
+            if (wrappedObject == null) {
+                wrappedObject = getNewObject();
+            }
         }
+
+        firePropertyChanges(oldValue, wrappedObject);
     }
 
     /**
@@ -781,8 +787,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         if (wrappers == null && !modelWrapper.isCached(property)) {
             Collection<R> raw = getModelProperty(modelWrapper, property);
-            wrappers = wrapModelCollection(appService, (List<R>) raw,
-                wrapperKlazz);
+
+            List<R> list = (raw instanceof List) ? (List<R>) raw
+                : new ArrayList<R>(raw);
+
+            wrappers = wrapModelCollection(appService, list, wrapperKlazz);
             modelWrapper.cache(property, wrappers);
         }
 

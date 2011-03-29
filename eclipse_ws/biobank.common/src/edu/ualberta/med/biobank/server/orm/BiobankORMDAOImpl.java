@@ -7,6 +7,7 @@ import edu.ualberta.med.biobank.common.reports.QueryProcess;
 import edu.ualberta.med.biobank.server.applicationservice.ReportData;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import edu.ualberta.med.biobank.server.reports.ReportRunner;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.dao.DAOException;
 import gov.nih.nci.system.dao.Request;
 import gov.nih.nci.system.dao.Response;
@@ -15,6 +16,7 @@ import gov.nih.nci.system.dao.orm.WritableORMDAOImpl;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.HibernateException;
 import org.hibernate.JDBCException;
@@ -32,7 +34,7 @@ import org.springframework.orm.hibernate3.HibernateCallback;
  * application-config*.xml for the generated files.
  */
 public class BiobankORMDAOImpl extends WritableORMDAOImpl {
-    private static int nextHandleId = 0;
+    private static AtomicInteger nextHandleId = new AtomicInteger(0);
     private static final HashMap<QueryHandle, QueryProcess> queryMap = new HashMap<QueryHandle, QueryProcess>();
 
     @Override
@@ -61,7 +63,8 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         } else if (request.getRequest() instanceof QueryHandleRequest) {
             QueryHandleRequest qhr = (QueryHandleRequest) request.getRequest();
             if (qhr.getCommandType().equals(CommandType.CREATE)) {
-                QueryHandle handle = new QueryHandle(nextHandleId++);
+                QueryHandle handle = new QueryHandle(
+                    nextHandleId.incrementAndGet());
                 try {
                     queryMap.put(handle, new QueryProcess(
                         qhr.getQueryCommand(), qhr.getAppService()));
@@ -70,15 +73,19 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
                 } catch (IllegalStateException e) {
                     e.printStackTrace();
                 }
-                return new Response(new QueryHandle(nextHandleId - 1));
+                return new Response(handle);
             } else if (qhr.getCommandType().equals(CommandType.STOP)) {
                 queryMap.get(qhr.getQueryHandle()).stop();
                 return new Response();
             } else {
-                Response r = queryMap.get(qhr.getQueryHandle()).start(
-                    getSession());
-                queryMap.remove(qhr.getQueryHandle());
-                return r;
+                try {
+                    return queryMap.get(qhr.getQueryHandle()).start(
+                        getSession());
+                } catch (ApplicationException e) {
+                    throw new DAOException(e);
+                } finally {
+                    queryMap.remove(qhr.getQueryHandle());
+                }
             }
         }
         return super.query(request);
