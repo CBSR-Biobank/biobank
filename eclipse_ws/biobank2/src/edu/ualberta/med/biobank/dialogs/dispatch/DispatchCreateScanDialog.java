@@ -13,6 +13,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
@@ -36,31 +37,15 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 public class DispatchCreateScanDialog extends
     AbstractScanDialog<DispatchWrapper> {
 
-    private class ProductBarcodeValue {
-        private String value;
-
-        @SuppressWarnings("unused")
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        @SuppressWarnings("unused")
-        public String getValue() {
-            return value;
-        }
-    }
-
-    private static final String TITLE = "Scanning aliquots";
+    private static final String TITLE = Messages
+        .getString("DispatchCreateScanDialog.title"); //$NON-NLS-1$
     private BiobankText palletproductBarcodeText;
     private NonEmptyStringValidator productBarcodeValidator;
     private String currentProductBarcode;
-    private Button newPalletCheckBox;
-    private boolean isNewPallet;
+    private boolean isPalletWithPosition;
     private boolean aliquotsAdded = false;
     private ContainerWrapper currentPallet;
     private List<ContainerWrapper> removedPallets = new ArrayList<ContainerWrapper>();
-
-    private ProductBarcodeValue productBarcodeValue;
 
     public DispatchCreateScanDialog(Shell parentShell,
         DispatchWrapper currentShipment, CenterWrapper<?> site) {
@@ -68,32 +53,45 @@ public class DispatchCreateScanDialog extends
     }
 
     @Override
-    protected void createCustomDialogContents(Composite parent) {
-        productBarcodeValidator = new NonEmptyStringValidator(
-            Messages.getString("ScanAssign.productBarcode.validationMsg"));
-        palletproductBarcodeText = (BiobankText) createBoundWidgetWithLabel(
-            parent, BiobankText.class, SWT.NONE,
-            Messages.getString("ScanAssign.productBarcode.label"), //$NON-NLS-1$
-            null, productBarcodeValue, "value", productBarcodeValidator); //$NON-NLS-1$
-        palletproductBarcodeText
-            .addKeyListener(new EnterKeyToNextFieldListener());
+    protected void createCustomDialogPreContents(final Composite parent) {
+        Button palletWithoutPositionRadio = new Button(parent, SWT.RADIO);
+        palletWithoutPositionRadio.setText(Messages
+            .getString("DispatchCreateScanDialog.without.position.radio.text")); //$NON-NLS-1$
+        final Button palletWithPositionRadio = new Button(parent, SWT.RADIO);
+        palletWithPositionRadio.setText(Messages
+            .getString("DispatchCreateScanDialog.with.position.radio.text")); //$NON-NLS-1$
 
-        newPalletCheckBox = new Button(parent, SWT.CHECK);
-        newPalletCheckBox.setText("new pallet");
-        newPalletCheckBox.addSelectionListener(new SelectionAdapter() {
+        palletWithPositionRadio.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                resetScan();
-                if (newPalletCheckBox.getSelection()) {
-                    palletproductBarcodeText.setEnabled(false);
-                    palletproductBarcodeText.setText("no product barcode");
-                } else {
-                    palletproductBarcodeText.setEnabled(true);
-                    palletproductBarcodeText.setText("");
-                }
-
+                isPalletWithPosition = palletWithPositionRadio.getSelection();
+                showProductBarcodeField(palletWithPositionRadio.getSelection());
             }
         });
+
+        productBarcodeValidator = new NonEmptyStringValidator(
+            Messages.getString("ScanAssign.productBarcode.validationMsg"));//$NON-NLS-1$
+        Label palletproductBarcodeLabel = widgetCreator.createLabel(parent,
+            Messages.getString("ScanAssign.productBarcode.label"));//$NON-NLS-1$
+        palletproductBarcodeText = (BiobankText) createBoundWidget(parent,
+            BiobankText.class, SWT.NONE, palletproductBarcodeLabel,
+            new String[0], this,
+            "currentProductBarcode", productBarcodeValidator); //$NON-NLS-1$
+        palletproductBarcodeText
+            .addKeyListener(new EnterKeyToNextFieldListener());
+        showProductBarcodeField(false);
+        palletWithoutPositionRadio.setSelection(true);
+    }
+
+    private void showProductBarcodeField(boolean show) {
+        resetScan();
+        palletproductBarcodeText.setEnabled(show);
+        if (show) {
+            palletproductBarcodeText.setText(""); //$NON-NLS-1$
+        } else {
+            palletproductBarcodeText.setText(Messages
+                .getString("DispatchCreateScanDialog.noposision.text")); //$NON-NLS-1$
+        }
     }
 
     @Override
@@ -104,25 +102,12 @@ public class DispatchCreateScanDialog extends
     }
 
     @Override
-    protected void beforeScanThreadStart() {
-        currentProductBarcode = palletproductBarcodeText.getText();
-        isNewPallet = newPalletCheckBox.getSelection();
-    }
-
-    @Override
     protected void processScanResult(IProgressMonitor monitor,
         CenterWrapper<?> site) throws Exception {
         aliquotsAdded = false;
         boolean scanOk = true;
         currentPallet = null;
-        if (isNewPallet) {
-            for (PalletCell cell : getCells().values()) {
-                processCell(monitor,
-                    new RowColPos(cell.getRow(), cell.getCol()), cell, null);
-                processCellStatus(cell);
-                scanOk = scanOk && cellOk(cell);
-            }
-        } else {
+        if (isPalletWithPosition) {
             currentPallet = ContainerWrapper
                 .getContainerWithProductBarcodeInSite(
                     SessionManager.getAppService(), (SiteWrapper) site,
@@ -142,9 +127,20 @@ public class DispatchCreateScanDialog extends
                 }
 
             } else {
-                BiobankPlugin.openAsyncError("Pallet error",
-                    "Can't find pallet with barcode '" + currentProductBarcode
-                        + "'");
+                BiobankPlugin
+                    .openAsyncError(
+                        Messages
+                            .getString("DispatchCreateScanDialog.pallet.search.error.title"), //$NON-NLS-1$
+                        Messages.getString(
+                            "DispatchCreateScanDialog.pallet.search.error.msg", //$NON-NLS-1$
+                            currentProductBarcode));
+            }
+        } else {
+            for (PalletCell cell : getCells().values()) {
+                processCell(monitor,
+                    new RowColPos(cell.getRow(), cell.getCol()), cell, null);
+                processCellStatus(cell);
+                scanOk = scanOk && cellOk(cell);
             }
         }
         setScanOkValue(scanOk);
@@ -158,8 +154,9 @@ public class DispatchCreateScanDialog extends
     private void processCell(IProgressMonitor monitor, RowColPos rcp,
         PalletCell cell, Map<RowColPos, SpecimenWrapper> expectedAliquots)
         throws Exception {
-        monitor.subTask("Processing position "
-            + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
+        monitor.subTask(Messages.getString(
+            "DispatchCreateScanDialog.processCell.task.position", //$NON-NLS-1$
+            ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
         SpecimenWrapper expectedAliquot = null;
         if (expectedAliquots != null) {
             expectedAliquot = expectedAliquots.get(rcp);
@@ -184,10 +181,9 @@ public class DispatchCreateScanDialog extends
         String value = scanCell.getValue();
         if (value == null) { // no aliquot scanned
             scanCell.setStatus(CellStatus.MISSING);
-            scanCell
-                .setInformation(Messages
-                    .getString(
-                        "ScanAssign.scanStatus.aliquot.missing", expectedAliquot.getInventoryId())); //$NON-NLS-1$
+            scanCell.setInformation(Messages.getString(
+                "ScanAssign.scanStatus.aliquot.missing", //$NON-NLS-1$
+                expectedAliquot.getInventoryId()));
             scanCell.setTitle("?"); //$NON-NLS-1$
         } else {
             SpecimenWrapper foundAliquot = SpecimenWrapper
@@ -247,7 +243,7 @@ public class DispatchCreateScanDialog extends
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Scan aliquots to dispatch";
+        return Messages.getString("DispatchCreateScanDialog.description"); //$NON-NLS-1$
     }
 
     @Override
@@ -262,7 +258,8 @@ public class DispatchCreateScanDialog extends
 
     @Override
     protected String getProceedButtonlabel() {
-        return "Add aliquots";
+        return Messages
+            .getString("DispatchCreateScanDialog.proceed.button.label"); //$NON-NLS-1$
     }
 
     @Override
@@ -345,5 +342,13 @@ public class DispatchCreateScanDialog extends
             okButton.setEnabled(false);
         }
         super.postprocessScanTubeAlone(cell);
+    }
+
+    public void setCurrentProductBarcode(String currentProductBarcode) {
+        this.currentProductBarcode = currentProductBarcode;
+    }
+
+    public String getCurrentProductBarcode() {
+        return currentProductBarcode;
     }
 }
