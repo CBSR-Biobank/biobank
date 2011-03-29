@@ -36,5 +36,6 @@
 			<many-to-one name="collectionEvent" class="edu.ualberta.med.biobank.model.CollectionEvent" column="COLLECTION_EVENT_ID" lazy="proxy" not-null="true" cascade="none"/>
 			<many-to-one name="specimenType" class="edu.ualberta.med.biobank.model.SpecimenType" column="SPECIMEN_TYPE_ID" lazy="proxy" not-null="true" cascade="none"/>
 			<many-to-one name="parentSpecimen" class="edu.ualberta.med.biobank.model.Specimen" column="PARENT_SPECIMEN_ID" lazy="proxy" not-null="false" cascade="none"/>
+			<many-to-one name="topSpecimen" class="edu.ualberta.med.biobank.model.Specimen" column="TOP_SPECIMEN_ID" lazy="proxy" not-null="false" cascade="none"/>
 	</class>
 </hibernate-mapping>

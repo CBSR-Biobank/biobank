@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -186,11 +187,19 @@ public class ReportWrapper extends ReportBaseWrapper {
     }
 
     public Collection<EntityColumn> getEntityColumnCollection() {
-        return getEntity().getEntityColumnCollection();
+        EntityWrapper entity = getEntity();
+        if (entity != null) {
+            return entity.getEntityColumnCollection();
+        }
+        return Arrays.asList();
     }
 
     public Collection<EntityFilter> getEntityFilterCollection() {
-        return getEntity().getEntityFilterCollection();
+        EntityWrapper entity = getEntity();
+        if (entity != null) {
+            return entity.getEntityFilterCollection();
+        }
+        return Arrays.asList();
     }
 
     @Override
