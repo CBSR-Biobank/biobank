@@ -436,9 +436,17 @@ ALTER TABLE collection_event
  *  EVENT ATTRIBUTES
  ****************************************************/
 
+insert into global_pv_attr (id,label,pv_attr_type_id) values (7,"Patient Type",4);
+
+update study_pv_attr spa, study set spa.label="Patient Type"
+       where study.id=spa.study_id and study.name_short='CRM'
+       and spa.label="Visit Type";
+
 RENAME TABLE global_pv_attr TO global_event_attr;
 RENAME TABLE study_pv_attr TO study_event_attr;
 RENAME TABLE pv_attr_type TO event_attr_type;
+
+-- Study CRM should have 'Visit Type' changed to 'Patient Type'
 
 ALTER TABLE global_event_attr
       CHANGE COLUMN PV_ATTR_TYPE_ID EVENT_ATTR_TYPE_ID INT(11) NOT NULL,
@@ -1266,16 +1274,6 @@ delete ea from event_attr as ea
 delete from global_event_attr where label='Worksheet';
 
 delete from study_event_attr where label='Worksheet';
-
--- remove "Visit Type" from event attributes
-
-delete ea from event_attr as ea
-       join study_event_attr as sea on sea.id=ea.study_event_attr_id
-       where sea.label='Visit Type';
-
-delete from global_event_attr where label='Visit Type';
-
-delete from study_event_attr where label='Visit Type';
 
 drop index pv_id_idx on collection_event;
 drop index pv_id_idx on processing_event;
