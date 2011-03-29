@@ -178,16 +178,20 @@ public class BiobankSecurityUtil {
                     .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
 
                 List<edu.ualberta.med.biobank.common.security.User> list = new ArrayList<edu.ualberta.med.biobank.common.security.User>();
-                Map<Long, User> users = new HashMap<Long, User>();
-
+                Map<Long, User> allUsers = new HashMap<Long, User>();
+                Map<Long, edu.ualberta.med.biobank.common.security.Group> allGroups = new HashMap<Long, edu.ualberta.med.biobank.common.security.Group>();
+                for (edu.ualberta.med.biobank.common.security.Group group : getSecurityGroups(true)) {
+                    allGroups.put(group.getId(), group);
+                }
                 for (Object g : upm.getObjects(new GroupSearchCriteria(
                     new Group()))) {
-                    Group group = (Group) g;
-                    for (Object u : upm.getUsers(group.getGroupId().toString())) {
-                        User user = (User) u;
-                        if (!users.containsKey(user.getUserId())) {
-                            list.add(createUser(upm, user));
-                            users.put(user.getUserId(), user);
+                    Group serverGroup = (Group) g;
+                    for (Object u : upm.getUsers(serverGroup.getGroupId()
+                        .toString())) {
+                        User serverUser = (User) u;
+                        if (!allUsers.containsKey(serverUser.getUserId())) {
+                            list.add(createUser(upm, serverUser, allGroups));
+                            allUsers.put(serverUser.getUserId(), serverUser);
                         }
                     }
                 }
@@ -309,7 +313,7 @@ public class BiobankSecurityUtil {
             User serverUser = upm.getUser(userLogin);
             if (serverUser == null)
                 throw new ApplicationException("Problem with user retrieval");
-            return createUser(upm, serverUser);
+            return createUser(upm, serverUser, null);
         } catch (ApplicationException ae) {
             log.error("Error getting current user", ae);
             throw ae;
@@ -320,7 +324,8 @@ public class BiobankSecurityUtil {
     }
 
     private static edu.ualberta.med.biobank.common.security.User createUser(
-        UserProvisioningManager upm, User serverUser)
+        UserProvisioningManager upm, User serverUser,
+        Map<Long, edu.ualberta.med.biobank.common.security.Group> allGroups)
         throws CSObjectNotFoundException {
         edu.ualberta.med.biobank.common.security.User userDTO = new edu.ualberta.med.biobank.common.security.User();
         userDTO.setId(serverUser.getUserId());
@@ -335,11 +340,18 @@ public class BiobankSecurityUtil {
             userDTO.setNeedToChangePassword(true);
         }
 
-        List<edu.ualberta.med.biobank.common.security.Group> groups = new ArrayList<edu.ualberta.med.biobank.common.security.Group>();
+        List<edu.ualberta.med.biobank.common.security.Group> userGroups = new ArrayList<edu.ualberta.med.biobank.common.security.Group>();
         for (Object o : upm.getGroups(serverUser.getUserId().toString())) {
-            groups.add(createGroup(upm, (Group) o));
+            if (allGroups == null) {
+                userGroups.add(createGroup(upm, (Group) o));
+            } else {
+                edu.ualberta.med.biobank.common.security.Group userGroup = allGroups
+                    .get(((Group) o).getGroupId());
+                if (userGroup != null)
+                    userGroups.add(userGroup);
+            }
         }
-        userDTO.setGroups(groups);
+        userDTO.setGroups(userGroups);
         return userDTO;
     }
 

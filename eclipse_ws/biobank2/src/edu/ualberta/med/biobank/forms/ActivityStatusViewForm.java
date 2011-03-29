@@ -11,15 +11,11 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ActivityStatusEntryInfoTable;
 
 public class ActivityStatusViewForm extends BiobankFormBase {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ActivityStatusViewForm";
-
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(ActivityStatusViewForm.class.getName());
 
     public static final String OK_MESSAGE = "Add or edit a  activity status";
 

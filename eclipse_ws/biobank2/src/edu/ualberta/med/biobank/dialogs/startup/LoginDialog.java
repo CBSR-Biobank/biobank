@@ -96,8 +96,6 @@ public class LoginDialog extends TitleAreaDialog {
 
     private Button superAdminWidget;
 
-    private boolean superAdminMode = false;
-
     public LoginDialog(Shell parentShell) {
         super(parentShell);
 
@@ -345,22 +343,20 @@ public class LoginDialog extends TitleAreaDialog {
         if (sessionHelper.getUser() != null) {
             if (superAdminWidget.getSelection()) {
                 // super admin mode
-                superAdminMode = sessionHelper.getUser().isSuperAdministrator();
-                if (!superAdminMode)
+                sessionHelper.getUser().setInSuperAdminMode(true);
+                if (!sessionHelper.getUser().isInSuperAdminMode())
                     BiobankPlugin
                         .openAsyncError("Super administrator",
                             "You don't have rights to connect as super administrator");
             }
-            if (!superAdminMode) {
-                selectWorkingCenter(sessionHelper);
-            }
-            if (superAdminMode
+            selectWorkingCenter(sessionHelper);
+            if (sessionHelper.getUser().isInSuperAdminMode()
                 || sessionHelper.getUser().getCurrentWorkingCenter() != null) {
                 // login successful
                 savePreferences();
                 SessionManager.getInstance().addSession(
                     sessionHelper.getAppService(), serverWidget.getText(),
-                    sessionHelper.getUser(), superAdminMode);
+                    sessionHelper.getUser());
             }
 
         }
@@ -404,8 +400,14 @@ public class LoginDialog extends TitleAreaDialog {
     private void selectWorkingCenter(SessionHelper sessionHelper) {
         List<CenterWrapper<?>> workingCenters = null;
         try {
-            workingCenters = sessionHelper.getUser().getWorkingCenters(
-                sessionHelper.getAppService());
+            if (sessionHelper.getUser().isInSuperAdminMode()) {
+                // in super admin mode, can use all centers
+                workingCenters = CenterWrapper.getCenters(sessionHelper
+                    .getAppService());
+            } else {
+                workingCenters = sessionHelper.getUser().getWorkingCenters(
+                    sessionHelper.getAppService());
+            }
         } catch (Exception e) {
             BiobankPlugin
                 .openAsyncError(Messages
@@ -419,16 +421,16 @@ public class LoginDialog extends TitleAreaDialog {
                     .getString("LoginDialog.working.center.error.title"), //$NON-NLS-1$
                     Messages
                         .getString("LoginDialog.no.working.center.error.msg")); //$NON-NLS-1$
-            else if (workingCenters.size() == 1) {
+            else if (workingCenters.size() == 1
+                && !sessionHelper.getUser().isInSuperAdminMode())
                 sessionHelper.getUser().setCurrentWorkingCenter(
                     workingCenters.get(0));
-            } else if (workingCenters.size() > 1) {
+            else
                 new WorkingCenterSelectDialog(getShell(),
-                    sessionHelper.getAppService(), sessionHelper.getUser())
-                    .open();
-            }
+                    sessionHelper.getUser(), workingCenters).open();
         }
-        if (sessionHelper.getUser().getCurrentWorkingCenter() == null)
+        if (sessionHelper.getUser().getCurrentWorkingCenter() == null
+            && !sessionHelper.getUser().isInSuperAdminMode())
             if (sessionHelper.getUser().isSuperAdministrator()) {
                 // connect in admin mode
                 BiobankPlugin.openAsyncInformation(Messages
@@ -437,7 +439,7 @@ public class LoginDialog extends TitleAreaDialog {
                         .getString("LoginDialog.no.working.center.admin.msg")); //$NON-NLS-1$
                 // open the administration perspective if another
                 // perspective is open
-                superAdminMode = true;
+                sessionHelper.getUser().setInSuperAdminMode(true);
                 IWorkbench workbench = PlatformUI.getWorkbench();
                 IWorkbenchWindow activeWindow = workbench
                     .getActiveWorkbenchWindow();
@@ -455,6 +457,7 @@ public class LoginDialog extends TitleAreaDialog {
                     }
                 }
             } else {
+                // can't connect without a working center
                 BiobankPlugin
                     .openAsyncError(
                         Messages

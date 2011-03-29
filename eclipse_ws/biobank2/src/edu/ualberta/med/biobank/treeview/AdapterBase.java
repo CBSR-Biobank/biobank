@@ -107,7 +107,7 @@ public abstract class AdapterBase {
         return modelObject;
     }
 
-    public ModelWrapper<?> getModelObjectClone() {
+    public ModelWrapper<?> getModelObjectClone() throws Exception {
         return modelObject.getDatabaseClone();
     }
 

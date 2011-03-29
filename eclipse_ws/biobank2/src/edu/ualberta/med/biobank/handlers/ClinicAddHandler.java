@@ -22,7 +22,8 @@ public class ClinicAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(ClinicWrapper.class)
+        return SessionManager.isSuperAdminMode()
+            && SessionManager.canCreate(ClinicWrapper.class)
             && SessionManager.getInstance().getSession() != null;
     }
 }

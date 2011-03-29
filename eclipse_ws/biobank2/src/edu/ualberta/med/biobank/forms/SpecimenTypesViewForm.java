@@ -11,15 +11,11 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenTypeEntryInfoTable;
 
 public class SpecimenTypesViewForm extends BiobankFormBase {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenTypesViewForm";
-
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(SpecimenTypesViewForm.class.getName());
 
     public static final String OK_MESSAGE = "Add or edit a specimen type";
 

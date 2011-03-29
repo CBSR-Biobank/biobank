@@ -30,7 +30,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientMergeForm extends BiobankEntryForm {
 
-    @SuppressWarnings("unused")
     private static BiobankLogger logger = BiobankLogger
         .getLogger(PatientMergeForm.class.getName());
 
@@ -70,8 +69,12 @@ public class PatientMergeForm extends BiobankEntryForm {
         if (patient1Adapter.getWrapper().isNew())
             patient1 = patient1Adapter.getWrapper();
         else
-            patient1 = (PatientWrapper) patient1Adapter.getWrapper()
-                .getDatabaseClone();
+            try {
+                patient1 = (PatientWrapper) patient1Adapter
+                    .getModelObjectClone();
+            } catch (Exception e) {
+                logger.error("Error getting patient clone", e);
+            }
         String tabName = "Merging Patient " + patient1.getPnumber();
         setPartName(tabName);
         patientNotNullValue = new WritableValue(Boolean.FALSE, Boolean.class);

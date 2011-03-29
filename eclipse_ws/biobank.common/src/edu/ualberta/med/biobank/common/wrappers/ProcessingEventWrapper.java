@@ -223,4 +223,12 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
             appService.search(ProcessingEvent.class, new ProcessingEvent()),
             ProcessingEventWrapper.class);
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
+        if (getCenter() != null)
+            return Arrays.asList(getCenter());
+        return super.getSecuritySpecificCenters();
+    }
 }

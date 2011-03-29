@@ -117,14 +117,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return null;
     }
 
-    public void setId(Integer id) {
+    private void setId(Integer id) throws Exception {
         Class<?> wrappedClass = wrappedObject.getClass();
-        try {
-            Method methodSetId = wrappedClass.getMethod("setId", Integer.class);
-            methodSetId.invoke(wrappedObject, id);
-        } catch (Exception e) {
-
-        }
+        Method methodSetId = wrappedClass.getMethod("setId", Integer.class);
+        methodSetId.invoke(wrappedObject, id);
     }
 
     public WritableApplicationService getAppService() {
@@ -521,14 +517,16 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * return true if the user can edit this object
      */
     public boolean canUpdate(User user) {
-        return user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass());
+        return user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass(),
+            getSecuritySpecificCenters());
     }
 
     /**
      * return true if the user can delete this object
      */
     public boolean canDelete(User user) {
-        return user.hasPrivilegeOnObject(Privilege.DELETE, getWrappedClass());
+        return user.hasPrivilegeOnObject(Privilege.DELETE, getWrappedClass(),
+            getSecuritySpecificCenters());
     }
 
     public void addWrapperListener(WrapperListener listener) {
@@ -960,42 +958,23 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return sb.toString();
     }
 
-    public ModelWrapper<?> getDatabaseClone() {
-        ModelWrapper<?> wrapper = null;
+    @SuppressWarnings("unchecked")
+    public ModelWrapper<E> getDatabaseClone() throws Exception {
+        ModelWrapper<E> wrapper = null;
 
-        try {
-            Constructor<?> c = getClass().getDeclaredConstructor(
-                WritableApplicationService.class);
-            Object[] arglist = new Object[] { appService };
-            try {
-                wrapper = (ModelWrapper<?>) c.newInstance(arglist);
-                wrapper.setId(getId());
-                try {
-                    wrapper.reload();
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            } catch (IllegalArgumentException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        Constructor<?> c = getClass().getDeclaredConstructor(
+            WritableApplicationService.class);
+        Object[] arglist = new Object[] { appService };
+        wrapper = (ModelWrapper<E>) c.newInstance(arglist);
+        wrapper.setId(getId());
+        wrapper.reload();
         return wrapper;
+    }
+
+    /**
+     * @return a list of center security should check for modifications
+     */
+    public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
+        return Collections.emptyList();
     }
 }

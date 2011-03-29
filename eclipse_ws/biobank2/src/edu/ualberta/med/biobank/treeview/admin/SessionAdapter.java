@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -55,37 +54,40 @@ public class SessionAdapter extends AdapterBase {
         this.serverName = serverName;
         this.user = user;
 
-        addGroupNodes();
+        addSubNodes();
     }
 
-    private void addGroupNodes() {
-        if (SessionManager.isSuperAdminMode()) {
-            addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
-            addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
-            addChild(new SiteGroup(this, SITES_NODE_ID));
-        } else
-            addCurrentCenter();
-    }
-
-    private AdapterBase addCurrentCenter() {
+    private void addSubNodes() {
         if (SessionManager.getInstance().isConnected()) {
-            CenterWrapper<?> currentCenter = SessionManager.getUser()
-                .getCurrentWorkingCenter();
-            if (currentCenter != null) {
-                AdapterBase child = AdapterFactory.getAdapter(currentCenter);
-                child.setParent(this);
-                addChild(child);
-                return child;
+            if (SessionManager.isSuperAdminMode()) {
+                addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
+                addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
+                SiteGroup siteGroup = new SiteGroup(this, SITES_NODE_ID);
+                addChild(siteGroup);
+                siteGroup.performExpand();
+            } else {
+                CenterWrapper<?> currentCenter = SessionManager.getUser()
+                    .getCurrentWorkingCenter();
+                CenterWrapper<?> clonedCenter;
+                try {
+                    clonedCenter = (CenterWrapper<?>) currentCenter
+                        .getDatabaseClone();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                if (clonedCenter != null) {
+                    AdapterBase child = AdapterFactory.getAdapter(clonedCenter);
+                    addChild(child);
+                    child.performExpand();
+                }
             }
         }
-        return null;
     }
 
     @Override
     public void rebuild() {
-        for (AdapterBase child : new ArrayList<AdapterBase>(getChildren())) {
-            child.rebuild();
-        }
+        removeAll();
+        addSubNodes();
     }
 
     @Override
@@ -219,17 +221,6 @@ public class SessionAdapter extends AdapterBase {
         SiteGroup s = getSitesGroupNode();
         if (s != null)
             s.addSite();
-    }
-
-    public void displayMainInformation() {
-        AdapterBase adapter = getChild(SITES_NODE_ID);
-        if (adapter != null)
-            adapter.performExpand();
-        else {
-            AdapterBase res = addCurrentCenter();
-            if (res != null)
-                res.performExpand();
-        }
     }
 
 }
