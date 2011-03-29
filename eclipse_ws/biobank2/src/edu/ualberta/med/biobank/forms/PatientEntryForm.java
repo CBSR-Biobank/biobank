@@ -54,8 +54,11 @@ public class PatientEntryForm extends BiobankEntryForm {
         if (adapter.getModelObject().isNew())
             patient = (PatientWrapper) adapter.getModelObject();
         else
-            patient = (PatientWrapper) adapter.getModelObject()
-                .getDatabaseClone();
+            try {
+                patient = (PatientWrapper) adapter.getModelObjectClone();
+            } catch (Exception e1) {
+                logger.error("Error getting patient clone", e1);
+            }
         retrievePatient();
         try {
             patient.logEdit(null);

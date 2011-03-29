@@ -61,7 +61,7 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
         }
     }
 
-    private boolean isUsed() throws ApplicationException,
+    public boolean isUsed() throws ApplicationException,
         BiobankQueryResultSizeException {
         Class<?>[] classes = new Class[] { StudyEventAttr.class, Study.class,
             Specimen.class, ProcessingEvent.class, Clinic.class,

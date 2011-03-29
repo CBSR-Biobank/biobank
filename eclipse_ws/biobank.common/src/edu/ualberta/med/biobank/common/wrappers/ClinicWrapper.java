@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
@@ -53,10 +54,6 @@ public class ClinicWrapper extends ClinicBaseWrapper {
                 cw.delete();
             }
         }
-    }
-
-    public List<ContactWrapper> getContactCollection() {
-        return getContactCollection(false);
     }
 
     /**
@@ -112,8 +109,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         if (wrapper instanceof ClinicWrapper) {
             String myName = wrappedObject.getName();
             String wrapperName = wrapper.wrappedObject.getName();
-            return ((myName.compareTo(wrapperName) > 0) ? 1 : (myName
-                .equals(wrapperName) ? 0 : -1));
+            return myName.compareTo(wrapperName);
         }
         return 0;
     }
@@ -233,6 +229,20 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         HQLCriteria c = new HQLCriteria(COLLECTION_EVENT_COUNT_FOR_STUDY_QRY,
             Arrays.asList(new Object[] { getId(), study.getId() }));
         return getCountResult(appService, c);
+    }
+
+    @Override
+    public void removeFromContactCollection(
+        List<ContactWrapper> contactCollection) {
+        super.removeFromContactCollection(contactCollection);
+        deletedContacts.addAll(contactCollection);
+    }
+
+    @Override
+    public void removeFromContactCollectionWithCheck(
+        List<ContactWrapper> contactCollection) throws BiobankCheckException {
+        super.removeFromContactCollectionWithCheck(contactCollection);
+        deletedContacts.addAll(contactCollection);
     }
 
 }

@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
-import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
+import edu.ualberta.med.biobank.common.exception.CheckFieldLimitsException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
@@ -117,14 +117,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return null;
     }
 
-    public void setId(Integer id) {
+    private void setId(Integer id) throws Exception {
         Class<?> wrappedClass = wrappedObject.getClass();
-        try {
-            Method methodSetId = wrappedClass.getMethod("setId", Integer.class);
-            methodSetId.invoke(wrappedObject, id);
-        } catch (Exception e) {
-
-        }
+        Method methodSetId = wrappedClass.getMethod("setId", Integer.class);
+        methodSetId.invoke(wrappedObject, id);
     }
 
     public WritableApplicationService getAppService() {
@@ -250,11 +246,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     protected void checkFieldLimits() throws BiobankCheckException,
-        BiobankStringLengthException {
+        CheckFieldLimitsException {
         String fieldValue = "";
         for (String field : getPropertyChangeNames()) {
-            Integer maxLen = VarCharLengths.getMaxSize(
-                wrappedObject.getClass(), field);
+            Integer maxLen = VarCharLengths
+                .getMaxSize(getWrappedClass(), field);
             if (maxLen == null)
                 continue;
 
@@ -266,9 +262,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 if (method.getReturnType().equals(String.class)) {
                     fieldValue = (String) method.invoke(this);
                     if ((fieldValue != null) && (fieldValue.length() > maxLen)) {
-                        throw new BiobankStringLengthException(
-                            "Field exceeds max length: field: " + field
-                                + ", value \"" + fieldValue + "\"");
+                        throw new CheckFieldLimitsException(field, maxLen,
+                            fieldValue);
                     }
                 }
             } catch (SecurityException e) {
@@ -522,14 +517,16 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * return true if the user can edit this object
      */
     public boolean canUpdate(User user) {
-        return user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass());
+        return user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass(),
+            getSecuritySpecificCenters());
     }
 
     /**
      * return true if the user can delete this object
      */
     public boolean canDelete(User user) {
-        return user.hasPrivilegeOnObject(Privilege.DELETE, getWrappedClass());
+        return user.hasPrivilegeOnObject(Privilege.DELETE, getWrappedClass(),
+            getSecuritySpecificCenters());
     }
 
     public void addWrapperListener(WrapperListener listener) {
@@ -961,42 +958,23 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return sb.toString();
     }
 
-    public ModelWrapper<?> getDatabaseClone() {
-        ModelWrapper<?> wrapper = null;
+    @SuppressWarnings("unchecked")
+    public ModelWrapper<E> getDatabaseClone() throws Exception {
+        ModelWrapper<E> wrapper = null;
 
-        try {
-            Constructor<?> c = getClass().getDeclaredConstructor(
-                WritableApplicationService.class);
-            Object[] arglist = new Object[] { appService };
-            try {
-                wrapper = (ModelWrapper<?>) c.newInstance(arglist);
-                wrapper.setId(getId());
-                try {
-                    wrapper.reload();
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            } catch (IllegalArgumentException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        Constructor<?> c = getClass().getDeclaredConstructor(
+            WritableApplicationService.class);
+        Object[] arglist = new Object[] { appService };
+        wrapper = (ModelWrapper<E>) c.newInstance(arglist);
+        wrapper.setId(getId());
+        wrapper.reload();
         return wrapper;
+    }
+
+    /**
+     * @return a list of center security should check for modifications
+     */
+    public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
+        return Collections.emptyList();
     }
 }

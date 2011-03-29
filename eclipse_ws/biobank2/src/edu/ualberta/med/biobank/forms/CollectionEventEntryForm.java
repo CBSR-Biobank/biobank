@@ -189,7 +189,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    setDirty(true);
+                    if (!selectedObject.equals(cevent.getActivityStatus()))
+                        setDirty(true);
                     cevent
                         .setActivityStatus((ActivityStatusWrapper) selectedObject);
                 }

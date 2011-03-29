@@ -119,22 +119,33 @@ public class DebugUtil {
             SpecimenWrapper.class);
     }
 
-    private static final String RANDOM_DISPATCHED_SPECIMENS_QRY = "select specimens from "
+    private static final String RANDOM_NON_DISPATCHED_SPECIMENS_QRY = "from "
         + Specimen.class.getName()
-        + "where and aliquots."
+        + " where "
+        + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
+        + "=? and "
         + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
-            ActivityStatusPeer.NAME) + "='Dispatched'";
+            ActivityStatusPeer.NAME) + "!='Dispatched'";
 
-    public static List<SpecimenWrapper> getRandomDispatchedSpecimens(
-        WritableApplicationService appService, Integer siteId)
+    public static List<SpecimenWrapper> getRandomNonDispatchedSpecimens(
+        WritableApplicationService appService, Integer centerId, Integer maxSize)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(RANDOM_DISPATCHED_SPECIMENS_QRY,
-            Arrays.asList(new Object[] { siteId }));
-        List<Specimen> aliquots = appService.query(criteria);
-
-        int items = aliquots.size();
-        int maxItems = items > 10 ? 10 : items;
-        return ModelWrapper.wrapModelCollection(appService,
-            aliquots.subList(0, maxItems), SpecimenWrapper.class);
+        HQLCriteria criteria = new HQLCriteria(
+            RANDOM_NON_DISPATCHED_SPECIMENS_QRY,
+            Arrays.asList(new Object[] { centerId }));
+        List<Specimen> res = appService.query(criteria);
+        List<Specimen> specimens;
+        if (maxSize == null)
+            specimens = res;
+        else {
+            specimens = new ArrayList<Specimen>();
+            int i = 0;
+            while (i < maxSize) {
+                specimens.add(res.get(i));
+                i++;
+            }
+        }
+        return ModelWrapper.wrapModelCollection(appService, specimens,
+            SpecimenWrapper.class);
     }
 }

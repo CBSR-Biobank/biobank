@@ -133,8 +133,8 @@ public class UserEditDialog extends BiobankDialog {
         // try saving or updating the user inside this dialog so that if there
         // is an error the entered information is not lost
         try {
-            SessionManager.getAppService().persistUser(modifiedUser);
-            originalUser.copy(modifiedUser);
+            originalUser.copy(SessionManager.getAppService().persistUser(
+                modifiedUser));
 
             if (SessionManager.getUser().getId().equals(originalUser.getId())) {
                 // if the User is making changes to himself, logout
@@ -196,7 +196,8 @@ public class UserEditDialog extends BiobankDialog {
                     if (warnOfRightsDemotion) {
                         for (Integer id : groupsWidget.getRemovedToSelection()) {
                             Group group = allGroupsMap.get(id.longValue());
-                            if (group != null && group.isSuperAdministratorGroup()) {
+                            if (group != null
+                                && group.isSuperAdministratorGroup()) {
                                 if (!BiobankPlugin.openConfirm(
                                     CONFIRM_DEMOTION_TITLE,
                                     CONFIRM_DEMOTION_MESSAGE)) {

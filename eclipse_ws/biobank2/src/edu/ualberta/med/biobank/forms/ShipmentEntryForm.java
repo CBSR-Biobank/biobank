@@ -75,6 +75,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private NotNullValidator departedValidator;
 
+    private BiobankText waybillWidget;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ShipmentAdapter,
@@ -132,19 +134,20 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 @Override
                 public void doSelection(Object selectedObject) {
                     shipment.setCenter((CenterWrapper<?>) selectedObject);
+                    activateWaybillWidget(((ClinicWrapper) selectedObject)
+                        .getSendsShipments());
                 }
             });
         setFirstControl(senderComboViewer.getControl());
 
-        // FIXME: leave waybill always optional? Required flag on shipment type?
         waybillLabel = widgetCreator.createLabel(client, "Waybill");
         waybillLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         waybillValidator = new NonEmptyStringValidator(
             "A waybill should be set");
-        createBoundWidget(client, BiobankText.class, SWT.NONE, waybillLabel,
-            new String[0], shipment, "shipmentInfo.waybill", waybillValidator,
-            WAYBILL_BINDING);
+        waybillWidget = (BiobankText) createBoundWidget(client,
+            BiobankText.class, SWT.NONE, waybillLabel, new String[0], shipment,
+            "shipmentInfo.waybill", waybillValidator, WAYBILL_BINDING);
 
         shippingMethodComboViewer = createComboViewer(client,
             "Shipping Method",
@@ -187,6 +190,19 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         dateReceivedWidget = createDateTimeWidget(client, "Date Received",
             shipInfo.getReceivedAt(), shipInfo, "receivedAt",
             new NotNullValidator("Date Received should be set"));
+    }
+
+    protected void activateWaybillWidget(boolean waybillNeeded) {
+        waybillWidget.setVisible(waybillNeeded);
+        ((GridData) waybillWidget.getLayoutData()).exclude = !waybillNeeded;
+        waybillLabel.setVisible(waybillNeeded);
+        ((GridData) waybillLabel.getLayoutData()).exclude = !waybillNeeded;
+        if (waybillNeeded) {
+            widgetCreator.addBinding(WAYBILL_BINDING);
+        } else {
+            widgetCreator.removeBinding(WAYBILL_BINDING);
+        }
+        form.layout(true, true);
     }
 
     protected void activateDepartedWidget(boolean departedNeeded) {

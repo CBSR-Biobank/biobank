@@ -164,4 +164,12 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
         return shipments;
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
+        if (getCenter() != null)
+            return Arrays.asList(getCenter());
+        return super.getSecuritySpecificCenters();
+    }
 }

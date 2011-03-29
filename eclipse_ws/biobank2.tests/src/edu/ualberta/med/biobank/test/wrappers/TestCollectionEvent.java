@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,12 +13,14 @@ import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
+import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
@@ -47,7 +48,7 @@ public class TestCollectionEvent extends TestDatabase {
 
     @Test
     public void testGetPatient() throws Exception {
-        String name = "testGetPatientCollection" + r.nextInt();
+        String name = "testGetPatient" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
         ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
@@ -85,7 +86,7 @@ public class TestCollectionEvent extends TestDatabase {
 
     @Test
     public void testRemoveSpecimens() throws Exception {
-        String name = "testRemovePatients" + r.nextInt();
+        String name = "testRemoveSpecimens" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite("site" + name);
         ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
         StudyWrapper study = StudyHelper.addStudy("study" + name);
@@ -93,278 +94,26 @@ public class TestCollectionEvent extends TestDatabase {
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
-        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study);
-        // FIXME
-        // CollectionEventWrapper cevent = CollectionEventHelper
-        // .addCollectionEvent(
-        // site,
-        // ShippingMethodWrapper.getShippingMethods(appService).get(0),
-        // SpecimenHelper.newSpecimen(patient1, Utils.getRandomDate(), 0.1),
-        // SpecimenHelper.newSpecimen(patient2, Utils.getRandomDate(), 0.1));
-        // cevent.reload();
-        //
-        // PatientWrapper patient = DbHelper.chooseRandomlyInList(cevent
-        // .getPatientCollection());
-        //
-        // patient.reload();
-        // cevent.removeFromSpecimenCollection(patient
-        // .getSpecimenCollection(false));
-        // cevent.persist();
-        //
-        // cevent.reload();
-        // // one patient removed
-        // Assert.assertEquals(1, cevent.getPatientCollection().size());
+        OriginInfoWrapper oi = new OriginInfoWrapper(appService);
+        oi.setCenter(clinic);
+        oi.persist();
+        SpecimenTypeWrapper type = SpecimenTypeWrapper.getAllSpecimenTypes(
+            appService, false).get(0);
+        SpecimenWrapper[] newSpecs = new SpecimenWrapper[r.nextInt(10) + 3];
+        for (int i = 0; i < newSpecs.length; i++) {
+            newSpecs[i] = SpecimenHelper.newSpecimen(type);
+        }
+        CollectionEventWrapper cevent = CollectionEventHelper
+            .addCollectionEvent(site, patient1, 1, oi, newSpecs);
 
-    }
+        Assert.assertEquals(newSpecs.length, cevent.getAllSpecimensCount(true));
 
-    @Test
-    public void testGetCollectionEventsInSite() throws Exception {
-        String name = "testSetPatientCollectionRemove" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite("site" + name);
-        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
-        StudyWrapper study = StudyHelper.addStudy("study" + name);
-        ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.addToContactCollection(Arrays.asList(contact));
-        study.persist();
-        PatientWrapper patient1 = PatientHelper.addPatient(name, study);
-        ShippingMethodWrapper method = ShippingMethodWrapper
-            .getShippingMethods(appService).get(0);
-        // FIXME
-        // CollectionEventHelper.addCollectionEvent(site, method,
-        // SpecimenHelper.newSpecimen(patient1, Utils.getRandomDate(), 0.1));
-        // CollectionEventWrapper ceventTest = CollectionEventHelper
-        // .addCollectionEvent(site, method, SpecimenHelper.newSpecimen(
-        // patient1, Utils.getRandomDate(), 0.1));
-        // CollectionEventWrapper ceventWithDate = CollectionEventHelper
-        // .addCollectionEvent(site, method, SpecimenHelper.newSpecimen(
-        // patient1, Utils.getRandomDate(), 0.1));
-        //
-        // String waybill = ceventTest.getWaybill();
-        //
-        // site.reload();
-        // List<CollectionEventWrapper> ceventsFound = CollectionEventWrapper
-        // .getCollectionEvents(appService, waybill);
-        //
-        // Assert.assertTrue(ceventsFound.size() == 1);
-        // Assert.assertEquals(ceventTest, ceventsFound.get(0));
-        //
-        // // test for date
-        // ceventsFound = CollectionEventWrapper.getCollectionEvents(appService,
-        // ceventWithDate.getDateReceived());
-        //
-        // Assert.assertEquals(1, ceventsFound.size());
-        // Assert.assertEquals(ceventWithDate, ceventsFound.get(0));
-        //
-        // CollectionEventWrapper cevent = CollectionEventHelper
-        // .newCollectionEvent(site,
-        // ShippingMethodWrapper.getShippingMethods(appService).get(0),
-        // name, Utils.getRandomDate());
-        //
-        // cevent.setSourceCenter(null);
-        // Assert.assertNull(cevent.getSourceCenter());
-    }
-
-    @Test
-    public void testHasPatient() throws Exception {
-        String name = "testHasPatient" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
-        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
-            + "CONTACT1");
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "CLINIC2");
-        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
-            + "CONTACT2");
-
-        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
-        contacts.add(contact1);
-        contacts.add(contact2);
-
-        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addToContactCollection(contacts);
-        study1.persist();
-        PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
-        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study1);
-
-        StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
-        study2.addToContactCollection(contacts);
-        study2.persist();
-        PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study2);
-        PatientHelper.addPatient(name + "_4", study2);
-
-        // FIXME
-        // CollectionEventWrapper cevent = CollectionEventHelper
-        // .newCollectionEvent(site,
-        // ShippingMethodWrapper.getShippingMethods(appService).get(0));
-        //
-        // List<SpecimenWrapper> spcs = new ArrayList<SpecimenWrapper>();
-        // for (PatientWrapper patient : new PatientWrapper[] { patient1,
-        // patient2, patient3 }) {
-        // SpecimenWrapper spc = SpecimenHelper.newSpecimen(patient,
-        // Utils.getRandomDate(), 0.1);
-        // spc.setCollectionEvent(cevent);
-        // spcs.add(spc);
-        // }
-        //
-        // cevent.addToSpecimenCollection(spcs);
-        // cevent.persist();
-        //
-        // cevent.reload();
-        // Assert.assertTrue(cevent.hasPatient(name + "_2"));
-        // Assert.assertFalse(cevent.hasPatient(name + "_4"));
-    }
-
-    @Test
-    public void testPersist() throws Exception {
-        String name = "testPersist" + r.nextInt();
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
-        ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.addToContactCollection(Arrays.asList(contact));
-        study.persist();
-        ShippingMethodWrapper method = ShippingMethodWrapper
-            .getShippingMethods(appService).get(0);
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
-        // FIXME
-        // CollectionEventWrapper cevent = CollectionEventHelper
-        // .newCollectionEvent(null, method, name, Utils.getRandomDate(),
-        // SpecimenHelper.newSpecimen(patient, Utils.getRandomDate(), 0.1));
-        //
-        // try {
-        // cevent.persist();
-        // Assert.fail("cevent does not have a site");
-        // } catch (BiobankCheckException bce) {
-        // Assert.assertTrue(true);
-        // }
-    }
-
-    @Test
-    public void testPersistFailWaybillNull() throws Exception {
-        String name = "testPersistFailWaybillNull" + r.nextInt();
-        ClinicWrapper clinic = ClinicHelper.addClinicWithShipments(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
-        ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.addToContactCollection(Arrays.asList(contact));
-        study.persist();
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
-
-        // FIXME
-        // CollectionEventWrapper cevent = CollectionEventHelper
-        // .newCollectionEvent(clinic, ShippingMethodWrapper
-        // .getShippingMethods(appService).get(0), null, Utils
-        // .getRandomDate(), SpecimenHelper.newSpecimen(patient,
-        // Utils.getRandomDate(), 0.1));
-        //
-        // try {
-        // cevent.persist();
-        // Assert.fail("cevent with waybill null");
-        // } catch (BiobankCheckException bce) {
-        // Assert.assertTrue(true);
-        // }
-    }
-
-    @Test
-    public void testPersistFailNoNeedWaybill() throws Exception {
-        String name = "testPersistFailNoNeedWaybill" + r.nextInt();
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
-
-        StudyWrapper study = StudyHelper.addStudy(name);
-        ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.addToContactCollection(Arrays.asList(contact));
-        study.persist();
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
-        // FIXME
-        // CollectionEventWrapper cevent = CollectionEventHelper
-        // .newCollectionEvent(clinic, ShippingMethodWrapper
-        // .getShippingMethods(appService).get(0), TestCommon
-        // .getNewWaybill(r), Utils.getRandomDate(), SpecimenHelper
-        // .newSpecimen(patient, Utils.getRandomDate(), 0.1));
-        //
-        // try {
-        // cevent.persist();
-        // Assert.fail("cevent should not have a waybill");
-        // } catch (BiobankCheckException bce) {
-        // Assert.assertTrue(true);
-        // }
-        //
-        // // should not have any waybill
-        // cevent.setWaybill(null);
-        // cevent.persist();
-    }
-
-    @Test
-    public void testPersistFailWaybillExists() throws Exception {
-        String name = "testPersistFailWaybillExists" + r.nextInt();
-        ClinicWrapper clinic = ClinicHelper.addClinicWithShipments(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
-        ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.addToContactCollection(Arrays.asList(contact));
-        study.persist();
-        ShippingMethodWrapper method = ShippingMethodWrapper
-            .getShippingMethods(appService).get(0);
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
-        // FIXME
-        // CollectionEventWrapper cevent = CollectionEventHelper
-        // .newCollectionEvent(clinic, method, name, Utils.getRandomDate(),
-        // SpecimenHelper.newSpecimen(patient, Utils.getRandomDate(), 0.1));
-        // cevent.persist();
-        //
-        // CollectionEventWrapper cevent2 = CollectionEventHelper
-        // .newCollectionEvent(clinic, method, name, Utils.getRandomDate(),
-        // SpecimenHelper.newSpecimen(patient, Utils.getRandomDate(), 0.1));
-        // try {
-        // cevent2.persist();
-        // Assert.fail("cevent with waybill '" + name
-        // + "' already exists. An exception should be thrown.");
-        // } catch (BiobankCheckException bce) {
-        // Assert.assertTrue(true);
-        // }
-    }
-
-    @Test
-    public void testPersistFailNoPatient() throws Exception {
-        String name = "testPersistFailNoPatient" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite("site" + name);
-        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
-        StudyWrapper study = StudyHelper.addStudy("study" + name);
-        ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.addToContactCollection(Arrays.asList(contact));
-        study.persist();
-        // FIXME
-        // CollectionEventWrapper cevent = CollectionEventHelper
-        // .newCollectionEvent(site,
-        // ShippingMethodWrapper.getShippingMethods(appService).get(0));
-        // try {
-        // cevent.persist();
-        // Assert
-        // .fail("cevent don't have any patient. An exception should be thrown.");
-        // } catch (BiobankCheckException bce) {
-        // Assert.assertTrue(true);
-        // }
-    }
-
-    @Test
-    public void testPersistFailPatientNoInStudyOwnByClinic() throws Exception {
-        String name = "testPersistFailPatientNoInStudyOwnByClinic"
-            + r.nextInt();
-        StudyWrapper study = StudyHelper.addStudy(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name, true);
-        study.addToContactCollection(clinic.getContactCollection(false));
-        study.persist();
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
-        // FIXME
-        // CollectionEventWrapper cevent = CollectionEventHelper
-        // .newCollectionEvent(clinic, ShippingMethodWrapper
-        // .getShippingMethods(appService).get(0), name, Utils
-        // .getRandomDate(), SpecimenHelper.newSpecimen(patient,
-        // Utils.getRandomDate(), 0.1));
-        //
-        // try {
-        // cevent.persist();
-        // Assert
-        // .fail("patient should be part of the study that has contact with the clinic");
-        // } catch (BiobankCheckException bce) {
-        // Assert.assertTrue(true);
-        // }
+        SpecimenWrapper spec = DbHelper.chooseRandomlyInList(cevent
+            .getAllSpecimenCollection(false));
+        cevent.removeFromAllSpecimenCollection(Arrays.asList(spec));
+        cevent.persist();
+        // one specimen removed
+        Assert.assertEquals(1, cevent.getAllSpecimensCount(true));
     }
 
     @Test
@@ -460,10 +209,9 @@ public class TestCollectionEvent extends TestDatabase {
     @Test
     public void testResetNew() throws Exception {
         CollectionEventWrapper cevent = new CollectionEventWrapper(appService);
-        // FIXME
-        // cevent.setWaybill("titi");
-        // cevent.reset();
-        // Assert.assertEquals(null, cevent.getWaybill());
+        cevent.setVisitNumber(120);
+        cevent.reset();
+        Assert.assertEquals(null, cevent.getVisitNumber());
     }
 
     @Test
@@ -507,42 +255,4 @@ public class TestCollectionEvent extends TestDatabase {
         // Assert.assertTrue(ships.contains(cevent3));
     }
 
-    @Test
-    public void testIsReceivedToday() throws Exception {
-        String name = "testTodaycevents_" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-
-        ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "_1");
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "_2");
-        StudyWrapper study = StudyHelper.addStudy(name);
-        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name);
-        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name);
-        study.addToContactCollection(Arrays.asList(contact1, contact2));
-        study.persist();
-
-        PatientWrapper patient1 = PatientHelper.addPatient(name + "_1", study);
-        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study);
-
-        ShippingMethodWrapper method = ShippingMethodWrapper
-            .getShippingMethods(appService).get(0);
-        // FIXME
-        // CollectionEventWrapper cevent1 = CollectionEventHelper
-        // .addCollectionEvent(site, method, SpecimenHelper.newSpecimen(
-        // patient1, Utils.getRandomDate(), 0.1)); // another day
-        // CollectionEventWrapper cevent2 = CollectionEventHelper
-        // .newCollectionEvent(site,
-        //
-        // method, "waybill_" + name + "_2", new Date(), SpecimenHelper
-        // .newSpecimen(patient1, Utils.getRandomDate(), 0.1)); // today
-        // cevent2.persist();
-        // CollectionEventWrapper cevent3 = CollectionEventHelper
-        // .newCollectionEvent(site, method, "waybill_" + name + "_3",
-        // new Date(), SpecimenHelper.newSpecimen(patient2,
-        // Utils.getRandomDate(), 0.1)); // today
-        // cevent3.persist();
-        //
-        // Assert.assertFalse(cevent1.isReceivedToday());
-        // Assert.assertTrue(cevent2.isReceivedToday());
-        // Assert.assertTrue(cevent3.isReceivedToday());
-    }
 }

@@ -295,7 +295,6 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
         boolean isVolumeRequired = ssw != null
             && Boolean.TRUE.equals(ssw.getNeedOriginalVolume());
 
-        timeDrawnWidget.setEnabled(enableTimeDrawn || defaultTimeDrawn == null);
         if (!enableTimeDrawn && defaultTimeDrawn != null) {
             timeDrawnWidget.setDate(defaultTimeDrawn);
         }

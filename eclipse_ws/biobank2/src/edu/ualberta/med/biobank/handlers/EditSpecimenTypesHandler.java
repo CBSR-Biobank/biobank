@@ -8,7 +8,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.forms.SpecimenTypesEntryForm;
+import edu.ualberta.med.biobank.forms.SpecimenTypesViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 
@@ -26,7 +26,7 @@ public class EditSpecimenTypesHandler extends AbstractHandler {
                 .getActiveWorkbenchWindow()
                 .getActivePage()
                 .openEditor(new FormInput(sessionAdapter),
-                    SpecimenTypesEntryForm.ID, false, 0);
+                    SpecimenTypesViewForm.ID, false, 0);
         } catch (Exception e) {
             throw new ExecutionException("Could not execute handler.", e);
         }

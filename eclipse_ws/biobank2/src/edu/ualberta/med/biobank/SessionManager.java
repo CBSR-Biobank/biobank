@@ -56,8 +56,6 @@ public class SessionManager {
 
     private String currentAdministrationViewId;
 
-    private boolean superAdminMode = false;
-
     private Map<String, Boolean> perspectivesUpdateDone;
 
     private SessionManager() {
@@ -80,11 +78,10 @@ public class SessionManager {
     }
 
     public void addSession(final BiobankApplicationService appService,
-        String serverName, User user, boolean superAdminMode) {
+        String serverName, User user) {
         logger.debug("addSession: " + serverName + ", user/" + user.getLogin());
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, user);
-        this.superAdminMode = superAdminMode;
         rootNode.addChild(sessionAdapter);
 
         updateMenus();
@@ -182,7 +179,7 @@ public class SessionManager {
     public static void setSelectedNode(final AdapterBase node) {
         final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null && node != null) {
-            view.setSelectedNode(node);
+            view.setSelectedNodeAsync(node);
         }
     }
 
@@ -324,7 +321,7 @@ public class SessionManager {
     }
 
     public static boolean isSuperAdminMode() {
-        return getInstance().superAdminMode;
+        return getUser().isInSuperAdminMode();
     }
 
     public static void updateVisibility(IWorkbenchPage page) {

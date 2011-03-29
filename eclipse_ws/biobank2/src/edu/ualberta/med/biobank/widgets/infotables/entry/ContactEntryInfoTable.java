@@ -32,7 +32,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
     public ContactEntryInfoTable(Composite parent, ClinicWrapper clinic) {
         super(parent, clinic.getContactCollection(true));
         this.clinic = clinic;
-        selectedContacts = clinic.getContactCollection();
+        selectedContacts = clinic.getContactCollection(false);
         if (selectedContacts == null) {
             selectedContacts = new ArrayList<ContactWrapper>();
         }
@@ -132,7 +132,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
     }
 
     public void reload() {
-        selectedContacts = clinic.getContactCollection();
+        selectedContacts = clinic.getContactCollection(false);
         if (selectedContacts == null) {
             selectedContacts = new ArrayList<ContactWrapper>();
         }

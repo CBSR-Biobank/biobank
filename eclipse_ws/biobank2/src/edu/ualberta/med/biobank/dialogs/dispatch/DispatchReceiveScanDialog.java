@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -30,7 +31,8 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 public class DispatchReceiveScanDialog extends
     AbstractScanDialog<DispatchWrapper> {
 
-    private static final String TITLE = "Scanning received pallets";
+    private static final String TITLE = Messages
+        .getString("DispatchReceiveScanDialog.title"); //$NON-NLS-1$
 
     private int pendingAliquotsNumber = 0;
 
@@ -45,7 +47,7 @@ public class DispatchReceiveScanDialog extends
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Scan one pallet received in the shipment.";
+        return Messages.getString("DispatchReceiveScanDialog.description"); //$NON-NLS-1$
     }
 
     @Override
@@ -75,21 +77,23 @@ public class DispatchReceiveScanDialog extends
             break;
         case DUPLICATE:
             cell.setStatus(CellStatus.ERROR);
-            cell.setInformation("Found more than one aliquot with inventoryId "
+            cell.setInformation(Messages
+                .getString("DispatchReceiveScanDialog.cell.duplicate.msg") //$NON-NLS-1$
                 + cell.getValue());
-            cell.setTitle("!");
+            cell.setTitle("!"); //$NON-NLS-1$
             errors++;
             break;
         case NOT_IN_DB:
             cell.setStatus(CellStatus.ERROR);
-            cell.setInformation("Aliquot " + cell.getValue()
-                + " not found in database");
-            cell.setTitle("!");
+            cell.setInformation(Messages.getString(
+                "DispatchReceiveScanDialog.cell.notInDb.msg", cell.getValue())); //$NON-NLS-1$
+            cell.setTitle("!"); //$NON-NLS-1$
             errors++;
             break;
         case NOT_IN_SHIPMENT:
             cell.setStatus(CellStatus.EXTRA);
-            cell.setInformation("Aliquot should not be in shipment");
+            cell.setInformation(Messages
+                .getString("DispatchReceiveScanDialog.cell.notInShipment.msg")); //$NON-NLS-1$
             pendingAliquotsNumber++;
             break;
         case OK:
@@ -122,8 +126,10 @@ public class DispatchReceiveScanDialog extends
             List<SpecimenWrapper> newExtraAliquots = new ArrayList<SpecimenWrapper>();
             for (RowColPos rcp : rcps) {
                 if (monitor != null) {
-                    monitor.subTask("Processing position "
-                        + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
+                    monitor
+                        .subTask(Messages
+                            .getString("DispatchReceiveScanDialog.processCell.task.position") //$NON-NLS-1$
+                            + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
                 }
                 PalletCell cell = cells.get(rcp);
                 processCellStatus(cell);
@@ -141,16 +147,17 @@ public class DispatchReceiveScanDialog extends
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    BiobankPlugin
-                        .openInformation(
-                            "Not in dispatch aliquots",
-                            "Some of the aliquots in this pallet were not supposed"
-                                + " to be in this shipment. They will be added to the"
-                                + " extra-pending list.");
+                    BiobankPlugin.openInformation(
+                        Messages
+                            .getString("DispatchReceiveScanDialog.notInDispatch.error.title"), //$NON-NLS-1$
+                        Messages
+                            .getString("DispatchReceiveScanDialog.notInDispatch.error.msg")); //$NON-NLS-1$
                     try {
                         (currentShipment).addExtraAliquots(extraAliquots);
                     } catch (Exception e) {
-                        BiobankPlugin.openAsyncError("Error flagging aliquots",
+                        BiobankPlugin.openAsyncError(
+                            Messages
+                                .getString("DispatchReceiveScanDialog.flagging.error.title"), //$NON-NLS-1$
                             e);
                     }
                 }
@@ -160,7 +167,8 @@ public class DispatchReceiveScanDialog extends
 
     @Override
     protected String getProceedButtonlabel() {
-        return "Accept aliquots";
+        return Messages
+            .getString("DispatchReceiveScanDialog.proceed.button.label"); //$NON-NLS-1$
     }
 
     @Override
@@ -189,7 +197,10 @@ public class DispatchReceiveScanDialog extends
             setOkButtonEnabled(true);
             aliquotsReceived = true;
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error receiving aliquots", e);
+            BiobankPlugin
+                .openAsyncError(
+                    Messages
+                        .getString("DispatchReceiveScanDialog.receiveing.error.title"), e); //$NON-NLS-1$
         }
         Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
         cancelButton.setEnabled(false);

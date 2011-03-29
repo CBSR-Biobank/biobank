@@ -4,7 +4,9 @@ import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
+import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.Site;
@@ -120,21 +122,19 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public List<edu.ualberta.med.biobank.common.security.Group> getSecurityGroups(
-        boolean includeSuperAdmin) throws ApplicationException {
+    public List<Group> getSecurityGroups(boolean includeSuperAdmin)
+        throws ApplicationException {
         return BiobankSecurityUtil.getSecurityGroups(includeSuperAdmin);
     }
 
     @Override
-    public List<edu.ualberta.med.biobank.common.security.User> getSecurityUsers()
-        throws ApplicationException {
+    public List<User> getSecurityUsers() throws ApplicationException {
         return BiobankSecurityUtil.getSecurityUsers();
     }
 
     @Override
-    public void persistUser(edu.ualberta.med.biobank.common.security.User user)
-        throws ApplicationException {
-        BiobankSecurityUtil.persistUser(user);
+    public User persistUser(User user) throws ApplicationException {
+        return BiobankSecurityUtil.persistUser(user);
     }
 
     @Override
@@ -143,21 +143,17 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public edu.ualberta.med.biobank.common.security.User getCurrentUser()
-        throws ApplicationException {
+    public User getCurrentUser() throws ApplicationException {
         return BiobankSecurityUtil.getCurrentUser();
     }
 
     @Override
-    public edu.ualberta.med.biobank.common.security.Group persistGroup(
-        edu.ualberta.med.biobank.common.security.Group group)
-        throws ApplicationException {
+    public Group persistGroup(Group group) throws ApplicationException {
         return BiobankSecurityUtil.persistGroup(group);
     }
 
     @Override
-    public void deleteGroup(edu.ualberta.med.biobank.common.security.Group group)
-        throws ApplicationException {
+    public void deleteGroup(Group group) throws ApplicationException {
         BiobankSecurityUtil.deleteGroup(group);
     }
 

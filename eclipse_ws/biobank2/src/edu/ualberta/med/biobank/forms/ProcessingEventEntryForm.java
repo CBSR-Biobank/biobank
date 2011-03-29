@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -132,7 +133,9 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             Messages.getString("ProcessingEvent.field.worksheet.label"), null, //$NON-NLS-1$
-            pEvent, ProcessingEventPeer.WORKSHEET.getName(), null);
+            pEvent, ProcessingEventPeer.WORKSHEET.getName(),
+            (!pEvent.isNew() && pEvent.getWorksheet() == null) ? null
+                : new NonEmptyStringValidator("Worksheet cannot be null"));
 
         activityStatusComboViewer = createComboViewer(
             client,
@@ -189,6 +192,25 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                 SpecimenWrapper specimen = event.getObject();
                 switch (event.getType()) {
                 case PRE_ADD:
+                    if (specimen == null)
+                        throw new VetoException(
+                            "No specimen found for that inventory id.");
+                    else if (!SessionManager.getUser()
+                        .getCurrentWorkingCenter()
+                        .equals(specimen.getCurrentCenter())) {
+                        String centerName = "'none'";
+                        if (specimen.getCurrentCenter() != null)
+                            centerName = specimen.getCurrentCenter()
+                                .getNameShort();
+                        throw new VetoException(
+                            "Specimen is currently in center " + centerName
+                                + ". You can't process it.");
+                    } else if (specimen.isUsedInDispatch())
+                        throw new VetoException(
+                            "Specimen is currently listed in a dispatch.");
+                    else if (specimen.getParentContainer() != null)
+                        throw new VetoException(
+                            "Specimen is currently listed as stored in a container.");
                     break;
                 case POST_ADD:
                     specimen.setProcessingEvent(pEvent);
