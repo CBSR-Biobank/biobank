@@ -123,31 +123,6 @@ public class ReportsView extends ViewPart {
         containerTree.setInput(containerRoot);
         containerTree.expandAll();
 
-        /*
-         * List<Class<?>> advancedObjs = SearchUtils.getSearchableObjs(); for
-         * (Class<?> obj : advancedObjs) { AdvancedReportTreeNode child = new
-         * AdvancedReportTreeNode(obj .getSimpleName().replace("Wrapper", ""),
-         * QueryTree.constructTree(new HQLField("", obj.getSimpleName(), obj)));
-         * advanced.addChild(child); child.setParent(advanced); }
-         * 
-         * AbstractReportTreeNode custom = new AbstractReportTreeNode("Custom");
-         * custom.setParent(advanced); advanced.addChild(custom);
-         * 
-         * File dir = new File(Platform.getInstanceLocation().getURL().getPath()
-         * + "/saved_reports"); File[] files = dir.listFiles(); if (files !=
-         * null) try { for (int i = 0; i < files.length; i++) { if
-         * (files[i].getName().contains(".xml")) { String name =
-         * files[i].getName().replace(".xml", ""); AdvancedReportTreeNode
-         * customNode = new AdvancedReportTreeNode( name,
-         * QueryTreeNode.getTreeFromFile(files[i]));
-         * customNode.setParent(custom); custom.addChild(customNode); } } }
-         * catch (Exception e) {
-         * BioBankPlugin.openAsyncError("Error loading saved reports", e); }
-         * 
-         * root.addChild(standard); standard.setParent(root); // FIXME: Advanced
-         * reports temporarily disabled // root.addChild(advanced);
-         * advanced.setParent(root);
-         */
     }
 
     private void initializeNewReports(AbstractReportTreeNode aliquots,

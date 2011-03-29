@@ -94,7 +94,6 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         if (!add) {
             dialogSpecimenTypes.add(sourceSpecimen.getSpecimenType());
         }
-        // FIXME: create new dialog type
         StudySourceSpecimenDialog dlg = new StudySourceSpecimenDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             sourceSpecimen, dialogSpecimenTypes);

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -69,8 +70,8 @@ public class RequestTableGroup implements Node {
         try {
             results = SessionManager.getAppService().query(query);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            BiobankPlugin.openAsyncError("Error",
+                "Unable to retrieve data from server");
         }
 
         HashSet<Integer> containers = new HashSet<Integer>();

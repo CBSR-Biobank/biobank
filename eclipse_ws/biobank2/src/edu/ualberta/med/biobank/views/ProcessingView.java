@@ -139,7 +139,6 @@ public class ProcessingView extends AbstractAdministrationView {
     @Override
     protected String getTreeTextToolTip() {
         return "";
-        // FIXME: i return nothign
     }
 
     @Override

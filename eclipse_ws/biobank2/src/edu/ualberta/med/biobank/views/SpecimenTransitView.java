@@ -61,11 +61,12 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     }
 
     public void createNodes() {
-        // FIXME DD: I think this should be center based instead of site based.
-        // getCurrentWorkingSite() will return null if the current center is a
-        // clinic
-        if (SessionManager.getUser().getCurrentWorkingSite() != null) {
-            SessionManager.getUser().getCurrentWorkingSite().reload();
+        if (SessionManager.getUser().getCurrentWorkingCenter() != null) {
+            try {
+                SessionManager.getUser().getCurrentWorkingCenter().reload();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             centerNode = new DispatchCenterAdapter(rootNode, SessionManager
                 .getUser().getCurrentWorkingSite());
             centerNode.setParent(rootNode);
@@ -336,8 +337,6 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     @Override
     protected void notFound(String text) {
-        // TODO Auto-generated method stub
-
     }
 
     public static void showShipment(OriginInfoWrapper shipment) {
