@@ -4,7 +4,7 @@ package edu.ualberta.med.biobank.common.util;
  * Never remove one of these enum. Use deprecated if it should not be used
  * anymore.
  */
-public enum DispatchSpecimenState {
+public enum DispatchSpecimenState implements ItemState {
     NONE(0, "Ok"), RECEIVED(1, "Received"), MISSING(2, "Missing"), EXTRA(3,
         "Extra");
 
@@ -16,14 +16,17 @@ public enum DispatchSpecimenState {
         this.label = label;
     }
 
+    @Override
     public String getLabel() {
         return label;
     }
 
+    @Override
     public Integer getId() {
         return id;
     }
 
+    @Override
     public boolean isEquals(Integer state) {
         return id.equals(state);
     }

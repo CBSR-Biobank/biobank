@@ -5,7 +5,8 @@ import edu.ualberta.med.biobank.common.wrappers.base.RequestSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class RequestSpecimenWrapper extends RequestSpecimenBaseWrapper {
+public class RequestSpecimenWrapper extends RequestSpecimenBaseWrapper
+    implements ItemWrapper {
 
     public RequestSpecimenWrapper(WritableApplicationService appService) {
         super(appService);

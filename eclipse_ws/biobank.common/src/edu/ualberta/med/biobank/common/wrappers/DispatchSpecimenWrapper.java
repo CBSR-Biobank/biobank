@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.common.wrappers.base.DispatchSpecimenBaseWrapper
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class DispatchSpecimenWrapper extends DispatchSpecimenBaseWrapper {
+public class DispatchSpecimenWrapper extends DispatchSpecimenBaseWrapper implements ItemWrapper {
 
     public DispatchSpecimenWrapper(WritableApplicationService appService) {
         super(appService);
