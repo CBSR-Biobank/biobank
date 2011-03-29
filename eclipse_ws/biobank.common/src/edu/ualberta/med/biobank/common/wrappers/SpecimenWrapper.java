@@ -478,7 +478,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
         if (isNew() || parentChanged) {
             for (SpecimenWrapper child : getChildSpecimenCollection(false)) {
-                child.setParentSpecimen(this);
+                super.setTopSpecimen(getTopSpecimen());
                 child.persist();
             }
         }
