@@ -18,6 +18,10 @@ public class Cell implements Serializable {
 
     private String title = "";
 
+    private Integer expectedSpecimenId;
+
+    private Integer specimenId;
+
     public Cell(int row, int col, String value, CellStatus status) {
         this.row = row;
         this.col = col;
@@ -85,4 +89,19 @@ public class Cell implements Serializable {
         return col;
     }
 
+    public void setExpectedSpecimenId(Integer specId) {
+        this.expectedSpecimenId = specId;
+    }
+
+    public Integer getExpectedSpecimenId() {
+        return expectedSpecimenId;
+    }
+
+    public void setSpecimenId(Integer id) {
+        this.specimenId = id;
+    }
+
+    public Integer getSpecimenId() {
+        return specimenId;
+    }
 }

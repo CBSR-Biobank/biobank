@@ -1,10 +1,11 @@
-package edu.ualberta.med.biobank.server.applicationservice;
+package edu.ualberta.med.biobank.common.scanprocess;
 
 import java.io.Serializable;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.util.linking.Cell;
+import edu.ualberta.med.biobank.common.util.linking.CellStatus;
 
 public class ScanProcessResult implements Serializable {
 
@@ -12,14 +13,17 @@ public class ScanProcessResult implements Serializable {
 
     private Map<RowColPos, Cell> cells;
     private String logs;
+    private CellStatus status;
 
     public ScanProcessResult() {
     }
 
-    public ScanProcessResult(Map<RowColPos, Cell> cells, String logs) {
+    public ScanProcessResult(Map<RowColPos, Cell> cells, String logs,
+        CellStatus status) {
         super();
         this.cells = cells;
         this.logs = logs;
+        this.setStatus(status);
     }
 
     public Map<RowColPos, Cell> getCells() {
@@ -36,6 +40,14 @@ public class ScanProcessResult implements Serializable {
 
     public void setLogs(String logs) {
         this.logs = logs;
+    }
+
+    public void setStatus(CellStatus status) {
+        this.status = status;
+    }
+
+    public CellStatus getStatus() {
+        return status;
     }
 
 }

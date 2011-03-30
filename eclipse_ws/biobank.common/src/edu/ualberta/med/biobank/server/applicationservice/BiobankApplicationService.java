@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.server.applicationservice;
 
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
+import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
