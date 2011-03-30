@@ -16,17 +16,22 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PatientVisitSummaryImpl extends AbstractReport {
 
-    public static String QUERY_STRING = "select study_name, clinic_name, sum(pvCount=1), sum(pvCount=2), "
-        + "sum(pvCount=3), sum(pvCount=4), sum(pvCount >=5), sum(pvCount), count(patient_number) "
-        + "from (select s.name_short "
-        + "as study_name, c.name_short as clinic_name, p.pnumber as patient_number, count(pv.id) as pvCount "
-        + "from patient_visit pv "
-        + "join shipment_patient sp on pv.shipment_patient_id=sp.id "
-        + "join patient p on sp.patient_id=p.id join study s on s.id = p.study_id "
-        + "join abstract_shipment sh on sh.id=sp.shipment_id join clinic c on c.id=sh.clinic_id where pv.date_processed "
-        + "between ? and ?"
-        + " group by s.name_short, c.name_short, p.pnumber) as filteredPvs group by study_name, "
-        + "clinic_name order by study_name, clinic_name";
+    public static String QUERY_STRING = "SELECT study_name, clinic_name, sum(pvCount=1), sum(pvCount=2),"
+        + " sum(pvCount=3), sum(pvCount=4), sum(pvCount >=5), sum(pvCount), count(patient_number)"
+        + " FROM (SELECT s.name_short as study_name,"
+        + "         c.name_short as clinic_name,"
+        + "         p.pnumber as patient_number,"
+        + "         count(distinct ce.id) as pvCount"
+        + "     FROM collection_event ce"
+        + "         join specimen s on s.original_collection_event_id=ce.id" // "source vessels"
+        + "         join origin_info oi on s.origin_info_id=oi.id"
+        + "         join center c on oi.center_id=c.id"
+        + "         join patient p on ce.patient_id=p.id"
+        + "         join study s on s.id=p.study_id"
+        + "     WHERE s.createdAt between ? and ?"
+        + "     GROUP BY s.name_short, c.name_short, p.pnumber) as filteredPvs"
+        + " GROUP BY study_name, clinic_name"
+        + " ORDER BY study_name, clinic_name";
 
     public PatientVisitSummaryImpl(BiobankReport report) {
         super(QUERY_STRING, report);

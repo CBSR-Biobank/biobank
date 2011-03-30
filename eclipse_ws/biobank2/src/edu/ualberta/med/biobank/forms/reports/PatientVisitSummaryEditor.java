@@ -18,9 +18,9 @@ public class PatientVisitSummaryEditor extends ReportsEditor {
     @Override
     protected void createOptionSection(Composite parent) {
         start = widgetCreator.createDateTimeWidget(parent,
-            "Start Date (Linked)", null, null, null, SWT.DATE);
-        end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
-            null, null, null, SWT.DATE);
+            "Start Date (Time Drawn)", null, null, null, SWT.DATE);
+        end = widgetCreator.createDateTimeWidget(parent,
+            "End Date (Time Drawn)", null, null, null, SWT.DATE);
     }
 
     @Override
@@ -40,8 +40,8 @@ public class PatientVisitSummaryEditor extends ReportsEditor {
     @Override
     protected List<String> getParamNames() {
         List<String> param = new ArrayList<String>();
-        param.add("Start Date (Linked)");
-        param.add("End Date (Linked)");
+        param.add("Start Date (Time Drawn)");
+        param.add("End Date (Time Drawn)");
         return param;
     }
 
