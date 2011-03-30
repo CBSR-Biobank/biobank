@@ -182,8 +182,9 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
         IStructuredSelection selection = (IStructuredSelection) tv
             .getSelection();
         if (selection != null && selection.size() > 0
-            && selection.getFirstElement() instanceof DispatchSpecimenWrapper) {
-            return (DispatchSpecimenWrapper) selection.getFirstElement();
+            && selection.getFirstElement() instanceof TreeItemAdapter) {
+            return (DispatchSpecimenWrapper) ((TreeItemAdapter) selection
+                .getFirstElement()).getSpecimen();
         }
         return null;
     }
@@ -225,8 +226,8 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
             String comment = dialog.getComment();
             for (Iterator<?> iter = iStructuredSelection.iterator(); iter
                 .hasNext();) {
-                DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) iter
-                    .next();
+                DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) ((TreeItemAdapter) iter
+                    .next()).getSpecimen();
                 dsa.setComment(comment);
                 if (newState != null) {
                     dsa.setDispatchSpecimenState(newState);
