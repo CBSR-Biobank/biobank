@@ -785,8 +785,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         if (wrappers == null && !modelWrapper.isCached(property)) {
             Collection<R> raw = getModelProperty(modelWrapper, property);
 
-            List<R> list = (raw instanceof List) ? (List<R>) raw
-                : new ArrayList<R>(raw);
+            List<R> list = new ArrayList<R>();
+            if (raw != null) {
+                if (raw instanceof List) {
+                    list = (List<R>) raw;
+                } else {
+                    list = new ArrayList<R>(raw);
+                }
+            }
 
             wrappers = wrapModelCollection(appService, list, wrapperKlazz);
             modelWrapper.cache(property, wrappers);
