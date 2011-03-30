@@ -925,11 +925,14 @@
   </target>
 
   <target name="tests-compile" depends="build-common-project,prepare">
-    <javac srcdir="${eclipse.proj.dir.junit}/src"
-           destdir="${test.build.dir}"
+    <javac destdir="${test.build.dir}"
            debug="true"
            debuglevel="lines,source"
            includeantruntime="false">
+      <src path="${eclipse.proj.dir.junit}/src" />
+      <src path="${eclipse.proj.dir.tools}/src" />
+      <include name="**/tools/utils/*.java" />
+      <include name="**/Test*.java" />
       <classpath>
         <pathelement location="${eclipse.proj.dir.common}/output" />
         <pathelement location="${eclipse.proj.dir.common}/lib/client" />
@@ -941,6 +944,7 @@
   <fileset id="testcase.files" dir="${eclipse.proj.dir.junit}/src">
     <include name="**/Test*.java" />
     <exclude name="**/speed/**" />
+    <exclude name="**/TestReportsProcedurallyGeneratedData.java" />
     <exclude name="**/TestCommon.java" />
     <exclude name="**/TestDatabase.java" />
     <exclude name="**/TestFunctionalities.java" />
