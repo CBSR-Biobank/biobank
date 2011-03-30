@@ -239,7 +239,7 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
     }
 
     public void refresh() {
-        tv.refresh();
+        tv.setInput("refresh");
     }
 
     private void addClipboardCopySupport(Menu menu,
