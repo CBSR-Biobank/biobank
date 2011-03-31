@@ -135,28 +135,24 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     protected Log getLogMessage(String action, String site, String details) {
         Log log = new Log();
         log.setAction(action);
-        CollectionEventWrapper cevent = getParentSpecimen()
-            .getCollectionEvent();
-        PatientWrapper patient = cevent.getPatient();
         if (site == null) {
-            log.setSite(getCenter().getNameShort());
+            log.setCenter(getCenter().getNameShort());
         } else {
-            log.setSite(site);
-        }
-        log.setPatientNumber(patient.getPnumber());
-        Date createdAt = getCreatedAt();
-        if (createdAt != null) {
-            details += " Date Processed: " + getFormattedCreatedAt();
+            log.setCenter(site);
         }
         try {
-            String worksheet = cevent.getEventAttrValue("Worksheet");
-            if (worksheet != null) {
-                details += " - Worksheet: " + worksheet;
-            }
-        } catch (Exception e) {
+            details += "Source Specimens: " + getSpecimenCount(false);
+        } catch (BiobankException e) {
+            e.printStackTrace();
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+        }
+        String worksheet = getWorksheet();
+        if (worksheet != null) {
+            details += " - Worksheet: " + worksheet;
         }
         log.setDetails(details);
-        log.setType("Visit");
+        log.setType("ProcessingEvent");
         return log;
     }
 

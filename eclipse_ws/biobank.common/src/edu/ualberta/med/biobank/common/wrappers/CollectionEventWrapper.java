@@ -133,12 +133,12 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         Log log = new Log();
         log.setAction(action);
         if (site == null) {
-            log.setSite(null);
+            log.setCenter(null);
         } else {
-            log.setSite(site);
+            log.setCenter(site);
         }
-        details += "Patient:" + getPatient().getPnumber();
-        details += " - Visit:" + getVisitNumber();
+        log.setPatientNumber(getPatient().getPnumber());
+        details += "Visit:" + getVisitNumber();
         try {
             details += " - Collected:" + getSourceSpecimensCount(false);
         } catch (BiobankException e) {
