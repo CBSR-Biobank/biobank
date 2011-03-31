@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.PerspectiveSecurity;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
@@ -122,7 +122,6 @@ public class SessionManager {
         if (perspectivesUpdateDone == null)
             perspectivesUpdateDone = new HashMap<String, Boolean>();
         perspectivesUpdateDone.clear();
-        perspectivesUpdateDone.put(ProcessingPerspective.ID, false);
     }
 
     public void updateSession() {
@@ -341,9 +340,8 @@ public class SessionManager {
             if (sm.isConnected()) {
                 String perspectiveId = page.getPerspective().getId();
                 Boolean done = sm.perspectivesUpdateDone.get(perspectiveId);
-                if (done != null && !done) {
-                    // will check if this is the right perspective
-                    ProcessingPerspective.updateVisibility(getUser(), page);
+                if (done == null || !done) {
+                    PerspectiveSecurity.updateVisibility(getUser(), page);
                     sm.perspectivesUpdateDone.put(perspectiveId, true);
                 }
             }

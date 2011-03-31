@@ -1,15 +1,15 @@
 package edu.ualberta.med.biobank.rcp.perspective;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
-import org.eclipse.ui.IViewReference;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.common.security.SecurityFeature;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.views.AdvancedReportsView;
-import edu.ualberta.med.biobank.views.CollectionView;
 import edu.ualberta.med.biobank.views.LoggingView;
 import edu.ualberta.med.biobank.views.ReportsView;
 
@@ -21,21 +21,23 @@ public class ReportsPerspective implements IPerspectiveFactory {
     public void createInitialLayout(IPageLayout layout) {
     }
 
-    public static void updateVisibility(User user, IWorkbenchPage page)
-        throws PartInitException {
-        if (page.getPerspective().getId().equals(ID)) {
-            PerspectiveUtil.updateVisibility(ReportsView.ID,
-                user.canPerformActions(SecurityFeature.REPORTS), page);
-            PerspectiveUtil.updateVisibility(AdvancedReportsView.ID,
-                user.canPerformActions(SecurityFeature.REPORTS), page);
-            PerspectiveUtil.updateVisibility(LoggingView.ID,
-                user.canPerformActions(SecurityFeature.LOGGING), page);
-            // want to display patient view on top
-            for (IViewReference ref : page.getViewReferences()) {
-                if (ref.getId().equals(CollectionView.ID)) {
-                    page.bringToTop(ref.getView(false));
-                }
-            }
+    public static synchronized void appendFeatureEnablements(
+        Map<String, Map<String, List<SecurityFeature>>> featureEnablements) {
+        Map<String, List<SecurityFeature>> map = featureEnablements.get(ID);
+        if (map == null) {
+            map = new HashMap<String, List<SecurityFeature>>();
+            map.put(ReportsView.ID, Arrays.asList(SecurityFeature.REPORTS));
+            map.put(AdvancedReportsView.ID,
+                Arrays.asList(SecurityFeature.REPORTS));
+            map.put(LoggingView.ID, Arrays.asList(SecurityFeature.LOGGING));
+            featureEnablements.put(ID, map);
+        }
+    }
+
+    public static void appendPreferredView(Map<String, String> preferredViews) {
+        String view = preferredViews.get(ID);
+        if (view == null) {
+            preferredViews.put(ID, ReportsView.ID);
         }
     }
 }
