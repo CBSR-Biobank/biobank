@@ -436,9 +436,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         Log log = new Log();
         log.setAction(action);
         if (site == null) {
-            log.setSite(getSenderCenter().getNameShort());
+            log.setCenter(getSenderCenter().getNameShort());
         } else {
-            log.setSite(site);
+            log.setCenter(site);
         }
 
         ShipmentInfoWrapper shipInfo = getShipmentInfo();

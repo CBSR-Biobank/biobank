@@ -32,7 +32,7 @@ public class LogSql {
         sql.append(") VALUES ('");
         sql.append(initString(log.getUsername()));
         sql.append("','");
-        sql.append(initString(log.getSite()));
+        sql.append(initString(log.getCenter()));
         sql.append("','");
         sql.append(initString(log.getCreatedAt()));
         sql.append("','");

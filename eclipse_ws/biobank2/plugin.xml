@@ -383,7 +383,6 @@
                </reference>
             </and>
          </activeWhen>
-         <enabledWhen></enabledWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.StudyAddHandler"
