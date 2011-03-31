@@ -68,7 +68,7 @@
   </condition>
   <condition property="isHostAicml5">
     <equals arg1="${host.name}"
-            arg2="aicml5.cs.ualberta.ca"
+            arg2="aicml5"
             casesensitive="true"
             trim="true" />
   </condition>
@@ -321,7 +321,7 @@
           overwrite="true" />
   </target>
   <target name="hostAicml5" if="isHostAicml5">
-    <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
+    <copy file="${secu-log.dir}/jboss/${host.name}.cs.ualberta.ca.keystore"
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
   </target>
