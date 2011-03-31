@@ -45,7 +45,7 @@ public class LoggingView extends ViewPart {
     private ISourceProviderListener siteStateListener;
 
     private static enum ComboListType {
-        SITE, USER, TYPE, ACTION
+        CENTER, USER, TYPE, ACTION
     }
 
     private BiobankText patientNumTextInput, inventoryIdTextInput,
@@ -366,7 +366,7 @@ public class LoggingView extends ViewPart {
     }
 
     private void loadComboFields() {
-        siteComboOptions = loadComboList(ComboListType.SITE);
+        siteComboOptions = loadComboList(ComboListType.CENTER);
         siteCombo.setItems(siteComboOptions);
         siteCombo.select(0);
         userCombo.setItems(loadComboList(ComboListType.USER));
@@ -453,8 +453,8 @@ public class LoggingView extends ViewPart {
             }
 
             switch (possibleList) {
-            case SITE:
-                arrayList = LogWrapper.getPossibleSites(SessionManager
+            case CENTER:
+                arrayList = LogWrapper.getPossibleCenters(SessionManager
                     .getAppService());
                 break;
 

@@ -21,7 +21,7 @@ public class LogWrapper extends LogBaseWrapper {
     }
 
     public static List<LogWrapper> getLogs(
-        WritableApplicationService appService, String site, String username,
+        WritableApplicationService appService, String center, String username,
         Date startDate, Date endDate, String action, String patientNumber,
         String inventoryId, String locationLabel, String details, String type)
         throws Exception {
@@ -49,7 +49,7 @@ public class LogWrapper extends LogBaseWrapper {
             parametersString.append(" " + datePart);
         }
 
-        addParam(parametersString, parametersArgs, "site", site);
+        addParam(parametersString, parametersArgs, "center", center);
         addParam(parametersString, parametersArgs, "action", action);
         addParam(parametersString, parametersArgs, "patientNumber",
             patientNumber);
@@ -110,12 +110,12 @@ public class LogWrapper extends LogBaseWrapper {
         }
     }
 
-    public static final String POSSIBLE_SITES_QRY = "select distinct(site) from "
-        + Log.class.getName() + " where site !=''";
+    public static final String POSSIBLE_CENTERS_QRY = "select distinct(center) from "
+        + Log.class.getName() + " where center !=''";
 
-    public static List<String> getPossibleSites(
+    public static List<String> getPossibleCenters(
         WritableApplicationService appService) throws ApplicationException {
-        return appService.query(new HQLCriteria(POSSIBLE_SITES_QRY));
+        return appService.query(new HQLCriteria(POSSIBLE_CENTERS_QRY));
     }
 
     public static final String POSSIBLE_USER_NAMES_QRY = "select distinct(username) from "
