@@ -23,7 +23,7 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
     }
 
     class TableRowData {
-        String site;
+        String center;
         String user;
         String date;
         String action;
@@ -35,7 +35,7 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { site, user, date, action,
+            return StringUtils.join(new String[] { center, user, date, action,
                 type, patientNumber, inventoryId, positionLabel, details },
                 "\t");
         }
@@ -55,7 +55,7 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
                 }
                 switch (columnIndex) {
                 case 0:
-                    return item.site;
+                    return item.center;
                 case 1:
                     return item.user;
                 case 2:
@@ -83,7 +83,7 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
     public Object getCollectionModelObject(LogWrapper logQuery)
         throws Exception {
         TableRowData info = new TableRowData();
-        info.site = logQuery.getSite();
+        info.center = logQuery.getCenter();
         info.user = logQuery.getUsername();
         info.action = logQuery.getAction();
         info.type = logQuery.getType();

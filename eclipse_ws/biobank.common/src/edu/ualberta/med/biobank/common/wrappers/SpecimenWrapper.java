@@ -414,7 +414,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         Log log = new Log();
         CollectionEventWrapper cevent = getCollectionEvent();
         log.setAction(action);
-        log.setSite(center);
+        log.setCenter(center);
         log.setPatientNumber(cevent.getPatient().getPnumber());
         log.setInventoryId(getInventoryId());
         log.setLocationLabel(getPositionString(true, true));

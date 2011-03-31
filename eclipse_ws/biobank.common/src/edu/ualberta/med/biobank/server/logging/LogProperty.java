@@ -17,7 +17,7 @@ public enum LogProperty {
     SITE("site") {
         @Override
         public void setValue(Log log, String value) {
-            log.setSite(value);
+            log.setCenter(value);
         }
     },
     ACTION("action") {
