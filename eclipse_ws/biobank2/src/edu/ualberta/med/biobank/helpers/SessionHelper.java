@@ -74,7 +74,10 @@ public class SessionHelper implements Runnable {
                     .openInformation(
                         "Server Version Error",
                         "The server you are connecting to does not have a version. Cannot authenticate.");
-                logger.error("Error while logging to application", exp);
+                logger
+                    .error(
+                        "The server you are connecting to does not have a version. Cannot authenticate.",
+                        exp);
             } else if (exp instanceof ServerVersionNewerException) {
                 if (BiobankPlugin.openConfirm("Server Version Error",
                     "Cannot connect to this server because the Java Client version is too old.\n"
@@ -84,29 +87,42 @@ public class SessionHelper implements Runnable {
                     } catch (Exception e1) {
                         // ignore
                     }
-                    logger.error("Error while logging to application", exp);
+                    logger
+                        .error(
+                            "Cannot connect to this server because the Java Client version is too old.",
+                            exp);
                 }
             } else if (exp instanceof ServerVersionOlderException) {
                 BiobankPlugin
                     .openInformation("Server Version Error",
                         "Cannot connect to this server because the Java Client version is too new.");
-                logger.error("Error while logging to application", exp);
+                logger
+                    .error(
+                        "Cannot connect to this server because the Java Client version is too new.",
+                        exp);
             } else if (exp instanceof ClientVersionInvalidException) {
                 BiobankPlugin
                     .openInformation("Client Version Error",
                         "Cannot connect to this server because the Java Client version is invalid.");
-                logger.error("Error while logging to application", exp);
+                logger
+                    .error(
+                        "Cannot connect to this server because the Java Client version is invalid.",
+                        exp);
             } else if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAuthenticationException) {
                 BiobankPlugin
                     .openAsyncError(
                         "Login Failed",
                         "Bad credentials. Warning: You will be locked out after 3 failed login attempts.");
-                return;
+                logger
+                    .error(
+                        "Bad credentials. Warning: You will be locked out after 3 failed login attempts.",
+                        exp);
             } else if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAccessException) {
                 BiobankPlugin.openAsyncError("Login Failed",
                     "Error contacting server.");
+                logger.error("Error contacting server.", exp);
             }
         } catch (Exception exp) {
             BiobankPlugin.openAsyncError("Login Failed", exp);

@@ -421,6 +421,9 @@ update collection_event ce
            if(@pp := ce.patient_id, @pv := 1, @pv := 1), @pv := @pv + 1)
        order by patient_id, pv_date_drawn;
 
+ALTER TABLE collection_event
+  ADD CONSTRAINT uc_visit_number UNIQUE (VISIT_NUMBER,PATIENT_ID);
+
 -- set specimen.original_collection_event_id for source specimens
 
 update specimen,collection_event as ce
