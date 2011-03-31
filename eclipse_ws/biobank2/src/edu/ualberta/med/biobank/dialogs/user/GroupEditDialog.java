@@ -39,7 +39,6 @@ public class GroupEditDialog extends BiobankDialog {
     private Group originalGroup, modifiedGroup;
     private MultiSelectWidget workingCentersWidget;
     private List<CenterWrapper<?>> allCenters;
-    private MultiSelectWidget globalFeaturesWidget;
     private MultiSelectWidget centerFeaturesWidget;
 
     public GroupEditDialog(Shell parent, Group originalGroup, boolean isNewGroup) {
@@ -86,19 +85,18 @@ public class GroupEditDialog extends BiobankDialog {
             modifiedGroup, "name", new NonEmptyStringValidator( //$NON-NLS-1$
                 MSG_NAME_REQUIRED));
 
-        final Button isSiteAdministratorCheckBox = (Button) createBoundWidgetWithLabel(
+        final Button isCenterAdministratorCheckBox = (Button) createBoundWidgetWithLabel(
             contents, Button.class, SWT.CHECK,
             Messages.getString("GroupEditDialog.center.administrator.title"),
             null, modifiedGroup, "isWorkingCentersAdministrator", null);
-        isSiteAdministratorCheckBox
+        isCenterAdministratorCheckBox
             .addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    widgetCreator.showWidget(centerFeaturesWidget,
-                        !isSiteAdministratorCheckBox.getSelection());
+                    setCenterAdministrator();
                 }
             });
-        isSiteAdministratorCheckBox.setToolTipText(Messages
+        isCenterAdministratorCheckBox.setToolTipText(Messages
             .getString("GroupEditDialog.center.administrator.tooltip"));
 
         List<String> centerNames = new ArrayList<String>();
@@ -117,14 +115,6 @@ public class GroupEditDialog extends BiobankDialog {
         workingCentersWidget.setSelections(centerMap,
             modifiedGroup.getWorkingCenterIds());
 
-        globalFeaturesWidget = createFeaturesSelectionWidget(
-            parent,
-            SessionManager.getAppService().getSecurityGlobalFeatures(),
-            modifiedGroup.getGlobalFeaturesEnabled(),
-            BiobankSecurityUtil.GLOBAL_FEATURE_START_NAME,
-            Messages.getString("GroupEditDialog.feature.global.list.available"), //$NON-NLS-1$
-            Messages.getString("GroupEditDialog.feature.global.list.selected")); //$NON-NLS-1$
-
         centerFeaturesWidget = createFeaturesSelectionWidget(
             parent,
             SessionManager.getAppService().getSecurityCenterFeatures(),
@@ -132,9 +122,17 @@ public class GroupEditDialog extends BiobankDialog {
             BiobankSecurityUtil.CENTER_FEATURE_START_NAME,
             Messages.getString("GroupEditDialog.feature.center.list.available"), //$NON-NLS-1$
             Messages.getString("GroupEditDialog.feature.center.list.selected")); //$NON-NLS-1$
-        // FIXME display not refresh properly
-        widgetCreator.showWidget(centerFeaturesWidget,
-            !modifiedGroup.getIsWorkingCentersAdministrator());
+        setCenterAdministrator();
+    }
+
+    protected void setCenterAdministrator() {
+        boolean centerAdministrator = modifiedGroup
+            .getIsWorkingCentersAdministrator();
+        centerFeaturesWidget.setEnabled(!centerAdministrator);
+        if (centerAdministrator)
+            centerFeaturesWidget.selectAll();
+        else
+            centerFeaturesWidget.deselectAll();
     }
 
     private MultiSelectWidget createFeaturesSelectionWidget(Composite parent,
@@ -155,7 +153,7 @@ public class GroupEditDialog extends BiobankDialog {
     private List<CenterWrapper<?>> getAllCenters() {
         if (allCenters == null) {
             try {
-                // FIXME can retrive everything ?
+                // FIXME can retrieve everything ?
                 allCenters = CenterWrapper.getCenters(SessionManager
                     .getAppService());
             } catch (Exception e) {
@@ -175,10 +173,12 @@ public class GroupEditDialog extends BiobankDialog {
         try {
             modifiedGroup.setWorkingCenterIds(workingCentersWidget
                 .getSelected());
-            modifiedGroup.setGlobalFeaturesEnabled(globalFeaturesWidget
-                .getSelected());
-            modifiedGroup.setCenterFeaturesEnabled(centerFeaturesWidget
-                .getSelected());
+            if (modifiedGroup.getIsWorkingCentersAdministrator())
+                modifiedGroup
+                    .setCenterFeaturesEnabled(new ArrayList<Integer>());
+            else
+                modifiedGroup.setCenterFeaturesEnabled(centerFeaturesWidget
+                    .getSelected());
             Group groupeResult = SessionManager.getAppService().persistGroup(
                 modifiedGroup);
             originalGroup.copy(groupeResult);
