@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.request.RequestSearchedNode;
+import edu.ualberta.med.biobank.treeview.request.RequestSiteAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class RequestAdministrationView extends AbstractAdministrationView {

@@ -132,7 +132,8 @@ public class GroupEditDialog extends BiobankDialog {
         if (centerAdministrator)
             centerFeaturesWidget.selectAll();
         else
-            centerFeaturesWidget.deselectAll();
+            centerFeaturesWidget.setSelection(modifiedGroup
+                .getCenterFeaturesEnabled());
     }
 
     private MultiSelectWidget createFeaturesSelectionWidget(Composite parent,

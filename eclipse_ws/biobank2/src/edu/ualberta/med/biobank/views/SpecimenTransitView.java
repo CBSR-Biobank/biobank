@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.DateNode;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.OriginInfoSearchedNode;
+import edu.ualberta.med.biobank.treeview.request.DispatchCenterAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ClinicWithShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentTodayNode;

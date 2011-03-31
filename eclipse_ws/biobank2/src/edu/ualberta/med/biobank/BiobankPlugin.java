@@ -55,10 +55,10 @@ import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
 import edu.ualberta.med.biobank.treeview.request.ApprovedRequestNode;
+import edu.ualberta.med.biobank.treeview.request.DispatchCenterAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
+import edu.ualberta.med.biobank.treeview.request.RequestSiteAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
-import edu.ualberta.med.biobank.views.DispatchCenterAdapter;
-import edu.ualberta.med.biobank.views.RequestSiteAdapter;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**

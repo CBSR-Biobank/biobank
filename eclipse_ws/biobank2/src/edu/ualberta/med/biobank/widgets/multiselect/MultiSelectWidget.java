@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
@@ -227,5 +228,11 @@ public class MultiSelectWidget extends BiobankWidget {
         super.setEnabled(enabled);
         selTree.getControl().setEnabled(enabled);
         availTree.getControl().setEnabled(enabled);
+    }
+
+    public void setSelection(List<Integer> selected) {
+        availTree.getTree().selectAll();
+        availTree.setSelection(new StructuredSelection(selected));
+        moveTreeViewerSelection(availTree, selTree);
     }
 }
