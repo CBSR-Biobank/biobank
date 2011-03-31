@@ -57,15 +57,15 @@ public class FTAReportEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Patient Number", "Date Processed",
-            "Inventory Id", "Sample Type", "Site", "Location" };
+        return new String[] { "Patient Number", "Date Drawn", "Inventory Id",
+            "Sample Type", "Site", "Location" };
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> names = new ArrayList<String>();
         names.add("Study");
-        names.add("After Date (Processed)");
+        names.add("After Date (Drawn)");
         return names;
     }
 

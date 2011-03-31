@@ -21,5 +21,4 @@ public class SampleTypePvCountImpl extends AbstractReport {
     public SampleTypePvCountImpl(BiobankReport report) {
         super(QUERY, report);
     }
-
 }
