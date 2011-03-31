@@ -18,8 +18,8 @@ public class ReportsHandler extends AbstractHandler {
         try {
             if (workbench.getActiveWorkbenchWindow().getActivePage()
                 .closeAllEditors(true))
-                workbench.showPerspective(ReportsPerspective.ID, workbench
-                    .getActiveWorkbenchWindow());
+                workbench.showPerspective(ReportsPerspective.ID,
+                    workbench.getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
             throw new ExecutionException(
                 "Perspective could not be initialized", e);
@@ -30,6 +30,6 @@ public class ReportsHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return (SessionManager.getInstance().getSession() != null);
+        return SessionManager.getInstance().isConnected();
     }
 }

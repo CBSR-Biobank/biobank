@@ -242,7 +242,7 @@ public class User implements Serializable, NotAProxy {
         }
         boolean currentCenterRights = true;
         CenterWrapper<?> currentCenter = getCurrentWorkingCenter();
-        if (currentCenter != null) {
+        if (!isInSuperAdminMode() && currentCenter != null) {
             // check object specific rights depending on center type
             List<String> centerSpecificRights = specificRightsMapping
                 .get(new TypePrivilegeKey(type, privilege));
@@ -325,9 +325,9 @@ public class User implements Serializable, NotAProxy {
 
     // FIXME for now assume features are center features (so can use
     // isAdministratorForCurrentCenter)
-    public boolean canPerformActions(Feature... features) {
+    public boolean canPerformActions(SecurityFeature... features) {
         boolean ok = isAdministratorForCurrentCenter();
-        for (Feature feature : features) {
+        for (SecurityFeature feature : features) {
             ok = ok
                 || hasPrivilegeOnProtectionGroup(Privilege.UPDATE,
                     feature.getName());

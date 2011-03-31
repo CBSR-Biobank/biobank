@@ -303,7 +303,7 @@ public class PatientWrapper extends PatientBaseWrapper {
     protected Log getLogMessage(String action, String site, String details) {
         Log log = new Log();
         log.setAction(action);
-        log.setSite(site);
+        log.setCenter(site);
         log.setPatientNumber(getPnumber());
         log.setDetails(details);
         log.setType("Patient");

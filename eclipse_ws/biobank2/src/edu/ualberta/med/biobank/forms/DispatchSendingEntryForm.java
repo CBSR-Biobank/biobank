@@ -37,7 +37,7 @@ import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
+public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     // private static BiobankLogger logger = BiobankLogger
     // .getLogger(DispatchSendingEntryForm.class.getName());

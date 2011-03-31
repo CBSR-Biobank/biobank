@@ -21,6 +21,8 @@ import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.Log;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -310,6 +312,27 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return DispatchState.CLOSED.equals(getDispatchState());
     }
 
+    public boolean isInLostState() {
+        return DispatchState.LOST.equals(getDispatchState());
+    }
+
+    public void setState(DispatchState ds) {
+        setState(ds.getId());
+        Log logMessage = null;
+        try {
+            logMessage = getLogMessage("state", null, "new state: "
+                + getStateDescription());
+            if (logMessage != null) {
+                ((BiobankApplicationService) appService)
+                    .logActivity(logMessage);
+            }
+        } catch (Exception ex) {
+            // Don't want the logs to affect delete
+            // FIXME save somewhere this information
+            ex.printStackTrace();
+        }
+    }
+
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
@@ -344,14 +367,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 return dsa;
         }
         return null;
-    }
-
-    public void setState(DispatchState ds) {
-        setState(ds.getId());
-    }
-
-    public boolean isInLostState() {
-        return DispatchState.LOST.equals(getDispatchState());
     }
 
     public List<DispatchSpecimenWrapper> getNonProcessedDispatchSpecimenCollection() {
@@ -435,6 +450,30 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public void resetMap() {
         dispatchSpecimenMap.clear();
+    }
+
+    @Override
+    protected Log getLogMessage(String action, String site, String details) {
+        Log log = new Log();
+        log.setAction(action);
+        if (site == null) {
+            log.setCenter(getSenderCenter().getNameShort());
+        } else {
+            log.setCenter(site);
+        }
+
+        ShipmentInfoWrapper shipInfo = getShipmentInfo();
+
+        if (shipInfo != null) {
+            details += "Sent at:" + shipInfo.getFormattedDateSent();
+            String waybill = shipInfo.getWaybill();
+            if (waybill != null) {
+                details += " - Waybill:" + waybill;
+            }
+        }
+        log.setDetails(details);
+        log.setType("Shipment");
+        return log;
     }
 
     private static final String DISPATCH_HQL_STRING = "from "

@@ -21,7 +21,7 @@ public class LogSql {
         StringBuffer sql = new StringBuffer();
         sql.append("INSERT INTO log (");
         sql.append(LogProperty.USERNAME);
-        sql.append(COMMA + LogProperty.SITE);
+        sql.append(COMMA + LogProperty.CENTER);
         sql.append(COMMA + LogProperty.CREATED_AT);
         sql.append(COMMA + LogProperty.ACTION);
         sql.append(COMMA + LogProperty.PATIENT_NUMBER);
@@ -32,7 +32,7 @@ public class LogSql {
         sql.append(") VALUES ('");
         sql.append(initString(log.getUsername()));
         sql.append("','");
-        sql.append(initString(log.getSite()));
+        sql.append(initString(log.getCenter()));
         sql.append("','");
         sql.append(initString(log.getCreatedAt()));
         sql.append("','");

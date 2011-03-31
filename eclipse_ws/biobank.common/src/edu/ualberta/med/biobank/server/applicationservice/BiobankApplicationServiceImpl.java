@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
+
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
@@ -52,7 +53,7 @@ public class BiobankApplicationServiceImpl extends
         throws Exception {
         Log log = new Log();
         log.setAction(action);
-        log.setSite(site);
+        log.setCenter(site);
         log.setPatientNumber(patientNumber);
         log.setInventoryId(inventoryID);
         log.setLocationLabel(locationLabel);

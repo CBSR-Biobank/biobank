@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
@@ -21,10 +22,10 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
-public abstract class AbstractShipmentEntryForm extends BiobankEntryForm {
+public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(AbstractShipmentEntryForm.class.getName());
+        .getLogger(AbstractDispatchEntryForm.class.getName());
 
     protected DispatchWrapper dispatch;
 
@@ -44,6 +45,8 @@ public abstract class AbstractShipmentEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         dispatch = (DispatchWrapper) adapter.getModelObject();
+        dispatch.logEdit(SessionManager.getUser().getCurrentWorkingCenter()
+            .getNameShort());
         retrieveShipment();
 
         setPartName(getTextForPartName());

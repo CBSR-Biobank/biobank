@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.views;
+package edu.ualberta.med.biobank.treeview.request;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,8 +13,6 @@ import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.request.ApprovedRequestNode;
-import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 
 public class RequestSiteAdapter extends AdapterBase {
 
