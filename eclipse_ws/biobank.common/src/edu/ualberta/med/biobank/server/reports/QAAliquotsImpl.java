@@ -12,9 +12,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class QAAliquotsImpl extends AbstractReport {
 
     private static final String QUERY = ("FROM " + Specimen.class.getName() + " as s")
-        + " WHERE s.parentSpecimen.processingEvent.createdAt between ? and ?"
-        + "     and s.specimenType.nameShort like ?"
-        + "     and s.aliquotPosition.container.id in (SELECT path1.container.id"
+        + " WHERE s.createdAt between ? and ?"
+        + "     and s.specimenType.nameShort = ?"
+        + "     and s.specimenPosition.container.id in (SELECT path1.container.id"
         + ("        FROM " + ContainerPath.class.getName() + " as path1 ")
         + ("            ," + ContainerPath.class.getName() + " as path2 ")
         + "         WHERE path1.path like path2.path || '/%' "

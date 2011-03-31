@@ -18,7 +18,7 @@ public class PatientVisitSummaryImpl extends AbstractReport {
 
     public static String QUERY_STRING = "SELECT study_name, clinic_name, sum(pvCount=1), sum(pvCount=2),"
         + " sum(pvCount=3), sum(pvCount=4), sum(pvCount >=5), sum(pvCount), count(patient_number)"
-        + " FROM (SELECT s.name_short as study_name,"
+        + " FROM (SELECT t.name_short as study_name,"
         + "         c.name_short as clinic_name,"
         + "         p.pnumber as patient_number,"
         + "         count(distinct ce.id) as pvCount"
@@ -27,9 +27,9 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         + "         join origin_info oi on s.origin_info_id=oi.id"
         + "         join center c on oi.center_id=c.id"
         + "         join patient p on ce.patient_id=p.id"
-        + "         join study s on s.id=p.study_id"
-        + "     WHERE s.createdAt between ? and ?"
-        + "     GROUP BY s.name_short, c.name_short, p.pnumber) as filteredPvs"
+        + "         join study t on t.id=p.study_id"
+        + "     WHERE s.created_at between ? and ?"
+        + "     GROUP BY t.name_short, c.name_short, p.pnumber) as filteredPvs"
         + " GROUP BY study_name, clinic_name"
         + " ORDER BY study_name, clinic_name";
 

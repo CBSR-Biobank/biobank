@@ -19,7 +19,7 @@ public class SampleTypeSUsageImpl extends AbstractReport {
 
     private final static String NOT_USED_QUERY = "SELECT st.nameShort "
         + (" FROM " + SpecimenType.class.getName() + " st ")
-        + " WHERE st not in (SELECT ss.sampleType "
+        + " WHERE st not in (SELECT ss.specimenType "
         + ("    FROM " + AliquotedSpecimen.class.getName() + " ss") + ")"
         + "ORDER BY st.nameShort";
 
