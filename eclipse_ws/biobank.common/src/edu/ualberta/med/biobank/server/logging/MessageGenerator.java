@@ -10,7 +10,7 @@ public class MessageGenerator {
 
         StringBuffer sb = new StringBuffer();
         append(sb, LogProperty.ACTION.getPropertyName(), action);
-        append(sb, LogProperty.SITE.getPropertyName(), site);
+        append(sb, LogProperty.CENTER.getPropertyName(), site);
         append(sb, LogProperty.PATIENT_NUMBER.getPropertyName(), patientNumber);
         append(sb, LogProperty.INVENTORY_ID.getPropertyName(), inventoryID);
         append(sb, LogProperty.LOCATION_LABEL.getPropertyName(), locationLabel);
@@ -22,7 +22,7 @@ public class MessageGenerator {
     public static String generateStringMessage(Log log) {
         StringBuffer sb = new StringBuffer();
         append(sb, LogProperty.ACTION.getPropertyName(), log.action);
-        append(sb, LogProperty.SITE.getPropertyName(), log.center);
+        append(sb, LogProperty.CENTER.getPropertyName(), log.center);
         append(sb, LogProperty.PATIENT_NUMBER.getPropertyName(),
             log.patientNumber);
         append(sb, LogProperty.INVENTORY_ID.getPropertyName(), log.inventoryId);
