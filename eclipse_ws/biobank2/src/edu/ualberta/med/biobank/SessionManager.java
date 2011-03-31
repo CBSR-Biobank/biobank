@@ -140,8 +140,8 @@ public class SessionManager {
         SessionState sessionSourceProvider = (SessionState) service
             .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
         sessionSourceProvider.setLoggedInState(sessionAdapter != null);
-        sessionSourceProvider.setWebAdmin(sessionAdapter != null
-            && sessionAdapter.getUser().isSuperAdministrator());
+        sessionSourceProvider.setSuperAdminMode(sessionAdapter != null
+            && sessionAdapter.getUser().isInSuperAdminMode());
         sessionSourceProvider.setHasWorkingCenter(sessionAdapter != null
             && sessionAdapter.getUser().getCurrentWorkingCenter() != null);
 
