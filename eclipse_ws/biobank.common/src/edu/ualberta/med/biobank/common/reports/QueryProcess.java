@@ -1,11 +1,11 @@
 package edu.ualberta.med.biobank.common.reports;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.dao.Response;
 
 public class QueryProcess {
@@ -24,14 +24,13 @@ public class QueryProcess {
             s.cancelQuery();
     }
 
-    public Response start(Session s) {
+    public synchronized Response start(Session s) throws ApplicationException {
+        if (this.s != null)
+            throw new ApplicationException("cannot start a query twice");
+
         this.s = s;
-        List<Object> obs = new ArrayList<Object>();
-        try {
-            obs = (qc.start(s, appService));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        List<Object> obs = qc.start(s, appService);
         return new Response(obs);
     }
 }

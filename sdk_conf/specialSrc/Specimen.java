@@ -399,4 +399,11 @@ public class Specimen  implements Serializable
 		this.parentSpecimen = parentSpecimen;
 	}
 	
+	private Specimen topSpecimen;
+	public Specimen getTopSpecimen(){
+		return topSpecimen;
+	}
+	public void setTopSpecimen(Specimen topSpecimen){
+		this.topSpecimen = topSpecimen;
+	}
 }
