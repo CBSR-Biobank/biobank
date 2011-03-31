@@ -414,14 +414,16 @@ public class LoginDialog extends TitleAreaDialog {
                     .getString("LoginDialog.working.center.error.title"), e); //$NON-NLS-1$
         }
         if (workingCenters != null) {
-            if ((workingCenters.size() == 0)
-                && !sessionHelper.getUser().isSuperAdministrator())
-                // cannot access the application.
-                BiobankPlugin.openAsyncError(Messages
-                    .getString("LoginDialog.working.center.error.title"), //$NON-NLS-1$
-                    Messages
-                        .getString("LoginDialog.no.working.center.error.msg")); //$NON-NLS-1$
-            else if (workingCenters.size() == 1
+            if (workingCenters.size() == 0) {
+                if (!sessionHelper.getUser().isSuperAdministrator())
+                    // cannot access the application.
+                    BiobankPlugin
+                        .openAsyncError(
+                            Messages
+                                .getString("LoginDialog.working.center.error.title"), //$NON-NLS-1$
+                            Messages
+                                .getString("LoginDialog.no.working.center.error.msg")); //$NON-NLS-1$
+            } else if (workingCenters.size() == 1
                 && !sessionHelper.getUser().isInSuperAdminMode())
                 sessionHelper.getUser().setCurrentWorkingCenter(
                     workingCenters.get(0));
