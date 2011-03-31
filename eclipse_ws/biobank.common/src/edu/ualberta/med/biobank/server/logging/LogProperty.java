@@ -14,10 +14,10 @@ public enum LogProperty {
         public void setValue(Log log, String value) {
         }
     },
-    SITE("site") {
+    CENTER("center") {
         @Override
         public void setValue(Log log, String value) {
-            log.setSite(value);
+            log.setCenter(value);
         }
     },
     ACTION("action") {

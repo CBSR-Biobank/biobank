@@ -174,7 +174,7 @@
   </target>
 
   <target name="sdk"
-          depends="validators,check-cacore-sdk-uptodate,log4j-conf"
+          depends="validators,check-cacore-sdk-uptodate"
           unless="cacore.sdk.uptodate"
           description="builds the caCORE SDK from the data model">
     <antcall target="sdk-nodeps" />
@@ -814,7 +814,7 @@
 
   <!-- copied from sdk build.xml -->
   <target name="package-webapp-orm"
-          depends="sdk-nodeps,sdk-files,prepare-webapp-orm,package-codegen-orm,build-common-project">
+          depends="sdk-nodeps,sdk-files,prepare-webapp-orm,log4j-conf,package-codegen-orm,build-common-project">
     <war destfile="${cacore.sdk.dir}/${package.system.dir}/${PROJECT_NAME}.war"
          webxml="${cacore.sdk.dir}/${build.conf.web-inf.dir}/web.xml">
       <manifest>

@@ -8,18 +8,18 @@ import org.eclipse.ui.ISources;
 
 public class SessionState extends AbstractSourceProvider {
     public final static String LOGIN_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.loginState";
-    public final static String IS_WEB_ADMIN_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.isWebAdmin";
+    public final static String IS_SUPER_ADMIN_MODE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.isSuperAdminMode";
     public final static String HAS_WORKING_CENTER_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter";
     public final static String LOGGED_IN = "loggedIn";
     public final static String LOGGED_OUT = "loggedOut";
     boolean loggedIn;
-    boolean isWebAdmin;
+    boolean isSuperAdminMode;
     private boolean hasWorkingCenter;
 
     @Override
     public String[] getProvidedSourceNames() {
         return new String[] { LOGIN_STATE_SOURCE_NAME,
-            IS_WEB_ADMIN_SOURCE_NAME, HAS_WORKING_CENTER_SOURCE_NAME };
+            IS_SUPER_ADMIN_MODE_SOURCE_NAME, HAS_WORKING_CENTER_SOURCE_NAME };
     }
 
     @Override
@@ -27,8 +27,8 @@ public class SessionState extends AbstractSourceProvider {
         Map<String, String> currentStateMap = new HashMap<String, String>(1);
         String currentState = loggedIn ? LOGGED_IN : LOGGED_OUT;
         currentStateMap.put(LOGIN_STATE_SOURCE_NAME, currentState);
-        currentStateMap.put(IS_WEB_ADMIN_SOURCE_NAME,
-            Boolean.toString((isWebAdmin)));
+        currentStateMap.put(IS_SUPER_ADMIN_MODE_SOURCE_NAME,
+            Boolean.toString((isSuperAdminMode)));
         currentStateMap.put(HAS_WORKING_CENTER_SOURCE_NAME,
             Boolean.toString(hasWorkingCenter));
         return currentStateMap;
@@ -47,16 +47,16 @@ public class SessionState extends AbstractSourceProvider {
             currentState);
     }
 
-    public void setWebAdmin(boolean isWebAdmin) {
-        if (this.isWebAdmin == isWebAdmin) {
+    public void setSuperAdminMode(boolean isSuperAdminMode) {
+        if (this.isSuperAdminMode == isSuperAdminMode) {
             return;
         }
 
-        this.isWebAdmin = isWebAdmin;
+        this.isSuperAdminMode = isSuperAdminMode;
         // note: must use a boolean object for the sourceValue, NOT a String
         // with value "true" or "false"
-        fireSourceChanged(ISources.WORKBENCH, IS_WEB_ADMIN_SOURCE_NAME,
-            isWebAdmin);
+        fireSourceChanged(ISources.WORKBENCH, IS_SUPER_ADMIN_MODE_SOURCE_NAME,
+            isSuperAdminMode);
     }
 
     public void setHasWorkingCenter(boolean hasWorkingCenter) {

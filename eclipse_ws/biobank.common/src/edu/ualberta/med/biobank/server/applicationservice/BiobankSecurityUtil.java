@@ -406,6 +406,10 @@ public class BiobankSecurityUtil {
                         serverGroup,
                         edu.ualberta.med.biobank.common.security.Group.PG_CENTER_ADMINISTRATOR_ID,
                         edu.ualberta.med.biobank.common.security.Group.OBJECT_FULL_ACCESS);
+                } else {
+                    upm.removeGroupFromProtectionGroup(
+                        edu.ualberta.med.biobank.common.security.Group.PG_CENTER_ADMINISTRATOR_ID
+                            .toString(), serverGroup.getGroupId().toString());
                 }
 
                 List<Integer> oldCentersList = oldGroup.getWorkingCenterIds();

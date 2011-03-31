@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.views;
+package edu.ualberta.med.biobank.treeview.request;
 
 import java.util.Collection;
 import java.util.List;
