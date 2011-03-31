@@ -68,7 +68,7 @@
   </condition>
   <condition property="isHostAicml5">
     <equals arg1="${host.name}"
-            arg2="aicml5.cs.ualberta.ca"
+            arg2="aicml5"
             casesensitive="true"
             trim="true" />
   </condition>
@@ -321,7 +321,7 @@
           overwrite="true" />
   </target>
   <target name="hostAicml5" if="isHostAicml5">
-    <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
+    <copy file="${secu-log.dir}/jboss/${host.name}.cs.ualberta.ca.keystore"
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
   </target>
@@ -392,7 +392,7 @@
           description="generates the database schema for the caCORE SDK data model">
     <ant dir="${schema.dir}" target="schemaexport" inheritRefs="false" />
   </target>
-  <target name="dbcreate-add-tables" depends="hbmstrings">
+  <target name="dbcreate-add-tables" depends="hbmstrings,prepare-webapp-orm">
     <sql driver="${DB_DRIVER}"
          url="${DB_CONNECTION_URL}"
          userid="${DB_USERNAME}"
@@ -925,11 +925,14 @@
   </target>
 
   <target name="tests-compile" depends="build-common-project,prepare">
-    <javac srcdir="${eclipse.proj.dir.junit}/src"
-           destdir="${test.build.dir}"
+    <javac destdir="${test.build.dir}"
            debug="true"
            debuglevel="lines,source"
            includeantruntime="false">
+      <src path="${eclipse.proj.dir.junit}/src" />
+      <src path="${eclipse.proj.dir.tools}/src" />
+      <include name="**/tools/utils/*.java" />
+      <include name="**/Test*.java" />
       <classpath>
         <pathelement location="${eclipse.proj.dir.common}/output" />
         <pathelement location="${eclipse.proj.dir.common}/lib/client" />
@@ -941,6 +944,7 @@
   <fileset id="testcase.files" dir="${eclipse.proj.dir.junit}/src">
     <include name="**/Test*.java" />
     <exclude name="**/speed/**" />
+    <exclude name="**/TestReportsProcedurallyGeneratedData.java" />
     <exclude name="**/TestCommon.java" />
     <exclude name="**/TestDatabase.java" />
     <exclude name="**/TestFunctionalities.java" />
@@ -1106,8 +1110,8 @@
     </taskdef>
     <propertyregex property="featureVersion"
                    input="${featureJar}"
-                   regexp="biobank2.feature.core_(.*)/.jar"
-                   select="/1"
+                   regexp="biobank2.feature.core_(.*)\.jar"
+                   select="\1"
                    casesensitive="true" />
     <copy file="${product.dir}/site.xml"
           tofile="${updateSiteFolder}/site.xml" />

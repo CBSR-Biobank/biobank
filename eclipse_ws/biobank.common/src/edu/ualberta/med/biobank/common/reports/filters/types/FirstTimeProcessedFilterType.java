@@ -41,7 +41,7 @@ public class FirstTimeProcessedFilterType implements FilterType {
             String entityOrClassName = cimpl.getEntityOrClassName();
 
             if (Patient.class.getName().equals(entityOrClassName)) {
-                patientIdAlias = "id";
+                patientIdAlias = criteria.getAlias() + ".id";
             } else if (CollectionEvent.class.getName()
                 .equals(entityOrClassName)) {
                 String patientIdProperty = "patient.id";

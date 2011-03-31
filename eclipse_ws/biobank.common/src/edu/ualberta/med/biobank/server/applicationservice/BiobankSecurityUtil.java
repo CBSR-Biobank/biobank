@@ -206,7 +206,7 @@ public class BiobankSecurityUtil {
         }
     }
 
-    public static void persistUser(
+    public static edu.ualberta.med.biobank.common.security.User persistUser(
         edu.ualberta.med.biobank.common.security.User user)
         throws ApplicationException {
         if (isSuperAdministrator()) {
@@ -259,6 +259,9 @@ public class BiobankSecurityUtil {
                 } else {
                     upm.modifyUser(serverUser);
                 }
+                serverUser = upm.getUser(serverUser.getLoginName());
+                user.setId(serverUser.getUserId());
+                return user;
             } catch (ApplicationException ae) {
                 log.error("Error persisting security user", ae);
                 throw ae;

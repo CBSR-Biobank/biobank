@@ -60,7 +60,7 @@ public class AliquotRequestEditor extends ReportsEditor {
 
         try {
             String[] header = new String[] { "pnumber", "dateDrawn",
-                "sampleTypeNameShort", "maxAliquots" };
+                "specimenTypeNameShort", "maxAliquots" };
             AliquotRequest request;
             while ((request = reader.read(AliquotRequest.class, header,
                 processors)) != null) {
