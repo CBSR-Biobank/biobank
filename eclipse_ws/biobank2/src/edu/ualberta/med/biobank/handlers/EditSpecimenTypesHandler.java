@@ -36,9 +36,10 @@ public class EditSpecimenTypesHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return (SessionManager.canCreate(SpecimenTypeWrapper.class)
-            || SessionManager.canUpdate(SpecimenTypeWrapper.class) || SessionManager
-            .canDelete(SpecimenTypeWrapper.class))
+        return SessionManager.getUser().isInSuperAdminMode()
+            && (SessionManager.canCreate(SpecimenTypeWrapper.class)
+                || SessionManager.canUpdate(SpecimenTypeWrapper.class) || SessionManager
+                .canDelete(SpecimenTypeWrapper.class))
             && SessionManager.getInstance().getSession() != null;
     }
 }

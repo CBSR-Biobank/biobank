@@ -242,7 +242,7 @@ public class User implements Serializable, NotAProxy {
         }
         boolean currentCenterRights = true;
         CenterWrapper<?> currentCenter = getCurrentWorkingCenter();
-        if (currentCenter != null) {
+        if (!isInSuperAdminMode() && currentCenter != null) {
             // check object specific rights depending on center type
             List<String> centerSpecificRights = specificRightsMapping
                 .get(new TypePrivilegeKey(type, privilege));
