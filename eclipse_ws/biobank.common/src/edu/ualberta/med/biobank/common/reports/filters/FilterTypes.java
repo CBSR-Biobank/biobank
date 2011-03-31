@@ -2,8 +2,9 @@ package edu.ualberta.med.biobank.common.reports.filters;
 
 import edu.ualberta.med.biobank.common.reports.filters.types.BooleanFilterType;
 import edu.ualberta.med.biobank.common.reports.filters.types.DateFilterType;
+import edu.ualberta.med.biobank.common.reports.filters.types.DoubleFilterType;
 import edu.ualberta.med.biobank.common.reports.filters.types.FirstTimeProcessedFilterType;
-import edu.ualberta.med.biobank.common.reports.filters.types.NumberFilterType;
+import edu.ualberta.med.biobank.common.reports.filters.types.IntegerFilterType;
 import edu.ualberta.med.biobank.common.reports.filters.types.StringFilterType;
 import edu.ualberta.med.biobank.common.reports.filters.types.TopContainerFilterType;
 
@@ -19,11 +20,18 @@ public enum FilterTypes {
     // correspond to database entries and if are altered may result in
     // catastrophe (at least if the id value is altered).
     STRING(1, new StringFilterType()),
-    NUMBER(2, new NumberFilterType()),
+    //
+    DOUBLE(2, new DoubleFilterType()),
+    //
     DATE(3, new DateFilterType()),
+    //
     TOP_CONTAINER(4, new TopContainerFilterType()),
+    //
     BOOLEAN(5, new BooleanFilterType()),
-    FIRST_TIME_PROCESSED(6, new FirstTimeProcessedFilterType());
+    //
+    FIRST_TIME_PROCESSED(6, new FirstTimeProcessedFilterType()),
+    //
+    INTEGER(7, new IntegerFilterType());
 
     private final int id;
     private final FilterType filterType;

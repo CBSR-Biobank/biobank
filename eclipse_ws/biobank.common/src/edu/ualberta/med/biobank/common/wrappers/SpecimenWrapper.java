@@ -43,7 +43,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     private void init() {
-        super.setTopSpecimen(this);
+        setTopSpecimenInternal(this);
         initManagement();
     }
 
@@ -473,12 +473,24 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     @Override
     protected void persistDependencies(Specimen originalSpecimen)
         throws Exception {
+
         boolean parentChanged = (originalSpecimen != null && originalSpecimen
             .getParentSpecimen().equals(getParentSpecimen()));
 
         if (isNew() || parentChanged) {
-            for (SpecimenWrapper child : getChildSpecimenCollection(false)) {
-                super.setTopSpecimen(getTopSpecimen());
+            updateChildren();
+        }
+    }
+
+    private void updateChildren() throws Exception {
+        for (SpecimenWrapper child : getChildSpecimenCollection(false)) {
+            child.setTopSpecimenInternal(getTopSpecimen());
+
+            // only persist if the child has already been persisted, otherwise
+            // only update the reference.
+            if (child.isNew()) {
+                child.updateChildren();
+            } else {
                 child.persist();
             }
         }
@@ -487,13 +499,25 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     @Override
     public void setParentSpecimen(SpecimenWrapper specimen) {
         super.setParentSpecimen(specimen);
-        super.setTopSpecimen(specimen != null ? specimen.getTopSpecimen()
+        // topSpecimen should never be null
+        setTopSpecimenInternal(specimen != null ? specimen.getTopSpecimen()
             : this);
     }
 
+    /**
+     * Call <code>setParentSpecimen(SpecimenWrapper)</code> instead of this
+     * method to change the top parent. The 'topSpecimen' will be automatically
+     * updated.
+     */
     @Override
+    @Deprecated
     public void setTopSpecimen(SpecimenWrapper specimen) {
         // this method should never be called outside of the wrapper.
-        throw new IllegalArgumentException("this method should never be called");
+        throw new UnsupportedOperationException(
+            "this method should never be called");
+    }
+
+    protected void setTopSpecimenInternal(SpecimenWrapper specimen) {
+        super.setTopSpecimen(specimen);
     }
 }

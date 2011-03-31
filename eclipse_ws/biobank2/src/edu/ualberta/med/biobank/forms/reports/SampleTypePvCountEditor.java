@@ -51,8 +51,8 @@ public class SampleTypePvCountEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Patient Number", "Date Processed", "Date Drawn",
-            "Sample Type", "Total" };
+        return new String[] { "Patient Number", "First Time Processed",
+            "First Time Drawn", "Sample Type", "Total" };
     }
 
     @Override

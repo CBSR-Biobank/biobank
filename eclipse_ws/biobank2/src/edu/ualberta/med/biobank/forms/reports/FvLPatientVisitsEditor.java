@@ -15,7 +15,8 @@ public class FvLPatientVisitsEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Study", "Clinic", "First Visit", "Last Visit" };
+        return new String[] { "Study", "Clinic", "First Specimen Time Drawn",
+            "Last Specimen Time Drawn" };
     }
 
     @Override
