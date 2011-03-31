@@ -3,8 +3,8 @@ package edu.ualberta.med.biobank.common.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import edu.ualberta.med.biobank.common.peer.LogPeer;
 import edu.ualberta.med.biobank.model.Log;
-import edu.ualberta.med.biobank.server.logging.LogProperty;
 
 public class LogSql {
 
@@ -20,15 +20,15 @@ public class LogSql {
 
         StringBuffer sql = new StringBuffer();
         sql.append("INSERT INTO log (");
-        sql.append(LogProperty.USERNAME);
-        sql.append(COMMA + LogProperty.CENTER);
-        sql.append(COMMA + LogProperty.CREATED_AT);
-        sql.append(COMMA + LogProperty.ACTION);
-        sql.append(COMMA + LogProperty.PATIENT_NUMBER);
-        sql.append(COMMA + LogProperty.INVENTORY_ID);
-        sql.append(COMMA + LogProperty.LOCATION_LABEL);
-        sql.append(COMMA + LogProperty.DETAILS);
-        sql.append(COMMA + LogProperty.TYPE);
+        sql.append(LogPeer.USERNAME.getName());
+        sql.append(COMMA + LogPeer.CENTER.getName());
+        sql.append(COMMA + LogPeer.CREATED_AT.getName());
+        sql.append(COMMA + LogPeer.ACTION.getName());
+        sql.append(COMMA + LogPeer.PATIENT_NUMBER.getName());
+        sql.append(COMMA + LogPeer.INVENTORY_ID.getName());
+        sql.append(COMMA + LogPeer.LOCATION_LABEL.getName());
+        sql.append(COMMA + LogPeer.DETAILS.getName());
+        sql.append(COMMA + LogPeer.TYPE.getName());
         sql.append(") VALUES ('");
         sql.append(initString(log.getUsername()));
         sql.append("','");

@@ -82,7 +82,7 @@ public class JDBCLogExecutor implements Runnable {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            ExceptionUtils.writeMsgToTmpFile("biobanklogappender", ex);
+            ExceptionUtils.writeMsgToTmpFile(ex);
         }
     }
 

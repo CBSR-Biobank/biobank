@@ -45,8 +45,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         dispatch = (DispatchWrapper) adapter.getModelObject();
-        dispatch.logEdit(SessionManager.getUser().getCurrentWorkingCenter()
-            .getNameShort());
+        SessionManager.logEdit(dispatch);
         retrieveShipment();
 
         setPartName(getTextForPartName());

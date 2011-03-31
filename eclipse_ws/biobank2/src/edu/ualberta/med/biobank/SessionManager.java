@@ -275,6 +275,17 @@ public class SessionManager {
             type);
     }
 
+    public static void logLookup(ModelWrapper<?> wrapper) throws Exception {
+        if (!wrapper.isNew())
+            wrapper.logLookup(getUser().getCurrentWorkingCenter()
+                .getNameShort());
+    }
+
+    public static void logEdit(ModelWrapper<?> wrapper) throws Exception {
+        if (!wrapper.isNew())
+            wrapper.logEdit(getUser().getCurrentWorkingCenter().getNameShort());
+    }
+
     /**
      * do an update on node holding the same wrapper than the given adapter.
      * 
