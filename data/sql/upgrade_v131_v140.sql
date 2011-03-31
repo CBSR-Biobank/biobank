@@ -654,106 +654,6 @@ UPDATE abstract_position ap, container c, container_type ct
        WHERE ap.container_id = c.id AND ap.discriminator = 'AliquotPosition'
        AND c.container_type_id = ct.id and ct.child_labeling_scheme_id = 5;
 
-
-/*****************************************************
- * advanced reports
- ****************************************************/
-
-CREATE TABLE entity (
-    ID INT(11) NOT NULL,
-    CLASS_NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE entity_column (
-    ID INT(11) NOT NULL,
-    NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    ENTITY_PROPERTY_ID INT(11) NOT NULL,
-    INDEX FK16BD7321698D6AC (ENTITY_PROPERTY_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE entity_filter (
-    ID INT(11) NOT NULL,
-    FILTER_TYPE INT(11) NULL DEFAULT NULL,
-    NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    ENTITY_PROPERTY_ID INT(11) NOT NULL,
-    INDEX FK635CF541698D6AC (ENTITY_PROPERTY_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE entity_property (
-    ID INT(11) NOT NULL,
-    PROPERTY VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    PROPERTY_TYPE_ID INT(11) NOT NULL,
-    ENTITY_ID INT(11) NULL DEFAULT NULL,
-    INDEX FK3FC956B191CFD445 (ENTITY_ID),
-    INDEX FK3FC956B157C0C3B0 (PROPERTY_TYPE_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE property_modifier (
-    ID INT(11) NOT NULL,
-    NAME TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    PROPERTY_MODIFIER TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    PROPERTY_TYPE_ID INT(11) NULL DEFAULT NULL,
-    INDEX FK5DF9160157C0C3B0 (PROPERTY_TYPE_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE property_type (
-    ID INT(11) NOT NULL,
-    NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE report (
-    ID INT(11) NOT NULL,
-    NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    DESCRIPTION TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    USER_ID INT(11) NULL DEFAULT NULL,
-    IS_PUBLIC TINYINT(1) NULL DEFAULT NULL,
-    IS_COUNT TINYINT(1) NULL DEFAULT NULL,
-    ENTITY_ID INT(11) NOT NULL,
-    INDEX FK8FDF493491CFD445 (ENTITY_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE report_column (
-    ID INT(11) NOT NULL,
-    POSITION INT(11) NULL DEFAULT NULL,
-    COLUMN_ID INT(11) NOT NULL,
-    PROPERTY_MODIFIER_ID INT(11) NULL DEFAULT NULL,
-    REPORT_ID INT(11) NULL DEFAULT NULL,
-    INDEX FKF0B78C1BE9306A5 (REPORT_ID),
-    INDEX FKF0B78C1C2DE3790 (PROPERTY_MODIFIER_ID),
-    INDEX FKF0B78C1A946D8E8 (COLUMN_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE report_filter (
-    ID INT(11) NOT NULL,
-    POSITION INT(11) NULL DEFAULT NULL,
-    OPERATOR INT(11) NULL DEFAULT NULL,
-    ENTITY_FILTER_ID INT(11) NOT NULL,
-    REPORT_ID INT(11) NULL DEFAULT NULL,
-    INDEX FK13D570E3445CEC4C (ENTITY_FILTER_ID),
-    INDEX FK13D570E3BE9306A5 (REPORT_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE report_filter_value (
-    ID INT(11) NOT NULL,
-    POSITION INT(11) NULL DEFAULT NULL,
-    VALUE TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    SECOND_VALUE TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    REPORT_FILTER_ID INT(11) NULL DEFAULT NULL,
-    INDEX FK691EF6F59FFD1CEE (REPORT_FILTER_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-
 /*****************************************************
  * research groups and sample orders
  ****************************************************/
@@ -829,220 +729,246 @@ ALTER TABLE ACTIVITY_STATUS
 ALTER TABLE ALIQUOT
       CHANGE COLUMN INVENTORY_ID INVENTORY_ID VARCHAR(100) NOT NULL UNIQUE;
 
+/*****************************************************
+ * advanced reports
+ ****************************************************/
 
+-- MySQL dump 10.13  Distrib 5.1.41, for debian-linux-gnu (x86_64)
+--
+-- Host: localhost    Database: biobank2
+-- ------------------------------------------------------
+-- Server version	5.1.41-3ubuntu12.10
 
-DROP TABLE IF EXISTS report;
-
-CREATE TABLE report (
-  ID int(11) NOT NULL,
-  NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  DESCRIPTION text COLLATE latin1_general_cs,
-  USER_ID int(11) DEFAULT NULL,
-  IS_PUBLIC bit(1) DEFAULT NULL,
-  IS_COUNT bit(1) DEFAULT NULL,
-  ENTITY_ID int(11) NOT NULL,
-  PRIMARY KEY (ID),
-  KEY FK8FDF493491CFD445 (ENTITY_ID)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Dumping data for table report
+-- Table structure for table `entity`
 --
 
-LOCK TABLES report WRITE;
-/*!40000 ALTER TABLE report DISABLE KEYS */;
-/*!40000 ALTER TABLE report ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table report_filter
---
-
-DROP TABLE IF EXISTS report_filter;
+DROP TABLE IF EXISTS `entity`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE report_filter (
-  ID int(11) NOT NULL,
-  POSITION int(11) DEFAULT NULL,
-  OPERATOR int(11) DEFAULT NULL,
-  ENTITY_FILTER_ID int(11) NOT NULL,
-  REPORT_ID int(11) DEFAULT NULL,
-  PRIMARY KEY (ID),
-  KEY FK13D570E3445CEC4C (ENTITY_FILTER_ID),
-  KEY FK13D570E3BE9306A5 (REPORT_ID)
+CREATE TABLE `entity` (
+  `ID` int(11) NOT NULL,
+  `CLASS_NAME` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  `NAME` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table report_filter
+-- Dumping data for table `entity`
 --
 
-LOCK TABLES report_filter WRITE;
-/*!40000 ALTER TABLE report_filter DISABLE KEYS */;
-/*!40000 ALTER TABLE report_filter ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table report_filter_value
---
-
-DROP TABLE IF EXISTS report_filter_value;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE report_filter_value (
-  ID int(11) NOT NULL,
-  POSITION int(11) DEFAULT NULL,
-  VALUE text COLLATE latin1_general_cs,
-  SECOND_VALUE text COLLATE latin1_general_cs,
-  REPORT_FILTER_ID int(11) DEFAULT NULL,
-  PRIMARY KEY (ID),
-  KEY FK691EF6F59FFD1CEE (REPORT_FILTER_ID)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table report_filter_value
---
-
-LOCK TABLES report_filter_value WRITE;
-/*!40000 ALTER TABLE report_filter_value DISABLE KEYS */;
-/*!40000 ALTER TABLE report_filter_value ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table report_column
---
-
-DROP TABLE IF EXISTS report_column;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE report_column (
-  ID int(11) NOT NULL,
-  POSITION int(11) DEFAULT NULL,
-  COLUMN_ID int(11) NOT NULL,
-  PROPERTY_MODIFIER_ID int(11) DEFAULT NULL,
-  REPORT_ID int(11) DEFAULT NULL,
-  PRIMARY KEY (ID),
-  KEY FKF0B78C1BE9306A5 (REPORT_ID),
-  KEY FKF0B78C1C2DE3790 (PROPERTY_MODIFIER_ID),
-  KEY FKF0B78C1A946D8E8 (COLUMN_ID)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table report_column
---
-
-LOCK TABLES report_column WRITE;
-/*!40000 ALTER TABLE report_column DISABLE KEYS */;
-/*!40000 ALTER TABLE report_column ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table entity
---
-
-DROP TABLE IF EXISTS entity;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE entity (
-  ID int(11) NOT NULL,
-  CLASS_NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  PRIMARY KEY (ID)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table entity
---
-
-LOCK TABLES entity WRITE;
-/*!40000 ALTER TABLE entity DISABLE KEYS */;
-INSERT INTO entity VALUES (1,'edu.ualberta.med.biobank.model.Specimen','Specimen'),
+LOCK TABLES `entity` WRITE;
+/*!40000 ALTER TABLE `entity` DISABLE KEYS */;
+INSERT INTO `entity` VALUES (1,'edu.ualberta.med.biobank.model.Specimen','Specimen'),
 (2,'edu.ualberta.med.biobank.model.Container','Container'),
 (3,'edu.ualberta.med.biobank.model.Patient','Patient'),
 (4,'edu.ualberta.med.biobank.model.CollectionEvent','Collection Event'),
 (5,'edu.ualberta.med.biobank.model.ProcessingEvent','Processing Event');
-/*!40000 ALTER TABLE entity ENABLE KEYS */;
+/*!40000 ALTER TABLE `entity` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table property_modifier
+-- Table structure for table `entity_column`
 --
 
-DROP TABLE IF EXISTS property_modifier;
+DROP TABLE IF EXISTS `entity_column`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE property_modifier (
-  ID int(11) NOT NULL,
-  NAME text COLLATE latin1_general_cs,
-  PROPERTY_MODIFIER text COLLATE latin1_general_cs,
-  PROPERTY_TYPE_ID int(11) DEFAULT NULL,
-  PRIMARY KEY (ID),
-  KEY FK5DF9160157C0C3B0 (PROPERTY_TYPE_ID)
+CREATE TABLE `entity_column` (
+  `ID` int(11) NOT NULL,
+  `NAME` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  `ENTITY_PROPERTY_ID` int(11) NOT NULL,
+  PRIMARY KEY (`ID`),
+
+  KEY `FK16BD7321698D6AC` (`ENTITY_PROPERTY_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table property_modifier
+-- Dumping data for table `entity_column`
 --
 
-LOCK TABLES property_modifier WRITE;
-/*!40000 ALTER TABLE property_modifier DISABLE KEYS */;
-INSERT INTO property_modifier VALUES (1,'Year','YEAR({value})',3),(2,'Year, Quarter','CONCAT(YEAR({value}), CONCAT(\'-\', QUARTER({value})))',3),(3,'Year, Month','CONCAT(YEAR({value}), CONCAT(\'-\', MONTH({value})))',3),(4,'Year, Week','CONCAT(YEAR({value}), CONCAT(\'-\', WEEK({value})))',3);
-/*!40000 ALTER TABLE property_modifier ENABLE KEYS */;
+LOCK TABLES `entity_column` WRITE;
+/*!40000 ALTER TABLE `entity_column` DISABLE KEYS */;
+INSERT INTO `entity_column` VALUES (1,'Inventory Id',1),
+(2,'Creation Time',2),
+(3,'Comment',3),
+(4,'Quantity',4),
+(5,'Activity Status',5),
+(6,'Container Product Barcode',7),
+(7,'Container Label',8),
+(8,'Specimen Type',9),
+(9,'Time Processed',10),
+(11,'Patient Number',12),
+(12,'Top Container Type',13),
+(13,'Aliquot Position',14),
+(14,'Current Center',15),
+(15,'Study',16),
+(16,'Shipment Time Received',17),
+(17,'Shipment Waybill',18),
+(18,'Shipment Time Sent',19),
+(19,'Shipment Box Number',20),
+(20,'Source Center',21),
+(21,'Dispatch Sender',22),
+(22,'Dispatch Receiver',23),
+(23,'Dispatch Time Received',24),
+(24,'Dispatch Time Sent',25),
+(25,'Dispatch Waybill',26),
+(26,'Dispatch Box Number',27),
+(27,'Visit Number',28),
+(101,'Product Barcode',101),
+(102,'Comment',102),
+(103,'Label',103),
+(104,'Temperature',104),
+(105,'Top Container Type',110),
+(106,'Specimen Creation Time',106),
+(107,'Container Type',107),
+(108,'Site',109),
+(201,'Patient Number',201),
+(202,'Study',202),
+(203,'Specimen Time Processed',203),
+(204,'Specimen Creation Time',204),
+(205,'Source Center',205),
+(206,'Visit Number',207),
+(301,'Specimen Time Processed',301),
+(302,'Specimen Creation Time',302),
+(303,'Comment',303),
+(304,'Patient Number',304),
+(305,'Specimen Source Center',305),
+(306,'Study',306),
+(307,'Visit Number',307),
+(401,'Worksheet',401),
+(402,'Creation Time',402),
+(403,'Comment',403),
+(404,'Center',404),
+(405,'Activity Status',405),
+(406,'Specimen Inventory Id',406),
+(407,'Specimen Creation Time',407);
+/*!40000 ALTER TABLE `entity_column` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table property_type
+-- Table structure for table `entity_filter`
 --
 
-DROP TABLE IF EXISTS property_type;
+DROP TABLE IF EXISTS `entity_filter`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE property_type (
-  ID int(11) NOT NULL,
-  NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  PRIMARY KEY (ID)
+CREATE TABLE `entity_filter` (
+  `ID` int(11) NOT NULL,
+  `FILTER_TYPE` int(11) DEFAULT NULL,
+  `NAME` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  `ENTITY_PROPERTY_ID` int(11) NOT NULL,
+  PRIMARY KEY (`ID`),
+
+  KEY `FK635CF541698D6AC` (`ENTITY_PROPERTY_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table property_type
+-- Dumping data for table `entity_filter`
 --
 
-LOCK TABLES property_type WRITE;
-/*!40000 ALTER TABLE property_type DISABLE KEYS */;
-INSERT INTO property_type VALUES (1,'String'),(2,'Number'),(3,'Date'),(4,'Boolean');
-/*!40000 ALTER TABLE property_type ENABLE KEYS */;
+LOCK TABLES `entity_filter` WRITE;
+/*!40000 ALTER TABLE `entity_filter` DISABLE KEYS */;
+INSERT INTO `entity_filter` VALUES (1,1,'Inventory Id',1),
+(2,3,'Creation Time',2),
+(3,1,'Comment',3),
+(4,2,'Quantity',4),
+(5,1,'Activity Status',5),
+(6,1,'Container Product Barcode',7),
+(7,1,'Container Label',8),
+(8,1,'Specimen Type',9),
+(9,3,'Time Processed',10),
+(11,1,'Patient Number',12),
+(12,4,'Top Container',6),
+(13,1,'Current Center',15),
+(14,1,'Study',16),
+(15,3,'Shipment Time Received',17),
+(16,1,'Shipment Waybill',18),
+(17,3,'Shipment Time Sent',19),
+(18,1,'Shipment Box Number',20),
+(19,1,'Source Center',21),
+(21,1,'Dispatch Sender',22),
+(22,1,'Dispatch Receiver',23),
+(23,3,'Dispatch Time Received',24),
+(24,3,'Dispatch Time Sent',25),
+(25,1,'Dispatch Waybill',26),
+(26,1,'Dispatch Box Number',27),
+(101,1,'Product Box Number',101),
+(102,1,'Comment',102),
+(103,1,'Label',103),
+(104,2,'Temperature',104),
+(105,4,'Top Container',105),
+(106,3,'Specimen Creation Time',106),
+(107,1,'Container Type',107),
+(108,5,'Is Top Level',108),
+(109,1,'Site',109),
+(201,1,'Patient Number',201),
+(202,1,'Study',202),
+(203,3,'Specimen Time Processed',203),
+(204,3,'Specimen Creation Time',204),
+(205,1,'Source Center',205),
+(206,6,'First Time Processed',204),
+(207,1,'Inventory Id',206),
+(208,7,'Visit Number',207),
+(301,3,'Specimen Time Processed',301),
+(302,3,'Specimen Creation Time',302),
+(303,1,'Comment',303),
+(304,1,'Patient Number',304),
+(305,1,'Specimen Source Center',305),
+(306,1,'Study',306),
+(307,6,'First Time Processed',301),
+(308,7,'Visit Number',307),
+(401,1,'Worksheet',401),
+(402,3,'Creation Time',402),
+(403,1,'Comment',403),
+(404,1,'Center',404),
+(405,1,'Activity Status',405),
+(406,1,'Specimen Inventory Id',406),
+(407,3,'Specimen Creation Time',407);
+/*!40000 ALTER TABLE `entity_filter` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table entity_property
+-- Table structure for table `entity_property`
 --
 
-DROP TABLE IF EXISTS entity_property;
+DROP TABLE IF EXISTS `entity_property`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE entity_property (
-  ID int(11) NOT NULL,
-  PROPERTY varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  PROPERTY_TYPE_ID int(11) NOT NULL,
-  ENTITY_ID int(11) DEFAULT NULL,
-  PRIMARY KEY (ID),
-  KEY FK3FC956B191CFD445 (ENTITY_ID),
-  KEY FK3FC956B157C0C3B0 (PROPERTY_TYPE_ID)
+CREATE TABLE `entity_property` (
+  `ID` int(11) NOT NULL,
+  `PROPERTY` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  `PROPERTY_TYPE_ID` int(11) NOT NULL,
+  `ENTITY_ID` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+
+  KEY `FK3FC956B191CFD445` (`ENTITY_ID`),
+
+  KEY `FK3FC956B157C0C3B0` (`PROPERTY_TYPE_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table entity_property
+-- Dumping data for table `entity_property`
 --
 
-LOCK TABLES entity_property WRITE;
-/*!40000 ALTER TABLE entity_property DISABLE KEYS */;
-INSERT INTO entity_property VALUES (1,'inventoryId',1,1),
+LOCK TABLES `entity_property` WRITE;
+/*!40000 ALTER TABLE `entity_property` DISABLE KEYS */;
+INSERT INTO `entity_property` VALUES (1,'inventoryId',1,1),
 (2,'createdAt',3,1),
 (3,'comment',1,1),
 (4,'quantity',2,1),
@@ -1068,7 +994,7 @@ INSERT INTO entity_property VALUES (1,'inventoryId',1,1),
 (25,'dispatchSpecimenCollection.dispatch.shipmentInfo.sentAt',3,1),
 (26,'dispatchSpecimenCollection.dispatch.shipmentInfo.waybill',1,1),
 (27,'dispatchSpecimenCollection.dispatch.shipmentInfo.boxNumber',1,1),
-
+(28,'collectionEvent.visitNumber',2,1),
 (101,'productBarcode',1,2),
 (102,'comment',1,2),
 (103,'label',1,2),
@@ -1079,21 +1005,20 @@ INSERT INTO entity_property VALUES (1,'inventoryId',1,1),
 (108,'containerType.topLevel',4,2),
 (109,'site.nameShort',1,2),
 (110,'containerPath.topContainer.containerType.nameShort',1,2),
-
 (201,'pnumber',1,3),
 (202,'study.nameShort',1,3),
 (203,'collectionEventCollection.allSpecimenCollection.parentSpecimen.processingEvent.createdAt',3,3),
 (204,'collectionEventCollection.allSpecimenCollection.createdAt',3,3),
 (205,'collectionEventCollection.allSpecimenCollection.originInfo.center.nameShort',1,3),
 (206,'collectionEventCollection.allSpecimenCollection.inventoryId',1,3),
-
+(207,'collectionEventCollection.visitNumber',2,3),
 (301,'allSpecimenCollection.parentSpecimen.processingEvent.createdAt',3,4),
 (302,'allSpecimenCollection.createdAt',3,4),
 (303,'comment',1,4),
 (304,'patient.pnumber',1,4),
 (305,'allSpecimenCollection.originInfo.center.nameShort',1,4),
 (306,'patient.study.nameShort',1,4),
-
+(307,'visitNumber',2,4),
 (401,'worksheet',1,5),
 (402,'createdAt',3,5),
 (403,'comment',1,5),
@@ -1101,172 +1026,306 @@ INSERT INTO entity_property VALUES (1,'inventoryId',1,1),
 (405,'activityStatus.name',1,5),
 (406,'specimenCollection.inventoryId',1,5),
 (407,'specimenCollection.createdAt',3,5);
-/*!40000 ALTER TABLE entity_property ENABLE KEYS */;
+/*!40000 ALTER TABLE `entity_property` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table entity_filter
+-- Table structure for table `property_modifier`
 --
 
-DROP TABLE IF EXISTS entity_filter;
+DROP TABLE IF EXISTS `property_modifier`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE entity_filter (
-  ID int(11) NOT NULL,
-  FILTER_TYPE int(11) DEFAULT NULL,
-  NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  ENTITY_PROPERTY_ID int(11) NOT NULL,
-  PRIMARY KEY (ID),
-  KEY FK635CF541698D6AC (ENTITY_PROPERTY_ID)
+CREATE TABLE `property_modifier` (
+  `ID` int(11) NOT NULL,
+  `NAME` text COLLATE latin1_general_cs,
+  `PROPERTY_MODIFIER` text COLLATE latin1_general_cs,
+  `PROPERTY_TYPE_ID` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+
+  KEY `FK5DF9160157C0C3B0` (`PROPERTY_TYPE_ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table entity_filter
+-- Dumping data for table `property_modifier`
 --
 
-LOCK TABLES entity_filter WRITE;
-/*!40000 ALTER TABLE entity_filter DISABLE KEYS */;
-INSERT INTO entity_filter VALUES (1,1,'Inventory Id',1),
-(2,3,'Creation Time',2),
-(3,1,'Comment',3),
-(4,2,'Quantity',4),
-(5,1,'Activity Status',5),
-(6,1,'Container Product Barcode',7),
-(7,1,'Container Label',8),
-(8,1,'Specimen Type',9),
-(9,3,'Time Processed',10),
-(11,1,'Patient Number',12),
-(12,4,'Top Container',6),
-(13,1,'Current Center',15),
-(14,1,'Study',16),
-(15,3,'Shipment Time Received',17),
-(16,1,'Shipment Waybill',18),
-(17,3,'Shipment Time Sent',19),
-(18,1,'Shipment Box Number',20),
-(19,1,'Source Center',21),
-(21,1,'Dispatch Sender',22),
-(22,1,'Dispatch Receiver',23),
-(23,3,'Dispatch Time Received',24),
-(24,3,'Dispatch Time Sent',25),
-(25,1,'Dispatch Waybill',26),
-(26,1,'Dispatch Box Number',27),
-
-(101,1,'Product Box Number',101),
-(102,1,'Comment',102),
-(103,1,'Label',103),
-(104,2,'Temperature',104),
-(105,4,'Top Container',105),
-(106,3,'Specimen Creation Time',106),
-(107,1,'Container Type',107),
-(108,5,'Is Top Level',108),
-(109,1,'Site',109),
-
-(201,1,'Patient Number',201),
-(202,1,'Study',202),
-(203,3,'Specimen Time Processed',203),
-(204,3,'Specimen Creation Time',204),
-(205,1,'Source Center',205),
-(206,6,'First Time Processed',204),
-(207,1,'Inventory Id',206),
-
-(301,3,'Specimen Time Processed',301),
-(302,3,'Specimen Creation Time',302),
-(303,1,'Comment',303),
-(304,1,'Patient Number',304),
-(305,1,'Specimen Source Center',305),
-(306,1,'Study',306),
-(307,6,'First Time Processed',301),
-
-(401,1,'Worksheet',401),
-(402,3,'Creation Time',402),
-(403,1,'Comment',403),
-(404,1,'Center',404),
-(405,1,'Activity Status',405),
-(406,1,'Specimen Inventory Id',406),
-(407,3,'Specimen Creation Time',407);
-/*!40000 ALTER TABLE entity_filter ENABLE KEYS */;
+LOCK TABLES `property_modifier` WRITE;
+/*!40000 ALTER TABLE `property_modifier` DISABLE KEYS */;
+INSERT INTO `property_modifier` VALUES (1,'Year','YEAR({value})',3),
+(2,'Year, Quarter','CONCAT(YEAR({value}), CONCAT(\'-\', QUARTER({value})))',3),
+(3,'Year, Month','CONCAT(YEAR({value}), CONCAT(\'-\', MONTH({value})))',3),
+(4,'Year, Week','CONCAT(YEAR({value}), CONCAT(\'-\', WEEK({value})))',3);
+/*!40000 ALTER TABLE `property_modifier` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table entity_column
+-- Table structure for table `property_type`
 --
 
-DROP TABLE IF EXISTS entity_column;
+DROP TABLE IF EXISTS `property_type`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE entity_column (
-  ID int(11) NOT NULL,
-  NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  ENTITY_PROPERTY_ID int(11) NOT NULL,
-  PRIMARY KEY (ID),
-  KEY FK16BD7321698D6AC (ENTITY_PROPERTY_ID)
+CREATE TABLE `property_type` (
+  `ID` int(11) NOT NULL,
+  `NAME` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table entity_column
+-- Dumping data for table `property_type`
 --
 
-LOCK TABLES entity_column WRITE;
-/*!40000 ALTER TABLE entity_column DISABLE KEYS */;
-INSERT INTO entity_column VALUES (1,'Inventory Id',1),
-(2,'Creation Time',2),
-(3,'Comment',3),
-(4,'Quantity',4),
-(5,'Activity Status',5),
-(6,'Container Product Barcode',7),
-(7,'Container Label',8),
-(8,'Specimen Type',9),
-(9,'Time Processed',10),
-(11,'Patient Number',12),
-(12,'Top Container Type',13),
-(13,'Aliquot Position',14),
-(14,'Current Center',15),
-(15,'Study',16),
-(16,'Shipment Time Received',17),
-(17,'Shipment Waybill',18),
-(18,'Shipment Time Sent',19),
-(19,'Shipment Box Number',20),
-(20,'Source Center',21),
-(21,'Dispatch Sender',22),
-(22,'Dispatch Receiver',23),
-(23,'Dispatch Time Received',24),
-(24,'Dispatch Time Sent',25),
-(25,'Dispatch Waybill',26),
-(26,'Dispatch Box Number',27),
-
-(101,'Product Barcode',101),
-(102,'Comment',102),
-(103,'Label',103),
-(104,'Temperature',104),
-(105,'Top Container Type',110),
-(106,'Specimen Creation Time',106),
-(107,'Container Type',107),
-(108,'Site',109),
-
-(201,'Patient Number',201),
-(202,'Study',202),
-(203,'Specimen Time Processed',203),
-(204,'Specimen Creation Time',204),
-(205,'Source Center',205),
-
-(301,'Specimen Time Processed',301),
-(302,'Specimen Creation Time',302),
-(303,'Comment',303),
-(304,'Patient Number',304),
-(305,'Specimen Source Center',305),
-(306,'Study',306),
-
-(401,'Worksheet',401),
-(402,'Creation Time',402),
-(403,'Comment',403),
-(404,'Center',404),
-(405,'Activity Status',405),
-(406,'Specimen Inventory Id',406),
-(407,'Specimen Creation Time',407);
-/*!40000 ALTER TABLE entity_column ENABLE KEYS */;
+LOCK TABLES `property_type` WRITE;
+/*!40000 ALTER TABLE `property_type` DISABLE KEYS */;
+INSERT INTO `property_type` VALUES (1,'String'),
+(2,'Number'),
+(3,'Date'),
+(4,'Boolean');
+/*!40000 ALTER TABLE `property_type` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `report`
+--
+
+DROP TABLE IF EXISTS `report`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `report` (
+  `ID` int(11) NOT NULL,
+  `NAME` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  `DESCRIPTION` text COLLATE latin1_general_cs,
+  `USER_ID` int(11) DEFAULT NULL,
+  `IS_PUBLIC` bit(1) DEFAULT NULL,
+  `IS_COUNT` bit(1) DEFAULT NULL,
+  `ENTITY_ID` int(11) NOT NULL,
+  PRIMARY KEY (`ID`),
+
+  KEY `FK8FDF493491CFD445` (`ENTITY_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `report`
+--
+
+LOCK TABLES `report` WRITE;
+/*!40000 ALTER TABLE `report` DISABLE KEYS */;
+INSERT INTO `report` VALUES (1,'Specimen Totals per Type','',24,'','',1),
+(2,'Specimens per Clinic by Date','Lists all specimens linked in a particular date range, excluding specimens in the SS freezer.',24,'',NULL,1),
+(3,'Specimens per Patient by Date','Lists all specimens linked in a particular date range, excluding specimens in the SS freezer.',24,'',NULL,1),
+(4,'Specimens by Container','Lists all specimens located in a given bottom-level container.',24,'',NULL,1),
+(5,'Specimen Totals per Study and Type','Lists the total number of each specimen by type and study.',24,'','',1),
+(6,'Specimen Totals per Study and Source',NULL,24,'','',1),
+(7,'Specimens per Study and Source by Date','Displays the total number of specimens per Study and Source Center, grouped by Creation Time in a calendar week/month/quarter/year for given top-level containers.',24,'','',1),
+(8,'Specimen Invoicing Report',NULL,24,'','',1),
+(10,'Collection Event Invoicing Report',NULL,24,'','',4),
+(11,'Collection Events per Study and Clinic by Date','Displays the total number of collection events added per study per clinic grouped by time processed in a calendar week/month/quarter/year.',24,'','',4),
+(12,'New Patients per Study and Clinic by Date','Displays the total number of patients added per study per clinic grouped by time processed in a calendar week/month/quarter/year.',24,'','',3),
+(13,'Patients per Study by Date','Displays the total number of patients per study with at least one patient visit grouped by date processed in a calendar week/month/quarter/year.',24,'','',3),
+(14,'Collection Events per Study by Date','Displays the total number of collection events per study grouped by time processed in a calendar week/month/quarter/year.',24,'','',4),
+(15,'Specimen Totals per Study','Displays the total number of specimens per study for given top-level containers.',24,'','',1);
+/*!40000 ALTER TABLE `report` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `report_column`
+--
+
+DROP TABLE IF EXISTS `report_column`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `report_column` (
+  `ID` int(11) NOT NULL,
+  `POSITION` int(11) DEFAULT NULL,
+  `COLUMN_ID` int(11) NOT NULL,
+  `PROPERTY_MODIFIER_ID` int(11) DEFAULT NULL,
+  `REPORT_ID` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+
+  KEY `FKF0B78C1BE9306A5` (`REPORT_ID`),
+
+  KEY `FKF0B78C1C2DE3790` (`PROPERTY_MODIFIER_ID`),
+
+  KEY `FKF0B78C1A946D8E8` (`COLUMN_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `report_column`
+--
+
+LOCK TABLES `report_column` WRITE;
+/*!40000 ALTER TABLE `report_column` DISABLE KEYS */;
+INSERT INTO `report_column` VALUES (1,0,8,NULL,1),
+(2,4,8,NULL,2),
+(3,3,2,NULL,2),
+(4,2,11,NULL,2),
+(5,1,20,NULL,2),
+(6,0,1,NULL,2),
+(7,4,8,NULL,3),
+(8,3,2,NULL,3),
+(9,2,20,NULL,3),
+(10,1,11,NULL,3),
+(11,0,1,NULL,3),
+(12,4,15,NULL,4),
+(13,3,11,NULL,4),
+(14,2,1,NULL,4),
+(15,1,7,NULL,4),
+(16,0,13,NULL,4),
+(17,1,8,NULL,5),
+(18,0,15,NULL,5),
+(19,1,20,NULL,6),
+(20,0,15,NULL,6),
+(21,2,2,3,7),
+(22,1,20,NULL,7),
+(23,0,15,NULL,7),
+(24,2,8,NULL,8),
+(25,1,20,NULL,8),
+(26,0,15,NULL,8),
+(27,1,305,NULL,10),
+(28,0,306,NULL,10),
+(29,2,301,3,11),
+(30,1,305,NULL,11),
+(31,0,306,NULL,11),
+(32,2,204,3,12),
+(33,1,205,NULL,12),
+(34,0,202,NULL,12),
+(35,1,203,3,13),
+(36,0,202,NULL,13),
+(37,1,301,3,14),
+(38,0,306,NULL,14),
+(39,0,15,NULL,15);
+/*!40000 ALTER TABLE `report_column` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `report_filter`
+--
+
+DROP TABLE IF EXISTS `report_filter`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `report_filter` (
+  `ID` int(11) NOT NULL,
+  `POSITION` int(11) DEFAULT NULL,
+  `OPERATOR` int(11) DEFAULT NULL,
+  `ENTITY_FILTER_ID` int(11) NOT NULL,
+  `REPORT_ID` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+
+  KEY `FK13D570E3445CEC4C` (`ENTITY_FILTER_ID`),
+
+  KEY `FK13D570E3BE9306A5` (`REPORT_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `report_filter`
+--
+
+LOCK TABLES `report_filter` WRITE;
+/*!40000 ALTER TABLE `report_filter` DISABLE KEYS */;
+INSERT INTO `report_filter` VALUES (1,0,102,7,NULL),
+(2,0,101,5,NULL),
+(3,1,102,7,NULL),
+(4,0,101,5,NULL),
+(5,1,4,12,NULL),
+(6,0,1,2,NULL),
+(7,0,1,2,NULL),
+(8,0,1,2,NULL),
+(9,1,4,12,NULL),
+(10,0,101,5,NULL),
+(11,1,4,12,NULL),
+(12,0,1,2,2),
+(13,1,4,12,2),
+(14,0,1,2,NULL),
+(15,1,4,12,NULL),
+(16,0,1,2,3),
+(17,1,4,12,3),
+(18,0,3,12,4),
+(19,1,101,7,4),
+(20,0,101,5,1),
+(21,1,4,12,1),
+(22,0,4,12,NULL),
+(23,1,1,2,NULL),
+(24,0,4,12,5),
+(25,1,1,2,5),
+(26,0,3,12,6),
+(27,1,1,2,6),
+(28,0,1,2,7),
+(29,1,3,12,7),
+(30,0,4,12,NULL),
+(31,1,1,2,NULL),
+(32,0,4,12,8),
+(33,1,1,2,8),
+(34,0,1,302,10),
+(35,0,1,301,NULL),
+(36,0,1,301,NULL),
+(37,0,1,301,11),
+(38,0,NULL,206,NULL),
+(39,1,1,203,NULL),
+(40,0,NULL,206,12),
+(41,1,1,203,12),
+(42,0,1,203,13),
+(43,0,1,301,14),
+(44,0,1,2,15),
+(45,1,3,12,15);
+/*!40000 ALTER TABLE `report_filter` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `report_filter_value`
+--
+
+DROP TABLE IF EXISTS `report_filter_value`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `report_filter_value` (
+  `ID` int(11) NOT NULL,
+  `POSITION` int(11) DEFAULT NULL,
+  `VALUE` text COLLATE latin1_general_cs,
+  `SECOND_VALUE` text COLLATE latin1_general_cs,
+  `REPORT_FILTER_ID` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+
+  KEY `FK691EF6F59FFD1CEE` (`REPORT_FILTER_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `report_filter_value`
+--
+
+LOCK TABLES `report_filter_value` WRITE;
+/*!40000 ALTER TABLE `report_filter_value` DISABLE KEYS */;
+INSERT INTO `report_filter_value` VALUES (1,0,'SS%',NULL,1),
+(2,0,'Active',NULL,2),
+(3,0,'SS%',NULL,3),
+(4,0,'Active',NULL,4),
+(5,0,'2799',NULL,21),
+(6,0,'2799',NULL,13),
+(7,0,'Active',NULL,10),
+(8,0,'2799',NULL,17),
+(9,0,'Active',NULL,20),
+(10,0,'2799',NULL,24),
+(11,0,'2799',NULL,32);
+/*!40000 ALTER TABLE `report_filter_value` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2011-03-30 13:52:46
 
 /*****************************************************
  * cleantup and drop tables that are no longer required
