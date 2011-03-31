@@ -135,29 +135,28 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     protected Log getLogMessage(String action, String site, String details) {
         Log log = new Log();
         log.setAction(action);
-        // FIXME getLogMessage ?
-        // CollectionEventWrapper cevent = getParentSpecimen()
-        // .getCollectionEvent();
-        // PatientWrapper patient = cevent.getPatient();
-        // if (site == null) {
-        // log.setSite(getCenter().getNameShort());
-        // } else {
-        // log.setSite(site);
-        // }
-        // log.setPatientNumber(patient.getPnumber());
-        // Date createdAt = getCreatedAt();
-        // if (createdAt != null) {
-        // details += " Date Processed: " + getFormattedCreatedAt();
-        // }
-        // try {
-        // String worksheet = cevent.getEventAttrValue("Worksheet");
-        // if (worksheet != null) {
-        // details += " - Worksheet: " + worksheet;
-        // }
-        // } catch (Exception e) {
-        // }
-        // log.setDetails(details);
-        // log.setType("Visit");
+        CollectionEventWrapper cevent = getParentSpecimen()
+            .getCollectionEvent();
+        PatientWrapper patient = cevent.getPatient();
+        if (site == null) {
+            log.setSite(getCenter().getNameShort());
+        } else {
+            log.setSite(site);
+        }
+        log.setPatientNumber(patient.getPnumber());
+        Date createdAt = getCreatedAt();
+        if (createdAt != null) {
+            details += " Date Processed: " + getFormattedCreatedAt();
+        }
+        try {
+            String worksheet = cevent.getEventAttrValue("Worksheet");
+            if (worksheet != null) {
+                details += " - Worksheet: " + worksheet;
+            }
+        } catch (Exception e) {
+        }
+        log.setDetails(details);
+        log.setType("Visit");
         return log;
     }
 
