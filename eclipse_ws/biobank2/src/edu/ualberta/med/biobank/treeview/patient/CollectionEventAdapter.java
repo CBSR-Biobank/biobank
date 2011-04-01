@@ -35,8 +35,8 @@ public class CollectionEventAdapter extends AdapterBase {
     protected String getLabelInternal() {
         CollectionEventWrapper cevent = getWrapper();
         Assert.isNotNull(cevent, "collection event is null");
-        String name = cevent.getPatient().getPnumber() + " - #"
-            + cevent.getVisitNumber();
+        StringBuilder name = new StringBuilder(cevent.getPatient().getPnumber())
+            .append(" - #").append(cevent.getVisitNumber());
 
         long count = -1;
         try {
@@ -44,7 +44,7 @@ public class CollectionEventAdapter extends AdapterBase {
         } catch (Exception e) {
             logger.error("Problem counting specimens", e);
         }
-        return name + " [" + count + "]";
+        return name.append(" [").append(count).append("]").toString();
     }
 
     @Override
@@ -55,12 +55,12 @@ public class CollectionEventAdapter extends AdapterBase {
             if (patient != null) {
                 StudyWrapper study = patient.getStudy();
                 Assert.isNotNull(study, "study is null");
-                return study.getNameShort() + " - " + patient.getPnumber()
-                    + " - " + getTooltipText("Collection Event");
+                return new StringBuilder(study.getNameShort()).append(" - ")
+                    .append(getTooltipText("")).toString();
 
             }
         }
-        return getTooltipText("Collection Event");
+        return getTooltipText("Visit");
     }
 
     @Override
