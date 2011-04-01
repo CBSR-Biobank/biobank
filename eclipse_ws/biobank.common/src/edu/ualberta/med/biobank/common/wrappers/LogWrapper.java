@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
+import edu.ualberta.med.biobank.common.util.PostProcessListProxy;
 import edu.ualberta.med.biobank.common.wrappers.base.LogBaseWrapper;
 import edu.ualberta.med.biobank.model.Log;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -21,10 +23,10 @@ public class LogWrapper extends LogBaseWrapper {
     }
 
     public static List<LogWrapper> getLogs(
-        WritableApplicationService appService, String center, String username,
-        Date startDate, Date endDate, String action, String patientNumber,
-        String inventoryId, String locationLabel, String details, String type)
-        throws Exception {
+        final WritableApplicationService appService, String center,
+        String username, Date startDate, Date endDate, String action,
+        String patientNumber, String inventoryId, String locationLabel,
+        String details, String type) throws Exception {
         StringBuffer parametersString = new StringBuffer();
         List<Object> parametersArgs = new ArrayList<Object>();
         addParam(parametersString, parametersArgs, "username", username);
@@ -62,19 +64,18 @@ public class LogWrapper extends LogBaseWrapper {
         if (parametersString.length() > 0) {
             qry.append(" where").append(parametersString.toString());
         }
-        List<Log> logs = appService.query(new HQLCriteria(qry.toString(),
-            parametersArgs));
+        List<LogWrapper> logs = new PostProcessListProxy(appService,
+            new HQLCriteria(qry.toString(), parametersArgs),
+            new AbstractRowPostProcess() {
+                private static final long serialVersionUID = 1L;
 
-        List<LogWrapper> wrappers = new ArrayList<LogWrapper>();
-        for (Log l : logs) {
-            // CASE is important for inventory id
-            String logInvId = l.getInventoryId();
-            if ((inventoryId == null)
-                || ((inventoryId != null) && (logInvId.equals(inventoryId)))) {
-                wrappers.add(new LogWrapper(appService, l));
-            }
-        }
-        return wrappers;
+                @Override
+                public Object rowPostProcess(Object element) {
+                    return new LogWrapper(appService, (Log) element);
+                }
+            });
+
+        return logs;
     }
 
     private static void addParam(StringBuffer sb, List<Object> parameters,

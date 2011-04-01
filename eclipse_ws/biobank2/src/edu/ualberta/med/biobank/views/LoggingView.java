@@ -403,7 +403,7 @@ public class LoggingView extends ViewPart {
 
         FormInput input = new FormInput(null, "Logging Form Input");
         try {
-            LogQuery.getInstance().setSearchQueryItem("site",
+            LogQuery.getInstance().setSearchQueryItem("center",
                 siteCombo.getText());
             LogQuery.getInstance().setSearchQueryItem("user",
                 userCombo.getText());
