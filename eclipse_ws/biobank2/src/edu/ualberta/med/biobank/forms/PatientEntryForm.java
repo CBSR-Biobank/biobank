@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -12,6 +13,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
@@ -21,8 +23,10 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.CollectionView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class PatientEntryForm extends BiobankEntryForm {
@@ -31,6 +35,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         .getLogger(PatientEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientEntryForm";
+
+    private static final String CREATED_AT_BINDING = "patient-created-at-binding";
 
     public static final String MSG_NEW_PATIENT_OK = Messages
         .getString("PatientEntryForm.creation.msg");
@@ -41,6 +47,12 @@ public class PatientEntryForm extends BiobankEntryForm {
     private PatientWrapper patient;
 
     private ComboViewer studiesViewer;
+
+    private Label createdAtLabel;
+
+    private NotNullValidator createdAtValidator;
+
+    private DateTimeWidget createdAtWidget;
 
     private NonEmptyStringValidator pnumberNonEmptyValidator = new NonEmptyStringValidator(
         Messages.getString("PatientEntryForm.patientNumber.validation.msg"));
@@ -125,6 +137,15 @@ public class PatientEntryForm extends BiobankEntryForm {
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             Messages.getString("PatientEntryForm.field.pNumber.label"), null,
             patient, PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
+
+        createdAtLabel = widgetCreator.createLabel(client, "Created At");
+        createdAtLabel.setLayoutData(new GridData(
+            GridData.VERTICAL_ALIGN_BEGINNING));
+        createdAtValidator = new NotNullValidator("Created At should be set");
+
+        createdAtWidget = createDateTimeWidget(client, createdAtLabel,
+            patient.getCreatedAt(), patient, "createdAt", createdAtValidator,
+            SWT.DATE | SWT.TIME, CREATED_AT_BINDING);
     }
 
     @Override
@@ -171,6 +192,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         if (study != null) {
             studiesViewer.setSelection(new StructuredSelection(study));
         }
+        createdAtWidget.setDate(new Date());
         studiesViewer.setSelection(null);
         patient.reset();
         pnumberNonEmptyValidator.validate(null);
