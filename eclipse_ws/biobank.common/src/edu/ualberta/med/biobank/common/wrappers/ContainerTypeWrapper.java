@@ -518,13 +518,4 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
             getRowCapacity(), getColCapacity());
     }
 
-    // @Override
-    // public SiteWrapper getCenterLinkedToObjectForSecu() {
-    // return getSite();
-    // }
-
-    // @Override
-    // public boolean checkSpecificAccess(User user, CenterWrapper<?> center) {
-    // return user.isCenterAdministrator(center);
-    // }
 }

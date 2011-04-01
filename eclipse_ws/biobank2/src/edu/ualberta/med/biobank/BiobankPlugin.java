@@ -398,27 +398,34 @@ public class BiobankPlugin extends AbstractUIPlugin {
      * Display an error message
      */
     public static void openError(String title, String message) {
-        MessageDialog.openError(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), title, message);
+        openError(title, message, null, null);
     }
 
     /**
      * Display an error message with exception message and log the exception
      */
     public static void openError(String title, Exception e) {
-        String msg = e.getMessage();
-        if (((msg == null) || msg.isEmpty()) && (e.getCause() != null)) {
-            msg = e.getCause().getMessage();
-        }
-        openError(title, e.getMessage());
-        logger.error(title, e);
+        openError(title, null, e, null);
     }
 
-    public static void openAsyncError(String title, Exception e,
+    /**
+     * Display an error message with exception message and log the exception
+     */
+    public static void openError(String title, String message, Exception e) {
+        openError(title, message, e, null);
+    }
+
+    /**
+     * Display an error message with exception message and log the exception
+     */
+    public static void openError(String title, String message, Exception e,
         String secondMessage) {
-        String msg = e.getMessage();
-        if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
-            msg = e.getCause().getMessage();
+        String msg = message;
+        if (msg == null && e != null) {
+            msg = e.getMessage();
+            if (((msg == null) || msg.isEmpty()) && (e.getCause() != null)) {
+                msg = e.getCause().getMessage();
+            }
         }
         if (msg == null) {
             msg = "";
@@ -429,12 +436,41 @@ public class BiobankPlugin extends AbstractUIPlugin {
             }
             msg += secondMessage;
         }
-        openAsyncError(title, msg);
-        logger.error(title, e);
+        MessageDialog.openError(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), title, msg);
+        if (e != null)
+            logger.error(title, e);
+    }
+
+    /**
+     * Display an error message asynchronously
+     */
+    public static void openAsyncError(final String title, final String message,
+        final Exception e, final String secondMessage) {
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                openError(title, message, e, secondMessage);
+            }
+        });
+    }
+
+    public static void openAsyncError(final String title, final String message) {
+        openAsyncError(title, message, null, null);
+    }
+
+    public static void openAsyncError(final String title, final String message,
+        final Exception e) {
+        openAsyncError(title, message, e, null);
+    }
+
+    public static void openAsyncError(String title, Exception e,
+        String secondMessage) {
+        openAsyncError(title, null, e, secondMessage);
     }
 
     public static void openAsyncError(String title, Exception e) {
-        openAsyncError(title, e, null);
+        openAsyncError(title, null, e, null);
     }
 
     /**
@@ -451,19 +487,6 @@ public class BiobankPlugin extends AbstractUIPlugin {
             @Override
             public void run() {
                 MessageDialog.openInformation(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(), title, message);
-            }
-        });
-    }
-
-    /**
-     * Display an error message asynchronously
-     */
-    public static void openAsyncError(final String title, final String message) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                MessageDialog.openError(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getShell(), title, message);
             }
         });

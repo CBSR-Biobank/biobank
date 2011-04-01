@@ -322,8 +322,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         dateReceivedWidget.setDate(new Date());
 
         specimenEntryWidget.setSpecimens(shipment.getSpecimenCollection(false));
-        ShippingMethodWrapper shipMethod = shipment.getShipmentInfo()
-            .getShippingMethod();
+        ShippingMethodWrapper shipMethod = null;
+        if (shipment.getShipmentInfo() != null)
+            shipMethod = shipment.getShipmentInfo().getShippingMethod();
         if (shipMethod != null) {
             shippingMethodComboViewer.setSelection(new StructuredSelection(
                 shipMethod));
@@ -331,5 +332,4 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             shippingMethodComboViewer.getCombo().deselectAll();
         }
     }
-
 }

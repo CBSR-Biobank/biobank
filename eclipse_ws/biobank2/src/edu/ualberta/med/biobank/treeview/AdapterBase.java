@@ -183,9 +183,9 @@ public abstract class AdapterBase {
     protected String getTooltipText(String string) {
         String name = getLabel();
         if (name == null) {
-            return "New " + string;
+            return new StringBuilder("New ").append(string).toString();
         }
-        return string + " " + name;
+        return new StringBuilder(string).append(" ").append(name).toString();
     }
 
     public List<AdapterBase> getItems() {

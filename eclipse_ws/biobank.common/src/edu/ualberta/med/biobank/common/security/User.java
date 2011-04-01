@@ -234,8 +234,6 @@ public class User implements Serializable, NotAProxy {
                 wrapper = (ModelWrapper<?>) constructor
                     .newInstance((WritableApplicationService) null);
             } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
                 return false;
             }
             type = wrapper.getWrappedClass().getName();

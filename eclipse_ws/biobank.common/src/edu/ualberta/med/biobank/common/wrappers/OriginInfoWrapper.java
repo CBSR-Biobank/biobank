@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
@@ -183,9 +185,18 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         } else {
             log.setCenter(site);
         }
-        details += "Waybill:" + this.getShipmentInfo().getWaybill();
-        details += " - Specimens:" + getSpecimenCollection(false).size();
-        log.setDetails(details);
+
+        List<String> detailsList = new ArrayList<String>();
+        detailsList.add(details);
+
+        ShipmentInfoWrapper shipInfo = getShipmentInfo();
+        if (shipInfo != null) {
+            detailsList.add(new StringBuilder("waybill:").append(
+                shipInfo.getWaybill()).toString());
+        }
+        detailsList.add(new StringBuilder(", specimens:").append(
+            getSpecimenCollection(false).size()).toString());
+        log.setDetails(StringUtils.join(detailsList, ", "));
         log.setType("Shipment");
         return log;
     }

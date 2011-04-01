@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.rcp.perspective;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,7 +23,7 @@ public class PerspectiveSecurity {
     private static Map<String, String> preferredViews;
 
     static {
-        featureEnablements = new HashMap<String, Map<String, List<SecurityFeature>>>();
+        featureEnablements = new LinkedHashMap<String, Map<String, List<SecurityFeature>>>();
         ProcessingPerspective.appendFeatureEnablements(featureEnablements);
         ReportsPerspective.appendFeatureEnablements(featureEnablements);
         preferredViews = new HashMap<String, String>();

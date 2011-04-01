@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -93,16 +94,27 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
-        checkVisitNumberFree();
+        checkVisitNumberUnused();
     }
 
-    private void checkVisitNumberFree() throws BiobankCheckException,
+    private static final String CHECK_VISIT_NUMBER_UNUSED = "select ce from "
+        + CollectionEvent.class.getName() + " ce where ce."
+        + CollectionEventPeer.VISIT_NUMBER.getName() + "=? and ce."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+        + "=? {0}";
+
+    private void checkVisitNumberUnused() throws BiobankCheckException,
         ApplicationException {
-        HQLCriteria c = new HQLCriteria("select ce from "
-            + CollectionEvent.class.getName() + " ce where ce."
-            + CollectionEventPeer.VISIT_NUMBER.getName() + "=? and ce."
-            + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
-            + "=?", Arrays.asList(getVisitNumber(), getPatient().getId()));
+        List<Object> params = new ArrayList<Object>();
+        params.add(getVisitNumber());
+        params.add(getPatient().getId());
+        String equalsTest = "";
+        if (!isNew()) {
+            equalsTest = " and id <> ?";
+            params.add(getId());
+        }
+        HQLCriteria c = new HQLCriteria(MessageFormat.format(
+            CHECK_VISIT_NUMBER_UNUSED, equalsTest), params);
         List<Object> result = appService.query(c);
         if (result.size() != 0)
             throw new BiobankCheckException("Visit #" + getVisitNumber()
@@ -129,7 +141,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details) {
+    protected Log getLogMessage(String action, String site, String details)
+        throws Exception {
         Log log = new Log();
         log.setAction(action);
         if (site == null) {
@@ -138,15 +151,19 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             log.setCenter(site);
         }
         log.setPatientNumber(getPatient().getPnumber());
-        details += "Visit:" + getVisitNumber();
+        StringBuilder detailsBuilder = new StringBuilder(details);
+
+        detailsBuilder.append("visit:").append(getVisitNumber());
+
         try {
-            details += " - Collected:" + getSourceSpecimensCount(false);
+            detailsBuilder.append(", specimens:").append(
+                getSourceSpecimensCount(false));
         } catch (BiobankException e) {
             e.printStackTrace();
         } catch (ApplicationException e) {
             e.printStackTrace();
         }
-        log.setDetails(details);
+        log.setDetails(detailsBuilder.toString());
         log.setType("CollectionEvent");
         return log;
     }

@@ -39,7 +39,12 @@ import edu.ualberta.med.biobank.widgets.utils.TreeFilter;
 public class AdapterTreeWidget extends Composite {
 
     private TreeViewer treeViewer;
+
     private AdapterTreeDragDropListener adapterTreeDragDropListener;
+
+    private Object mouseMoveLastElement = null;
+
+    private String lastToolTipText = null;
 
     public AdapterTreeWidget(Composite parent, boolean patternFilter) {
         super(parent, SWT.NONE);
@@ -176,8 +181,12 @@ public class AdapterTreeWidget extends Composite {
                     .getCell(new Point(event.x, event.y));
                 if (cell != null) {
                     Object element = cell.getElement();
-                    if (element != null) {
+                    if ((element != null) && (element != mouseMoveLastElement)) {
                         tooltip = ((AdapterBase) element).getTooltipText();
+                        lastToolTipText = tooltip;
+                        mouseMoveLastElement = element;
+                    } else {
+                        tooltip = lastToolTipText;
                     }
                 }
                 treeViewer.getTree().setToolTipText(tooltip);
