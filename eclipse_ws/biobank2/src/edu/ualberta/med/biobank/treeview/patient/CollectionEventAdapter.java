@@ -40,7 +40,7 @@ public class CollectionEventAdapter extends AdapterBase {
 
         long count = -1;
         try {
-            count = cevent.getSourceSpecimensCount(true);
+            count = cevent.getSourceSpecimensCount(false);
         } catch (Exception e) {
             logger.error("Problem counting specimens", e);
         }
@@ -49,9 +49,9 @@ public class CollectionEventAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        CollectionEventWrapper visit = getWrapper();
-        if (visit != null) {
-            PatientWrapper patient = visit.getPatient();
+        CollectionEventWrapper cevent = getWrapper();
+        if (cevent != null) {
+            PatientWrapper patient = cevent.getPatient();
             if (patient != null) {
                 StudyWrapper study = patient.getStudy();
                 Assert.isNotNull(study, "study is null");
@@ -60,7 +60,7 @@ public class CollectionEventAdapter extends AdapterBase {
 
             }
         }
-        return getTooltipText("Patient Visit");
+        return getTooltipText("Collection Event");
     }
 
     @Override
