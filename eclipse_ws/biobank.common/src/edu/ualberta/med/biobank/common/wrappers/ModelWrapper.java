@@ -585,7 +585,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     protected Log getLogMessage(@SuppressWarnings("unused") String action,
         @SuppressWarnings("unused") String site,
-        @SuppressWarnings("unused") String details) {
+        @SuppressWarnings("unused") String details) throws Exception {
         return null;
     }
 
@@ -593,19 +593,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     public int compareTo(ModelWrapper<E> arg0) {
         return this.getId().compareTo(arg0.getId());
     }
-
-    // public CenterWrapper<?> getCenterLinkedToObjectForSecu() {
-    // return null;
-    // }
-
-    /**
-     * return true if access is authorized
-     */
-    // FIXME needed ?
-    // public boolean checkSpecificAccess(@SuppressWarnings("unused") User user,
-    // @SuppressWarnings("unused") CenterWrapper<?> center) {
-    // return true;
-    // }
 
     public static <W extends ModelWrapper<? extends M>, M> W wrapModel(
         WritableApplicationService appService, M model, Class<W> wrapperKlazz)

@@ -207,11 +207,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return getCountResult(appService, c);
     }
 
-    // @Override
-    // public CenterWrapper<?> getCenterLinkedToObjectForSecu() {
-    // return getCenter();
-    // }
-
     public static Collection<? extends ModelWrapper<?>> getAllProcessingEvents(
         BiobankApplicationService appService) throws ApplicationException {
         return ModelWrapper.wrapModelCollection(appService,

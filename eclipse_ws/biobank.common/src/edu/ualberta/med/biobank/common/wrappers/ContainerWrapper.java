@@ -1164,14 +1164,4 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return objectWithPositionManagement.getTop();
     }
 
-    // @Override
-    // public SiteWrapper getCenterLinkedToObjectForSecu() {
-    // return getSite();
-    // }
-
-    // @Override
-    // public boolean checkSpecificAccess(User user, CenterWrapper<?> center) {
-    // return user.isCenterAdministrator(center);
-    // }
-
 }
