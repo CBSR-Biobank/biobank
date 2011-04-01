@@ -30,20 +30,20 @@ public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {
 
     @Override
     public void setRow(Integer row) {
-        if (row == null || !row.equals(getRow())) {
+        Integer oldRow = getRow();
+        super.setRow(row);
+        if (row == null || !row.equals(oldRow)) {
             updatePositionString();
         }
-
-        super.setRow(row);
     }
 
     @Override
     public void setCol(Integer col) {
-        if (col == null || !col.equals(getCol())) {
+        Integer oldCol = getCol();
+        super.setCol(col);
+        if (col == null || !col.equals(oldCol)) {
             updatePositionString();
         }
-
-        super.setCol(col);
     }
 
     private void updatePositionString() {
