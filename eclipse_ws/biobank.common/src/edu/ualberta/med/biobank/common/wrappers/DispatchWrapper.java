@@ -454,33 +454,32 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
         detailsBuilder.append("state: ").append(getStateDescription());
 
-        if (state.equals(DispatchState.CREATION)
-            || state.equals(DispatchState.IN_TRANSIT)) {
-            if (site == null) {
+        if (site != null) {
+            log.setCenter(site);
+        } else {
+            if (state.equals(DispatchState.CREATION)
+                || state.equals(DispatchState.IN_TRANSIT)) {
                 log.setCenter(getSenderCenter().getNameShort());
             } else {
-                log.setCenter(site);
+                log.setCenter(getReceiverCenter().getNameShort());
             }
+        }
 
+        if (state.equals(DispatchState.CREATION)
+            || state.equals(DispatchState.IN_TRANSIT)
+            || state.equals(DispatchState.LOST)) {
             String packedAt = getFormattedPackedAt();
             if ((packedAt != null) && (packedAt.length() > 0)) {
                 detailsBuilder.append(", packed at: ").append(packedAt);
             }
-        } else {
-            if (site == null) {
-                log.setCenter(getReceiverCenter().getNameShort());
-            } else {
-                log.setCenter(site);
-            }
-            if (shipInfo != null) {
-                String receivedAt = shipInfo.getFormattedDateReceived();
-                if ((receivedAt != null) && (receivedAt.length() > 0)) {
-                    detailsBuilder.append(", received at: ").append(receivedAt);
-                }
-            }
         }
 
         if (shipInfo != null) {
+            String receivedAt = shipInfo.getFormattedDateReceived();
+            if ((receivedAt != null) && (receivedAt.length() > 0)) {
+                detailsBuilder.append(", received at: ").append(receivedAt);
+            }
+
             String waybill = shipInfo.getWaybill();
             if (waybill != null) {
                 detailsBuilder.append(", waybill: ").append(waybill);
