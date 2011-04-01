@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -443,16 +445,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         Log log = new Log();
         log.setAction(action);
 
-        StringBuilder detailsBuilder = new StringBuilder(details);
-
-        if (details.length() > 0) {
-            detailsBuilder.append(": ");
-        }
-
         DispatchState state = getDispatchState();
-        ShipmentInfoWrapper shipInfo = getShipmentInfo();
-
-        detailsBuilder.append("state: ").append(getStateDescription());
 
         if (site != null) {
             log.setCenter(site);
@@ -465,27 +458,39 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             }
         }
 
+        List<String> detailsList = new ArrayList<String>();
+        if (details.length() > 0) {
+            detailsList.add(details);
+        }
+
+        detailsList.add(new StringBuilder("state: ").append(
+            getStateDescription()).toString());
+
         if (state.equals(DispatchState.CREATION)
             || state.equals(DispatchState.IN_TRANSIT)
             || state.equals(DispatchState.LOST)) {
             String packedAt = getFormattedPackedAt();
             if ((packedAt != null) && (packedAt.length() > 0)) {
-                detailsBuilder.append(", packed at: ").append(packedAt);
+                detailsList.add(new StringBuilder("packed at: ").append(
+                    packedAt).toString());
             }
         }
 
+        ShipmentInfoWrapper shipInfo = getShipmentInfo();
         if (shipInfo != null) {
             String receivedAt = shipInfo.getFormattedDateReceived();
             if ((receivedAt != null) && (receivedAt.length() > 0)) {
-                detailsBuilder.append(", received at: ").append(receivedAt);
+                detailsList.add(new StringBuilder("received at: ").append(
+                    receivedAt).toString());
             }
 
             String waybill = shipInfo.getWaybill();
             if (waybill != null) {
-                detailsBuilder.append(", waybill: ").append(waybill);
+                detailsList.add(new StringBuilder(", waybill: ")
+                    .append(waybill).toString());
             }
         }
-        log.setDetails(detailsBuilder.toString());
+        log.setDetails(StringUtils.join(detailsList, ", "));
         log.setType("Dispatch");
         return log;
     }

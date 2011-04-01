@@ -17,6 +17,7 @@ public class FTAReportImpl extends AbstractReport {
         + ("    inner join fetch s2.specimenType st")
         + ("    inner join fetch s2.currentCenter c")
         + ("    inner join fetch s2.specimenPosition pos")
+        + ("    inner join fetch pos.container cnt")
         + " WHERE s2.id = (SELECT min(s.id) "
         + ("        FROM " + Specimen.class.getName() + " s")
         + "         WHERE s.collectionEvent.visitNumber = 1"
@@ -48,11 +49,14 @@ public class FTAReportImpl extends AbstractReport {
                 .getTopSpecimen().getCreatedAt());
             String specimenType = specimen.getSpecimenType().getNameShort();
             String currentCenter = specimen.getCurrentCenter().getNameShort();
+
+            String containerLabel = specimen.getSpecimenPosition()
+                .getContainer().getLabel();
             String positionString = specimen.getSpecimenPosition()
                 .getPositionString();
 
             modifiedResults.add(new Object[] { pnumber, dateDrawn, inventoryId,
-                specimenType, currentCenter, positionString });
+                specimenType, currentCenter, containerLabel + positionString });
         }
         return modifiedResults;
     }

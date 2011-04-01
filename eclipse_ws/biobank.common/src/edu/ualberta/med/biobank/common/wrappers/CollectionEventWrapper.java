@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -151,19 +153,23 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             log.setCenter(site);
         }
         log.setPatientNumber(getPatient().getPnumber());
-        StringBuilder detailsBuilder = new StringBuilder(details);
+        List<String> detailsList = new ArrayList<String>();
+        if (details.length() > 0) {
+            detailsList.add(details);
+        }
 
-        detailsBuilder.append("visit:").append(getVisitNumber());
+        detailsList.add(new StringBuilder("visit:").append(getVisitNumber())
+            .toString());
 
         try {
-            detailsBuilder.append(", specimens:").append(
-                getSourceSpecimensCount(false));
+            detailsList.add(new StringBuilder("specimens:").append(
+                getSourceSpecimensCount(false)).toString());
         } catch (BiobankException e) {
             e.printStackTrace();
         } catch (ApplicationException e) {
             e.printStackTrace();
         }
-        log.setDetails(detailsBuilder.toString());
+        log.setDetails(StringUtils.join(detailsList, ", "));
         log.setType("CollectionEvent");
         return log;
     }
