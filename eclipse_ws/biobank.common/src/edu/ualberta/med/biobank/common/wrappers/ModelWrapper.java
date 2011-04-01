@@ -398,7 +398,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         + "from {0} as o where {1}=? and site.id{2} {3}";
 
     protected void checkNoDuplicatesInSite(Class<?> objectClass,
-        String propertyName, String value, Integer siteId, String errorMessage)
+        String propertyName, String value, Integer siteId, String errorName)
         throws ApplicationException, BiobankException {
         List<Object> params = new ArrayList<Object>();
         params.add(value);
@@ -417,7 +417,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             CHECK_NO_DUPLICATES_IN_SITE, objectClass.getName(), propertyName,
             siteIdTest, equalsTest), params);
         if (getCountResult(appService, criteria) > 0) {
-            throw new DuplicateEntryException(errorMessage);
+            throw new DuplicateEntryException(errorName + " \"" + value
+                + "\" already exists.");
         }
     }
 
