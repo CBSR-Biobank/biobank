@@ -310,27 +310,6 @@ public class PatientWrapper extends PatientBaseWrapper {
         return log;
     }
 
-    // @Override
-    // public boolean checkSpecificAccess(User user, CenterWrapper<?> center) {
-    // if (isNew()) {
-    // return true;
-    // }
-    // // won't use siteId because patient is not site specific (will be null)
-    // StudyWrapper study = getStudy();
-    // if (study != null) {
-    // List<CenterWrapper<?>> studyCenters = study
-    // .getSiteCollection(false);
-    // for (SiteWrapper studySite : sites) {
-    // // if can update at least one site, then can add/update a
-    // // patient to the linked study
-    // if (user.canUpdateCenter(studySite)) {
-    // return true;
-    // }
-    // }
-    // }
-    // return false;
-    // }
-
     /**
      * merge patient2 into this patient
      */

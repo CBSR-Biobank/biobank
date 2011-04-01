@@ -458,9 +458,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             for (SpecimenPositionWrapper position : positions) {
                 try {
                     position.reload();
-                } catch (Exception e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                } catch (Exception ex) {
+                    // do nothing
                 }
                 SpecimenWrapper spc = position.getSpecimen();
                 aliquots.put(
@@ -1164,15 +1163,5 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public ContainerWrapper getTop() {
         return objectWithPositionManagement.getTop();
     }
-
-    // @Override
-    // public SiteWrapper getCenterLinkedToObjectForSecu() {
-    // return getSite();
-    // }
-
-    // @Override
-    // public boolean checkSpecificAccess(User user, CenterWrapper<?> center) {
-    // return user.isCenterAdministrator(center);
-    // }
 
 }

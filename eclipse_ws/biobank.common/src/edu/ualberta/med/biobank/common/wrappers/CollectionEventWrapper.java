@@ -141,7 +141,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details) {
+    protected Log getLogMessage(String action, String site, String details)
+        throws Exception {
         Log log = new Log();
         log.setAction(action);
         if (site == null) {
@@ -150,7 +151,6 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             log.setCenter(site);
         }
         log.setPatientNumber(getPatient().getPnumber());
-
         StringBuilder detailsBuilder = new StringBuilder(details);
 
         detailsBuilder.append("visit:").append(getVisitNumber());

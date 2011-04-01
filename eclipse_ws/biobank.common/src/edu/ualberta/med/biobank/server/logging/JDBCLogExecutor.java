@@ -81,7 +81,6 @@ public class JDBCLogExecutor implements Runnable {
                 }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
             ExceptionUtils.writeMsgToTmpFile(ex);
         }
     }
@@ -95,7 +94,7 @@ public class JDBCLogExecutor implements Runnable {
             con = DriverManager.getConnection(getDbUrl(), getDbUser(),
                 getDbPwd());
         } catch (Throwable t) {
-            t.printStackTrace();
+            ExceptionUtils.writeMsgToTmpFile(t);
         }
         return con;
     }

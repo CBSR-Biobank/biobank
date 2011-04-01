@@ -463,11 +463,10 @@ class FilterRow extends Composite {
 
             if ((end - start) / 1000 >= MAX_QUERY_TIME) {
                 BiobankPlugin.openError("Cannot Suggest Options",
-                    "It is taking too long to find suggestions.");
+                    "It is taking too long to find suggestions.", e);
             } else {
                 BiobankPlugin.openError("Cannot Suggest Options",
-                    "There was a problem trying to find suggestions.");
-                e.printStackTrace();
+                    "There was a problem trying to find suggestions.", e);
             }
             return false;
         }

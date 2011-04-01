@@ -320,7 +320,7 @@ public class SessionManager {
                         }
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    logger.error("Error updating tree nodes", ex);
                 }
             }
         });

@@ -31,7 +31,7 @@ public class SessionsView extends AbstractViewWithAdapterTree {
         // will refresh and expand sites if open application on another view
         getTreeViewer().refresh();
         SessionAdapter session = (SessionAdapter) rootNode.getChild(0);
-        if (session != null)
+        if (session != null && SessionManager.getInstance().isConnected())
             session.rebuild();
     }
 
