@@ -136,6 +136,10 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
     }
 
     private void preLoadList(final int i) {
+        if (!semaphore.tryAcquire()) {
+            return;
+        }
+
         if ((i - offset) > (pageSize / 2)) {
             nextOffset = offset + pageSize;
         } else
@@ -146,14 +150,13 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
                 @Override
                 public void run() {
                     try {
-                        semaphore.acquire();
                         nextListChunk = getChunk(nextOffset);
                         if (nextListChunk.size() != 1000 && realSize == -1)
                             realSize = nextOffset + nextListChunk.size();
-                        semaphore.release();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
+                    semaphore.release();
                 }
             };
             t.start();
