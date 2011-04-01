@@ -323,9 +323,13 @@ public class User implements Serializable, NotAProxy {
         return null;
     }
 
+    public boolean canPerformActions(SecurityFeature... features) {
+        return canPerformActions(Arrays.asList(features));
+    }
+
     // FIXME for now assume features are center features (so can use
     // isAdministratorForCurrentCenter)
-    public boolean canPerformActions(SecurityFeature... features) {
+    public boolean canPerformActions(List<SecurityFeature> features) {
         boolean ok = isAdministratorForCurrentCenter();
         for (SecurityFeature feature : features) {
             ok = ok

@@ -60,8 +60,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
         patientVisitAdapter = (CollectionEventAdapter) adapter;
         cevent = patientVisitAdapter.getWrapper();
         retrievePatientVisit();
-        cevent.logLookup(SessionManager.getUser().getCurrentWorkingCenter()
-            .getNameShort());
+        SessionManager.logLookup(cevent);
 
         setPartName(Messages.getString("CollectionEventViewForm.title",
             cevent.getVisitNumber()));

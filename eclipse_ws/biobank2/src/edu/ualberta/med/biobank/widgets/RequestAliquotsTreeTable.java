@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -272,15 +273,16 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                 for (Iterator<Object> iterator = sel.iterator(); iterator
                     .hasNext();) {
                     Object item = iterator.next();
-                    String row = "";
+                    List<String> row = new ArrayList<String>();
                     for (int i = 0; i < numCols; i++) {
                         String text = labelProvider.getColumnText(item, i);
-                        if (text != null)
-                            row += text;
-                        if (i < numCols - 1)
-                            row += ", ";
+                        if (text != null) {
+                            row.add(text);
+                        } else {
+                            row.add("");
+                        }
                     }
-                    selectedRows.add(row);
+                    selectedRows.add(StringUtils.join(row, ","));
                 }
                 if (selectedRows.size() > 0) {
                     StringBuilder sb = new StringBuilder();

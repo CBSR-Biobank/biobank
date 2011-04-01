@@ -1,9 +1,14 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import edu.ualberta.med.biobank.common.peer.LogPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.LogBaseWrapper;
 import edu.ualberta.med.biobank.model.Log;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -27,18 +32,23 @@ public class LogWrapper extends LogBaseWrapper {
         throws Exception {
         StringBuffer parametersString = new StringBuffer();
         List<Object> parametersArgs = new ArrayList<Object>();
-        addParam(parametersString, parametersArgs, "username", username);
+        addParam(parametersString, parametersArgs, LogPeer.USERNAME.getName(),
+            username, true);
 
         StringBuffer datePart = new StringBuffer();
         if ((startDate != null) && (endDate != null)) {
-            datePart.append(" createdAt >= ? and createdAt <= ?");
+            datePart.append(" ").append(LogPeer.CREATED_AT.getName())
+                .append(" >= ? and ").append(LogPeer.CREATED_AT.getName())
+                .append(" <= ?");
             parametersArgs.add(startDate);
             parametersArgs.add(endDate);
         } else if (startDate != null) {
-            datePart.append(" createdAt >= ?");
+            datePart.append(" ").append(LogPeer.CREATED_AT.getName())
+                .append(" >= ?");
             parametersArgs.add(startDate);
         } else if (endDate != null) {
-            datePart.append(" createdAt <= ?");
+            datePart.append(" ").append(LogPeer.CREATED_AT.getName())
+                .append(" <= ?");
             parametersArgs.add(endDate);
         }
 
@@ -49,14 +59,19 @@ public class LogWrapper extends LogBaseWrapper {
             parametersString.append(" " + datePart);
         }
 
-        addParam(parametersString, parametersArgs, "site", site);
-        addParam(parametersString, parametersArgs, "action", action);
-        addParam(parametersString, parametersArgs, "patientNumber",
-            patientNumber);
-        addParam(parametersString, parametersArgs, "inventoryId", inventoryId);
+        addParam(parametersString, parametersArgs, LogPeer.CENTER.getName(),
+            site, true);
+        addParam(parametersString, parametersArgs, LogPeer.ACTION.getName(),
+            action, true);
+        addParam(parametersString, parametersArgs,
+            LogPeer.PATIENT_NUMBER.getName(), patientNumber, true);
+        addParam(parametersString, parametersArgs,
+            LogPeer.INVENTORY_ID.getName(), inventoryId, true);
         addLocationLabelParam(parametersString, parametersArgs, locationLabel);
-        addParam(parametersString, parametersArgs, "details", details, false);
-        addParam(parametersString, parametersArgs, "type", type);
+        addParam(parametersString, parametersArgs, LogPeer.DETAILS.getName(),
+            details, false);
+        addParam(parametersString, parametersArgs, LogPeer.TYPE.getName(),
+            type, true);
         StringBuilder qry = new StringBuilder("from ").append(Log.class
             .getName());
         if (parametersString.length() > 0) {
@@ -75,11 +90,6 @@ public class LogWrapper extends LogBaseWrapper {
             }
         }
         return wrappers;
-    }
-
-    private static void addParam(StringBuffer sb, List<Object> parameters,
-        String property, Object value) {
-        addParam(sb, parameters, property, value, true);
     }
 
     private static void addParam(StringBuffer sb, List<Object> parameters,
@@ -105,37 +115,40 @@ public class LogWrapper extends LogBaseWrapper {
             if (sb.length() > 0) {
                 sb.append(" and");
             }
-            sb.append(" ").append("locationLabel").append(" like ?");
+            sb.append(" ").append(LogPeer.LOCATION_LABEL.getName())
+                .append(" like ?");
             parameters.add(value + " (%");
         }
     }
 
-    public static final String POSSIBLE_SITES_QRY = "select distinct(site) from "
-        + Log.class.getName() + " where site !=''";
+    public static final String POSSIBLE_SITES_QRY = "select distinct("
+        + LogPeer.CENTER.getName() + ") from " + Log.class.getName()
+        + " where " + LogPeer.CENTER.getName() + "!=''";
 
     public static List<String> getPossibleSites(
         WritableApplicationService appService) throws ApplicationException {
         return appService.query(new HQLCriteria(POSSIBLE_SITES_QRY));
     }
 
-    public static final String POSSIBLE_USER_NAMES_QRY = "select distinct(username) from "
-        + Log.class.getName();
+    public static final String POSSIBLE_USER_NAMES_QRY = "select distinct("
+        + LogPeer.USERNAME.getName() + ") from " + Log.class.getName();
 
     public static List<String> getPossibleUsernames(
         WritableApplicationService appService) throws ApplicationException {
         return appService.query(new HQLCriteria(POSSIBLE_USER_NAMES_QRY));
     }
 
-    public static final String POSSIBLE_ACTIONS_QRY = "select distinct(action) from "
-        + Log.class.getName();
+    public static final String POSSIBLE_ACTIONS_QRY = "select distinct("
+        + LogPeer.ACTION.getName() + " from " + Log.class.getName();
 
     public static List<String> getPossibleActions(
         WritableApplicationService appService) throws ApplicationException {
         return appService.query(new HQLCriteria(POSSIBLE_ACTIONS_QRY));
     }
 
-    public static final String POSSIBLE_TYPES_QRY = "select distinct(type) from "
-        + Log.class.getName() + " where type !=''";
+    public static final String POSSIBLE_TYPES_QRY = "select distinct("
+        + LogPeer.TYPE.getName() + " from " + Log.class.getName()
+        + " where type !=''";
 
     public static List<String> getPossibleTypes(
         WritableApplicationService appService) throws ApplicationException {
@@ -144,9 +157,36 @@ public class LogWrapper extends LogBaseWrapper {
 
     @Override
     public String toString() {
-        return getCreatedAt() + " -- action: " + getAction() + " / type: "
-            + getType() + " / patientNumber: " + getPatientNumber()
-            + " / inventoryId: " + getInventoryId() + " / locationLabel: "
-            + getLocationLabel() + " / details: " + getDetails();
+        return getCreatedAt() + " -- " + LogPeer.ACTION.getName() + ": "
+            + getAction() + " / " + LogPeer.TYPE.getName() + ": " + getType()
+            + " / " + LogPeer.PATIENT_NUMBER.getName() + ": "
+            + getPatientNumber() + " / " + LogPeer.INVENTORY_ID.getName()
+            + ": " + getInventoryId() + " / "
+            + LogPeer.LOCATION_LABEL.getName() + ": " + getLocationLabel()
+            + " / " + LogPeer.DETAILS.getName() + ": " + getDetails();
+    }
+
+    @SuppressWarnings("rawtypes")
+    private static Map<String, Property> logFields;
+
+    /**
+     * Used on the server side
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public synchronized void setLogStringValue(String attributeName,
+        String value) throws Exception {
+        if (logFields == null) {
+            logFields = new HashMap<String, Property>();
+            for (Field field : LogPeer.class.getFields()) {
+                if (field.getType().getName().equals(Property.class.getName())
+                    && Modifier.isStatic(field.getModifiers())) {
+                    Property property = (Property) field.get(null);
+                    logFields.put(property.getName(), property);
+                }
+            }
+        }
+        Property property = logFields.get(attributeName);
+        if (property != null)
+            setProperty(property, value);
     }
 }
