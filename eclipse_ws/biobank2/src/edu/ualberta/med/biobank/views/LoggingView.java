@@ -52,7 +52,7 @@ public class LoggingView extends ViewPart {
         detailsTextInput, locationTextInput;
     // containerLabelTextInput
 
-    private Combo siteCombo, userCombo, typeCombo, actionCombo;
+    private Combo centerCombo, userCombo, typeCombo, actionCombo;
 
     private DateTimeWidget startDateWidget, endDateWidget;
 
@@ -105,14 +105,14 @@ public class LoggingView extends ViewPart {
         parent.setBackground(colorWhite);
 
         Label label = new Label(parent, SWT.NO_BACKGROUND);
-        label.setText("Site:");
+        label.setText("Center:");
         label.setAlignment(SWT.LEFT);
         label.setBackground(colorWhite);
 
-        siteCombo = new Combo(parent, SWT.READ_ONLY);
-        siteCombo.setFocus();
-        siteCombo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        siteCombo.addKeyListener(enterListener);
+        centerCombo = new Combo(parent, SWT.READ_ONLY);
+        centerCombo.setFocus();
+        centerCombo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        centerCombo.addKeyListener(enterListener);
 
         label = new Label(parent, SWT.NO_BACKGROUND);
         label.setText("User:");
@@ -283,7 +283,7 @@ public class LoggingView extends ViewPart {
         searchButton.addTraverseListener(new TraverseListener() {
             @Override
             public void keyTraversed(TraverseEvent e) {
-                siteCombo.setFocus();
+                centerCombo.setFocus();
                 e.doit = false;
             }
         });
@@ -351,7 +351,7 @@ public class LoggingView extends ViewPart {
     }
 
     private void setEnableAllFields(boolean enabled) {
-        siteCombo.setEnabled(enabled);
+        centerCombo.setEnabled(enabled);
         userCombo.setEnabled(enabled);
         typeCombo.setEnabled(enabled);
         actionCombo.setEnabled(enabled);
@@ -367,8 +367,8 @@ public class LoggingView extends ViewPart {
 
     private void loadComboFields() {
         siteComboOptions = loadComboList(ComboListType.SITE);
-        siteCombo.setItems(siteComboOptions);
-        siteCombo.select(0);
+        centerCombo.setItems(siteComboOptions);
+        centerCombo.select(0);
         userCombo.setItems(loadComboList(ComboListType.USER));
         userCombo.select(0);
         typeCombo.setItems(loadComboList(ComboListType.TYPE));
@@ -378,7 +378,7 @@ public class LoggingView extends ViewPart {
     }
 
     private void clearFields() {
-        siteCombo.select(0);
+        centerCombo.select(0);
         userCombo.select(0);
         typeCombo.select(0);
         actionCombo.select(0);
@@ -404,7 +404,7 @@ public class LoggingView extends ViewPart {
         FormInput input = new FormInput(null, "Logging Form Input");
         try {
             LogQuery.getInstance().setSearchQueryItem("site",
-                siteCombo.getText());
+                centerCombo.getText());
             LogQuery.getInstance().setSearchQueryItem("user",
                 userCombo.getText());
             LogQuery.getInstance().setSearchQueryItem("type",

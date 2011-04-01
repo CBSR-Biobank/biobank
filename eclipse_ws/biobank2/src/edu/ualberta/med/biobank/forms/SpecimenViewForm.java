@@ -9,7 +9,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -53,7 +53,7 @@ public class SpecimenViewForm extends BiobankViewForm {
     private DispatchInfoTable dispatchInfoTable;
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue((adapter instanceof SpecimenAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -61,11 +61,7 @@ public class SpecimenViewForm extends BiobankViewForm {
         specimenAdapter = (SpecimenAdapter) adapter;
         specimen = specimenAdapter.getSpecimen();
         retrieveSpecimen();
-        try {
-            specimen.logLookup(specimen.getCenterString());
-        } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Log lookup failed", e);
-        }
+        SessionManager.logLookup(specimen);
         setPartName("Specimen: " + specimen.getInventoryId());
     }
 

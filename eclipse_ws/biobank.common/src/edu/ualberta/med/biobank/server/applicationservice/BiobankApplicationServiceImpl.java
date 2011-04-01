@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
-
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
@@ -62,6 +61,9 @@ public class BiobankApplicationServiceImpl extends
         logActivity(log);
     }
 
+    /**
+     * See log4j.xml: it should contain the Biobank.Activity appender
+     */
     @Override
     public void logActivity(Log log) throws Exception {
         Logger logger = Logger.getLogger("Biobank.Activity");

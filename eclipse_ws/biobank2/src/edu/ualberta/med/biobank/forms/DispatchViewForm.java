@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
@@ -79,8 +80,7 @@ public class DispatchViewForm extends BiobankViewForm {
 
         dispatchAdapter = (DispatchAdapter) adapter;
         dispatch = (DispatchWrapper) adapter.getModelObject();
-        dispatch.logLookup(SessionManager.getUser().getCurrentWorkingCenter()
-            .getNameShort());
+        SessionManager.logLookup(dispatch);
         retrieveDispatch();
         setPartName("Dispatch");
     }
@@ -320,7 +320,7 @@ public class DispatchViewForm extends BiobankViewForm {
             "Receiver");
         if (!dispatch.isInCreationState()) {
             departedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Departed");
+                "Packed at");
             shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
                 "Shipping Method");
             waybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
@@ -341,19 +341,21 @@ public class DispatchViewForm extends BiobankViewForm {
         setTextValue(receiverLabel,
             dispatch.getReceiverCenter() == null ? "ACCESS DENIED" : dispatch
                 .getReceiverCenter().getName());
-        if (dispatch.getShipmentInfo() != null) {
-            if (departedLabel != null)
-                setTextValue(departedLabel, dispatch.getFormattedPackedAt());
+        if (departedLabel != null)
+            setTextValue(departedLabel, dispatch.getFormattedPackedAt());
+
+        ShipmentInfoWrapper shipInfo = dispatch.getShipmentInfo();
+
+        if (shipInfo != null) {
             if (shippingMethodLabel != null)
-                setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
-                    .getShippingMethod() == null ? "" : dispatch
-                    .getShipmentInfo().getShippingMethod().getName());
+                setTextValue(shippingMethodLabel,
+                    shipInfo.getShippingMethod() == null ? "" : shipInfo
+                        .getShippingMethod().getName());
             if (waybillLabel != null)
-                setTextValue(waybillLabel, dispatch.getShipmentInfo()
-                    .getWaybill());
+                setTextValue(waybillLabel, shipInfo.getWaybill());
             if (dateReceivedLabel != null)
-                setTextValue(dateReceivedLabel, dispatch.getShipmentInfo()
-                    .getFormattedDateReceived());
+                setTextValue(dateReceivedLabel,
+                    shipInfo.getFormattedDateReceived());
         }
         setTextValue(commentLabel, dispatch.getComment());
     }

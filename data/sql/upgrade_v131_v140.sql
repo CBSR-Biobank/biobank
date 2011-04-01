@@ -659,6 +659,13 @@ UPDATE abstract_position ap, container c, container_type ct
 
 
 /*****************************************************
+ * log
+ ****************************************************/
+
+alter table log
+      change column SITE CENTER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT '';
+
+/*****************************************************
  * advanced reports
  ****************************************************/
 

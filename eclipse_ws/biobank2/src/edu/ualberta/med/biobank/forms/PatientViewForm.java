@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
@@ -41,7 +42,7 @@ public class PatientViewForm extends BiobankViewForm {
         patientAdapter = (PatientAdapter) adapter;
         patient = patientAdapter.getWrapper();
         retrievePatient();
-        patient.logLookup(null);
+        SessionManager.logLookup(patient);
         setPartName(Messages.getString("PatientViewForm.title", //$NON-NLS-1$
             patient.getPnumber()));
     }
