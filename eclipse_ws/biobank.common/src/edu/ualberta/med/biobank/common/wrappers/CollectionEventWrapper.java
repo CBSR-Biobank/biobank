@@ -129,7 +129,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details) {
+    protected Log getLogMessage(String action, String site, String details)
+        throws Exception {
         Log log = new Log();
         log.setAction(action);
         if (site == null) {
@@ -139,13 +140,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         }
         log.setPatientNumber(getPatient().getPnumber());
         details += "Visit:" + getVisitNumber();
-        try {
-            details += " - Collected:" + getSourceSpecimensCount(false);
-        } catch (BiobankException e) {
-            e.printStackTrace();
-        } catch (ApplicationException e) {
-            e.printStackTrace();
-        }
+        details += " - Collected:" + getSourceSpecimensCount(false);
         log.setDetails(details);
         log.setType("CollectionEvent");
         return log;

@@ -132,7 +132,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details) {
+    protected Log getLogMessage(String action, String site, String details)
+        throws Exception {
         Log log = new Log();
         log.setAction(action);
         if (site == null) {
@@ -140,13 +141,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         } else {
             log.setCenter(site);
         }
-        try {
-            details += "Source Specimens: " + getSpecimenCount(false);
-        } catch (BiobankException e) {
-            e.printStackTrace();
-        } catch (ApplicationException e) {
-            e.printStackTrace();
-        }
+        details += "Source Specimens: " + getSpecimenCount(false);
         String worksheet = getWorksheet();
         if (worksheet != null) {
             details += " - Worksheet: " + worksheet;

@@ -65,13 +65,9 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         super.createPartControl(parent);
     }
 
-    public void createNodes() {
+    public void createNodes() throws Exception {
         if (SessionManager.getUser().getCurrentWorkingCenter() != null) {
-            try {
-                SessionManager.getUser().getCurrentWorkingCenter().reload();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            SessionManager.getUser().getCurrentWorkingCenter().reload();
             centerNode = new DispatchCenterAdapter(rootNode, SessionManager
                 .getUser().getCurrentWorkingCenter());
             centerNode.setParent(rootNode);
