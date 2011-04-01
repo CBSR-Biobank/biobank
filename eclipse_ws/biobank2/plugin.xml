@@ -2357,7 +2357,7 @@
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.SessionsView"
             id="edu.ualberta.med.biobank.views.SessionsView"
-            name="Site Administration"
+            name="Center Administration"
             restorable="true">
 	      </view>
 	      <view
