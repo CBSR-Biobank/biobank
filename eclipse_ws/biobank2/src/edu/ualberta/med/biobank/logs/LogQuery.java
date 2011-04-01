@@ -20,8 +20,8 @@ public class LogQuery {
     public static final String START_DATE_KEY = "startDate";
     public static final String END_DATE_KEY = "endDate";
 
-    private static final String NONE = "NONE";
-    private static final String ALL = "ALL";
+    public static final String NONE = "NONE";
+    public static final String ALL = "ALL";
 
     protected LogQuery() {
         /* Define all the keys to be used here */

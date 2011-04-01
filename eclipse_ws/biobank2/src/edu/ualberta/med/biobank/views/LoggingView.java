@@ -29,6 +29,7 @@ import org.eclipse.ui.services.ISourceProviderService;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.LogPeer;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.forms.LoggingForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -50,13 +51,10 @@ public class LoggingView extends ViewPart {
 
     private BiobankText patientNumTextInput, inventoryIdTextInput,
         detailsTextInput, locationTextInput;
-    // containerLabelTextInput
 
     private Combo centerCombo, userCombo, typeCombo, actionCombo;
 
     private DateTimeWidget startDateWidget, endDateWidget;
-
-    // containerTypeCombo
 
     private Button clearButton, searchButton;
 
@@ -403,28 +401,29 @@ public class LoggingView extends ViewPart {
 
         FormInput input = new FormInput(null, "Logging Form Input");
         try {
-            LogQuery.getInstance().setSearchQueryItem("center",
+            LogQuery.getInstance().setSearchQueryItem(LogPeer.CENTER.getName(),
                 centerCombo.getText());
-            LogQuery.getInstance().setSearchQueryItem("user",
-                userCombo.getText());
-            LogQuery.getInstance().setSearchQueryItem("type",
+            LogQuery.getInstance().setSearchQueryItem(
+                LogPeer.USERNAME.getName(), userCombo.getText());
+            LogQuery.getInstance().setSearchQueryItem(LogPeer.TYPE.getName(),
                 typeCombo.getText());
-            LogQuery.getInstance().setSearchQueryItem("action",
+            LogQuery.getInstance().setSearchQueryItem(LogPeer.ACTION.getName(),
                 actionCombo.getText());
-            LogQuery.getInstance().setSearchQueryItem("patientNumber",
-                patientNumTextInput.getText());
-            LogQuery.getInstance().setSearchQueryItem("inventoryId",
-                inventoryIdTextInput.getText());
-            LogQuery.getInstance().setSearchQueryItem("location",
-                locationTextInput.getText());
-            LogQuery.getInstance().setSearchQueryItem("details",
-                detailsTextInput.getText());
+            LogQuery.getInstance()
+                .setSearchQueryItem(LogPeer.PATIENT_NUMBER.getName(),
+                    patientNumTextInput.getText());
+            LogQuery.getInstance().setSearchQueryItem(
+                LogPeer.INVENTORY_ID.getName(), inventoryIdTextInput.getText());
+            LogQuery.getInstance().setSearchQueryItem(
+                LogPeer.LOCATION_LABEL.getName(), locationTextInput.getText());
+            LogQuery.getInstance().setSearchQueryItem(
+                LogPeer.DETAILS.getName(), detailsTextInput.getText());
             Date startDateDate = startDateWidget.getDate();
             Date endDateDate = endDateWidget.getDate();
 
-            LogQuery.getInstance().setSearchQueryItem("startDate",
+            LogQuery.getInstance().setSearchQueryItem(LogQuery.START_DATE_KEY,
                 DateFormatter.formatAsDate(startDateDate));
-            LogQuery.getInstance().setSearchQueryItem("endDate",
+            LogQuery.getInstance().setSearchQueryItem(LogQuery.END_DATE_KEY,
                 DateFormatter.formatAsDate(endDateDate));
             /*
              * LogQuery.getInstance().setSearchQueryItem( "containerType",
@@ -437,10 +436,8 @@ public class LoggingView extends ViewPart {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, LoggingForm.ID);
         } catch (Exception ex) {
-            BiobankPlugin.openAsyncError(
-                "Error",
-                "There was an error opening: LoggingForm.\n"
-                    + ex.getLocalizedMessage());
+            BiobankPlugin.openAsyncError("Error",
+                "There was an error opening: LoggingForm.", ex);
         }
     }
 
@@ -475,8 +472,8 @@ public class LoggingView extends ViewPart {
             }
             arrayList.remove(null);
             List<String> result = new ArrayList<String>();
-            result.add("ALL");
-            result.add("NONE");
+            result.add(LogQuery.ALL);
+            result.add(LogQuery.NONE);
             for (String item : arrayList) {
                 if (item != null)
                     result.add(item);
@@ -485,7 +482,7 @@ public class LoggingView extends ViewPart {
 
         } catch (ApplicationException ex) {
             BiobankPlugin.openAsyncError("Error",
-                "There was an error: \n" + ex.getLocalizedMessage());
+                "There was an error loading combo values.", ex);
         }
         return null;
     }
