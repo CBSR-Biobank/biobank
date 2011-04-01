@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.common.peer.LogPeer;
 import edu.ualberta.med.biobank.logs.LogQuery;
 import edu.ualberta.med.biobank.views.LoggingView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -66,7 +67,7 @@ public class LoggingForm extends BiobankViewForm {
         toolkit.paintBordersFor(rightClient);
 
         /* a grid might make this easier */
-        siteLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "Site");
+        siteLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "Center");
         userLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "User");
         typeLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "Type");
         actionLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
@@ -90,8 +91,7 @@ public class LoggingForm extends BiobankViewForm {
         generateSearchQueryTable();
     }
 
-    private void generateSearchQueryTable() {
-
+    private void generateSearchQueryTable() throws Exception {
         LogQuery.getInstance().queryDatabase();
 
         Composite client = createSectionWithClient("Search Results");
@@ -104,24 +104,26 @@ public class LoggingForm extends BiobankViewForm {
     }
 
     private void getSearchRequestFields() throws Exception {
-        siteLabel.setText(LogQuery.getInstance().getSearchQueryItem("site"));
-        userLabel.setText(LogQuery.getInstance().getSearchQueryItem("user"));
-        actionLabel
-            .setText(LogQuery.getInstance().getSearchQueryItem("action"));
-        typeLabel.setText(LogQuery.getInstance().getSearchQueryItem("type"));
+        siteLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+            LogPeer.CENTER.getName()));
+        userLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+            LogPeer.USERNAME.getName()));
+        actionLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+            LogPeer.ACTION.getName()));
+        typeLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+            LogPeer.TYPE.getName()));
         startDateLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-            "startDate"));
+            LogQuery.START_DATE_KEY));
         endDateLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-            "endDate"));
+            LogQuery.END_DATE_KEY));
         patientNumLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-            "patientNumber"));
+            LogPeer.PATIENT_NUMBER.getName()));
         inventoryIDLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-            "inventoryId"));
+            LogPeer.INVENTORY_ID.getName()));
         locationLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-            "location"));
-
+            LogPeer.LOCATION_LABEL.getName()));
         detailsLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-            "details"));
+            LogPeer.DETAILS.getName()));
         /*
          * containerTypeLabel = createReadOnlyLabelledField(client, SWT.NONE,
          * "Container Type"); containerLabelLabel

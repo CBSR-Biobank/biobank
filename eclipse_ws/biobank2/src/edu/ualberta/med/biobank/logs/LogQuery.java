@@ -7,6 +7,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.LogPeer;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 
 public class LogQuery {
@@ -16,21 +17,27 @@ public class LogQuery {
     private static HashMap<String, String> searchQuery = new HashMap<String, String>();
     private static List<LogWrapper> dbResults = new ArrayList<LogWrapper>();
 
+    public static final String START_DATE_KEY = "startDate";
+    public static final String END_DATE_KEY = "endDate";
+
+    private static final String NONE = "NONE";
+    private static final String ALL = "ALL";
+
     protected LogQuery() {
         /* Define all the keys to be used here */
         // searchQuery.put("containerType", "");
         // searchQuery.put("containerLabel", "");
 
-        searchQuery.put("site", "");
-        searchQuery.put("user", "");
-        searchQuery.put("type", "");
-        searchQuery.put("action", "");
-        searchQuery.put("patientNumber", "");
-        searchQuery.put("inventoryId", "");
-        searchQuery.put("location", "");
-        searchQuery.put("details", "");
-        searchQuery.put("startDate", "");
-        searchQuery.put("endDate", "");
+        searchQuery.put(LogPeer.CENTER.getName(), "");
+        searchQuery.put(LogPeer.USERNAME.getName(), "");
+        searchQuery.put(LogPeer.TYPE.getName(), "");
+        searchQuery.put(LogPeer.ACTION.getName(), "");
+        searchQuery.put(LogPeer.PATIENT_NUMBER.getName(), "");
+        searchQuery.put(LogPeer.INVENTORY_ID.getName(), "");
+        searchQuery.put(LogPeer.LOCATION_LABEL.getName(), "");
+        searchQuery.put(LogPeer.DETAILS.getName(), "");
+        searchQuery.put(START_DATE_KEY, "");
+        searchQuery.put(END_DATE_KEY, "");
         dbResults.clear();
     }
 
@@ -45,76 +52,75 @@ public class LogQuery {
         return dbResults;
     }
 
-    public boolean queryDatabase() {
-        try {
-            String site = searchQuery.get("site");
-            site = site.equals("NONE") ? "" : site;
-            site = site.equals("ALL") ? null : site;
+    public void queryDatabase() throws Exception {
+        String center = searchQuery.get(LogPeer.CENTER.getName());
+        center = getValueForNoneAll(center);
 
-            String user = searchQuery.get("user");
-            user = user.equals("NONE") ? "" : user;
-            user = user.equals("ALL") ? null : user;
+        String user = searchQuery.get(LogPeer.USERNAME.getName());
+        user = getValueForNoneAll(user);
 
-            String action = searchQuery.get("action");
-            action = action.equals("NONE") ? "" : action;
-            action = action.equals("ALL") ? null : action;
+        String action = searchQuery.get(LogPeer.ACTION.getName());
+        action = getValueForNoneAll(action);
 
-            String type = searchQuery.get("type");
-            type = type.equals("NONE") ? "" : type;
-            type = type.equals("ALL") ? null : type;
+        String type = searchQuery.get(LogPeer.TYPE.getName());
+        type = getValueForNoneAll(type);
 
-            String patientNumber = searchQuery.get("patientNumber");
-            patientNumber = patientNumber.equals("") ? null : patientNumber;
+        String patientNumber = searchQuery
+            .get(LogPeer.PATIENT_NUMBER.getName());
+        patientNumber = setValueIfEmpty(patientNumber);
 
-            String inventoryId = searchQuery.get("inventoryId");
-            inventoryId = inventoryId.equals("") ? null : inventoryId;
+        String inventoryId = searchQuery.get(LogPeer.INVENTORY_ID.getName());
+        inventoryId = setValueIfEmpty(inventoryId);
 
-            String details = searchQuery.get("details");
-            details = details.equals("") ? null : details;
+        String details = searchQuery.get(LogPeer.DETAILS.getName());
+        details = setValueIfEmpty(details);
 
-            String location = searchQuery.get("location");
-            location = location.equals("") ? null : location;
+        String location = searchQuery.get(LogPeer.LOCATION_LABEL.getName());
+        location = setValueIfEmpty(location);
 
-            String startDateText = searchQuery.get("startDate");
-            startDateText = startDateText.equals("") ? null : startDateText;
+        String startDateText = searchQuery.get(START_DATE_KEY);
+        startDateText = setValueIfEmpty(startDateText);
+        // set the time on end date to midnight (00:00 AM)
+        Date startDate = formatDate(startDateText, "00:00");
 
-            String endDateText = searchQuery.get("endDate");
-            endDateText = endDateText.equals("") ? null : endDateText;
+        String endDateText = searchQuery.get(END_DATE_KEY);
+        endDateText = setValueIfEmpty(endDateText);
+        // set the time on end date to 11:59 PM
+        Date endDate = formatDate(endDateText, "23:59");
 
-            Date startDate = null;
+        dbResults = LogWrapper.getLogs(SessionManager.getAppService(), center,
+            user, startDate, endDate, action, patientNumber, inventoryId,
+            location, details, type);
+    }
 
-            if (startDateText != null) {
-                // set the time on end date to midnight (00:00 AM)
-                startDate = DateFormatter.parseToDateTime(startDateText
-                    + " 00:00");
-            }
-
-            Date endDate = null;
-
-            if (endDateText != null) {
-                // set the time on end date to 11:59 PM
-                endDate = DateFormatter.parseToDateTime(endDateText + " 23:59");
-            }
-
-            dbResults = LogWrapper.getLogs(SessionManager.getAppService(),
-                site, user, startDate, endDate, action, patientNumber,
-                inventoryId, location, details, type);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+    private Date formatDate(String dateText, String time) {
+        Date date = null;
+        if (dateText != null) {
+            date = DateFormatter.parseToDateTime(dateText + " " + time);
         }
-        return true;
+        return date;
+    }
+
+    private String setValueIfEmpty(String value) {
+        if ("".equals(value))
+            return null;
+        return value;
+    }
+
+    private String getValueForNoneAll(String value) {
+        if (value.equals(NONE))
+            return "";
+        if (value.equals(ALL))
+            return null;
+        return value;
     }
 
     public String getSearchQueryItem(String key) throws Exception {
         String value = searchQuery.get(key);
-
         if (value == null) {
-            System.err.printf("Searcg Query key: %s does not exist.", value);
-            throw new NullPointerException();
+            throw new NullPointerException("Search Query key: " + value
+                + " does not exist.");
         }
-
         return value;
 
     }

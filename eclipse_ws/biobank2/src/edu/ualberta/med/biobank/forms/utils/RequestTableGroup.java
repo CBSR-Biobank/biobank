@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
@@ -21,6 +22,9 @@ import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class RequestTableGroup implements Node {
+
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(RequestTableGroup.class.getName());
 
     private Integer numAliquots = 0;
     private RequestSpecimenState state;
@@ -69,8 +73,7 @@ public class RequestTableGroup implements Node {
         try {
             results = SessionManager.getAppService().query(query);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("error in query", e);
         }
 
         HashSet<Integer> containers = new HashSet<Integer>();

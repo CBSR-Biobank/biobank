@@ -134,14 +134,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         widgetCreator.setSelectionListener(selectionListener);
     }
 
-    public void formClosed() {
-        try {
-            if ((adapter != null) && (adapter.getModelObject() != null)) {
-                adapter.getModelObject().reload();
-            }
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+    public void formClosed() throws Exception {
+        if ((adapter != null) && (adapter.getModelObject() != null)) {
+            adapter.getModelObject().reload();
         }
         SessionManager.updateAdapterTreeNode(adapter);
     }

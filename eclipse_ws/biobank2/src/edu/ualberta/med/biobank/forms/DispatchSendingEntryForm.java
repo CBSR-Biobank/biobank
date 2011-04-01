@@ -152,13 +152,11 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     }
 
     @Override
-    public void formClosed() {
-        try {
-            reset();
-        } catch (Exception e) {
-            // TODO: how to handle?
-            e.printStackTrace();
-        }
+    public void formClosed() throws Exception {
+        // FIXME why formClosed is overridden ? reload is already done in
+        // default
+        // method
+        reset();
     }
 
     private void createAliquotsSelectionSection() {

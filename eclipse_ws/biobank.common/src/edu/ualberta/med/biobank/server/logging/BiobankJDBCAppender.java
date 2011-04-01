@@ -64,7 +64,6 @@ public class BiobankJDBCAppender extends AppenderSkeleton {
         try {
             log = populateObjectStateLogMesage(msg);
         } catch (Exception ex) {
-            ex.printStackTrace();
             ExceptionUtils.writeMsgToTmpFile(ex);
         }
         if (log != null) {

@@ -69,9 +69,14 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
                     queryMap.put(handle, new QueryProcess(
                         qhr.getQueryCommand(), qhr.getAppService()));
                 } catch (DataAccessResourceFailureException e) {
-                    e.printStackTrace();
+                    log.error(
+                        "DataAccessResourceFailureException in ORMDAOImpl ", e);
+                    throw new DAOException(
+                        "DataAccessResourceFailureException in ORMDAOImpl ", e);
                 } catch (IllegalStateException e) {
-                    e.printStackTrace();
+                    log.error("IllegalStateException in ORMDAOImpl ", e);
+                    throw new DAOException(
+                        "IllegalStateException in ORMDAOImpl ", e);
                 }
                 return new Response(handle);
             } else if (qhr.getCommandType().equals(CommandType.STOP)) {
