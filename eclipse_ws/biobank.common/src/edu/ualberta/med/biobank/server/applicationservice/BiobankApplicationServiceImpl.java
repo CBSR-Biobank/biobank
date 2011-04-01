@@ -52,7 +52,7 @@ public class BiobankApplicationServiceImpl extends
         throws Exception {
         Log log = new Log();
         log.setAction(action);
-        log.setSite(site);
+        log.setCenter(site);
         log.setPatientNumber(patientNumber);
         log.setInventoryId(inventoryID);
         log.setLocationLabel(locationLabel);
@@ -61,6 +61,9 @@ public class BiobankApplicationServiceImpl extends
         logActivity(log);
     }
 
+    /**
+     * See log4j.xml: it should contain the Biobank.Activity appender
+     */
     @Override
     public void logActivity(Log log) throws Exception {
         Logger logger = Logger.getLogger("Biobank.Activity");

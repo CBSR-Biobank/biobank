@@ -79,6 +79,7 @@ public class DispatchViewForm extends BiobankViewForm {
 
         dispatchAdapter = (DispatchAdapter) adapter;
         dispatch = (DispatchWrapper) adapter.getModelObject();
+        SessionManager.logLookup(dispatch);
         retrieveDispatch();
         setPartName("Dispatch");
     }

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.server.logging;
 
+import edu.ualberta.med.biobank.common.peer.LogPeer;
 import edu.ualberta.med.biobank.model.Log;
 
 public class MessageGenerator {
@@ -7,30 +8,20 @@ public class MessageGenerator {
     public static String generateStringMessage(String action, String site,
         String patientNumber, String inventoryID, String locationLabel,
         String details, String type) {
-
         StringBuffer sb = new StringBuffer();
-        append(sb, LogProperty.ACTION.getPropertyName(), action);
-        append(sb, LogProperty.SITE.getPropertyName(), site);
-        append(sb, LogProperty.PATIENT_NUMBER.getPropertyName(), patientNumber);
-        append(sb, LogProperty.INVENTORY_ID.getPropertyName(), inventoryID);
-        append(sb, LogProperty.LOCATION_LABEL.getPropertyName(), locationLabel);
-        append(sb, LogProperty.DETAILS.getPropertyName(), details);
-        append(sb, LogProperty.TYPE.getPropertyName(), type);
+        append(sb, LogPeer.ACTION.getName(), action);
+        append(sb, LogPeer.CENTER.getName(), site);
+        append(sb, LogPeer.PATIENT_NUMBER.getName(), patientNumber);
+        append(sb, LogPeer.INVENTORY_ID.getName(), inventoryID);
+        append(sb, LogPeer.LOCATION_LABEL.getName(), locationLabel);
+        append(sb, LogPeer.DETAILS.getName(), details);
+        append(sb, LogPeer.TYPE.getName(), type);
         return sb.toString();
     }
 
     public static String generateStringMessage(Log log) {
-        StringBuffer sb = new StringBuffer();
-        append(sb, LogProperty.ACTION.getPropertyName(), log.action);
-        append(sb, LogProperty.SITE.getPropertyName(), log.site);
-        append(sb, LogProperty.PATIENT_NUMBER.getPropertyName(),
-            log.patientNumber);
-        append(sb, LogProperty.INVENTORY_ID.getPropertyName(), log.inventoryId);
-        append(sb, LogProperty.LOCATION_LABEL.getPropertyName(),
-            log.locationLabel);
-        append(sb, LogProperty.DETAILS.getPropertyName(), log.details);
-        append(sb, LogProperty.TYPE.getPropertyName(), log.type);
-        return sb.toString();
+        return generateStringMessage(log.action, log.center, log.patientNumber,
+            log.inventoryId, log.locationLabel, log.details, log.type);
     }
 
     private static void append(StringBuffer sb, String property, String value) {

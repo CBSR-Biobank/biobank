@@ -421,6 +421,9 @@ update collection_event ce
            if(@pp := ce.patient_id, @pv := 1, @pv := 1), @pv := @pv + 1)
        order by patient_id, pv_date_drawn;
 
+ALTER TABLE collection_event
+  ADD CONSTRAINT uc_visit_number UNIQUE (VISIT_NUMBER,PATIENT_ID);
+
 -- set specimen.original_collection_event_id for source specimens
 
 update specimen,collection_event as ce
@@ -654,6 +657,13 @@ UPDATE abstract_position ap, container c, container_type ct
        WHERE ap.container_id = c.id AND ap.discriminator = 'AliquotPosition'
        AND c.container_type_id = ct.id and ct.child_labeling_scheme_id = 5;
 
+
+/*****************************************************
+ * log
+ ****************************************************/
+
+alter table log
+      change column SITE CENTER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT '';
 
 /*****************************************************
  * advanced reports
