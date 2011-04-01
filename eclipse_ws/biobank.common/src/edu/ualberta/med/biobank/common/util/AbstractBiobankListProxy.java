@@ -83,20 +83,21 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public E get(int index) {
         init();
         Assert.isTrue(index >= 0);
         updateListChunk(index);
         if (listChunk.size() > 0 && listChunk.size() > index - offset)
-            return (E) getRowObject(listChunk.get(index - offset));
+            return getRowObject((E) listChunk.get(index - offset));
         else
             return null;
     }
 
     private void updateListChunk(int index) {
         if (index - offset >= pageSize || index < offset) {
-            if (index < loadedOffset + pageSize) {
+            if (index < loadedOffset + pageSize && index >= loadedOffset) {
                 // swap
                 if (semaphore.availablePermits() == 0) {
                     if (listener != null)
@@ -172,7 +173,7 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
 
     @Override
     public Iterator<E> iterator() {
-        return (Iterator<E>) new AbstractBiobankListProxyIterator(this);
+        return new AbstractBiobankListProxyIterator<E>(this);
     }
 
     @Override
@@ -224,6 +225,7 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
         return realSize;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
         init();
@@ -233,7 +235,7 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
         List<E> subList = new ArrayList<E>();
         for (Object o : listChunk.subList(fromIndex - offset,
             Math.min(listChunk.size(), toIndex - offset))) {
-            subList.add((E) getRowObject(o));
+            subList.add(getRowObject((E) o));
         }
         if (offset + pageSize < toIndex && listChunk.size() == pageSize) {
             subList.addAll(subList(offset + pageSize, toIndex));
@@ -241,7 +243,7 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
         return subList;
     }
 
-    protected Object getRowObject(Object object) {
+    protected E getRowObject(E object) {
         return object;
     }
 
@@ -278,7 +280,7 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
         this.listener = l;
     }
 
-    public AbstractBiobankListProxy init() {
+    public AbstractBiobankListProxy<?> init() {
         if (listChunk == null) {
             updateListChunk(-1);
         }

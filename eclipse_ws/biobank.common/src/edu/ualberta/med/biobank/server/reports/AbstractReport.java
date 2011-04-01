@@ -70,7 +70,8 @@ public class AbstractReport {
             queryString = queryString.replaceAll(CONTAINER_LIST_SEARCH_STRING,
                 report.getContainerList());
         HQLCriteria criteria = new HQLCriteria(queryString, report.getParams());
-        return new PostProcessListProxy(appService, criteria, getRowPostProcess());
+        return new PostProcessListProxy<Object>(appService, criteria,
+            getRowPostProcess());
     }
 
     /**

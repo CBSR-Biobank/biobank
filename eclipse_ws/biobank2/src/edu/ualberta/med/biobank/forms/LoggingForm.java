@@ -104,7 +104,7 @@ public class LoggingForm extends BiobankViewForm {
     }
 
     private void getSearchRequestFields() throws Exception {
-        siteLabel.setText(LogQuery.getInstance().getSearchQueryItem("site"));
+        siteLabel.setText(LogQuery.getInstance().getSearchQueryItem("center"));
         userLabel.setText(LogQuery.getInstance().getSearchQueryItem("user"));
         actionLabel
             .setText(LogQuery.getInstance().getSearchQueryItem("action"));

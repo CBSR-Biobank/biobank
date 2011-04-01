@@ -111,7 +111,7 @@ public class LogQuery {
         String value = searchQuery.get(key);
 
         if (value == null) {
-            System.err.printf("Searcg Query key: %s does not exist.", value);
+            System.err.printf("Search Query key: %s does not exist.", value);
             throw new NullPointerException();
         }
 

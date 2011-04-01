@@ -26,6 +26,7 @@ public class RequestSpecimenWrapper extends RequestSpecimenBaseWrapper
         return super.compareTo(object);
     }
 
+    @Override
     public String getStateDescription() {
         return RequestSpecimenState.getState(getState()).getLabel();
     }

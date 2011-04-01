@@ -31,7 +31,7 @@ public class LogWrapper extends LogBaseWrapper {
         final WritableApplicationService appService, String center,
         String username, Date startDate, Date endDate, String action,
         String patientNumber, String inventoryId, String locationLabel,
-        String details, String type) throws Exception {
+        String details, String type) {
         StringBuffer parametersString = new StringBuffer();
         List<Object> parametersArgs = new ArrayList<Object>();
         addParam(parametersString, parametersArgs, LogPeer.USERNAME.getName(),
@@ -79,8 +79,8 @@ public class LogWrapper extends LogBaseWrapper {
         if (parametersString.length() > 0) {
             qry.append(" where").append(parametersString.toString());
         }
-        List<LogWrapper> logs = new PostProcessListProxy(appService,
-            new HQLCriteria(qry.toString(), parametersArgs),
+        List<LogWrapper> logs = new PostProcessListProxy<LogWrapper>(
+            appService, new HQLCriteria(qry.toString(), parametersArgs),
             new AbstractRowPostProcess() {
                 private static final long serialVersionUID = 1L;
 
