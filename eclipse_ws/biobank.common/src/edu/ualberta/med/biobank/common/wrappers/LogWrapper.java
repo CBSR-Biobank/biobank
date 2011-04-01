@@ -121,13 +121,13 @@ public class LogWrapper extends LogBaseWrapper {
         }
     }
 
-    public static final String POSSIBLE_SITES_QRY = "select distinct("
+    public static final String POSSIBLE_CENTERS_QRY = "select distinct("
         + LogPeer.CENTER.getName() + ") from " + Log.class.getName()
         + " where " + LogPeer.CENTER.getName() + "!=''";
 
     public static List<String> getPossibleSites(
         WritableApplicationService appService) throws ApplicationException {
-        return appService.query(new HQLCriteria(POSSIBLE_SITES_QRY));
+        return appService.query(new HQLCriteria(POSSIBLE_CENTERS_QRY));
     }
 
     public static final String POSSIBLE_USER_NAMES_QRY = "select distinct("
@@ -139,7 +139,7 @@ public class LogWrapper extends LogBaseWrapper {
     }
 
     public static final String POSSIBLE_ACTIONS_QRY = "select distinct("
-        + LogPeer.ACTION.getName() + " from " + Log.class.getName();
+        + LogPeer.ACTION.getName() + ") from " + Log.class.getName();
 
     public static List<String> getPossibleActions(
         WritableApplicationService appService) throws ApplicationException {
@@ -147,7 +147,7 @@ public class LogWrapper extends LogBaseWrapper {
     }
 
     public static final String POSSIBLE_TYPES_QRY = "select distinct("
-        + LogPeer.TYPE.getName() + " from " + Log.class.getName()
+        + LogPeer.TYPE.getName() + ") from " + Log.class.getName()
         + " where type !=''";
 
     public static List<String> getPossibleTypes(
