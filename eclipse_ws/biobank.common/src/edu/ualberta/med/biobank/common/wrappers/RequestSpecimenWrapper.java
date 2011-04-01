@@ -5,7 +5,8 @@ import edu.ualberta.med.biobank.common.wrappers.base.RequestSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class RequestSpecimenWrapper extends RequestSpecimenBaseWrapper {
+public class RequestSpecimenWrapper extends RequestSpecimenBaseWrapper
+    implements ItemWrapper {
 
     public RequestSpecimenWrapper(WritableApplicationService appService) {
         super(appService);
@@ -25,6 +26,7 @@ public class RequestSpecimenWrapper extends RequestSpecimenBaseWrapper {
         return super.compareTo(object);
     }
 
+    @Override
     public String getStateDescription() {
         return RequestSpecimenState.getState(getState()).getLabel();
     }

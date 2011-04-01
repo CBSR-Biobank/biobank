@@ -13,37 +13,19 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class AliquotRequestImpl extends AbstractReport {
-    private enum RowSource {
-        HIBERNATE, FAKE;
-    }
-
-    private static class ResultRow {
-        public final RowSource type;
-        public final Object data;
-
-        public ResultRow(RowSource type, Object data) {
-            this.type = type;
-            this.data = data;
-        }
-    }
-
-    // pull all collection events of (source) specimens with a created at date
-    // of the given date and then pull all specimens of those C.E.'s
 
     // TODO: switch to CollectionEvent.visitNumber?
 
-    private static final String QUERY = "SELECT DISTINCT s.createdAt, alq"
+    private static final String QUERY = "SELECT s"
         + (" FROM " + Specimen.class.getName() + " s ")
-        + " JOIN s.collectionEvent ce"
-        + " JOIN ce.allSpecimenCollection alq"
-        + " WHERE s.parentSpecimen is null" // source specimens only
-        + ("    and alq.specimenPosition.container.label not like '"
+        + " WHERE s.parentSpecimen is not null" // "aliquots" only
+        + ("    and s.specimenPosition.container.label not like '"
             + SENT_SAMPLES_FREEZER_NAME + "'")
-        + "     and ce.patient.pnumber = ?"
-        + "     and datediff(s.createdAt, ?) = 0"
-        + "     and alq.specimenType.nameShort like ?"
-        + "     and alq.activityStatus.name != 'Closed'"
-        + " ORDER BY alq.activityStatus.name, RAND()";
+        + "     and s.collectionEvent.patient.pnumber = ?"
+        + "     and datediff(s.topSpecimen.createdAt, ?) = 0"
+        + "     and s.specimenType.nameShort like ?"
+        + "     and s.activityStatus.name != 'Closed'"
+        + " ORDER BY s.activityStatus.name, RAND()";
 
     public AliquotRequestImpl(BiobankReport report) {
         super(QUERY, report);
@@ -67,15 +49,12 @@ public class AliquotRequestImpl extends AbstractReport {
             long maxResults = request.getMaxAliquots();
             for (int j = 0; j < maxResults; j++) {
                 if (j < queried.size())
-                    results.add(new ResultRow(RowSource.HIBERNATE, queried
-                        .get(j)));
+                    results.add(queried.get(j));
             }
             if (queried.size() < maxResults) {
-                Object[] data = getNotFoundRow(request.getPnumber(),
+                results.add(getNotFoundRow(request.getPnumber(),
                     request.getDateDrawn(), request.getSpecimenTypeNameShort(),
-                    maxResults, queried.size());
-                ResultRow row = new ResultRow(RowSource.FAKE, data);
-                results.add(row);
+                    maxResults, queried.size()));
             }
         }
         return results;
@@ -94,24 +73,21 @@ public class AliquotRequestImpl extends AbstractReport {
         List<Object> results) {
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
         for (Object result : results) {
-            ResultRow row = (ResultRow) result;
-            if (row.type == RowSource.FAKE) {
-                modifiedResults.add(row.data);
-            } else {
-                Object[] hibernateRow = (Object[]) row.data;
-
-                Date dateDrawn = (Date) hibernateRow[0];
-                Specimen specimen = (Specimen) hibernateRow[1];
+            if (result instanceof Specimen) {
+                Specimen specimen = (Specimen) result;
 
                 String pnumber = specimen.getCollectionEvent().getPatient()
                     .getPnumber();
                 String inventoryId = specimen.getInventoryId();
+                Date dateDrawn = specimen.getTopSpecimen().getCreatedAt();
                 String specimenType = specimen.getSpecimenType().getNameShort();
                 String positionString = specimen.getSpecimenPosition()
                     .getPositionString();
                 String activityStatus = specimen.getActivityStatus().getName();
                 modifiedResults.add(new Object[] { pnumber, inventoryId,
                     dateDrawn, specimenType, positionString, activityStatus });
+            } else if (result instanceof Object[]) {
+                modifiedResults.add(result);
             }
         }
 

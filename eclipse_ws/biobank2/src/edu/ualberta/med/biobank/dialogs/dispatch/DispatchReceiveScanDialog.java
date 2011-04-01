@@ -223,7 +223,7 @@ public class DispatchReceiveScanDialog extends
         if ((currentShipment).getSpecimenCollection().size() > 0) {
             int i = 0;
             for (DispatchSpecimenWrapper dsa : (currentShipment)
-                .getDispatchSpecimenCollection()) {
+                .getDispatchSpecimenCollection(false)) {
                 int row = i / 12;
                 int col = i % 12;
                 if (!DispatchSpecimenState.MISSING.isEquals(dsa.getState()))

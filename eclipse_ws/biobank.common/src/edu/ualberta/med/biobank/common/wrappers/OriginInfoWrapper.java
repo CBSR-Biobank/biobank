@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -171,5 +172,21 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         if (getCenter() != null)
             return Arrays.asList(getCenter());
         return super.getSecuritySpecificCenters();
+    }
+
+    @Override
+    protected Log getLogMessage(String action, String site, String details) {
+        Log log = new Log();
+        log.setAction(action);
+        if (site == null) {
+            log.setCenter(getCenter().getNameShort());
+        } else {
+            log.setCenter(site);
+        }
+        details += "Waybill:" + this.getShipmentInfo().getWaybill();
+        details += " - Specimens:" + getSpecimenCollection(false).size();
+        log.setDetails(details);
+        log.setType("Shipment");
+        return log;
     }
 }

@@ -37,11 +37,16 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.ModifyStateDispatchDialog;
 import edu.ualberta.med.biobank.forms.utils.DispatchTableGroup;
+import edu.ualberta.med.biobank.forms.utils.TableGroup;
+import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
+import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 
 public class DispatchAliquotsTreeTable extends BiobankWidget {
 
     private TreeViewer tv;
     private DispatchWrapper shipment;
+    protected List<DispatchTableGroup> groups;
 
     public DispatchAliquotsTreeTable(Composite parent,
         final DispatchWrapper shipment, final boolean editAliquotsState,
@@ -90,33 +95,28 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
+                groups = DispatchTableGroup
+                    .getGroupsForShipment(DispatchAliquotsTreeTable.this.shipment);
             }
 
             @Override
             public Object[] getElements(Object inputElement) {
-                return DispatchTableGroup.getGroupsForShipment(shipment)
-                    .toArray();
+                return groups.toArray();
             }
 
             @Override
             public Object[] getChildren(Object parentElement) {
-                if (parentElement instanceof DispatchTableGroup)
-                    return ((DispatchTableGroup) parentElement).getChildren(
-                        shipment).toArray();
-                return null;
+                return ((Node) parentElement).getChildren().toArray();
             }
 
             @Override
             public Object getParent(Object element) {
-                if (element instanceof DispatchSpecimenWrapper)
-                    return DispatchTableGroup
-                        .findParent((DispatchSpecimenWrapper) element);
-                return null;
+                return ((Node) element).getParent();
             }
 
             @Override
             public boolean hasChildren(Object element) {
-                return element instanceof DispatchTableGroup;
+                return ((Node) element).getChildren().size() != 0;
             }
         };
         tv.setContentProvider(contentProvider);
@@ -124,13 +124,20 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
         final BiobankLabelProvider labelProvider = new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                if (element instanceof DispatchTableGroup) {
+                if (element instanceof TableGroup) {
                     if (columnIndex == 0)
-                        return ((DispatchTableGroup) element)
-                            .getTitle(shipment);
+                        return ((TableGroup<?>) element).getTitle();
                     return "";
+                } else if (element instanceof RequestContainerAdapter) {
+                    if (columnIndex == 0)
+                        return ((RequestContainerAdapter) element)
+                            .getLabelInternal();
+                    return "";
+                } else if (element instanceof TreeItemAdapter) {
+                    return ((TreeItemAdapter) element)
+                        .getColumnText(columnIndex);
                 }
-                return super.getColumnText(element, columnIndex);
+                return "";
             }
         };
         tv.setLabelProvider(labelProvider);
@@ -176,8 +183,9 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
         IStructuredSelection selection = (IStructuredSelection) tv
             .getSelection();
         if (selection != null && selection.size() > 0
-            && selection.getFirstElement() instanceof DispatchSpecimenWrapper) {
-            return (DispatchSpecimenWrapper) selection.getFirstElement();
+            && selection.getFirstElement() instanceof TreeItemAdapter) {
+            return (DispatchSpecimenWrapper) ((TreeItemAdapter) selection
+                .getFirstElement()).getSpecimen();
         }
         return null;
     }
@@ -219,8 +227,8 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
             String comment = dialog.getComment();
             for (Iterator<?> iter = iStructuredSelection.iterator(); iter
                 .hasNext();) {
-                DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) iter
-                    .next();
+                DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) ((TreeItemAdapter) iter
+                    .next()).getSpecimen();
                 dsa.setComment(comment);
                 if (newState != null) {
                     dsa.setDispatchSpecimenState(newState);
@@ -233,7 +241,7 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
     }
 
     public void refresh() {
-        tv.refresh();
+        tv.setInput("refresh");
     }
 
     private void addClipboardCopySupport(Menu menu,

@@ -27,7 +27,7 @@ public class LoggingForm extends BiobankViewForm {
     private BiobankText startDateLabel;
     private BiobankText endDateLabel;
 
-    private BiobankText siteLabel;
+    private BiobankText centerLabel;
 
     // private BiobankText containerTypeLabel;
     // private BiobankText containerLabelLabel;
@@ -67,7 +67,7 @@ public class LoggingForm extends BiobankViewForm {
         toolkit.paintBordersFor(rightClient);
 
         /* a grid might make this easier */
-        siteLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "Center");
+        centerLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "Center");
         userLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "User");
         typeLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "Type");
         actionLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
@@ -104,7 +104,7 @@ public class LoggingForm extends BiobankViewForm {
     }
 
     private void getSearchRequestFields() throws Exception {
-        siteLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+        centerLabel.setText(LogQuery.getInstance().getSearchQueryItem(
             LogPeer.CENTER.getName()));
         userLabel.setText(LogQuery.getInstance().getSearchQueryItem(
             LogPeer.USERNAME.getName()));

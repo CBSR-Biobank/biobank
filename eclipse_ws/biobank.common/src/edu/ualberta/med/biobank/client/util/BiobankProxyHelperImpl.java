@@ -17,7 +17,8 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
     @Override
     public Object convertToProxy(ApplicationService as, Object obj) {
         if (obj instanceof AbstractBiobankListProxy) {
-            return convertListProxyToProxy(as, (AbstractBiobankListProxy) obj);
+            return convertListProxyToProxy(as,
+                (AbstractBiobankListProxy<?>) obj);
         }
         if (obj instanceof NotAProxy) {
             return obj;
@@ -35,7 +36,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
     }
 
     private Object convertListProxyToProxy(ApplicationService as,
-        AbstractBiobankListProxy proxy) {
+        AbstractBiobankListProxy<?> proxy) {
         proxy.setAppService(as);
         // We don't convert the chunk: it is suppose to contain only simple
         // object, no model objects
@@ -79,7 +80,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
 
             // Add this part for our own ListProxy
             if (obj instanceof AbstractBiobankListProxy)
-                ((AbstractBiobankListProxy) obj).setAppService(as);
+                ((AbstractBiobankListProxy<?>) obj).setAppService(as);
 
             if (!field.getType().getName()
                 .equalsIgnoreCase("java.util.Collection")) {

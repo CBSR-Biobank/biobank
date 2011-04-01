@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 
-// FIXME: see below for commented out code
 public class ShipmentViewForm extends BiobankViewForm {
 
     private static BiobankLogger logger = BiobankLogger

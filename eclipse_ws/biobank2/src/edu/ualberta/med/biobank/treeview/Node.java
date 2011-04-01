@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface Node {
 
-    public List<Object> getChildren();
+    public List<Node> getChildren();
 
     public Object getParent();
 

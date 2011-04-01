@@ -130,21 +130,24 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     @Override
     protected Log getLogMessage(String action, String site, String details) {
-        // FIXME: what should be logged here
         Log log = new Log();
-        // log.setAction(action);
-        // if (site == null) {
-        // log.setSite(getSourceCenter().getNameShort());
-        // } else {
-        // log.setSite(site);
-        // }
-        // details += "Received:" + getFormattedDateReceived();
-        // String waybill = getWaybill();
-        // if (waybill != null) {
-        // details += " - Waybill:" + waybill;
-        // }
-        // log.setDetails(details);
-        // log.setType("Shipment");
+        log.setAction(action);
+        if (site == null) {
+            log.setCenter(null);
+        } else {
+            log.setCenter(site);
+        }
+        log.setPatientNumber(getPatient().getPnumber());
+        details += "Visit:" + getVisitNumber();
+        try {
+            details += " - Collected:" + getSourceSpecimensCount(false);
+        } catch (BiobankException e) {
+            e.printStackTrace();
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+        }
+        log.setDetails(details);
+        log.setType("CollectionEvent");
         return log;
     }
 

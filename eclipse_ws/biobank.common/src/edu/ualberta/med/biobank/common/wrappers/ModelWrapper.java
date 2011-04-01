@@ -953,7 +953,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         propertyMap.put(property, value);
     }
 
-    private boolean isCached(Property<?, ?> property) {
+    protected boolean isCached(Property<?, ?> property) {
         return propertyMap.containsKey(property);
     }
 

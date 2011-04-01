@@ -14,7 +14,7 @@ public enum RequestState {
 
     public static RequestState getState(Integer state) {
         if (state == null)
-            return NEW;
+            return values()[0];
         for (RequestState dss : values()) {
             if (dss.getId().equals(state))
                 return dss;

@@ -8,8 +8,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 import java.io.Serializable;
 import java.util.List;
 
-public class HQLCriteriaListProxy extends AbstractBiobankListProxy implements
-    Serializable {
+public class HQLCriteriaListProxy<E> extends AbstractBiobankListProxy<E>
+    implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

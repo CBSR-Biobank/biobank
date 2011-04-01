@@ -5,75 +5,57 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.regex.Pattern;
 
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPath;
+import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
-import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.RequestAliquotAdapter;
+import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class RequestTableGroup implements Node {
+public class RequestTableGroup extends TableGroup<RequestWrapper> {
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(RequestTableGroup.class.getName());
-
-    private Integer numAliquots = 0;
-    private RequestSpecimenState state;
-    private List<Object> tops;
-    private static final Pattern p = Pattern.compile("/");
-    private Object parent = null;
-
-    private RequestTableGroup(RequestSpecimenState state, RequestWrapper request) {
-        this.state = state;
-        getAdapterTree(state.getId(), request);
-    }
-
-    @Override
-    public String toString() {
-        return state.getLabel();
-    }
-
-    public String getTitle() {
-        return state.getLabel() + " (" + numAliquots + ")";
+    public RequestTableGroup(RequestSpecimenState ds, RequestWrapper dispatch) {
+        super(ds, dispatch);
     }
 
     public static List<RequestTableGroup> getGroupsForShipment(
         RequestWrapper ship) {
         List<RequestTableGroup> groups = new ArrayList<RequestTableGroup>();
-        groups.add(new RequestTableGroup(RequestSpecimenState.PROCESSED_STATE,
-            ship));
         groups.add(new RequestTableGroup(
             RequestSpecimenState.NONPROCESSED_STATE, ship));
+        groups.add(new RequestTableGroup(RequestSpecimenState.PROCESSED_STATE,
+            ship));
         groups.add(new RequestTableGroup(
             RequestSpecimenState.UNAVAILABLE_STATE, ship));
         return groups;
     }
 
-    public void getAdapterTree(Integer state, RequestWrapper request) {
+    @Override
+    public void createAdapterTree(Integer state, RequestWrapper request) {
         List<Object[]> results = new ArrayList<Object[]>();
         // test hql
         HQLCriteria query = new HQLCriteria(
             "select ra, cp.container, cp.path from "
-                + RequestSpecimen.class.getName()
-                + " ra inner join fetch ra.aliquot inner join fetch ra.aliquot.sampleType, "
+                + Request.class.getName()
+                + " ra inner join fetch ra.specimen inner join fetch ra.specimen.specimenType, "
                 + ContainerPath.class.getName()
                 + " cp where ra.request ="
                 + request.getId()
-                + " and ra.aliquot.aliquotPosition.container=cp.container and ra.state=?",
+                + " and ra.specimen.specimenPosition.container=cp.container and ra.state=?",
             Arrays.asList(new Object[] { state }));
         try {
             results = SessionManager.getAppService().query(query);
         } catch (Exception e) {
-            logger.error("error in query", e);
+            BiobankPlugin.openAsyncError("Error",
+                "Unable to retrieve data from server");
         }
 
         HashSet<Integer> containers = new HashSet<Integer>();
@@ -105,22 +87,13 @@ public class RequestTableGroup implements Node {
                 }
             }
             adapters.get(Integer.parseInt(cIds[i - 1])).addChild(
-                new RequestAliquotAdapter(adapters.get(Integer
-                    .parseInt(cIds[i - 1])), new RequestSpecimenWrapper(
-                    SessionManager.getAppService(), ra)));
+                new TreeItemAdapter(
+                    adapters.get(Integer.parseInt(cIds[i - 1])),
+                    new RequestSpecimenWrapper(SessionManager.getAppService(),
+                        ra)));
             numAliquots++;
         }
 
-        this.tops = tops;
-    }
-
-    @Override
-    public List<Object> getChildren() {
-        return tops;
-    }
-
-    @Override
-    public Object getParent() {
-        return parent;
+        // this.tops = tops;
     }
 }

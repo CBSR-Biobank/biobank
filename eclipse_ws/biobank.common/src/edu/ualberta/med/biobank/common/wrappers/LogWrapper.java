@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.peer.LogPeer;
+import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
+import edu.ualberta.med.biobank.common.util.PostProcessListProxy;
 import edu.ualberta.med.biobank.common.wrappers.base.LogBaseWrapper;
 import edu.ualberta.med.biobank.model.Log;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -26,10 +28,10 @@ public class LogWrapper extends LogBaseWrapper {
     }
 
     public static List<LogWrapper> getLogs(
-        WritableApplicationService appService, String site, String username,
-        Date startDate, Date endDate, String action, String patientNumber,
-        String inventoryId, String locationLabel, String details, String type)
-        throws Exception {
+        final WritableApplicationService appService, String center,
+        String username, Date startDate, Date endDate, String action,
+        String patientNumber, String inventoryId, String locationLabel,
+        String details, String type) {
         StringBuffer parametersString = new StringBuffer();
         List<Object> parametersArgs = new ArrayList<Object>();
         addParam(parametersString, parametersArgs, LogPeer.USERNAME.getName(),
@@ -60,7 +62,7 @@ public class LogWrapper extends LogBaseWrapper {
         }
 
         addParam(parametersString, parametersArgs, LogPeer.CENTER.getName(),
-            site, true);
+            center, true);
         addParam(parametersString, parametersArgs, LogPeer.ACTION.getName(),
             action, true);
         addParam(parametersString, parametersArgs,
@@ -77,19 +79,18 @@ public class LogWrapper extends LogBaseWrapper {
         if (parametersString.length() > 0) {
             qry.append(" where").append(parametersString.toString());
         }
-        List<Log> logs = appService.query(new HQLCriteria(qry.toString(),
-            parametersArgs));
+        List<LogWrapper> logs = new PostProcessListProxy<LogWrapper>(
+            appService, new HQLCriteria(qry.toString(), parametersArgs),
+            new AbstractRowPostProcess() {
+                private static final long serialVersionUID = 1L;
 
-        List<LogWrapper> wrappers = new ArrayList<LogWrapper>();
-        for (Log l : logs) {
-            // CASE is important for inventory id
-            String logInvId = l.getInventoryId();
-            if ((inventoryId == null)
-                || ((inventoryId != null) && (logInvId.equals(inventoryId)))) {
-                wrappers.add(new LogWrapper(appService, l));
-            }
-        }
-        return wrappers;
+                @Override
+                public Object rowPostProcess(Object element) {
+                    return new LogWrapper(appService, (Log) element);
+                }
+            });
+
+        return logs;
     }
 
     private static void addParam(StringBuffer sb, List<Object> parameters,
@@ -125,7 +126,7 @@ public class LogWrapper extends LogBaseWrapper {
         + LogPeer.CENTER.getName() + ") from " + Log.class.getName()
         + " where " + LogPeer.CENTER.getName() + "!=''";
 
-    public static List<String> getPossibleSites(
+    public static List<String> getPossibleCenters(
         WritableApplicationService appService) throws ApplicationException {
         return appService.query(new HQLCriteria(POSSIBLE_CENTERS_QRY));
     }

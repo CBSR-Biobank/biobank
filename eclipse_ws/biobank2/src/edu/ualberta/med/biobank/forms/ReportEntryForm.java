@@ -267,14 +267,15 @@ public class ReportEntryForm extends BiobankEntryForm {
                     results = new ArrayList<Object>();
 
                     Thread thread = new Thread("Querying") {
+                        @SuppressWarnings("unchecked")
                         @Override
                         public void run() {
-                            results = new ReportListProxy(
+                            results = (List<Object>) new ReportListProxy(
                                 (BiobankApplicationService) appService,
                                 rawReport).init();
 
                             if (results instanceof AbstractBiobankListProxy)
-                                ((AbstractBiobankListProxy) results)
+                                ((AbstractBiobankListProxy<?>) results)
                                     .addBusyListener(new ProgressMonitorDialogBusyListener(
                                         "Loading more results..."));
                         }

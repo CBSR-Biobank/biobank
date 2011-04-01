@@ -26,7 +26,7 @@ public class FTAReportEditor extends ReportsEditor {
     protected void createOptionSection(Composite parent) throws Exception {
         studyCombo = createStudyComboOption("Study", parent);
         afterDate = widgetCreator.createDateTimeWidget(parent,
-            "After Date (Processed)", null, null, null, SWT.DATE);
+            "After Date (Drawn)", null, null, null, SWT.DATE);
     }
 
     @Override
