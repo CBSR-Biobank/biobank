@@ -11,22 +11,31 @@ public abstract class TableGroup<T extends ModelWrapper<?>> implements Node {
 
     protected Integer numAliquots = 0;
     protected ItemState state;
+    protected String alternateLabel;
     protected List<Node> tops;
     protected static final Pattern p = Pattern.compile("/");
     protected Object parent = null;
 
     protected TableGroup(ItemState state, T request) {
+        this(state, null, request);
+    }
+
+    protected TableGroup(ItemState state, String alternateLabel, T request) {
         this.state = state;
+        this.alternateLabel = alternateLabel;
         createAdapterTree(state.getId(), request);
     }
 
     @Override
     public String toString() {
-        return state.getLabel();
+        if (alternateLabel == null)
+            return state.getLabel();
+        return alternateLabel;
     }
 
     public String getTitle() {
-        return state.getLabel() + " (" + numAliquots + ")";
+        return (alternateLabel == null ? state.getLabel() : alternateLabel)
+            + " (" + numAliquots + ")";
     }
 
     protected abstract void createAdapterTree(Integer state, T request);

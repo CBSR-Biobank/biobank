@@ -41,6 +41,10 @@ public class SessionsView extends AbstractViewWithAdapterTree {
         if (session != null) {
             session.rebuild();
         }
+        if (SessionManager.isSuperAdminMode())
+            setPartName("Administration");
+        else
+            setPartName("Center Administration");
     }
 
     @Override

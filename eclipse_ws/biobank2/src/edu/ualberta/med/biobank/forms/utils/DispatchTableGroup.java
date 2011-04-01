@@ -11,6 +11,11 @@ import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 
 public class DispatchTableGroup extends TableGroup<DispatchWrapper> {
 
+    public DispatchTableGroup(DispatchSpecimenState ds, String alternateLabel,
+        DispatchWrapper dispatch) {
+        super(ds, alternateLabel, dispatch);
+    }
+
     public DispatchTableGroup(DispatchSpecimenState ds, DispatchWrapper dispatch) {
         super(ds, dispatch);
     }
@@ -18,11 +23,23 @@ public class DispatchTableGroup extends TableGroup<DispatchWrapper> {
     public static List<DispatchTableGroup> getGroupsForShipment(
         DispatchWrapper ship) {
         List<DispatchTableGroup> groups = new ArrayList<DispatchTableGroup>();
-        groups
-            .add(new DispatchTableGroup(DispatchSpecimenState.RECEIVED, ship));
-        groups.add(new DispatchTableGroup(DispatchSpecimenState.MISSING, ship));
-        groups.add(new DispatchTableGroup(DispatchSpecimenState.NONE, ship));
-        groups.add(new DispatchTableGroup(DispatchSpecimenState.EXTRA, ship));
+        if (ship.isInCreationState()) {
+            groups.add(new DispatchTableGroup(DispatchSpecimenState.NONE,
+                "Added", ship));
+        } else {
+            groups.add(new DispatchTableGroup(DispatchSpecimenState.NONE,
+                "Non processed", ship));
+        }
+        if (ship.hasBeenReceived()) {
+            groups.add(new DispatchTableGroup(DispatchSpecimenState.RECEIVED,
+                ship));
+            groups
+                .add(new DispatchTableGroup(DispatchSpecimenState.EXTRA, ship));
+        }
+        if (ship.hasBeenReceived() || ship.isInTransitState()) {
+            groups.add(new DispatchTableGroup(DispatchSpecimenState.MISSING,
+                ship));
+        }
         return groups;
     }
 
@@ -36,12 +53,16 @@ public class DispatchTableGroup extends TableGroup<DispatchWrapper> {
             switch (DispatchSpecimenState.getState(state)) {
             case NONE:
                 cache = request.getNonProcessedDispatchSpecimenCollection();
+                break;
             case MISSING:
                 cache = request.getMissingDispatchSpecimens();
+                break;
             case EXTRA:
                 cache = request.getExtraDispatchSpecimens();
+                break;
             case RECEIVED:
                 cache = request.getReceivedDispatchSpecimens();
+                break;
             }
         }
 
