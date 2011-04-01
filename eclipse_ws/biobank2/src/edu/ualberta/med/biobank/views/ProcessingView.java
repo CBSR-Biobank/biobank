@@ -208,4 +208,10 @@ public class ProcessingView extends AbstractAdministrationView {
     public AdapterBase getProcessingNode() {
         return processingNode;
     }
+
+    @Override
+    public void clear() {
+        processingNode.removeAll();
+        setSearchFieldsEnablement(false);
+    }
 }

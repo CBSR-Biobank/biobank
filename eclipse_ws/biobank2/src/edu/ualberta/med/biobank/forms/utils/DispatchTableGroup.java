@@ -21,8 +21,8 @@ public class DispatchTableGroup extends TableGroup<DispatchWrapper> {
         groups
             .add(new DispatchTableGroup(DispatchSpecimenState.RECEIVED, ship));
         groups.add(new DispatchTableGroup(DispatchSpecimenState.MISSING, ship));
-        groups.add(new DispatchTableGroup(DispatchSpecimenState.NONE, ship));
         groups.add(new DispatchTableGroup(DispatchSpecimenState.EXTRA, ship));
+        groups.add(new DispatchTableGroup(DispatchSpecimenState.NONE, ship));
         return groups;
     }
 
@@ -36,12 +36,16 @@ public class DispatchTableGroup extends TableGroup<DispatchWrapper> {
             switch (DispatchSpecimenState.getState(state)) {
             case NONE:
                 cache = request.getNonProcessedDispatchSpecimenCollection();
+                break;
             case MISSING:
                 cache = request.getMissingDispatchSpecimens();
+                break;
             case EXTRA:
                 cache = request.getExtraDispatchSpecimens();
+                break;
             case RECEIVED:
                 cache = request.getReceivedDispatchSpecimens();
+                break;
             }
         }
 

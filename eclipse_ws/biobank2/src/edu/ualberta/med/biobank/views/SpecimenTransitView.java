@@ -374,7 +374,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     public void clear() {
         if (centerNode != null)
             rootNode.removeChild(centerNode);
+        setSearchFieldsEnablement(false);
         super.clear();
     }
-
 }
