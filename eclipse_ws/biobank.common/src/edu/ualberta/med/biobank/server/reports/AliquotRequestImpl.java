@@ -18,6 +18,11 @@ public class AliquotRequestImpl extends AbstractReport {
 
     private static final String QUERY = "SELECT s"
         + (" FROM " + Specimen.class.getName() + " s ")
+        + ("    inner join fetch s.collectionEvent ce")
+        + ("    inner join fetch ce.patient p")
+        + ("    inner join fetch s.topSpecimen ts")
+        + ("    inner join fetch s.specimenType st")
+        + ("    inner join fetch s.activityStatus a")
         + " WHERE s.parentSpecimen is not null" // "aliquots" only
         + ("    and s.specimenPosition.container.label not like '"
             + SENT_SAMPLES_FREEZER_NAME + "'")

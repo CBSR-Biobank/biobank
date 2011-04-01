@@ -6,12 +6,19 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.ContainerPath;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class QAAliquotsImpl extends AbstractReport {
 
     private static final String QUERY = ("FROM " + Specimen.class.getName() + " as s")
+        + ("    inner join fetch s.collectionEvent ce")
+        + ("    inner join fetch s.specimenType st")
+        + ("    inner join fetch ce.patient p")
+        + ("    inner join fetch s.specimenPosition sp")
+        + ("    left join fetch s.parentSpecimen ps")
+        + ("    left join fetch ps.processingEvent pe")
         + " WHERE s.createdAt between ? and ?"
         + "     and s.specimenType.nameShort = ?"
         + "     and s.specimenPosition.container.id in (SELECT path1.container.id"
@@ -48,8 +55,17 @@ public class QAAliquotsImpl extends AbstractReport {
                 .getPnumber();
             String inventoryId = specimen.getInventoryId();
             String specimenType = specimen.getSpecimenType().getNameShort();
-            String dateProcessed = DateFormatter.formatAsDate(specimen
-                .getParentSpecimen().getProcessingEvent().getCreatedAt());
+
+            String dateProcessed = "No Date Processed";
+            Specimen parentSpecimen = specimen.getParentSpecimen();
+            if (parentSpecimen != null) {
+                ProcessingEvent pe = parentSpecimen.getProcessingEvent();
+                if (pe != null) {
+                    dateProcessed = DateFormatter.formatAsDate(pe
+                        .getCreatedAt());
+                }
+            }
+
             String positionString = specimen.getSpecimenPosition()
                 .getPositionString();
             modifiedResults.add(new Object[] { positionString, inventoryId,
