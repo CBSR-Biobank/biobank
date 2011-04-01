@@ -42,11 +42,13 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         ApplicationException {
         // TODO: new checks required
         // TODO at least one specimen added ?
-        if (isNew()
-            && getWorksheet() != null
-            && getProcessingEventsWithWorksheetCount(appService, getWorksheet()) > 0) {
-            throw new BiobankCheckException("Worksheet " + getWorksheet()
-                + " is already used.");
+        if (isNew()) {
+            if (getWorksheet() == null || getWorksheet().isEmpty())
+                throw new BiobankCheckException("Worksheet cannot be empty.");
+            else if (getProcessingEventsWithWorksheetCount(appService,
+                getWorksheet()) > 0)
+                throw new BiobankCheckException("Worksheet " + getWorksheet()
+                    + " is already used.");
         }
     }
 
