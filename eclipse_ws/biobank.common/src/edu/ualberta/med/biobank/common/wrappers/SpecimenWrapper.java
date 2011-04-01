@@ -164,7 +164,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         if (center != null) {
             return center.getNameShort();
         }
-        // FIXME should never see that ? should never retrieve an Specimen which
+        // FIXME should never see that ? should never retrieve a Specimen which
         // site cannot be displayed ?
         return "CANNOT DISPLAY INFORMATION";
     }
@@ -414,6 +414,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         Log log = new Log();
         CollectionEventWrapper cevent = getCollectionEvent();
         log.setAction(action);
+        if (center == null)
+            center = getCurrentCenter().getNameShort();
         log.setCenter(center);
         log.setPatientNumber(cevent.getPatient().getPnumber());
         log.setInventoryId(getInventoryId());

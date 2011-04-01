@@ -6,6 +6,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class ExceptionUtils {
+
+    private static final String FILE_PREFIX_DEFAULT = "biobanklogappender";
+
+    public static void writeMsgToTmpFile(Throwable t) {
+        writeMsgToTmpFile(FILE_PREFIX_DEFAULT, t);
+    }
+
     /**
      * Writes fatal errors to a log file on the system's current directory.
      * 

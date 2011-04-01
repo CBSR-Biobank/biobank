@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -31,7 +32,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     public static final String OK_MESSAGE = "Edit specimen";
 
-    private SpecimenWrapper aliquot;
+    private SpecimenWrapper specimen;
 
     private ComboViewer activityStatusComboViewer;
 
@@ -43,15 +44,15 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     @Override
     protected void init() throws Exception {
-        SpecimenAdapter aliquotAdapter = (SpecimenAdapter) adapter;
-        aliquot = aliquotAdapter.getSpecimen();
-        aliquot.logEdit(aliquot.getCurrentCenter().getNameShort());
+        SpecimenAdapter specimenAdapter = (SpecimenAdapter) adapter;
+        specimen = specimenAdapter.getSpecimen();
+        SessionManager.logEdit(specimen);
         setPartName("Specimen Entry");
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Aliquot " + aliquot.getInventoryId() + " Information");
+        form.setText("Aliquot " + specimen.getInventoryId() + " Information");
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true,
             false));
@@ -63,7 +64,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        StudyWrapper study = aliquot.getCollectionEvent().getPatient()
+        StudyWrapper study = specimen.getCollectionEvent().getPatient()
             .getStudy();
         study.reload();
 
@@ -71,8 +72,8 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             .getAliquotedSpecimenCollection(true);
 
         List<SpecimenTypeWrapper> containerSampleTypeList = null;
-        if (aliquot.hasParent()) {
-            ContainerTypeWrapper ct = aliquot.getParentContainer()
+        if (specimen.hasParent()) {
+            ContainerTypeWrapper ct = specimen.getParentContainer()
                 .getContainerType();
             ct.reload();
             containerSampleTypeList = ct.getSpecimenTypeCollection();
@@ -90,23 +91,23 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 }
             }
         }
-        if (aliquot.getSpecimenType() != null
-            && !sampleTypes.contains(aliquot.getSpecimenType())) {
-            sampleTypes.add(aliquot.getSpecimenType());
+        if (specimen.getSpecimenType() != null
+            && !sampleTypes.contains(specimen.getSpecimenType())) {
+            sampleTypes.add(specimen.getSpecimenType());
         }
 
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
-        setTextValue(siteLabel, aliquot.getCenterString());
+        setTextValue(siteLabel, specimen.getCenterString());
 
         sampleTypeComboViewer = createComboViewer(client, "Type", sampleTypes,
-            aliquot.getSpecimenType(), "Aliquot must have a sample type",
+            specimen.getSpecimenType(), "Aliquot must have a sample type",
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    aliquot
+                    specimen
                         .setSpecimenType((SpecimenTypeWrapper) selectedObject);
-                    aliquot.setQuantityFromType();
-                    Double volume = aliquot.getQuantity();
+                    specimen.setQuantityFromType();
+                    Double volume = specimen.getQuantity();
                     if (volumeField != null) {
                         if (volume == null) {
                             volumeField.setText("");
@@ -118,13 +119,13 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             });
 
         createReadOnlyLabelledField(client, SWT.NONE, "Link Date",
-            aliquot.getFormattedCreatedAt());
+            specimen.getFormattedCreatedAt());
 
         volumeField = createReadOnlyLabelledField(client, SWT.NONE,
-            "Volume (ml)", aliquot.getQuantity() == null ? null : aliquot
+            "Volume (ml)", specimen.getQuantity() == null ? null : specimen
                 .getQuantity().toString());
 
-        createReadOnlyLabelledField(client, SWT.NONE, "Study", aliquot
+        createReadOnlyLabelledField(client, SWT.NONE, "Study", specimen
             .getCollectionEvent().getPatient().getStudy().getNameShort());
 
         Label label = widgetCreator.createLabel(client, "Patient Number");
@@ -141,7 +142,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 
         Control w = widgetCreator.createBoundWidget(c, BiobankText.class,
-            SWT.READ_ONLY, null, BeansObservables.observeValue(aliquot,
+            SWT.READ_ONLY, null, BeansObservables.observeValue(specimen,
                 "collectionEvent.patient.pnumber"), null);
         w.setBackground(WidgetCreator.READ_ONLY_TEXT_BGR);
 
@@ -181,29 +182,29 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         // });
 
         createReadOnlyLabelledField(client, SWT.NONE, "Position",
-            aliquot.getPositionString(true, false));
+            specimen.getPositionString(true, false));
 
         activityStatusComboViewer = createComboViewer(client,
             "Activity Status",
             ActivityStatusWrapper.getAllActivityStatuses(appService),
-            aliquot.getActivityStatus(),
+            specimen.getActivityStatus(),
             "Aliquot must have an activity status", new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    aliquot
+                    specimen
                         .setActivityStatus((ActivityStatusWrapper) selectedObject);
                 }
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.WRAP
-            | SWT.MULTI, "Comments", null, aliquot, "comment", null);
+            | SWT.MULTI, "Comments", null, specimen, "comment", null);
 
         setFirstControl(sampleTypeComboViewer.getControl());
     }
 
     @Override
     protected void saveForm() throws Exception {
-        aliquot.persist();
+        specimen.persist();
     }
 
     @Override
@@ -225,7 +226,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        ActivityStatusWrapper currentActivityStatus = aliquot
+        ActivityStatusWrapper currentActivityStatus = specimen
             .getActivityStatus();
         if (currentActivityStatus != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
@@ -234,7 +235,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             activityStatusComboViewer.getCombo().deselectAll();
         }
 
-        SpecimenTypeWrapper currentSampleType = aliquot.getSpecimenType();
+        SpecimenTypeWrapper currentSampleType = specimen.getSpecimenType();
         if (currentSampleType != null)
             sampleTypeComboViewer.setSelection(new StructuredSelection(
                 currentSampleType));

@@ -22,7 +22,6 @@ import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Log;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -318,19 +317,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public void setState(DispatchState ds) {
         setState(ds.getId());
-        Log logMessage = null;
-        try {
-            logMessage = getLogMessage("state", null, "new state: "
-                + getStateDescription());
-            if (logMessage != null) {
-                ((BiobankApplicationService) appService)
-                    .logActivity(logMessage);
-            }
-        } catch (Exception ex) {
-            // Don't want the logs to affect delete
-            // FIXME save somewhere this information
-            ex.printStackTrace();
-        }
     }
 
     @Override
@@ -456,23 +442,52 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     protected Log getLogMessage(String action, String site, String details) {
         Log log = new Log();
         log.setAction(action);
-        if (site == null) {
-            log.setCenter(getSenderCenter().getNameShort());
-        } else {
-            log.setCenter(site);
+
+        StringBuilder detailsBuilder = new StringBuilder(details);
+
+        if (details.length() > 0) {
+            detailsBuilder.append(": ");
         }
 
+        DispatchState state = getDispatchState();
         ShipmentInfoWrapper shipInfo = getShipmentInfo();
 
-        if (shipInfo != null) {
-            details += "Sent at:" + shipInfo.getFormattedDateSent();
-            String waybill = shipInfo.getWaybill();
-            if (waybill != null) {
-                details += " - Waybill:" + waybill;
+        detailsBuilder.append("state: ").append(getStateDescription());
+
+        if (state.equals(DispatchState.CREATION)
+            || state.equals(DispatchState.IN_TRANSIT)) {
+            if (site == null) {
+                log.setCenter(getSenderCenter().getNameShort());
+            } else {
+                log.setCenter(site);
+            }
+
+            String packedAt = getFormattedPackedAt();
+            if ((packedAt != null) && (packedAt.length() > 0)) {
+                detailsBuilder.append(", packed at: ").append(packedAt);
+            }
+        } else {
+            if (site == null) {
+                log.setCenter(getReceiverCenter().getNameShort());
+            } else {
+                log.setCenter(site);
+            }
+            if (shipInfo != null) {
+                String receivedAt = shipInfo.getFormattedDateReceived();
+                if ((receivedAt != null) && (receivedAt.length() > 0)) {
+                    detailsBuilder.append(", received at: ").append(receivedAt);
+                }
             }
         }
-        log.setDetails(details);
-        log.setType("Shipment");
+
+        if (shipInfo != null) {
+            String waybill = shipInfo.getWaybill();
+            if (waybill != null) {
+                detailsBuilder.append(", waybill: ").append(waybill);
+            }
+        }
+        log.setDetails(detailsBuilder.toString());
+        log.setType("Dispatch");
         return log;
     }
 
