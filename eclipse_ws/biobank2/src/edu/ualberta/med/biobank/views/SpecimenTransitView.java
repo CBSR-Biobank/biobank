@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
@@ -29,6 +28,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.DateNode;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.OriginInfoSearchedNode;
+import edu.ualberta.med.biobank.treeview.request.DispatchCenterAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ClinicWithShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentTodayNode;
@@ -66,15 +66,10 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     }
 
     public void createNodes() throws Exception {
-        // FIXME DD: I think this should be center based instead of site based.
-        // getCurrentWorkingSite() will return null if the current center is a
-        // clinic
-        SiteWrapper currentSite = SessionManager.getUser()
-            .getCurrentWorkingSite();
-        if (currentSite != null) {
-            currentSite.reload();
+        if (SessionManager.getUser().getCurrentWorkingCenter() != null) {
+            SessionManager.getUser().getCurrentWorkingCenter().reload();
             centerNode = new DispatchCenterAdapter(rootNode, SessionManager
-                .getUser().getCurrentWorkingSite());
+                .getUser().getCurrentWorkingCenter());
             centerNode.setParent(rootNode);
             rootNode.addChild(centerNode);
         }
@@ -348,8 +343,6 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     @Override
     protected void notFound(String text) {
-        // TODO Auto-generated method stub
-
     }
 
     public static void showShipment(OriginInfoWrapper shipment) {
@@ -381,7 +374,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     public void clear() {
         if (centerNode != null)
             rootNode.removeChild(centerNode);
+        setSearchFieldsEnablement(false);
         super.clear();
     }
-
 }

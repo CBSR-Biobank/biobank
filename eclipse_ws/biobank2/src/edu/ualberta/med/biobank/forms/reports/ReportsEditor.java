@@ -259,7 +259,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
         }
 
         if (reportData instanceof HQLCriteriaListProxy)
-            ((HQLCriteriaListProxy) reportData).addBusyListener(listener);
+            ((HQLCriteriaListProxy<?>) reportData).addBusyListener(listener);
 
         if (!reportData.isEmpty()) {
             printButton.setEnabled(true);
@@ -273,8 +273,8 @@ public abstract class ReportsEditor extends BiobankFormBase {
         reportTable.dispose();
         // if size > 1000 or unknown, disable print and
         // export to pdf
-        if ((reportData instanceof HQLCriteriaListProxy && (((HQLCriteriaListProxy) reportData)
-            .getRealSize() == -1 || ((HQLCriteriaListProxy) reportData)
+        if ((reportData instanceof HQLCriteriaListProxy && (((HQLCriteriaListProxy<?>) reportData)
+            .getRealSize() == -1 || ((HQLCriteriaListProxy<?>) reportData)
             .getRealSize() > 1000))
             || reportData.size() > 1000) {
             printButton.setEnabled(false);

@@ -71,11 +71,8 @@ public class SessionHelper implements Runnable {
         } catch (ApplicationException exp) {
             if (exp instanceof ServerVersionInvalidException) {
                 BiobankPlugin
-                    .openInformation(
+                    .openError(
                         "Server Version Error",
-                        "The server you are connecting to does not have a version. Cannot authenticate.");
-                logger
-                    .error(
                         "The server you are connecting to does not have a version. Cannot authenticate.",
                         exp);
             } else if (exp instanceof ServerVersionNewerException) {
@@ -94,18 +91,14 @@ public class SessionHelper implements Runnable {
                 }
             } else if (exp instanceof ServerVersionOlderException) {
                 BiobankPlugin
-                    .openInformation("Server Version Error",
-                        "Cannot connect to this server because the Java Client version is too new.");
-                logger
-                    .error(
+                    .openError(
+                        "Server Version Error",
                         "Cannot connect to this server because the Java Client version is too new.",
                         exp);
             } else if (exp instanceof ClientVersionInvalidException) {
                 BiobankPlugin
-                    .openInformation("Client Version Error",
-                        "Cannot connect to this server because the Java Client version is invalid.");
-                logger
-                    .error(
+                    .openError(
+                        "Client Version Error",
                         "Cannot connect to this server because the Java Client version is invalid.",
                         exp);
             } else if (exp.getCause() != null
@@ -113,16 +106,12 @@ public class SessionHelper implements Runnable {
                 BiobankPlugin
                     .openAsyncError(
                         "Login Failed",
-                        "Bad credentials. Warning: You will be locked out after 3 failed login attempts.");
-                logger
-                    .error(
                         "Bad credentials. Warning: You will be locked out after 3 failed login attempts.",
                         exp);
             } else if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAccessException) {
                 BiobankPlugin.openAsyncError("Login Failed",
-                    "Error contacting server.");
-                logger.error("Error contacting server.", exp);
+                    "Error contacting server.", exp);
             }
         } catch (Exception exp) {
             BiobankPlugin.openAsyncError("Login Failed", exp);

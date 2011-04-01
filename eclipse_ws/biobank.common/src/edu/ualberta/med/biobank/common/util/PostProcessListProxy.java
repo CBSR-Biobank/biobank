@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.util;
 import gov.nih.nci.system.applicationservice.ApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class PostProcessListProxy extends HQLCriteriaListProxy {
+public class PostProcessListProxy<E> extends HQLCriteriaListProxy<E> {
 
     private static final long serialVersionUID = 1L;
 
@@ -16,12 +16,13 @@ public class PostProcessListProxy extends HQLCriteriaListProxy {
         init();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Object getRowObject(Object object) {
+    public E getRowObject(E object) {
         if (pp == null) {
             return object;
         }
-        return pp.rowPostProcess(object);
+        return (E) pp.rowPostProcess(object);
     }
 
 }

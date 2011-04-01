@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.ApplicationService;
 
-public class ReportListProxy extends AbstractBiobankListProxy implements
+public class ReportListProxy extends AbstractBiobankListProxy<Object> implements
     Serializable {
 
     private static final long serialVersionUID = 1L;

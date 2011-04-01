@@ -51,6 +51,7 @@ import edu.ualberta.med.biobank.export.DataExporter;
 import edu.ualberta.med.biobank.export.PdfDataExporter;
 import edu.ualberta.med.biobank.export.PrintPdfDataExporter;
 import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
@@ -69,6 +70,10 @@ import edu.ualberta.med.biobank.widgets.report.FilterChangeEvent;
 import edu.ualberta.med.biobank.widgets.report.FilterSelectWidget;
 
 public class ReportEntryForm extends BiobankEntryForm {
+
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(ReportEntryForm.class.getName());
+
     private static ImageDescriptor SAVE_AS_NEW_ACTION_IMAGE = ImageDescriptor
         .createFromImage(BiobankPlugin.getDefault().getImageRegistry()
             .get(BiobankPlugin.IMG_SAVE_AS_NEW));
@@ -262,14 +267,15 @@ public class ReportEntryForm extends BiobankEntryForm {
                     results = new ArrayList<Object>();
 
                     Thread thread = new Thread("Querying") {
+                        @SuppressWarnings("unchecked")
                         @Override
                         public void run() {
-                            results = new ReportListProxy(
+                            results = (List<Object>) new ReportListProxy(
                                 (BiobankApplicationService) appService,
                                 rawReport).init();
 
                             if (results instanceof AbstractBiobankListProxy)
-                                ((AbstractBiobankListProxy) results)
+                                ((AbstractBiobankListProxy<?>) results)
                                     .addBusyListener(new ProgressMonitorDialogBusyListener(
                                         "Loading more results..."));
                         }
@@ -391,7 +397,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
                         SessionManager.openViewForm(wrapper);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error("Error opening selection", e);
                     }
                 }
             }

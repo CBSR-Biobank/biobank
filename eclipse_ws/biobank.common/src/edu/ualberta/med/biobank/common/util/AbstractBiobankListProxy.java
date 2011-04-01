@@ -20,7 +20,7 @@ import org.springframework.util.Assert;
  * <li>Non-searchable</li><br>
  * </ul>
  */
-public abstract class AbstractBiobankListProxy implements List<Object>,
+public abstract class AbstractBiobankListProxy<E> implements List<E>,
     Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -60,12 +60,12 @@ public abstract class AbstractBiobankListProxy implements List<Object>,
     }
 
     @Override
-    public boolean addAll(Collection<? extends Object> c) {
+    public boolean addAll(Collection<? extends E> c) {
         return false;
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends Object> c) {
+    public boolean addAll(int index, Collection<? extends E> c) {
         return false;
     }
 
@@ -83,20 +83,21 @@ public abstract class AbstractBiobankListProxy implements List<Object>,
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Object get(int index) {
+    public E get(int index) {
         init();
         Assert.isTrue(index >= 0);
         updateListChunk(index);
         if (listChunk.size() > 0 && listChunk.size() > index - offset)
-            return getRowObject(listChunk.get(index - offset));
+            return getRowObject((E) listChunk.get(index - offset));
         else
             return null;
     }
 
     private void updateListChunk(int index) {
         if (index - offset >= pageSize || index < offset) {
-            if (index < loadedOffset + pageSize) {
+            if (index < loadedOffset + pageSize && index >= loadedOffset) {
                 // swap
                 if (semaphore.availablePermits() == 0) {
                     if (listener != null)
@@ -171,8 +172,8 @@ public abstract class AbstractBiobankListProxy implements List<Object>,
     }
 
     @Override
-    public Iterator<Object> iterator() {
-        return new AbstractBiobankListProxyIterator(this);
+    public Iterator<E> iterator() {
+        return new AbstractBiobankListProxyIterator<E>(this);
     }
 
     @Override
@@ -181,12 +182,12 @@ public abstract class AbstractBiobankListProxy implements List<Object>,
     }
 
     @Override
-    public ListIterator<Object> listIterator() {
+    public ListIterator<E> listIterator() {
         return null;
     }
 
     @Override
-    public ListIterator<Object> listIterator(int index) {
+    public ListIterator<E> listIterator(int index) {
         return null;
     }
 
@@ -196,7 +197,7 @@ public abstract class AbstractBiobankListProxy implements List<Object>,
     }
 
     @Override
-    public Object remove(int index) {
+    public E remove(int index) {
         return null;
     }
 
@@ -211,7 +212,7 @@ public abstract class AbstractBiobankListProxy implements List<Object>,
     }
 
     @Override
-    public Object set(int index, Object element) {
+    public E set(int index, Object element) {
         return null;
     }
 
@@ -224,16 +225,17 @@ public abstract class AbstractBiobankListProxy implements List<Object>,
         return realSize;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public List<Object> subList(int fromIndex, int toIndex) {
+    public List<E> subList(int fromIndex, int toIndex) {
         init();
         assert (fromIndex >= 0 && toIndex >= 0);
         assert (fromIndex <= toIndex);
         updateListChunk(fromIndex);
-        List<Object> subList = new ArrayList<Object>();
+        List<E> subList = new ArrayList<E>();
         for (Object o : listChunk.subList(fromIndex - offset,
             Math.min(listChunk.size(), toIndex - offset))) {
-            subList.add(getRowObject(o));
+            subList.add(getRowObject((E) o));
         }
         if (offset + pageSize < toIndex && listChunk.size() == pageSize) {
             subList.addAll(subList(offset + pageSize, toIndex));
@@ -241,7 +243,7 @@ public abstract class AbstractBiobankListProxy implements List<Object>,
         return subList;
     }
 
-    protected Object getRowObject(Object object) {
+    protected E getRowObject(E object) {
         return object;
     }
 
@@ -278,7 +280,7 @@ public abstract class AbstractBiobankListProxy implements List<Object>,
         this.listener = l;
     }
 
-    public AbstractBiobankListProxy init() {
+    public AbstractBiobankListProxy<?> init() {
         if (listChunk == null) {
             updateListChunk(-1);
         }

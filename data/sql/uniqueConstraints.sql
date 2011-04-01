@@ -10,3 +10,6 @@ ALTER TABLE container_type
 
 ALTER TABLE study_event_attr
   ADD CONSTRAINT uc_label UNIQUE (label,study_id);
+
+ALTER TABLE collection_event
+  ADD CONSTRAINT uc_visit_number UNIQUE (VISIT_NUMBER,PATIENT_ID);

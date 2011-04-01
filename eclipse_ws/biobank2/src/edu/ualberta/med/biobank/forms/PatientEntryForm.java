@@ -15,8 +15,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -58,7 +58,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         Messages.getString("PatientEntryForm.patientNumber.validation.msg"));
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue((adapter instanceof PatientAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -72,11 +72,7 @@ public class PatientEntryForm extends BiobankEntryForm {
                 logger.error("Error getting patient clone", e1);
             }
         retrievePatient();
-        try {
-            patient.logEdit(null);
-        } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Log edit failed", e);
-        }
+        SessionManager.logEdit(patient);
         String tabName;
         if (patient.isNew()) {
             tabName = Messages.getString("PatientEntryForm.new.title");

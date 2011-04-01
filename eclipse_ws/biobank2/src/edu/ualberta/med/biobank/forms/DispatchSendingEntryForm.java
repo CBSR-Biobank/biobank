@@ -37,7 +37,7 @@ import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
+public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     // private static BiobankLogger logger = BiobankLogger
     // .getLogger(DispatchSendingEntryForm.class.getName());
@@ -152,13 +152,11 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     }
 
     @Override
-    public void formClosed() {
-        try {
-            reset();
-        } catch (Exception e) {
-            // TODO: how to handle?
-            e.printStackTrace();
-        }
+    public void formClosed() throws Exception {
+        // FIXME why formClosed is overridden ? reload is already done in
+        // default
+        // method
+        reset();
     }
 
     private void createAliquotsSelectionSection() {

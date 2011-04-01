@@ -102,11 +102,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 .getDatabaseClone();
         patient = cevent.getPatient();
         retrieve();
-        try {
-            cevent.logEdit(null);
-        } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Log edit failed", e);
-        }
+        SessionManager.logEdit(cevent);
         String tabName;
         if (cevent.isNew()) {
             tabName = Messages.getString("CollectionEventEntryForm.title.new");

@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
 
-public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
+public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm";
     private DispatchAliquotsTreeTable aliquotsTree;

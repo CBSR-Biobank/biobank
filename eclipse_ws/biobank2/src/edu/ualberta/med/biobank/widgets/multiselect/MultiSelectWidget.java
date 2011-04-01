@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
@@ -109,6 +110,16 @@ public class MultiSelectWidget extends BiobankWidget {
         notifyListeners();
     }
 
+    public void selectAll() {
+        availTree.getTree().selectAll();
+        moveTreeViewerSelection(availTree, selTree);
+    }
+
+    public void deselectAll() {
+        selTree.getTree().selectAll();
+        moveTreeViewerSelection(selTree, availTree);
+    }
+
     private TreeViewer createLabelledTree(Composite parent, String label) {
         Composite selComposite = new Composite(parent, SWT.NONE);
         selComposite.setLayout(new GridLayout(1, true));
@@ -210,5 +221,18 @@ public class MultiSelectWidget extends BiobankWidget {
             result.add(new Integer(node.getId()));
         }
         return result;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        selTree.getControl().setEnabled(enabled);
+        availTree.getControl().setEnabled(enabled);
+    }
+
+    public void setSelection(List<Integer> selected) {
+        availTree.getTree().selectAll();
+        availTree.setSelection(new StructuredSelection(selected));
+        moveTreeViewerSelection(availTree, selTree);
     }
 }

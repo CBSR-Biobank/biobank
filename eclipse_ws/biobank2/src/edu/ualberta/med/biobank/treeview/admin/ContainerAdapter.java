@@ -159,7 +159,7 @@ public class ContainerAdapter extends AdapterBase {
                 getContainer().reload();
                 SessionManager.openViewForm(getContainer());
             } catch (Exception e) {
-                BiobankPlugin.openError(e.getMessage(), e);
+                BiobankPlugin.openError("Problem while moving aliquots", e);
             }
         }
     }
@@ -197,7 +197,7 @@ public class ContainerAdapter extends AdapterBase {
                     oldParent.performExpand();
                 }
             } catch (Exception e) {
-                BiobankPlugin.openError(e.getMessage(), e);
+                BiobankPlugin.openError("Problem while moving container", e);
             }
         }
     }
