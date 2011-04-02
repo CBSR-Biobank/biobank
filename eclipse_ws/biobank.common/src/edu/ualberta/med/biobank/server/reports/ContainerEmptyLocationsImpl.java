@@ -15,14 +15,14 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerEmptyLocationsImpl extends AbstractReport {
 
-    private static final String QUERY = "select c.container from "
-        + ContainerPath.class.getName()
-        + " c, "
-        + ContainerPath.class.getName()
-        + " parent where parent.id in ("
-        + CONTAINER_LIST
-        + ") and (c.path LIKE parent.path || '/%' OR c.id=parent.id) and c.container.label LIKE ? || '%' and c.container.containerType.specimenTypeCollection.size > 0 "
-        + "and (c.container.containerType.capacity.rowCapacity * c.container.containerType.capacity.colCapacity) > c.container.specimenPositionCollection.size";
+    private static final String QUERY = "SELECT c.container"
+        + (" FROM " + ContainerPath.class.getName() + " c ")
+        + ("    inner join fetch c.container.containerType")
+        + ("    ," + ContainerPath.class.getName() + " parent ")
+        + (" WHERE parent.id in (" + CONTAINER_LIST + ")")
+        + "     and (c.path LIKE parent.path || '/%' OR c.id=parent.id) "
+        + "     and c.container.label LIKE ? || '%' and c.container.containerType.specimenTypeCollection.size > 0"
+        + "     and (c.container.containerType.capacity.rowCapacity * c.container.containerType.capacity.colCapacity) > c.container.specimenPositionCollection.size";
 
     public ContainerEmptyLocationsImpl(BiobankReport report) {
         super(QUERY, report);

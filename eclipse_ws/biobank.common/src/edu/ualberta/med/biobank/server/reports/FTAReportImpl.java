@@ -11,6 +11,13 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class FTAReportImpl extends AbstractReport {
     private static final String QUERY = "SELECT s2"
         + (" FROM " + Specimen.class.getName() + " s2")
+        + ("    inner join fetch s2.collectionEvent ce")
+        + ("    inner join fetch ce.patient p")
+        + ("    inner join fetch s2.topSpecimen ts")
+        + ("    inner join fetch s2.specimenType st")
+        + ("    inner join fetch s2.currentCenter c")
+        + ("    inner join fetch s2.specimenPosition pos")
+        + ("    inner join fetch pos.container cnt")
         + " WHERE s2.id = (SELECT min(s.id) "
         + ("        FROM " + Specimen.class.getName() + " s")
         + "         WHERE s.collectionEvent.visitNumber = 1"
@@ -38,21 +45,18 @@ public class FTAReportImpl extends AbstractReport {
             String pnumber = specimen.getCollectionEvent().getPatient()
                 .getPnumber();
             String inventoryId = specimen.getInventoryId();
-
-            String dateProcessed = "No Date Processed";
-            Specimen parentSpecimen = specimen.getParentSpecimen();
-            if (parentSpecimen != null) {
-                dateProcessed = DateFormatter.formatAsDate(parentSpecimen
-                    .getProcessingEvent().getCreatedAt());
-            }
-
+            String dateDrawn = DateFormatter.formatAsDate(specimen
+                .getTopSpecimen().getCreatedAt());
             String specimenType = specimen.getSpecimenType().getNameShort();
             String currentCenter = specimen.getCurrentCenter().getNameShort();
+
+            String containerLabel = specimen.getSpecimenPosition()
+                .getContainer().getLabel();
             String positionString = specimen.getSpecimenPosition()
                 .getPositionString();
 
-            modifiedResults.add(new Object[] { pnumber, dateProcessed,
-                inventoryId, specimenType, currentCenter, positionString });
+            modifiedResults.add(new Object[] { pnumber, dateDrawn, inventoryId,
+                specimenType, currentCenter, containerLabel + positionString });
         }
         return modifiedResults;
     }

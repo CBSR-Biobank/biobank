@@ -519,7 +519,9 @@ CREATE TABLE processing_event (
 
 create index CREATED_AT_IDX on processing_event(CREATED_AT);
 
--- add a processing event for each patient visit
+-- add a processing event for each patient visit 
+-- (more than one processing event will have the same worksheet and same date/time. 
+-- This won't be allowed anymore in future entries)
 
 insert into processing_event (created_at,comment,activity_status_id,center_id,pv_id)
        select pv.date_processed,pv.comment,
@@ -666,8 +668,6 @@ UPDATE abstract_position ap, container c, container_type ct
 
 alter table log
       change column SITE CENTER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT '';
-
-
 
 /*****************************************************
  * research groups and sample orders
