@@ -180,6 +180,13 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
     @Override
     protected Log getLogMessage(String action, String site, String details) {
+        ShipmentInfoWrapper shipInfo = getShipmentInfo();
+        if (shipInfo == null) {
+            // nothing to log since origin info does not yet point to any
+            // shipping information
+            return null;
+        }
+
         Log log = new Log();
         log.setAction(action);
         if (site == null) {
@@ -193,11 +200,8 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
             detailsList.add(details);
         }
 
-        ShipmentInfoWrapper shipInfo = getShipmentInfo();
-        if (shipInfo != null) {
-            detailsList.add(new StringBuilder("waybill:").append(
-                shipInfo.getWaybill()).toString());
-        }
+        detailsList.add(new StringBuilder("waybill:").append(
+            shipInfo.getWaybill()).toString());
         detailsList.add(new StringBuilder("specimens:").append(
             getSpecimenCollection(false).size()).toString());
         log.setDetails(StringUtils.join(detailsList, ", "));
