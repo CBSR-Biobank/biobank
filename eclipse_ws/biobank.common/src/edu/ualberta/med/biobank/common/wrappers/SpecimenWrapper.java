@@ -478,7 +478,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     protected void persistDependencies(Specimen originalSpecimen)
         throws Exception {
 
-        boolean parentChanged = (originalSpecimen != null && originalSpecimen
+        boolean parentChanged = (originalSpecimen != null
+            && originalSpecimen.getParentSpecimen() != null && originalSpecimen
             .getParentSpecimen().equals(getParentSpecimen()));
 
         if (isNew() || parentChanged) {

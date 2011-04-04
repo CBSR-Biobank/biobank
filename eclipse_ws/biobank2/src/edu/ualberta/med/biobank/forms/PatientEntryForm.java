@@ -126,9 +126,6 @@ public class PatientEntryForm extends BiobankEntryForm {
                 }
             });
         setFirstControl(studiesViewer.getControl());
-        if (selectedStudy != null) {
-            studiesViewer.setSelection(new StructuredSelection(selectedStudy));
-        }
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             Messages.getString("PatientEntryForm.field.pNumber.label"), null,

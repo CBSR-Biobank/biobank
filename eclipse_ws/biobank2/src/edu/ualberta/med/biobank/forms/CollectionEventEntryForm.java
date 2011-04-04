@@ -191,10 +191,6 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                         .setActivityStatus((ActivityStatusWrapper) selectedObject);
                 }
             });
-        if (cevent.getActivityStatus() != null) {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                cevent.getActivityStatus()));
-        }
 
         widgetCreator.createLabel(client,
             Messages.getString("CollectionEventEntryForm.timeDrawn.label"));
