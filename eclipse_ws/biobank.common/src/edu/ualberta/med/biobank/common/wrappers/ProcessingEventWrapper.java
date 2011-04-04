@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -42,11 +44,13 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         ApplicationException {
         // TODO: new checks required
         // TODO at least one specimen added ?
-        if (isNew()
-            && getWorksheet() != null
-            && getProcessingEventsWithWorksheetCount(appService, getWorksheet()) > 0) {
-            throw new BiobankCheckException("Worksheet " + getWorksheet()
-                + " is already used.");
+        if (isNew()) {
+            if (getWorksheet() == null || getWorksheet().isEmpty())
+                throw new BiobankCheckException("Worksheet cannot be empty.");
+            else if (getProcessingEventsWithWorksheetCount(appService,
+                getWorksheet()) > 0)
+                throw new BiobankCheckException("Worksheet " + getWorksheet()
+                    + " is already used.");
         }
     }
 
@@ -141,12 +145,19 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         } else {
             log.setCenter(site);
         }
-        details += "Source Specimens: " + getSpecimenCount(false);
+        List<String> detailsList = new ArrayList<String>();
+        if (details.length() > 0) {
+            detailsList.add(details);
+        }
+
+        detailsList.add(new StringBuilder("Source Specimens: ").append(
+            getSpecimenCount(false)).toString());
         String worksheet = getWorksheet();
         if (worksheet != null) {
-            details += " - Worksheet: " + worksheet;
+            detailsList.add(new StringBuilder("Worksheet: ").append(worksheet)
+                .toString());
         }
-        log.setDetails(details);
+        log.setDetails(StringUtils.join(detailsList, ", "));
         log.setType("ProcessingEvent");
         return log;
     }
