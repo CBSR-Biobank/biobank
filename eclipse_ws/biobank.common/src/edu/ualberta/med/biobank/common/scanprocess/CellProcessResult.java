@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.server.applicationservice;
+package edu.ualberta.med.biobank.common.scanprocess;
 
 import java.io.Serializable;
 

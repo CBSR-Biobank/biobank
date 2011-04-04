@@ -1,6 +1,8 @@
-package edu.ualberta.med.biobank.server.applicationservice;
+package edu.ualberta.med.biobank.server.scanprocess;
 
 import edu.ualberta.med.biobank.common.Messages;
+import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.util.linking.Cell;
@@ -12,8 +14,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class BiobankSpecimenProcessUtil {
-
+public class LinkProcess implements ScanProcess {
     public static ScanProcessResult processScanLinkResult(
         WritableApplicationService appService, Map<RowColPos, Cell> cells,
         boolean rescanMode, User user) throws Exception {
@@ -28,7 +29,7 @@ public class BiobankSpecimenProcessUtil {
                 }
             }
         }
-        return new ScanProcessResult(cells, consoleLog.toString());
+        return new ScanProcessResult(cells, consoleLog.toString(), null);
     }
 
     public static CellProcessResult processCellLinkStatus(
@@ -77,4 +78,5 @@ public class BiobankSpecimenProcessUtil {
             return cell.getStatus();
         }
     }
+
 }
