@@ -1391,7 +1391,7 @@ drop index pv_id_idx on processing_event;
 drop index pv_id_idx on specimen;
 
 
-ALTER TABLE origin_info DROP COLUMN ASHIP_ID;
+ALTER TABLE origin_info DROP COLUMN ASHIP_ID, DROP COLUMN ASHIP_TYPE;
 
 ALTER TABLE collection_event DROP COLUMN PV_ID;
 
