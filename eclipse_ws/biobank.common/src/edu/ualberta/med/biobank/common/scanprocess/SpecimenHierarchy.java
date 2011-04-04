@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.util.linking;
+package edu.ualberta.med.biobank.common.scanprocess;
 
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;

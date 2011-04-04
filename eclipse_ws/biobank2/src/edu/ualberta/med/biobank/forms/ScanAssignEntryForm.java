@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -38,6 +39,7 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.ContainerLabelSearchException;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -47,8 +49,8 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
@@ -594,8 +596,60 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
      */
     @Override
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
-        Map<RowColPos, SpecimenWrapper> expectedAliquots = currentPalletWrapper
+        Map<RowColPos, SpecimenWrapper> expectedSpecimens = currentPalletWrapper
             .getSpecimens();
+        long start = System.currentTimeMillis();
+        // oldMethod(monitor, expectedSpecimens);
+        newMethod(monitor, expectedSpecimens);
+        long end = System.currentTimeMillis();
+        System.out.println((end - start) / 1000.0);
+    }
+
+    private void newMethod(IProgressMonitor monitor,
+        Map<RowColPos, SpecimenWrapper> expectedSpecimens) throws Exception {
+        Map<RowColPos, PalletCell> cells = getCells();
+        Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells = null;
+        if (cells != null) {
+            serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell>();
+            for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
+                serverCells
+                    .put(entry.getKey(), getServerCell(entry.getValue()));
+            }
+        }
+        Map<RowColPos, Integer> expectedSpecimensServer = new HashMap<RowColPos, Integer>();
+        for (Entry<RowColPos, SpecimenWrapper> entry : expectedSpecimens
+            .entrySet()) {
+            expectedSpecimensServer.put(entry.getKey(), entry.getValue()
+                .getId());
+        }
+        ScanProcessResult res = appService.processScanAssignResult(serverCells,
+            expectedSpecimensServer, currentPalletWrapper.getLabel(),
+            currentPalletWrapper.getId(), currentPalletWrapper
+                .getContainerType().getId(), currentPalletWrapper
+                .getContainerType().getRowCapacity(), currentPalletWrapper
+                .getContainerType().getColCapacity(), isRescanMode(),
+            SessionManager.getUser());
+
+        for (Entry<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> entry : res
+            .getCells().entrySet()) {
+            RowColPos rcp = entry.getKey();
+            monitor.subTask("Processing position "
+                + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
+            PalletCell cell = getCells().get(rcp);
+            if (cell == null) {
+                cell = new PalletCell(new ScanCell(rcp.row, rcp.col, null));
+                cells.put(rcp, cell);
+            }
+            cell.merge(appService, entry.getValue());
+        }
+        appendLogs(res.getLogs());
+        currentScanState = UICellStatus.valueOf(res.getStatus().name());
+        setScanValid(!getCells().isEmpty()
+            && currentScanState != UICellStatus.ERROR);
+    }
+
+    private void oldMethod(IProgressMonitor monitor,
+        Map<RowColPos, SpecimenWrapper> expectedAliquots) throws Exception {
         currentScanState = UICellStatus.EMPTY;
         for (int row = 0; row < currentPalletWrapper.getRowCapacity(); row++) {
             for (int col = 0; col < currentPalletWrapper.getColCapacity(); col++) {

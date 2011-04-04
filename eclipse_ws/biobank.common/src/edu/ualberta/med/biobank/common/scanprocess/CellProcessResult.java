@@ -1,39 +1,33 @@
 package edu.ualberta.med.biobank.common.scanprocess;
 
 import java.io.Serializable;
-
-import edu.ualberta.med.biobank.common.util.linking.CellStatus;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CellProcessResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    private List<String> logs;
     private CellStatus status;
-    private String logs;
 
     public CellProcessResult() {
+        logs = new ArrayList<String>();
     }
 
-    public CellProcessResult(CellStatus status, String logs) {
-        super();
-        this.setStatus(status);
-        this.logs = logs;
-    }
-
-    public String getLogs() {
-        return logs;
-    }
-
-    public void setLogs(String logs) {
-        this.logs = logs;
-    }
-
-    public void setStatus(CellStatus status) {
+    public void setResult(CellStatus status) {
         this.status = status;
+    }
+
+    public List<String> getLogs() {
+        return logs;
     }
 
     public CellStatus getStatus() {
         return status;
+    }
+
+    public void appendNewLog(String log) {
+        logs.add(log);
     }
 
 }

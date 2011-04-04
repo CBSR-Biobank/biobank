@@ -38,8 +38,8 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.SpecimenHierarchy;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.util.linking.SpecimenHierarchy;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -475,21 +475,21 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         processScanResult = false;
         boolean everythingOk = true;
         Map<RowColPos, PalletCell> cells = getCells();
-        Map<RowColPos, edu.ualberta.med.biobank.common.util.linking.Cell> serverCells = null;
+        Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells = null;
         if (cells != null) {
-            serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.util.linking.Cell>();
+            serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell>();
             for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
                 serverCells
                     .put(entry.getKey(), getServerCell(entry.getValue()));
             }
         }
         ScanProcessResult res = SessionManager.getAppService()
-            .processScanResult(serverCells, isRescanMode(),
+            .processScanLinkResult(serverCells, isRescanMode(),
                 SessionManager.getUser());
-        appendLog(res.getLogs());
+        appendLogs(res.getLogs());
         if (cells != null) {
             final Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
-            for (Entry<RowColPos, edu.ualberta.med.biobank.common.util.linking.Cell> entry : res
+            for (Entry<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> entry : res
                 .getCells().entrySet()) {
                 RowColPos rcp = entry.getKey();
                 monitor.subTask(Messages.getString(
@@ -502,7 +502,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                         !isRescanMode(), true, true);
                 }
                 PalletCell palletCell = cells.get(entry.getKey());
-                palletCell.merge(entry.getValue());
+                palletCell.merge(appService, entry.getValue());
                 SpecimenHierarchy selection = preSelections.get(palletCell
                     .getRow());
                 if (selection != null)
@@ -523,15 +523,6 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             });
         }
         processScanResult = everythingOk;
-    }
-
-    private edu.ualberta.med.biobank.common.util.linking.Cell getServerCell(
-        PalletCell palletCell) {
-        return new edu.ualberta.med.biobank.common.util.linking.Cell(
-            palletCell.getRow(), palletCell.getCol(), palletCell.getValue(),
-            palletCell.getStatus() == null ? null
-                : edu.ualberta.med.biobank.common.util.linking.CellStatus
-                    .valueOf(palletCell.getStatus().name()));
     }
 
     /**
@@ -696,7 +687,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     @Override
     protected void postprocessScanTubeAlone(PalletCell palletCell)
         throws Exception {
-        CellProcessResult res = appService.processCellStatus(
+        CellProcessResult res = appService.processCellLinkStatus(
             getServerCell(palletCell), SessionManager.getUser());
         palletCell.setStatus(res.getStatus());
         if (palletCell.getStatus() == UICellStatus.NO_TYPE) {

@@ -1,11 +1,11 @@
 package edu.ualberta.med.biobank.server.scanprocess;
 
 import edu.ualberta.med.biobank.common.Messages;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.util.linking.Cell;
-import edu.ualberta.med.biobank.common.util.linking.CellStatus;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -14,15 +14,24 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AssignProcess implements ScanProcess {
-    public static ScanProcessResult processScanAssignResult(
-        WritableApplicationService appService, Map<RowColPos, Cell> cells,
-        StringBuffer consoleLog, Map<RowColPos, Integer> expectedSpecimens,
+public class AssignProcess {
+
+    private WritableApplicationService appService;
+    private User user;
+
+    public AssignProcess(WritableApplicationService appService, User user) {
+        this.appService = appService;
+        this.user = user;
+    }
+
+    public ScanProcessResult processScanAssignResult(
+        Map<RowColPos, Cell> cells, Map<RowColPos, Integer> expectedSpecimens,
         String palletLabel, Integer palletId, Integer containerTypeId,
-        int rowCapacity, int colCapacity, boolean rescanMode, User user)
-        throws Exception {
+        int rowCapacity, int colCapacity, boolean rescanMode) throws Exception {
         CellStatus currentScanState = CellStatus.EMPTY;
-        // FIXME need to remember when rescan ?
+        ScanProcessResult res = new ScanProcessResult();
+        // FIXME need to remember movedAndMissingAliquotsFromPallet when rescan
+        // ?
         Map<RowColPos, Boolean> movedAndMissingAliquotsFromPallet = new HashMap<RowColPos, Boolean>();
         for (int row = 0; row < rowCapacity; row++) {
             for (int col = 0; col < colCapacity; col++) {
@@ -43,10 +52,9 @@ public class AssignProcess implements ScanProcess {
                         }
                     }
                     if (cell != null) {
-                        processCellAssignStatus(appService, cell, palletLabel,
-                            palletId, consoleLog,
-                            movedAndMissingAliquotsFromPallet, containerTypeId,
-                            user);
+                        processCellAssignStatus(cell, palletLabel, palletId,
+                            res, movedAndMissingAliquotsFromPallet,
+                            containerTypeId);
                     }
                 }
                 CellStatus newStatus = CellStatus.EMPTY;
@@ -56,18 +64,17 @@ public class AssignProcess implements ScanProcess {
                 currentScanState = currentScanState.mergeWith(newStatus);
             }
         }
-        return new ScanProcessResult(cells, consoleLog.toString(),
-            currentScanState);
+        res.setResult(cells, currentScanState);
+        return res;
     }
 
     /**
      * set the status of the cell
      */
-    private static void processCellAssignStatus(
-        WritableApplicationService appService, Cell scanCell,
-        String palletLabel, Integer palletId, StringBuffer consoleLog,
+    private void processCellAssignStatus(Cell scanCell, String palletLabel,
+        Integer palletId, ScanProcessResult res,
         Map<RowColPos, Boolean> movedAndMissingAliquotsFromPallet,
-        Integer containerTypeId, User user) throws Exception {
+        Integer containerTypeId) throws Exception {
         SpecimenWrapper expectedSpecimen = null;
         if (scanCell.getExpectedSpecimenId() != null) {
             expectedSpecimen = new SpecimenWrapper(appService);
@@ -81,18 +88,18 @@ public class AssignProcess implements ScanProcess {
             + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(scanCell
                 .getRow(), scanCell.getCol()));
         if (value == null) { // no specimen scanned
-            updateCellAsMissing(positionString, consoleLog, scanCell,
+            updateCellAsMissing(positionString, res, scanCell,
                 expectedSpecimen, movedAndMissingAliquotsFromPallet);
         } else {
             // FIXME test what happen if don't have read rights on the site
             SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(
                 appService, value, user);
             if (foundSpecimen == null) {
-                updateCellAsNotLinked(positionString, scanCell, consoleLog);
+                updateCellAsNotLinked(positionString, scanCell, res);
             } else if (expectedSpecimen != null
                 && !foundSpecimen.equals(expectedSpecimen)) {
                 updateCellAsPositionAlreadyTaken(positionString, scanCell,
-                    expectedSpecimen, foundSpecimen, consoleLog);
+                    expectedSpecimen, foundSpecimen, res);
             } else {
                 scanCell.setSpecimenId(foundSpecimen.getId());
                 if (expectedSpecimen != null) {
@@ -111,13 +118,12 @@ public class AssignProcess implements ScanProcess {
                         foundSpecimen.getSpecimenType())) {
                         if (foundSpecimen.hasParent()) { // moved
                             processCellWithPreviousPosition(scanCell,
-                                positionString, foundSpecimen, consoleLog,
-                                palletId, user,
+                                positionString, foundSpecimen, res, palletId,
                                 movedAndMissingAliquotsFromPallet);
                         } else { // new in pallet
                             if (foundSpecimen.isUsedInDispatch()) {
                                 updateCellAsDispatchedError(positionString,
-                                    scanCell, foundSpecimen, consoleLog);
+                                    scanCell, foundSpecimen, res);
                             } else {
                                 scanCell.setStatus(CellStatus.NEW);
                                 scanCell.setTitle(foundSpecimen
@@ -128,7 +134,7 @@ public class AssignProcess implements ScanProcess {
                     } else {
                         // pallet can't hold this aliquot type
                         updateCellAsTypeError(positionString, scanCell,
-                            foundSpecimen, consoleLog);
+                            foundSpecimen, res, cType);
                     }
                 }
             }
@@ -136,10 +142,10 @@ public class AssignProcess implements ScanProcess {
     }
 
     /**
-     * aliquot missing
+     * specimen missing
      */
-    private static void updateCellAsMissing(String position,
-        StringBuffer consoleLog, Cell scanCell, SpecimenWrapper missingAliquot,
+    private void updateCellAsMissing(String position, ScanProcessResult res,
+        Cell scanCell, SpecimenWrapper missingAliquot,
         Map<RowColPos, Boolean> movedAndMissingAliquotsFromPallet) {
         RowColPos rcp = new RowColPos(scanCell.getRow(), scanCell.getCol());
         Boolean posHasMovedSpecimen = movedAndMissingAliquotsFromPallet
@@ -153,14 +159,12 @@ public class AssignProcess implements ScanProcess {
             scanCell.setTitle("?"); //$NON-NLS-1$
             // MISSING in {0}\: specimen {1} from visit {2} (patient {3})
             // missing
-            consoleLog
-                .append(Messages
-                    .getString(
-                        "ScanAssign.activitylog.aliquot.missing", position, missingAliquot //$NON-NLS-1$
-                            .getInventoryId(), missingAliquot
-                            .getCollectionEvent().getVisitNumber(),
-                        missingAliquot.getCollectionEvent().getPatient()
-                            .getPnumber()));
+            res.appendNewLog(Messages
+                .getString(
+                    "ScanAssign.activitylog.aliquot.missing", position, missingAliquot //$NON-NLS-1$
+                        .getInventoryId(), missingAliquot.getCollectionEvent()
+                        .getVisitNumber(), missingAliquot.getCollectionEvent()
+                        .getPatient().getPnumber()));
             movedAndMissingAliquotsFromPallet.put(rcp, true);
         } else {
             movedAndMissingAliquotsFromPallet.remove(rcp);
@@ -172,43 +176,40 @@ public class AssignProcess implements ScanProcess {
      * specimen not found in site (not yet linked ?)
      */
     // FIXME not linked or not added into any cevent
-    private static void updateCellAsNotLinked(String position, Cell scanCell,
-        StringBuffer consoleLog) {
+    private void updateCellAsNotLinked(String position, Cell scanCell,
+        ScanProcessResult res) {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages
             .getString("ScanAssign.scanStatus.aliquot.notlinked")); //$NON-NLS-1$
-        consoleLog
-            .append(Messages
-                .getString(
-                    "ScanAssign.activitylog.aliquot.notlinked", position, scanCell.getValue())); //$NON-NLS-1$
+        res.appendNewLog(Messages
+            .getString(
+                "ScanAssign.activitylog.aliquot.notlinked", position, scanCell.getValue())); //$NON-NLS-1$
     }
 
     /**
      * specimen found but another specimen already at this position
      */
-    private static void updateCellAsPositionAlreadyTaken(String position,
+    private void updateCellAsPositionAlreadyTaken(String position,
         Cell scanCell, SpecimenWrapper expectedAliquot,
-        SpecimenWrapper foundAliquot, StringBuffer consoleLog) {
+        SpecimenWrapper foundAliquot, ScanProcessResult res) {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages
             .getString("ScanAssign.scanStatus.aliquot.positionTakenError")); //$NON-NLS-1$
         scanCell.setTitle("!"); //$NON-NLS-1$
-        consoleLog
-            .append(Messages
-                .getString(
-                    "ScanAssign.activitylog.aliquot.positionTaken", position, expectedAliquot //$NON-NLS-1$
-                        .getInventoryId(), expectedAliquot.getCollectionEvent()
-                        .getPatient().getPnumber(),
-                    foundAliquot.getInventoryId(), foundAliquot
-                        .getCollectionEvent().getPatient().getPnumber()));
+        res.appendNewLog(Messages
+            .getString(
+                "ScanAssign.activitylog.aliquot.positionTaken", position, expectedAliquot //$NON-NLS-1$
+                    .getInventoryId(), expectedAliquot.getCollectionEvent()
+                    .getPatient().getPnumber(), foundAliquot.getInventoryId(),
+                foundAliquot.getCollectionEvent().getPatient().getPnumber()));
     }
 
     /**
      * this cell has already a position. Check if it was on the pallet or not
      */
-    private static void processCellWithPreviousPosition(Cell scanCell,
+    private void processCellWithPreviousPosition(Cell scanCell,
         String positionString, SpecimenWrapper foundSpecimen,
-        StringBuffer consoleLog, Integer palletId, User user,
+        ScanProcessResult res, Integer palletId,
         Map<RowColPos, Boolean> movedAndMissingAliquotsFromPallet) {
         if (foundSpecimen.getParentContainer().getSite()
             .equals(user.getCurrentWorkingSite())) {
@@ -219,7 +220,7 @@ public class AssignProcess implements ScanProcess {
                 if (!foundSpecimen.getPosition().equals(rcp)) {
                     // moved inside the same pallet
                     updateCellAsMoved(positionString, scanCell, foundSpecimen,
-                        consoleLog);
+                        res);
                     RowColPos movedFromPosition = foundSpecimen.getPosition();
                     Boolean posHasMissing = movedAndMissingAliquotsFromPallet
                         .get(movedFromPosition);
@@ -239,17 +240,16 @@ public class AssignProcess implements ScanProcess {
                 }
             } else {
                 // old position was on another pallet
-                updateCellAsMoved(positionString, scanCell, foundSpecimen,
-                    consoleLog);
+                updateCellAsMoved(positionString, scanCell, foundSpecimen, res);
             }
         } else {
             updateCellAsInOtherSite(positionString, scanCell, foundSpecimen,
-                consoleLog);
+                res);
         }
     }
 
-    private static void updateCellAsMoved(String position, Cell scanCell,
-        SpecimenWrapper foundAliquot, StringBuffer consoleLog) {
+    private void updateCellAsMoved(String position, Cell scanCell,
+        SpecimenWrapper foundAliquot, ScanProcessResult res) {
         String expectedPosition = foundAliquot.getPositionString(true, false);
         if (expectedPosition == null) {
             expectedPosition = "none"; //$NON-NLS-1$
@@ -261,15 +261,14 @@ public class AssignProcess implements ScanProcess {
         scanCell.setInformation(Messages.getString(
             "ScanAssign.scanStatus.aliquot.moved", expectedPosition)); //$NON-NLS-1$
 
-        consoleLog
-            .append(Messages
-                .getString(
-                    "ScanAssign.activitylog.aliquot.moved", position, scanCell.getValue(), //$NON-NLS-1$
-                    expectedPosition));
+        res.appendNewLog(Messages
+            .getString(
+                "ScanAssign.activitylog.aliquot.moved", position, scanCell.getValue(), //$NON-NLS-1$
+                expectedPosition));
     }
 
-    private static void updateCellAsInOtherSite(String position, Cell scanCell,
-        SpecimenWrapper foundAliquot, StringBuffer consoleLog) {
+    private void updateCellAsInOtherSite(String position, Cell scanCell,
+        SpecimenWrapper foundAliquot, ScanProcessResult res) {
         String currentPosition = foundAliquot.getPositionString(true, false);
         if (currentPosition == null) {
             currentPosition = "none"; //$NON-NLS-1$
@@ -282,17 +281,16 @@ public class AssignProcess implements ScanProcess {
         scanCell.setInformation(Messages.getString(
             "ScanAssign.scanStatus.aliquot.otherSite", siteName)); //$NON-NLS-1$
 
-        consoleLog
-            .append(Messages
-                .getString(
-                    "ScanAssign.activitylog.aliquot.otherSite", position, scanCell.getValue(), //$NON-NLS-1$
-                    siteName, currentPosition));
+        res.appendNewLog(Messages
+            .getString(
+                "ScanAssign.activitylog.aliquot.otherSite", position, scanCell.getValue(), //$NON-NLS-1$
+                siteName, currentPosition));
     }
 
-    private static void updateCellAsTypeError(String position, Cell scanCell,
-        SpecimenWrapper foundAliquot, StringBuffer consoleLog) {
-        String palletType = "TO BE REPLACED"; // FIXME
-                                              // currentPalletWrapper.getContainerType().getName();
+    private void updateCellAsTypeError(String position, Cell scanCell,
+        SpecimenWrapper foundAliquot, ScanProcessResult res,
+        ContainerTypeWrapper containerType) {
+        String palletType = containerType.getName();
         String sampleType = foundAliquot.getSpecimenType().getName();
 
         scanCell.setTitle(foundAliquot.getCollectionEvent().getPatient()
@@ -300,19 +298,19 @@ public class AssignProcess implements ScanProcess {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages.getString(
             "ScanAssign.scanStatus.aliquot.typeError", palletType, sampleType)); //$NON-NLS-1$
-        consoleLog.append(Messages.getString(
+        res.appendNewLog(Messages.getString(
             "ScanAssign.activitylog.aliquot.typeError", position, palletType, //$NON-NLS-1$
             sampleType));
     }
 
-    private static void updateCellAsDispatchedError(String positionString,
-        Cell scanCell, SpecimenWrapper foundAliquot, StringBuffer consoleLog) {
+    private void updateCellAsDispatchedError(String positionString,
+        Cell scanCell, SpecimenWrapper foundAliquot, ScanProcessResult res) {
         scanCell.setTitle(foundAliquot.getCollectionEvent().getPatient()
             .getPnumber());
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages
             .getString("ScanAssign.scanStatus.aliquot.dispatchedError")); //$NON-NLS-1$
-        consoleLog.append(Messages.getString(
+        res.appendNewLog(Messages.getString(
             "ScanAssign.activitylog.aliquot.dispatchedError", positionString));
 
     }

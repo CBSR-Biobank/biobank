@@ -138,6 +138,15 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
 
     protected abstract String getActivityTitle();
 
+    public void appendLogs(List<String> messages) {
+        if (activityLogger != null) {
+            for (String msg : messages) {
+                activityLogger.trace(msg);
+            }
+        }
+        printed = false;
+    }
+
     public void appendLog(String message) {
         if (activityLogger != null) {
             activityLogger.trace(message);

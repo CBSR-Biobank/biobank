@@ -7,8 +7,8 @@ import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
+import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.util.linking.CellStatus;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
@@ -99,7 +99,7 @@ public class PalletCell extends Cell {
         throws ApplicationException {
         Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
         List<SpecimenWrapper> specimens = DebugUtil
-            .getRandomNonAssignedNonDispatchedSpecimens(appService, siteId);
+            .getRandomNonAssignedNonDispatchedSpecimens(appService, siteId, 30);
         int i = 0;
         while (i < specimens.size() && i < 30) {
             int row = i / 12;
@@ -252,8 +252,27 @@ public class PalletCell extends Cell {
         return sourceSpecimen;
     }
 
-    public void merge(edu.ualberta.med.biobank.common.util.linking.Cell cell) {
+    public void merge(WritableApplicationService appService,
+        edu.ualberta.med.biobank.common.scanprocess.Cell cell) throws Exception {
         setStatus(cell.getStatus());
+        setInformation(cell.getInformation());
+        setValue(cell.getValue());
+        setTitle(cell.getTitle());
+        SpecimenWrapper expectedSpecimen = null;
+        if (cell.getExpectedSpecimenId() != null) {
+            expectedSpecimen = new SpecimenWrapper(appService);
+            expectedSpecimen.getWrappedObject().setId(
+                cell.getExpectedSpecimenId());
+            expectedSpecimen.reload();
+        }
+        setExpectedSpecimen(expectedSpecimen);
+        SpecimenWrapper specimen = null;
+        if (cell.getSpecimenId() != null) {
+            specimen = new SpecimenWrapper(appService);
+            specimen.getWrappedObject().setId(cell.getSpecimenId());
+            specimen.reload();
+        }
+        setSpecimen(specimen);
     }
 
     public void setStatus(CellStatus status) {

@@ -712,7 +712,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                         wrapperKlazz);
                     wrapper = tmp;
                 } catch (Exception e) {
-                    throw new RuntimeException(e.getMessage());
+                    throw new RuntimeException(e);
                 }
             }
 

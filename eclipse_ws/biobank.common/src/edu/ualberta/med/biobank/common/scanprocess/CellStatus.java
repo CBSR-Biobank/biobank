@@ -1,6 +1,8 @@
-package edu.ualberta.med.biobank.common.util.linking;
+package edu.ualberta.med.biobank.common.scanprocess;
 
-public enum CellStatus {
+import edu.ualberta.med.biobank.common.util.NotAProxy;
+
+public enum CellStatus implements NotAProxy {
     NOT_INITIALIZED("Not Initialized"), INITIALIZED("Initialized"), FULL("Full"), FREE_LOCATIONS(
         "Free locations"), EMPTY("Empty"), FILLED("Filled"), NEW("New"), MOVED(
         "Moved"), MISSING("Missing"), ERROR("Error"), NO_TYPE("No type"), TYPE(

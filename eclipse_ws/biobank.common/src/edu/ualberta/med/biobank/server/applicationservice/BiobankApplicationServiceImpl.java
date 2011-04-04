@@ -4,18 +4,19 @@ import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.util.linking.Cell;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
+import edu.ualberta.med.biobank.server.scanprocess.AssignProcess;
 import edu.ualberta.med.biobank.server.scanprocess.LinkProcess;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
@@ -194,23 +195,39 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
+    public ScanProcessResult processScanLinkResult(Map<RowColPos, Cell> cells,
         boolean rescanMode, User user) throws ApplicationException {
         try {
-            return LinkProcess.processScanLinkResult(this, cells, rescanMode,
-                user);
+            return new LinkProcess(this, user).processScanLinkResult(cells,
+                rescanMode);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
     }
 
     @Override
-    public CellProcessResult processCellStatus(Cell cell, User user)
+    public CellProcessResult processCellLinkStatus(Cell cell, User user)
         throws ApplicationException {
         try {
-            return LinkProcess.processCellLinkStatus(this, cell, user);
+            return new LinkProcess(this, user).processCellLinkStatus(cell);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
     }
+
+    @Override
+    public ScanProcessResult processScanAssignResult(
+        Map<RowColPos, Cell> cells, Map<RowColPos, Integer> expectedSpecimens,
+        String palletLabel, Integer palletId, Integer containerTypeId,
+        int rowCapacity, int colCapacity, boolean rescanMode, User user)
+        throws ApplicationException {
+        try {
+            return new AssignProcess(this, user).processScanAssignResult(cells,
+                expectedSpecimens, palletLabel, palletId, containerTypeId,
+                rowCapacity, colCapacity, rescanMode);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+    }
+
 }

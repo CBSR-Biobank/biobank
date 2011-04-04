@@ -2,13 +2,13 @@ package edu.ualberta.med.biobank.server.applicationservice;
 
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.util.linking.Cell;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
@@ -77,9 +77,15 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public void stopQuery(QueryHandle qh) throws Exception;
 
-    public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
+    public ScanProcessResult processScanLinkResult(Map<RowColPos, Cell> cells,
         boolean rescanMode, User user) throws ApplicationException;
 
-    public CellProcessResult processCellStatus(Cell cell, User user)
+    public CellProcessResult processCellLinkStatus(Cell cell, User user)
+        throws ApplicationException;
+
+    public ScanProcessResult processScanAssignResult(
+        Map<RowColPos, Cell> cells, Map<RowColPos, Integer> expectedSpecimens,
+        String palletLabel, Integer palletId, Integer containerTypeId,
+        int rowCapacity, int colCapacity, boolean rescanMode, User user)
         throws ApplicationException;
 }

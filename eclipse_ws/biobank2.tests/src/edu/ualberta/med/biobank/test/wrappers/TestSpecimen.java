@@ -615,7 +615,7 @@ public class TestSpecimen extends TestDatabase {
         // DebugUtil.getRandomLinkedSpecimens(appService, site.getId());
         DebugUtil.getRandomAssignedSpecimens(appService, site.getId());
         DebugUtil.getRandomNonAssignedNonDispatchedSpecimens(appService,
-            site.getId());
+            site.getId(), 30);
         // FIXME
         // DebugUtil.getRandomDispatchedSpecimens(appService, site.getId());
 

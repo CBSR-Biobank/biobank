@@ -1,12 +1,12 @@
 package edu.ualberta.med.biobank.server.scanprocess;
 
 import edu.ualberta.med.biobank.common.Messages;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.util.linking.Cell;
-import edu.ualberta.med.biobank.common.util.linking.CellStatus;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -14,31 +14,37 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class LinkProcess implements ScanProcess {
-    public static ScanProcessResult processScanLinkResult(
-        WritableApplicationService appService, Map<RowColPos, Cell> cells,
-        boolean rescanMode, User user) throws Exception {
-        StringBuffer consoleLog = new StringBuffer();
+public class LinkProcess {
+
+    private WritableApplicationService appService;
+    private User user;
+
+    public LinkProcess(WritableApplicationService appService, User user) {
+        this.appService = appService;
+        this.user = user;
+    }
+
+    public ScanProcessResult processScanLinkResult(Map<RowColPos, Cell> cells,
+        boolean rescanMode) throws Exception {
+        ScanProcessResult res = new ScanProcessResult();
         if (cells != null) {
             for (Entry<RowColPos, Cell> entry : cells.entrySet()) {
                 Cell cell = entry.getValue();
                 if (!rescanMode
                     || (cell != null && cell.getStatus() != CellStatus.TYPE && cell
                         .getStatus() != CellStatus.NO_TYPE)) {
-                    processCellLinkStatus(appService, cell, consoleLog, user);
+                    processCellLinkStatus(appService, cell, res, user);
                 }
             }
         }
-        return new ScanProcessResult(cells, consoleLog.toString(), null);
+        res.setResult(cells, null);
+        return res;
     }
 
-    public static CellProcessResult processCellLinkStatus(
-        WritableApplicationService appService, Cell cell, User user)
-        throws Exception {
-        StringBuffer consoleLog = new StringBuffer();
-        CellStatus status = processCellLinkStatus(appService, cell, consoleLog,
-            user);
-        return new CellProcessResult(status, consoleLog.toString());
+    public CellProcessResult processCellLinkStatus(Cell cell) throws Exception {
+        CellProcessResult res = new CellProcessResult();
+        res.setResult(processCellLinkStatus(appService, cell, res, user));
+        return res;
     }
 
     /**
@@ -46,9 +52,9 @@ public class LinkProcess implements ScanProcess {
      * 
      * @throws Exception
      */
-    private static CellStatus processCellLinkStatus(
+    private CellStatus processCellLinkStatus(
         WritableApplicationService appService, Cell cell,
-        StringBuffer consoleLog, User user) throws Exception {
+        CellProcessResult res, User user) throws Exception {
         if (cell == null) {
             return CellStatus.EMPTY;
         } else {
@@ -62,7 +68,7 @@ public class LinkProcess implements ScanProcess {
                         .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
                     String palletPosition = ContainerLabelingSchemeWrapper
                         .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
-                    consoleLog.append(Messages.getString(
+                    res.appendNewLog(Messages.getString(
                         "ScanLink.activitylog.aliquot.existsError",
                         palletPosition, value, foundAliquot
                             .getCollectionEvent().getVisitNumber(),
@@ -78,5 +84,4 @@ public class LinkProcess implements ScanProcess {
             return cell.getStatus();
         }
     }
-
 }

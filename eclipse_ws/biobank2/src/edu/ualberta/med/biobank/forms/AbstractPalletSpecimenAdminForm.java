@@ -34,8 +34,8 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
-import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
@@ -479,5 +479,14 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected boolean isFirstSuccessfulScan() {
         return palletScanManagement.getSuccessfulScansCount() == 1;
+    }
+
+    protected edu.ualberta.med.biobank.common.scanprocess.Cell getServerCell(
+        PalletCell palletCell) {
+        return new edu.ualberta.med.biobank.common.scanprocess.Cell(
+            palletCell.getRow(), palletCell.getCol(), palletCell.getValue(),
+            palletCell.getStatus() == null ? null
+                : edu.ualberta.med.biobank.common.scanprocess.CellStatus
+                    .valueOf(palletCell.getStatus().name()));
     }
 }
