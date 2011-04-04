@@ -15,20 +15,7 @@ import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 
-public class NumberFilterType implements FilterType {
-    private static Double getNumber(ReportFilterValue value) {
-        return Double.parseDouble(value.getValue());
-    }
-
-    private static Double getSecondNumber(ReportFilterValue value) {
-        return Double.parseDouble(value.getSecondValue());
-    }
-
-    private static Criterion between(String property, ReportFilterValue value) {
-        return Restrictions.between(property, getNumber(value),
-            getSecondNumber(value));
-    }
-
+public abstract class NumberFilterType<E extends Number> implements FilterType {
     @Override
     public void addCriteria(Criteria criteria, String aliasedProperty,
         FilterOperator op, List<ReportFilterValue> values) {
@@ -37,8 +24,8 @@ public class NumberFilterType implements FilterType {
         case EQUALS:
             FilterTypeUtil.checkValues(values, 0, 1);
             for (ReportFilterValue value : values) {
-                criteria
-                    .add(Restrictions.eq(aliasedProperty, getNumber(value)));
+                criteria.add(Restrictions.eq(aliasedProperty,
+                    getFirstNumber(value)));
                 break;
             }
             break;
@@ -46,7 +33,7 @@ public class NumberFilterType implements FilterType {
             FilterTypeUtil.checkValues(values, 0, 1);
             Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
             for (ReportFilterValue value : values) {
-                or.add(Restrictions.ne(aliasedProperty, getNumber(value)));
+                or.add(Restrictions.ne(aliasedProperty, getFirstNumber(value)));
                 break;
             }
             criteria.add(or);
@@ -55,7 +42,7 @@ public class NumberFilterType implements FilterType {
         case IS_IN: {
             Disjunction or = Restrictions.disjunction();
             for (ReportFilterValue value : values) {
-                or.add(Restrictions.eq(aliasedProperty, getNumber(value)));
+                or.add(Restrictions.eq(aliasedProperty, getFirstNumber(value)));
             }
             criteria.add(or);
         }
@@ -64,7 +51,7 @@ public class NumberFilterType implements FilterType {
             Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
             Conjunction and = Restrictions.conjunction();
             for (ReportFilterValue value : values) {
-                and.add(Restrictions.ne(aliasedProperty, getNumber(value)));
+                and.add(Restrictions.ne(aliasedProperty, getFirstNumber(value)));
             }
             or.add(and);
             criteria.add(or);
@@ -113,22 +100,22 @@ public class NumberFilterType implements FilterType {
         case LESS_THAN:
             FilterTypeUtil.checkValues(values, 0, 1);
             criteria.add(Restrictions.lt(aliasedProperty,
-                getNumber(values.get(0))));
+                getFirstNumber(values.get(0))));
             break;
         case LESS_THAN_OR_EQUAL_TO:
             FilterTypeUtil.checkValues(values, 0, 1);
             criteria.add(Restrictions.le(aliasedProperty,
-                getNumber(values.get(0))));
+                getFirstNumber(values.get(0))));
             break;
         case GREATER_THAN:
             FilterTypeUtil.checkValues(values, 0, 1);
             criteria.add(Restrictions.gt(aliasedProperty,
-                getNumber(values.get(0))));
+                getFirstNumber(values.get(0))));
             break;
         case GREATER_THAN_OR_EQUAL_TO:
             FilterTypeUtil.checkValues(values, 0, 1);
             criteria.add(Restrictions.ge(aliasedProperty,
-                getNumber(values.get(0))));
+                getFirstNumber(values.get(0))));
             break;
         }
     }
@@ -142,5 +129,20 @@ public class NumberFilterType implements FilterType {
             FilterOperator.GREATER_THAN_OR_EQUAL_TO, FilterOperator.IS_NOT_SET,
             FilterOperator.BETWEEN, FilterOperator.BETWEEN_ANY,
             FilterOperator.NOT_BETWEEN, FilterOperator.NOT_BETWEEN_ANY);
+    }
+
+    protected abstract E getNumber(String string);
+
+    private E getFirstNumber(ReportFilterValue value) {
+        return getNumber(value.getValue());
+    }
+
+    private E getSecondNumber(ReportFilterValue value) {
+        return getNumber(value.getSecondValue());
+    }
+
+    private Criterion between(String property, ReportFilterValue value) {
+        return Restrictions.between(property, getFirstNumber(value),
+            getSecondNumber(value));
     }
 }

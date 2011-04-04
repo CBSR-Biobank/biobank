@@ -80,26 +80,22 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     protected int getWrapperChildCount() throws Exception {
-        // TODO Auto-generated method stub
         return 0;
     }
 

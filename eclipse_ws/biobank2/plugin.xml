@@ -423,6 +423,11 @@
                <reference
                      definitionId="biobank2.mainPerspectiveSelected">
                </reference>
+               <not>
+                  <reference
+                        definitionId="biobank2.isSuperAdminMode">
+                  </reference>
+               </not>
             </and>
          </activeWhen>
       </handler>
@@ -437,6 +442,11 @@
                <reference
                      definitionId="biobank2.mainPerspectiveSelected">
                </reference>
+               <not>
+                  <reference
+                        definitionId="biobank2.isSuperAdminMode">
+                  </reference>
+               </not>
             </and>
          </activeWhen>
       </handler>
@@ -764,13 +774,15 @@
                      definitionId="biobank2.loggedIn">
                </reference>
                <reference
-                     definitionId="biobank2.isWebAdmin">
-               </reference>
-               <reference
-                     definitionId="biobank2.mainPerspectiveSelected">
+                     definitionId="biobank2.isSuperAdminMode">
                </reference>
             </and>
          </activeWhen>
+         <enabledWhen>
+            <reference
+                  definitionId="biobank2.isSuperAdminMode">
+            </reference>
+         </enabledWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.DispatchAddHandler"
@@ -890,6 +902,12 @@
                      id="edu.ualberta.med.biobank.menu.siteAdd"
                      label="Add Repository Site"
                      style="push">
+                  <visibleWhen
+                        checkEnabled="false">
+                     <reference
+                           definitionId="biobank2.isSuperAdminMode">
+                     </reference>
+                  </visibleWhen>
                </command>
                <command
                      commandId="edu.ualberta.med.biobank.commands.clinicAdd"
@@ -897,6 +915,12 @@
                      id="edu.ualberta.med.biobank.menu.clinicAdd"
                      label="Add Clinic"
                      style="push">
+                  <visibleWhen
+                        checkEnabled="false">
+                     <reference
+                           definitionId="biobank2.isSuperAdminMode">
+                     </reference>
+                  </visibleWhen>
                </command>
                <command
                      commandId="edu.ualberta.med.biobank.commands.studyAdd"
@@ -904,6 +928,12 @@
                      id="edu.ualberta.med.biobank.menu.studyAdd"
                      label="Add Study"
                      style="push">
+                  <visibleWhen
+                        checkEnabled="false">
+                     <reference
+                           definitionId="biobank2.isSuperAdminMode">
+                     </reference>
+                  </visibleWhen>
                </command>
                <command
                      commandId="edu.ualberta.med.biobank.commands.containerTypeAdd"
@@ -911,6 +941,14 @@
                   icon="icons/containerTypes_add.png"
                      label="Add Container Type"
                      style="push">
+                  <visibleWhen
+                        checkEnabled="false">
+                     <not>
+                        <reference
+                              definitionId="biobank2.isSuperAdminMode">
+                        </reference>
+                     </not>
+                  </visibleWhen>
                </command>
                <command
                      commandId="edu.ualberta.med.biobank.commands.containerAdd"
@@ -918,30 +956,62 @@
                   icon="icons/containers_add.png"
                      label="Add Container"
                      style="push">
+                  <visibleWhen
+                        checkEnabled="false">
+                     <not>
+                        <reference
+                              definitionId="biobank2.isSuperAdminMode">
+                        </reference>
+                     </not>
+                  </visibleWhen>
                </command>
                 <command
                      commandId="edu.ualberta.med.biobank.commands.editSpecimenTypes"
                      id="edu.ualberta.med.biobank.menu.editSpecimenTypes"
                      label="Edit Specimen Types"
                      style="push">
+                   <visibleWhen
+                         checkEnabled="false">
+                      <reference
+                            definitionId="biobank2.isSuperAdminMode">
+                      </reference>
+                   </visibleWhen>
                </command>
                 <command
                       commandId="edu.ualberta.med.biobank.commands.editShippingMethods"
                       id="edu.ualberta.med.biobank.menu.editActivityStatusMethods"
                       label="Edit Shipping Methods"
                       style="push">
+                   <visibleWhen
+                         checkEnabled="false">
+                      <reference
+                            definitionId="biobank2.isSuperAdminMode">
+                      </reference>
+                   </visibleWhen>
                 </command>
                 <command
                       commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
                       id="edu.ualberta.med.biobank.menu.editActivityStatusMethods"
                       label="Edit Activity Status"
                       style="push">
+                   <visibleWhen
+                         checkEnabled="false">
+                      <reference
+                            definitionId="biobank2.isSuperAdminMode">
+                      </reference>
+                   </visibleWhen>
                 </command>
                 <command
                       commandId="edu.ualberta.med.biobank.commands.userManagement"
                       id="edu.ualberta.med.biobank.menu.userManagement"
                       label="User Management"
                       style="push">
+                   <visibleWhen
+                         checkEnabled="false">
+                      <reference
+                            definitionId="biobank2.isSuperAdminMode">
+                      </reference>
+                   </visibleWhen>
                 </command>
                 <command
                       commandId="edu.ualberta.med.biobank.commands.changePassword"
@@ -1145,30 +1215,64 @@
                   id="edu.ualberta.med.biobank.menu.siteAdd"
                   label="Add Repository Site"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.isSuperAdminMode">
+                  </reference>
+               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.studyAdd"
                   icon="icons/studies_add.png"
                   label="Add Study"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.isSuperAdminMode">
+                  </reference>
+               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.clinicAdd"
                   icon="icons/clinics_add.png"
                   label="Add Clinic"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.isSuperAdminMode">
+                  </reference>
+               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.containerTypeAdd"
                   icon="icons/containerTypes_add.png"
                   label="Add Container Type"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <not>
+                     <reference
+                           definitionId="biobank2.isSuperAdminMode">
+                     </reference>
+                  </not>
+               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.containerAdd"
                   icon="icons/containers_add.png"
                   label="Add Container"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <not>
+                     <reference
+                           definitionId="biobank2.isSuperAdminMode">
+                     </reference>
+                  </not>
+               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.deleteSelection"
@@ -2253,7 +2357,7 @@
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.SessionsView"
             id="edu.ualberta.med.biobank.views.SessionsView"
-            name="Site Administration"
+            name="Center Administration"
             restorable="true">
 	      </view>
 	      <view
@@ -2351,9 +2455,9 @@
          </with>
       </definition>
       <definition
-            id="biobank2.isWebAdmin">
+            id="biobank2.isSuperAdminMode">
          <with
-               variable="edu.ualberta.med.biobank.sourceprovider.isWebAdmin">
+               variable="edu.ualberta.med.biobank.sourceprovider.isSuperAdminMode">
             <equals
                   value="true">
             </equals>

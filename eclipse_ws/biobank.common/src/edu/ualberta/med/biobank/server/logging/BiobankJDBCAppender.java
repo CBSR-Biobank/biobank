@@ -8,6 +8,7 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Layout;
 import org.apache.log4j.spi.LoggingEvent;
 
+import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.BiobankThreadVariable;
 import edu.ualberta.med.biobank.server.LocalInfo;
@@ -27,7 +28,6 @@ import edu.ualberta.med.biobank.server.LocalInfo;
  * See use in log4j.xml
  * 
  * Copy from CLM JDBCAppender
- * 
  */
 public class BiobankJDBCAppender extends AppenderSkeleton {
 
@@ -60,21 +60,29 @@ public class BiobankJDBCAppender extends AppenderSkeleton {
         if (le.getMessage() != null) {
             msg = le.getMessage().toString();
         }
-        Log log = populateObjectStateLogMesage(msg);
-        java.util.Date d = new java.util.Date();
-        d.setTime(System.currentTimeMillis());
-        log.setCreatedAt(new Date());
-        log.setUsername(userInfo.getUsername());
+        Log log = null;
+        try {
+            log = populateObjectStateLogMesage(msg);
+        } catch (Exception ex) {
+            ExceptionUtils.writeMsgToTmpFile(ex);
+        }
+        if (log != null) {
+            java.util.Date d = new java.util.Date();
+            d.setTime(System.currentTimeMillis());
+            log.setCreatedAt(new Date());
+            log.setUsername(userInfo.getUsername());
 
-        JDBCLogExecutor exe = new JDBCLogExecutor(log, getJDBCProperties());
-        // execute the batch insert
-        new Thread(exe).start();
+            JDBCLogExecutor exe = new JDBCLogExecutor(log, getJDBCProperties());
+            // execute the batch insert
+            new Thread(exe).start();
+        }
     }
 
     /**
      * Method parses the string to populate the log object
      */
-    private Log populateObjectStateLogMesage(String objectAttributeMessage) {
+    private Log populateObjectStateLogMesage(String objectAttributeMessage)
+        throws Exception {
 
         Log log = new Log();
 
@@ -87,13 +95,8 @@ public class BiobankJDBCAppender extends AppenderSkeleton {
             String attributeName = messagetemp.substring(0,
                 messagetemp.indexOf("="));
             String value = messagetemp.substring(messagetemp.indexOf("=") + 1);
-            for (LogProperty logProperties : LogProperty.values()) {
-                boolean set = logProperties.setLogValueIfInString(log,
-                    attributeName, value);
-                if (set) {
-                    break;
-                }
-            }
+            LogWrapper logW = new LogWrapper(null, log);
+            logW.setLogStringValue(attributeName, value);
         }
         return log;
     }

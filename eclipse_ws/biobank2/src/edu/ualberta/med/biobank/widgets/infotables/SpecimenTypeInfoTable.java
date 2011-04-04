@@ -15,7 +15,7 @@ public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> 
 
     public SpecimenTypeInfoTable(Composite parent,
         List<SpecimenTypeWrapper> specimenCollection) {
-        super(parent, specimenCollection, HEADINGS, 10);
+        super(parent, specimenCollection, HEADINGS, 20);
     }
 
     @Override

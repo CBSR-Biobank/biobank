@@ -45,7 +45,6 @@ public enum SearchType {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
-            // FIXME only in site (the one with positions ?)
             if (center instanceof SiteWrapper)
                 return SpecimenWrapper.getSpecimensInSiteWithPositionLabel(
                     SessionManager.getAppService(), (SiteWrapper) center,

@@ -56,11 +56,9 @@ public abstract class GuiDataExporter implements DataExporter {
                 }
             });
         } catch (InvocationTargetException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new DataExportException(e);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new DataExportException(e);
         }
     }
 

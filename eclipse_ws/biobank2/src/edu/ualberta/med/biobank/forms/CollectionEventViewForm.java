@@ -27,7 +27,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(CollectionEventViewForm.class.getName());
 
-    private CollectionEventAdapter patientVisitAdapter;
+    private CollectionEventAdapter ceventAdapter;
 
     private CollectionEventWrapper cevent;
 
@@ -57,11 +57,10 @@ public class CollectionEventViewForm extends BiobankViewForm {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        patientVisitAdapter = (CollectionEventAdapter) adapter;
-        cevent = patientVisitAdapter.getWrapper();
+        ceventAdapter = (CollectionEventAdapter) adapter;
+        cevent = ceventAdapter.getWrapper();
         retrievePatientVisit();
-        cevent.logLookup(SessionManager.getUser().getCurrentWorkingCenter()
-            .getNameShort());
+        SessionManager.logLookup(cevent);
 
         setPartName(Messages.getString("CollectionEventViewForm.title",
             cevent.getVisitNumber()));

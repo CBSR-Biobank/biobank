@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -42,11 +44,13 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         ApplicationException {
         // TODO: new checks required
         // TODO at least one specimen added ?
-        if (isNew()
-            && getWorksheet() != null
-            && getProcessingEventsWithWorksheetCount(appService, getWorksheet()) > 0) {
-            throw new BiobankCheckException("Worksheet " + getWorksheet()
-                + " is already used.");
+        if (isNew()) {
+            if (getWorksheet() == null || getWorksheet().isEmpty())
+                throw new BiobankCheckException("Worksheet cannot be empty.");
+            else if (getProcessingEventsWithWorksheetCount(appService,
+                getWorksheet()) > 0)
+                throw new BiobankCheckException("Worksheet " + getWorksheet()
+                    + " is already used.");
         }
     }
 
@@ -132,32 +136,29 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details) {
+    protected Log getLogMessage(String action, String site, String details)
+        throws Exception {
         Log log = new Log();
         log.setAction(action);
-        // FIXME getLogMessage ?
-        // CollectionEventWrapper cevent = getParentSpecimen()
-        // .getCollectionEvent();
-        // PatientWrapper patient = cevent.getPatient();
-        // if (site == null) {
-        // log.setSite(getCenter().getNameShort());
-        // } else {
-        // log.setSite(site);
-        // }
-        // log.setPatientNumber(patient.getPnumber());
-        // Date createdAt = getCreatedAt();
-        // if (createdAt != null) {
-        // details += " Date Processed: " + getFormattedCreatedAt();
-        // }
-        // try {
-        // String worksheet = cevent.getEventAttrValue("Worksheet");
-        // if (worksheet != null) {
-        // details += " - Worksheet: " + worksheet;
-        // }
-        // } catch (Exception e) {
-        // }
-        // log.setDetails(details);
-        // log.setType("Visit");
+        if (site == null) {
+            log.setCenter(getCenter().getNameShort());
+        } else {
+            log.setCenter(site);
+        }
+        List<String> detailsList = new ArrayList<String>();
+        if (details.length() > 0) {
+            detailsList.add(details);
+        }
+
+        detailsList.add(new StringBuilder("Source Specimens: ").append(
+            getSpecimenCount(false)).toString());
+        String worksheet = getWorksheet();
+        if (worksheet != null) {
+            detailsList.add(new StringBuilder("Worksheet: ").append(worksheet)
+                .toString());
+        }
+        log.setDetails(StringUtils.join(detailsList, ", "));
+        log.setType("ProcessingEvent");
         return log;
     }
 
@@ -211,11 +212,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
             Arrays.asList(new Object[] { worksheetNumber }));
         return getCountResult(appService, c);
     }
-
-    // @Override
-    // public CenterWrapper<?> getCenterLinkedToObjectForSecu() {
-    // return getCenter();
-    // }
 
     public static Collection<? extends ModelWrapper<?>> getAllProcessingEvents(
         BiobankApplicationService appService) throws ApplicationException {

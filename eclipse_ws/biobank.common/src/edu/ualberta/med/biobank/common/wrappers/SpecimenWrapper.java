@@ -34,11 +34,16 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     public SpecimenWrapper(WritableApplicationService appService,
         Specimen wrappedObject) {
         super(appService, wrappedObject);
-        initManagement();
+        init();
     }
 
     public SpecimenWrapper(WritableApplicationService appService) {
         super(appService);
+        init();
+    }
+
+    private void init() {
+        setTopSpecimenInternal(this);
         initManagement();
     }
 
@@ -159,7 +164,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         if (center != null) {
             return center.getNameShort();
         }
-        // FIXME should never see that ? should never retrieve an Specimen which
+        // FIXME should never see that ? should never retrieve a Specimen which
         // site cannot be displayed ?
         return "CANNOT DISPLAY INFORMATION";
     }
@@ -411,7 +416,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         Log log = new Log();
         CollectionEventWrapper cevent = getCollectionEvent();
         log.setAction(action);
-        log.setSite(center);
+        if (center == null)
+            center = getCurrentCenter().getNameShort();
+        log.setCenter(center);
         log.setPatientNumber(cevent.getPatient().getPnumber());
         log.setInventoryId(getInventoryId());
         log.setLocationLabel(getPositionString(true, true));
@@ -467,4 +474,54 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         objectWithPositionManagement.resetInternalFields();
     }
 
+    @Override
+    protected void persistDependencies(Specimen originalSpecimen)
+        throws Exception {
+
+        boolean parentChanged = (originalSpecimen != null && originalSpecimen
+            .getParentSpecimen().equals(getParentSpecimen()));
+
+        if (isNew() || parentChanged) {
+            updateChildren();
+        }
+    }
+
+    private void updateChildren() throws Exception {
+        for (SpecimenWrapper child : getChildSpecimenCollection(false)) {
+            child.setTopSpecimenInternal(getTopSpecimen());
+
+            // only persist if the child has already been persisted, otherwise
+            // only update the reference.
+            if (child.isNew()) {
+                child.updateChildren();
+            } else {
+                child.persist();
+            }
+        }
+    }
+
+    @Override
+    public void setParentSpecimen(SpecimenWrapper specimen) {
+        super.setParentSpecimen(specimen);
+        // topSpecimen should never be null
+        setTopSpecimenInternal(specimen != null ? specimen.getTopSpecimen()
+            : this);
+    }
+
+    /**
+     * Call <code>setParentSpecimen(SpecimenWrapper)</code> instead of this
+     * method to change the top parent. The 'topSpecimen' will be automatically
+     * updated.
+     */
+    @Override
+    @Deprecated
+    public void setTopSpecimen(SpecimenWrapper specimen) {
+        // this method should never be called outside of the wrapper.
+        throw new UnsupportedOperationException(
+            "this method should never be called");
+    }
+
+    protected void setTopSpecimenInternal(SpecimenWrapper specimen) {
+        super.setTopSpecimen(specimen);
+    }
 }

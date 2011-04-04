@@ -10,12 +10,12 @@ public class RequestContainerAdapter implements Node {
 
     public Object parent;
     public ContainerWrapper container;
-    List<Object> children;
+    List<Node> children;
 
     public RequestContainerAdapter(Object parent, ContainerWrapper container) {
         this.parent = parent;
         this.container = container;
-        this.children = new ArrayList<Object>();
+        this.children = new ArrayList<Node>();
     }
 
     @Override
@@ -28,7 +28,7 @@ public class RequestContainerAdapter implements Node {
     }
 
     @Override
-    public List<Object> getChildren() {
+    public List<Node> getChildren() {
         return children;
     }
 
@@ -42,14 +42,15 @@ public class RequestContainerAdapter implements Node {
         Integer aliquots = 0;
         for (Object child : getChildren()) {
             if (child instanceof RequestContainerAdapter)
-                aliquots += ((RequestContainerAdapter) child).getSpecimenCount();
+                aliquots += ((RequestContainerAdapter) child)
+                    .getSpecimenCount();
             else
                 aliquots++;
         }
         return aliquots;
     }
 
-    public void addChild(Object c) {
+    public void addChild(Node c) {
         children.add(c);
     }
 }

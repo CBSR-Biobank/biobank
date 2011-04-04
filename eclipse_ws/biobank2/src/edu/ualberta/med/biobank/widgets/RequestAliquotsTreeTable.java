@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -31,18 +32,20 @@ import org.eclipse.swt.widgets.TreeColumn;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
+import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
+import edu.ualberta.med.biobank.forms.utils.DispatchTableGroup;
 import edu.ualberta.med.biobank.forms.utils.RequestTableGroup;
 import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.treeview.RequestAliquotAdapter;
+import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 
 public class RequestAliquotsTreeTable extends BiobankWidget {
 
     private TreeViewer tv;
     private RequestWrapper shipment;
-    protected List<RequestTableGroup> groups;
+    protected List<DispatchTableGroup> groups;
 
     public RequestAliquotsTreeTable(Composite parent, RequestWrapper shipment) {
         super(parent, SWT.NONE);
@@ -85,8 +88,8 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
-                groups = RequestTableGroup
-                    .getGroupsForShipment(RequestAliquotsTreeTable.this.shipment);
+                // groups = RequestTableGroup
+                // .getGroupsForShipment(RequestAliquotsTreeTable.this.shipment);
             }
 
             @Override
@@ -123,21 +126,9 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                         return ((RequestContainerAdapter) element)
                             .getLabelInternal();
                     return "";
-                } else if (element instanceof RequestAliquotAdapter) {
-                    switch (columnIndex) {
-                    case 0:
-                        return ((RequestAliquotAdapter) element)
-                            .getLabelInternal();
-                    case 1:
-                        return ((RequestAliquotAdapter) element)
-                            .getSpecimenType();
-                    case 2:
-                        return ((RequestAliquotAdapter) element).getPosition();
-                    case 3:
-                        return ((RequestAliquotAdapter) element).getClaimedBy();
-                    default:
-                        return "";
-                    }
+                } else if (element instanceof TreeItemAdapter) {
+                    return ((TreeItemAdapter) element)
+                        .getColumnText(columnIndex);
                 }
                 return "";
             }
@@ -150,9 +141,8 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             public void doubleClick(DoubleClickEvent event) {
                 Object o = ((IStructuredSelection) tv.getSelection())
                     .getFirstElement();
-                if (o instanceof RequestAliquotAdapter) {
-                    RequestSpecimenWrapper ra = ((RequestAliquotAdapter) o)
-                        .getSpecimen();
+                if (o instanceof TreeItemAdapter) {
+                    ItemWrapper ra = ((TreeItemAdapter) o).getSpecimen();
                     SessionManager.openViewForm(ra.getSpecimen());
                 }
             }
@@ -188,7 +178,7 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             .getSelection();
         if (selection != null
             && selection.size() > 0
-            && (selection.getFirstElement() instanceof RequestAliquotAdapter || selection
+            && (selection.getFirstElement() instanceof TreeItemAdapter || selection
                 .getFirstElement() instanceof RequestContainerAdapter))
             return selection.getFirstElement();
         return null;
@@ -196,8 +186,9 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
 
     protected RequestSpecimenWrapper getSelectedAliquot() {
         Object node = getSelectedNode();
-        if (node != null && node instanceof RequestAliquotAdapter) {
-            return ((RequestAliquotAdapter) node).getSpecimen();
+        if (node != null && node instanceof TreeItemAdapter) {
+            return (RequestSpecimenWrapper) ((TreeItemAdapter) node)
+                .getSpecimen();
         }
         return null;
     }
@@ -217,13 +208,13 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
 
     protected void claim(Object node) {
         try {
-            if (node instanceof RequestAliquotAdapter) {
-                RequestSpecimenWrapper a = ((RequestAliquotAdapter) node)
+            if (node instanceof TreeItemAdapter) {
+                RequestSpecimenWrapper a = (RequestSpecimenWrapper) ((TreeItemAdapter) node)
                     .getSpecimen();
                 a.setClaimedBy(SessionManager.getUser().getFirstName());
                 a.persist();
             } else {
-                List<Object> children = ((RequestContainerAdapter) node)
+                List<Node> children = ((RequestContainerAdapter) node)
                     .getChildren();
                 for (Object child : children)
                     claim(child);
@@ -272,15 +263,16 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                 for (Iterator<Object> iterator = sel.iterator(); iterator
                     .hasNext();) {
                     Object item = iterator.next();
-                    String row = "";
+                    List<String> row = new ArrayList<String>();
                     for (int i = 0; i < numCols; i++) {
                         String text = labelProvider.getColumnText(item, i);
-                        if (text != null)
-                            row += text;
-                        if (i < numCols - 1)
-                            row += ", ";
+                        if (text != null) {
+                            row.add(text);
+                        } else {
+                            row.add("");
+                        }
                     }
-                    selectedRows.add(row);
+                    selectedRows.add(StringUtils.join(row, ","));
                 }
                 if (selectedRows.size() > 0) {
                     StringBuilder sb = new StringBuilder();

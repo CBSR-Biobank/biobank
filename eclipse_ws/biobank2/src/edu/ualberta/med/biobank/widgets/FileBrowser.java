@@ -59,7 +59,7 @@ public class FileBrowser extends BiobankWidget {
                 while (br.ready())
                     contents += br.readLine() + "\n";
             } catch (Exception e1) {
-                BiobankPlugin.openError("IO Error", "Unable to read file.");
+                BiobankPlugin.openError("IO Error", "Unable to read file.", e1);
             }
             setText(contents);
         }

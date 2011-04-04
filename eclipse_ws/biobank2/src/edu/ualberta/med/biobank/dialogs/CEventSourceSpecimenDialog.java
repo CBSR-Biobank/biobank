@@ -29,7 +29,7 @@ import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.validators.InventoryIdValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -160,7 +160,7 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
             null,
             internalSpecimen,
             SpecimenPeer.INVENTORY_ID.getName(),
-            new NonEmptyStringValidator(
+            new InventoryIdValidator(
                 Messages
                     .getString("CEventSourceSpecimenDialog.field.inventoryID.validator.msg"))); //$NON-NLS-1$
         GridData gd = (GridData) inventoryIdWidget.getLayoutData();

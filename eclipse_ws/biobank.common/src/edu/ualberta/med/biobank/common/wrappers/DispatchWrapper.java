@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -20,6 +22,8 @@ import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.Log;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -59,6 +63,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return !getDispatchSpecimenCollectionWithState(
             DispatchSpecimenState.MISSING, DispatchSpecimenState.EXTRA)
             .isEmpty();
+    }
+
+    public Map<DispatchSpecimenState, List<DispatchSpecimenWrapper>> getMap() {
+        return dispatchSpecimenMap;
     }
 
     @Override
@@ -123,7 +131,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     private List<DispatchSpecimenWrapper> getDispatchSpecimenCollectionWithState(
         DispatchSpecimenState... states) {
         return getDispatchSpecimenCollectionWithState(dispatchSpecimenMap,
-            getDispatchSpecimenCollection(false), states);
+            getFastDispatchSpecimenCollection(), states);
     }
 
     private List<DispatchSpecimenWrapper> getDispatchSpecimenCollectionWithState(
@@ -278,7 +286,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         for (DispatchSpecimenWrapper da : nonProcessedAliquots) {
             if (specimensToReceive.contains(da.getSpecimen())) {
                 da.setDispatchSpecimenState(DispatchSpecimenState.RECEIVED);
-                da.getDispatchSpecimenState();
             }
         }
         resetMap();
@@ -304,6 +311,14 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public boolean isInClosedState() {
         return DispatchState.CLOSED.equals(getDispatchState());
+    }
+
+    public boolean isInLostState() {
+        return DispatchState.LOST.equals(getDispatchState());
+    }
+
+    public void setState(DispatchState ds) {
+        setState(ds.getId());
     }
 
     @Override
@@ -342,14 +357,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return null;
     }
 
-    public void setState(DispatchState ds) {
-        setState(ds.getId());
-    }
-
-    public boolean isInLostState() {
-        return DispatchState.LOST.equals(getDispatchState());
-    }
-
     public List<DispatchSpecimenWrapper> getNonProcessedDispatchSpecimenCollection() {
         return getDispatchSpecimenCollectionWithState(DispatchSpecimenState.NONE);
     }
@@ -379,7 +386,24 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         resetMap();
     }
 
-    public List<DispatchSpecimenWrapper> getDispatchSpecimenCollection() {
+    // fast... from db. should only call this once then use the cached value
+    public List<DispatchSpecimenWrapper> getFastDispatchSpecimenCollection() {
+        if (!isCached(DispatchPeer.DISPATCH_SPECIMEN_COLLECTION)) {
+            List<DispatchSpecimen> results = new ArrayList<DispatchSpecimen>();
+            // test hql
+            HQLCriteria query = new HQLCriteria(
+                "select ra from "
+                    + DispatchSpecimen.class.getName()
+                    + " ra inner join fetch ra.specimen inner join fetch ra.specimen.specimenType inner join fetch ra.specimen.collectionEvent inner join fetch ra.specimen.collectionEvent.patient inner join fetch ra.specimen.activityStatus "
+                    + " where ra.dispatch.id = ?",
+                Arrays.asList(new Object[] { getId() }));
+            try {
+                results = appService.query(query);
+            } catch (ApplicationException e) {
+                throw new RuntimeException(e);
+            }
+            wrappedObject.setDispatchSpecimenCollection(results);
+        }
         return getDispatchSpecimenCollection(false);
     }
 
@@ -414,6 +438,61 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public void resetMap() {
         dispatchSpecimenMap.clear();
+    }
+
+    @Override
+    protected Log getLogMessage(String action, String site, String details) {
+        Log log = new Log();
+        log.setAction(action);
+
+        DispatchState state = getDispatchState();
+
+        if (site != null) {
+            log.setCenter(site);
+        } else {
+            if (state.equals(DispatchState.CREATION)
+                || state.equals(DispatchState.IN_TRANSIT)) {
+                log.setCenter(getSenderCenter().getNameShort());
+            } else {
+                log.setCenter(getReceiverCenter().getNameShort());
+            }
+        }
+
+        List<String> detailsList = new ArrayList<String>();
+        if (details.length() > 0) {
+            detailsList.add(details);
+        }
+
+        detailsList.add(new StringBuilder("state: ").append(
+            getStateDescription()).toString());
+
+        if (state.equals(DispatchState.CREATION)
+            || state.equals(DispatchState.IN_TRANSIT)
+            || state.equals(DispatchState.LOST)) {
+            String packedAt = getFormattedPackedAt();
+            if ((packedAt != null) && (packedAt.length() > 0)) {
+                detailsList.add(new StringBuilder("packed at: ").append(
+                    packedAt).toString());
+            }
+        }
+
+        ShipmentInfoWrapper shipInfo = getShipmentInfo();
+        if (shipInfo != null) {
+            String receivedAt = shipInfo.getFormattedDateReceived();
+            if ((receivedAt != null) && (receivedAt.length() > 0)) {
+                detailsList.add(new StringBuilder("received at: ").append(
+                    receivedAt).toString());
+            }
+
+            String waybill = shipInfo.getWaybill();
+            if (waybill != null) {
+                detailsList.add(new StringBuilder(", waybill: ")
+                    .append(waybill).toString());
+            }
+        }
+        log.setDetails(StringUtils.join(detailsList, ", "));
+        log.setType("Dispatch");
+        return log;
     }
 
     private static final String DISPATCH_HQL_STRING = "from "

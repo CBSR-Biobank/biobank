@@ -131,11 +131,17 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         propertiesMap.clear();
         propertyMap.clear();
         resetInternalFields();
+
+        E oldValue = wrappedObject;
+
         if (!isNew()) {
-            E oldValue = wrappedObject;
             wrappedObject = getObjectFromDatabase();
-            firePropertyChanges(oldValue, wrappedObject);
+            if (wrappedObject == null) {
+                wrappedObject = getNewObject();
+            }
         }
+
+        firePropertyChanges(oldValue, wrappedObject);
     }
 
     /**
@@ -392,7 +398,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         + "from {0} as o where {1}=? and site.id{2} {3}";
 
     protected void checkNoDuplicatesInSite(Class<?> objectClass,
-        String propertyName, String value, Integer siteId, String errorMessage)
+        String propertyName, String value, Integer siteId, String errorName)
         throws ApplicationException, BiobankException {
         List<Object> params = new ArrayList<Object>();
         params.add(value);
@@ -411,7 +417,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             CHECK_NO_DUPLICATES_IN_SITE, objectClass.getName(), propertyName,
             siteIdTest, equalsTest), params);
         if (getCountResult(appService, criteria) > 0) {
-            throw new DuplicateEntryException(errorMessage);
+            throw new DuplicateEntryException(errorName + " \"" + value
+                + "\" already exists.");
         }
     }
 
@@ -578,7 +585,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     protected Log getLogMessage(@SuppressWarnings("unused") String action,
         @SuppressWarnings("unused") String site,
-        @SuppressWarnings("unused") String details) {
+        @SuppressWarnings("unused") String details) throws Exception {
         return null;
     }
 
@@ -586,19 +593,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     public int compareTo(ModelWrapper<E> arg0) {
         return this.getId().compareTo(arg0.getId());
     }
-
-    // public CenterWrapper<?> getCenterLinkedToObjectForSecu() {
-    // return null;
-    // }
-
-    /**
-     * return true if access is authorized
-     */
-    // FIXME needed ?
-    // public boolean checkSpecificAccess(@SuppressWarnings("unused") User user,
-    // @SuppressWarnings("unused") CenterWrapper<?> center) {
-    // return true;
-    // }
 
     public static <W extends ModelWrapper<? extends M>, M> W wrapModel(
         WritableApplicationService appService, M model, Class<W> wrapperKlazz)
@@ -778,8 +772,17 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         if (wrappers == null && !modelWrapper.isCached(property)) {
             Collection<R> raw = getModelProperty(modelWrapper, property);
-            wrappers = wrapModelCollection(appService, (List<R>) raw,
-                wrapperKlazz);
+
+            List<R> list = new ArrayList<R>();
+            if (raw != null) {
+                if (raw instanceof List) {
+                    list = (List<R>) raw;
+                } else {
+                    list = new ArrayList<R>(raw);
+                }
+            }
+
+            wrappers = wrapModelCollection(appService, list, wrapperKlazz);
             modelWrapper.cache(property, wrappers);
         }
 
@@ -937,7 +940,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         propertyMap.put(property, value);
     }
 
-    private boolean isCached(Property<?, ?> property) {
+    protected boolean isCached(Property<?, ?> property) {
         return propertyMap.containsKey(property);
     }
 

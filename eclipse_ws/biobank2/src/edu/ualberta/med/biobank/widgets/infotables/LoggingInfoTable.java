@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
+public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
 
     private static final String[] HEADINGS = new String[] { "Site", "User",
         "Date", "Action", "Type", "Patient #", "Inventory ID", "Location",
@@ -23,7 +23,7 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
     }
 
     class TableRowData {
-        String site;
+        String center;
         String user;
         String date;
         String action;
@@ -35,18 +35,18 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { site, user, date, action,
+            return StringUtils.join(new String[] { center, user, date, action,
                 type, patientNumber, inventoryId, positionLabel, details },
                 "\t");
         }
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
+    public BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item = getCollectionModelObject((LogWrapper) element);
                 if (item == null) {
                     if (columnIndex == 0) {
                         return "loading...";
@@ -55,7 +55,7 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
                 }
                 switch (columnIndex) {
                 case 0:
-                    return item.site;
+                    return item.center;
                 case 1:
                     return item.user;
                 case 2:
@@ -79,11 +79,9 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
         };
     }
 
-    @Override
-    public Object getCollectionModelObject(LogWrapper logQuery)
-        throws Exception {
+    public TableRowData getCollectionModelObject(LogWrapper logQuery) {
         TableRowData info = new TableRowData();
-        info.site = logQuery.getSite();
+        info.center = logQuery.getCenter();
         info.user = logQuery.getUsername();
         info.action = logQuery.getAction();
         info.type = logQuery.getType();
@@ -105,24 +103,8 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
     }
 
     @Override
-    protected String getCollectionModelObjectToString(Object o) {
-        if (o == null)
-            return null;
-        return ((TableRowData) o).toString();
-    }
-
-    @Override
     public List<LogWrapper> getCollection() {
         return null;
     }
 
-    @Override
-    public LogWrapper getSelection() {
-        return null;
-    }
-
-    @Override
-    protected BiobankTableSorter getComparator() {
-        return null;
-    }
 }
