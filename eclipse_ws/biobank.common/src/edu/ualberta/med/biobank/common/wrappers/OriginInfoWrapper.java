@@ -168,13 +168,15 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return shipments;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
-        if (getCenter() != null)
-            return Arrays.asList(getCenter());
-        return super.getSecuritySpecificCenters();
-    }
+    // @SuppressWarnings("unchecked")
+    // @Override
+    // jmf: Cannot just return the origin center becaus then the receivers
+    // cannot edit the shipment
+    // public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
+    // if (getCenter() != null)
+    // return Arrays.asList(getCenter());
+    // return super.getSecuritySpecificCenters();
+    // }
 
     @Override
     protected Log getLogMessage(String action, String site, String details) {

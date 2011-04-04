@@ -2,12 +2,15 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -21,6 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.dialogs.SpecimenOriginSelectDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
@@ -76,6 +80,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private NotNullValidator departedValidator;
 
     private BiobankText waybillWidget;
+
+    private Set<SpecimenWrapper> specimensToPersist = new HashSet<SpecimenWrapper>();
 
     @Override
     protected void init() throws Exception {
@@ -193,14 +199,19 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     }
 
     protected void activateWaybillWidget(boolean waybillNeeded) {
-        waybillWidget.setVisible(waybillNeeded);
-        ((GridData) waybillWidget.getLayoutData()).exclude = !waybillNeeded;
-        waybillLabel.setVisible(waybillNeeded);
-        ((GridData) waybillLabel.getLayoutData()).exclude = !waybillNeeded;
-        if (waybillNeeded) {
-            widgetCreator.addBinding(WAYBILL_BINDING);
-        } else {
-            widgetCreator.removeBinding(WAYBILL_BINDING);
+        if (waybillLabel != null && !waybillLabel.isDisposed()) {
+            waybillLabel.setVisible(waybillNeeded);
+            ((GridData) waybillLabel.getLayoutData()).exclude = !waybillNeeded;
+        }
+        if (waybillWidget != null && !waybillWidget.isDisposed()) {
+            waybillWidget.setVisible(waybillNeeded);
+            ((GridData) waybillWidget.getLayoutData()).exclude = !waybillNeeded;
+
+            if (waybillNeeded) {
+                widgetCreator.addBinding(WAYBILL_BINDING);
+            } else {
+                widgetCreator.removeBinding(WAYBILL_BINDING);
+            }
         }
         form.layout(true, true);
     }
@@ -258,12 +269,38 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                     else if (specimen.getParentContainer() != null)
                         throw new VetoException(
                             "Specimen is currently listed as stored in a container.");
+                    else if (specimen.getOriginInfo() != null
+                        && specimen.getOriginInfo().getShipmentInfo() != null
+                        && !specimen.getOriginInfo().getShipmentInfo()
+                            .equals(this))
+                        throw new VetoException(
+                            "Specimen is currently part of another shipment: "
+                                + specimen.getOriginInfo().getShipmentInfo()
+                                + ". You must remove this specimen from that shipment before it can be added to this one.");
                     break;
                 case POST_ADD:
                     shipment.addToSpecimenCollection(Arrays.asList(specimen));
                     specimen.setOriginInfo(shipment);
                     break;
                 case PRE_DELETE:
+                    if (!shipment.isNew()) {
+                        try {
+                            List<CenterWrapper<?>> centers = CenterWrapper
+                                .getCenters(specimen.getAppService());
+                            SpecimenOriginSelectDialog dlg = new SpecimenOriginSelectDialog(
+                                form.getShell(), specimen, centers);
+
+                            if (dlg.open() == Window.OK) {
+                                specimensToPersist.add(specimen);
+                            } else {
+                                throw new VetoException(
+                                    "Must select a new center for this specimen to originate from.");
+                            }
+                        } catch (ApplicationException e) {
+                            throw new VetoException(e.getMessage());
+                        }
+
+                    }
                     break;
                 case POST_DELETE:
                     shipment.removeFromSpecimenCollection(Arrays
@@ -301,6 +338,14 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         }
 
         shipment.persist();
+
+        for (SpecimenWrapper s : specimensToPersist) {
+            OriginInfoWrapper origin = s.getOriginInfo();
+            origin.persist();
+
+            s.setOriginInfo(origin);
+            s.persist();
+        }
 
         Display.getDefault().syncExec(new Runnable() {
             @Override
