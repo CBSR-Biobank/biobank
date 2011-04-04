@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.security;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -233,7 +234,13 @@ public class User implements Serializable, NotAProxy {
                     .getConstructor(WritableApplicationService.class);
                 wrapper = (ModelWrapper<?>) constructor
                     .newInstance((WritableApplicationService) null);
-            } catch (Exception e) {
+            } catch (NoSuchMethodException e) {
+                return false;
+            } catch (InvocationTargetException e) {
+                return false;
+            } catch (IllegalAccessException e) {
+                return false;
+            } catch (InstantiationException e) {
                 return false;
             }
             type = wrapper.getWrappedClass().getName();

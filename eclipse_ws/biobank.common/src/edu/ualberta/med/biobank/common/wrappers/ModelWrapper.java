@@ -583,9 +583,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
     }
 
-    protected Log getLogMessage(@SuppressWarnings("unused") String action,
-        @SuppressWarnings("unused") String site,
-        @SuppressWarnings("unused") String details) throws Exception {
+    @SuppressWarnings("unused")
+    protected Log getLogMessage(String action, String site, String details)
+        throws Exception {
         return null;
     }
 
