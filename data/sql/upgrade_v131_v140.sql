@@ -225,21 +225,37 @@ INSERT INTO shipment_info (aship_id,received_at,sent_at,waybill,box_number,shipp
 SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id FROM abstract_shipment
 WHERE discriminator='ClinicShipment';
 
+-- aship_type=0 for source specimens, aship_type=1 for aliquoted_specimens
+
 CREATE TABLE origin_info (
     ID INT(11) NOT NULL AUTO_INCREMENT,
     SHIPMENT_INFO_ID INT(11) NULL DEFAULT NULL,
     CENTER_ID INT(11) NOT NULL,
     ASHIP_ID INT(11) NOT NULL,
+    ASHIP_TYPE INT(11) NOT NULL,
     CONSTRAINT SHIPMENT_INFO_ID UNIQUE KEY(SHIPMENT_INFO_ID),
     INDEX FKE92E7A2792FAA705 (CENTER_ID),
     INDEX FKE92E7A27F59D873A (SHIPMENT_INFO_ID),
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-INSERT INTO origin_info (center_id,shipment_info_id,aship_id)
-SELECT center.id,shipment_info.id,abstract_shipment.id FROM abstract_shipment
+-- create origin info for source specimens
+
+INSERT INTO origin_info (center_id,shipment_info_id,aship_id,aship_type)
+SELECT center.id,shipment_info.id,abstract_shipment.id,0
+       FROM abstract_shipment
        JOIN clinic ON clinic.id=abstract_shipment.clinic_id
        JOIN center ON center.name=clinic.name
+       join shipment_info on shipment_info.aship_id=abstract_shipment.id
+       WHERE abstract_shipment.discriminator='ClinicShipment';
+
+-- create origin info for aliquoted specimens
+
+INSERT INTO origin_info (center_id,shipment_info_id,aship_id,aship_type)
+SELECT center.id,null,abstract_shipment.id,1
+       FROM abstract_shipment
+       JOIN site ON site.id=abstract_shipment.site_id
+       JOIN center ON center.name=site.name
        join shipment_info on shipment_info.aship_id=abstract_shipment.id
        WHERE abstract_shipment.discriminator='ClinicShipment';
 
@@ -254,8 +270,22 @@ abstract_shipment as aship, origin_info as oi
        and aship.id=csp.CLINIC_SHIPMENT_ID
        and oi.aship_id=aship.id
        and aship.discriminator='ClinicShipment'
+       and oi.aship_type=0
        and specimen.pv_id=pv.id
        and specimen.pv_sv_id is not null;
+
+-- set origin info for aliquoted specimens
+
+UPDATE specimen,patient_visit as pv, clinic_shipment_patient as csp,
+abstract_shipment as aship, origin_info as oi
+       set specimen.origin_info_id=oi.id
+       where csp.id=pv.CLINIC_SHIPMENT_PATIENT_ID
+       and aship.id=csp.CLINIC_SHIPMENT_ID
+       and oi.aship_id=aship.id
+       and aship.discriminator='ClinicShipment'
+       and oi.aship_type=1
+       and specimen.pv_id=pv.id
+       and specimen.pv_sv_id is null;
 
 drop index aship_id_idx on origin_info;
 
@@ -519,8 +549,8 @@ CREATE TABLE processing_event (
 
 create index CREATED_AT_IDX on processing_event(CREATED_AT);
 
--- add a processing event for each patient visit 
--- (more than one processing event will have the same worksheet and same date/time. 
+-- add a processing event for each patient visit
+-- (more than one processing event will have the same worksheet and same date/time.
 -- This won't be allowed anymore in future entries)
 
 insert into processing_event (created_at,comment,activity_status_id,center_id,pv_id)
