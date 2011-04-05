@@ -467,10 +467,13 @@ public class ModelUmlParser {
             + toClassName);
     }
 
-    public void geDataModel(String modelFileName) throws Exception {
+    public Map<String, ModelClass> geDataModel(String modelFileName)
+        throws Exception {
         Document doc = getDocument(modelFileName);
         getDataModelDataTypes(doc);
         getDataModel(doc);
+
+        return Collections.unmodifiableMap(dataModelClassMap);
     }
 
     public Set<String> getDmTableSet() throws Exception {
@@ -478,19 +481,6 @@ public class ModelUmlParser {
             throw new Exception("UML file not parsed yet");
         }
         return dataModelClassMap.keySet();
-    }
-
-    public Map<String, Attribute> getDmTableAttrMap(String className)
-        throws Exception {
-        if (dataModelClassMap.size() == 0) {
-            throw new Exception("UML file not parsed yet");
-        }
-
-        ModelClass dmTable = dataModelClassMap.get(className);
-        if (dmTable == null) {
-            throw new Exception(INVALID_DATA_MODEL_CLASS_NAME_MSG + className);
-        }
-        return Collections.unmodifiableMap(dmTable.getAttrMap());
     }
 
     private void getDataModelDataTypes(Document doc) throws Exception {
