@@ -130,10 +130,14 @@ public class HbmStrings {
 
         Map<String, Attribute> attrMap = ModelUmlParser.getInstance()
             .getDmTableAttrMap(tableName);
-        Map<String, Integer> attrLengthMap = new HashMap<String, Integer>();
+        Map<String, Attribute> attrTypeMap = new HashMap<String, Attribute>();
 
         Set<String> uniqueList = new HashSet<String>();
         Set<String> notNullList = new HashSet<String>();
+
+        if (className.equals("AbstractPosition")) {
+            LOGGER.info("here");
+        }
 
         for (String attrName : attrMap.keySet()) {
             Attribute attr = attrMap.get(attrName);
@@ -143,12 +147,14 @@ public class HbmStrings {
                 Matcher varcharMatcher = VARCHAR_LEN.matcher(attrType);
 
                 if (varcharMatcher.find()) {
-                    attrLengthMap.put(attrName,
-                        Integer.valueOf(varcharMatcher.group(1)));
+                    attrTypeMap.put(attrName, new Attribute(attrName, "string",
+                        Integer.valueOf(varcharMatcher.group(1))));
                 }
             } else if (attrType.startsWith("TEXT")) {
-                attrLengthMap.put(attrName, 500);
+                attrTypeMap
+                    .put(attrName, new Attribute(attrName, "text", null));
             }
+
             if (attr.hasStereotype(UNIQUE_STEREOTYPE))
                 uniqueList.add(attrName);
             if (attr.hasStereotype(NOT_NULL_STEREOTYPE))
@@ -158,7 +164,7 @@ public class HbmStrings {
         }
 
         HbmModifier.getInstance().alterMapping(hbmFilePath, className,
-            tableName, attrLengthMap, uniqueList, notNullList);
+            tableName, attrTypeMap, uniqueList, notNullList);
     }
 
     private void createVarCharLengthsSourceCode() throws Exception {

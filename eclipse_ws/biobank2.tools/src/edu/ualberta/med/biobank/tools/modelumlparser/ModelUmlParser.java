@@ -294,7 +294,7 @@ public class ModelUmlParser {
             }
 
             modelClass.addAttr(classAttrName, new Attribute(classAttrName,
-                classAttrType, getStereotypes(attrNode)));
+                classAttrType, null, getStereotypes(attrNode)));
             LOGGER.debug("LM class/" + modelClass.getName() + " attribute/"
                 + classAttrName + " type/" + classAttrType);
         }
@@ -569,7 +569,7 @@ public class ModelUmlParser {
                 throw new Exception("xmi id ref not found: " + xmiIdRef);
             }
 
-            mc.addAttr(attrName, new Attribute(attrName, attrType,
+            mc.addAttr(attrName, new Attribute(attrName, attrType, null,
                 getStereotypes(attrNode)));
         }
     }
