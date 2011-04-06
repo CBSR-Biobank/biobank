@@ -71,7 +71,7 @@ public class ColumnSelectWidget extends Composite {
         createContainer();
 
         report.addPropertyChangeListener(
-            ReportWrapper.PROPERTY_REPORT_COLUMN_COLLECTION,
+            ReportWrapper.REPORT_COLUMN_COLLECTION_CACHE_KEY,
             new PropertyChangeListener() {
                 @Override
                 public void propertyChange(PropertyChangeEvent arg0) {
