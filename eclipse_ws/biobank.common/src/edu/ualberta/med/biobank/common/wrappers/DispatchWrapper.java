@@ -538,6 +538,23 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return shipments;
     }
 
+    public static List<DispatchWrapper> getDispatchesByDateSent(
+        WritableApplicationService appService, Date dateSent)
+        throws ApplicationException {
+
+        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING
+            + " and DATE(s." + ShipmentInfoPeer.SENT_AT.getName()
+            + ") = DATE(?)");
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            Arrays.asList(new Object[] { dateSent }));
+
+        List<Dispatch> origins = appService.query(criteria);
+        List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(
+            appService, origins, DispatchWrapper.class);
+
+        return shipments;
+    }
+
     @Override
     public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
         List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>();

@@ -53,6 +53,8 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     private Button radioDateReceived;
 
+    private Button radioDateSent;
+
     private static SpecimenTransitView currentInstance;
 
     public SpecimenTransitView() {
@@ -103,16 +105,6 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 }
             }
         });
-        // radioDateSent = new Button(composite, SWT.RADIO);
-        // radioDateSent.setText("Packed At");
-        // radioDateSent.addSelectionListener(new SelectionAdapter() {
-        // @Override
-        // public void widgetSelected(SelectionEvent e) {
-        // if (radioDateSent.getSelection()) {
-        // showTextOnly(false);
-        // }
-        // }
-        // });
 
         radioDateReceived = new Button(composite, SWT.RADIO);
         radioDateReceived.setText("Date Received");
@@ -120,6 +112,17 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (radioDateReceived.getSelection()) {
+                    showTextOnly(false);
+                }
+            }
+        });
+
+        radioDateSent = new Button(composite, SWT.RADIO);
+        radioDateSent.setText("Date Sent");
+        radioDateSent.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (radioDateSent.getSelection()) {
                     showTextOnly(false);
                 }
             }
@@ -208,12 +211,21 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 SessionManager.getAppService(), treeText.getText().trim()));
             return wrappers;
 
-        } else {
+        } else if (radioDateReceived.getSelection()) {
             Date date = dateWidget.getDate();
             if (date != null) {
                 wrappers.addAll(OriginInfoWrapper.getShipmentsByDateReceived(
                     SessionManager.getAppService(), date));
                 wrappers.addAll(DispatchWrapper.getDispatchesByDateReceived(
+                    SessionManager.getAppService(), date));
+                return wrappers;
+            }
+        } else {
+            Date date = dateWidget.getDate();
+            if (date != null) {
+                wrappers.addAll(OriginInfoWrapper.getShipmentsByDateSent(
+                    SessionManager.getAppService(), date));
+                wrappers.addAll(DispatchWrapper.getDispatchesByDateSent(
                     SessionManager.getAppService(), date));
                 return wrappers;
             }

@@ -168,6 +168,23 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return shipments;
     }
 
+    public static List<OriginInfoWrapper> getShipmentsByDateSent(
+        WritableApplicationService appService, Date dateSent)
+        throws ApplicationException {
+
+        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING
+            + " and DATE(s." + ShipmentInfoPeer.SENT_AT.getName()
+            + ") = DATE(?)");
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            Arrays.asList(new Object[] { dateSent }));
+
+        List<OriginInfo> origins = appService.query(criteria);
+        List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
+            appService, origins, OriginInfoWrapper.class);
+
+        return shipments;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
