@@ -511,9 +511,6 @@ public class WidgetCreator {
         AbstractValidator validator, int typeShown, String bindingKey) {
         final DateTimeWidget widget = new DateTimeWidget(client, typeShown,
             date);
-        if (selectionListener != null) {
-            widget.addModifyListener(modifyListener);
-        }
         if (toolkit != null) {
             widget.adaptToToolkit(toolkit, true);
         }
@@ -531,6 +528,14 @@ public class WidgetCreator {
             if (bindingKey != null) {
                 bindings.put(bindingKey, binding);
             }
+        }
+
+        // Don't add a ModifyListener until after the Observable is bound
+        // because
+        // the binding may cause the value to change, which will call the
+        // ModifyListener (not really a modification, it's an initialization).
+        if (selectionListener != null) {
+            widget.addModifyListener(modifyListener);
         }
         return widget;
     }

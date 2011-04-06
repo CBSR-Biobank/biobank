@@ -72,6 +72,8 @@ public class ValidatorGeneration {
 
     private Map<String, ModelClass> modelClasses;
 
+    private Map<String, ModelClass> dmTables;
+
     public static class AppArgs {
         boolean verbose = false;
         String modelFileName = null;
@@ -95,6 +97,8 @@ public class ValidatorGeneration {
 
         modelClasses = ModelUmlParser.getInstance().geLogicalModel(
             appArgs.modelFileName);
+        dmTables = ModelUmlParser.getInstance().geDataModel(
+            appArgs.modelFileName);
         ModelUmlParser.getInstance().geDataModel(appArgs.modelFileName);
         createValidatorFile(appArgs.validatorFileName);
     }
@@ -111,8 +115,8 @@ public class ValidatorGeneration {
                 String tableName = CamelCase.toTitleCase(currentModelClass
                     .getName());
                 try {
-                    tableAttributes.putAll(ModelUmlParser.getInstance()
-                        .getDmTableAttrMap(tableName));
+                    tableAttributes
+                        .putAll(dmTables.get(tableName).getAttrMap());
                 } catch (Exception ex) {
                 }
                 currentModelClass = currentModelClass.getExtendsClass();
