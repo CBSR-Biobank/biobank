@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -177,10 +178,6 @@ public class HbmStrings {
         for (ModelClass dmClass : dmClasses.values()) {
             LOGGER.debug("class name: " + dmClass.getName());
 
-            if (dmClass.getName().equals("Address")) {
-                LOGGER.debug("here");
-            }
-
             ModelClass dmTable = null;
             ModelClass extendsClass = dmClass.getExtendsClass();
 
@@ -198,8 +195,20 @@ public class HbmStrings {
                 System.exit(-1);
             }
 
-            Map<String, Attribute> dmClassAttrMap = dmClass.getAttrMap();
+            Map<String, Attribute> dmClassAttrMap = new HashMap<String, Attribute>(
+                dmClass.getAttrMap());
             Map<String, Attribute> dmTableAttrMap = dmTable.getAttrMap();
+
+            if (extendsClass != null) {
+                // add all attributes from the super class, not already in
+                // derived class
+                for (Entry<String, Attribute> entry : extendsClass.getAttrMap()
+                    .entrySet()) {
+                    if (!dmClassAttrMap.keySet().contains(entry.getKey())) {
+                        dmClassAttrMap.put(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
 
             for (String attrName : dmClassAttrMap.keySet()) {
                 String tableAttrName = CamelCase.toTitleCase(attrName);
