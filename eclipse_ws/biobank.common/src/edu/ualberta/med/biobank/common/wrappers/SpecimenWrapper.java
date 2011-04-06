@@ -313,7 +313,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         throws Exception {
         SpecimenWrapper specimen = getSpecimen(appService, inventoryId);
         if (specimen != null && user != null) {
-            CenterWrapper<?> center = null;// specimen.getCurrentCenter();
+            CenterWrapper<?> center = specimen.getCurrentCenter();
             if (center != null
                 && !user.getWorkingCenters(appService).contains(center)) {
                 String name = "none";

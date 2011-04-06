@@ -229,5 +229,4 @@ public class BiobankApplicationServiceImpl extends
             throw new ApplicationException(e);
         }
     }
-
 }

@@ -40,6 +40,9 @@ import java.util.Map;
 
 import net.sf.cglib.proxy.Enhancer;
 
+import org.springframework.aop.TargetSource;
+import org.springframework.aop.framework.Advised;
+
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     private final Map<Property<?, ?>, Object> propertyMap = new HashMap<Property<?, ?>, Object>();
@@ -600,10 +603,16 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         Class<?> modelKlazz = model.getClass();
         if (Enhancer.isEnhanced(modelKlazz)) {
-            // if the given model's Class is 'enhanced' by CGLIB, then the
-            // superclass should be the real (non-proxied/non-enhanced) model
-            // class
-            modelKlazz = modelKlazz.getSuperclass();
+            // if the given model's Class is 'enhanced' by CGLIB, then
+            // it should be an instance of Advised, that contain the real
+            // (non-proxied/non-enhanced) model.
+            if (model instanceof Advised) {
+                TargetSource ts = ((Advised) model).getTargetSource();
+                modelKlazz = ts.getTarget().getClass();
+            } else
+                // the superclass was not enough in some cases on the server
+                // side, but keep it just in case...
+                modelKlazz = modelKlazz.getSuperclass();
         }
 
         if (wrapperKlazz == null
