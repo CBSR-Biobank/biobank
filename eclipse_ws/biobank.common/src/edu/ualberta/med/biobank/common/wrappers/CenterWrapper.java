@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.wrappers.base.CenterBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -306,12 +305,12 @@ public abstract class CenterWrapper<E extends Center> extends
     private static final String PATIENT_COUNT_QRY = "select count(distinct cevent."
         + CollectionEventPeer.PATIENT.getName()
         + ") from "
-        + Site.class.getName()
-        + " as site join site."
+        + Center.class.getName()
+        + " as center join center."
         + SitePeer.SPECIMEN_COLLECTION.getName()
         + " as spcs join spcs."
         + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cevent where site."
+        + " as cevent where center."
         + SitePeer.ID.getName() + "=?";
 
     public Long getPatientCount() throws Exception {
