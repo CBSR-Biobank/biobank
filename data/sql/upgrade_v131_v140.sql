@@ -6,6 +6,15 @@
 
 
 /*****************************************************
+ * Address table
+ ****************************************************/
+
+ALTER TABLE address
+      ADD COLUMN EMAIL_ADDRESS VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '',
+      ADD COLUMN PHONE_NUMBER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '',
+      ADD COLUMN FAX_NUMBER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '';
+
+/*****************************************************
  * Merge clinics and sites into centers
  ****************************************************/
 
