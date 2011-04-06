@@ -497,7 +497,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private static final String DISPATCH_HQL_STRING = "from "
         + Dispatch.class.getName() + " as d inner join fetch d."
-        + DispatchPeer.SHIPMENT_INFO.getName() + " as s where s is not null";
+        + DispatchPeer.SHIPMENT_INFO.getName() + " as s ";
 
     /**
      * Search for shipments in the site with the given waybill
@@ -505,7 +505,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     public static List<DispatchWrapper> getDispatchesByWaybill(
         WritableApplicationService appService, String waybill)
         throws ApplicationException {
-        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING + " and s."
+        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING + " where s."
             + ShipmentInfoPeer.WAYBILL.getName() + " = ?");
         HQLCriteria criteria = new HQLCriteria(qry.toString(),
             Arrays.asList(new Object[] { waybill }));
@@ -526,7 +526,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         throws ApplicationException {
 
         StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING
-            + " and DATE(s." + ShipmentInfoPeer.RECEIVED_AT.getName()
+            + " where DATE(s." + ShipmentInfoPeer.RECEIVED_AT.getName()
             + ") = DATE(?)");
         HQLCriteria criteria = new HQLCriteria(qry.toString(),
             Arrays.asList(new Object[] { dateReceived }));
@@ -543,7 +543,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         throws ApplicationException {
 
         StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING
-            + " and DATE(s." + ShipmentInfoPeer.SENT_AT.getName()
+            + " where DATE(s." + ShipmentInfoPeer.SENT_AT.getName()
             + ") = DATE(?)");
         HQLCriteria criteria = new HQLCriteria(qry.toString(),
             Arrays.asList(new Object[] { dateSent }));
