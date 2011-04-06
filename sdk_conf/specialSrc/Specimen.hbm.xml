@@ -4,11 +4,11 @@
 	<class name="Specimen" table="SPECIMEN" lazy="true" polymorphism="explicit" abstract="false" >
 		<cache usage="read-write" />
 		<id name="id" type="integer" column="ID">
-			<generator class="increment"/>			
+			<generator class="increment"/>
 		</id>
 		<!-- Attributes mapping for the Specimen class -->
 		<property name="inventoryId" type="string" length="100" column="INVENTORY_ID" unique="true" not-null="true"/>
-		<property name="comment" type="string" length="500" column="COMMENT"/>
+		<property name="comment" type="text" column="COMMENT"/>
 		<property name="quantity" type="double" column="QUANTITY"/>
 		<property name="createdAt" type="java.util.Date" column="CREATED_AT" not-null="true"/>
 		<!-- Associations mapping for the Specimen class -->
@@ -36,6 +36,6 @@
 			<many-to-one name="collectionEvent" class="edu.ualberta.med.biobank.model.CollectionEvent" column="COLLECTION_EVENT_ID" lazy="proxy" not-null="true" cascade="none"/>
 			<many-to-one name="specimenType" class="edu.ualberta.med.biobank.model.SpecimenType" column="SPECIMEN_TYPE_ID" lazy="proxy" not-null="true" cascade="none"/>
 			<many-to-one name="parentSpecimen" class="edu.ualberta.med.biobank.model.Specimen" column="PARENT_SPECIMEN_ID" lazy="proxy" not-null="false" cascade="none"/>
-			<many-to-one name="topSpecimen" class="edu.ualberta.med.biobank.model.Specimen" column="TOP_SPECIMEN_ID" lazy="proxy" not-null="false" cascade="none"/>
+			<many-to-one name="topSpecimen" class="edu.ualberta.med.biobank.model.Specimen" column="TOP_SPECIMEN_ID" lazy="proxy" not-null="true" cascade="none"/>
 	</class>
 </hibernate-mapping>

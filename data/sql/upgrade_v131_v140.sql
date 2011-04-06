@@ -6,6 +6,15 @@
 
 
 /*****************************************************
+ * Address table
+ ****************************************************/
+
+ALTER TABLE address
+      ADD COLUMN EMAIL_ADDRESS VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '',
+      ADD COLUMN PHONE_NUMBER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '',
+      ADD COLUMN FAX_NUMBER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '';
+
+/*****************************************************
  * Merge clinics and sites into centers
  ****************************************************/
 
@@ -105,7 +114,7 @@ CREATE TABLE specimen (
   SPECIMEN_TYPE_ID int(11) NOT NULL,
   COLLECTION_EVENT_ID int(11) NOT NULL,
   PARENT_SPECIMEN_ID int(11) DEFAULT NULL,
-  TOP_SPECIMEN_ID int(11) DEFAULT NULL,
+  TOP_SPECIMEN_ID int(11) NOT NULL,
   CURRENT_CENTER_ID int(11) DEFAULT NULL,
   PV_ID INT(11),
   PV_SV_ID INT(11),
@@ -184,11 +193,17 @@ update specimen spc, aliquot aq,dispatch_shipment_aliquot dsa,abstract_shipment 
        and center.name=site.name
        and aship.discriminator='DispatchShipment';
 
+-- set the "top specimen" on source specimens to point to themselves
+
+update specimen as spc
+       set spc.top_specimen_id=spc.id
+       where spc.pv_sv_id is not null;
+
 -- set the aliquoted specimens to point to their parent specimen
 
 update specimen as spc_a, specimen as spc_b
        set spc_a.parent_specimen_id=spc_b.id, spc_a.top_specimen_id=spc_b.id
-	where spc_a.pv_id=spc_b.pv_id and spc_b.pv_sv_id is not null and spc_a.pv_sv_id is null;
+       where spc_a.pv_id=spc_b.pv_id and spc_b.pv_sv_id is not null and spc_a.pv_sv_id is null;
 
 ALTER TABLE specimen MODIFY COLUMN ID INT(11) NOT NULL;
 
