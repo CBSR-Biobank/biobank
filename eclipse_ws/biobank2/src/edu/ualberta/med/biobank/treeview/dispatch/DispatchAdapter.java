@@ -62,7 +62,7 @@ public class DispatchAdapter extends AdapterBase {
             label += shipment.getSenderCenter().getNameShort() + " -> "
                 + shipment.getReceiverCenter().getNameShort();
 
-        if (shipment.getPackedAt() != null)
+        if (shipment.getShipmentInfo().getPackedAt() != null)
             label += " [" + shipment.getFormattedPackedAt() + "]";
         return label;
 
@@ -173,7 +173,7 @@ public class DispatchAdapter extends AdapterBase {
 
     private void setDispatchAsCreation() {
         getWrapper().setState(DispatchState.CREATION);
-        getWrapper().setPackedAt(null);
+        getWrapper().getShipmentInfo().setPackedAt(null);
         persistDispatch();
     }
 
