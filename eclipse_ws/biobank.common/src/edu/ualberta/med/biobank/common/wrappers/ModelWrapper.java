@@ -73,9 +73,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             if (classType != null) {
                 throw new RuntimeException(
                     "was not able to create new object of type "
-                        + classType.getName());
+                        + classType.getName(), e);
             } else {
-                throw new RuntimeException("was not able to create new object");
+                throw new RuntimeException("was not able to create new object",
+                    e);
             }
         }
     }
@@ -608,7 +609,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             // if the given model's Class is 'enhanced' by CGLIB, then the
             // superclass container the real class
             modelKlazz = modelKlazz.getSuperclass();
-            if (Modifier.isAbstract(wrapperKlazz.getModifiers())) {
+            if (Modifier.isAbstract(modelKlazz.getModifiers())) {
                 // The super class can be a problem when the class is abstract,
                 // but it should be an instance of Advised, that contain the
                 // real (non-proxied/non-enhanced) model object.
@@ -703,7 +704,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                         wrapperKlazz);
                     wrappers.add(wrapper);
                 } catch (Exception e) {
-                    throw new RuntimeException(e.getMessage());
+                    throw new RuntimeException(e);
                 }
             }
         }
