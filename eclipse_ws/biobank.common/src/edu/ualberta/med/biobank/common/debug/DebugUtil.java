@@ -26,7 +26,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DebugUtil {
 
-    private static final String RANDOM_LINKED_ALIQUOTED_SPECIMENS_QRY = "select aliquots from "
+    private static final String RANDOM_LINKED_ALIQUOTED_SPECIMENS_QRY = "select children from "
         + Center.class.getName()
         + " as center join center."
         + CenterPeer.PROCESSING_EVENT_COLLECTION.getName()
