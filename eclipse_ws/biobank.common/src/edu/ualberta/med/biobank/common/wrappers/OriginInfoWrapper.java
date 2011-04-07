@@ -173,7 +173,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         throws ApplicationException {
 
         StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING
-            + " where DATE(s." + ShipmentInfoPeer.SENT_AT.getName()
+            + " where DATE(s." + ShipmentInfoPeer.PACKED_AT.getName()
             + ") = DATE(?)");
         HQLCriteria criteria = new HQLCriteria(qry.toString(),
             Arrays.asList(new Object[] { dateSent }));
