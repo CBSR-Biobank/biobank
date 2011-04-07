@@ -24,8 +24,8 @@ public class ReportWrapper extends ReportBaseWrapper {
     public static final String PROPERTY_IS_COUNT = "isCount";
     public static final String PROPERTY_IS_PUBLIC = "isPublic";
     public static final String PROPERTY_USER_ID = "userId";
-    public static final String PROPERTY_REPORT_COLUMN_COLLECTION = "reportColumnCollection";
-    public static final String PROPERTY_REPORT_FILTER_COLLECTION = "reportFilterCollection";
+    public static final String REPORT_COLUMN_COLLECTION_CACHE_KEY = "reportColumnCollection";
+    public static final String REPORT_FILTER_COLLECTION_CACHE_KEY = "reportFilterCollection";
 
     public ReportWrapper(WritableApplicationService appService, Report report) {
         super(appService, report);
@@ -93,8 +93,8 @@ public class ReportWrapper extends ReportBaseWrapper {
 
     public List<ReportColumn> getReportColumnCollection() {
         @SuppressWarnings("unchecked")
-        List<ReportColumn> columns = (List<ReportColumn>) propertiesMap
-            .get(PROPERTY_REPORT_COLUMN_COLLECTION);
+        List<ReportColumn> columns = (List<ReportColumn>) cache
+            .get(REPORT_COLUMN_COLLECTION_CACHE_KEY);
 
         if (columns == null) {
             columns = new ArrayList<ReportColumn>();
@@ -112,7 +112,7 @@ public class ReportWrapper extends ReportBaseWrapper {
                 }
             });
 
-            propertiesMap.put(PROPERTY_REPORT_COLUMN_COLLECTION, columns);
+            cache.put(REPORT_COLUMN_COLLECTION_CACHE_KEY, columns);
         }
 
         return columns;
@@ -126,15 +126,15 @@ public class ReportWrapper extends ReportBaseWrapper {
         newReportColumns.addAll(reportColumns);
 
         wrappedObject.setReportColumnCollection(newReportColumns);
-        propertiesMap.remove(PROPERTY_REPORT_COLUMN_COLLECTION);
+        cache.remove(REPORT_COLUMN_COLLECTION_CACHE_KEY);
         propertyChangeSupport.firePropertyChange(
-            PROPERTY_REPORT_COLUMN_COLLECTION, oldReportColumns, reportColumns);
+            REPORT_COLUMN_COLLECTION_CACHE_KEY, oldReportColumns, reportColumns);
     }
 
     public List<ReportFilter> getReportFilterCollection() {
         @SuppressWarnings("unchecked")
-        List<ReportFilter> filters = (List<ReportFilter>) propertiesMap
-            .get(PROPERTY_REPORT_FILTER_COLLECTION);
+        List<ReportFilter> filters = (List<ReportFilter>) cache
+            .get(REPORT_FILTER_COLLECTION_CACHE_KEY);
 
         if (filters == null) {
             filters = new ArrayList<ReportFilter>();
@@ -152,7 +152,7 @@ public class ReportWrapper extends ReportBaseWrapper {
                 }
             });
 
-            propertiesMap.put(PROPERTY_REPORT_FILTER_COLLECTION, filters);
+            cache.put(REPORT_FILTER_COLLECTION_CACHE_KEY, filters);
         }
 
         return filters;
@@ -166,9 +166,9 @@ public class ReportWrapper extends ReportBaseWrapper {
         newReportFilters.addAll(reportFilters);
 
         wrappedObject.setReportFilterCollection(newReportFilters);
-        propertiesMap.remove(PROPERTY_REPORT_FILTER_COLLECTION);
+        cache.remove(REPORT_FILTER_COLLECTION_CACHE_KEY);
         propertyChangeSupport.firePropertyChange(
-            PROPERTY_REPORT_FILTER_COLLECTION, oldReportFilters, reportFilters);
+            REPORT_FILTER_COLLECTION_CACHE_KEY, oldReportFilters, reportFilters);
     }
 
     public static Collection<String> getFilterValueStrings(

@@ -286,6 +286,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         for (DispatchSpecimenWrapper da : nonProcessedAliquots) {
             if (specimensToReceive.contains(da.getSpecimen())) {
                 da.setDispatchSpecimenState(DispatchSpecimenState.RECEIVED);
+                da.getSpecimen().setCurrentCenter(getReceiverCenter());
             }
         }
         resetMap();
@@ -388,7 +389,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     // fast... from db. should only call this once then use the cached value
     public List<DispatchSpecimenWrapper> getFastDispatchSpecimenCollection() {
-        if (!isCached(DispatchPeer.DISPATCH_SPECIMEN_COLLECTION)) {
+        if (!isPropertyCached(DispatchPeer.DISPATCH_SPECIMEN_COLLECTION)) {
             List<DispatchSpecimen> results = new ArrayList<DispatchSpecimen>();
             // test hql
             HQLCriteria query = new HQLCriteria(
@@ -497,7 +498,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private static final String DISPATCH_HQL_STRING = "from "
         + Dispatch.class.getName() + " as d inner join fetch d."
-        + DispatchPeer.SHIPMENT_INFO.getName() + " as s where s is not null";
+        + DispatchPeer.SHIPMENT_INFO.getName() + " as s ";
 
     /**
      * Search for shipments in the site with the given waybill
@@ -505,7 +506,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     public static List<DispatchWrapper> getDispatchesByWaybill(
         WritableApplicationService appService, String waybill)
         throws ApplicationException {
-        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING + " and s."
+        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING + " where s."
             + ShipmentInfoPeer.WAYBILL.getName() + " = ?");
         HQLCriteria criteria = new HQLCriteria(qry.toString(),
             Arrays.asList(new Object[] { waybill }));
@@ -526,10 +527,27 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         throws ApplicationException {
 
         StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING
-            + " and DATE(s." + ShipmentInfoPeer.RECEIVED_AT.getName()
+            + " where DATE(s." + ShipmentInfoPeer.RECEIVED_AT.getName()
             + ") = DATE(?)");
         HQLCriteria criteria = new HQLCriteria(qry.toString(),
             Arrays.asList(new Object[] { dateReceived }));
+
+        List<Dispatch> origins = appService.query(criteria);
+        List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(
+            appService, origins, DispatchWrapper.class);
+
+        return shipments;
+    }
+
+    public static List<DispatchWrapper> getDispatchesByDateSent(
+        WritableApplicationService appService, Date dateSent)
+        throws ApplicationException {
+
+        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING
+            + " where DATE(s." + ShipmentInfoPeer.SENT_AT.getName()
+            + ") = DATE(?)");
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            Arrays.asList(new Object[] { dateSent }));
 
         List<Dispatch> origins = appService.query(criteria);
         List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(

@@ -71,9 +71,11 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         clinic.reload();
 
         String tabName;
-        if (clinic.getId() == null)
+        if (clinic.isNew()) {
             tabName = Messages.getString("ClinicEntryForm.title.new"); //$NON-NLS-1$
-        else
+            clinic.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
+        } else
             tabName = Messages.getString("ClinicEntryForm.title.edit", //$NON-NLS-1$
                 clinic.getNameShort());
         setPartName(tabName);

@@ -25,7 +25,7 @@ public class ModelExtender {
 
     private static ModelExtender instance = null;
 
-    Map<String, ModelClass> modelClasses;
+    private Map<String, ModelClass> modelClasses;
 
     private ModelExtender() {
 

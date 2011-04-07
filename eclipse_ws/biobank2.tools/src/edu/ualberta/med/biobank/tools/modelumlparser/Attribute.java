@@ -4,18 +4,25 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Attribute {
-    String name;
-    String type;
-    Set<String> stereotypes;
+    private String name;
+    private String type;
+    private Integer length;
+    private Set<String> stereotypes;
 
     public Attribute(String name, String type) {
-        this(name, type, null);
+        this(name, type, null, null);
     }
 
-    public Attribute(String name, String type, Set<String> stereotypes) {
+    public Attribute(String name, String type, Integer length) {
+        this(name, type, length, null);
+    }
+
+    public Attribute(String name, String type, Integer length,
+        Set<String> stereotypes) {
         super();
         this.name = name;
         this.type = type;
+        this.length = length;
         setStereotypes(stereotypes);
     }
 
@@ -41,6 +48,14 @@ public class Attribute {
 
     public void addStereotype(String stereotype) {
         stereotypes.add(stereotype);
+    }
+
+    public Integer getLength() {
+        return length;
+    }
+
+    public void setLength(Integer length) {
+        this.length = length;
     }
 
     public void setStereotypes(Set<String> stereotypes) {

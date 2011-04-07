@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +23,7 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.tools.modelumlparser.Attribute;
+import edu.ualberta.med.biobank.tools.modelumlparser.ModelClass;
 import edu.ualberta.med.biobank.tools.modelumlparser.ModelUmlParser;
 import edu.ualberta.med.biobank.tools.utils.CamelCase;
 
@@ -46,6 +48,10 @@ public class HbmStrings {
 
     private AppArgs appArgs = null;
 
+    private Map<String, ModelClass> dmClasses;
+
+    private Map<String, ModelClass> dmTables;
+
     private HbmStrings() {
 
     }
@@ -66,20 +72,20 @@ public class HbmStrings {
             LOGGER.info("  Template: " + appArgs.template);
         }
 
-        ModelUmlParser.getInstance().geDataModel(appArgs.modelFileName);
+        dmClasses = ModelUmlParser.getInstance().geLogicalModel(
+            appArgs.modelFileName);
+        dmTables = ModelUmlParser.getInstance().geDataModel(
+            appArgs.modelFileName);
 
         if (appArgs.verbose) {
-            for (String className : ModelUmlParser.getInstance()
-                .getDmTableSet()) {
-                Map<String, Attribute> attrMap = ModelUmlParser.getInstance()
-                    .getDmTableAttrMap(className);
+            for (ModelClass dmTable : dmTables.values()) {
+                Map<String, Attribute> attrMap = dmTable.getAttrMap();
                 for (String attrName : attrMap.keySet()) {
                     String type = attrMap.get(attrName).getType();
                     if (!type.startsWith("VARCHAR") && !type.startsWith("TEXT"))
                         continue;
 
-                    LOGGER
-                        .info("  " + className + "." + attrName + ": " + type);
+                    LOGGER.info("  " + dmTable + "." + attrName + ": " + type);
                 }
             }
         }
@@ -89,7 +95,6 @@ public class HbmStrings {
         }
 
         createVarCharLengthsSourceCode();
-
     }
 
     public boolean getVerbose() throws Exception {
@@ -128,9 +133,9 @@ public class HbmStrings {
         String className = hbmFileName.replace(HBM_FILE_EXTENSION, "");
         String tableName = CamelCase.toTitleCase(className);
 
-        Map<String, Attribute> attrMap = ModelUmlParser.getInstance()
-            .getDmTableAttrMap(tableName);
-        Map<String, Integer> attrLengthMap = new HashMap<String, Integer>();
+        ModelClass table = dmTables.get(tableName);
+        Map<String, Attribute> attrMap = table.getAttrMap();
+        Map<String, Attribute> attrTypeMap = new HashMap<String, Attribute>();
 
         Set<String> uniqueList = new HashSet<String>();
         Set<String> notNullList = new HashSet<String>();
@@ -143,12 +148,14 @@ public class HbmStrings {
                 Matcher varcharMatcher = VARCHAR_LEN.matcher(attrType);
 
                 if (varcharMatcher.find()) {
-                    attrLengthMap.put(attrName,
-                        Integer.valueOf(varcharMatcher.group(1)));
+                    attrTypeMap.put(attrName, new Attribute(attrName, "string",
+                        Integer.valueOf(varcharMatcher.group(1))));
                 }
             } else if (attrType.startsWith("TEXT")) {
-                attrLengthMap.put(attrName, 500);
+                attrTypeMap
+                    .put(attrName, new Attribute(attrName, "text", null));
             }
+
             if (attr.hasStereotype(UNIQUE_STEREOTYPE))
                 uniqueList.add(attrName);
             if (attr.hasStereotype(NOT_NULL_STEREOTYPE))
@@ -158,18 +165,59 @@ public class HbmStrings {
         }
 
         HbmModifier.getInstance().alterMapping(hbmFilePath, className,
-            tableName, attrLengthMap, uniqueList, notNullList);
+            tableName, attrTypeMap, uniqueList, notNullList);
     }
 
     private void createVarCharLengthsSourceCode() throws Exception {
         String newLine = System.getProperty("line.separator");
         StringBuffer sb = new StringBuffer();
 
-        for (String className : ModelUmlParser.getInstance().getDmTableSet()) {
-            Map<String, Attribute> attrMap = ModelUmlParser.getInstance()
-                .getDmTableAttrMap(className);
-            for (String attrName : attrMap.keySet()) {
-                String attrType = attrMap.get(attrName).getType();
+        for (ModelClass dmClass : dmClasses.values()) {
+            LOGGER.debug("class name: " + dmClass.getName());
+
+            ModelClass dmTable = null;
+            ModelClass extendsClass = dmClass.getExtendsClass();
+
+            if (extendsClass == null) {
+                dmTable = dmTables
+                    .get(CamelCase.toTitleCase(dmClass.getName()));
+            } else {
+                dmTable = dmTables.get(CamelCase.toTitleCase(extendsClass
+                    .getName()));
+            }
+
+            if (dmTable == null) {
+                LOGGER.info("Error: data model table not found for class "
+                    + dmClass.getName());
+                System.exit(-1);
+            }
+
+            Map<String, Attribute> dmClassAttrMap = new HashMap<String, Attribute>(
+                dmClass.getAttrMap());
+            Map<String, Attribute> dmTableAttrMap = dmTable.getAttrMap();
+
+            if (extendsClass != null) {
+                // add all attributes from the super class, not already in
+                // derived class
+                for (Entry<String, Attribute> entry : extendsClass.getAttrMap()
+                    .entrySet()) {
+                    if (!dmClassAttrMap.keySet().contains(entry.getKey())) {
+                        dmClassAttrMap.put(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
+
+            for (String attrName : dmClassAttrMap.keySet()) {
+                String tableAttrName = CamelCase.toTitleCase(attrName);
+                String attrType = dmTableAttrMap.get(tableAttrName).getType();
+
+                LOGGER.debug("class name: " + dmClass.getName() + ", attr: "
+                    + attrName + ", attrType: " + attrType);
+
+                if (!dmTableAttrMap.containsKey(tableAttrName)) {
+                    continue;
+                }
+
                 if (!attrType.startsWith("VARCHAR"))
                     continue;
 
@@ -181,12 +229,9 @@ public class HbmStrings {
 
                         sb.append(
                             "\t\taMap.put(\"edu.ualberta.med.biobank.model.")
-                            .append(
-                                CamelCase.toCamelCase(className, true, true))
-                            .append(".")
-                            .append(
-                                CamelCase.toCamelCase(attrName, false, true))
-                            .append("\", ").append(attrType).append(");");
+                            .append(dmClass.getName()).append(".")
+                            .append(attrName).append("\", ").append(attrType)
+                            .append(");");
                         sb.append(newLine);
                     }
                 }

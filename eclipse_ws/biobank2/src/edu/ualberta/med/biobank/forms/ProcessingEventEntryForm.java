@@ -162,8 +162,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     }
 
     private void createSpecimensSection() {
-        // FIXME combo to select study. If Edit and specimens are already added,
-        // set it to one of the specimen study
         Composite client = createSectionWithClient(Messages
             .getString("ProcessingEventEntryForm.specimens.title")); //$NON-NLS-1$
         GridLayout layout = new GridLayout(1, false);
@@ -211,6 +209,18 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     else if (specimen.getParentContainer() != null)
                         throw new VetoException(
                             "Specimen is currently listed as stored in a container.");
+                    else if (pEvent.getSpecimenCollection(false).size() > 0
+                        && !pEvent
+                            .getSpecimenCollection(false)
+                            .get(0)
+                            .getCollectionEvent()
+                            .getPatient()
+                            .getStudy()
+                            .equals(
+                                specimen.getCollectionEvent().getPatient()
+                                    .getStudy()))
+                        throw new VetoException(
+                            "All specimens must be part of the same study.");
                     break;
                 case POST_ADD:
                     specimen.setProcessingEvent(pEvent);

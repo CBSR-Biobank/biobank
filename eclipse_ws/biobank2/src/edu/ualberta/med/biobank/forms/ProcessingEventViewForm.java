@@ -94,7 +94,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         Composite client = createSectionWithClient(Messages
             .getString("ProcessingEventViewForm.specimens.title")); //$NON-NLS-1$
         sourceSpecimenTable = new SpecimenInfoTable(client,
-            pEvent.getSpecimenCollection(true), ColumnsShown.ALL, 10);
+            pEvent.getSpecimenCollection(true), ColumnsShown.CEVENT_FORM, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
     }
 

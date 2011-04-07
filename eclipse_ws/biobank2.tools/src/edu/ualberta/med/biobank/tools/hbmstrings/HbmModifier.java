@@ -12,8 +12,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+
+import edu.ualberta.med.biobank.tools.modelumlparser.Attribute;
 
 public class HbmModifier {
+
+    private static final Logger LOGGER = Logger.getLogger(HbmModifier.class
+        .getName());
 
     private static Pattern HBM_STRING_ATTR = Pattern.compile(
         "<property.*type=\"string\"\\s*column=\"([^\"]*)\"/>",
@@ -40,7 +46,7 @@ public class HbmModifier {
     }
 
     public void alterMapping(String filename, String className,
-        String tableName, Map<String, Integer> columnLenMap,
+        String tableName, Map<String, Attribute> columnTypeMap,
         Set<String> uniqueList, Set<String> notNullList) throws Exception {
         if (!filename.contains(className)) {
             throw new Exception(
@@ -55,19 +61,40 @@ public class HbmModifier {
             BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
 
             String line = reader.readLine();
+            boolean lineChanged;
+
             while (line != null) {
+                lineChanged = false;
                 Matcher stringAttrMatcher = HBM_STRING_ATTR.matcher(line);
                 Matcher attrMatcher = HBM_ATTR.matcher(line);
                 if (stringAttrMatcher.find() && !line.contains("length=\"")) {
                     String attrName = stringAttrMatcher.group(1);
-                    Integer attrLen = columnLenMap.get(attrName);
+                    Attribute attr = columnTypeMap.get(attrName);
 
-                    if (attrLen == null) {
+                    if (attr == null) {
                         throw new Exception("column not found in column map: "
                             + attrName);
                     }
-                    line = line.replace("type=\"string\"",
-                        "type=\"string\" length=\"" + attrLen + "\"");
+
+                    Integer attrLen = attr.getLength();
+
+                    if (attrLen != null) {
+                        line = line.replace(
+                            "type=\"string\"",
+                            "type=\"" + attr.getType() + "\" length=\""
+                                + attr.getLength() + "\"");
+                        lineChanged = true;
+                    } else {
+                        line = line.replace("type=\"string\"",
+                            "type=\"" + attr.getType() + "\"");
+                        lineChanged = true;
+                    }
+
+                    if (lineChanged) {
+                        LOGGER
+                            .debug("line changed: " + className + ": " + line);
+                    }
+
                     documentChanged = true;
                     line = addContraints(line, attrName, uniqueList,
                         notNullList);
