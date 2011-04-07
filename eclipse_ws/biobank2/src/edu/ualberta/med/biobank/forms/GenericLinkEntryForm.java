@@ -27,6 +27,9 @@ import org.eclipse.swt.widgets.Display;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.SpecimenHierarchy;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -34,8 +37,8 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.LinkFormPatientManagement.PatientTextCallback;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
 import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -44,6 +47,7 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
@@ -510,7 +514,8 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
      * combos components
      */
     @Override
-    protected void processScanResult(IProgressMonitor monitor) throws Exception {
+    protected boolean processScanResult(IProgressMonitor monitor)
+        throws Exception {
         // processScanResult = false;
         boolean everythingOk = true;
         Map<RowColPos, PalletCell> cells = getCells();
@@ -548,6 +553,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             });
             // processScanResult = everythingOk;
         }
+        return everythingOk;
     }
 
     @Override
@@ -556,7 +562,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     @Override
-    protected void afterScanAndProcess() {
+    protected void afterScanAndProcess(Integer rowOnly) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -576,6 +582,26 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             }
         });
         setScanValid(true);
+    }
+
+    @Override
+    protected void processCellResult(RowColPos rcp, PalletCell palletCell) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected ScanProcessResult callServerSideProcess(
+        Map<RowColPos, Cell> serverCells) throws ApplicationException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected CellProcessResult callServerSideProcess(Cell serverCell)
+        throws ApplicationException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

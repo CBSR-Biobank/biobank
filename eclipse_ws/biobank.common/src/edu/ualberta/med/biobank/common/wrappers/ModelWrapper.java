@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.cglib.proxy.Enhancer;
 
@@ -1002,5 +1003,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
         return Collections.emptyList();
+    }
+
+    public static <T> void persistBatch(Set<? extends ModelWrapper<T>> wrappers)
+        throws Exception {
+        // once the persist method is using batch queries, we should use batch
+        // queries here
+        for (ModelWrapper<T> wrapper : wrappers) {
+            wrapper.persist();
+        }
     }
 }

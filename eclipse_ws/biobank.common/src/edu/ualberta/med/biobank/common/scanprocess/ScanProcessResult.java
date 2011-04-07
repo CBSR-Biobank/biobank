@@ -5,8 +5,7 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
 
-public class ScanProcessResult extends CellProcessResult implements
-    Serializable {
+public class ScanProcessResult extends ProcessResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -17,7 +16,7 @@ public class ScanProcessResult extends CellProcessResult implements
     }
 
     public void setResult(Map<RowColPos, Cell> cells, CellStatus status) {
-        super.setResult(status);
+        setProcessStatus(status);
         this.cells = cells;
     }
 

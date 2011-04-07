@@ -27,20 +27,24 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class GenericAssignEntryForm extends AbstractPalletSpecimenAdminForm {
 
@@ -392,7 +396,8 @@ public class GenericAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     @Override
-    protected void processScanResult(IProgressMonitor monitor) throws Exception {
+    protected boolean processScanResult(IProgressMonitor monitor)
+        throws Exception {
         Map<RowColPos, SpecimenWrapper> expectedAliquots = currentParentContainer
             .getSpecimens();
         // currentScanState = CellStatus.EMPTY;
@@ -430,6 +435,7 @@ public class GenericAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             }
         }
         setScanValid(true);
+        return true;
     }
 
     protected void processCellStatus(PalletCell scanCell) throws Exception {
@@ -508,6 +514,26 @@ public class GenericAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     @Override
     public String getNextOpenedFormID() {
         return ID;
+    }
+
+    @Override
+    protected void processCellResult(RowColPos rcp, PalletCell palletCell) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected ScanProcessResult callServerSideProcess(
+        Map<RowColPos, Cell> serverCells) throws ApplicationException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected CellProcessResult callServerSideProcess(Cell serverCell)
+        throws ApplicationException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

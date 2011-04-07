@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -43,6 +42,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -57,6 +57,7 @@ import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionSpecificBehaviour;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Link aliquoted specimens to their source specimens
@@ -101,6 +102,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     private List<SpecimenHierarchy> preSelections;
 
     private CenterWrapper<?> currentSelectedCenter;
+
+    private Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
 
     @Override
     protected void init() throws Exception {
@@ -418,11 +421,22 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     @Override
-    protected void afterScanAndProcess() {
+    protected void afterScanAndProcess(final Integer rowOnly) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
                 typesSelectionPerRowComposite.setEnabled(processScanResult);
+                if (typesRows.size() > 0)
+                    Display.getDefault().asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (rowOnly == null)
+                                setCombosLists(typesRows);
+                            else {
+                                setCountOnSpecimenWidget(typesRows, rowOnly);
+                            }
+                        }
+                    });
                 for (AliquotedSpecimenSelectionWidget typeWidget : specimenTypesWidgets) {
                     if (typeWidget.canFocus()) {
                         typeWidget.setFocus();
@@ -467,62 +481,64 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     /**
-     * go through cells retrieved from scan, set status and update the types
-     * combos components
+     * Server side call for the cells processing
      */
     @Override
-    protected void processScanResult(IProgressMonitor monitor) throws Exception {
-        processScanResult = false;
-        boolean everythingOk = true;
-        Map<RowColPos, PalletCell> cells = getCells();
-        Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells = null;
-        if (cells != null) {
-            serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell>();
-            for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
-                serverCells
-                    .put(entry.getKey(), getServerCell(entry.getValue()));
-            }
-        }
-        ScanProcessResult res = SessionManager.getAppService()
-            .processScanLinkResult(serverCells, isRescanMode(),
-                SessionManager.getUser());
-        appendLogs(res.getLogs());
-        if (cells != null) {
-            final Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
-            for (Entry<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> entry : res
-                .getCells().entrySet()) {
-                RowColPos rcp = entry.getKey();
-                monitor.subTask(Messages.getString(
-                    "ScanLink.scan.monitor.position", //$NON-NLS-1$
-                    ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
-                Integer typesRowsCount = typesRows.get(rcp.row);
-                if (typesRowsCount == null) {
-                    typesRowsCount = 0;
-                    specimenTypesWidgets.get(rcp.row).resetValues(
-                        !isRescanMode(), true, true);
-                }
-                PalletCell palletCell = cells.get(entry.getKey());
-                palletCell.merge(appService, entry.getValue());
-                SpecimenHierarchy selection = preSelections.get(palletCell
-                    .getRow());
-                if (selection != null)
-                    setTypeToCell(palletCell, selection);
+    protected ScanProcessResult callServerSideProcess(
+        Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells)
+        throws ApplicationException {
+        return SessionManager.getAppService().processScanLinkResult(
+            serverCells, isRescanMode(), SessionManager.getUser());
+    }
 
-                everythingOk = palletCell.getStatus() != UICellStatus.ERROR
-                    && everythingOk;
-                if (PalletCell.hasValue(palletCell)) {
-                    typesRowsCount++;
-                    typesRows.put(rcp.row, typesRowsCount);
-                }
-            }
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    setCombosLists(typesRows);
-                }
-            });
+    /**
+     * Server side call for the cell processing
+     */
+    @Override
+    protected CellProcessResult callServerSideProcess(
+        edu.ualberta.med.biobank.common.scanprocess.Cell serverCell)
+        throws ApplicationException {
+        return SessionManager.getAppService().processCellLinkStatus(serverCell,
+            SessionManager.getUser());
+    }
+
+    /**
+     * whole cells processing
+     */
+    @Override
+    protected boolean processScanResult(IProgressMonitor monitor)
+        throws Exception {
+        processScanResult = false;
+        typesRows.clear();
+        processScanResult = super.processScanResult(monitor);
+        return processScanResult;
+    }
+
+    /**
+     * Post process of only one cell after server call has been made
+     */
+    @Override
+    protected void processCellResult(final RowColPos rcp, PalletCell cell) {
+        Integer typesRowsCount = typesRows.get(rcp.row);
+        if (typesRowsCount == null) {
+            typesRowsCount = 0;
+            specimenTypesWidgets.get(rcp.row).resetValues(!isRescanMode(),
+                true, true);
         }
-        processScanResult = everythingOk;
+        SpecimenHierarchy selection = preSelections.get(cell.getRow());
+        if (selection != null)
+            setTypeToCell(cell, selection);
+        // if (tubeAlone)
+        // Display.getDefault().asyncExec(new Runnable() {
+        // @Override
+        // public void run() {
+        // specimenTypesWidgets.get(rcp.row).increaseNumber();
+        // }
+        // });
+        if (PalletCell.hasValue(cell)) {
+            typesRowsCount++;
+            typesRows.put(rcp.row, typesRowsCount);
+        }
     }
 
     /**
@@ -540,16 +556,22 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         // set the list of aliquoted types to all widgets, in case the list is
         // activated using the handheld scanner
         for (int row = 0; row < specimenTypesWidgets.size(); row++) {
-            AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets
-                .get(row);
-            Integer number = typesRows.get(row);
-            if (number != null)
-                widget.setNumber(number);
+            AliquotedSpecimenSelectionWidget widget = setCountOnSpecimenWidget(
+                typesRows, row);
             if (isFirstSuccessfulScan()) {
                 widget.setSourceSpecimens(availableSourceSpecimens);
                 widget.setResultTypes(studiesAliquotedTypes);
             }
         }
+    }
+
+    private AliquotedSpecimenSelectionWidget setCountOnSpecimenWidget(
+        Map<Integer, Integer> typesRows, int row) {
+        AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets.get(row);
+        Integer number = typesRows.get(row);
+        if (number != null)
+            widget.setNumber(number);
+        return widget;
     }
 
     @SuppressWarnings("unchecked")
@@ -566,6 +588,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         originInfo
             .setCenter(SessionManager.getUser().getCurrentWorkingCenter());
         originInfo.persist();
+        // use a set because do not want to add the same parent twice
         Set<SpecimenWrapper> modifiedSources = new HashSet<SpecimenWrapper>();
         for (PalletCell cell : cells.values()) {
             if (PalletCell.hasValue(cell)
@@ -589,16 +612,17 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 sb.append(Messages.getString(
                     "ScanLink.activitylog.aliquot.linked", //$NON-NLS-1$
                     cell.getValue(), cell.getType().getName(), sourceSpecimen
-                        .getCollectionEvent().getPatient().getPnumber(),
-                    sourceSpecimen.getCollectionEvent().getVisitNumber(),
+                        .getSpecimenType().getNameShort(), sourceSpecimen
+                        .getInventoryId(), sourceSpecimen.getCollectionEvent()
+                        .getPatient().getPnumber(), sourceSpecimen
+                        .getCollectionEvent().getVisitNumber(),
                     currentSelectedCenter.getNameShort()));
                 nber++;
             }
         }
-
-        for (SpecimenWrapper source : modifiedSources) {
-            source.persist();
-        }
+        // persist of parent will automatically persist children
+        ModelWrapper.persistBatch(modifiedSources);
+        // display logs only if persist succeeds.
         appendLog(sb.toString());
 
         // SCAN-LINK\: {0} specimens linked to patient {1} on center {2}
@@ -682,26 +706,6 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     @Override
     public BiobankLogger getErrorLogger() {
         return logger;
-    }
-
-    @Override
-    protected void postprocessScanTubeAlone(PalletCell palletCell)
-        throws Exception {
-        CellProcessResult res = appService.processCellLinkStatus(
-            getServerCell(palletCell), SessionManager.getUser());
-        palletCell.setStatus(res.getStatus());
-        if (palletCell.getStatus() == UICellStatus.NO_TYPE) {
-            AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets
-                .get(palletCell.getRow());
-            widget.increaseNumber();
-        }
-
-        boolean ok = isScanValid()
-            && (palletCell.getStatus() != UICellStatus.ERROR);
-        setScanValid(ok);
-        typesSelectionPerRowComposite.setEnabled(ok);
-        spw.redraw();
-        form.layout();
     }
 
     @Override

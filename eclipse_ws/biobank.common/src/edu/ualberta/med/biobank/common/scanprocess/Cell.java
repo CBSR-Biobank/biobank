@@ -22,7 +22,11 @@ public class Cell implements Serializable {
 
     private Integer specimenId;
 
+    public Cell() {
+    }
+
     public Cell(int row, int col, String value, CellStatus status) {
+        this();
         this.row = row;
         this.col = col;
         this.value = value;

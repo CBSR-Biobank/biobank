@@ -89,6 +89,7 @@ public class PalletScanManagement {
                             "Scan error", //$NON-NLS-1$
                             ex,
                             "Barcodes can still be scanned with the handheld 2D scanner.");
+                    return;
                 }
             }
         } else {

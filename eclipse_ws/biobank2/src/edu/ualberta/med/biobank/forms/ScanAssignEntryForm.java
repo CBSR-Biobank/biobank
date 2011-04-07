@@ -39,6 +39,8 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.ContainerLabelSearchException;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -553,7 +555,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     @Override
-    protected void afterScanAndProcess() {
+    protected void afterScanAndProcess(Integer rowOnly) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -595,7 +597,8 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
      * to the current pallet
      */
     @Override
-    protected void processScanResult(IProgressMonitor monitor) throws Exception {
+    protected boolean processScanResult(IProgressMonitor monitor)
+        throws Exception {
         Map<RowColPos, SpecimenWrapper> expectedSpecimens = currentPalletWrapper
             .getSpecimens();
         long start = System.currentTimeMillis();
@@ -603,6 +606,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         newMethod(monitor, expectedSpecimens);
         long end = System.currentTimeMillis();
         System.out.println((end - start) / 1000.0);
+        return true;
     }
 
     private void newMethod(IProgressMonitor monitor,
@@ -643,7 +647,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             cell.merge(appService, entry.getValue());
         }
         appendLogs(res.getLogs());
-        currentScanState = UICellStatus.valueOf(res.getStatus().name());
+        currentScanState = UICellStatus.valueOf(res.getProcessStatus().name());
         setScanValid(!getCells().isEmpty()
             && currentScanState != UICellStatus.ERROR);
     }
@@ -1310,5 +1314,25 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     @Override
     public BiobankLogger getErrorLogger() {
         return logger;
+    }
+
+    @Override
+    protected void processCellResult(RowColPos rcp, PalletCell palletCell) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected ScanProcessResult callServerSideProcess(
+        Map<RowColPos, Cell> serverCells) throws ApplicationException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected CellProcessResult callServerSideProcess(Cell serverCell)
+        throws ApplicationException {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
