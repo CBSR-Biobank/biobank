@@ -88,4 +88,5 @@ public interface BiobankApplicationService extends WritableApplicationService {
         String palletLabel, Integer palletId, Integer containerTypeId,
         int rowCapacity, int colCapacity, boolean rescanMode, User user)
         throws ApplicationException;
+
 }

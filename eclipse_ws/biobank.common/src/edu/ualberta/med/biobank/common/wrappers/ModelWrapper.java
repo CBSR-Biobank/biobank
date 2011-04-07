@@ -40,6 +40,7 @@ import java.util.Map;
 
 import net.sf.cglib.proxy.Enhancer;
 
+import org.hibernate.proxy.HibernateProxy;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
 
@@ -597,27 +598,39 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return this.getId().compareTo(arg0.getId());
     }
 
+    @SuppressWarnings("unchecked")
     public static <W extends ModelWrapper<? extends M>, M> W wrapModel(
         WritableApplicationService appService, M model, Class<W> wrapperKlazz)
         throws Exception {
 
         Class<?> modelKlazz = model.getClass();
         if (Enhancer.isEnhanced(modelKlazz)) {
-            // if the given model's Class is 'enhanced' by CGLIB, then
-            // it should be an instance of Advised, that contain the real
-            // (non-proxied/non-enhanced) model.
-            if (model instanceof Advised) {
-                TargetSource ts = ((Advised) model).getTargetSource();
-                modelKlazz = ts.getTarget().getClass();
-            } else
-                // the superclass was not enough in some cases on the server
-                // side, but keep it just in case...
-                modelKlazz = modelKlazz.getSuperclass();
+            // if the given model's Class is 'enhanced' by CGLIB, then the
+            // superclass container the real class
+            modelKlazz = modelKlazz.getSuperclass();
+            if (Modifier.isAbstract(wrapperKlazz.getModifiers())) {
+                // The super class can be a problem when the class is abstract,
+                // but it should be an instance of Advised, that contain the
+                // real (non-proxied/non-enhanced) model object.
+                if (model instanceof Advised) { // ok for client side
+                    TargetSource ts = ((Advised) model).getTargetSource();
+                    modelKlazz = ts.getTarget().getClass();
+                } else if (model instanceof HibernateProxy) {
+                    // only on server side (?).
+                    Object implementation = ((HibernateProxy) model)
+                        .getHibernateLazyInitializer().getImplementation();
+                    modelKlazz = implementation.getClass();
+                    // Is this bad to do that ? On server side, will get a proxy
+                    // that inherit from Center, not from Site, so won't be able
+                    // to create a SiteWrapper unless is using the direct
+                    // implementation
+                    model = (M) implementation;
+                }
+            }
         }
 
         if (wrapperKlazz == null
             || Modifier.isAbstract(wrapperKlazz.getModifiers())) {
-            @SuppressWarnings("unchecked")
             Class<W> tmp = (Class<W>) ModelWrapperHelper
                 .getWrapperClass(modelKlazz);
             wrapperKlazz = tmp;
