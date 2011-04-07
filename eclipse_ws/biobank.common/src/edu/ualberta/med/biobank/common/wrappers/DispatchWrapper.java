@@ -286,6 +286,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         for (DispatchSpecimenWrapper da : nonProcessedAliquots) {
             if (specimensToReceive.contains(da.getSpecimen())) {
                 da.setDispatchSpecimenState(DispatchSpecimenState.RECEIVED);
+                da.getSpecimen().setCurrentCenter(getReceiverCenter());
             }
         }
         resetMap();
