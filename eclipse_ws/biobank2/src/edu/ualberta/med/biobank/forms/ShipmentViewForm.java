@@ -112,7 +112,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         setTextValue(senderLabel, shipment.getCenter().getName());
         setTextValue(waybillLabel, shipment.getShipmentInfo().getWaybill());
         if (departedLabel != null) {
-            setTextValue(departedLabel, shipInfo.getFormattedDateSent());
+            setTextValue(departedLabel, shipInfo.getFormattedDatePacked());
         }
         setTextValue(shippingMethodLabel,
             shipMethod == null ? "" : shipMethod.getName());
