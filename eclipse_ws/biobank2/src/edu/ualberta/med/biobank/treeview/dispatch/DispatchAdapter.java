@@ -62,7 +62,8 @@ public class DispatchAdapter extends AdapterBase {
             label += shipment.getSenderCenter().getNameShort() + " -> "
                 + shipment.getReceiverCenter().getNameShort();
 
-        if (shipment.getShipmentInfo().getPackedAt() != null)
+        if (shipment.getShipmentInfo() != null
+            && shipment.getShipmentInfo().getPackedAt() != null)
             label += " [" + shipment.getFormattedPackedAt() + "]";
         return label;
 
