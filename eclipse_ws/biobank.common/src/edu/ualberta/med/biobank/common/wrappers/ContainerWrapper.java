@@ -39,6 +39,10 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends ContainerBaseWrapper {
 
+    private static final String CHILDREN_CACHE_KEY = "children";
+
+    private static final String ALIQUOTS_CACHE_KEY = "aliquots";
+
     private AbstractObjectWithPositionManagement<ContainerPosition, ContainerWrapper> objectWithPositionManagement;
 
     private List<ContainerWrapper> addedChildren = new ArrayList<ContainerWrapper>();
@@ -447,8 +451,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     @SuppressWarnings("unchecked")
     public Map<RowColPos, SpecimenWrapper> getSpecimens() {
-        Map<RowColPos, SpecimenWrapper> aliquots = (Map<RowColPos, SpecimenWrapper>) propertiesMap
-            .get("aliquots");
+        Map<RowColPos, SpecimenWrapper> aliquots = (Map<RowColPos, SpecimenWrapper>) cache
+            .get(ALIQUOTS_CACHE_KEY);
         if (aliquots == null) {
             List<SpecimenPositionWrapper> positions = getWrapperCollection(
                 ContainerPeer.SPECIMEN_POSITION_COLLECTION,
@@ -465,7 +469,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 aliquots.put(
                     new RowColPos(position.getRow(), position.getCol()), spc);
             }
-            propertiesMap.put("aliquots", aliquots);
+            cache.put(ALIQUOTS_CACHE_KEY, aliquots);
         }
         return aliquots;
     }
@@ -500,7 +504,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         Map<RowColPos, SpecimenWrapper> aliquots = getSpecimens();
         if (aliquots == null) {
             aliquots = new TreeMap<RowColPos, SpecimenWrapper>();
-            propertiesMap.put("aliquots", aliquots);
+            cache.put(ALIQUOTS_CACHE_KEY, aliquots);
         } else if (!canHoldAliquot(aliquot)) {
             throw new BiobankCheckException("Container " + getFullInfoLabel()
                 + " does not allow inserts of type "
@@ -549,8 +553,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 Arrays.asList(new Object[] { getId() }));
             return getCountResult(appService, criteria);
         }
-        Map<RowColPos, ContainerWrapper> children = (Map<RowColPos, ContainerWrapper>) propertiesMap
-            .get("children");
+        Map<RowColPos, ContainerWrapper> children = (Map<RowColPos, ContainerWrapper>) cache
+            .get(CHILDREN_CACHE_KEY);
         if (children != null) {
             return children.size();
         }
@@ -576,8 +580,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     @SuppressWarnings("unchecked")
     public Map<RowColPos, ContainerWrapper> getChildren()
         throws BiobankFailedQueryException {
-        Map<RowColPos, ContainerWrapper> children = (Map<RowColPos, ContainerWrapper>) propertiesMap
-            .get("children");
+        Map<RowColPos, ContainerWrapper> children = (Map<RowColPos, ContainerWrapper>) cache
+            .get(CHILDREN_CACHE_KEY);
         if (children == null) {
             children = new TreeMap<RowColPos, ContainerWrapper>();
 
@@ -598,7 +602,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                             cp.getContainer());
                     }
                 }
-                propertiesMap.put("children", children);
+                cache.put(CHILDREN_CACHE_KEY, children);
             } catch (ApplicationException e) {
                 throw new BiobankFailedQueryException(e);
             }
@@ -684,7 +688,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         Map<RowColPos, ContainerWrapper> children = getChildren();
         if (children == null) {
             children = new TreeMap<RowColPos, ContainerWrapper>();
-            propertiesMap.put("children", children);
+            cache.put(CHILDREN_CACHE_KEY, children);
         } else {
             ContainerWrapper containerAtPosition = getChild(row, col);
             if (containerAtPosition != null) {

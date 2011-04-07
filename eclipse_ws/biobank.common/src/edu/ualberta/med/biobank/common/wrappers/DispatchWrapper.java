@@ -389,7 +389,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     // fast... from db. should only call this once then use the cached value
     public List<DispatchSpecimenWrapper> getFastDispatchSpecimenCollection() {
-        if (!isCached(DispatchPeer.DISPATCH_SPECIMEN_COLLECTION)) {
+        if (!isPropertyCached(DispatchPeer.DISPATCH_SPECIMEN_COLLECTION)) {
             List<DispatchSpecimen> results = new ArrayList<DispatchSpecimen>();
             // test hql
             HQLCriteria query = new HQLCriteria(

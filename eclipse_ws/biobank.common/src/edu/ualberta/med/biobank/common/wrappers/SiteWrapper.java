@@ -35,6 +35,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SiteWrapper extends SiteBaseWrapper {
+    private static final String TOP_CONTAINER_COLLECTION_CACHE_KEY = "topContainerCollection";
+
     private Map<RequestState, List<RequestWrapper>> requestCollectionMap = new HashMap<RequestState, List<RequestWrapper>>();
 
     public static final List<String> PROP_NAMES;
@@ -144,8 +146,8 @@ public class SiteWrapper extends SiteBaseWrapper {
     @SuppressWarnings("unchecked")
     public List<ContainerWrapper> getTopContainerCollection(boolean sort)
         throws Exception {
-        List<ContainerWrapper> topContainerCollection = (List<ContainerWrapper>) propertiesMap
-            .get("topContainerCollection");
+        List<ContainerWrapper> topContainerCollection = (List<ContainerWrapper>) cache
+            .get(TOP_CONTAINER_COLLECTION_CACHE_KEY);
 
         if (topContainerCollection == null) {
             topContainerCollection = new ArrayList<ContainerWrapper>();
@@ -157,7 +159,7 @@ public class SiteWrapper extends SiteBaseWrapper {
             }
             if (sort)
                 Collections.sort(topContainerCollection);
-            propertiesMap.put("topContainerCollection", topContainerCollection);
+            cache.put(TOP_CONTAINER_COLLECTION_CACHE_KEY, topContainerCollection);
         }
         return topContainerCollection;
     }
@@ -167,7 +169,7 @@ public class SiteWrapper extends SiteBaseWrapper {
     }
 
     public void clearTopContainerCollection() {
-        propertiesMap.put("topContainerCollection", null);
+        cache.put(TOP_CONTAINER_COLLECTION_CACHE_KEY, null);
     }
 
     @Override

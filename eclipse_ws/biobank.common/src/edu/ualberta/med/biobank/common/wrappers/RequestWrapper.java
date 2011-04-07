@@ -20,9 +20,9 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class RequestWrapper extends RequestBaseWrapper {
 
-    private static final String NON_PROCESSED_ALIQUOTS_KEY = "nonProcessedRequestSpecimenCollection";
+    private static final String NON_PROCESSED_ALIQUOTS_CACHE_KEY = "nonProcessedRequestSpecimenCollection";
 
-    private static final String PROCESSED_ALIQUOTS_KEY = "processedRequestSpecimens";
+    private static final String PROCESSED_ALIQUOTS_CACHE_KEY = "processedRequestSpecimens";
 
     private static final String UNAVAILABLE_ALIQUOTS_KEY = "unavailableRequestSpecimens";
 
@@ -52,8 +52,8 @@ public class RequestWrapper extends RequestBaseWrapper {
             a.setState(RequestSpecimenState.PROCESSED_STATE.getId());
             a.persist();
         }
-        propertiesMap.put(NON_PROCESSED_ALIQUOTS_KEY, null);
-        propertiesMap.put(PROCESSED_ALIQUOTS_KEY, null);
+        cache.put(NON_PROCESSED_ALIQUOTS_CACHE_KEY, null);
+        cache.put(PROCESSED_ALIQUOTS_CACHE_KEY, null);
     }
 
     public void receiveAliquot(String text) throws Exception {
@@ -70,19 +70,19 @@ public class RequestWrapper extends RequestBaseWrapper {
 
     public List<RequestSpecimenWrapper> getNonProcessedRequestSpecimenCollection() {
         return getRequestSpecimenCollectionWithState(
-            NON_PROCESSED_ALIQUOTS_KEY, true,
+            NON_PROCESSED_ALIQUOTS_CACHE_KEY, true,
             RequestSpecimenState.NONPROCESSED_STATE);
     }
 
     public List<RequestSpecimenWrapper> getProcessedRequestSpecimenCollection() {
-        return getRequestSpecimenCollectionWithState(PROCESSED_ALIQUOTS_KEY,
+        return getRequestSpecimenCollectionWithState(PROCESSED_ALIQUOTS_CACHE_KEY,
             true, RequestSpecimenState.PROCESSED_STATE);
     }
 
     @SuppressWarnings("unchecked")
     private List<RequestSpecimenWrapper> getRequestSpecimenCollectionWithState(
         String mapKey, boolean sort, RequestSpecimenState... states) {
-        List<RequestSpecimenWrapper> dsaCollection = (List<RequestSpecimenWrapper>) propertiesMap
+        List<RequestSpecimenWrapper> dsaCollection = (List<RequestSpecimenWrapper>) cache
             .get(mapKey);
         if (dsaCollection == null) {
             Collection<RequestSpecimenWrapper> children = getRequestSpecimenCollection(sort);
@@ -99,7 +99,7 @@ public class RequestWrapper extends RequestBaseWrapper {
                     if (hasState)
                         dsaCollection.add(dsa);
                 }
-                propertiesMap.put(mapKey, dsaCollection);
+                cache.put(mapKey, dsaCollection);
             }
             if ((dsaCollection != null) && sort)
                 Collections.sort(dsaCollection);
@@ -113,9 +113,9 @@ public class RequestWrapper extends RequestBaseWrapper {
     }
 
     public void resetStateLists() {
-        propertiesMap.put(UNAVAILABLE_ALIQUOTS_KEY, null);
-        propertiesMap.put(PROCESSED_ALIQUOTS_KEY, null);
-        propertiesMap.put(NON_PROCESSED_ALIQUOTS_KEY, null);
+        cache.put(UNAVAILABLE_ALIQUOTS_KEY, null);
+        cache.put(PROCESSED_ALIQUOTS_CACHE_KEY, null);
+        cache.put(NON_PROCESSED_ALIQUOTS_CACHE_KEY, null);
     }
 
     public RequestSpecimenWrapper getRequestSpecimen(String inventoryId) {

@@ -24,6 +24,12 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class CenterWrapper<E extends Center> extends
     CenterBaseWrapper<E> {
+    private static final String RECEIVING_WITH_ERRORS_DISPATCH_COLLECTION_CACHE_KEY = "receivingWithErrorsDispatchCollection";
+    private static final String RECEIVING_DISPATCH_COLLECTION_CACHE_KEY = "receivingDispatchCollection";
+    private static final String IN_TRANSIT_RECEIVE_DISPATCH_COLLECTION_CACHE_KEY = "inTransitReceiveDispatchCollection";
+    private static final String IN_CREATION_DISPATCH_COLLECTION_CACHE_KEY = "inCreationDispatchCollection";
+    private static final String IN_TRANSIT_SENT_DISPATCH_COLLECTION_CACHE_KEY = "inTransitSentDispatchCollection";
+
     private static final String ALL_CENTERS_HQL_STRING = "from "
         + Center.class.getName();
 
@@ -172,8 +178,8 @@ public abstract class CenterWrapper<E extends Center> extends
 
     @SuppressWarnings("unchecked")
     public List<DispatchWrapper> getInTransitSentDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("inTransitSentDispatchCollection");
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) cache
+            .get(IN_TRANSIT_SENT_DISPATCH_COLLECTION_CACHE_KEY);
         if (shipCollection == null) {
             List<DispatchWrapper> children = getSrcDispatchCollection(false);
             if (children != null) {
@@ -184,8 +190,7 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                propertiesMap.put("inTransitSentDispatchCollection",
-                    shipCollection);
+                cache.put(IN_TRANSIT_SENT_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
             }
         }
         return shipCollection;
@@ -193,8 +198,8 @@ public abstract class CenterWrapper<E extends Center> extends
 
     @SuppressWarnings("unchecked")
     public List<DispatchWrapper> getInTransitReceiveDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("inTransitReceiveDispatchCollection");
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) cache
+            .get(IN_TRANSIT_RECEIVE_DISPATCH_COLLECTION_CACHE_KEY);
         if (shipCollection == null) {
             List<DispatchWrapper> children = getDstDispatchCollection(false);
             if (children != null) {
@@ -205,8 +210,7 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                propertiesMap.put("inTransitReceiveDispatchCollection",
-                    shipCollection);
+                cache.put(IN_TRANSIT_RECEIVE_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
             }
         }
         return shipCollection;
@@ -214,8 +218,8 @@ public abstract class CenterWrapper<E extends Center> extends
 
     @SuppressWarnings("unchecked")
     public List<DispatchWrapper> getReceivingNoErrorsDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("receivingDispatchCollection");
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) cache
+            .get(RECEIVING_DISPATCH_COLLECTION_CACHE_KEY);
         if (shipCollection == null) {
             List<DispatchWrapper> children = getDstDispatchCollection(false);
             if (children != null) {
@@ -226,8 +230,7 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                propertiesMap
-                    .put("receivingDispatchCollection", shipCollection);
+                cache.put(RECEIVING_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
             }
         }
         return shipCollection;
@@ -235,8 +238,8 @@ public abstract class CenterWrapper<E extends Center> extends
 
     @SuppressWarnings("unchecked")
     public List<DispatchWrapper> getReceivingWithErrorsDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("receivingWithErrorsDispatchCollection");
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) cache
+            .get(RECEIVING_WITH_ERRORS_DISPATCH_COLLECTION_CACHE_KEY);
         if (shipCollection == null) {
             List<DispatchWrapper> children = getDstDispatchCollection(false);
             if (children != null) {
@@ -247,7 +250,7 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                propertiesMap.put("receivingWithErrorsDispatchCollection",
+                cache.put(RECEIVING_WITH_ERRORS_DISPATCH_COLLECTION_CACHE_KEY,
                     shipCollection);
             }
         }
@@ -256,8 +259,8 @@ public abstract class CenterWrapper<E extends Center> extends
 
     @SuppressWarnings("unchecked")
     public List<DispatchWrapper> getInCreationDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("inCreationDispatchCollection");
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) cache
+            .get(IN_CREATION_DISPATCH_COLLECTION_CACHE_KEY);
         if (shipCollection == null) {
             List<DispatchWrapper> children = getSrcDispatchCollection(false);
             if (children != null) {
@@ -268,8 +271,7 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                propertiesMap.put("inCreationDispatchCollection",
-                    shipCollection);
+                cache.put(IN_CREATION_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
             }
         }
         return shipCollection;
