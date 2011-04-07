@@ -42,7 +42,7 @@ import net.sf.cglib.proxy.Enhancer;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
-    private final Map<Property<?, ?>, Object> propertyMap = new HashMap<Property<?, ?>, Object>();
+    private final Map<Property<?, ?>, Object> propertyCache = new HashMap<Property<?, ?>, Object>();
 
     protected WritableApplicationService appService;
 
@@ -51,7 +51,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
         this);
 
-    protected HashMap<String, Object> propertiesMap = new HashMap<String, Object>();
+    protected HashMap<String, Object> cache = new HashMap<String, Object>();
 
     private List<WrapperListener> listeners = new ArrayList<WrapperListener>();
 
@@ -82,8 +82,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     public void setWrappedObject(E wrappedObject) {
         this.wrappedObject = wrappedObject;
-        propertiesMap.clear();
-        propertyMap.clear();
+        cache.clear();
+        propertyCache.clear();
     }
 
     public void addPropertyChangeListener(String propertyName,
@@ -128,8 +128,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public void reload() throws Exception {
-        propertiesMap.clear();
-        propertyMap.clear();
+        cache.clear();
+        propertyCache.clear();
         resetInternalFields();
 
         E oldValue = wrappedObject;
@@ -230,8 +230,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         if (logMessage != null) {
             ((BiobankApplicationService) appService).logActivity(logMessage);
         }
-        propertiesMap.clear();
-        propertyMap.clear();
+        cache.clear();
+        propertyCache.clear();
         resetInternalFields();
         notifyListeners(new WrapperEvent(eventType, this));
     }
@@ -330,8 +330,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public void reset() throws Exception {
-        propertiesMap.clear();
-        propertyMap.clear();
+        cache.clear();
+        propertyCache.clear();
         resetInternalFields();
         if (isNew()) {
             resetToNewObject();
@@ -701,9 +701,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         @SuppressWarnings("unchecked")
-        W wrapper = (W) modelWrapper.recall(property);
+        W wrapper = (W) modelWrapper.recallProperty(property);
 
-        if (wrapper == null && !modelWrapper.isCached(property)) {
+        if (wrapper == null && !modelWrapper.isPropertyCached(property)) {
             R raw = getModelProperty(modelWrapper, property);
 
             if (raw != null) {
@@ -716,7 +716,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 }
             }
 
-            modelWrapper.cache(property, wrapper);
+            modelWrapper.cacheProperty(property, wrapper);
         }
 
         return wrapper;
@@ -731,7 +731,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         ModelWrapper<M> modelWrapper, Property<R, ? super M> property, W wrapper) {
         R newValue = (wrapper == null ? null : wrapper.getWrappedObject());
         setProperty(modelWrapper, property, newValue);
-        modelWrapper.cache(property, wrapper);
+        modelWrapper.cacheProperty(property, wrapper);
     }
 
     protected <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
@@ -750,7 +750,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         setModelProperty(modelWrapper, property, newValues);
-        modelWrapper.cache(property, wrappers);
+        modelWrapper.cacheProperty(property, wrappers);
     }
 
     protected <W extends ModelWrapper<? extends R>, R> List<W> getWrapperCollection(
@@ -768,9 +768,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         @SuppressWarnings("unchecked")
-        List<W> wrappers = (List<W>) modelWrapper.recall(property);
+        List<W> wrappers = (List<W>) modelWrapper.recallProperty(property);
 
-        if (wrappers == null && !modelWrapper.isCached(property)) {
+        if (wrappers == null && !modelWrapper.isPropertyCached(property)) {
             Collection<R> raw = getModelProperty(modelWrapper, property);
 
             List<R> list = new ArrayList<R>();
@@ -783,7 +783,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             }
 
             wrappers = wrapModelCollection(appService, list, wrapperKlazz);
-            modelWrapper.cache(property, wrappers);
+            modelWrapper.cacheProperty(property, wrappers);
         }
 
         if (wrappers != null && sort) {
@@ -870,11 +870,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         @SuppressWarnings("unchecked")
-        T value = (T) modelWrapper.recall(property);
+        T value = (T) modelWrapper.recallProperty(property);
 
-        if (value == null && !modelWrapper.isCached(property)) {
+        if (value == null && !modelWrapper.isPropertyCached(property)) {
             value = getModelProperty(modelWrapper, property);
-            modelWrapper.cache(property, value);
+            modelWrapper.cacheProperty(property, value);
         }
 
         return value;
@@ -887,7 +887,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private <T, M> void setProperty(ModelWrapper<M> modelWrapper,
         Property<T, ? super M> property, T newValue) {
         setModelProperty(modelWrapper, property, newValue);
-        modelWrapper.cache(property, newValue);
+        modelWrapper.cacheProperty(property, newValue);
     }
 
     private static <T, M> T getModelProperty(ModelWrapper<M> modelWrapper,
@@ -936,16 +936,16 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
     }
 
-    private void cache(Property<?, ?> property, Object value) {
-        propertyMap.put(property, value);
+    private void cacheProperty(Property<?, ?> property, Object value) {
+        propertyCache.put(property, value);
     }
 
-    protected boolean isCached(Property<?, ?> property) {
-        return propertyMap.containsKey(property);
+    protected boolean isPropertyCached(Property<?, ?> property) {
+        return propertyCache.containsKey(property);
     }
 
-    private Object recall(Property<?, ?> property) {
-        return propertyMap.get(property);
+    private Object recallProperty(Property<?, ?> property) {
+        return propertyCache.get(property);
     }
 
     private static String capitalizeFirstLetter(String name) {

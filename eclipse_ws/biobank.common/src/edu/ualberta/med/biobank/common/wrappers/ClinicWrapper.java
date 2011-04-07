@@ -27,6 +27,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ClinicWrapper extends ClinicBaseWrapper {
 
+    private static final String STUDY_COLLECTION_CACHE_KEY = "studyCollection";
     private Set<ContactWrapper> deletedContacts = new HashSet<ContactWrapper>();
 
     public ClinicWrapper(WritableApplicationService appService) {
@@ -78,8 +79,8 @@ public class ClinicWrapper extends ClinicBaseWrapper {
 
     @SuppressWarnings("unchecked")
     public List<StudyWrapper> getStudyCollection() throws ApplicationException {
-        List<StudyWrapper> studyCollection = (List<StudyWrapper>) propertiesMap
-            .get("studyCollection");
+        List<StudyWrapper> studyCollection = (List<StudyWrapper>) cache
+            .get(STUDY_COLLECTION_CACHE_KEY);
 
         if (studyCollection == null) {
             studyCollection = new ArrayList<StudyWrapper>();
@@ -89,7 +90,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
             for (Study study : collection) {
                 studyCollection.add(new StudyWrapper(appService, study));
             }
-            propertiesMap.put("studyCollection", studyCollection);
+            cache.put(STUDY_COLLECTION_CACHE_KEY, studyCollection);
         }
         return studyCollection;
     }
