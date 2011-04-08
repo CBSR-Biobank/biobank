@@ -11,7 +11,6 @@ import java.util.Set;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -35,8 +34,8 @@ import org.eclipse.swt.widgets.Label;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
-import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.LinkProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.SpecimenHierarchy;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -57,7 +56,6 @@ import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionSpecificBehaviour;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Link aliquoted specimens to their source specimens
@@ -92,8 +90,6 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     private Button fakeScanRandom;
 
     private Composite fieldsComposite;
-
-    private boolean processScanResult;
 
     private boolean isFakeScanRandom;
 
@@ -425,7 +421,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                typesSelectionPerRowComposite.setEnabled(processScanResult);
+                typesSelectionPerRowComposite
+                    .setEnabled(currentScanState != UICellStatus.ERROR);
                 if (typesRows.size() > 0)
                     Display.getDefault().asyncExec(new Runnable() {
                         @Override
@@ -451,11 +448,19 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 // again form.layout(true, true);
             }
         });
-        setScanValid(processScanResult);
     }
 
     @Override
     protected void beforeScanThreadStart() {
+        beforeScans(true);
+    }
+
+    @Override
+    protected void beforeScanTubeAlone() {
+        beforeScans(false);
+    }
+
+    private void beforeScans(boolean resetTypeRows) {
         isFakeScanRandom = fakeScanRandom != null
             && fakeScanRandom.getSelection();
         currentSelectedCenter = SessionManager.getUser()
@@ -464,6 +469,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         for (AliquotedSpecimenSelectionWidget stw : specimenTypesWidgets) {
             preSelections.add(stw.getSelection());
         }
+        if (resetTypeRows)
+            typesRows.clear();
     }
 
     @Override
@@ -480,38 +487,9 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         return null;
     }
 
-    /**
-     * Server side call for the cells processing
-     */
     @Override
-    protected ScanProcessResult callServerSideProcess(
-        Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells)
-        throws ApplicationException {
-        return SessionManager.getAppService().processScanLinkResult(
-            serverCells, isRescanMode(), SessionManager.getUser());
-    }
-
-    /**
-     * Server side call for the cell processing
-     */
-    @Override
-    protected CellProcessResult callServerSideProcess(
-        edu.ualberta.med.biobank.common.scanprocess.Cell serverCell)
-        throws ApplicationException {
-        return SessionManager.getAppService().processCellLinkStatus(serverCell,
-            SessionManager.getUser());
-    }
-
-    /**
-     * whole cells processing
-     */
-    @Override
-    protected boolean processScanResult(IProgressMonitor monitor)
-        throws Exception {
-        processScanResult = false;
-        typesRows.clear();
-        processScanResult = super.processScanResult(monitor);
-        return processScanResult;
+    protected ProcessData getProcessData() {
+        return new LinkProcessData();
     }
 
     /**
@@ -528,13 +506,6 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         SpecimenHierarchy selection = preSelections.get(cell.getRow());
         if (selection != null)
             setTypeToCell(cell, selection);
-        // if (tubeAlone)
-        // Display.getDefault().asyncExec(new Runnable() {
-        // @Override
-        // public void run() {
-        // specimenTypesWidgets.get(rcp.row).increaseNumber();
-        // }
-        // });
         if (PalletCell.hasValue(cell)) {
             typesRowsCount++;
             typesRows.put(rcp.row, typesRowsCount);

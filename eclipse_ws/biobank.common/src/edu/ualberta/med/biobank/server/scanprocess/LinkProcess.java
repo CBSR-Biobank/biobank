@@ -4,6 +4,7 @@ import edu.ualberta.med.biobank.common.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
+import edu.ualberta.med.biobank.common.scanprocess.LinkProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.ProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
@@ -16,19 +17,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class LinkProcess {
+public class LinkProcess extends ServerProcess {
 
-    private WritableApplicationService appService;
-    private User user;
-
-    public LinkProcess(WritableApplicationService appService, User user) {
-        this.appService = appService;
-        this.user = user;
+    public LinkProcess(WritableApplicationService appService,
+        LinkProcessData data, User user) {
+        super(appService, data, user);
     }
 
-    public ScanProcessResult processScanLinkResult(Map<RowColPos, Cell> cells,
-        boolean isRescanMode) throws Exception {
-        ScanProcessResult res = new ScanProcessResult();
+    @Override
+    protected CellStatus internalProcessScanResult(ScanProcessResult res,
+        Map<RowColPos, Cell> cells, boolean isRescanMode) throws Exception {
+        CellStatus currentScanState = CellStatus.EMPTY;
         if (cells != null) {
             Map<String, Cell> allValues = new HashMap<String, Cell>();
             for (Entry<RowColPos, Cell> entry : cells.entrySet()) {
@@ -50,13 +49,18 @@ public class LinkProcess {
                         .getStatus() != CellStatus.NO_TYPE)) {
                     processCellLinkStatus(appService, cell, res, user);
                 }
+                CellStatus newStatus = CellStatus.EMPTY;
+                if (cell != null) {
+                    newStatus = cell.getStatus();
+                }
+                currentScanState = currentScanState.mergeWith(newStatus);
             }
         }
-        res.setResult(cells, null);
-        return res;
+        return currentScanState;
     }
 
-    public CellProcessResult processCellLinkStatus(Cell cell) throws Exception {
+    @Override
+    public CellProcessResult processCellStatus(Cell cell) throws Exception {
         CellProcessResult res = new CellProcessResult();
         res.setResult(cell, processCellLinkStatus(appService, cell, res, user));
         return res;
@@ -116,4 +120,5 @@ public class LinkProcess {
             return cell.getStatus();
         }
     }
+
 }

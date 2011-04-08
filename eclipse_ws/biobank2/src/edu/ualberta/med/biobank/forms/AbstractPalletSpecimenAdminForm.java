@@ -32,7 +32,9 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -47,7 +49,6 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class AbstractPalletSpecimenAdminForm extends
     AbstractSpecimenAdminForm {
@@ -82,6 +83,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     private IPropertyChangeListener propertyListener;
 
     protected String currentPlateToScan;
+
+    // global state of the pallet process
+    protected UICellStatus currentScanState;
 
     @Override
     protected void init() throws Exception {
@@ -441,14 +445,22 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected void postprocessScanTubeAlone(PalletCell palletCell)
         throws Exception {
-        beforeScanThreadStart();
-        CellProcessResult res = callServerSideProcess(getServerCell(palletCell));
+        beforeScanTubeAlone();
+        CellProcessResult res = appService.processCellStatus(
+            getServerCell(palletCell), getProcessData(),
+            SessionManager.getUser());
         palletCell.merge(appService, res.getCell());
+        appendLogs(res.getLogs());
         processCellResult(palletCell.getRowColPos(), palletCell);
+        currentScanState = currentScanState.mergeWith(palletCell.getStatus());
         boolean ok = isScanValid()
             && (palletCell.getStatus() != UICellStatus.ERROR);
         setScanValid(ok);
         afterScanAndProcess(palletCell.getRow());
+    }
+
+    protected void beforeScanTubeAlone() {
+
     }
 
     protected boolean isScanTubeAloneMode() {
@@ -495,9 +507,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
      * go through cells retrieved from scan, set status and update the types
      * combos components
      */
-    protected boolean processScanResult(IProgressMonitor monitor)
-        throws Exception {
-        boolean everythingOk = true;
+    protected void processScanResult(IProgressMonitor monitor) throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
         // conversion for server side call
         Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells = null;
@@ -509,7 +519,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
         }
         // server side call
-        ScanProcessResult res = callServerSideProcess(serverCells);
+        ScanProcessResult res = appService.processScanResult(serverCells,
+            getProcessData(), isRescanMode(), SessionManager.getUser());
         // print result logs
         appendLogs(res.getLogs());
 
@@ -525,23 +536,19 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                 palletCell.merge(appService, entry.getValue());
                 // additional cell specific client conversion
                 processCellResult(rcp, palletCell);
-                everythingOk = palletCell.getStatus() != UICellStatus.ERROR
-                    && everythingOk;
             }
         }
-        return everythingOk;
+        currentScanState = UICellStatus.valueOf(res.getProcessStatus().name());
+        setScanValid(!getCells().isEmpty()
+            && currentScanState != UICellStatus.ERROR);
     }
 
-    protected abstract void processCellResult(RowColPos rcp,
-        PalletCell palletCell);
+    protected abstract ProcessData getProcessData();
 
-    protected abstract ScanProcessResult callServerSideProcess(
-        Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells)
-        throws ApplicationException;
-
-    protected abstract CellProcessResult callServerSideProcess(
-        edu.ualberta.med.biobank.common.scanprocess.Cell serverCell)
-        throws ApplicationException;
+    protected void processCellResult(@SuppressWarnings("unused") RowColPos rcp,
+        @SuppressWarnings("unused") PalletCell palletCell) {
+        // nothing done by default
+    }
 
     protected boolean isFirstSuccessfulScan() {
         return palletScanManagement.getSuccessfulScansCount() == 1;

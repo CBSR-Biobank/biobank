@@ -1,8 +1,11 @@
 package edu.ualberta.med.biobank.server.scanprocess;
 
 import edu.ualberta.med.biobank.common.Messages;
+import edu.ualberta.med.biobank.common.scanprocess.AssignProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
+import edu.ualberta.med.biobank.common.scanprocess.ProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -14,35 +17,39 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AssignProcess {
+public class AssignProcess extends ServerProcess {
 
-    private WritableApplicationService appService;
-    private User user;
-
-    public AssignProcess(WritableApplicationService appService, User user) {
-        this.appService = appService;
-        this.user = user;
+    public AssignProcess(WritableApplicationService appService,
+        AssignProcessData data, User user) {
+        super(appService, data, user);
     }
 
-    public ScanProcessResult processScanAssignResult(
-        Map<RowColPos, Cell> cells, Map<RowColPos, Integer> expectedSpecimens,
-        String palletLabel, Integer palletId, Integer containerTypeId,
-        int rowCapacity, int colCapacity, boolean rescanMode) throws Exception {
+    @Override
+    public CellProcessResult processCellStatus(Cell cell) throws Exception {
+        CellProcessResult res = new CellProcessResult();
+        res.setResult(cell, processCellAssignStatus(cell, res, null));
+        return res;
+    }
+
+    @Override
+    protected CellStatus internalProcessScanResult(ScanProcessResult res,
+        Map<RowColPos, Cell> cells, boolean rescanMode) throws Exception {
+        AssignProcessData assignData = (AssignProcessData) data;
         CellStatus currentScanState = CellStatus.EMPTY;
-        ScanProcessResult res = new ScanProcessResult();
         // FIXME need to remember movedAndMissingAliquotsFromPallet when rescan
         // ?
         Map<RowColPos, Boolean> movedAndMissingAliquotsFromPallet = new HashMap<RowColPos, Boolean>();
-        for (int row = 0; row < rowCapacity; row++) {
-            for (int col = 0; col < colCapacity; col++) {
+        for (int row = 0; row < assignData.getPalletRowCapacity(); row++) {
+            for (int col = 0; col < assignData.getPalletColCapacity(); col++) {
                 RowColPos rcp = new RowColPos(row, col);
                 Cell cell = cells.get(rcp);
                 if (!rescanMode || cell == null || cell.getStatus() == null
                     || cell.getStatus() == CellStatus.EMPTY
                     || cell.getStatus() == CellStatus.ERROR
                     || cell.getStatus() == CellStatus.MISSING) {
-                    if (expectedSpecimens != null) {
-                        Integer specId = expectedSpecimens.get(rcp);
+                    if (assignData.getExpectedSpecimens() != null) {
+                        Integer specId = assignData.getExpectedSpecimens().get(
+                            rcp);
                         if (specId != null) {
                             if (cell == null) {
                                 cell = new Cell(rcp.row, rcp.col, null, null);
@@ -52,9 +59,8 @@ public class AssignProcess {
                         }
                     }
                     if (cell != null) {
-                        processCellAssignStatus(cell, palletLabel, palletId,
-                            res, movedAndMissingAliquotsFromPallet,
-                            containerTypeId);
+                        processCellAssignStatus(cell, res,
+                            movedAndMissingAliquotsFromPallet);
                     }
                 }
                 CellStatus newStatus = CellStatus.EMPTY;
@@ -64,17 +70,16 @@ public class AssignProcess {
                 currentScanState = currentScanState.mergeWith(newStatus);
             }
         }
-        res.setResult(cells, currentScanState);
-        return res;
+        return currentScanState;
     }
 
     /**
      * set the status of the cell
      */
-    private void processCellAssignStatus(Cell scanCell, String palletLabel,
-        Integer palletId, ScanProcessResult res,
-        Map<RowColPos, Boolean> movedAndMissingAliquotsFromPallet,
-        Integer containerTypeId) throws Exception {
+    private CellStatus processCellAssignStatus(Cell scanCell,
+        ProcessResult res,
+        Map<RowColPos, Boolean> movedAndMissingAliquotsFromPallet)
+        throws Exception {
         SpecimenWrapper expectedSpecimen = null;
         if (scanCell.getExpectedSpecimenId() != null) {
             expectedSpecimen = new SpecimenWrapper(appService);
@@ -84,7 +89,7 @@ public class AssignProcess {
         }
 
         String value = scanCell.getValue();
-        String positionString = palletLabel
+        String positionString = ((AssignProcessData) data).getPalletLabel()
             + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(scanCell
                 .getRow(), scanCell.getCol()));
         if (value == null) { // no specimen scanned
@@ -112,13 +117,14 @@ public class AssignProcess {
                 } else {
                     ContainerTypeWrapper cType = new ContainerTypeWrapper(
                         appService);
-                    cType.getWrappedObject().setId(containerTypeId);
+                    cType.getWrappedObject().setId(
+                        ((AssignProcessData) data).getContainerTypeId());
                     cType.reload();
                     if (cType.getSpecimenTypeCollection().contains(
                         foundSpecimen.getSpecimenType())) {
                         if (foundSpecimen.hasParent()) { // moved
                             processCellWithPreviousPosition(scanCell,
-                                positionString, foundSpecimen, res, palletId,
+                                positionString, foundSpecimen, res,
                                 movedAndMissingAliquotsFromPallet);
                         } else { // new in pallet
                             if (foundSpecimen.isUsedInDispatch()) {
@@ -139,12 +145,13 @@ public class AssignProcess {
                 }
             }
         }
+        return scanCell.getStatus();
     }
 
     /**
      * specimen missing
      */
-    private void updateCellAsMissing(String position, ScanProcessResult res,
+    private void updateCellAsMissing(String position, ProcessResult res,
         Cell scanCell, SpecimenWrapper missingAliquot,
         Map<RowColPos, Boolean> movedAndMissingAliquotsFromPallet) {
         RowColPos rcp = new RowColPos(scanCell.getRow(), scanCell.getCol());
@@ -177,7 +184,7 @@ public class AssignProcess {
      */
     // FIXME not linked or not added into any cevent
     private void updateCellAsNotLinked(String position, Cell scanCell,
-        ScanProcessResult res) {
+        ProcessResult res) {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages
             .getString("ScanAssign.scanStatus.aliquot.notlinked")); //$NON-NLS-1$
@@ -191,7 +198,7 @@ public class AssignProcess {
      */
     private void updateCellAsPositionAlreadyTaken(String position,
         Cell scanCell, SpecimenWrapper expectedAliquot,
-        SpecimenWrapper foundAliquot, ScanProcessResult res) {
+        SpecimenWrapper foundAliquot, ProcessResult res) {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages
             .getString("ScanAssign.scanStatus.aliquot.positionTakenError")); //$NON-NLS-1$
@@ -209,11 +216,12 @@ public class AssignProcess {
      */
     private void processCellWithPreviousPosition(Cell scanCell,
         String positionString, SpecimenWrapper foundSpecimen,
-        ScanProcessResult res, Integer palletId,
+        ProcessResult res,
         Map<RowColPos, Boolean> movedAndMissingAliquotsFromPallet) {
         if (foundSpecimen.getParentContainer().getSite()
             .equals(user.getCurrentWorkingSite())) {
-            if (foundSpecimen.getParentContainer().getId().equals(palletId)) {
+            if (foundSpecimen.getParentContainer().getId()
+                .equals(((AssignProcessData) data).getPalletId())) {
                 // same pallet
                 RowColPos rcp = new RowColPos(scanCell.getRow(),
                     scanCell.getCol());
@@ -249,7 +257,7 @@ public class AssignProcess {
     }
 
     private void updateCellAsMoved(String position, Cell scanCell,
-        SpecimenWrapper foundAliquot, ScanProcessResult res) {
+        SpecimenWrapper foundAliquot, ProcessResult res) {
         String expectedPosition = foundAliquot.getPositionString(true, false);
         if (expectedPosition == null) {
             expectedPosition = "none"; //$NON-NLS-1$
@@ -268,7 +276,7 @@ public class AssignProcess {
     }
 
     private void updateCellAsInOtherSite(String position, Cell scanCell,
-        SpecimenWrapper foundAliquot, ScanProcessResult res) {
+        SpecimenWrapper foundAliquot, ProcessResult res) {
         String currentPosition = foundAliquot.getPositionString(true, false);
         if (currentPosition == null) {
             currentPosition = "none"; //$NON-NLS-1$
@@ -288,7 +296,7 @@ public class AssignProcess {
     }
 
     private void updateCellAsTypeError(String position, Cell scanCell,
-        SpecimenWrapper foundAliquot, ScanProcessResult res,
+        SpecimenWrapper foundAliquot, ProcessResult res,
         ContainerTypeWrapper containerType) {
         String palletType = containerType.getName();
         String sampleType = foundAliquot.getSpecimenType().getName();
@@ -304,7 +312,7 @@ public class AssignProcess {
     }
 
     private void updateCellAsDispatchedError(String positionString,
-        Cell scanCell, SpecimenWrapper foundAliquot, ScanProcessResult res) {
+        Cell scanCell, SpecimenWrapper foundAliquot, ProcessResult res) {
         scanCell.setTitle(foundAliquot.getCollectionEvent().getPatient()
             .getPnumber());
         scanCell.setStatus(CellStatus.ERROR);
@@ -314,4 +322,5 @@ public class AssignProcess {
             "ScanAssign.activitylog.aliquot.dispatchedError", positionString));
 
     }
+
 }

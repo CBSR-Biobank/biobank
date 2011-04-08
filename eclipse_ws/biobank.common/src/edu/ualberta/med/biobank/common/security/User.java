@@ -35,6 +35,9 @@ public class User implements Serializable, NotAProxy {
 
     private transient CenterWrapper<?> currentWorkingCenter;
 
+    // only the current working center id will be serialized
+    private Integer currentWorkingCenterId;
+
     private boolean needToChangePassword;
 
     private List<Group> groups = new ArrayList<Group>();
@@ -313,12 +316,15 @@ public class User implements Serializable, NotAProxy {
     }
 
     public void setCurrentWorkingCenter(CenterWrapper<?> center) {
-        this.currentWorkingCenter = center;
+        currentWorkingCenter = center;
+        // only the id is serialized
+        if (center == null)
+            currentWorkingCenterId = null;
+        else
+            currentWorkingCenterId = center.getId();
     }
 
     public CenterWrapper<?> getCurrentWorkingCenter() {
-        // TODO: removed reload... called way too often, should manage reloads
-        // in forms
         return currentWorkingCenter;
     }
 
@@ -326,6 +332,21 @@ public class User implements Serializable, NotAProxy {
         if (currentWorkingCenter instanceof SiteWrapper)
             return (SiteWrapper) currentWorkingCenter;
         return null;
+    }
+
+    /**
+     * To use on the server side to initialize the currentWorkingCenter from the
+     * id
+     */
+    public void initCurrentWorkingCenter(WritableApplicationService appService) {
+        if (currentWorkingCenter == null && currentWorkingCenterId != null) {
+            try {
+                currentWorkingCenter = CenterWrapper.getCenterFromId(
+                    appService, currentWorkingCenterId);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public boolean canPerformActions(SecurityFeature... features) {
