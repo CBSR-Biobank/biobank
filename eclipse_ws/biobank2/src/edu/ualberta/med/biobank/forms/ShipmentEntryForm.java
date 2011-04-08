@@ -182,7 +182,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         departedValidator = new NotNullValidator("Date Sent should be set");
 
         dateSentWidget = createDateTimeWidget(client, departedLabel,
-            shipInfo.getPackedAt(), shipInfo, "sentAt", departedValidator,
+            shipInfo.getPackedAt(), shipInfo, "packedAt", departedValidator,
             SWT.DATE | SWT.TIME, DATE_SHIPPED_BINDING);
         activateDepartedWidget(shipMethod != null && shipMethod.needDate());
 
