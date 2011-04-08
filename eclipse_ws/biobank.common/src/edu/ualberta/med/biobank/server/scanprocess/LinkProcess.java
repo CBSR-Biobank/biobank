@@ -27,16 +27,28 @@ public class LinkProcess {
     }
 
     public ScanProcessResult processScanLinkResult(Map<RowColPos, Cell> cells,
-        boolean rescanMode) throws Exception {
+        boolean isRescanMode) throws Exception {
         ScanProcessResult res = new ScanProcessResult();
         if (cells != null) {
-            Map<String, Cell> values = new HashMap<String, Cell>();
+            Map<String, Cell> allValues = new HashMap<String, Cell>();
             for (Entry<RowColPos, Cell> entry : cells.entrySet()) {
                 Cell cell = entry.getValue();
-                if (!rescanMode
+                if (cell != null) {
+                    Cell otherValue = allValues.get(cell.getValue());
+                    if (otherValue != null) {
+                        String msg = "existe ailleurs en "
+                            + otherValue.getRow() + ":" + otherValue.getCol();
+                        cell.setInformation(msg);
+                        res.appendNewLog(msg);
+                        cell.setStatus(CellStatus.ERROR);
+                    } else {
+                        allValues.put(cell.getValue(), cell);
+                    }
+                }
+                if (!isRescanMode
                     || (cell != null && cell.getStatus() != CellStatus.TYPE && cell
                         .getStatus() != CellStatus.NO_TYPE)) {
-                    processCellLinkStatus(appService, cell, res, user, values);
+                    processCellLinkStatus(appService, cell, res, user);
                 }
             }
         }
@@ -46,8 +58,7 @@ public class LinkProcess {
 
     public CellProcessResult processCellLinkStatus(Cell cell) throws Exception {
         CellProcessResult res = new CellProcessResult();
-        res.setResult(cell,
-            processCellLinkStatus(appService, cell, res, user, null));
+        res.setResult(cell, processCellLinkStatus(appService, cell, res, user));
         return res;
     }
 
@@ -58,56 +69,46 @@ public class LinkProcess {
      */
     private CellStatus processCellLinkStatus(
         WritableApplicationService appService, Cell cell, ProcessResult res,
-        User user, Map<String, Cell> values) throws Exception {
-        if (cell == null) {
+        User user) throws Exception {
+        if (cell == null)
             return CellStatus.EMPTY;
-        } else {
+        if (cell.getStatus() == CellStatus.ERROR)
+            return CellStatus.ERROR;
+        else {
             String value = cell.getValue();
             if (value != null) {
-                Cell otherValue = values.get(value);
-                if (otherValue != null) {
-                    String msg = "existe ailleurs en " + otherValue.getRow()
-                        + ":" + otherValue.getCol();
-                    cell.setInformation(msg);
-                    res.appendNewLog(msg);
+                SpecimenWrapper foundAliquot = SpecimenWrapper.getSpecimen(
+                    appService, value, user);
+                if (foundAliquot != null) {
                     cell.setStatus(CellStatus.ERROR);
+                    cell.setInformation(Messages
+                        .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
+                    String palletPosition = ContainerLabelingSchemeWrapper
+                        .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
+                    if (foundAliquot.getParentSpecimen() == null)
+                        res.appendNewLog(Messages
+                            .getString(
+                                "ScanLink.activitylog.aliquot.existsError.noParent",
+                                palletPosition, value, foundAliquot
+                                    .getCollectionEvent().getVisitNumber(),
+                                foundAliquot.getCollectionEvent().getPatient()
+                                    .getPnumber(), foundAliquot
+                                    .getCurrentCenter().getNameShort()));
+                    else
+                        res.appendNewLog(Messages
+                            .getString(
+                                "ScanLink.activitylog.aliquot.existsError.withParent",
+                                palletPosition, value, foundAliquot
+                                    .getParentSpecimen().getInventoryId(),
+                                foundAliquot.getParentSpecimen()
+                                    .getSpecimenType().getNameShort(),
+                                foundAliquot.getCollectionEvent()
+                                    .getVisitNumber(), foundAliquot
+                                    .getCollectionEvent().getPatient()
+                                    .getPnumber(), foundAliquot
+                                    .getCurrentCenter().getNameShort()));
                 } else {
-                    values.put(value, cell);
-                    SpecimenWrapper foundAliquot = SpecimenWrapper.getSpecimen(
-                        appService, value, user);
-                    if (foundAliquot != null) {
-                        cell.setStatus(CellStatus.ERROR);
-                        cell.setInformation(Messages
-                            .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
-                        String palletPosition = ContainerLabelingSchemeWrapper
-                            .rowColToSbs(new RowColPos(cell.getRow(), cell
-                                .getCol()));
-                        if (foundAliquot.getParentSpecimen() == null)
-                            res.appendNewLog(Messages
-                                .getString(
-                                    "ScanLink.activitylog.aliquot.existsError.noParent",
-                                    palletPosition, value, foundAliquot
-                                        .getCollectionEvent().getVisitNumber(),
-                                    foundAliquot.getCollectionEvent()
-                                        .getPatient().getPnumber(),
-                                    foundAliquot.getCurrentCenter()
-                                        .getNameShort()));
-                        else
-                            res.appendNewLog(Messages
-                                .getString(
-                                    "ScanLink.activitylog.aliquot.existsError.withParent",
-                                    palletPosition, value, foundAliquot
-                                        .getParentSpecimen().getInventoryId(),
-                                    foundAliquot.getParentSpecimen()
-                                        .getSpecimenType().getNameShort(),
-                                    foundAliquot.getCollectionEvent()
-                                        .getVisitNumber(), foundAliquot
-                                        .getCollectionEvent().getPatient()
-                                        .getPnumber(), foundAliquot
-                                        .getCurrentCenter().getNameShort()));
-                    } else {
-                        cell.setStatus(CellStatus.NO_TYPE);
-                    }
+                    cell.setStatus(CellStatus.NO_TYPE);
                 }
             } else {
                 cell.setStatus(CellStatus.EMPTY);

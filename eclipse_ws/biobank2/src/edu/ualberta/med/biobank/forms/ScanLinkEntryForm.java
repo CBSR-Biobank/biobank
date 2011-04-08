@@ -569,8 +569,11 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         Map<Integer, Integer> typesRows, int row) {
         AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets.get(row);
         Integer number = typesRows.get(row);
-        if (number != null)
-            widget.setNumber(number);
+        if (number == null) {
+            number = 0;
+            widget.deselectAll();
+        }
+        widget.setNumber(number);
         return widget;
     }
 

@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms.utils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -100,29 +101,52 @@ public class PalletScanManagement {
         if (cells == null) {
             cells = new HashMap<RowColPos, PalletCell>();
         } else {
+            Map<String, PalletCell> cellValues = getValuesMap(cells);
             if (rescanMode && oldCells != null) {
                 // rescan: merge previous scan with new in case the scanner
-                // wasn't
-                // able to scan well
+                // wasn't able to scan well
                 for (RowColPos rcp : oldCells.keySet()) {
                     PalletCell oldScannedCell = oldCells.get(rcp);
                     PalletCell newScannedCell = cells.get(rcp);
-                    if (PalletCell.hasValue(oldScannedCell)
-                        && PalletCell.hasValue(newScannedCell)
-                        && !oldScannedCell.getValue().equals(
-                            newScannedCell.getValue())) {
-                        cells = oldCells;
-                        throw new Exception(
-                            "Scan Aborted: previously scanned aliquot has been replaced. "
-                                + "If this is not a re-scan, reset and start again.");
-                    }
+                    boolean copyOldValue = false;
                     if (PalletCell.hasValue(oldScannedCell)) {
+                        copyOldValue = true;
+                        if (PalletCell.hasValue(newScannedCell)
+                            && !oldScannedCell.getValue().equals(
+                                newScannedCell.getValue())) {
+                            // Different values at same position
+                            cells = oldCells;
+                            throw new Exception(
+                                "Scan Aborted: previously scanned aliquot has been replaced. "
+                                    + "If this is not a re-scan, reset and start again.");
+                        } else if (!PalletCell.hasValue(newScannedCell)) {
+                            // previous position has value - new has none
+                            PalletCell newPosition = cellValues
+                                .get(oldScannedCell.getValue());
+                            if (newPosition != null) {
+                                // still there but moved to another position, so
+                                // don't copy previous scanned position
+                                copyOldValue = false;
+                            }
+                        }
+                    }
+                    if (copyOldValue) {
                         cells.put(rcp, oldScannedCell);
                     }
                 }
             }
             afterScan();
         }
+    }
+
+    private Map<String, PalletCell> getValuesMap(
+        Map<RowColPos, PalletCell> cells) {
+        Map<String, PalletCell> valuesMap = new HashMap<String, PalletCell>();
+        for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
+            PalletCell cell = entry.getValue();
+            valuesMap.put(cell.getValue(), cell);
+        }
+        return valuesMap;
     }
 
     protected void beforeThreadStart() {

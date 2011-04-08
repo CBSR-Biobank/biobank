@@ -78,7 +78,7 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void stopQuery(QueryHandle qh) throws Exception;
 
     public ScanProcessResult processScanLinkResult(Map<RowColPos, Cell> cells,
-        boolean rescanMode, User user) throws ApplicationException;
+        boolean isRescanMode, User user) throws ApplicationException;
 
     public CellProcessResult processCellLinkStatus(Cell cell, User user)
         throws ApplicationException;

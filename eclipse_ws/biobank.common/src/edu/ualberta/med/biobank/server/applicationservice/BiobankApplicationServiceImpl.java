@@ -196,10 +196,10 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public ScanProcessResult processScanLinkResult(Map<RowColPos, Cell> cells,
-        boolean rescanMode, User user) throws ApplicationException {
+        boolean isRescanMode, User user) throws ApplicationException {
         try {
             return new LinkProcess(this, user).processScanLinkResult(cells,
-                rescanMode);
+                isRescanMode);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
