@@ -12,8 +12,8 @@ public class CellProcessResult extends ProcessResult implements Serializable {
         super();
     }
 
-    public void setResult(Cell cell, CellStatus processStatus) {
-        setProcessStatus(processStatus);
+    public void setResult(Cell cell) {
+        setProcessStatus(cell.getStatus());
         this.cell = cell;
     }
 

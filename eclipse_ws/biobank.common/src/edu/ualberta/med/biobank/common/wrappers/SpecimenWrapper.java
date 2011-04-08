@@ -44,7 +44,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     private void init() {
-        setTopSpecimenInternal(this);
+        if (isNew()) {
+            setTopSpecimenInternal(this);
+        }
         initManagement();
     }
 

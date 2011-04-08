@@ -195,7 +195,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 BiobankPlugin.openMessage("Dispatch not found", msg);
             } else {
                 showSearchedObjectsInTree(searchedObject, true);
-                getTreeViewer().expandToLevel(searchedNode, 3);
+                getTreeViewer().expandToLevel(searchedNode, 2);
             }
         } catch (Exception e) {
             BiobankPlugin.openError("Search error", e);
@@ -238,17 +238,14 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
         for (ModelWrapper<?> searchedObject : searchedObjects) {
             List<AdapterBase> nodeRes = rootNode.search(searchedObject);
-            if (nodeRes.size() == 0) {
+            if (nodeRes.size() == 0)
                 searchedNode.addSearchObject(searchedObject);
-                searchedNode.performExpand();
-                nodeRes = searchedNode.search(searchedObject);
-            }
-            if (nodeRes.size() > 0) {
-                setSelectedNode(nodeRes.get(0));
-                if (doubleClick) {
-                    nodeRes.get(0).performDoubleClick();
-                }
-            }
+        }
+        searchedNode.performExpand();
+        for (ModelWrapper<?> searchedObject : searchedObjects) {
+            List<AdapterBase> nodeRes = rootNode.search(searchedObject);
+            if (doubleClick)
+                nodeRes.get(0).performDoubleClick();
         }
     }
 

@@ -2,11 +2,8 @@ package edu.ualberta.med.biobank.server.scanprocess;
 
 import edu.ualberta.med.biobank.common.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.scanprocess.LinkProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.ProcessResult;
-import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -25,8 +22,8 @@ public class LinkProcess extends ServerProcess {
     }
 
     @Override
-    protected CellStatus internalProcessScanResult(ScanProcessResult res,
-        Map<RowColPos, Cell> cells, boolean isRescanMode) throws Exception {
+    protected CellStatus internalProcessScanResult(Map<RowColPos, Cell> cells,
+        boolean isRescanMode) throws Exception {
         CellStatus currentScanState = CellStatus.EMPTY;
         if (cells != null) {
             Map<String, Cell> allValues = new HashMap<String, Cell>();
@@ -47,7 +44,7 @@ public class LinkProcess extends ServerProcess {
                 if (!isRescanMode
                     || (cell != null && cell.getStatus() != CellStatus.TYPE && cell
                         .getStatus() != CellStatus.NO_TYPE)) {
-                    processCellLinkStatus(appService, cell, res, user);
+                    processCellLinkStatus(cell);
                 }
                 CellStatus newStatus = CellStatus.EMPTY;
                 if (cell != null) {
@@ -60,10 +57,8 @@ public class LinkProcess extends ServerProcess {
     }
 
     @Override
-    public CellProcessResult processCellStatus(Cell cell) throws Exception {
-        CellProcessResult res = new CellProcessResult();
-        res.setResult(cell, processCellLinkStatus(appService, cell, res, user));
-        return res;
+    protected void internalProcessCellStatus(Cell cell) throws Exception {
+        processCellLinkStatus(cell);
     }
 
     /**
@@ -71,9 +66,7 @@ public class LinkProcess extends ServerProcess {
      * 
      * @throws Exception
      */
-    private CellStatus processCellLinkStatus(
-        WritableApplicationService appService, Cell cell, ProcessResult res,
-        User user) throws Exception {
+    private CellStatus processCellLinkStatus(Cell cell) throws Exception {
         if (cell == null)
             return CellStatus.EMPTY;
         if (cell.getStatus() == CellStatus.ERROR)

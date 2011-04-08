@@ -4,6 +4,7 @@ import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.scanprocess.ProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.ProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -15,6 +16,7 @@ public abstract class ServerProcess {
     protected WritableApplicationService appService;
     protected ProcessData data;
     protected User user;
+    protected ProcessResult res;
 
     public ServerProcess(WritableApplicationService appService,
         ProcessData data, User user) {
@@ -24,19 +26,26 @@ public abstract class ServerProcess {
         user.initCurrentWorkingCenter(appService);
     }
 
-    public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
+    public void processScanResult(Map<RowColPos, Cell> cells,
         boolean isRescanMode) throws Exception {
-        ScanProcessResult res = new ScanProcessResult();
-        res.setResult(cells,
-            internalProcessScanResult(res, cells, isRescanMode));
+        res = new ScanProcessResult();
+        ((ScanProcessResult) res).setResult(cells,
+            internalProcessScanResult(cells, isRescanMode));
+    }
+
+    public ProcessResult getProcessResult() {
         return res;
     }
 
     protected abstract CellStatus internalProcessScanResult(
-        ScanProcessResult res, Map<RowColPos, Cell> cells, boolean isRescanMode)
-        throws Exception;
+        Map<RowColPos, Cell> cells, boolean isRescanMode) throws Exception;
 
-    public abstract CellProcessResult processCellStatus(Cell cell)
-        throws Exception;
+    public void processCellStatus(Cell cell) throws Exception {
+        res = new CellProcessResult();
+        internalProcessCellStatus(cell);
+        ((CellProcessResult) res).setResult(cell);
+    }
 
+    protected abstract void internalProcessCellStatus(Cell scanCell)
+        throws Exception;
 }
