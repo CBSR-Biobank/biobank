@@ -106,7 +106,8 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         String dateString = "";
-        if (dispatch.getShipmentInfo().getPackedAt() != null) {
+        if (dispatch.getShipmentInfo() != null
+            && dispatch.getShipmentInfo().getPackedAt() != null) {
             dateString = " on " + dispatch.getFormattedPackedAt();
         }
         canSeeEverything = true;

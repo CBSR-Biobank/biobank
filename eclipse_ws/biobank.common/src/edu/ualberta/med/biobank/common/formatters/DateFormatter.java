@@ -23,18 +23,26 @@ public class DateFormatter {
         TIME_FORMAT);
 
     public static String formatAsDate(Date date) {
+        if (date == null)
+            return null;
         return format(dateFormatter, date);
     }
 
     public static String formatAsDateTime(Date date) {
+        if (date == null)
+            return null;
         return format(dateTimeFormatter, date);
     }
 
     public static String formatAsDateTime(Timestamp timestamp) {
+        if (timestamp == null)
+            return null;
         return format(dateTimeFormatter, timestamp);
     }
 
     public static String formatAsTime(Date date) {
+        if (date == null)
+            return null;
         return format(timeFormatter, date);
     }
 
