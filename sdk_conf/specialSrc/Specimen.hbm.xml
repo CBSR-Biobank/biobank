@@ -12,30 +12,30 @@
 		<property name="quantity" type="double" column="QUANTITY"/>
 		<property name="createdAt" type="java.util.Date" column="CREATED_AT" not-null="true"/>
 		<!-- Associations mapping for the Specimen class -->
-		<set name="requestSpecimenCollection" lazy="true" cascade="none" inverse="false">
-			<cache usage="read-write" />
-			<key column="SPECIMEN_ID" not-null="false" />
-			<one-to-many class="edu.ualberta.med.biobank.model.RequestSpecimen"/>
-		</set>
-			<many-to-one name="activityStatus" class="edu.ualberta.med.biobank.model.ActivityStatus" column="ACTIVITY_STATUS_ID" lazy="proxy" not-null="true" cascade="none"/>
-		<set name="childSpecimenCollection" lazy="true" cascade="save-update" inverse="true">
-			<cache usage="read-write" />
-			<key column="PARENT_SPECIMEN_ID" not-null="false" />
-			<one-to-many class="edu.ualberta.med.biobank.model.Specimen"/>
-		</set>
-			<many-to-one name="originInfo" class="edu.ualberta.med.biobank.model.OriginInfo" column="ORIGIN_INFO_ID" lazy="proxy" not-null="true" cascade="none"/>
+			<many-to-one name="topSpecimen" class="edu.ualberta.med.biobank.model.Specimen" column="TOP_SPECIMEN_ID" lazy="proxy" not-null="false" cascade="none"/>
+			<many-to-one name="collectionEvent" class="edu.ualberta.med.biobank.model.CollectionEvent" column="COLLECTION_EVENT_ID" lazy="proxy" not-null="true" cascade="none"/>
+			<many-to-one name="currentCenter" class="edu.ualberta.med.biobank.model.Center" column="CURRENT_CENTER_ID" lazy="proxy" not-null="false" cascade="none"/>
 		<set name="dispatchSpecimenCollection" lazy="true" cascade="none" inverse="true">
 			<cache usage="read-write" />
 			<key column="SPECIMEN_ID" not-null="false" />
 			<one-to-many class="edu.ualberta.med.biobank.model.DispatchSpecimen"/>
 		</set>
-			<many-to-one name="currentCenter" class="edu.ualberta.med.biobank.model.Center" column="CURRENT_CENTER_ID" lazy="proxy" not-null="false" cascade="none"/>
 			<many-to-one name="originalCollectionEvent" class="edu.ualberta.med.biobank.model.CollectionEvent" column="ORIGINAL_COLLECTION_EVENT_ID" lazy="proxy" not-null="false" cascade="none"/>
-			<many-to-one name="processingEvent" class="edu.ualberta.med.biobank.model.ProcessingEvent" column="PROCESSING_EVENT_ID" lazy="proxy" not-null="false" cascade="none"/>
-		<one-to-one name="specimenPosition" class="edu.ualberta.med.biobank.model.SpecimenPosition" property-ref="specimen" lazy="proxy" cascade="all"/>
-			<many-to-one name="collectionEvent" class="edu.ualberta.med.biobank.model.CollectionEvent" column="COLLECTION_EVENT_ID" lazy="proxy" not-null="true" cascade="none"/>
 			<many-to-one name="specimenType" class="edu.ualberta.med.biobank.model.SpecimenType" column="SPECIMEN_TYPE_ID" lazy="proxy" not-null="true" cascade="none"/>
+		<one-to-one name="specimenPosition" class="edu.ualberta.med.biobank.model.SpecimenPosition" property-ref="specimen" lazy="proxy" cascade="all"/>
+		<set name="childSpecimenCollection" lazy="true" cascade="save-update" inverse="true">
+			<cache usage="read-write" />
+			<key column="PARENT_SPECIMEN_ID" not-null="false" />
+			<one-to-many class="edu.ualberta.med.biobank.model.Specimen"/>
+		</set>
+		<set name="requestSpecimenCollection" lazy="true" cascade="none" inverse="false">
+			<cache usage="read-write" />
+			<key column="SPECIMEN_ID" not-null="false" />
+			<one-to-many class="edu.ualberta.med.biobank.model.RequestSpecimen"/>
+		</set>
+			<many-to-one name="originInfo" class="edu.ualberta.med.biobank.model.OriginInfo" column="ORIGIN_INFO_ID" lazy="proxy" not-null="true" cascade="none"/>
+			<many-to-one name="activityStatus" class="edu.ualberta.med.biobank.model.ActivityStatus" column="ACTIVITY_STATUS_ID" lazy="proxy" not-null="true" cascade="none"/>
+			<many-to-one name="processingEvent" class="edu.ualberta.med.biobank.model.ProcessingEvent" column="PROCESSING_EVENT_ID" lazy="proxy" not-null="false" cascade="none"/>
 			<many-to-one name="parentSpecimen" class="edu.ualberta.med.biobank.model.Specimen" column="PARENT_SPECIMEN_ID" lazy="proxy" not-null="false" cascade="none"/>
-			<many-to-one name="topSpecimen" class="edu.ualberta.med.biobank.model.Specimen" column="TOP_SPECIMEN_ID" lazy="proxy" not-null="true" cascade="none"/>
 	</class>
 </hibernate-mapping>

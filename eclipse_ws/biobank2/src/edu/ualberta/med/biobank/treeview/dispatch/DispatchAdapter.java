@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchViewForm;
@@ -54,18 +55,19 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        DispatchWrapper shipment = getWrapper();
-        Assert.isNotNull(shipment, "Dispatch is null");
+        DispatchWrapper dispatch = getWrapper();
+        Assert.isNotNull(dispatch, "Dispatch is null");
         String label = new String();
-        if (shipment.getSenderCenter() != null
-            && shipment.getReceiverCenter() != null)
-            label += shipment.getSenderCenter().getNameShort() + " -> "
-                + shipment.getReceiverCenter().getNameShort();
+        if (dispatch.getSenderCenter() != null
+            && dispatch.getReceiverCenter() != null)
+            label += dispatch.getSenderCenter().getNameShort() + " -> "
+                + dispatch.getReceiverCenter().getNameShort();
 
-        if (shipment.getShipmentInfo().getPackedAt() != null)
-            label += " [" + shipment.getFormattedPackedAt() + "]";
+        ShipmentInfoWrapper shipInfo = dispatch.getShipmentInfo();
+        if ((shipInfo != null) && (shipInfo.getPackedAt() != null)) {
+            label += " [" + dispatch.getFormattedPackedAt() + "]";
+        }
         return label;
-
     }
 
     @Override

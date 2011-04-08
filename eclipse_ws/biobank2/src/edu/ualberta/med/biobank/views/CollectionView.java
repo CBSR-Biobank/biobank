@@ -3,6 +3,11 @@ package edu.ualberta.med.biobank.views;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
@@ -21,6 +26,8 @@ public class CollectionView extends AbstractAdministrationView {
     private static CollectionView currentInstance;
 
     private PatientSearchedNode searchedNode;
+
+    private Button radioPnumber;
 
     public CollectionView() {
         super();
@@ -43,6 +50,26 @@ public class CollectionView extends AbstractAdministrationView {
             return Arrays.asList(patient);
         }
         return null;
+    }
+
+    @Override
+    protected void createTreeTextOptions(Composite parent) {
+        Composite composite = new Composite(parent, SWT.NONE);
+        GridLayout layout = new GridLayout(3, false);
+        layout.horizontalSpacing = 0;
+        layout.marginHeight = 0;
+        layout.verticalSpacing = 0;
+        composite.setLayout(layout);
+
+        radioPnumber = new Button(composite, SWT.RADIO);
+        radioPnumber.setText("Patient Number");
+        radioPnumber.setSelection(true);
+        radioPnumber.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+            }
+        });
+
     }
 
     protected void notFound(String text) {

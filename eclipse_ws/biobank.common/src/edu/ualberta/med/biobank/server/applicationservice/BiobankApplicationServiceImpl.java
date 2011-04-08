@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
+import edu.ualberta.med.biobank.server.scanprocess.ServerProcess;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
 import gov.nih.nci.system.dao.Request;
@@ -198,8 +199,9 @@ public class BiobankApplicationServiceImpl extends
         ProcessData processData, boolean isRescanMode, User user)
         throws ApplicationException {
         try {
-            return processData.getProcessInstance(this, user)
-                .processScanResult(cells, isRescanMode);
+            ServerProcess process = processData.getProcessInstance(this, user);
+            process.processScanResult(cells, isRescanMode);
+            return (ScanProcessResult) process.getProcessResult();
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
@@ -209,8 +211,9 @@ public class BiobankApplicationServiceImpl extends
     public CellProcessResult processCellStatus(Cell cell,
         ProcessData processData, User user) throws ApplicationException {
         try {
-            return processData.getProcessInstance(this, user)
-                .processCellStatus(cell);
+            ServerProcess process = processData.getProcessInstance(this, user);
+            process.processCellStatus(cell);
+            return (CellProcessResult) process.getProcessResult();
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
