@@ -224,7 +224,7 @@ CREATE TABLE specimen_type_specimen_type (
 CREATE TABLE shipment_info (
     ID INT(11) NOT NULL AUTO_INCREMENT,
     RECEIVED_AT DATETIME NULL DEFAULT NULL,
-    SENT_AT DATETIME NULL DEFAULT NULL,
+    PACKED_AT DATETIME NULL DEFAULT NULL,
     WAYBILL VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
     BOX_NUMBER VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
     SHIPPING_METHOD_ID INT(11) NOT NULL,
@@ -236,7 +236,7 @@ CREATE TABLE shipment_info (
 create index WAYBILL_IDX on shipment_info(WAYBILL);
 create index RECEIVED_AT_IDX on shipment_info(RECEIVED_AT);
 
-INSERT INTO shipment_info (aship_id,received_at,sent_at,waybill,box_number,shipping_method_id)
+INSERT INTO shipment_info (aship_id,received_at,packed_at,waybill,box_number,shipping_method_id)
 SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id FROM abstract_shipment
 WHERE discriminator='ClinicShipment';
 
@@ -310,7 +310,6 @@ CREATE TABLE dispatch (
     ID INT(11) NOT NULL AUTO_INCREMENT,
     STATE INT(11) NULL DEFAULT NULL,
     COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    PACKED_AT DATETIME NULL DEFAULT NULL,
     RECEIVER_CENTER_ID INT(11) NULL DEFAULT NULL,
     SHIPMENT_INFO_ID INT(11)  NULL DEFAULT NULL,
     SENDER_CENTER_ID INT(11) NULL DEFAULT NULL,
@@ -324,7 +323,7 @@ CREATE TABLE dispatch (
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-INSERT INTO shipment_info (aship_id,received_at,sent_at,waybill,box_number,
+INSERT INTO shipment_info (aship_id,received_at,packed_at,waybill,box_number,
        shipping_method_id)
        SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id
        FROM abstract_shipment

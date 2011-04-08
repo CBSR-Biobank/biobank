@@ -56,7 +56,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     public String getFormattedPackedAt() {
-        return DateFormatter.formatAsDateTime(getPackedAt());
+        return DateFormatter.formatAsDateTime(getShipmentInfo().getPackedAt());
     }
 
     public boolean hasErrors() {
@@ -544,7 +544,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         throws ApplicationException {
 
         StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING
-            + " where DATE(s." + ShipmentInfoPeer.SENT_AT.getName()
+            + " where DATE(s." + ShipmentInfoPeer.PACKED_AT.getName()
             + ") = DATE(?)");
         HQLCriteria criteria = new HQLCriteria(qry.toString(),
             Arrays.asList(new Object[] { dateSent }));

@@ -9,7 +9,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
@@ -71,9 +70,9 @@ public class SendDispatchDialog extends BiobankDialog {
             "Waybill", null, shipInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
 
         Date date = new Date();
-        shipment.setPackedAt(date);
-        createDateTimeWidget(contents, "Packed At", date, shipment,
-            DispatchPeer.PACKED_AT.getName(), new NotNullValidator(
+        shipment.getShipmentInfo().setPackedAt(date);
+        createDateTimeWidget(contents, "Packed At", date, shipInfo,
+            ShipmentInfoPeer.PACKED_AT.getName(), new NotNullValidator(
                 "Packed should be set"));
     }
 
