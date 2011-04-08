@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.views.SpecimenTransitView;
 public class OriginInfoSearchedNode extends AbstractSearchedNode {
 
     public OriginInfoSearchedNode(AdapterBase parent, int id) {
-        super(parent, id, true);
+        super(parent, id, false);
     }
 
     @Override
