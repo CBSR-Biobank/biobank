@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 
 public abstract class AbstractSearchedNode extends AdapterBase {
 
@@ -83,7 +84,8 @@ public abstract class AbstractSearchedNode extends AdapterBase {
                 List<AdapterBase> children = new ArrayList<AdapterBase>(
                     getChildren());
                 for (AdapterBase child : children) {
-                    if (child.getChildren().size() == 0) {
+                    if (!(child instanceof DispatchAdapter)
+                        && child.getChildren().size() == 0) {
                         removeChild(child);
                     }
                 }

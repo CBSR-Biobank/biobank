@@ -319,7 +319,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             label += dispatch.getSenderCenter().getNameShort() + " -> "
                 + dispatch.getReceiverCenter().getNameShort();
 
-            if (dispatch.getShipmentInfo().getPackedAt() != null)
+            if (dispatch.getShipmentInfo() != null
+                && dispatch.getShipmentInfo().getPackedAt() != null)
                 label += "[" + dispatch.getFormattedPackedAt() + "]";
             return label;
         }

@@ -71,7 +71,7 @@ public class SendDispatchDialog extends BiobankDialog {
 
         Date date = new Date();
         shipment.getShipmentInfo().setPackedAt(date);
-        createDateTimeWidget(contents, "Packed At", date, shipInfo,
+        createDateTimeWidget(contents, "Time Packed", date, shipInfo,
             ShipmentInfoPeer.PACKED_AT.getName(), new NotNullValidator(
                 "Packed should be set"));
     }
