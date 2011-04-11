@@ -14,6 +14,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -23,8 +25,8 @@ import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.AliquotInfo;
 import edu.ualberta.med.biobank.forms.RequestEntryFormBase;
-import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 public class RequestReceiveScanDialog extends
@@ -227,5 +229,13 @@ public class RequestReceiveScanDialog extends
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
         processCells(Arrays.asList(cell.getRowColPos()), null);
         super.postprocessScanTubeAlone(cell);
+    }
+
+    @Override
+    protected ScanProcessResult internalProcessScanResult(
+        IProgressMonitor monitor, Map<RowColPos, Cell> serverCells,
+        CenterWrapper<?> site) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

@@ -2,8 +2,10 @@ package edu.ualberta.med.biobank.server.scanprocess;
 
 import edu.ualberta.med.biobank.common.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.scanprocess.LinkProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -22,6 +24,13 @@ public class LinkProcess extends ServerProcess {
     }
 
     @Override
+    protected ScanProcessResult getScanProcessResult(
+        Map<RowColPos, Cell> cells, boolean isRescanMode) throws Exception {
+        ScanProcessResult res = new ScanProcessResult();
+        res.setResult(cells, internalProcessScanResult(cells, isRescanMode));
+        return res;
+    }
+
     protected CellStatus internalProcessScanResult(Map<RowColPos, Cell> cells,
         boolean isRescanMode) throws Exception {
         CellStatus currentScanState = CellStatus.EMPTY;
@@ -35,7 +44,7 @@ public class LinkProcess extends ServerProcess {
                         String msg = "existe ailleurs en "
                             + otherValue.getRow() + ":" + otherValue.getCol();
                         cell.setInformation(msg);
-                        res.appendNewLog(msg);
+                        appendNewLog(msg);
                         cell.setStatus(CellStatus.ERROR);
                     } else {
                         allValues.put(cell.getValue(), cell);
@@ -57,8 +66,12 @@ public class LinkProcess extends ServerProcess {
     }
 
     @Override
-    protected void internalProcessCellStatus(Cell cell) throws Exception {
+    protected CellProcessResult getCellProcessResult(Cell cell)
+        throws Exception {
+        CellProcessResult res = new CellProcessResult();
         processCellLinkStatus(cell);
+        res.setResult(cell);
+        return res;
     }
 
     /**
@@ -83,7 +96,7 @@ public class LinkProcess extends ServerProcess {
                     String palletPosition = ContainerLabelingSchemeWrapper
                         .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
                     if (foundAliquot.getParentSpecimen() == null)
-                        res.appendNewLog(Messages
+                        appendNewLog(Messages
                             .getString(
                                 "ScanLink.activitylog.aliquot.existsError.noParent",
                                 palletPosition, value, foundAliquot
@@ -92,7 +105,7 @@ public class LinkProcess extends ServerProcess {
                                     .getPnumber(), foundAliquot
                                     .getCurrentCenter().getNameShort()));
                     else
-                        res.appendNewLog(Messages
+                        appendNewLog(Messages
                             .getString(
                                 "ScanLink.activitylog.aliquot.existsError.withParent",
                                 palletPosition, value, foundAliquot

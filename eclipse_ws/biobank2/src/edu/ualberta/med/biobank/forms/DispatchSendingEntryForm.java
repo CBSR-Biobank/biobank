@@ -252,7 +252,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     }
 
     private void addAliquot(SpecimenWrapper aliquot) {
-        List<SpecimenWrapper> aliquots = dispatch.getSpecimenCollection();
+        List<SpecimenWrapper> aliquots = dispatch.getSpecimenCollection(false);
         if (aliquots != null && aliquots.contains(aliquot)) {
             BiobankPlugin.openAsyncError("Error",
                 "Aliquot " + aliquot.getInventoryId()

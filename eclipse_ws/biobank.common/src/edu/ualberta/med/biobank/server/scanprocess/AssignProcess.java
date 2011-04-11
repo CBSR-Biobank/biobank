@@ -3,8 +3,9 @@ package edu.ualberta.med.biobank.server.scanprocess;
 import edu.ualberta.med.biobank.common.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.AssignProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
-import edu.ualberta.med.biobank.common.scanprocess.ProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -23,6 +24,13 @@ public class AssignProcess extends ServerProcess {
     }
 
     @Override
+    protected ScanProcessResult getScanProcessResult(
+        Map<RowColPos, Cell> cells, boolean isRescanMode) throws Exception {
+        ScanProcessResult res = new ScanProcessResult();
+        res.setResult(cells, internalProcessScanResult(cells, isRescanMode));
+        return res;
+    }
+
     protected CellStatus internalProcessScanResult(Map<RowColPos, Cell> cells,
         boolean rescanMode) throws Exception {
         AssignProcessData assignData = (AssignProcessData) data;
@@ -65,8 +73,12 @@ public class AssignProcess extends ServerProcess {
     }
 
     @Override
-    protected void internalProcessCellStatus(Cell cell) throws Exception {
+    protected CellProcessResult getCellProcessResult(Cell cell)
+        throws Exception {
+        CellProcessResult res = new CellProcessResult();
         internalProcessCellAssignStatus(cell, null);
+        res.setResult(cell);
+        return res;
     }
 
     /**
@@ -164,7 +176,7 @@ public class AssignProcess extends ServerProcess {
             scanCell.setTitle("?"); //$NON-NLS-1$
             // MISSING in {0}\: specimen {1} from visit {2} (patient {3})
             // missing
-            res.appendNewLog(Messages
+            appendNewLog(Messages
                 .getString(
                     "ScanAssign.activitylog.aliquot.missing", position, missingAliquot //$NON-NLS-1$
                         .getInventoryId(), missingAliquot.getCollectionEvent()
@@ -185,7 +197,7 @@ public class AssignProcess extends ServerProcess {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages
             .getString("ScanAssign.scanStatus.aliquot.notlinked")); //$NON-NLS-1$
-        res.appendNewLog(Messages
+        appendNewLog(Messages
             .getString(
                 "ScanAssign.activitylog.aliquot.notlinked", position, scanCell.getValue())); //$NON-NLS-1$
     }
@@ -200,7 +212,7 @@ public class AssignProcess extends ServerProcess {
         scanCell.setInformation(Messages
             .getString("ScanAssign.scanStatus.aliquot.positionTakenError")); //$NON-NLS-1$
         scanCell.setTitle("!"); //$NON-NLS-1$
-        res.appendNewLog(Messages
+        appendNewLog(Messages
             .getString(
                 "ScanAssign.activitylog.aliquot.positionTaken", position, expectedAliquot //$NON-NLS-1$
                     .getInventoryId(), expectedAliquot.getCollectionEvent()
@@ -220,7 +232,7 @@ public class AssignProcess extends ServerProcess {
             RowColPos rcp = new RowColPos(scanCell.getRow(), scanCell.getCol());
             if (!foundSpecimen.getPosition().equals(rcp)) {
                 // moved inside the same pallet
-                updateCellAsMoved(positionString, scanCell, foundSpecimen, res);
+                updateCellAsMoved(positionString, scanCell, foundSpecimen);
                 RowColPos movedFromPosition = foundSpecimen.getPosition();
                 Boolean posHasMissing = movedAndMissingAliquotsFromPallet
                     .get(movedFromPosition);
@@ -239,12 +251,12 @@ public class AssignProcess extends ServerProcess {
             }
         } else {
             // old position was on another pallet
-            updateCellAsMoved(positionString, scanCell, foundSpecimen, res);
+            updateCellAsMoved(positionString, scanCell, foundSpecimen);
         }
     }
 
     private void updateCellAsMoved(String position, Cell scanCell,
-        SpecimenWrapper foundAliquot, ProcessResult res) {
+        SpecimenWrapper foundAliquot) {
         String expectedPosition = foundAliquot.getPositionString(true, false);
         if (expectedPosition == null) {
             expectedPosition = "none"; //$NON-NLS-1$
@@ -256,7 +268,7 @@ public class AssignProcess extends ServerProcess {
         scanCell.setInformation(Messages.getString(
             "ScanAssign.scanStatus.aliquot.moved", expectedPosition)); //$NON-NLS-1$
 
-        res.appendNewLog(Messages
+        appendNewLog(Messages
             .getString(
                 "ScanAssign.activitylog.aliquot.moved", position, scanCell.getValue(), //$NON-NLS-1$
                 expectedPosition));
@@ -275,7 +287,7 @@ public class AssignProcess extends ServerProcess {
         scanCell.setInformation(Messages.getString(
             "ScanAssign.scanStatus.aliquot.otherSite", siteName)); //$NON-NLS-1$
 
-        res.appendNewLog(Messages
+        appendNewLog(Messages
             .getString(
                 "ScanAssign.activitylog.aliquot.otherSite", position, scanCell.getValue(), //$NON-NLS-1$
                 siteName, currentPosition));
@@ -291,7 +303,7 @@ public class AssignProcess extends ServerProcess {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages.getString(
             "ScanAssign.scanStatus.aliquot.typeError", palletType, sampleType)); //$NON-NLS-1$
-        res.appendNewLog(Messages.getString(
+        appendNewLog(Messages.getString(
             "ScanAssign.activitylog.aliquot.typeError", position, palletType, //$NON-NLS-1$
             sampleType));
     }
@@ -303,7 +315,7 @@ public class AssignProcess extends ServerProcess {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages
             .getString("ScanAssign.scanStatus.aliquot.dispatchedError")); //$NON-NLS-1$
-        res.appendNewLog(Messages.getString(
+        appendNewLog(Messages.getString(
             "ScanAssign.activitylog.aliquot.dispatchedError", positionString));
 
     }

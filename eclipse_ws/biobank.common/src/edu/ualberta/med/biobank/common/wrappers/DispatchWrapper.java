@@ -172,10 +172,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return list;
     }
 
-    public List<SpecimenWrapper> getSpecimenCollection() {
-        return getSpecimenCollection(true);
-    }
-
     public void addSpecimens(List<SpecimenWrapper> newSpecimens) {
         if (newSpecimens == null)
             return;
@@ -222,36 +218,36 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public CheckStatus checkCanAddSpecimen(SpecimenWrapper spc,
         boolean checkAlreadyAdded) {
-        return checkCanAddSpecimen(getSpecimenCollection(), spc,
+        return checkCanAddSpecimen(getSpecimenCollection(false), spc,
             checkAlreadyAdded);
     }
 
     public CheckStatus checkCanAddSpecimen(
-        List<SpecimenWrapper> currentAliquots, SpecimenWrapper aliquot,
+        List<SpecimenWrapper> currentSpecimens, SpecimenWrapper specimen,
         boolean checkAlreadyAdded) {
-        if (aliquot.isNew()) {
-            return new CheckStatus(false, "Cannot add aliquot "
-                + aliquot.getInventoryId() + ": it has not already been saved");
+        if (specimen.isNew()) {
+            return new CheckStatus(false, "Cannot add specimen "
+                + specimen.getInventoryId() + ": it has not already been saved");
         }
-        if (!aliquot.isActive()) {
+        if (!specimen.isActive()) {
             return new CheckStatus(false, "Activity status of "
-                + aliquot.getInventoryId() + " is not 'Active'."
+                + specimen.getInventoryId() + " is not 'Active'."
                 + " Check comments on this aliquot for more information.");
         }
-        if (!aliquot.getCurrentCenter().equals(getSenderCenter())) {
-            return new CheckStatus(false, "Aliquot " + aliquot.getInventoryId()
-                + " is currently assigned to site "
-                + aliquot.getCurrentCenter().getNameShort()
+        if (!specimen.getCurrentCenter().equals(getSenderCenter())) {
+            return new CheckStatus(false, "Specimen "
+                + specimen.getInventoryId() + " is currently assigned to site "
+                + specimen.getCurrentCenter().getNameShort()
                 + ". It should be first assigned to "
                 + getSenderCenter().getNameShort() + " site.");
         }
-        if (checkAlreadyAdded && currentAliquots != null
-            && currentAliquots.contains(aliquot)) {
-            return new CheckStatus(false, aliquot.getInventoryId()
+        if (checkAlreadyAdded && currentSpecimens != null
+            && currentSpecimens.contains(specimen)) {
+            return new CheckStatus(false, specimen.getInventoryId()
                 + " is already in this Dispatch.");
         }
-        if (aliquot.isUsedInDispatch()) {
-            return new CheckStatus(false, aliquot.getInventoryId()
+        if (specimen.isUsedInDispatch()) {
+            return new CheckStatus(false, specimen.getInventoryId()
                 + " is already in a Dispatch in-transit or in creation.");
         }
         return new CheckStatus(true, "");
@@ -343,8 +339,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     public boolean hasDispatchSpecimens() {
-        return getSpecimenCollection() != null
-            && !getSpecimenCollection().isEmpty();
+        return getSpecimenCollection(false) != null
+            && !getSpecimenCollection(false).isEmpty();
     }
 
     public boolean canBeReceivedBy(User user) {

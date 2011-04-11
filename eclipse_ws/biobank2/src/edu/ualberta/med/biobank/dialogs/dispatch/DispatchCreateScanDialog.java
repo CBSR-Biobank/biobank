@@ -16,20 +16,19 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.scanprocess.DispatchProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper.CheckStatus;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
@@ -102,143 +101,22 @@ public class DispatchCreateScanDialog extends
     }
 
     @Override
-    protected void processScanResult(IProgressMonitor monitor,
+    protected ScanProcessResult internalProcessScanResult(
+        IProgressMonitor monitor,
+        Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells,
         CenterWrapper<?> site) throws Exception {
         aliquotsAdded = false;
-        boolean scanOk = true;
         currentPallet = null;
         if (isPalletWithPosition) {
             currentPallet = ContainerWrapper
                 .getContainerWithProductBarcodeInSite(
                     SessionManager.getAppService(), (SiteWrapper) site,
                     currentProductBarcode);
-            if (currentPallet != null) {
-                // FIXME check it is a pallet ? Should we do it when enter
-                // barcode ?
-                Map<RowColPos, SpecimenWrapper> expectedAliquots = currentPallet
-                    .getSpecimens();
-                for (int row = 0; row < currentPallet.getRowCapacity(); row++) {
-                    for (int col = 0; col < currentPallet.getColCapacity(); col++) {
-                        RowColPos rcp = new RowColPos(row, col);
-                        PalletCell cell = getCells().get(rcp);
-                        processCell(monitor, rcp, cell, expectedAliquots);
-                        scanOk = scanOk && cellOk(cell);
-                    }
-                }
-
-            } else {
-                BiobankPlugin
-                    .openAsyncError(
-                        Messages
-                            .getString("DispatchCreateScanDialog.pallet.search.error.title"), //$NON-NLS-1$
-                        Messages.getString(
-                            "DispatchCreateScanDialog.pallet.search.error.msg", //$NON-NLS-1$
-                            currentProductBarcode));
-            }
-        } else {
-            for (PalletCell cell : getCells().values()) {
-                processCell(monitor,
-                    new RowColPos(cell.getRow(), cell.getCol()), cell, null);
-                processCellStatus(cell);
-                scanOk = scanOk && cellOk(cell);
-            }
         }
-        setScanOkValue(scanOk);
-    }
-
-    private boolean cellOk(PalletCell cell) {
-        return cell == null || cell.getStatus() == UICellStatus.FILLED
-            || cell.getStatus() == UICellStatus.IN_SHIPMENT_ADDED;
-    }
-
-    private void processCell(IProgressMonitor monitor, RowColPos rcp,
-        PalletCell cell, Map<RowColPos, SpecimenWrapper> expectedAliquots)
-        throws Exception {
-        monitor.subTask(Messages.getString(
-            "DispatchCreateScanDialog.processCell.task.position", //$NON-NLS-1$
-            ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
-        SpecimenWrapper expectedAliquot = null;
-        if (expectedAliquots != null) {
-            expectedAliquot = expectedAliquots.get(rcp);
-            if (expectedAliquot != null) {
-                if (cell == null) {
-                    cell = new PalletCell(new ScanCell(rcp.row, rcp.col, null));
-                    getCells().put(rcp, cell);
-                }
-                cell.setExpectedSpecimen(expectedAliquot);
-            }
-        }
-        if (cell != null) {
-            processCellStatus(cell);
-        }
-    }
-
-    /**
-     * set the status of the cell
-     */
-    protected void processCellStatus(PalletCell scanCell) throws Exception {
-        SpecimenWrapper expectedAliquot = scanCell.getExpectedSpecimen();
-        String value = scanCell.getValue();
-        if (value == null) { // no aliquot scanned
-            scanCell.setStatus(UICellStatus.MISSING);
-            scanCell.setInformation(Messages.getString(
-                "ScanAssign.scanStatus.aliquot.missing", //$NON-NLS-1$
-                expectedAliquot.getInventoryId()));
-            scanCell.setTitle("?"); //$NON-NLS-1$
-        } else {
-            SpecimenWrapper foundAliquot = SpecimenWrapper
-                .getSpecimen(SessionManager.getAppService(), value,
-                    SessionManager.getUser());
-            if (foundAliquot == null) {
-                // not in database
-                scanCell.setStatus(UICellStatus.ERROR);
-                scanCell.setInformation(Messages
-                    .getString("ScanAssign.scanStatus.aliquot.notlinked")); //$NON-NLS-1$
-            } else {
-                if (expectedAliquot != null
-                    && !foundAliquot.equals(expectedAliquot)) {
-                    // Position taken
-                    scanCell.setStatus(UICellStatus.ERROR);
-                    scanCell
-                        .setInformation(Messages
-                            .getString("ScanAssign.scanStatus.aliquot.positionTakenError")); //$NON-NLS-1$
-                    scanCell.setTitle("!"); //$NON-NLS-1$
-                } else {
-                    scanCell.setSpecimen(foundAliquot);
-                    if (expectedAliquot != null || currentPallet == null) {
-                        List<SpecimenWrapper> currentAliquots = (currentShipment)
-                            .getSpecimenCollection(false);
-                        CheckStatus check = (currentShipment)
-                            .checkCanAddSpecimen(foundAliquot, false);
-                        if (check.ok) {
-                            // aliquot scanned is already registered at this
-                            // position (everything is ok !)
-                            scanCell.setStatus(UICellStatus.FILLED);
-                            scanCell.setTitle(foundAliquot.getCollectionEvent()
-                                .getPatient().getPnumber());
-                            scanCell.setSpecimen(foundAliquot);
-                            if (currentAliquots != null
-                                && currentAliquots.contains(foundAliquot)) {
-                                // was already added. Ok but just display the
-                                // right color
-                                scanCell
-                                    .setStatus(UICellStatus.IN_SHIPMENT_ADDED);
-                            }
-                        } else {
-                            scanCell.setStatus(UICellStatus.ERROR);
-                            scanCell.setInformation(check.message);
-                        }
-                    } else {
-                        // should not be there
-                        scanCell.setStatus(UICellStatus.ERROR);
-                        scanCell.setTitle(foundAliquot.getCollectionEvent()
-                            .getPatient().getPnumber());
-                        scanCell
-                            .setInformation("This aliquot should be on another pallet"); //$NON-NLS-1$
-                    }
-                }
-            }
-        }
+        // server side call
+        return SessionManager.getAppService().processScanResult(serverCells,
+            new DispatchProcessData(currentPallet, currentShipment, true),
+            isRescanMode(), SessionManager.getUser());
     }
 
     @Override
@@ -336,7 +214,7 @@ public class DispatchCreateScanDialog extends
 
     @Override
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-        processCellStatus(cell);
+        // processCellStatus(cell);
         if (cell.getStatus() == UICellStatus.ERROR) {
             Button okButton = getButton(IDialogConstants.PROCEED_ID);
             okButton.setEnabled(false);

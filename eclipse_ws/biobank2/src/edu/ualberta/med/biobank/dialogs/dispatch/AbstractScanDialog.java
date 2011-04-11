@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.dialogs.dispatch;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -26,14 +28,19 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
+import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
-import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
@@ -125,8 +132,48 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     protected abstract Map<RowColPos, PalletCell> getFakeScanCells()
         throws Exception;
 
-    protected abstract void processScanResult(IProgressMonitor monitor,
-        CenterWrapper<?> currentSite) throws Exception;
+    protected void processScanResult(IProgressMonitor monitor,
+        CenterWrapper<?> currentSite) throws Exception {
+        Map<RowColPos, PalletCell> cells = getCells();
+        // conversion for server side call
+        Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells = null;
+        if (cells != null) {
+            serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell>();
+            for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
+                serverCells
+                    .put(entry.getKey(), getServerCell(entry.getValue()));
+            }
+        }
+        ScanProcessResult res = internalProcessScanResult(monitor, serverCells,
+            currentSite);
+        if (cells != null) {
+            // for each cell, convert into a client side cell
+            for (Entry<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> entry : res
+                .getCells().entrySet()) {
+                RowColPos rcp = entry.getKey();
+                monitor.subTask(Messages.getString(
+                    "DispatchCreateScanDialog.processCell.task.position", //$NON-NLS-1$
+                    ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
+                PalletCell palletCell = cells.get(entry.getKey());
+                palletCell.merge(SessionManager.getAppService(),
+                    entry.getValue());
+            }
+        }
+        setScanOkValue(res.getProcessStatus() != CellStatus.ERROR);
+    }
+
+    protected abstract ScanProcessResult internalProcessScanResult(
+        IProgressMonitor monitor,
+        Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells,
+        CenterWrapper<?> site) throws Exception;
+
+    public static Cell getServerCell(PalletCell palletCell) {
+        return new edu.ualberta.med.biobank.common.scanprocess.Cell(
+            palletCell.getRow(), palletCell.getCol(), palletCell.getValue(),
+            palletCell.getStatus() == null ? null
+                : edu.ualberta.med.biobank.common.scanprocess.CellStatus
+                    .valueOf(palletCell.getStatus().name()));
+    }
 
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {

@@ -7,12 +7,8 @@ import java.util.List;
 public abstract class ProcessResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private List<String> logs;
+    private List<String> logs = new ArrayList<String>();
     private CellStatus processStatus;
-
-    public ProcessResult() {
-        logs = new ArrayList<String>();
-    }
 
     public List<String> getLogs() {
         return logs;
@@ -26,8 +22,8 @@ public abstract class ProcessResult implements Serializable {
         this.processStatus = processStatus;
     }
 
-    public void appendNewLog(String log) {
-        logs.add(log);
+    public void setLogs(List<String> logs) {
+        this.logs = logs;
     }
 
 }

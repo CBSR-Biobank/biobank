@@ -2,21 +2,21 @@ package edu.ualberta.med.biobank.server.scanprocess;
 
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
-import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.scanprocess.ProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.ProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public abstract class ServerProcess {
     protected WritableApplicationService appService;
     protected ProcessData data;
     protected User user;
-    protected ProcessResult res;
+    private List<String> logs;
 
     public ServerProcess(WritableApplicationService appService,
         ProcessData data, User user) {
@@ -24,28 +24,29 @@ public abstract class ServerProcess {
         this.data = data;
         this.user = user;
         user.initCurrentWorkingCenter(appService);
+        logs = new ArrayList<String>();
     }
 
-    public void processScanResult(Map<RowColPos, Cell> cells,
+    public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
         boolean isRescanMode) throws Exception {
-        res = new ScanProcessResult();
-        ((ScanProcessResult) res).setResult(cells,
-            internalProcessScanResult(cells, isRescanMode));
-    }
-
-    public ProcessResult getProcessResult() {
+        ScanProcessResult res = getScanProcessResult(cells, isRescanMode);
+        res.setLogs(logs);
         return res;
     }
 
-    protected abstract CellStatus internalProcessScanResult(
+    protected abstract ScanProcessResult getScanProcessResult(
         Map<RowColPos, Cell> cells, boolean isRescanMode) throws Exception;
 
-    public void processCellStatus(Cell cell) throws Exception {
-        res = new CellProcessResult();
-        internalProcessCellStatus(cell);
-        ((CellProcessResult) res).setResult(cell);
+    public CellProcessResult processCellStatus(Cell cell) throws Exception {
+        CellProcessResult res = getCellProcessResult(cell);
+        res.setLogs(logs);
+        return res;
     }
 
-    protected abstract void internalProcessCellStatus(Cell scanCell)
+    protected abstract CellProcessResult getCellProcessResult(Cell cell)
         throws Exception;
+
+    public void appendNewLog(String log) {
+        logs.add(log);
+    }
 }

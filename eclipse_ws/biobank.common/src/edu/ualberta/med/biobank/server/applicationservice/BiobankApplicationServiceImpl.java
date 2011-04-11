@@ -200,8 +200,7 @@ public class BiobankApplicationServiceImpl extends
         throws ApplicationException {
         try {
             ServerProcess process = processData.getProcessInstance(this, user);
-            process.processScanResult(cells, isRescanMode);
-            return (ScanProcessResult) process.getProcessResult();
+            return process.processScanResult(cells, isRescanMode);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
@@ -213,7 +212,7 @@ public class BiobankApplicationServiceImpl extends
         try {
             ServerProcess process = processData.getProcessInstance(this, user);
             process.processCellStatus(cell);
-            return (CellProcessResult) process.getProcessResult();
+            return process.processCellStatus(cell);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
