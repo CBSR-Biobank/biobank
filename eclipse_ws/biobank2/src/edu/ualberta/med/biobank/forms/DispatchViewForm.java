@@ -302,7 +302,7 @@ public class DispatchViewForm extends BiobankViewForm {
         if (dispatch.isInLostState())
             stateMessage = " Dispatch Lost ";
         else if (dispatch.isInClosedState())
-            stateMessage = " Dispatch Closed ";
+            stateMessage = " Dispatch Complete ";
         if (stateMessage != null) {
             Label label = widgetCreator.createLabel(client, stateMessage,
                 SWT.CENTER, false);
