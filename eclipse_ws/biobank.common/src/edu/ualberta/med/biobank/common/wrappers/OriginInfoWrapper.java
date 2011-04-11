@@ -25,7 +25,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
     private static final String SHIPMENT_HQL_STRING = "from "
         + OriginInfo.class.getName() + " as o inner join fetch o."
-        + OriginInfoPeer.SHIPMENT_INFO.getName() + " as s where s is not null";
+        + OriginInfoPeer.SHIPMENT_INFO.getName() + " as s ";
 
     public OriginInfoWrapper(WritableApplicationService appService) {
         super(appService);
@@ -135,7 +135,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     public static List<OriginInfoWrapper> getShipmentsByWaybill(
         WritableApplicationService appService, String waybill)
         throws ApplicationException {
-        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING + " and s."
+        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING + " where s."
             + ShipmentInfoPeer.WAYBILL.getName() + " = ?");
         HQLCriteria criteria = new HQLCriteria(qry.toString(),
             Arrays.asList(new Object[] { waybill }));
@@ -156,7 +156,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         throws ApplicationException {
 
         StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING
-            + " and DATE(s." + ShipmentInfoPeer.RECEIVED_AT.getName()
+            + " where DATE(s." + ShipmentInfoPeer.RECEIVED_AT.getName()
             + ") = DATE(?)");
         HQLCriteria criteria = new HQLCriteria(qry.toString(),
             Arrays.asList(new Object[] { dateReceived }));
@@ -166,6 +166,31 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
             appService, origins, OriginInfoWrapper.class);
 
         return shipments;
+    }
+
+    public static List<OriginInfoWrapper> getShipmentsByDateSent(
+        WritableApplicationService appService, Date dateSent)
+        throws ApplicationException {
+
+        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING
+            + " where DATE(s." + ShipmentInfoPeer.PACKED_AT.getName()
+            + ") = DATE(?)");
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            Arrays.asList(new Object[] { dateSent }));
+
+        List<OriginInfo> origins = appService.query(criteria);
+        List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
+            appService, origins, OriginInfoWrapper.class);
+
+        return shipments;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
+        if (getCenter() != null)
+            return Arrays.asList(getCenter());
+        return super.getSecuritySpecificCenters();
     }
 
     // @SuppressWarnings("unchecked")

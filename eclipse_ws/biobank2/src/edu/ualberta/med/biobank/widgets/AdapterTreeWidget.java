@@ -18,7 +18,8 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -49,7 +50,14 @@ public class AdapterTreeWidget extends Composite {
     public AdapterTreeWidget(Composite parent, boolean patternFilter) {
         super(parent, SWT.NONE);
 
-        setLayout(new FillLayout());
+        GridLayout gl = new GridLayout(1, false);
+        gl.marginWidth = 0;
+        gl.marginHeight = 0;
+        gl.horizontalSpacing = 0;
+        gl.verticalSpacing = 0;
+        parent.setLayout(gl);
+        setLayout(gl);
+        setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         if (patternFilter) {
             FilteredTree filteredTree = new FilteredTree(this, SWT.BORDER
@@ -62,6 +70,16 @@ public class AdapterTreeWidget extends Composite {
         } else {
             treeViewer = new TreeViewer(this);
         }
+
+        gl = new GridLayout(1, false);
+        gl.marginWidth = 0;
+        gl.marginHeight = 0;
+        gl.horizontalSpacing = 0;
+        gl.verticalSpacing = 0;
+        treeViewer.getTree().setLayout(gl);
+        treeViewer.getTree().setLayoutData(
+            new GridData(SWT.FILL, SWT.FILL, true, true));
+
         /*----------------------------DND-----------------------------------*/
 
         adapterTreeDragDropListener = new AdapterTreeDragDropListener(

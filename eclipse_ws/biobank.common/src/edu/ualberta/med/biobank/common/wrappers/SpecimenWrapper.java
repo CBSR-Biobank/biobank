@@ -29,6 +29,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenWrapper extends SpecimenBaseWrapper {
 
+    private static final String DISPATCHS_CACHE_KEY = "dispatchs";
     private AbstractObjectWithPositionManagement<SpecimenPosition, SpecimenWrapper> objectWithPositionManagement;
 
     public SpecimenWrapper(WritableApplicationService appService,
@@ -43,7 +44,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     private void init() {
-        setTopSpecimenInternal(this);
+        if (isNew()) {
+            setTopSpecimenInternal(this);
+        }
         initManagement();
     }
 
@@ -394,8 +397,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
     @SuppressWarnings("unchecked")
     public List<DispatchWrapper> getDispatchs() {
-        List<DispatchWrapper> dispatchs = (List<DispatchWrapper>) propertiesMap
-            .get("dispatchs");
+        List<DispatchWrapper> dispatchs = (List<DispatchWrapper>) cache
+            .get(DISPATCHS_CACHE_KEY);
         if (dispatchs == null) {
             List<DispatchSpecimenWrapper> dsaList = getDispatchSpecimenCollection();
             if (dsaList != null) {
@@ -403,7 +406,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                 for (DispatchSpecimenWrapper dsa : dsaList) {
                     dispatchs.add(dsa.getDispatch());
                 }
-                propertiesMap.put("dispatchs", dispatchs);
+                cache.put(DISPATCHS_CACHE_KEY, dispatchs);
             }
         }
         return dispatchs;
@@ -455,8 +458,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                 DispatchWrapper dispatch = dsa.getDispatch();
                 if (!dispatch.equals(excludedShipment)
                     && (EnumSet.of(DispatchState.CREATION,
-                        DispatchState.IN_TRANSIT).contains(dispatch
-                        .getDispatchState()))) {
+                        DispatchState.IN_TRANSIT, DispatchState.RECEIVED)
+                        .contains(dispatch.getDispatchState()))) {
                     if (DispatchSpecimenState.MISSING.equals(dsa
                         .getDispatchSpecimenState())) {
                         return false;

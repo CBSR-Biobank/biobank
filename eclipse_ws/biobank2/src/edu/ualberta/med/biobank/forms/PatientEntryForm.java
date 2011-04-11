@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -63,14 +64,22 @@ public class PatientEntryForm extends BiobankEntryForm {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        if (adapter.getModelObject().isNew())
+        if (adapter.getModelObject().isNew()) {
             patient = (PatientWrapper) adapter.getModelObject();
-        else
+
+            Calendar c = Calendar.getInstance();
+            c.setTime(new Date());
+            c.set(Calendar.SECOND, 0);
+            patient.setCreatedAt(c.getTime());
+
+        } else {
             try {
                 patient = (PatientWrapper) adapter.getModelObjectClone();
             } catch (Exception e1) {
                 logger.error("Error getting patient clone", e1);
             }
+        }
+
         retrievePatient();
         SessionManager.logEdit(patient);
         String tabName;

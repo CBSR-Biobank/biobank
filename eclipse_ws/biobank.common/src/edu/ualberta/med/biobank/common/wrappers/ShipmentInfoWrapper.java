@@ -27,13 +27,11 @@ public class ShipmentInfoWrapper extends ShipmentInfoBaseWrapper {
     }
 
     public String getFormattedDateReceived() {
-        // date received is not supposed to be null
         return DateFormatter.formatAsDateTime(getReceivedAt());
     }
 
-    public String getFormattedDateSent() {
-        // date received is not supposed to be null
-        return DateFormatter.formatAsDateTime(getSentAt());
+    public String getFormattedDatePacked() {
+        return DateFormatter.formatAsDateTime(getPackedAt());
     }
 
     @Override

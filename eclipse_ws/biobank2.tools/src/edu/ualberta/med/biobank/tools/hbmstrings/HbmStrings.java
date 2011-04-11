@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.tools.modelumlparser.Attribute;
@@ -65,8 +64,6 @@ public class HbmStrings {
     }
 
     public void doWork(AppArgs appArgs) throws Exception {
-        LOGGER.setLevel(Level.DEBUG);
-
         this.appArgs = appArgs;
 
         if (appArgs.verbose) {
@@ -214,8 +211,8 @@ public class HbmStrings {
                 String tableAttrName = CamelCase.toTitleCase(attrName);
                 String attrType = dmTableAttrMap.get(tableAttrName).getType();
 
-                LOGGER.debug("class name: " + dmClass.getName() + " attr: "
-                    + attrName + " attrType: " + attrType);
+                LOGGER.debug("class name: " + dmClass.getName() + ", attr: "
+                    + attrName + ", attrType: " + attrType);
 
                 if (!dmTableAttrMap.containsKey(tableAttrName)) {
                     continue;

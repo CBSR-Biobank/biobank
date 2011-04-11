@@ -924,7 +924,7 @@
                </command>
                <command
                      commandId="edu.ualberta.med.biobank.commands.studyAdd"
-                  icon="icons/studies_add.png"
+                     icon="icons/studies_add.png"
                      id="edu.ualberta.med.biobank.menu.studyAdd"
                      label="Add Study"
                      style="push">
