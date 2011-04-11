@@ -45,10 +45,13 @@ public class DispatchAdapter extends AdapterBase {
             return editable
                 && ((getWrapper().getSenderCenter().equals(
                     SessionManager.getUser().getCurrentWorkingCenter()) && (getWrapper()
-                    .isNew() || getWrapper().isInCreationState() || getWrapper()
-                    .isInTransitState())) || (getWrapper().getReceiverCenter()
+                    .isNew()
+                    || getWrapper().isInCreationState()
+                    || getWrapper().isInTransitState() || getWrapper()
+                    .isInLostState())) || (getWrapper().getReceiverCenter()
                     .equals(SessionManager.getUser().getCurrentWorkingCenter()) && (getWrapper()
-                    .isInReceivedState() || getWrapper().isInTransitState())));
+                    .isInReceivedState() || getWrapper().isInLostState() || getWrapper()
+                    .isInClosedState())));
         }
         return editable;
     }

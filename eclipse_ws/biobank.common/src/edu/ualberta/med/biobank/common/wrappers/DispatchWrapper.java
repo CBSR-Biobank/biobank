@@ -231,7 +231,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         boolean checkAlreadyAdded) {
         if (aliquot.isNew()) {
             return new CheckStatus(false, "Cannot add aliquot "
-                + aliquot.getInventoryId() + ": it has not already been saved");
+                + aliquot.getInventoryId() + ": it has not been saved");
         }
         if (!aliquot.isActive()) {
             return new CheckStatus(false, "Activity status of "
@@ -239,20 +239,21 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 + " Check comments on this aliquot for more information.");
         }
         if (!aliquot.getCurrentCenter().equals(getSenderCenter())) {
-            return new CheckStatus(false, "Aliquot " + aliquot.getInventoryId()
-                + " is currently assigned to site "
+            return new CheckStatus(false, "Specimen "
+                + aliquot.getInventoryId() + " is currently assigned to site "
                 + aliquot.getCurrentCenter().getNameShort()
                 + ". It should be first assigned to "
                 + getSenderCenter().getNameShort() + " site.");
         }
         if (checkAlreadyAdded && currentAliquots != null
             && currentAliquots.contains(aliquot)) {
-            return new CheckStatus(false, aliquot.getInventoryId()
-                + " is already in this Dispatch.");
+            return new CheckStatus(false, "Specimen "
+                + aliquot.getInventoryId() + " is already in this Dispatch.");
         }
         if (aliquot.isUsedInDispatch()) {
-            return new CheckStatus(false, aliquot.getInventoryId()
-                + " is already in a Dispatch in-transit or in creation.");
+            return new CheckStatus(false, "Specimen "
+                + aliquot.getInventoryId()
+                + " is already in an active dispatch.");
         }
         return new CheckStatus(true, "");
     }
@@ -264,19 +265,19 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         resetMap();
     }
 
-    public void removeAliquots(List<SpecimenWrapper> aliquotsToRemove) {
-        if (aliquotsToRemove == null) {
+    public void removeAliquots(List<DispatchSpecimenWrapper> dsaList) {
+        if (dsaList == null) {
             throw new NullPointerException();
         }
 
-        if (aliquotsToRemove.isEmpty())
+        if (dsaList.isEmpty())
             return;
 
         List<DispatchSpecimenWrapper> currentDaList = getDispatchSpecimenCollection(false);
         List<DispatchSpecimenWrapper> removeDispatchSpecimens = new ArrayList<DispatchSpecimenWrapper>();
 
         for (DispatchSpecimenWrapper dsa : currentDaList) {
-            if (aliquotsToRemove.contains(dsa.getSpecimen())) {
+            if (dsaList.contains(dsa)) {
                 removeDispatchSpecimens.add(dsa);
                 deletedDispatchedSpecimens.add(dsa);
             }
