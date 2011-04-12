@@ -74,7 +74,7 @@ public class SessionManager {
 
     public void setSessionsView(SessionsView view) {
         addView(view);
-        updateMenus();
+        updateSessionState();
     }
 
     public void addSession(final BiobankApplicationService appService,
@@ -83,20 +83,13 @@ public class SessionManager {
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, user);
         rootNode.addChild(sessionAdapter);
-
-        updateMenus();
+        updateSessionState();
 
         if (sessionAdapter.getUser().passwordChangeRequired()) {
             ChangePasswordDialog dlg = new ChangePasswordDialog(PlatformUI
                 .getWorkbench().getActiveWorkbenchWindow().getShell(), true);
             dlg.open();
         }
-
-        // for key binding contexts:
-        BindingContextHelper
-            .activateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_IN);
-        BindingContextHelper
-            .deactivateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
 
         IWorkbench workbench = BiobankPlugin.getDefault().getWorkbench();
         IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
@@ -107,14 +100,8 @@ public class SessionManager {
     public void deleteSession() throws Exception {
         WritableApplicationService appService = sessionAdapter.getAppService();
         sessionAdapter = null;
-        updateMenus();
+        updateSessionState();
         ServiceConnection.logout(appService);
-        // for key binding contexts:
-        BindingContextHelper
-            .activateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
-        BindingContextHelper
-            .deactivateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_IN);
-
         initPerspectivesUpdateDone();
     }
 
@@ -129,11 +116,24 @@ public class SessionManager {
         sessionAdapter.performExpand();
     }
 
-    private void updateMenus() {
+    private void updateSessionState() {
         IWorkbenchWindow window = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
+
+        // for key binding contexts:
+        if (sessionAdapter == null) {
+            BindingContextHelper
+                .activateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
+            BindingContextHelper
+                .deactivateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_IN);
+        } else {
+            BindingContextHelper
+                .activateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_IN);
+            BindingContextHelper
+                .deactivateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
+        }
 
         // assign logged in state
         SessionState sessionSourceProvider = (SessionState) service
