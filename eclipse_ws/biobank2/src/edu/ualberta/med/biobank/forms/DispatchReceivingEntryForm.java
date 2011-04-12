@@ -33,7 +33,10 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
         createMainSection();
         boolean editAliquots = !dispatch.isInClosedState()
-            && !dispatch.isInLostState() && !dispatch.isInTransitState();
+            && !dispatch.isInLostState();
+
+        setFirstControl(form);
+
         if (editAliquots)
             createAliquotsSelectionActions(page, true);
         aliquotsTree = new DispatchAliquotsTreeTable(page, dispatch,

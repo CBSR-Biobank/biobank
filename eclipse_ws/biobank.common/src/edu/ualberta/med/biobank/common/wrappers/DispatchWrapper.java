@@ -227,28 +227,30 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         boolean checkAlreadyAdded) {
         if (specimen.isNew()) {
             return new CheckStatus(false, "Cannot add specimen "
-                + specimen.getInventoryId() + ": it has not already been saved");
+                + specimen.getInventoryId() + ": it has not been saved");
         }
         if (!specimen.isActive()) {
             return new CheckStatus(false, "Activity status of "
                 + specimen.getInventoryId() + " is not 'Active'."
-                + " Check comments on this aliquot for more information.");
+                + " Check comments on this specimen for more information.");
         }
         if (!specimen.getCurrentCenter().equals(getSenderCenter())) {
             return new CheckStatus(false, "Specimen "
-                + specimen.getInventoryId() + " is currently assigned to site "
+                + specimen.getInventoryId()
+                + " is currently assigned to center "
                 + specimen.getCurrentCenter().getNameShort()
                 + ". It should be first assigned to "
-                + getSenderCenter().getNameShort() + " site.");
+                + getSenderCenter().getNameShort() + " center.");
         }
         if (checkAlreadyAdded && currentSpecimens != null
             && currentSpecimens.contains(specimen)) {
-            return new CheckStatus(false, specimen.getInventoryId()
-                + " is already in this Dispatch.");
+            return new CheckStatus(false, "Specimen "
+                + specimen.getInventoryId() + " is already in this Dispatch.");
         }
         if (specimen.isUsedInDispatch()) {
-            return new CheckStatus(false, specimen.getInventoryId()
-                + " is already in a Dispatch in-transit or in creation.");
+            return new CheckStatus(false, "Specimen "
+                + specimen.getInventoryId()
+                + " is already in an active dispatch.");
         }
         return new CheckStatus(true, "");
     }
@@ -260,19 +262,19 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         resetMap();
     }
 
-    public void removeAliquots(List<SpecimenWrapper> aliquotsToRemove) {
-        if (aliquotsToRemove == null) {
+    public void removeAliquots(List<DispatchSpecimenWrapper> dsaList) {
+        if (dsaList == null) {
             throw new NullPointerException();
         }
 
-        if (aliquotsToRemove.isEmpty())
+        if (dsaList.isEmpty())
             return;
 
         List<DispatchSpecimenWrapper> currentDaList = getDispatchSpecimenCollection(false);
         List<DispatchSpecimenWrapper> removeDispatchSpecimens = new ArrayList<DispatchSpecimenWrapper>();
 
         for (DispatchSpecimenWrapper dsa : currentDaList) {
-            if (aliquotsToRemove.contains(dsa.getSpecimen())) {
+            if (dsaList.contains(dsa)) {
                 removeDispatchSpecimens.add(dsa);
                 deletedDispatchedSpecimens.add(dsa);
             }
