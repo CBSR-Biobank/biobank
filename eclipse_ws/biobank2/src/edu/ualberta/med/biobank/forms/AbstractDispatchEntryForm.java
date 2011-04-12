@@ -33,7 +33,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
     protected BiobankEntryFormWidgetListener biobankListener = new BiobankEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
-            reloadAliquots();
+            reloadSpecimens();
             setDirty(true);
         }
     };
@@ -63,7 +63,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     protected abstract String getTextForPartName();
 
-    protected void createAliquotsSelectionActions(Composite composite,
+    protected void createSpecimensSelectionActions(Composite composite,
         boolean setAsFirstControl) {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
@@ -76,7 +76,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         newAliquotText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
-                doAliquotTextAction(newAliquotText.getText());
+                doSpecimenTextAction(newAliquotText.getText());
                 newAliquotText.setFocus();
                 newAliquotText.setText("");
             }
@@ -90,7 +90,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                doAliquotTextAction(newAliquotText.getText());
+                doSpecimenTextAction(newAliquotText.getText());
                 newAliquotText.setFocus();
                 newAliquotText.setText("");
             }
@@ -110,7 +110,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     protected abstract void openScanDialog();
 
-    protected abstract void doAliquotTextAction(String text);
+    protected abstract void doSpecimenTextAction(String text);
 
     @Override
     protected void saveForm() throws Exception {
@@ -128,6 +128,6 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         });
     }
 
-    protected abstract void reloadAliquots();
+    protected abstract void reloadSpecimens();
 
 }

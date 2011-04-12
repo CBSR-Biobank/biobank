@@ -2,10 +2,10 @@ package edu.ualberta.med.biobank.server.scanprocess;
 
 import edu.ualberta.med.biobank.common.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
-import edu.ualberta.med.biobank.common.scanprocess.LinkProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.data.LinkProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -41,10 +41,18 @@ public class LinkProcess extends ServerProcess {
                 if (cell != null) {
                     Cell otherValue = allValues.get(cell.getValue());
                     if (otherValue != null) {
-                        String msg = "existe ailleurs en "
-                            + otherValue.getRow() + ":" + otherValue.getCol();
-                        cell.setInformation(msg);
-                        appendNewLog(msg);
+                        String thisPosition = ContainerLabelingSchemeWrapper
+                            .rowColToSbs(new RowColPos(cell.getRow(), cell
+                                .getCol()));
+                        String otherPosition = ContainerLabelingSchemeWrapper
+                            .rowColToSbs(new RowColPos(otherValue.getRow(),
+                                otherValue.getCol()));
+                        cell.setInformation(Messages.getString(
+                            "ScanLink.value.already.scanned", cell.getValue(), //$NON-NLS-1$
+                            otherPosition));
+                        appendNewLog(Messages.getString(
+                            "ScanLink.activitylog.value.already.scanned", //$NON-NLS-1$
+                            thisPosition, cell.getValue(), otherPosition));
                         cell.setStatus(CellStatus.ERROR);
                     } else {
                         allValues.put(cell.getValue(), cell);
@@ -98,7 +106,7 @@ public class LinkProcess extends ServerProcess {
                     if (foundAliquot.getParentSpecimen() == null)
                         appendNewLog(Messages
                             .getString(
-                                "ScanLink.activitylog.aliquot.existsError.noParent",
+                                "ScanLink.activitylog.aliquot.existsError.noParent", //$NON-NLS-1$
                                 palletPosition, value, foundAliquot
                                     .getCollectionEvent().getVisitNumber(),
                                 foundAliquot.getCollectionEvent().getPatient()
@@ -107,7 +115,7 @@ public class LinkProcess extends ServerProcess {
                     else
                         appendNewLog(Messages
                             .getString(
-                                "ScanLink.activitylog.aliquot.existsError.withParent",
+                                "ScanLink.activitylog.aliquot.existsError.withParent", //$NON-NLS-1$
                                 palletPosition, value, foundAliquot
                                     .getParentSpecimen().getInventoryId(),
                                 foundAliquot.getParentSpecimen()

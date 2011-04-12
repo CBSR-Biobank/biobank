@@ -483,7 +483,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
         boolean parentChanged = (originalSpecimen != null
             && originalSpecimen.getParentSpecimen() != null && originalSpecimen
-            .getParentSpecimen().equals(getParentSpecimen()));
+            .getParentSpecimen().getId().equals(getParentSpecimen().getId()));
 
         if (isNew() || parentChanged) {
             updateChildren();

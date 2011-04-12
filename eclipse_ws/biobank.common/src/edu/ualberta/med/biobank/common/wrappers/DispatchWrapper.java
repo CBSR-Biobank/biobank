@@ -15,8 +15,11 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
+import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
+import edu.ualberta.med.biobank.common.peer.DispatchSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
@@ -205,56 +208,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         deletedDispatchedSpecimens.removeAll(newDispatchSpecimens);
     }
 
-    public static class CheckStatus {
-        public CheckStatus(boolean b, String string) {
-            this.ok = b;
-            this.message = string;
-        }
-
-        public boolean ok = true;
-        public String message;
-
-    }
-
-    public CheckStatus checkCanAddSpecimen(SpecimenWrapper spc,
-        boolean checkAlreadyAdded) {
-        return checkCanAddSpecimen(getSpecimenCollection(false), spc,
-            checkAlreadyAdded);
-    }
-
-    public CheckStatus checkCanAddSpecimen(
-        List<SpecimenWrapper> currentSpecimens, SpecimenWrapper specimen,
-        boolean checkAlreadyAdded) {
-        if (specimen.isNew()) {
-            return new CheckStatus(false, "Cannot add specimen "
-                + specimen.getInventoryId() + ": it has not been saved");
-        }
-        if (!specimen.isActive()) {
-            return new CheckStatus(false, "Activity status of "
-                + specimen.getInventoryId() + " is not 'Active'."
-                + " Check comments on this specimen for more information.");
-        }
-        if (!specimen.getCurrentCenter().equals(getSenderCenter())) {
-            return new CheckStatus(false, "Specimen "
-                + specimen.getInventoryId()
-                + " is currently assigned to center "
-                + specimen.getCurrentCenter().getNameShort()
-                + ". It should be first assigned to "
-                + getSenderCenter().getNameShort() + " center.");
-        }
-        if (checkAlreadyAdded && currentSpecimens != null
-            && currentSpecimens.contains(specimen)) {
-            return new CheckStatus(false, "Specimen "
-                + specimen.getInventoryId() + " is already in this Dispatch.");
-        }
-        if (specimen.isUsedInDispatch()) {
-            return new CheckStatus(false, "Specimen "
-                + specimen.getInventoryId()
-                + " is already in an active dispatch.");
-        }
-        return new CheckStatus(true, "");
-    }
-
     @Override
     public void removeFromDispatchSpecimenCollection(
         List<DispatchSpecimenWrapper> dasToRemove) {
@@ -388,16 +341,24 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         resetMap();
     }
 
+    private static final String FAST_DISPATCH_SPECIMEN_QRY = "select ra from "
+        + DispatchSpecimen.class.getName() + " ra inner join fetch ra."
+        + DispatchSpecimenPeer.SPECIMEN.getName()
+        + " as spec inner join fetch spec."
+        + SpecimenPeer.SPECIMEN_TYPE.getName() + " inner join fetch spec."
+        + SpecimenPeer.COLLECTION_EVENT.getName()
+        + " as cevent inner join fetch cevent."
+        + CollectionEventPeer.PATIENT.getName() + " inner join fetch spec."
+        + SpecimenPeer.ACTIVITY_STATUS.getName() + " where ra."
+        + Property.concatNames(DispatchSpecimenPeer.DISPATCH, DispatchPeer.ID)
+        + " = ?";
+
     // fast... from db. should only call this once then use the cached value
     public List<DispatchSpecimenWrapper> getFastDispatchSpecimenCollection() {
         if (!isPropertyCached(DispatchPeer.DISPATCH_SPECIMEN_COLLECTION)) {
-            List<DispatchSpecimen> results = new ArrayList<DispatchSpecimen>();
+            List<DispatchSpecimen> results;
             // test hql
-            HQLCriteria query = new HQLCriteria(
-                "select ra from "
-                    + DispatchSpecimen.class.getName()
-                    + " ra inner join fetch ra.specimen inner join fetch ra.specimen.specimenType inner join fetch ra.specimen.collectionEvent inner join fetch ra.specimen.collectionEvent.patient inner join fetch ra.specimen.activityStatus "
-                    + " where ra.dispatch.id = ?",
+            HQLCriteria query = new HQLCriteria(FAST_DISPATCH_SPECIMEN_QRY,
                 Arrays.asList(new Object[] { getId() }));
             try {
                 results = appService.query(query);

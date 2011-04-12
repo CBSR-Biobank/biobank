@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.scanprocess;
+package edu.ualberta.med.biobank.common.scanprocess.data;
 
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.server.scanprocess.LinkProcess;

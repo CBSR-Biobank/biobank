@@ -31,7 +31,9 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
-import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -133,7 +135,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         throws Exception;
 
     protected void processScanResult(IProgressMonitor monitor,
-        CenterWrapper<?> currentSite) throws Exception {
+        CenterWrapper<?> currentCenter) throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
         // conversion for server side call
         Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells = null;
@@ -145,27 +147,31 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             }
         }
         ScanProcessResult res = internalProcessScanResult(monitor, serverCells,
-            currentSite);
-        if (cells != null) {
-            // for each cell, convert into a client side cell
-            for (Entry<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> entry : res
-                .getCells().entrySet()) {
-                RowColPos rcp = entry.getKey();
-                monitor.subTask(Messages.getString(
-                    "DispatchCreateScanDialog.processCell.task.position", //$NON-NLS-1$
-                    ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
-                PalletCell palletCell = cells.get(entry.getKey());
-                palletCell.merge(SessionManager.getAppService(),
-                    entry.getValue());
+            currentCenter);
+        if (res != null) {
+            if (cells != null) {
+                // for each cell, convert into a client side cell
+                for (Entry<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> entry : res
+                    .getCells().entrySet()) {
+                    RowColPos rcp = entry.getKey();
+                    monitor.subTask(Messages.getString(
+                        "DispatchCreateScanDialog.processCell.task.position", //$NON-NLS-1$
+                        ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
+                    PalletCell palletCell = cells.get(entry.getKey());
+                    palletCell.merge(SessionManager.getAppService(),
+                        entry.getValue());
+                }
             }
+            setScanOkValue(res.getProcessStatus() != CellStatus.ERROR);
+        } else {
+            setScanOkValue(false);
         }
-        setScanOkValue(res.getProcessStatus() != CellStatus.ERROR);
     }
 
     protected abstract ScanProcessResult internalProcessScanResult(
         IProgressMonitor monitor,
         Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells,
-        CenterWrapper<?> site) throws Exception;
+        CenterWrapper<?> center) throws Exception;
 
     public static Cell getServerCell(PalletCell palletCell) {
         return new edu.ualberta.med.biobank.common.scanprocess.Cell(
@@ -440,10 +446,19 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             || cell.getStatus() == UICellStatus.MISSING;
     }
 
-    @SuppressWarnings("unused")
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
+        CellProcessResult res = SessionManager.getAppService()
+            .processCellStatus(getServerCell(cell), getProcessData(),
+                SessionManager.getUser());
+        cell.merge(SessionManager.getAppService(), res.getCell());
+        if (res.getProcessStatus() == CellStatus.ERROR) {
+            Button okButton = getButton(IDialogConstants.PROCEED_ID);
+            okButton.setEnabled(false);
+        }
         spw.redraw();
     }
+
+    protected abstract ProcessData getProcessData();
 
     private String scanTubeAloneDialog(RowColPos rcp) {
         ScanOneTubeDialog dlg = new ScanOneTubeDialog(PlatformUI.getWorkbench()

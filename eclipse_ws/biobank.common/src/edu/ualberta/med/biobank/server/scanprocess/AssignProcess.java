@@ -1,11 +1,11 @@
 package edu.ualberta.med.biobank.server.scanprocess;
 
 import edu.ualberta.med.biobank.common.Messages;
-import edu.ualberta.med.biobank.common.scanprocess.AssignProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
-import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.data.AssignProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -38,24 +38,24 @@ public class AssignProcess extends ServerProcess {
         // FIXME need to remember movedAndMissingAliquotsFromPallet when rescan
         // ?
         Map<RowColPos, Boolean> movedAndMissingAliquotsFromPallet = new HashMap<RowColPos, Boolean>();
-        for (int row = 0; row < assignData.getPalletRowCapacity(); row++) {
-            for (int col = 0; col < assignData.getPalletColCapacity(); col++) {
+        for (int row = 0; row < assignData.getPallet(appService)
+            .getRowCapacity(); row++) {
+            for (int col = 0; col < assignData.getPallet(appService)
+                .getColCapacity(); col++) {
                 RowColPos rcp = new RowColPos(row, col);
                 Cell cell = cells.get(rcp);
                 if (!rescanMode || cell == null || cell.getStatus() == null
                     || cell.getStatus() == CellStatus.EMPTY
                     || cell.getStatus() == CellStatus.ERROR
                     || cell.getStatus() == CellStatus.MISSING) {
-                    if (assignData.getExpectedSpecimens() != null) {
-                        Integer specId = assignData.getExpectedSpecimens().get(
-                            rcp);
-                        if (specId != null) {
-                            if (cell == null) {
-                                cell = new Cell(rcp.row, rcp.col, null, null);
-                                cells.put(rcp, cell);
-                            }
-                            cell.setExpectedSpecimenId(specId);
+                    SpecimenWrapper expectedSpecimen = assignData
+                        .getPallet(appService).getSpecimens().get(rcp);
+                    if (expectedSpecimen != null) {
+                        if (cell == null) {
+                            cell = new Cell(rcp.row, rcp.col, null, null);
+                            cells.put(rcp, cell);
                         }
+                        cell.setExpectedSpecimenId(expectedSpecimen.getId());
                     }
                     if (cell != null) {
                         internalProcessCellAssignStatus(cell,
@@ -96,7 +96,8 @@ public class AssignProcess extends ServerProcess {
         }
 
         String value = scanCell.getValue();
-        String positionString = ((AssignProcessData) data).getPalletLabel()
+        String positionString = ((AssignProcessData) data)
+            .getPallet(appService).getLabel()
             + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(scanCell
                 .getRow(), scanCell.getCol()));
         if (value == null) { // no specimen scanned
@@ -125,11 +126,8 @@ public class AssignProcess extends ServerProcess {
                         .getPatient().getPnumber());
                     scanCell.setSpecimenId(expectedSpecimen.getId());
                 } else {
-                    ContainerTypeWrapper cType = new ContainerTypeWrapper(
-                        appService);
-                    cType.getWrappedObject().setId(
-                        ((AssignProcessData) data).getContainerTypeId());
-                    cType.reload();
+                    ContainerTypeWrapper cType = ((AssignProcessData) data)
+                        .getPallet(appService).getContainerType();
                     if (cType.getSpecimenTypeCollection().contains(
                         foundSpecimen.getSpecimenType())) {
                         if (foundSpecimen.hasParent()) { // moved
@@ -169,19 +167,17 @@ public class AssignProcess extends ServerProcess {
             .get(rcp);
         if (!Boolean.TRUE.equals(posHasMovedSpecimen)) {
             scanCell.setStatus(CellStatus.MISSING);
-            scanCell
-                .setInformation(Messages
-                    .getString(
-                        "ScanAssign.scanStatus.aliquot.missing", missingAliquot.getInventoryId())); //$NON-NLS-1$
+            scanCell.setInformation(Messages.getString(
+                "ScanAssign.scanStatus.aliquot.missing", //$NON-NLS-1$
+                missingAliquot.getInventoryId()));
             scanCell.setTitle("?"); //$NON-NLS-1$
             // MISSING in {0}\: specimen {1} from visit {2} (patient {3})
             // missing
-            appendNewLog(Messages
-                .getString(
-                    "ScanAssign.activitylog.aliquot.missing", position, missingAliquot //$NON-NLS-1$
-                        .getInventoryId(), missingAliquot.getCollectionEvent()
-                        .getVisitNumber(), missingAliquot.getCollectionEvent()
-                        .getPatient().getPnumber()));
+            appendNewLog(Messages.getString(
+                "ScanAssign.activitylog.aliquot.missing", position, //$NON-NLS-1$
+                missingAliquot.getInventoryId(), missingAliquot
+                    .getCollectionEvent().getVisitNumber(), missingAliquot
+                    .getCollectionEvent().getPatient().getPnumber()));
             movedAndMissingAliquotsFromPallet.put(rcp, true);
         } else {
             movedAndMissingAliquotsFromPallet.remove(rcp);
@@ -196,10 +192,10 @@ public class AssignProcess extends ServerProcess {
     private void updateCellAsNotLinked(String position, Cell scanCell) {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages
-            .getString("ScanAssign.scanStatus.aliquot.notlinked")); //$NON-NLS-1$
-        appendNewLog(Messages
-            .getString(
-                "ScanAssign.activitylog.aliquot.notlinked", position, scanCell.getValue())); //$NON-NLS-1$
+            .getString("ScanAssign.scanStatus.aliquot.notlinked"));//$NON-NLS-1$
+        appendNewLog(Messages.getString(
+            "ScanAssign.activitylog.aliquot.notlinked", position, //$NON-NLS-1$
+            scanCell.getValue()));
     }
 
     /**
@@ -212,22 +208,25 @@ public class AssignProcess extends ServerProcess {
         scanCell.setInformation(Messages
             .getString("ScanAssign.scanStatus.aliquot.positionTakenError")); //$NON-NLS-1$
         scanCell.setTitle("!"); //$NON-NLS-1$
-        appendNewLog(Messages
-            .getString(
-                "ScanAssign.activitylog.aliquot.positionTaken", position, expectedAliquot //$NON-NLS-1$
-                    .getInventoryId(), expectedAliquot.getCollectionEvent()
-                    .getPatient().getPnumber(), foundAliquot.getInventoryId(),
-                foundAliquot.getCollectionEvent().getPatient().getPnumber()));
+        appendNewLog(Messages.getString(
+            "ScanAssign.activitylog.aliquot.positionTaken", position, //$NON-NLS-1$
+            expectedAliquot.getInventoryId(), expectedAliquot
+                .getCollectionEvent().getPatient().getPnumber(),
+            foundAliquot.getInventoryId(), foundAliquot.getCollectionEvent()
+                .getPatient().getPnumber()));
     }
 
     /**
      * this cell has already a position. Check if it was on the pallet or not
+     * 
+     * @throws Exception
      */
     private void processCellWithPreviousPosition(Cell scanCell,
         String positionString, SpecimenWrapper foundSpecimen,
-        Map<RowColPos, Boolean> movedAndMissingAliquotsFromPallet) {
-        if (foundSpecimen.getParentContainer().getId()
-            .equals(((AssignProcessData) data).getPalletId())) {
+        Map<RowColPos, Boolean> movedAndMissingAliquotsFromPallet)
+        throws Exception {
+        if (foundSpecimen.getParentContainer().equals(
+            ((AssignProcessData) data).getPallet(appService))) {
             // same pallet
             RowColPos rcp = new RowColPos(scanCell.getRow(), scanCell.getCol());
             if (!foundSpecimen.getPosition().equals(rcp)) {
@@ -268,10 +267,8 @@ public class AssignProcess extends ServerProcess {
         scanCell.setInformation(Messages.getString(
             "ScanAssign.scanStatus.aliquot.moved", expectedPosition)); //$NON-NLS-1$
 
-        appendNewLog(Messages
-            .getString(
-                "ScanAssign.activitylog.aliquot.moved", position, scanCell.getValue(), //$NON-NLS-1$
-                expectedPosition));
+        appendNewLog(Messages.getString("ScanAssign.activitylog.aliquot.moved", //$NON-NLS-1$
+            position, scanCell.getValue(), expectedPosition));
     }
 
     private void updateCellAsInOtherSite(String position, Cell scanCell,
@@ -287,10 +284,9 @@ public class AssignProcess extends ServerProcess {
         scanCell.setInformation(Messages.getString(
             "ScanAssign.scanStatus.aliquot.otherSite", siteName)); //$NON-NLS-1$
 
-        appendNewLog(Messages
-            .getString(
-                "ScanAssign.activitylog.aliquot.otherSite", position, scanCell.getValue(), //$NON-NLS-1$
-                siteName, currentPosition));
+        appendNewLog(Messages.getString(
+            "ScanAssign.activitylog.aliquot.otherSite", position, //$NON-NLS-1$
+            scanCell.getValue(), siteName, currentPosition));
     }
 
     private void updateCellAsTypeError(String position, Cell scanCell,
@@ -316,7 +312,7 @@ public class AssignProcess extends ServerProcess {
         scanCell.setInformation(Messages
             .getString("ScanAssign.scanStatus.aliquot.dispatchedError")); //$NON-NLS-1$
         appendNewLog(Messages.getString(
-            "ScanAssign.activitylog.aliquot.dispatchedError", positionString));
+            "ScanAssign.activitylog.aliquot.dispatchedError", positionString)); //$NON-NLS-1$
 
     }
 

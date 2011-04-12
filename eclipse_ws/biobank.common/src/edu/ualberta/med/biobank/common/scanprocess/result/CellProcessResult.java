@@ -1,6 +1,8 @@
-package edu.ualberta.med.biobank.common.scanprocess;
+package edu.ualberta.med.biobank.common.scanprocess.result;
 
 import java.io.Serializable;
+
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
 
 public class CellProcessResult extends ProcessResult implements Serializable {
 

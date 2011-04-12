@@ -5,9 +5,9 @@ import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.CellProcessResult;
-import edu.ualberta.med.biobank.common.scanprocess.ProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
@@ -211,7 +211,6 @@ public class BiobankApplicationServiceImpl extends
         ProcessData processData, User user) throws ApplicationException {
         try {
             ServerProcess process = processData.getProcessInstance(this, user);
-            process.processCellStatus(cell);
             return process.processCellStatus(cell);
         } catch (Exception e) {
             throw new ApplicationException(e);

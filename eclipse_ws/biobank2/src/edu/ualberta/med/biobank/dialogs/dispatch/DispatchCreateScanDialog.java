@@ -16,10 +16,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.scanprocess.DispatchProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -104,19 +106,29 @@ public class DispatchCreateScanDialog extends
     protected ScanProcessResult internalProcessScanResult(
         IProgressMonitor monitor,
         Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells,
-        CenterWrapper<?> site) throws Exception {
+        CenterWrapper<?> center) throws Exception {
         aliquotsAdded = false;
         currentPallet = null;
         if (isPalletWithPosition) {
-            currentPallet = ContainerWrapper
-                .getContainerWithProductBarcodeInSite(
-                    SessionManager.getAppService(), (SiteWrapper) site,
-                    currentProductBarcode);
+            if (center instanceof SiteWrapper)
+                currentPallet = ContainerWrapper
+                    .getContainerWithProductBarcodeInSite(
+                        SessionManager.getAppService(), (SiteWrapper) center,
+                        currentProductBarcode);
+            if (currentPallet == null) {
+                BiobankPlugin
+                    .openAsyncError(
+                        Messages
+                            .getString("DispatchCreateScanDialog.pallet.search.error.title"), //$NON-NLS-1$
+                        Messages.getString(
+                            "DispatchCreateScanDialog.pallet.search.error.msg", //$NON-NLS-1$
+                            currentProductBarcode));
+                return null;
+            }
         }
         // server side call
         return SessionManager.getAppService().processScanResult(serverCells,
-            new DispatchProcessData(currentPallet, currentShipment, true),
-            isRescanMode(), SessionManager.getUser());
+            getProcessData(), isRescanMode(), SessionManager.getUser());
     }
 
     @Override
@@ -185,10 +197,12 @@ public class DispatchCreateScanDialog extends
 
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
-        ContainerWrapper currentPallet = ContainerWrapper
-            .getContainerWithProductBarcodeInSite(
-                SessionManager.getAppService(), (SiteWrapper) currentSite,
-                currentProductBarcode);
+        ContainerWrapper currentPallet = null;
+        if (isPalletWithPosition)
+            currentPallet = ContainerWrapper
+                .getContainerWithProductBarcodeInSite(
+                    SessionManager.getAppService(), (SiteWrapper) currentSite,
+                    currentProductBarcode);
         Map<RowColPos, PalletCell> map = new HashMap<RowColPos, PalletCell>();
         if (currentPallet == null) {
             Map<RowColPos, PalletCell> cells = PalletCell
@@ -213,13 +227,9 @@ public class DispatchCreateScanDialog extends
     }
 
     @Override
-    protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-        // processCellStatus(cell);
-        if (cell.getStatus() == UICellStatus.ERROR) {
-            Button okButton = getButton(IDialogConstants.PROCEED_ID);
-            okButton.setEnabled(false);
-        }
-        super.postprocessScanTubeAlone(cell);
+    protected ProcessData getProcessData() {
+        return new DispatchProcessData(currentPallet, currentShipment, true,
+            false);
     }
 
     public void setCurrentProductBarcode(String currentProductBarcode) {

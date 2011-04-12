@@ -10,19 +10,19 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.peer.DispatchPeer;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
+import edu.ualberta.med.biobank.widgets.DispatchSpecimensTreeTable;
 
 public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm";
-    private DispatchAliquotsTreeTable aliquotsTree;
+    private DispatchSpecimensTreeTable specimensTree;
 
     @Override
     protected void createFormContent() throws Exception {
@@ -32,22 +32,27 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createMainSection();
-        boolean editAliquots = !dispatch.isInClosedState()
+        boolean editSpecimens = !dispatch.isInClosedState()
             && !dispatch.isInLostState();
 
         setFirstControl(form);
 
-        if (editAliquots)
-            createAliquotsSelectionActions(page, true);
-        aliquotsTree = new DispatchAliquotsTreeTable(page, dispatch,
-            editAliquots, true);
-        aliquotsTree.addSelectionChangedListener(biobankListener);
+        if (editSpecimens)
+            createSpecimensSelectionActions(page, true);
+        specimensTree = new DispatchSpecimensTreeTable(page, dispatch,
+            editSpecimens, true);
+        specimensTree.addSelectionChangedListener(biobankListener);
 
     }
 
     @Override
-    protected void doAliquotTextAction(String text) {
-        receiveAliquot(text);
+    protected void doSpecimenTextAction(String text) {
+        try {
+            receiveSpecimen(text);
+        } catch (Exception e) {
+            BiobankPlugin.openAsyncError("Error",
+                "Error receiving the specimen", e);
+        }
     }
 
     @Override
@@ -56,10 +61,10 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             dispatch, dispatch.getReceiverCenter());
         dialog.open();
-        if (dialog.hasReceivedAliquots()) {
+        if (dialog.hasReceivedSpecimens()) {
             setDirty(true);
         }
-        aliquotsTree.refresh();
+        specimensTree.refresh();
     }
 
     private void createMainSection() {
@@ -93,7 +98,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             .getFormattedDateReceived());
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, dispatch, "comment", null);
+            "Comments", null, dispatch, DispatchPeer.COMMENT.getName(), null);
 
     }
 
@@ -111,6 +116,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         OK, NOT_IN_SHIPMENT, NOT_IN_DB, DUPLICATE, RECEIVED, EXTRA;
     }
 
+    // FIXME remove when doesnt use anymore
     public static class AliquotInfo {
         public SpecimenWrapper aliquot;
         public ResType type;
@@ -121,70 +127,50 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         }
     }
 
-    public static AliquotInfo getInfoForInventoryId(
-        ModelWrapper<?> currentShipment, String inventoryId) {
-        DispatchSpecimenWrapper dsa = ((DispatchWrapper) currentShipment)
-            .getDispatchSpecimen(inventoryId);
-        if (dsa == null) {
-            // aliquot not in shipment. Check if exists in DB:
-            SpecimenWrapper aliquot = null;
-            try {
-                aliquot = SpecimenWrapper.getSpecimen(
-                    currentShipment.getAppService(), inventoryId,
-                    SessionManager.getUser());
-            } catch (Exception ae) {
-                BiobankPlugin.openAsyncError("Error retrieving aliquot", ae);
-            }
-            if (aliquot == null) {
-                return new AliquotInfo(null, ResType.NOT_IN_DB);
-            }
-            return new AliquotInfo(aliquot, ResType.NOT_IN_SHIPMENT);
+    protected void receiveSpecimen(String inventoryId) throws Exception {
+        CellProcessResult res = appService.processCellStatus(new Cell(-1, -1,
+            inventoryId, null), new DispatchProcessData(null, dispatch, false,
+            false), SessionManager.getUser());
+        SpecimenWrapper specimen = null;
+        if (res.getCell().getSpecimenId() != null) {
+            specimen = new SpecimenWrapper(appService);
+            specimen.getWrappedObject().setId(res.getCell().getSpecimenId());
+            specimen.reload();
         }
-        if (DispatchSpecimenState.RECEIVED.equals(dsa
-            .getDispatchSpecimenState())) {
-            return new AliquotInfo(dsa.getSpecimen(), ResType.RECEIVED);
-        }
-        if (DispatchSpecimenState.EXTRA.isEquals(dsa.getState())) {
-            return new AliquotInfo(dsa.getSpecimen(), ResType.EXTRA);
-        }
-        return new AliquotInfo(dsa.getSpecimen(), ResType.OK);
-    }
-
-    protected void receiveAliquot(String inventoryId) {
-        AliquotInfo info = getInfoForInventoryId(dispatch, inventoryId);
-        switch (info.type) {
-        case OK:
-            dispatch.receiveSpecimens(Arrays.asList(info.aliquot));
-            aliquotsTree.refresh();
+        switch (res.getCell().getStatus()) {
+        case IN_SHIPMENT_EXPECTED:
+            dispatch.receiveSpecimens(Arrays.asList(specimen));
+            specimensTree.refresh();
             setDirty(true);
             break;
-        case RECEIVED:
-            BiobankPlugin.openInformation("Aliquot already accepted",
-                "Aliquot with inventory id " + inventoryId
+        case IN_SHIPMENT_RECEIVED:
+            BiobankPlugin.openInformation("Specimen already accepted",
+                "Specimen with inventory id " + inventoryId
                     + " is already in received list.");
             break;
-        case NOT_IN_SHIPMENT:
-            BiobankPlugin.openInformation("Aliquot not found",
+        case EXTRA:
+            BiobankPlugin.openInformation("Specimen not found",
                 "Aliquot with inventory id " + inventoryId
                     + " has not been found in this dispatch."
                     + " It will be moved into the extra-pending list.");
-            dispatch.addExtraAliquots(Arrays.asList(info.aliquot));
-            aliquotsTree.refresh();
+            dispatch.addExtraAliquots(Arrays.asList(specimen));
+            specimensTree.refresh();
             setDirty(true);
             break;
-        case NOT_IN_DB:
-            BiobankPlugin.openError("Aliquot not found",
-                "This aliquot does not exist in the database.");
-            break;
-        case DUPLICATE:
-            BiobankPlugin.openError("Duplicate aliquot !",
-                "This aliquot exists more that once in the database !");
-            break;
-        case EXTRA:
-            BiobankPlugin.openInformation("Aliquot already extra",
-                "Aliquot with inventory id " + inventoryId
-                    + " is already in extra list.");
-            break;
+        // FIXME
+        // case NOT_IN_DB:
+        // BiobankPlugin.openError("Aliquot not found",
+        // "This aliquot does not exist in the database.");
+        // break;
+        // case DUPLICATE:
+        // BiobankPlugin.openError("Duplicate aliquot !",
+        // "This aliquot exists more that once in the database !");
+        // break;
+        // case EXTRA:
+        // BiobankPlugin.openInformation("Aliquot already extra",
+        // "Aliquot with inventory id " + inventoryId
+        // + " is already in extra list.");
+        // break;
         }
     }
 
@@ -192,16 +178,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     public void reset() throws Exception {
         super.reset();
         dispatch.reset();
-        aliquotsTree.refresh();
-    }
-
-    @Override
-    public void formClosed() {
-        try {
-            dispatch.reload();
-        } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error", "Unable to reload dispatch");
-        }
+        specimensTree.refresh();
     }
 
     @Override
@@ -210,8 +187,8 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     }
 
     @Override
-    protected void reloadAliquots() {
-        aliquotsTree.refresh();
+    protected void reloadSpecimens() {
+        specimensTree.refresh();
     }
 
 }

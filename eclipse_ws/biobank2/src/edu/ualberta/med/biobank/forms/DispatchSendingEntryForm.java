@@ -23,24 +23,23 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper.CheckStatus;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
+import edu.ualberta.med.biobank.widgets.DispatchSpecimensTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
-
-    // private static BiobankLogger logger = BiobankLogger
-    // .getLogger(DispatchSendingEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchSendingEntryForm";
 
@@ -52,7 +51,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     protected DispatchAliquotListInfoTable aliquotsNonProcessedTable;
 
-    private DispatchAliquotsTreeTable aliquotsTreeTable;
+    private DispatchSpecimensTreeTable specimensTreeTable;
 
     @Override
     public void createPartControl(Composite parent) {
@@ -117,7 +116,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             BeansObservables.observeValue(dispatch,
                 DispatchPeer.COMMENT.getName()), null);
 
-        createAliquotsSelectionSection();
+        createSpecimensSelectionSection();
 
     }
 
@@ -151,15 +150,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         }
     }
 
-    @Override
-    public void formClosed() throws Exception {
-        // FIXME why formClosed is overridden ? reload is already done in
-        // default
-        // method
-        reset();
-    }
-
-    private void createAliquotsSelectionSection() {
+    private void createSpecimensSelectionSection() {
         if (dispatch.isInCreationState()) {
             Section section = createSection("Add Specimens");
             Composite composite = toolkit.createComposite(section);
@@ -174,13 +165,13 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                         }
                     }, null, BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT);
 
-                createAliquotsSelectionActions(composite, false);
+                createSpecimensSelectionActions(composite, false);
                 createAliquotsNonProcessedSection(true);
             }
         } else {
-            aliquotsTreeTable = new DispatchAliquotsTreeTable(page, dispatch,
+            specimensTreeTable = new DispatchSpecimensTreeTable(page, dispatch,
                 !dispatch.isInClosedState() && !dispatch.isInLostState(), true);
-            aliquotsTreeTable.addSelectionChangedListener(biobankListener);
+            specimensTreeTable.addSelectionChangedListener(biobankListener);
         }
     }
 
@@ -223,48 +214,41 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             dispatch, SessionManager.getUser().getCurrentWorkingCenter());
         dialog.open();
         setDirty(true); // FIXME need to do this better !
-        reloadAliquots();
+        reloadSpecimens();
     }
 
     @Override
-    protected void doAliquotTextAction(String text) {
-        addAliquot(text);
-    }
-
-    protected void addAliquot(String inventoryId) {
-        if (!inventoryId.isEmpty()) {
-            SpecimenWrapper existingAliquot;
-            try {
-                existingAliquot = SpecimenWrapper.getSpecimen(
-                    dispatch.getAppService(), inventoryId,
-                    SessionManager.getUser());
-                CheckStatus status = dispatch.checkCanAddSpecimen(
-                    existingAliquot, true);
-                if (status.ok)
-                    addAliquot(existingAliquot);
-                else
-                    BiobankPlugin.openAsyncError("Error", status.message);
-            } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Error",
-                    "Unable to retrieve specimen info");
-            }
-        }
-    }
-
-    private void addAliquot(SpecimenWrapper aliquot) {
-        List<SpecimenWrapper> aliquots = dispatch.getSpecimenCollection(false);
-        if (aliquots != null && aliquots.contains(aliquot)) {
-            BiobankPlugin.openAsyncError("Error",
-                "Aliquot " + aliquot.getInventoryId()
-                    + " has already been added to this dispatch");
-            return;
-        }
+    protected void doSpecimenTextAction(String text) {
         try {
-            dispatch.addSpecimens(Arrays.asList(aliquot));
+            addSpecimen(text);
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error adding aliquots", e);
+            BiobankPlugin.openAsyncError("Error", "Error adding the specimen",
+                e);
         }
-        reloadAliquots();
+    }
+
+    protected void addSpecimen(String inventoryId) throws Exception {
+        CellProcessResult res = appService.processCellStatus(new Cell(-1, -1,
+            inventoryId, null), new DispatchProcessData(null, dispatch, true,
+            true), SessionManager.getUser());
+        String msg = null;
+        switch (res.getProcessStatus()) {
+        case FILLED:
+            // ok
+            SpecimenWrapper specimen = new SpecimenWrapper(appService);
+            specimen.getWrappedObject().setId(res.getCell().getSpecimenId());
+            specimen.reload();
+            dispatch.addSpecimens(Arrays.asList(specimen));
+            reloadSpecimens();
+            break;
+        // case IN_SHIPMENT_ADDED:
+        // // already added
+        // msg = "Specimen " + inventoryId + " is alre"
+        case ERROR:
+            BiobankPlugin.openAsyncError("Invalid specimen", res.getCell()
+                .getInformation());
+            break;
+        }
     }
 
     @Override
@@ -294,18 +278,18 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             else
                 destSiteComboViewer.getCombo().deselectAll();
         }
-        reloadAliquots();
+        reloadSpecimens();
     }
 
     @Override
-    protected void reloadAliquots() {
+    protected void reloadSpecimens() {
         if (aliquotsNonProcessedTable != null) {
             aliquotsNonProcessedTable.reloadCollection();
             page.layout(true, true);
             book.reflow(true);
         }
-        if (aliquotsTreeTable != null) {
-            aliquotsTreeTable.refresh();
+        if (specimensTreeTable != null) {
+            specimensTreeTable.refresh();
         }
     }
 

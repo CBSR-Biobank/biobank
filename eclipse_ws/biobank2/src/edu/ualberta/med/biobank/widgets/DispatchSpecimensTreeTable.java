@@ -42,13 +42,13 @@ import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 
-public class DispatchAliquotsTreeTable extends BiobankWidget {
+public class DispatchSpecimensTreeTable extends BiobankWidget {
 
     private TreeViewer tv;
     private DispatchWrapper shipment;
     protected List<DispatchTableGroup> groups;
 
-    public DispatchAliquotsTreeTable(Composite parent,
+    public DispatchSpecimensTreeTable(Composite parent,
         final DispatchWrapper shipment, final boolean editAliquotsState,
         final boolean editAliquotsComment) {
         super(parent, SWT.NONE);
@@ -96,7 +96,7 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
                 groups = DispatchTableGroup
-                    .getGroupsForShipment(DispatchAliquotsTreeTable.this.shipment);
+                    .getGroupsForShipment(DispatchSpecimensTreeTable.this.shipment);
             }
 
             @Override

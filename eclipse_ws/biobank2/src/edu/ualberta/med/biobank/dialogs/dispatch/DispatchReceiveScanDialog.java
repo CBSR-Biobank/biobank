@@ -13,8 +13,9 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.scanprocess.DispatchProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.ScanProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -62,30 +63,14 @@ public class DispatchReceiveScanDialog extends
         CenterWrapper<?> site) throws Exception {
         // server side call
         ScanProcessResult res = SessionManager.getAppService()
-            .processScanResult(serverCells,
-                new DispatchProcessData(null, currentShipment, false),
-                isRescanMode(), SessionManager.getUser());
-        // if (res.getProcessStatus() == CellStatus.EXTRA) {
-        // Display.getDefault().asyncExec(new Runnable() {
-        // @Override
-        // public void run() {
-        // BiobankPlugin.openInformation(
-        // Messages
-        //                            .getString("DispatchReceiveScanDialog.notInDispatch.error.title"), //$NON-NLS-1$
-        // Messages
-        //                            .getString("DispatchReceiveScanDialog.notInDispatch.error.msg")); //$NON-NLS-1$
-        // try {
-        // (currentShipment).addExtraAliquots(extraAliquots);
-        // } catch (Exception e) {
-        // BiobankPlugin.openAsyncError(
-        // Messages
-        //                                .getString("DispatchReceiveScanDialog.flagging.error.title"), //$NON-NLS-1$
-        // e);
-        // }
-        // }
-        // });
-        // }
+            .processScanResult(serverCells, getProcessData(), isRescanMode(),
+                SessionManager.getUser());
         return res;
+    }
+
+    @Override
+    protected ProcessData getProcessData() {
+        return new DispatchProcessData(null, currentShipment, false, false);
     }
 
     @Override
@@ -159,7 +144,7 @@ public class DispatchReceiveScanDialog extends
         return palletScanned;
     }
 
-    public boolean hasReceivedAliquots() {
+    public boolean hasReceivedSpecimens() {
         return aliquotsReceived;
     }
 

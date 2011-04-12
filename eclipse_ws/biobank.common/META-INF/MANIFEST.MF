@@ -61,6 +61,8 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.common.reports,
  edu.ualberta.med.biobank.common.reports.filters,
  edu.ualberta.med.biobank.common.scanprocess,
+ edu.ualberta.med.biobank.common.scanprocess.data,
+ edu.ualberta.med.biobank.common.scanprocess.result,
  edu.ualberta.med.biobank.common.security;uses:="gov.nih.nci.system.applicationservice",
  edu.ualberta.med.biobank.common.util,
  edu.ualberta.med.biobank.common.wrappers;

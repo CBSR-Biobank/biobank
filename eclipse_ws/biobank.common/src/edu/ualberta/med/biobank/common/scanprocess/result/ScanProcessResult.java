@@ -1,8 +1,10 @@
-package edu.ualberta.med.biobank.common.scanprocess;
+package edu.ualberta.med.biobank.common.scanprocess.result;
 
 import java.io.Serializable;
 import java.util.Map;
 
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 
 public class ScanProcessResult extends ProcessResult implements Serializable {

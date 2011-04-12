@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
+import edu.ualberta.med.biobank.widgets.DispatchSpecimensTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
@@ -66,7 +66,7 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private BiobankText commentLabel;
 
-    private DispatchAliquotsTreeTable aliquotsTree;
+    private DispatchSpecimensTreeTable aliquotsTree;
 
     private DispatchAliquotListInfoTable aliquotsNonProcessedTable;
 
@@ -194,7 +194,7 @@ public class DispatchViewForm extends BiobankViewForm {
                     }
                 });
         } else {
-            aliquotsTree = new DispatchAliquotsTreeTable(page, dispatch, false,
+            aliquotsTree = new DispatchSpecimensTreeTable(page, dispatch, false,
                 false);
         }
     }
