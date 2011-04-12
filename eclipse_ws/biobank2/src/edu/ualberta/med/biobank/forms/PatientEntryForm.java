@@ -29,7 +29,7 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
-public class PatientEntryForm extends BiobankEntryForm {
+public class PatientEntryForm extends BiobankEntryForm<PatientWrapper> {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(PatientEntryForm.class.getName());
@@ -44,8 +44,6 @@ public class PatientEntryForm extends BiobankEntryForm {
     public static final String MSG_PATIENT_OK = Messages
         .getString("PatientEntryForm.edition.msg");
 
-    private PatientWrapper patient;
-
     private ComboViewer studiesViewer;
 
     private Label createdAtLabel;
@@ -59,26 +57,18 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     public void init() throws Exception {
+        super.init();
         Assert.isTrue((adapter instanceof PatientAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        if (adapter.getModelObject().isNew())
-            patient = (PatientWrapper) adapter.getModelObject();
-        else
-            try {
-                patient = (PatientWrapper) adapter.getModelObjectClone();
-            } catch (Exception e1) {
-                logger.error("Error getting patient clone", e1);
-            }
-        retrievePatient();
-        SessionManager.logEdit(patient);
+        SessionManager.logEdit(modelObject);
         String tabName;
-        if (patient.isNew()) {
+        if (modelObject.isNew()) {
             tabName = Messages.getString("PatientEntryForm.new.title");
         } else {
             tabName = Messages.getString("PatientEntryForm.edit.title",
-                patient.getPnumber());
+                modelObject.getPnumber());
         }
         setPartName(tabName);
     }
@@ -91,7 +81,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         createPatientSection();
 
-        if (patient.isNew()) {
+        if (modelObject.isNew()) {
             setDirty(true);
         }
     }
@@ -107,12 +97,12 @@ public class PatientEntryForm extends BiobankEntryForm {
         List<StudyWrapper> studies = new ArrayList<StudyWrapper>(
             StudyWrapper.getAllStudies(appService));
         StudyWrapper selectedStudy = null;
-        if (patient.isNew()) {
+        if (modelObject.isNew()) {
             if (studies.size() == 1) {
                 selectedStudy = studies.get(0);
             }
         } else {
-            selectedStudy = patient.getStudy();
+            selectedStudy = modelObject.getStudy();
         }
 
         studiesViewer = createComboViewer(client,
@@ -122,14 +112,15 @@ public class PatientEntryForm extends BiobankEntryForm {
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    patient.setStudy((StudyWrapper) selectedObject);
+                    modelObject.setStudy((StudyWrapper) selectedObject);
                 }
             });
         setFirstControl(studiesViewer.getControl());
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             Messages.getString("PatientEntryForm.field.pNumber.label"), null,
-            patient, PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
+            modelObject, PatientPeer.PNUMBER.getName(),
+            pnumberNonEmptyValidator);
 
         createdAtLabel = widgetCreator.createLabel(client, "Created At");
         createdAtLabel.setLayoutData(new GridData(
@@ -137,13 +128,13 @@ public class PatientEntryForm extends BiobankEntryForm {
         createdAtValidator = new NotNullValidator("Created At should be set");
 
         createdAtWidget = createDateTimeWidget(client, createdAtLabel,
-            patient.getCreatedAt(), patient, "createdAt", createdAtValidator,
-            SWT.DATE | SWT.TIME, CREATED_AT_BINDING);
+            modelObject.getCreatedAt(), modelObject, "createdAt",
+            createdAtValidator, SWT.DATE | SWT.TIME, CREATED_AT_BINDING);
     }
 
     @Override
     protected String getOkMessage() {
-        if (patient.isNew()) {
+        if (modelObject.isNew()) {
             return MSG_NEW_PATIENT_OK;
         }
         return MSG_PATIENT_OK;
@@ -151,13 +142,13 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        patient.persist();
+        modelObject.persist();
         // to update patient view:
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
                 CollectionView.reloadCurrent();
-                CollectionView.showPatient(patient);
+                CollectionView.showPatient(modelObject);
             }
         });
     }
@@ -167,27 +158,17 @@ public class PatientEntryForm extends BiobankEntryForm {
         return PatientViewForm.ID;
     }
 
-    private void retrievePatient() {
-        try {
-            patient.reload();
-        } catch (Exception e) {
-            logger
-                .error(
-                    Messages.getString("PatientEntryForm.retrieve.error.msg",
-                        patient.getPnumber()), e);
-        }
-    }
-
     @Override
     public void reset() throws Exception {
-        super.reset();
-        StudyWrapper study = patient.getStudy();
+        createdAtWidget.setDate(new Date());
+        studiesViewer.setSelection(null);
+        pnumberNonEmptyValidator.validate(null);
+
+        modelObject.reset();
+        StudyWrapper study = modelObject.getStudy();
         if (study != null) {
             studiesViewer.setSelection(new StructuredSelection(study));
         }
-        createdAtWidget.setDate(new Date());
-        studiesViewer.setSelection(null);
-        patient.reset();
-        pnumberNonEmptyValidator.validate(null);
+        setDirty(false);
     }
 }

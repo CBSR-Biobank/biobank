@@ -26,17 +26,17 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Dispatch sent on " + dispatch.getFormattedPackedAt()
-            + " from " + dispatch.getSenderCenter().getNameShort());
+        form.setText("Dispatch sent on " + modelObject.getFormattedPackedAt()
+            + " from " + modelObject.getSenderCenter().getNameShort());
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createMainSection();
-        boolean editAliquots = !dispatch.isInClosedState()
-            && !dispatch.isInLostState();
+        boolean editAliquots = !modelObject.isInClosedState()
+            && !modelObject.isInLostState();
         if (editAliquots)
             createAliquotsSelectionActions(page, true);
-        aliquotsTree = new DispatchAliquotsTreeTable(page, dispatch,
+        aliquotsTree = new DispatchAliquotsTreeTable(page, modelObject,
             editAliquots, true);
         aliquotsTree.addSelectionChangedListener(biobankListener);
 
@@ -51,7 +51,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     protected void openScanDialog() {
         DispatchReceiveScanDialog dialog = new DispatchReceiveScanDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            dispatch, dispatch.getReceiverCenter());
+            modelObject, modelObject.getReceiverCenter());
         dialog.open();
         if (dialog.hasReceivedAliquots()) {
             setDirty(true);
@@ -69,28 +69,28 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
         BiobankText senderLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Sender");
-        setTextValue(senderLabel, dispatch.getSenderCenter().getName());
+        setTextValue(senderLabel, modelObject.getSenderCenter().getName());
         BiobankText receiverLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Receiver");
-        setTextValue(receiverLabel, dispatch.getReceiverCenter().getName());
+        setTextValue(receiverLabel, modelObject.getReceiverCenter().getName());
         BiobankText departedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Departed");
-        setTextValue(departedLabel, dispatch.getFormattedPackedAt());
+        setTextValue(departedLabel, modelObject.getFormattedPackedAt());
         BiobankText shippingMethodLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Shipping Method");
-        setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
-            .getShippingMethod() == null ? "" : dispatch.getShipmentInfo()
+        setTextValue(shippingMethodLabel, modelObject.getShipmentInfo()
+            .getShippingMethod() == null ? "" : modelObject.getShipmentInfo()
             .getShippingMethod().getName());
         BiobankText waybillLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Waybill");
-        setTextValue(waybillLabel, dispatch.getShipmentInfo().getWaybill());
+        setTextValue(waybillLabel, modelObject.getShipmentInfo().getWaybill());
         BiobankText dateReceivedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Date received");
-        setTextValue(dateReceivedLabel, dispatch.getShipmentInfo()
+        setTextValue(dateReceivedLabel, modelObject.getShipmentInfo()
             .getFormattedDateReceived());
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, dispatch, "comment", null);
+            "Comments", null, modelObject, "comment", null);
 
     }
 
@@ -148,10 +148,10 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     }
 
     protected void receiveAliquot(String inventoryId) {
-        AliquotInfo info = getInfoForInventoryId(dispatch, inventoryId);
+        AliquotInfo info = getInfoForInventoryId(modelObject, inventoryId);
         switch (info.type) {
         case OK:
-            dispatch.receiveSpecimens(Arrays.asList(info.aliquot));
+            modelObject.receiveSpecimens(Arrays.asList(info.aliquot));
             aliquotsTree.refresh();
             setDirty(true);
             break;
@@ -165,7 +165,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                 "Aliquot with inventory id " + inventoryId
                     + " has not been found in this dispatch."
                     + " It will be moved into the extra-pending list.");
-            dispatch.addExtraAliquots(Arrays.asList(info.aliquot));
+            modelObject.addExtraAliquots(Arrays.asList(info.aliquot));
             aliquotsTree.refresh();
             setDirty(true);
             break;
@@ -187,23 +187,14 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
     @Override
     public void reset() throws Exception {
-        super.reset();
-        dispatch.reset();
+        modelObject.reset();
         aliquotsTree.refresh();
-    }
-
-    @Override
-    public void formClosed() {
-        try {
-            dispatch.reload();
-        } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error", "Unable to reload dispatch");
-        }
+        setDirty(false);
     }
 
     @Override
     protected String getTextForPartName() {
-        return "Dispatch sent on " + dispatch.getPackedAt();
+        return "Dispatch sent on " + modelObject.getPackedAt();
     }
 
     @Override

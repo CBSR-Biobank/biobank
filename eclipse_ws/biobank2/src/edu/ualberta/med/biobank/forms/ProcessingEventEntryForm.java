@@ -34,7 +34,8 @@ import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListen
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ProcessingEventEntryForm extends BiobankEntryForm {
+public class ProcessingEventEntryForm extends
+    BiobankEntryForm<ProcessingEventWrapper> {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ProcessingEventEntryForm"; //$NON-NLS-1$
 
@@ -47,7 +48,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         .getString("ProcessingEventEntryForm.edition.msg"); //$NON-NLS-1$
 
     private ProcessingEventAdapter pEventAdapter;
-    private ProcessingEventWrapper pEvent;
 
     private ComboViewer activityStatusComboViewer;
 
@@ -57,45 +57,29 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void init() throws Exception {
+        super.init();
         Assert.isTrue(adapter instanceof ProcessingEventAdapter,
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         pEventAdapter = (ProcessingEventAdapter) adapter;
-        if (pEventAdapter.getWrapper().isNew())
-            pEvent = pEventAdapter.getWrapper();
-        else
-            pEvent = (ProcessingEventWrapper) pEventAdapter.getWrapper()
-                .getDatabaseClone();
-        retrieve();
         String tabName;
-        if (pEvent.isNew()) {
+        if (modelObject.isNew()) {
             tabName = Messages.getString("ProcessingEventEntryForm.title.new"); //$NON-NLS-1$
-            pEvent.setActivityStatus(ActivityStatusWrapper
+            modelObject.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else {
-            if (pEvent.getWorksheet() == null)
+            if (modelObject.getWorksheet() == null)
                 tabName = Messages.getString(
                     "ProcessingEventEntryForm.title.edit.worksheet", //$NON-NLS-1$
-                    pEvent.getWorksheet(), pEvent.getFormattedCreatedAt());
+                    modelObject.getWorksheet(),
+                    modelObject.getFormattedCreatedAt());
             else
                 tabName = Messages.getString(
                     "ProcessingEventEntryForm.title.edit.noworksheet", //$NON-NLS-1$
-                    pEvent.getFormattedCreatedAt());
+                    modelObject.getFormattedCreatedAt());
         }
         setPartName(tabName);
-    }
-
-    private void retrieve() {
-        try {
-            if (!pEvent.isNew()) {
-                pEvent.reload();
-            }
-        } catch (Exception e) {
-            logger.error("Error while retrieving processing event " //$NON-NLS-1$
-                + pEvent.getFormattedCreatedAt() + " (Worksheet " //$NON-NLS-1$
-                + pEvent.getWorksheet() + ")", e); //$NON-NLS-1$
-        }
     }
 
     @Override
@@ -115,15 +99,17 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("ProcessingEvent.field.center.label"), pEvent //$NON-NLS-1$
+        createReadOnlyLabelledField(
+            client,
+            SWT.NONE,
+            Messages.getString("ProcessingEvent.field.center.label"), modelObject //$NON-NLS-1$
                 .getCenter().getName());
 
         dateWidget = createDateTimeWidget(
             client,
             Messages.getString("ProcessingEvent.field.date.label"), //$NON-NLS-1$
-            pEvent.getCreatedAt(),
-            pEvent,
+            modelObject.getCreatedAt(),
+            modelObject,
             ProcessingEventPeer.CREATED_AT.getName(),
             new NotNullValidator(
                 Messages
@@ -133,31 +119,31 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             Messages.getString("ProcessingEvent.field.worksheet.label"), null, //$NON-NLS-1$
-            pEvent, ProcessingEventPeer.WORKSHEET.getName(),
-            (!pEvent.isNew() && pEvent.getWorksheet() == null) ? null
+            modelObject, ProcessingEventPeer.WORKSHEET.getName(),
+            (!modelObject.isNew() && modelObject.getWorksheet() == null) ? null
                 : new NonEmptyStringValidator("Worksheet cannot be null"));
 
         activityStatusComboViewer = createComboViewer(
             client,
             Messages.getString("label.activity"), //$NON-NLS-1$
             ActivityStatusWrapper.getAllActivityStatuses(appService),
-            pEvent.getActivityStatus(),
+            modelObject.getActivityStatus(),
             Messages
                 .getString("ProcessingEventEntryForm.field.activity.validation.msg"), //$NON-NLS-1$
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     setDirty(true);
-                    pEvent
+                    modelObject
                         .setActivityStatus((ActivityStatusWrapper) selectedObject);
                 }
             });
-        if (pEvent.getActivityStatus() != null)
+        if (modelObject.getActivityStatus() != null)
             activityStatusComboViewer.setSelection(new StructuredSelection(
-                pEvent.getActivityStatus()));
+                modelObject.getActivityStatus()));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            Messages.getString("label.comments"), null, pEvent, //$NON-NLS-1$
+            Messages.getString("label.comments"), null, modelObject, //$NON-NLS-1$
             ProcessingEventPeer.COMMENT.getName(), null);
     }
 
@@ -171,7 +157,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
         toolkit.paintBordersFor(client);
 
-        List<SpecimenWrapper> specimens = pEvent.getSpecimenCollection(true);
+        List<SpecimenWrapper> specimens = modelObject
+            .getSpecimenCollection(true);
 
         specimenEntryWidget = new SpecimenEntryWidget(client, SWT.NONE,
             toolkit, appService, true);
@@ -213,14 +200,15 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                             "Specimen is currently listed as stored in a container.");
                     break;
                 case POST_ADD:
-                    specimen.setProcessingEvent(pEvent);
-                    pEvent.addToSpecimenCollection(Arrays.asList(specimen));
+                    specimen.setProcessingEvent(modelObject);
+                    modelObject
+                        .addToSpecimenCollection(Arrays.asList(specimen));
                     break;
                 case PRE_DELETE:
                     break;
                 case POST_DELETE:
-                    pEvent
-                        .removeFromSpecimenCollection(Arrays.asList(specimen));
+                    modelObject.removeFromSpecimenCollection(Arrays
+                        .asList(specimen));
                     break;
                 }
             }
@@ -238,13 +226,13 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        pEvent.persist();
+        modelObject.persist();
         SessionManager.updateAllSimilarNodes(pEventAdapter, true);
     }
 
     @Override
     protected String getOkMessage() {
-        return (pEvent.isNew()) ? MSG_NEW_PEVENT_OK : MSG_PEVENT_OK;
+        return (modelObject.isNew()) ? MSG_NEW_PEVENT_OK : MSG_PEVENT_OK;
     }
 
     @Override
@@ -254,11 +242,13 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     @Override
     public void reset() throws Exception {
-        super.reset();
-        if (pEvent.getActivityStatus() != null) {
+        modelObject.reset();
+        if (modelObject.getActivityStatus() != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
-                pEvent.getActivityStatus()));
+                modelObject.getActivityStatus()));
         }
-        specimenEntryWidget.setSpecimens(pEvent.getSpecimenCollection(true));
+        specimenEntryWidget.setSpecimens(modelObject
+            .getSpecimenCollection(true));
+        setDirty(false);
     }
 }

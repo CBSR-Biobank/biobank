@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class SiteEntryForm extends AddressEntryFormCommon {
+public class SiteEntryForm extends AddressEntryFormCommon<SiteWrapper> {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteEntryForm"; //$NON-NLS-1$
 
@@ -35,9 +35,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     private static final String MSG_SITE_OK = Messages
         .getString("SiteEntryForm.edition.msg"); //$NON-NLS-1$
 
-    private SiteAdapter siteAdapter;
-
-    private SiteWrapper site;
+    private SiteWrapper modelObject;
 
     protected Combo session;
 
@@ -58,20 +56,14 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        siteAdapter = (SiteAdapter) adapter;
-        if (siteAdapter.getWrapper().isNew())
-            site = siteAdapter.getWrapper();
-        else
-            site = (SiteWrapper) siteAdapter.getWrapper().getDatabaseClone();
-
         String tabName;
-        if (site.isNew()) {
+        if (modelObject.isNew()) {
             tabName = Messages.getString("SiteEntryForm.title.new"); //$NON-NLS-1$
-            site.setActivityStatus(ActivityStatusWrapper
+            modelObject.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else {
             tabName = Messages.getString("SiteEntryForm.title.edit", //$NON-NLS-1$
-                site.getNameShort());
+                modelObject.getNameShort());
         }
         setPartName(tabName);
     }
@@ -81,7 +73,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         form.setText(Messages.getString("SiteEntryForm.main.title")); //$NON-NLS-1$
         page.setLayout(new GridLayout(1, false));
         createSiteSection();
-        createAddressArea(site);
+        createAddressArea(modelObject);
         createStudySection();
 
         // When adding help uncomment line below
@@ -100,10 +92,16 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, Messages.getString("label.name"), //$NON-NLS-1$
-            null, site, SitePeer.NAME.getName(), new NonEmptyStringValidator(
-                Messages.getString("SiteEntryForm.field.name.validation.msg")))); //$NON-NLS-1$
+        setFirstControl(createBoundWidgetWithLabel(
+            client,
+            BiobankText.class,
+            SWT.NONE,
+            Messages.getString("label.name"), //$NON-NLS-1$
+            null,
+            modelObject,
+            SitePeer.NAME.getName(),
+            new NonEmptyStringValidator(Messages
+                .getString("SiteEntryForm.field.name.validation.msg")))); //$NON-NLS-1$
 
         createBoundWidgetWithLabel(
             client,
@@ -111,7 +109,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             SWT.NONE,
             Messages.getString("label.nameShort"), //$NON-NLS-1$
             null,
-            site,
+            modelObject,
             SitePeer.NAME_SHORT.getName(),
             new NonEmptyStringValidator(Messages
                 .getString("SiteEntryForm.field.nameShort.validation.msg"))); //$NON-NLS-1$
@@ -120,17 +118,18 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             client,
             Messages.getString("label.activity"), //$NON-NLS-1$
             ActivityStatusWrapper.getAllActivityStatuses(appService),
-            site.getActivityStatus(),
+            modelObject.getActivityStatus(),
             Messages.getString("SiteEntryForm.field.activity.validation.msg"), //$NON-NLS-1$
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    site.setActivityStatus((ActivityStatusWrapper) selectedObject);
+                    modelObject
+                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
                 }
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            Messages.getString("label.comments"), null, site, //$NON-NLS-1$
+            Messages.getString("label.comments"), null, modelObject, //$NON-NLS-1$
             SitePeer.COMMENT.getName(), null);
     }
 
@@ -145,7 +144,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                     studiesTable.createStudyDlg();
                 }
             }, ContactWrapper.class);
-        studiesTable = new StudyAddInfoTable(section, site);
+        studiesTable = new StudyAddInfoTable(section, modelObject);
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addClickListener(collectionDoubleClickListener);
         studiesTable.addSelectionChangedListener(listener);
@@ -154,7 +153,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected String getOkMessage() {
-        if (site.getId() == null) {
+        if (modelObject.getId() == null) {
             return MSG_NEW_SITE_OK;
         }
         return MSG_SITE_OK;
@@ -162,7 +161,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void saveForm() throws Exception {
-        site.persist();
+        modelObject.persist();
     }
 
     @Override
@@ -172,7 +171,9 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     public void reset() throws Exception {
-        ActivityStatusWrapper currentActivityStatus = site.getActivityStatus();
+        super.reset();
+        ActivityStatusWrapper currentActivityStatus = modelObject
+            .getActivityStatus();
         if (currentActivityStatus != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
                 currentActivityStatus));
@@ -180,6 +181,5 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             activityStatusComboViewer.getCombo().deselectAll();
         }
         studiesTable.reload();
-        super.reset();
     }
 }

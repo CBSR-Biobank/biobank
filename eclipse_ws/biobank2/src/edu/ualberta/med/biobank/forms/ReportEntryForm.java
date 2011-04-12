@@ -69,7 +69,7 @@ import edu.ualberta.med.biobank.widgets.report.ColumnSelectWidget;
 import edu.ualberta.med.biobank.widgets.report.FilterChangeEvent;
 import edu.ualberta.med.biobank.widgets.report.FilterSelectWidget;
 
-public class ReportEntryForm extends BiobankEntryForm {
+public class ReportEntryForm extends BiobankEntryForm<ReportWrapper> {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ReportEntryForm.class.getName());
@@ -146,9 +146,9 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     @Override
     protected void init() throws Exception {
+        super.init();
         reportAdapter = (ReportAdapter) adapter;
-        report = reportAdapter.getWrapper();
-        report.reload();
+        report = modelObject;
 
         updatePartName();
     }

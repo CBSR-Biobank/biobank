@@ -53,6 +53,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
@@ -70,7 +71,8 @@ import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
  * database is possible.
  * 
  */
-public abstract class BiobankEntryForm extends BiobankFormBase {
+public abstract class BiobankEntryForm<E extends ModelWrapper<?>> extends
+    BiobankFormBase {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(BiobankEntryForm.class.getName());
@@ -78,6 +80,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected String sessionName;
 
     private boolean dirty = false;
+
+    protected E modelObject = null;
 
     protected IStatus currentStatus;
 
@@ -255,13 +259,36 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
         super.init(editorSite, input);
+
         setDirty(false);
         checkEditAccess();
     }
 
+    @Override
+    protected void init() throws Exception {
+        initModelObject();
+    }
+
+    private void initModelObject() throws PartInitException {
+        @SuppressWarnings("unchecked")
+        E modelObject = (E) adapter.getModelObject();
+
+        if (!modelObject.isNew()) {
+            try {
+                @SuppressWarnings("unchecked")
+                E modelObjectClone = (E) adapter.getModelObjectClone();
+                modelObject = modelObjectClone;
+            } catch (Exception e) {
+                throw new PartInitException(e.getMessage());
+            }
+        }
+
+        this.modelObject = modelObject;
+    }
+
     protected void checkEditAccess() {
-        if (adapter != null && adapter.getModelObject() != null
-            && !adapter.getModelObject().canUpdate(SessionManager.getUser())) {
+        if (modelObject != null
+            && !modelObject.canUpdate(SessionManager.getUser())) {
             BiobankPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException("Cannot edit. Access Denied.");
         }
@@ -538,7 +565,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     public void reset() throws Exception {
-        adapter.resetObject();
+        modelObject.reset();
         setDirty(false);
     }
 

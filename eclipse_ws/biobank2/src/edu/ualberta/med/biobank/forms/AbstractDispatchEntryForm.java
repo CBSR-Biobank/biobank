@@ -22,12 +22,11 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
-public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
+public abstract class AbstractDispatchEntryForm extends
+    BiobankEntryForm<DispatchWrapper> {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(AbstractDispatchEntryForm.class.getName());
-
-    protected DispatchWrapper dispatch;
 
     protected BiobankEntryFormWidgetListener biobankListener = new BiobankEntryFormWidgetListener() {
         @Override
@@ -39,13 +38,13 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     @Override
     protected void init() throws Exception {
+        super.init();
         Assert.isNotNull(adapter, "Adapter should be no null");
         Assert.isTrue((adapter instanceof DispatchAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        dispatch = (DispatchWrapper) adapter.getModelObject();
-        SessionManager.logEdit(dispatch);
+        SessionManager.logEdit(modelObject);
         retrieveShipment();
 
         setPartName(getTextForPartName());
@@ -53,10 +52,10 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     private void retrieveShipment() {
         try {
-            dispatch.reload();
+            modelObject.reload();
         } catch (Exception ex) {
             logger.error("Error while retrieving shipment "
-                + dispatch.getShipmentInfo().getWaybill(), ex);
+                + modelObject.getShipmentInfo().getWaybill(), ex);
         }
     }
 
@@ -113,7 +112,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        dispatch.persist();
+        modelObject.persist();
 
         Display.getDefault().asyncExec(new Runnable() {
             @Override

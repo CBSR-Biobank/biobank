@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
-public class ContainerEntryForm extends BiobankEntryForm {
+public class ContainerEntryForm extends BiobankEntryForm<ContainerWrapper> {
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerEntryForm";
 
     public static final String MSG_STORAGE_CONTAINER_NEW_OK = "Creating a new storage container.";
@@ -39,8 +39,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
     public static final String MSG_INVALID_POSITION = "Position is empty or not a valid number";
 
     private ContainerAdapter containerAdapter;
-
-    private ContainerWrapper container;
 
     private BiobankText tempWidget;
 
@@ -56,26 +54,26 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     @Override
     public void init() throws Exception {
+        super.init();
         Assert.isTrue((adapter instanceof ContainerAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         containerAdapter = (ContainerAdapter) adapter;
-        container = containerAdapter.getContainer();
 
         String tabName;
-        if (container.isNew()) {
+        if (modelObject.isNew()) {
             tabName = "Container";
-            container.setActivityStatus(ActivityStatusWrapper
+            modelObject.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
-            if (container.hasParentContainer()) {
-                container.setLabel(container.getParentContainer().getLabel()
-                    + container.getPositionString());
-                container.setTemperature(container.getParentContainer()
+            if (modelObject.hasParentContainer()) {
+                modelObject.setLabel(modelObject.getParentContainer()
+                    .getLabel() + modelObject.getPositionString());
+                modelObject.setTemperature(modelObject.getParentContainer()
                     .getTemperature());
             }
         } else {
-            tabName = "Container " + container.getLabel();
-            oldContainerLabel = container.getLabel();
+            tabName = "Container " + modelObject.getLabel();
+            oldContainerLabel = modelObject.getLabel();
         }
         setPartName(tabName);
     }
@@ -97,36 +95,35 @@ public class ContainerEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        if (!container.hasParentContainer()) {
+        if (!modelObject.hasParentContainer()) {
             containerTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
-                appService, container.getSite());
+                appService, modelObject.getSite());
         } else {
-            containerTypes = container.getParentContainer().getContainerType()
-                .getChildContainerTypeCollection();
+            containerTypes = modelObject.getParentContainer()
+                .getContainerType().getChildContainerTypeCollection();
         }
-        if (container.isNew())
-            adapter
-                .setParent(((SiteAdapter) SessionManager
-                    .searchFirstNode(container.getSite()))
-                    .getContainersGroupNode());
+        if (modelObject.isNew())
+            adapter.setParent(((SiteAdapter) SessionManager
+                .searchFirstNode(modelObject.getSite()))
+                .getContainersGroupNode());
 
         setFirstControl(client);
 
-        if ((container.isNew() && container.getParentContainer() == null)
-            || (container.getContainerType() != null && Boolean.TRUE
-                .equals(container.getContainerType().getTopLevel()))) {
+        if ((modelObject.isNew() && modelObject.getParentContainer() == null)
+            || (modelObject.getContainerType() != null && Boolean.TRUE
+                .equals(modelObject.getContainerType().getTopLevel()))) {
             // only allow edit to label on top level containers
             setFirstControl(createBoundWidgetWithLabel(client,
-                BiobankText.class, SWT.NONE, "Label", null, container, "label",
-                new NonEmptyStringValidator(MSG_CONTAINER_NAME_EMPTY)));
+                BiobankText.class, SWT.NONE, "Label", null, modelObject,
+                "label", new NonEmptyStringValidator(MSG_CONTAINER_NAME_EMPTY)));
         } else {
             BiobankText l = createReadOnlyLabelledField(client, SWT.NONE,
                 "Label");
-            setTextValue(l, container.getLabel());
+            setTextValue(l, modelObject.getLabel());
         }
 
         Control c = createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Product Barcode", null, container, "productBarcode",
+            SWT.NONE, "Product Barcode", null, modelObject, "productBarcode",
             null);
         if (getFirstControl() == null)
             setFirstControl(c);
@@ -134,18 +131,18 @@ public class ContainerEntryForm extends BiobankEntryForm {
         activityStatusComboViewer = createComboViewer(client,
             "Activity Status",
             ActivityStatusWrapper.getAllActivityStatuses(appService),
-            container.getActivityStatus(),
+            modelObject.getActivityStatus(),
             "Container must have an activity status",
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    container
+                    modelObject
                         .setActivityStatus((ActivityStatusWrapper) selectedObject);
                 }
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, container, "comment", null);
+            "Comments", null, modelObject, "comment", null);
 
         createContainerTypesSection(client);
 
@@ -153,19 +150,19 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private void createContainerTypesSection(Composite client) throws Exception {
         List<ContainerTypeWrapper> containerTypes;
-        ContainerTypeWrapper currentType = container.getContainerType();
-        if (!container.hasParentContainer()) {
-            SiteWrapper currentSite = container.getSite();
+        ContainerTypeWrapper currentType = modelObject.getContainerType();
+        if (!modelObject.hasParentContainer()) {
+            SiteWrapper currentSite = modelObject.getSite();
             if (currentSite == null)
                 containerTypes = new ArrayList<ContainerTypeWrapper>();
             else
                 containerTypes = ContainerTypeWrapper
                     .getTopContainerTypesInSite(appService, currentSite);
         } else {
-            containerTypes = container.getParentContainer().getContainerType()
-                .getChildContainerTypeCollection();
+            containerTypes = modelObject.getParentContainer()
+                .getContainerType().getChildContainerTypeCollection();
         }
-        if (container.isNew() && containerTypes.size() == 1)
+        if (modelObject.isNew() && containerTypes.size() == 1)
             currentType = containerTypes.get(0);
 
         containerTypeComboViewer = createComboViewer(client, "Container Type",
@@ -174,7 +171,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 @Override
                 public void doSelection(Object selectedObject) {
                     ContainerTypeWrapper ct = (ContainerTypeWrapper) selectedObject;
-                    container.setContainerType(ct);
+                    modelObject.setContainerType(ct);
                     if (tempWidget != null) {
                         tempWidget.setText("");
                         if (ct != null && Boolean.TRUE.equals(ct.getTopLevel())) {
@@ -190,12 +187,12 @@ public class ContainerEntryForm extends BiobankEntryForm {
             });
         tempWidget = (BiobankText) createBoundWidgetWithLabel(client,
             BiobankText.class, SWT.NONE, "Temperature (Celcius)", null,
-            container, "temperature", new DoubleNumberValidator(
+            modelObject, "temperature", new DoubleNumberValidator(
                 "Default temperature is not a valid number"));
-        if (container.hasParentContainer())
+        if (modelObject.hasParentContainer())
             tempWidget.setEnabled(false);
 
-        if (container.hasChildren() || container.hasSpecimens()) {
+        if (modelObject.hasChildren() || modelObject.hasSpecimens()) {
             containerTypeComboViewer.getCombo().setEnabled(false);
         }
     }
@@ -211,7 +208,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        if (container.isNew()) {
+        if (modelObject.isNew()) {
             return MSG_STORAGE_CONTAINER_NEW_OK;
         }
         return MSG_STORAGE_CONTAINER_OK;
@@ -220,8 +217,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     protected void doBeforeSave() throws Exception {
         doSave = true;
-        if (container.hasChildren() && oldContainerLabel != null
-            && !oldContainerLabel.equals(container.getLabel())) {
+        if (modelObject.hasChildren() && oldContainerLabel != null
+            && !oldContainerLabel.equals(modelObject.getLabel())) {
             doSave = BiobankPlugin
                 .openConfirm(
                     "Renaming container",
@@ -232,7 +229,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         if (doSave) {
-            container.persist();
+            modelObject.persist();
             SessionManager.updateAllSimilarNodes(containerAdapter, true);
         } else {
             setDirty(true);
@@ -246,13 +243,14 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     @Override
     public void reset() throws Exception {
-        super.reset();
-        ActivityStatusWrapper activity = container.getActivityStatus();
+        modelObject.reset();
+        ActivityStatusWrapper activity = modelObject.getActivityStatus();
         if (activity != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
                 activity));
         } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
             activityStatusComboViewer.getCombo().deselectAll();
         }
+        setDirty(false);
     }
 }

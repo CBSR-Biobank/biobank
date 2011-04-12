@@ -16,7 +16,8 @@ import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.PostalCodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
-public abstract class AddressEntryFormCommon extends BiobankEntryForm {
+public abstract class AddressEntryFormCommon<E extends ModelWrapper<?>> extends
+    BiobankEntryForm<E> {
 
     /*
      * Want to preserve insert order so using ListOrderedMap.

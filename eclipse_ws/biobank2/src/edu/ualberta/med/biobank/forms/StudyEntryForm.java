@@ -38,7 +38,7 @@ import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
-public class StudyEntryForm extends BiobankEntryForm {
+public class StudyEntryForm extends BiobankEntryForm<StudyWrapper> {
     public static final String ID = "edu.ualberta.med.biobank.forms.StudyEntryForm"; //$NON-NLS-1$
 
     private static final String MSG_NEW_STUDY_OK = Messages
@@ -51,8 +51,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         .getString("study.visit.info.dateProcessed"); //$NON-NLS-1$
 
     private StudyAdapter studyAdapter;
-
-    private StudyWrapper study;
 
     private ClinicAddInfoTable contactEntryTable;
 
@@ -83,24 +81,20 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     public void init() throws Exception {
+        super.init();
         Assert.isTrue((adapter instanceof StudyAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         studyAdapter = (StudyAdapter) adapter;
-        if (studyAdapter.getWrapper().isNew())
-            study = studyAdapter.getWrapper();
-        else
-            study = (StudyWrapper) studyAdapter.getWrapper().getDatabaseClone();
-
         String tabName;
-        if (study.isNew()) {
+        if (modelObject.isNew()) {
             tabName = Messages.getString("StudyEntryForm.title.new"); //$NON-NLS-1$
-            study.setActivityStatus(ActivityStatusWrapper
+            modelObject.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else {
             tabName = Messages.getString("StudyEntryForm.title.edit", //$NON-NLS-1$
-                study.getNameShort());
+                modelObject.getNameShort());
         }
         setPartName(tabName);
     }
@@ -121,13 +115,13 @@ public class StudyEntryForm extends BiobankEntryForm {
         setFirstControl(createBoundWidgetWithLabel(client,
             BiobankText.class,
             SWT.NONE,
-            Messages.getString("label.name"), null, study, //$NON-NLS-1$
+            Messages.getString("label.name"), null, modelObject, //$NON-NLS-1$
             StudyPeer.NAME.getName(),
             new NonEmptyStringValidator(Messages
                 .getString("StudyEntryForm.name.validator.msg")))); //$NON-NLS-1$
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            Messages.getString("label.nameShort"), null, study, //$NON-NLS-1$
+            Messages.getString("label.nameShort"), null, modelObject, //$NON-NLS-1$
             StudyPeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 Messages.getString("StudyEntryForm.nameShort.validator.msg"))); //$NON-NLS-1$
 
@@ -135,18 +129,18 @@ public class StudyEntryForm extends BiobankEntryForm {
             client,
             Messages.getString("label.activity"), //$NON-NLS-1$
             ActivityStatusWrapper.getAllActivityStatuses(appService),
-            study.getActivityStatus(),
+            modelObject.getActivityStatus(),
             Messages.getString("StudyEntryForm.activity.validator.msg"), //$NON-NLS-1$
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    study
+                    modelObject
                         .setActivityStatus((ActivityStatusWrapper) selectedObject);
                 }
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            Messages.getString("label.comments"), null, study, //$NON-NLS-1$
+            Messages.getString("label.comments"), null, modelObject, //$NON-NLS-1$
             StudyPeer.COMMENT.getName(), null);
 
         createClinicSection();
@@ -159,7 +153,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     private void createClinicSection() {
         Section section = createSection(Messages
             .getString("StudyEntryForm.contacts.title")); //$NON-NLS-1$
-        contactEntryTable = new ClinicAddInfoTable(section, study);
+        contactEntryTable = new ClinicAddInfoTable(section, modelObject);
         contactEntryTable.adaptToToolkit(toolkit, true);
         contactEntryTable.addSelectionChangedListener(listener);
 
@@ -178,7 +172,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         Section section = createSection(Messages
             .getString("StudyEntryForm.aliquoted.specimens.title")); //$NON-NLS-1$
         aliquotedSpecimenEntryTable = new AliquotedSpecimenEntryInfoTable(
-            section, study);
+            section, modelObject);
         aliquotedSpecimenEntryTable.adaptToToolkit(toolkit, true);
         aliquotedSpecimenEntryTable.addSelectionChangedListener(listener);
 
@@ -198,7 +192,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         Section section = createSection(Messages
             .getString("StudyEntryForm.source.specimens.title")); //$NON-NLS-1$
         sourceSpecimenEntryTable = new SourceSpecimenEntryInfoTable(section,
-            study);
+            modelObject);
         sourceSpecimenEntryTable.adaptToToolkit(toolkit, true);
         sourceSpecimenEntryTable.addSelectionChangedListener(listener);
 
@@ -240,7 +234,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         //
         // END KLUDGE
 
-        List<String> studyEventInfoLabels = Arrays.asList(study
+        List<String> studyEventInfoLabels = Arrays.asList(modelObject
             .getStudyEventAttrLabels());
 
         for (GlobalEventAttrWrapper pvAttr : GlobalEventAttrWrapper
@@ -251,7 +245,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             studyPvAttrCustom.setLabel(label);
             studyPvAttrCustom.setType(pvAttr.getTypeName());
             if (studyEventInfoLabels.contains(label)) {
-                studyPvAttrCustom.setAllowedValues(study
+                studyPvAttrCustom.setAllowedValues(modelObject
                     .getStudyEventAttrPermissible(label));
                 selected = true;
             }
@@ -275,7 +269,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        if (study.getId() == null) {
+        if (modelObject.getId() == null) {
             return MSG_NEW_STUDY_OK;
         }
         return MSG_STUDY_OK;
@@ -288,17 +282,19 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        study.addToSourceSpecimenCollection(sourceSpecimenEntryTable
+        modelObject.addToSourceSpecimenCollection(sourceSpecimenEntryTable
             .getAddedOrModifiedSourceSpecimens());
-        study.removeFromSourceSpecimenCollection(sourceSpecimenEntryTable
+        modelObject.removeFromSourceSpecimenCollection(sourceSpecimenEntryTable
             .getDeletedSourceSpecimens());
 
         // sample storage
-        study.addToAliquotedSpecimenCollection(aliquotedSpecimenEntryTable
-            .getAddedOrModifiedAliquotedSpecimens());
-        study.removeFromAliquotedSpecimenCollection(aliquotedSpecimenEntryTable
-            .getDeletedAliquotedSpecimens());
-        study.persist();
+        modelObject
+            .addToAliquotedSpecimenCollection(aliquotedSpecimenEntryTable
+                .getAddedOrModifiedAliquotedSpecimens());
+        modelObject
+            .removeFromAliquotedSpecimenCollection(aliquotedSpecimenEntryTable
+                .getDeletedAliquotedSpecimens());
+        modelObject.persist();
 
         SessionManager.updateAllSimilarNodes(studyAdapter, true);
     }
@@ -313,7 +309,8 @@ public class StudyEntryForm extends BiobankEntryForm {
             if (!studyPvAttrCustom.widget.getSelected()
                 && studyPvAttrCustom.inStudy) {
                 try {
-                    study.deleteStudyEventAttr(studyPvAttrCustom.getLabel());
+                    modelObject.deleteStudyEventAttr(studyPvAttrCustom
+                        .getLabel());
                 } catch (BiobankCheckException e) {
                     throw new UserUIException(
                         "Cannot delete " //$NON-NLS-1$
@@ -327,14 +324,16 @@ public class StudyEntryForm extends BiobankEntryForm {
                 if (studyPvAttrCustom.getType().equals("select_single") //$NON-NLS-1$
                     || studyPvAttrCustom.getType().equals("select_multiple")) { //$NON-NLS-1$
                     if (value.length() > 0) {
-                        study.setStudyEventAttr(studyPvAttrCustom.getLabel(),
+                        modelObject.setStudyEventAttr(
+                            studyPvAttrCustom.getLabel(),
                             studyPvAttrCustom.getType(), value.split(";")); //$NON-NLS-1$
                     } else if (value.length() == 0) {
-                        study.setStudyEventAttr(studyPvAttrCustom.getLabel(),
+                        modelObject.setStudyEventAttr(
+                            studyPvAttrCustom.getLabel(),
                             studyPvAttrCustom.getType(), null);
                     }
                 } else {
-                    study.setStudyEventAttr(studyPvAttrCustom.getLabel(),
+                    modelObject.setStudyEventAttr(studyPvAttrCustom.getLabel(),
                         studyPvAttrCustom.getType());
                 }
             }
@@ -348,8 +347,10 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     public void reset() throws Exception {
-        super.reset();
-        ActivityStatusWrapper currentActivityStatus = study.getActivityStatus();
+        modelObject.reset();
+
+        ActivityStatusWrapper currentActivityStatus = modelObject
+            .getActivityStatus();
         if (currentActivityStatus != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
                 currentActivityStatus));
@@ -363,17 +364,18 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         resetPvCustomInfo();
 
+        setDirty(false);
     }
 
     private void resetPvCustomInfo() throws Exception {
-        List<String> studyPvInfoLabels = Arrays.asList(study
+        List<String> studyPvInfoLabels = Arrays.asList(modelObject
             .getStudyEventAttrLabels());
 
         for (StudyPvAttrCustom studyPvAttrCustom : pvCustomInfoList) {
             boolean selected = false;
             String label = studyPvAttrCustom.getLabel();
             if (studyPvInfoLabels.contains(studyPvAttrCustom.getLabel())) {
-                studyPvAttrCustom.setAllowedValues(study
+                studyPvAttrCustom.setAllowedValues(modelObject
                     .getStudyEventAttrPermissible(label));
                 selected = true;
                 studyPvAttrCustom.inStudy = true;

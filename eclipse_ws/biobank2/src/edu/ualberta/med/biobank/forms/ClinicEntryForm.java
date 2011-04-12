@@ -28,7 +28,7 @@ import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ClinicEntryForm extends AddressEntryFormCommon {
+public class ClinicEntryForm extends AddressEntryFormCommon<ClinicWrapper> {
     public static final String ID = "edu.ualberta.med.biobank.forms.ClinicEntryForm"; //$NON-NLS-1$
 
     private static final String MSG_NEW_CLINIC_OK = Messages
@@ -41,8 +41,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         .getString("ClinicEntryForm.msg.noClinicName"); //$NON-NLS-1$
 
     private ClinicAdapter clinicAdapter;
-
-    private ClinicWrapper clinic;
 
     private ContactEntryInfoTable contactEntryWidget;
 
@@ -59,29 +57,24 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void init() throws Exception {
+        super.init();
         Assert.isTrue((adapter instanceof ClinicAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
         clinicAdapter = (ClinicAdapter) adapter;
-        if (clinicAdapter.getWrapper().isNew())
-            clinic = clinicAdapter.getWrapper();
-        else
-            clinic = (ClinicWrapper) clinicAdapter.getWrapper()
-                .getDatabaseClone();
-        clinic.reload();
 
         String tabName;
-        if (clinic.getId() == null)
+        if (modelObject.getId() == null)
             tabName = Messages.getString("ClinicEntryForm.title.new"); //$NON-NLS-1$
         else
             tabName = Messages.getString("ClinicEntryForm.title.edit", //$NON-NLS-1$
-                clinic.getNameShort());
+                modelObject.getNameShort());
         setPartName(tabName);
     }
 
     @Override
     protected String getOkMessage() {
-        if (clinic.getId() == null) {
+        if (modelObject.getId() == null) {
             return MSG_NEW_CLINIC_OK;
         }
         return MSG_CLINIC_OK;
@@ -94,7 +87,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         toolkit.createLabel(page,
             Messages.getString("ClinicEntryForm.main.description"), SWT.LEFT); //$NON-NLS-1$
         createClinicInfoSection();
-        createAddressArea(clinic);
+        createAddressArea(modelObject);
         createContactSection();
         createButtonsSection();
 
@@ -109,36 +102,36 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, Messages.getString("label.name"), null, clinic, //$NON-NLS-1$
+            SWT.NONE, Messages.getString("label.name"), null, modelObject, //$NON-NLS-1$
             ClinicPeer.NAME.getName(), new NonEmptyStringValidator(
                 MSG_NO_CLINIC_NAME)));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            Messages.getString("label.nameShort"), null, clinic, //$NON-NLS-1$
+            Messages.getString("label.nameShort"), null, modelObject, //$NON-NLS-1$
             ClinicPeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 MSG_NO_CLINIC_NAME));
 
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
             Messages.getString("clinic.field.label.sendsShipments"), null, //$NON-NLS-1$
-            clinic, ClinicPeer.SENDS_SHIPMENTS.getName(), null);
+            modelObject, ClinicPeer.SENDS_SHIPMENTS.getName(), null);
         toolkit.paintBordersFor(client);
 
         activityStatusComboViewer = createComboViewer(
             client,
             Messages.getString("label.activity"), //$NON-NLS-1$
             ActivityStatusWrapper.getAllActivityStatuses(appService),
-            clinic.getActivityStatus(),
+            modelObject.getActivityStatus(),
             Messages.getString("ClinicEntryForm.activity.validator.msg"), //$NON-NLS-1$
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    clinic
+                    modelObject
                         .setActivityStatus((ActivityStatusWrapper) selectedObject);
                 }
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            Messages.getString("label.comments"), null, clinic, //$NON-NLS-1$
+            Messages.getString("label.comments"), null, modelObject, //$NON-NLS-1$
             ClinicPeer.COMMENT.getName(), null);
     }
 
@@ -146,7 +139,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         Section section = createSection(Messages
             .getString("clinic.contact.title")); //$NON-NLS-1$
 
-        contactEntryWidget = new ContactEntryInfoTable(section, clinic);
+        contactEntryWidget = new ContactEntryInfoTable(section, modelObject);
         contactEntryWidget.adaptToToolkit(toolkit, true);
         contactEntryWidget.addSelectionChangedListener(listener);
 
@@ -172,11 +165,11 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     @Override
     public void saveForm() throws Exception {
-        clinic.addToContactCollection(contactEntryWidget
+        modelObject.addToContactCollection(contactEntryWidget
             .getAddedOrModifedContacts());
-        clinic.removeFromContactCollection(contactEntryWidget
+        modelObject.removeFromContactCollection(contactEntryWidget
             .getDeletedContacts());
-        clinic.persist();
+        modelObject.persist();
         SessionManager.updateAllSimilarNodes(clinicAdapter, true);
     }
 
@@ -188,7 +181,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     @Override
     public void reset() throws Exception {
         super.reset();
-        ActivityStatusWrapper currentActivityStatus = clinic
+        ActivityStatusWrapper currentActivityStatus = modelObject
             .getActivityStatus();
         if (currentActivityStatus != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
