@@ -38,10 +38,8 @@ public class AssignProcess extends ServerProcess {
         // FIXME need to remember movedAndMissingSpecimensFromPallet when rescan
         // ?
         Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet = new HashMap<RowColPos, Boolean>();
-        for (int row = 0; row < assignData.getPallet(appService)
-            .getRowCapacity(); row++) {
-            for (int col = 0; col < assignData.getPallet(appService)
-                .getColCapacity(); col++) {
+        for (int row = 0; row < assignData.getPalletRowCapacity(appService); row++) {
+            for (int col = 0; col < assignData.getPalletColCapacity(appService); col++) {
                 RowColPos rcp = new RowColPos(row, col);
                 Cell cell = cells.get(rcp);
                 if (!rescanMode || cell == null || cell.getStatus() == null
@@ -49,7 +47,7 @@ public class AssignProcess extends ServerProcess {
                     || cell.getStatus() == CellStatus.ERROR
                     || cell.getStatus() == CellStatus.MISSING) {
                     SpecimenWrapper expectedSpecimen = assignData
-                        .getPallet(appService).getSpecimens().get(rcp);
+                        .getExpectedSpecimen(appService, row, col);
                     if (expectedSpecimen != null) {
                         if (cell == null) {
                             cell = new Cell(rcp.row, rcp.col, null, null);
@@ -97,7 +95,7 @@ public class AssignProcess extends ServerProcess {
 
         String value = scanCell.getValue();
         String positionString = ((AssignProcessData) data)
-            .getPallet(appService).getLabel()
+            .getPalletLabel(appService)
             + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(scanCell
                 .getRow(), scanCell.getCol()));
         if (value == null) { // no specimen scanned
@@ -127,7 +125,7 @@ public class AssignProcess extends ServerProcess {
                     scanCell.setSpecimenId(expectedSpecimen.getId());
                 } else {
                     ContainerTypeWrapper cType = ((AssignProcessData) data)
-                        .getPallet(appService).getContainerType();
+                        .getContainerType(appService);
                     if (cType.getSpecimenTypeCollection().contains(
                         foundSpecimen.getSpecimenType())) {
                         if (foundSpecimen.hasParent()) { // moved

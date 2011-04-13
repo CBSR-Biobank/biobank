@@ -43,29 +43,6 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         specimensTree = new DispatchSpecimensTreeTable(page, dispatch,
             editSpecimens, true);
         specimensTree.addSelectionChangedListener(biobankListener);
-
-    }
-
-    @Override
-    protected void doSpecimenTextAction(String text) {
-        try {
-            receiveSpecimen(text);
-        } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error",
-                "Error receiving the specimen", e);
-        }
-    }
-
-    @Override
-    protected void openScanDialog() {
-        DispatchReceiveScanDialog dialog = new DispatchReceiveScanDialog(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            dispatch, dispatch.getReceiverCenter());
-        dialog.open();
-        if (dialog.hasReceivedSpecimens()) {
-            setDirty(true);
-        }
-        specimensTree.refresh();
     }
 
     private void createMainSection() {
@@ -104,6 +81,73 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     }
 
     @Override
+    protected void openScanDialog() {
+        DispatchReceiveScanDialog dialog = new DispatchReceiveScanDialog(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+            dispatch, dispatch.getReceiverCenter());
+        dialog.open();
+        if (dialog.hasReceivedSpecimens()) {
+            setDirty(true);
+        }
+        reloadSpecimens();
+    }
+
+    @Override
+    protected void doSpecimenTextAction(String inventoryId) {
+        try {
+            CellProcessResult res = appService.processCellStatus(new Cell(-1,
+                -1, inventoryId, null), new DispatchProcessData(null, dispatch,
+                false, false), SessionManager.getUser());
+            SpecimenWrapper specimen = null;
+            if (res.getCell().getSpecimenId() != null) {
+                specimen = new SpecimenWrapper(appService);
+                specimen.getWrappedObject()
+                    .setId(res.getCell().getSpecimenId());
+                specimen.reload();
+            }
+            switch (res.getCell().getStatus()) {
+            case IN_SHIPMENT_EXPECTED:
+                dispatch.receiveSpecimens(Arrays.asList(specimen));
+                reloadSpecimens();
+                setDirty(true);
+                break;
+            case IN_SHIPMENT_RECEIVED:
+                BiobankPlugin.openInformation("Specimen already accepted",
+                    "Specimen with inventory id " + inventoryId
+                        + " is already in received list.");
+                break;
+            case EXTRA:
+                BiobankPlugin.openInformation("Specimen not found",
+                    "Specimen with inventory id " + inventoryId
+                        + " has not been found in this dispatch."
+                        + " It will be moved into the extra-pending list.");
+                dispatch.addSpecimens(Arrays.asList(specimen),
+                    DispatchSpecimenState.EXTRA);
+                reloadSpecimens();
+                setDirty(true);
+                break;
+            // FIXME
+            // case NOT_IN_DB:
+            // BiobankPlugin.openError("Specimen not found",
+            // "This specimen does not exist in the database.");
+            // break;
+            // case DUPLICATE:
+            // BiobankPlugin.openError("Duplicate specimen !",
+            // "This specimen exists more that once in the database !");
+            // break;
+            // case EXTRA:
+            // BiobankPlugin.openInformation("Specimen already extra",
+            // "Specimen with inventory id " + inventoryId
+            // + " is already in extra list.");
+            // break;
+            }
+        } catch (Exception e) {
+            BiobankPlugin.openAsyncError("Error",
+                "Error receiving the specimen", e);
+        }
+    }
+
+    @Override
     protected String getOkMessage() {
         return "Receiving dispatch";
     }
@@ -113,6 +157,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         return DispatchViewForm.ID;
     }
 
+    // FIXME remove when doesnt use anymore
     public enum ResType {
         OK, NOT_IN_SHIPMENT, NOT_IN_DB, DUPLICATE, RECEIVED, EXTRA;
     }
@@ -126,61 +171,6 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             this.specimen = specimen;
             this.type = type;
         }
-    }
-
-    protected void receiveSpecimen(String inventoryId) throws Exception {
-        CellProcessResult res = appService.processCellStatus(new Cell(-1, -1,
-            inventoryId, null), new DispatchProcessData(null, dispatch, false,
-            false), SessionManager.getUser());
-        SpecimenWrapper specimen = null;
-        if (res.getCell().getSpecimenId() != null) {
-            specimen = new SpecimenWrapper(appService);
-            specimen.getWrappedObject().setId(res.getCell().getSpecimenId());
-            specimen.reload();
-        }
-        switch (res.getCell().getStatus()) {
-        case IN_SHIPMENT_EXPECTED:
-            dispatch.receiveSpecimens(Arrays.asList(specimen));
-            specimensTree.refresh();
-            setDirty(true);
-            break;
-        case IN_SHIPMENT_RECEIVED:
-            BiobankPlugin.openInformation("Specimen already accepted",
-                "Specimen with inventory id " + inventoryId
-                    + " is already in received list.");
-            break;
-        case EXTRA:
-            BiobankPlugin.openInformation("Specimen not found",
-                "Specimen with inventory id " + inventoryId
-                    + " has not been found in this dispatch."
-                    + " It will be moved into the extra-pending list.");
-            dispatch.addSpecimens(Arrays.asList(specimen),
-                DispatchSpecimenState.EXTRA);
-            specimensTree.refresh();
-            setDirty(true);
-            break;
-        // FIXME
-        // case NOT_IN_DB:
-        // BiobankPlugin.openError("Specimen not found",
-        // "This specimen does not exist in the database.");
-        // break;
-        // case DUPLICATE:
-        // BiobankPlugin.openError("Duplicate specimen !",
-        // "This specimen exists more that once in the database !");
-        // break;
-        // case EXTRA:
-        // BiobankPlugin.openInformation("Specimen already extra",
-        // "Specimen with inventory id " + inventoryId
-        // + " is already in extra list.");
-        // break;
-        }
-    }
-
-    @Override
-    public void reset() throws Exception {
-        super.reset();
-        dispatch.reset();
-        specimensTree.refresh();
     }
 
     @Override

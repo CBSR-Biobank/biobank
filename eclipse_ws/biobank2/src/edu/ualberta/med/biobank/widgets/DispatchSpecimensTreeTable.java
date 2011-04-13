@@ -219,9 +219,14 @@ public class DispatchSpecimensTreeTable extends BiobankWidget {
     private void modifyCommentAndState(
         IStructuredSelection iStructuredSelection,
         DispatchSpecimenState newState) {
+        String previousComment = null;
+        if (iStructuredSelection.size() == 1) {
+            previousComment = ((DispatchSpecimenWrapper) ((TreeItemAdapter) iStructuredSelection
+                .getFirstElement()).getSpecimen()).getComment();
+        }
         ModifyStateDispatchDialog dialog = new ModifyStateDispatchDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            newState);
+            previousComment, newState);
         int res = dialog.open();
         if (res == Dialog.OK) {
             String comment = dialog.getComment();

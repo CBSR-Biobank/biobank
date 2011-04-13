@@ -60,33 +60,41 @@ public class DispatchCreateScanDialog extends
      */
     @Override
     protected void createCustomDialogPreContents(final Composite parent) {
-        Button palletWithoutPositionRadio = new Button(parent, SWT.RADIO);
-        palletWithoutPositionRadio.setText(Messages
-            .getString("DispatchCreateScanDialog.without.position.radio.text")); //$NON-NLS-1$
-        final Button palletWithPositionRadio = new Button(parent, SWT.RADIO);
-        palletWithPositionRadio.setText(Messages
-            .getString("DispatchCreateScanDialog.with.position.radio.text")); //$NON-NLS-1$
+        // only sites have containers
+        if (SessionManager.getUser().getCurrentWorkingCenter() instanceof SiteWrapper) {
+            Button palletWithoutPositionRadio = new Button(parent, SWT.RADIO);
+            palletWithoutPositionRadio
+                .setText(Messages
+                    .getString("DispatchCreateScanDialog.without.position.radio.text")); //$NON-NLS-1$
+            final Button palletWithPositionRadio = new Button(parent, SWT.RADIO);
+            palletWithPositionRadio
+                .setText(Messages
+                    .getString("DispatchCreateScanDialog.with.position.radio.text")); //$NON-NLS-1$
 
-        palletWithPositionRadio.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                isPalletWithPosition = palletWithPositionRadio.getSelection();
-                showProductBarcodeField(palletWithPositionRadio.getSelection());
-            }
-        });
+            palletWithPositionRadio
+                .addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        isPalletWithPosition = palletWithPositionRadio
+                            .getSelection();
+                        showProductBarcodeField(palletWithPositionRadio
+                            .getSelection());
+                    }
+                });
 
-        productBarcodeValidator = new NonEmptyStringValidator(
-            Messages.getString("ScanAssign.productBarcode.validationMsg"));//$NON-NLS-1$
-        Label palletproductBarcodeLabel = widgetCreator.createLabel(parent,
-            Messages.getString("ScanAssign.productBarcode.label"));//$NON-NLS-1$
-        palletproductBarcodeText = (BiobankText) createBoundWidget(parent,
-            BiobankText.class, SWT.NONE, palletproductBarcodeLabel,
-            new String[0], this,
-            "currentProductBarcode", productBarcodeValidator); //$NON-NLS-1$
-        palletproductBarcodeText
-            .addKeyListener(new EnterKeyToNextFieldListener());
-        showProductBarcodeField(false);
-        palletWithoutPositionRadio.setSelection(true);
+            productBarcodeValidator = new NonEmptyStringValidator(
+                Messages.getString("ScanAssign.productBarcode.validationMsg"));//$NON-NLS-1$
+            Label palletproductBarcodeLabel = widgetCreator.createLabel(parent,
+                Messages.getString("ScanAssign.productBarcode.label"));//$NON-NLS-1$
+            palletproductBarcodeText = (BiobankText) createBoundWidget(parent,
+                BiobankText.class, SWT.NONE, palletproductBarcodeLabel,
+                new String[0], this,
+                "currentProductBarcode", productBarcodeValidator); //$NON-NLS-1$
+            palletproductBarcodeText
+                .addKeyListener(new EnterKeyToNextFieldListener());
+            showProductBarcodeField(false);
+            palletWithoutPositionRadio.setSelection(true);
+        }
     }
 
     private void showProductBarcodeField(boolean show) {
@@ -106,8 +114,9 @@ public class DispatchCreateScanDialog extends
     @Override
     protected boolean fieldsValid() {
         return super.fieldsValid()
-            && productBarcodeValidator.validate(
-                palletproductBarcodeText.getText()).equals(Status.OK_STATUS);
+            && (productBarcodeValidator == null || productBarcodeValidator
+                .validate(palletproductBarcodeText.getText()).equals(
+                    Status.OK_STATUS));
     }
 
     /**
@@ -182,7 +191,6 @@ public class DispatchCreateScanDialog extends
 
     @Override
     protected void startNewPallet() {
-        setRescanMode(false);
         Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
         cancelButton.setEnabled(true);
         super.startNewPallet();

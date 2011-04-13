@@ -214,38 +214,36 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             dispatch, SessionManager.getUser().getCurrentWorkingCenter());
         dialog.open();
-        setDirty(true); // FIXME need to do this better !
+        setDirty(true); // FIXME add a boolean in the dialog to know if
+                        // specimens were added
         reloadSpecimens();
     }
 
     @Override
-    protected void doSpecimenTextAction(String text) {
+    protected void doSpecimenTextAction(String inventoryId) {
         try {
-            addSpecimen(text);
+            CellProcessResult res = appService.processCellStatus(new Cell(-1,
+                -1, inventoryId, null), new DispatchProcessData(null, dispatch,
+                true, true), SessionManager.getUser());
+            switch (res.getProcessStatus()) {
+            case FILLED:
+                // ok
+                SpecimenWrapper specimen = new SpecimenWrapper(appService);
+                specimen.getWrappedObject()
+                    .setId(res.getCell().getSpecimenId());
+                specimen.reload();
+                dispatch.addSpecimens(Arrays.asList(specimen),
+                    DispatchSpecimenState.NONE);
+                reloadSpecimens();
+                break;
+            case ERROR:
+                BiobankPlugin.openAsyncError("Invalid specimen", res.getCell()
+                    .getInformation());
+                break;
+            }
         } catch (Exception e) {
             BiobankPlugin.openAsyncError("Error", "Error adding the specimen",
                 e);
-        }
-    }
-
-    protected void addSpecimen(String inventoryId) throws Exception {
-        CellProcessResult res = appService.processCellStatus(new Cell(-1, -1,
-            inventoryId, null), new DispatchProcessData(null, dispatch, true,
-            true), SessionManager.getUser());
-        switch (res.getProcessStatus()) {
-        case FILLED:
-            // ok
-            SpecimenWrapper specimen = new SpecimenWrapper(appService);
-            specimen.getWrappedObject().setId(res.getCell().getSpecimenId());
-            specimen.reload();
-            dispatch.addSpecimens(Arrays.asList(specimen),
-                DispatchSpecimenState.NONE);
-            reloadSpecimens();
-            break;
-        case ERROR:
-            BiobankPlugin.openAsyncError("Invalid specimen", res.getCell()
-                .getInformation());
-            break;
         }
     }
 
@@ -262,7 +260,6 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        dispatch.reset();
         dispatch.setSenderCenter(SessionManager.getUser()
             .getCurrentWorkingCenter());
         if (destSiteComboViewer != null) {
@@ -275,19 +272,6 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                     destSiteComboViewer.getElementAt(0)));
             else
                 destSiteComboViewer.getCombo().deselectAll();
-        }
-        reloadSpecimens();
-    }
-
-    @Override
-    protected void reloadSpecimens() {
-        if (specimensNonProcessedTable != null) {
-            specimensNonProcessedTable.reloadCollection();
-            page.layout(true, true);
-            book.reflow(true);
-        }
-        if (specimensTreeTable != null) {
-            specimensTreeTable.refresh();
         }
     }
 
@@ -305,6 +289,18 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 && dispatch.getShipmentInfo().getPackedAt() != null)
                 label += "[" + dispatch.getFormattedPackedAt() + "]";
             return label;
+        }
+    }
+
+    @Override
+    protected void reloadSpecimens() {
+        if (specimensNonProcessedTable != null) {
+            specimensNonProcessedTable.reloadCollection();
+            page.layout(true, true);
+            book.reflow(true);
+        }
+        if (specimensTreeTable != null) {
+            specimensTreeTable.refresh();
         }
     }
 }

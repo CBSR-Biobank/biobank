@@ -279,6 +279,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     protected void startNewPallet() {
         spw.setCells(null);
         scanHasBeenLaunchedValue.setValue(false);
+        setRescanMode(false);
     }
 
     protected void setScanOkValue(final boolean resOk) {

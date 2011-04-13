@@ -7,7 +7,7 @@ public abstract class ProcessWithPallet implements ProcessData {
 
     private static final long serialVersionUID = 1L;
 
-    private Integer palletId;
+    protected Integer palletId;
 
     // will retrieve on server side
     private transient ContainerWrapper pallet;

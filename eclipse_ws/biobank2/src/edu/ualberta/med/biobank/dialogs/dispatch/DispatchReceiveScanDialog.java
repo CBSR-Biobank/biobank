@@ -79,12 +79,6 @@ public class DispatchReceiveScanDialog extends
     }
 
     @Override
-    protected void startNewPallet() {
-        setRescanMode(false);
-        super.startNewPallet();
-    }
-
-    @Override
     protected List<UICellStatus> getPalletCellStatus() {
         return UICellStatus.DEFAULT_PALLET_DISPATCH_RECEIVE_STATUS_LIST;
     }

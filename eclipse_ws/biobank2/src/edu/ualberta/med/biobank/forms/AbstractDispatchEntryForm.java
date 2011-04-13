@@ -63,6 +63,10 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     protected abstract String getTextForPartName();
 
+    /**
+     * Create a field to enter inventory id one by one + a button to open a scan
+     * dialog
+     */
     protected void createSpecimensSelectionActions(Composite composite,
         boolean setAsFirstControl) {
         Composite addComposite = toolkit.createComposite(composite);
@@ -108,8 +112,14 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         });
     }
 
+    /**
+     * open scan when click on button
+     */
     protected abstract void openScanDialog();
 
+    /**
+     * add specimen represented by the inventoryid entered in the text field
+     */
     protected abstract void doSpecimenTextAction(String text);
 
     @Override
@@ -129,5 +139,12 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
     }
 
     protected abstract void reloadSpecimens();
+
+    @Override
+    public void reset() throws Exception {
+        super.reset();
+        dispatch.reset();
+        reloadSpecimens();
+    }
 
 }

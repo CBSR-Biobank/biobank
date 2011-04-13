@@ -35,9 +35,10 @@ public class ModifyStateDispatchDialog extends BiobankDialog {
 
     private CommentValue commentValue = new CommentValue();
 
-    public ModifyStateDispatchDialog(Shell parentShell,
+    public ModifyStateDispatchDialog(Shell parentShell, String oldComment,
         DispatchSpecimenState newState) {
         super(parentShell);
+        commentValue.setValue(oldComment);
         if (newState == null) {
             currentTitle = TITLE_COMMENT_ONLY;
             message = "Set a comment";
