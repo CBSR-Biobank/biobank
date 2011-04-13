@@ -664,7 +664,7 @@
   </target>
 
   <target name="build-common-project"
-          depends="sdk-files,hbmpostproc,modelextender">
+          depends="sdk-files,modelextender">
     <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output">
@@ -684,11 +684,13 @@
     </javac>
   </target>
 
-  <target name="compile-generated-beans" description="REDO:: Compiles the generated beans">
+  <target name="compile-generated-beans"
+    description="REDO:: Compiles the generated beans">
     <copy todir="${cacore.sdk.dir}/${output.src.dir}/edu/ualberta/med/biobank/model"
       overwrite="true">
       <fileset dir="sdk_conf/specialSrc" />
     </copy>
+    <antcall target="hbmpostproc" />
     <delete>
       <fileset dir="${cacore.sdk.dir}/${build.classes.dir}"/>
     </delete>
