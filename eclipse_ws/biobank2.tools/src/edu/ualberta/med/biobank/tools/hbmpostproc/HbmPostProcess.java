@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.tools.hbmstrings;
+package edu.ualberta.med.biobank.tools.hbmpostproc;
 
 import jargs.gnu.CmdLineParser;
 import jargs.gnu.CmdLineParser.Option;
@@ -27,20 +27,20 @@ import edu.ualberta.med.biobank.tools.modelumlparser.ModelClass;
 import edu.ualberta.med.biobank.tools.modelumlparser.ModelUmlParser;
 import edu.ualberta.med.biobank.tools.utils.CamelCase;
 
-public class HbmStrings {
+public class HbmPostProcess {
     private static final String NOT_EMPTY_STEREOTYPE = "not-empty";
 
     private static final String NOT_NULL_STEREOTYPE = "not-null";
 
     private static final String UNIQUE_STEREOTYPE = "unique";
 
-    private static final Logger LOGGER = Logger.getLogger(HbmStrings.class
+    private static final Logger LOGGER = Logger.getLogger(HbmPostProcess.class
         .getName());
 
     private static String USAGE = "Usage: strfields [options] UMLFILE HBMDIR TEMPLATE\n\n"
         + "Options\n" + "  -v, --verbose    Shows verbose output";
 
-    private static HbmStrings instance = null;
+    private static HbmPostProcess instance = null;
 
     private static String HBM_FILE_EXTENSION = ".hbm.xml";
 
@@ -52,13 +52,13 @@ public class HbmStrings {
 
     private Map<String, ModelClass> dmTables;
 
-    private HbmStrings() {
+    private HbmPostProcess() {
 
     }
 
-    public static HbmStrings getInstance() {
+    public static HbmPostProcess getInstance() {
         if (instance == null) {
-            instance = new HbmStrings();
+            instance = new HbmPostProcess();
         }
         return instance;
     }
@@ -259,7 +259,7 @@ public class HbmStrings {
     }
 
     public static void main(String argv[]) throws Exception {
-        HbmStrings.getInstance().doWork(parseCommandLine(argv));
+        HbmPostProcess.getInstance().doWork(parseCommandLine(argv));
     }
 
     /*
