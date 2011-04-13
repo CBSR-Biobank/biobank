@@ -1,5 +1,5 @@
 LOCK TABLES `SPECIMEN_TYPE` WRITE;
-INSERT INTO `SPECIMEN_TYPE` (ID, NAME, NAME_SHORT, LAST_MODIFIY_DATE_TIME) VALUES
+INSERT INTO `SPECIMEN_TYPE` (ID, NAME, NAME_SHORT, LAST_UPDATED) VALUES
 
 (01, "Ascending Colon",              "Colon, A",        "1970-01-01"),
 (02, "Buffy coat",                   "BC",              "1970-01-01"),
