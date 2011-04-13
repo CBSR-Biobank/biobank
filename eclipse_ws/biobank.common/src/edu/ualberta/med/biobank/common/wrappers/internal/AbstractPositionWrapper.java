@@ -1,11 +1,14 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.AbstractPositionPeer;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -20,11 +23,6 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
 
     public AbstractPositionWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return AbstractPositionPeer.PROP_NAMES;
     }
 
     public Integer getRow() {
@@ -46,6 +44,13 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     public abstract ContainerWrapper getParent();
 
     public abstract void setParent(ContainerWrapper parent);
+
+    @Override
+    protected List<Property<?, ? super E>> getProperties() {
+        return Collections
+            .unmodifiableList(new ArrayList<Property<?, ? super E>>(
+                AbstractPositionPeer.PROPERTIES));
+    }
 
     @Override
     public void persistChecks() throws BiobankCheckException,

@@ -22,8 +22,8 @@ public class ShipmentInfoWrapper extends ShipmentInfoBaseWrapper {
     }
 
     @Override
-    protected List<String> getPropertyChangeNames() {
-        return ShipmentInfoPeer.PROP_NAMES;
+    protected List<Property<?, ? super ShipmentInfo>> getProperties() {
+        return ShipmentInfoPeer.PROPERTIES;
     }
 
     public String getFormattedDateReceived() {

@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.tools.modelumlparser.Attribute;
 import edu.ualberta.med.biobank.tools.modelumlparser.ClassAssociation;
 import edu.ualberta.med.biobank.tools.modelumlparser.ClassAssociationType;
@@ -118,7 +119,11 @@ public class BaseWrapperBuilder extends BaseBuilder {
             .append(
                 "import gov.nih.nci.system.applicationservice.WritableApplicationService;\n")
             .append("import ").append(mc.getPkg()).append(".")
-            .append(mc.getName()).append(";\n");
+            .append(mc.getName()).append(";\n").append("\nimport ")
+            .append(Property.class.getName()).append(";");
+
+        contents.append("\nimport ").append(ArrayList.class.getName())
+            .append(";");
 
         if (mc.getExtendsClass() == null)
             contents.append("import ").append(wrapperPackageName)
@@ -209,22 +214,36 @@ public class BaseWrapperBuilder extends BaseBuilder {
                 .append(".class;\n").append("    }\n\n");
         }
 
-        result.append("    @Override\n").append(
-            "   protected List<String> getPropertyChangeNames() {\n");
-        if (mc.getExtendsClass() == null)
-            result.append("        return ").append(mc.getName())
-                .append("Peer.PROP_NAMES;\n");
-        else
+        String wrappedObjectType = mc.getName();
+        if (modelBaseClasses.containsKey(mc.getName())) {
+            wrappedObjectType = "E";
+        }
+
+        result.append("    @Override\n")
+            .append("   protected List<Property<?, ? super ")
+            .append(wrappedObjectType).append(">> getProperties() {\n");
+
+        if (modelBaseClasses.containsKey(mc.getName()))
             result
-                .append(
-                    "        List<String> superNames = super.getPropertyChangeNames();\n")
-                .append("        List<String> all = new ArrayList<String>();\n")
+                .append("        return new ArrayList<Property<?, ? super E>>(")
+                .append(mc.getName()).append("Peer.PROPERTIES);\n");
+        else if (mc.getExtendsClass() == null)
+            result.append("        return ").append(mc.getName())
+                .append("Peer.PROPERTIES;\n");
+        else
+            result.append("        List<Property<?, ? super ")
+                .append(mc.getName())
+                .append(">> superNames = super.getProperties();\n")
+                .append("        List<Property<?, ? super ")
+                .append(mc.getName())
+                .append(">> all = new ArrayList<Property<?, ? super ")
+                .append(mc.getName()).append(">>();\n")
                 .append("        all.addAll(superNames);\n")
                 .append("        all.addAll(").append(mc.getName())
-                .append("Peer.PROP_NAMES);\n").append("        return all;\n");
+                .append("Peer.PROPERTIES);\n").append("        return all;\n");
         result.append("    }\n\n");
-        return result.toString();
 
+        return result.toString();
     }
 
     private String createPropertyGetter(ModelClass mc, Attribute member) {

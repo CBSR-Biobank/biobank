@@ -11,7 +11,6 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
@@ -38,25 +37,12 @@ public class SiteWrapper extends SiteBaseWrapper {
 
     private Map<RequestState, List<RequestWrapper>> requestCollectionMap = new HashMap<RequestState, List<RequestWrapper>>();
 
-    public static final List<String> PROP_NAMES;
-    static {
-        List<String> aList = new ArrayList<String>();
-        aList.addAll(SitePeer.PROP_NAMES);
-        aList.addAll(AddressPeer.PROP_NAMES);
-        PROP_NAMES = Collections.unmodifiableList(aList);
-    };
-
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
     }
 
     public SiteWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return PROP_NAMES;
     }
 
     @Override
@@ -158,7 +144,8 @@ public class SiteWrapper extends SiteBaseWrapper {
             }
             if (sort)
                 Collections.sort(topContainerCollection);
-            cache.put(TOP_CONTAINER_COLLECTION_CACHE_KEY, topContainerCollection);
+            cache.put(TOP_CONTAINER_COLLECTION_CACHE_KEY,
+                topContainerCollection);
         }
         return topContainerCollection;
     }

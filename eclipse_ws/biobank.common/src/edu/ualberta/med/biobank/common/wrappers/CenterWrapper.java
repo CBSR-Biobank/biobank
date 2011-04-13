@@ -47,10 +47,18 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     @Override
-    protected List<String> getPropertyChangeNames() {
-        List<String> all = new ArrayList<String>(super.getPropertyChangeNames());
-        all.addAll(AddressPeer.PROP_NAMES);
-        return all;
+    protected List<Property<?, ? super E>> getProperties() {
+        List<Property<?, ? super E>> aList = new ArrayList<Property<?, ? super E>>();
+
+        aList.addAll(super.getProperties());
+
+        aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.CITY));
+        aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.POSTAL_CODE));
+        aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.PROVINCE));
+        aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.STREET1));
+        aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.STREET2));
+
+        return aList;
     }
 
     private AddressWrapper initAddress() {
@@ -193,7 +201,8 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                cache.put(IN_TRANSIT_SENT_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
+                cache.put(IN_TRANSIT_SENT_DISPATCH_COLLECTION_CACHE_KEY,
+                    shipCollection);
             }
         }
         return shipCollection;
@@ -213,7 +222,8 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                cache.put(IN_TRANSIT_RECEIVE_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
+                cache.put(IN_TRANSIT_RECEIVE_DISPATCH_COLLECTION_CACHE_KEY,
+                    shipCollection);
             }
         }
         return shipCollection;
@@ -233,7 +243,8 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                cache.put(RECEIVING_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
+                cache.put(RECEIVING_DISPATCH_COLLECTION_CACHE_KEY,
+                    shipCollection);
             }
         }
         return shipCollection;
@@ -274,7 +285,8 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                cache.put(IN_CREATION_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
+                cache.put(IN_CREATION_DISPATCH_COLLECTION_CACHE_KEY,
+                    shipCollection);
             }
         }
         return shipCollection;
