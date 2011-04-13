@@ -1,5 +1,5 @@
 LOCK TABLES `SHIPPING_METHOD` WRITE;
-INSERT INTO `SHIPPING_METHOD` (ID, NAME, LAST_MODIFIY_DATE_TIME) VALUES
+INSERT INTO `SHIPPING_METHOD` (ID, NAME, LAST_UPDATED) VALUES
        ( 1, 'unknown',          "1970-01-01"),
        ( 2, 'Drop-off',         "1970-01-01"),
        ( 3, 'Pick-up',          "1970-01-01"),
