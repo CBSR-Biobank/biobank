@@ -6,6 +6,8 @@
 		<id name="id" type="integer" column="ID">
 			<generator class="increment"/>
 		</id>
+                <timestamp name="lastModifyDateTime" column="LAST_MODIFIY_DATE_TIME" access="field" />
+
 		<!-- Attributes mapping for the Specimen class -->
 		<property name="inventoryId" type="string" length="100" column="INVENTORY_ID" unique="true" not-null="true"/>
 		<property name="comment" type="text" column="COMMENT"/>
