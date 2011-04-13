@@ -39,10 +39,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     private IPropertyChangeListener propertyListener;
 
-    private String server = null;
-
-    private String username = null;
-
     private String currentCenterText = null;
 
     public ApplicationWorkbenchWindowAdvisor(
@@ -125,11 +121,17 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
                     if (sourceValue != null) {
-                        if (sourceValue.equals(SessionState.LOGGED_IN))
-                            mainWindowUpdateTitle(SessionManager.getServer(),
-                                SessionManager.getUser());
-                        else if (sourceValue.equals(SessionState.LOGGED_OUT))
+                        if (sourceValue.equals(SessionState.LOGGED_IN)) {
+                            mainWindowUpdateTitle(SessionManager.getUser());
+                            ServerMsgStatusItem.getInstance().setServerName(
+                                new StringBuffer(SessionManager.getUser()
+                                    .getLogin()).append("@")
+                                    .append(SessionManager.getServer())
+                                    .toString());
+                        } else if (sourceValue.equals(SessionState.LOGGED_OUT)) {
                             mainWindowResetTitle();
+                            ServerMsgStatusItem.getInstance().setServerName("");
+                        }
                     }
                 }
 
@@ -150,16 +152,13 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     }
 
     private void mainWindowResetTitle() {
-        mainWindowUpdateTitle(null, null);
+        mainWindowUpdateTitle(null);
     }
 
-    private void mainWindowUpdateTitle(String server, User user) {
-        this.server = server;
+    private void mainWindowUpdateTitle(User user) {
         if (user == null) {
-            this.username = null;
             this.currentCenterText = null;
         } else {
-            this.username = user.getLogin();
             CenterWrapper<?> center = user.getCurrentWorkingCenter();
             this.currentCenterText = center == null ? null : center
                 .getNameShort();
@@ -170,17 +169,14 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     private void mainWindowUpdateTitle() {
         IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
         String oldTitle = configurer.getTitle();
-        String newTitle = getWindowTitle();
+        StringBuffer newTitle = new StringBuffer(getWindowTitle());
 
-        if ((server != null) && (username != null)) {
-            newTitle += " - " + server + " [" + username + "]";
-        }
         if (currentCenterText != null) {
-            newTitle += " - Center " + currentCenterText;
+            newTitle.append(" - Center ").append(currentCenterText);
         }
 
         if (!newTitle.equals(oldTitle)) {
-            configurer.setTitle(newTitle);
+            configurer.setTitle(newTitle.toString());
         }
     }
 

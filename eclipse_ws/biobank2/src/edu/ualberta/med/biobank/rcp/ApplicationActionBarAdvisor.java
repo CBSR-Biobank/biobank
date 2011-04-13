@@ -11,6 +11,7 @@ import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -32,10 +33,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         .getLogger(ApplicationActionBarAdvisor.class.getName());
 
     public static final String VIEW_ID_PARM = "org.eclipse.ui.views.showView.viewId";
+
     public static final String ERROR_LOGS_VIEW = "org.eclipse.pde.runtime.LogView";
 
     List<Action> helpMenuCustomActions = new ArrayList<Action>();
+
     public static final String SEND_ERROR_EMAIL_ID = "edu.ualberta.med.biobank.commands.sendErrorMail";
+
     public static final String EXPORT_ERRORS_LOGS_ID = "edu.ualberta.med.biobank.commands.exportErrorsLogs";
 
     private IWorkbenchAction resetPerspectiveAction;
@@ -134,5 +138,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         }
         helpMenu.add(resetPerspectiveAction);
         helpMenu.add(new Separator());
+    }
+
+    @Override
+    protected void fillStatusLine(IStatusLineManager statusLine) {
+        ServerMsgStatusItem serverMsgStatusItem = ServerMsgStatusItem
+            .getInstance();
+        serverMsgStatusItem.setServerName("");
+        statusLine.add(serverMsgStatusItem);
     }
 }
