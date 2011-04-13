@@ -21,7 +21,8 @@ public class HbmModifier {
     private static final Logger LOGGER = Logger.getLogger(HbmModifier.class
         .getName());
 
-    private static Pattern HBM_ID_END_TAG = Pattern.compile("</id>",
+    private static Pattern HBM_ATTR_MAPPING_COMMENT_TAG = Pattern.compile(
+        "<!-- Attributes mapping for the .+ class -->",
         Pattern.CASE_INSENSITIVE);
 
     private static Pattern HBM_STRING_ATTR = Pattern.compile(
@@ -32,9 +33,6 @@ public class HbmModifier {
         "<property.*column=\"([^\"]*)\"/>", Pattern.CASE_INSENSITIVE);
 
     private static String HBM_FILE_EXTENSION = ".hbm.xml";
-
-    // private static final String VERSION_PROPERTY =
-    // "<version name=\"version\" column=\"VERSION\" access=\"field\" />";
 
     private static final String TIMESTAMP_PROPERTY = "<timestamp name=\"lastModifyDateTime\" column=\"LAST_MODIFIY_DATE_TIME\" access=\"field\" />";
 
@@ -74,13 +72,15 @@ public class HbmModifier {
 
             while (line != null) {
                 String alteredLine = new String(line);
-                Matcher idMatcher = HBM_ID_END_TAG.matcher(line);
+                Matcher idMatcher = HBM_ATTR_MAPPING_COMMENT_TAG.matcher(line);
                 Matcher stringAttrMatcher = HBM_STRING_ATTR.matcher(line);
                 Matcher attrMatcher = HBM_ATTR.matcher(line);
 
-                if (idMatcher.find()) {
-                    alteredLine = new StringBuffer(alteredLine).append("\n")
-                        .append(TIMESTAMP_PROPERTY).toString();
+                if (!idPropertyFound && idMatcher.find()) {
+                    // has to be after discriminator tag and before first
+                    // property tag
+                    alteredLine = new StringBuffer(TIMESTAMP_PROPERTY)
+                        .append("\n").append(alteredLine).toString();
                     idPropertyFound = true;
                 } else if (stringAttrMatcher.find()
                     && !line.contains("length=\"")) {
@@ -112,8 +112,9 @@ public class HbmModifier {
             writer.close();
 
             if (!idPropertyFound) {
-                throw new Exception("id property not found for HBM file "
-                    + filename);
+                throw new Exception(
+                    "tag not found found for inserting timestamp in HBM file "
+                        + filename);
             }
 
             if (documentChanged) {
