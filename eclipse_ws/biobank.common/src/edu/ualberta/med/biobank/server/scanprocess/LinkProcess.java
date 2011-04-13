@@ -95,35 +95,35 @@ public class LinkProcess extends ServerProcess {
         else {
             String value = cell.getValue();
             if (value != null) {
-                SpecimenWrapper foundAliquot = SpecimenWrapper.getSpecimen(
+                SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(
                     appService, value, user);
-                if (foundAliquot != null) {
+                if (foundSpecimen != null) {
                     cell.setStatus(CellStatus.ERROR);
                     cell.setInformation(Messages
-                        .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
+                        .getString("ScanLink.scanStatus.specimen.alreadyExists")); //$NON-NLS-1$
                     String palletPosition = ContainerLabelingSchemeWrapper
                         .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
-                    if (foundAliquot.getParentSpecimen() == null)
+                    if (foundSpecimen.getParentSpecimen() == null)
                         appendNewLog(Messages
                             .getString(
-                                "ScanLink.activitylog.aliquot.existsError.noParent", //$NON-NLS-1$
-                                palletPosition, value, foundAliquot
+                                "ScanLink.activitylog.specimen.existsError.noParent", //$NON-NLS-1$
+                                palletPosition, value, foundSpecimen
                                     .getCollectionEvent().getVisitNumber(),
-                                foundAliquot.getCollectionEvent().getPatient()
-                                    .getPnumber(), foundAliquot
+                                foundSpecimen.getCollectionEvent().getPatient()
+                                    .getPnumber(), foundSpecimen
                                     .getCurrentCenter().getNameShort()));
                     else
                         appendNewLog(Messages
                             .getString(
-                                "ScanLink.activitylog.aliquot.existsError.withParent", //$NON-NLS-1$
-                                palletPosition, value, foundAliquot
+                                "ScanLink.activitylog.specimen.existsError.withParent", //$NON-NLS-1$
+                                palletPosition, value, foundSpecimen
                                     .getParentSpecimen().getInventoryId(),
-                                foundAliquot.getParentSpecimen()
+                                foundSpecimen.getParentSpecimen()
                                     .getSpecimenType().getNameShort(),
-                                foundAliquot.getCollectionEvent()
-                                    .getVisitNumber(), foundAliquot
+                                foundSpecimen.getCollectionEvent()
+                                    .getVisitNumber(), foundSpecimen
                                     .getCollectionEvent().getPatient()
-                                    .getPnumber(), foundAliquot
+                                    .getPnumber(), foundSpecimen
                                     .getCurrentCenter().getNameShort()));
                 } else {
                     cell.setStatus(CellStatus.NO_TYPE);

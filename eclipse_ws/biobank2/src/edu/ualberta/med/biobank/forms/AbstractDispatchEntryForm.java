@@ -68,21 +68,21 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
         toolkit.createLabel(addComposite, "Enter inventory ID to add:");
-        final BiobankText newAliquotText = new BiobankText(addComposite,
+        final BiobankText newSpecimenText = new BiobankText(addComposite,
             SWT.NONE, toolkit);
         GridData gd = new GridData();
         gd.widthHint = 100;
-        newAliquotText.setLayoutData(gd);
-        newAliquotText.addListener(SWT.DefaultSelection, new Listener() {
+        newSpecimenText.setLayoutData(gd);
+        newSpecimenText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
-                doSpecimenTextAction(newAliquotText.getText());
-                newAliquotText.setFocus();
-                newAliquotText.setText("");
+                doSpecimenTextAction(newSpecimenText.getText());
+                newSpecimenText.setFocus();
+                newSpecimenText.setText("");
             }
         });
         if (setAsFirstControl) {
-            setFirstControl(newAliquotText);
+            setFirstControl(newSpecimenText);
         }
         Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
         addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
@@ -90,16 +90,16 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                doSpecimenTextAction(newAliquotText.getText());
-                newAliquotText.setFocus();
-                newAliquotText.setText("");
+                doSpecimenTextAction(newSpecimenText.getText());
+                newSpecimenText.setFocus();
+                newSpecimenText.setText("");
             }
         });
         toolkit.createLabel(addComposite, "or open scan dialog:");
         Button openScanButton = toolkit
             .createButton(addComposite, "", SWT.PUSH);
         openScanButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT));
+            .get(BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

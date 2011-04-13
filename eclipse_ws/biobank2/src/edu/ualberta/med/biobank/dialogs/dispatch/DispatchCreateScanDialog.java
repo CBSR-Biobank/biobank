@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
@@ -21,7 +20,7 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
+import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -38,13 +37,11 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 public class DispatchCreateScanDialog extends
     AbstractScanDialog<DispatchWrapper> {
 
-    private static final String TITLE = Messages
-        .getString("DispatchCreateScanDialog.title"); //$NON-NLS-1$
     private BiobankText palletproductBarcodeText;
     private NonEmptyStringValidator productBarcodeValidator;
     private String currentProductBarcode;
     private boolean isPalletWithPosition;
-    private boolean aliquotsAdded = false;
+    private boolean specimensAdded = false;
     private ContainerWrapper currentPallet;
     private List<ContainerWrapper> removedPallets = new ArrayList<ContainerWrapper>();
 
@@ -53,6 +50,14 @@ public class DispatchCreateScanDialog extends
         super(parentShell, currentShipment, site);
     }
 
+    @Override
+    protected String getTitleAreaMessage() {
+        return Messages.getString("DispatchCreateScanDialog.description"); //$NON-NLS-1$
+    }
+
+    /**
+     * add the product barcode field and radios
+     */
     @Override
     protected void createCustomDialogPreContents(final Composite parent) {
         Button palletWithoutPositionRadio = new Button(parent, SWT.RADIO);
@@ -95,6 +100,9 @@ public class DispatchCreateScanDialog extends
         }
     }
 
+    /**
+     * Add validation of product barcode
+     */
     @Override
     protected boolean fieldsValid() {
         return super.fieldsValid()
@@ -102,12 +110,13 @@ public class DispatchCreateScanDialog extends
                 palletproductBarcodeText.getText()).equals(Status.OK_STATUS);
     }
 
+    /**
+     * check the pallet is actually found (if need one)
+     */
     @Override
-    protected ScanProcessResult internalProcessScanResult(
-        IProgressMonitor monitor,
-        Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells,
-        CenterWrapper<?> center) throws Exception {
-        aliquotsAdded = false;
+    protected boolean checkBeforeProcessing(CenterWrapper<?> center)
+        throws Exception {
+        specimensAdded = false;
         currentPallet = null;
         if (isPalletWithPosition) {
             if (center instanceof SiteWrapper)
@@ -123,27 +132,16 @@ public class DispatchCreateScanDialog extends
                         Messages.getString(
                             "DispatchCreateScanDialog.pallet.search.error.msg", //$NON-NLS-1$
                             currentProductBarcode));
-                return null;
+                return false;
             }
         }
-        // server side call
-        return SessionManager.getAppService().processScanResult(serverCells,
-            getProcessData(), isRescanMode(), SessionManager.getUser());
+        return true;
     }
 
     @Override
-    protected String getTitleAreaMessage() {
-        return Messages.getString("DispatchCreateScanDialog.description"); //$NON-NLS-1$
-    }
-
-    @Override
-    protected String getTitleAreaTitle() {
-        return TITLE;
-    }
-
-    @Override
-    protected String getDialogShellTitle() {
-        return TITLE;
+    protected ProcessData getProcessData() {
+        return new DispatchProcessData(currentPallet, currentShipment, true,
+            false);
     }
 
     @Override
@@ -153,20 +151,30 @@ public class DispatchCreateScanDialog extends
     }
 
     @Override
+    protected boolean canActivateProceedButton() {
+        return !specimensAdded;
+    }
+
+    @Override
+    protected boolean canActivateNextAndFinishButton() {
+        return specimensAdded;
+    }
+
+    @Override
     protected void doProceed() throws Exception {
-        List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>();
+        List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
         for (PalletCell cell : getCells().values()) {
             if (cell.getStatus() != UICellStatus.MISSING) {
-                aliquots.add(cell.getSpecimen());
+                specimens.add(cell.getSpecimen());
                 cell.setStatus(UICellStatus.IN_SHIPMENT_ADDED);
             }
         }
-        (currentShipment).addAliquots(aliquots);
+        currentShipment.addSpecimens(specimens, DispatchSpecimenState.NONE);
         if (currentPallet != null) {
             removedPallets.add(currentPallet);
         }
         redrawPallet();
-        aliquotsAdded = true;
+        specimensAdded = true;
         setOkButtonEnabled(true);
         Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
         cancelButton.setEnabled(false);
@@ -178,16 +186,6 @@ public class DispatchCreateScanDialog extends
         Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
         cancelButton.setEnabled(true);
         super.startNewPallet();
-    }
-
-    @Override
-    protected boolean canActivateProceedButton() {
-        return !aliquotsAdded;
-    }
-
-    @Override
-    protected boolean canActivateNextAndFinishButton() {
-        return aliquotsAdded;
     }
 
     @Override
@@ -211,12 +209,12 @@ public class DispatchCreateScanDialog extends
                         .getSenderCenter().getId());
             return cells;
         } else {
-            for (SpecimenWrapper aliquot : currentPallet.getSpecimens()
+            for (SpecimenWrapper specimen : currentPallet.getSpecimens()
                 .values()) {
                 PalletCell cell = new PalletCell(new ScanCell(
-                    aliquot.getPosition().row, aliquot.getPosition().col,
-                    aliquot.getInventoryId()));
-                map.put(aliquot.getPosition(), cell);
+                    specimen.getPosition().row, specimen.getPosition().col,
+                    specimen.getInventoryId()));
+                map.put(specimen.getPosition(), cell);
             }
         }
         return map;
@@ -224,12 +222,6 @@ public class DispatchCreateScanDialog extends
 
     public List<ContainerWrapper> getRemovedPallets() {
         return removedPallets;
-    }
-
-    @Override
-    protected ProcessData getProcessData() {
-        return new DispatchProcessData(currentPallet, currentShipment, true,
-            false);
     }
 
     public void setCurrentProductBarcode(String currentProductBarcode) {

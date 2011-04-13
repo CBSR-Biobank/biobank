@@ -82,7 +82,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     private Composite typesSelectionCustomComposite;
     private AliquotedSpecimenSelectionWidget customSelectionWidget;
 
-    // should be set to true when all scanned aliquots have a type set
+    // should be set to true when all scanned specimens have a type set
     private IObservableValue typesFilledValue = new WritableValue(Boolean.TRUE,
         Boolean.class);
 
@@ -271,7 +271,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     /**
-     * Give a sample type to selected aliquots
+     * Give a sample type to selected specimens
      */
     private void createTypeSelectionCustom(Composite parent) {
         typesSelectionCustomComposite = toolkit.createComposite(parent);
@@ -413,7 +413,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             SWT.RADIO);
         fakeScanRandom.setSelection(true);
         toolkit.createButton(comp,
-            "Get random and already linked aliquots", SWT.RADIO); //$NON-NLS-1$
+            "Get random and already linked specimens", SWT.RADIO); //$NON-NLS-1$
     }
 
     @Override
@@ -584,7 +584,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 // LINKED\: {0} - Type: {1} - Patient\: {2} - Visit\: {3} -
                 // Center: {4} \n
                 sb.append(Messages.getString(
-                    "ScanLink.activitylog.aliquot.linked", //$NON-NLS-1$
+                    "ScanLink.activitylog.specimen.linked", //$NON-NLS-1$
                     cell.getValue(), cell.getType().getName(), sourceSpecimen
                         .getSpecimenType().getNameShort(), sourceSpecimen
                         .getInventoryId(), sourceSpecimen.getCollectionEvent()

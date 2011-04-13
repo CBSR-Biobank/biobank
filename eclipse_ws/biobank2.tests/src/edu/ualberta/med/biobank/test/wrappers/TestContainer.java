@@ -894,22 +894,22 @@ public class TestContainer extends TestDatabase {
         // reload because we changed container type
         childL3.reload();
         ProcessingEventWrapper pv = addProcessingEvent();
-        SpecimenWrapper aliquot = null;
+        SpecimenWrapper specimen = null;
 
         for (SpecimenTypeWrapper st : allSampleTypes) {
             // FIXME
-            // aliquot = SpecimenHelper.newAliquot(st, childL3, pv, 0, 0);
+            // specimen = SpecimenHelper.newAliquot(st, childL3, pv, 0, 0);
             if (selectedSampleTypes.contains(st)) {
-                Assert.assertTrue(childL3.canHoldAliquot(aliquot));
+                Assert.assertTrue(childL3.canHoldSpecimen(specimen));
             } else {
-                Assert.assertTrue(!childL3.canHoldAliquot(aliquot));
+                Assert.assertTrue(!childL3.canHoldSpecimen(specimen));
             }
         }
 
         // FIXME
         // aliquot = SpecimenHelper.newAliquot(null, childL3, pv, 0, 0);
         try {
-            childL3.canHoldAliquot(aliquot);
+            childL3.canHoldSpecimen(specimen);
             Assert
                 .fail("should not be allowed to add aliquot with null sample type");
         } catch (BiobankCheckException e) {
@@ -1793,7 +1793,7 @@ public class TestContainer extends TestDatabase {
         Assert.assertEquals(0, child2.getSpecimens() == null ? 0 : child2
             .getSpecimens().size());
 
-        child.moveAliquots(child2);
+        child.moveSpecimens(child2);
         child.reload();
         child2.reload();
 

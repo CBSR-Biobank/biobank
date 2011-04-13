@@ -27,7 +27,7 @@ public class CeListInfoTable extends InfoTableWidget<CollectionEventWrapper> {
     }
 
     private static final String[] HEADINGS = new String[] { "Patient Number",
-        "Study", "Waybill", "Departed", "Clinic", "Source Vessels", "Aliquots" };
+        "Study", "Waybill", "Departed", "Clinic", "Source Vessels", "Specimens" };
 
     public CeListInfoTable(Composite parent, List<CollectionEventWrapper> pvs) {
         super(parent, pvs, HEADINGS, PAGE_SIZE_ROWS);

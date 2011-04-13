@@ -35,7 +35,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     }
 
     private static final String[] HEADINGS = new String[] { "Dispatch Time",
-        "Date Received", "Waybill", "Dispatch State", "Aliquot State" };
+        "Date Received", "Waybill", "Dispatch State", "Specimen State" };
 
     private boolean editMode = false;
 

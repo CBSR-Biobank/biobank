@@ -5,17 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -29,12 +25,9 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 public class DispatchReceiveScanDialog extends
     AbstractScanDialog<DispatchWrapper> {
 
-    private static final String TITLE = Messages
-        .getString("DispatchReceiveScanDialog.title"); //$NON-NLS-1$
+    private int pendingSpecimensNumber = 0;
 
-    private int pendingAliquotsNumber = 0;
-
-    private boolean aliquotsReceived = false;
+    private boolean specimensReceived = false;
 
     public DispatchReceiveScanDialog(Shell parentShell,
         final DispatchWrapper currentShipment, CenterWrapper<?> currentSite) {
@@ -44,28 +37,6 @@ public class DispatchReceiveScanDialog extends
     @Override
     protected String getTitleAreaMessage() {
         return Messages.getString("DispatchReceiveScanDialog.description"); //$NON-NLS-1$
-    }
-
-    @Override
-    protected String getTitleAreaTitle() {
-        return TITLE;
-    }
-
-    @Override
-    protected String getDialogShellTitle() {
-        return TITLE;
-    }
-
-    @Override
-    protected ScanProcessResult internalProcessScanResult(
-        IProgressMonitor monitor,
-        Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells,
-        CenterWrapper<?> site) throws Exception {
-        // server side call
-        ScanProcessResult res = SessionManager.getAppService()
-            .processScanResult(serverCells, getProcessData(), isRescanMode(),
-                SessionManager.getUser());
-        return res;
     }
 
     @Override
@@ -81,35 +52,28 @@ public class DispatchReceiveScanDialog extends
 
     @Override
     protected boolean canActivateProceedButton() {
-        return pendingAliquotsNumber != 0;
+        return pendingSpecimensNumber != 0;
     }
 
     @Override
     protected boolean canActivateNextAndFinishButton() {
-        return pendingAliquotsNumber == 0;
+        return pendingSpecimensNumber == 0;
     }
 
     @Override
     protected void doProceed() {
-        List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>();
+        List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
         for (PalletCell cell : getCells().values()) {
             if (cell.getStatus() == UICellStatus.IN_SHIPMENT_EXPECTED) {
-                aliquots.add(cell.getSpecimen());
+                specimens.add(cell.getSpecimen());
                 cell.setStatus(UICellStatus.IN_SHIPMENT_RECEIVED);
             }
         }
-        try {
-            (currentShipment).receiveSpecimens(aliquots);
-            redrawPallet();
-            pendingAliquotsNumber = 0;
-            setOkButtonEnabled(true);
-            aliquotsReceived = true;
-        } catch (Exception e) {
-            BiobankPlugin
-                .openAsyncError(
-                    Messages
-                        .getString("DispatchReceiveScanDialog.receiveing.error.title"), e); //$NON-NLS-1$
-        }
+        currentShipment.receiveSpecimens(specimens);
+        redrawPallet();
+        pendingSpecimensNumber = 0;
+        setOkButtonEnabled(true);
+        specimensReceived = true;
         Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
         cancelButton.setEnabled(false);
     }
@@ -145,7 +109,7 @@ public class DispatchReceiveScanDialog extends
     }
 
     public boolean hasReceivedSpecimens() {
-        return aliquotsReceived;
+        return specimensReceived;
     }
 
 }

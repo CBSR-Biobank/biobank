@@ -117,7 +117,7 @@ public class PalletScanManagement {
                             // Different values at same position
                             cells = oldCells;
                             throw new Exception(
-                                "Scan Aborted: previously scanned aliquot has been replaced. "
+                                "Scan Aborted: previously scanned specimens has been replaced. "
                                     + "If this is not a re-scan, reset and start again.");
                         } else if (!PalletCell.hasValue(newScannedCell)) {
                             // previous position has value - new has none

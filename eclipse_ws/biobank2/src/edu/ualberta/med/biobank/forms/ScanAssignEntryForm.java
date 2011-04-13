@@ -84,9 +84,9 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     private ScrolledComposite containersScroll;
     private Composite containersComposite;
 
-    // contains moved and missing aliquots. a missing one is set to into the
+    // contains moved and missing specimens. a missing one is set to into the
     // missing rowColPos. A moved one is set into its old RowColPos
-    private Map<RowColPos, PalletCell> movedAndMissingAliquotsFromPallet = new HashMap<RowColPos, PalletCell>();
+    private Map<RowColPos, PalletCell> movedAndMissingSpecimensFromPallet = new HashMap<RowColPos, PalletCell>();
 
     private Composite fieldsComposite;
 
@@ -359,10 +359,10 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         gd.horizontalSpan = 2;
         comp.setLayoutData(gd);
         fakeScanLinkedOnlyButton = toolkit.createButton(comp,
-            "Select linked only aliquots", SWT.RADIO); //$NON-NLS-1$
+            "Select linked only specimens", SWT.RADIO); //$NON-NLS-1$
         fakeScanLinkedOnlyButton.setSelection(true);
         toolkit.createButton(comp,
-            "Select linked and assigned aliquots", SWT.RADIO); //$NON-NLS-1$
+            "Select linked and assigned specimens", SWT.RADIO); //$NON-NLS-1$
     }
 
     private void createContainersVisualisationSection() {
@@ -630,7 +630,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
 
     @Override
     protected void doBeforeSave() throws Exception {
-        saveEvenIfMissing = saveEvenIfAliquotsMissing();
+        saveEvenIfMissing = saveEvenIfSpecimensMissing();
     }
 
     @Override
@@ -642,7 +642,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             currentPalletWrapper.persist();
             displayPalletPositionInfo();
             int totalNb = 0;
-            StringBuffer sb = new StringBuffer("ALIQUOTS ASSIGNED:\n"); //$NON-NLS-1$
+            StringBuffer sb = new StringBuffer("SPECIMENS ASSIGNED:\n"); //$NON-NLS-1$
             try {
                 Map<RowColPos, PalletCell> cells = getCells();
                 for (RowColPos rcp : cells.keySet()) {
@@ -650,17 +650,18 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                     if (cell != null
                         && (cell.getStatus() == UICellStatus.NEW || cell
                             .getStatus() == UICellStatus.MOVED)) {
-                        SpecimenWrapper aliquot = cell.getSpecimen();
-                        if (aliquot != null) {
-                            aliquot.setPosition(rcp);
-                            aliquot.setParent(currentPalletWrapper);
-                            aliquot.persist();
-                            String posStr = aliquot.getPositionString(true,
+                        SpecimenWrapper specimen = cell.getSpecimen();
+                        if (specimen != null) {
+                            specimen.setPosition(rcp);
+                            specimen.setParent(currentPalletWrapper);
+                            specimen.persist();
+                            String posStr = specimen.getPositionString(true,
                                 false);
                             if (posStr == null) {
                                 posStr = "none"; //$NON-NLS-1$
                             }
-                            computeActivityLogMessage(sb, cell, aliquot, posStr);
+                            computeActivityLogMessage(sb, cell, specimen,
+                                posStr);
                             totalNb++;
                         }
                     }
@@ -678,17 +679,18 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     private void computeActivityLogMessage(StringBuffer sb, PalletCell cell,
-        SpecimenWrapper aliquot, String posStr) {
-        CollectionEventWrapper visit = aliquot.getCollectionEvent();
-        sb.append(Messages.getString("ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
+        SpecimenWrapper specimen, String posStr) {
+        CollectionEventWrapper visit = specimen.getCollectionEvent();
+        sb.append(Messages.getString(
+            "ScanAssign.activitylog.specimen.assigned", //$NON-NLS-1$
             posStr, currentPalletWrapper.getSite().getNameShort(), cell
-                .getValue(), aliquot.getSpecimenType().getName(), visit
+                .getValue(), specimen.getSpecimenType().getName(), visit
                 .getPatient().getPnumber(), visit.getVisitNumber()));
     }
 
-    private boolean saveEvenIfAliquotsMissing() {
+    private boolean saveEvenIfSpecimensMissing() {
         if (currentScanState == UICellStatus.MISSING
-            && movedAndMissingAliquotsFromPallet.size() > 0) {
+            && movedAndMissingSpecimensFromPallet.size() > 0) {
             boolean save = BiobankPlugin.openConfirm(
                 Messages.getString("ScanAssign.dialog.reallySave.title"), //$NON-NLS-1$
                 Messages.getString("ScanAssign.dialog.saveWithMissing.msg")); //$NON-NLS-1$
@@ -748,7 +750,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             hotelWidget.setSelection(null);
             palletWidget.setCells(null);
         }
-        movedAndMissingAliquotsFromPallet.clear();
+        movedAndMissingSpecimensFromPallet.clear();
         setScanHasBeenLauched(false);
         initPalletValues();
 

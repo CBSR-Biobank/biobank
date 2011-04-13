@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -117,12 +118,12 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     }
 
     // FIXME remove when doesnt use anymore
-    public static class AliquotInfo {
-        public SpecimenWrapper aliquot;
+    public static class SpecimenInfo {
+        public SpecimenWrapper specimen;
         public ResType type;
 
-        public AliquotInfo(SpecimenWrapper aliquot, ResType type) {
-            this.aliquot = aliquot;
+        public SpecimenInfo(SpecimenWrapper specimen, ResType type) {
+            this.specimen = specimen;
             this.type = type;
         }
     }
@@ -150,25 +151,26 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             break;
         case EXTRA:
             BiobankPlugin.openInformation("Specimen not found",
-                "Aliquot with inventory id " + inventoryId
+                "Specimen with inventory id " + inventoryId
                     + " has not been found in this dispatch."
                     + " It will be moved into the extra-pending list.");
-            dispatch.addExtraAliquots(Arrays.asList(specimen));
+            dispatch.addSpecimens(Arrays.asList(specimen),
+                DispatchSpecimenState.EXTRA);
             specimensTree.refresh();
             setDirty(true);
             break;
         // FIXME
         // case NOT_IN_DB:
-        // BiobankPlugin.openError("Aliquot not found",
-        // "This aliquot does not exist in the database.");
+        // BiobankPlugin.openError("Specimen not found",
+        // "This specimen does not exist in the database.");
         // break;
         // case DUPLICATE:
-        // BiobankPlugin.openError("Duplicate aliquot !",
-        // "This aliquot exists more that once in the database !");
+        // BiobankPlugin.openError("Duplicate specimen !",
+        // "This specimen exists more that once in the database !");
         // break;
         // case EXTRA:
-        // BiobankPlugin.openInformation("Aliquot already extra",
-        // "Aliquot with inventory id " + inventoryId
+        // BiobankPlugin.openInformation("Specimen already extra",
+        // "Specimen with inventory id " + inventoryId
         // + " is already in extra list.");
         // break;
         }

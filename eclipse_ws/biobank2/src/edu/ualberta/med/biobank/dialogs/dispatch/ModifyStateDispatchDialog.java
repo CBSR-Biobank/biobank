@@ -15,8 +15,8 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class ModifyStateDispatchDialog extends BiobankDialog {
 
-    private static final String TITLE_STATE = "Setting {0} state to aliquots in current dispatch";
-    private static final String TITLE_COMMENT_ONLY = "Modifying comment of aliquots in current dispatch";
+    private static final String TITLE_STATE = "Setting {0} state to specimens in current dispatch";
+    private static final String TITLE_COMMENT_ONLY = "Modifying comment of specimens in current dispatch";
     private String currentTitle;
     private String message;
 

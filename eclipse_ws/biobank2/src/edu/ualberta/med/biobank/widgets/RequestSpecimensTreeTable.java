@@ -41,13 +41,13 @@ import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 
-public class RequestAliquotsTreeTable extends BiobankWidget {
+public class RequestSpecimensTreeTable extends BiobankWidget {
 
     private TreeViewer tv;
     private RequestWrapper shipment;
     protected List<DispatchTableGroup> groups;
 
-    public RequestAliquotsTreeTable(Composite parent, RequestWrapper shipment) {
+    public RequestSpecimensTreeTable(Composite parent, RequestWrapper shipment) {
         super(parent, SWT.NONE);
 
         this.shipment = shipment;
@@ -89,7 +89,7 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
                 // groups = RequestTableGroup
-                // .getGroupsForShipment(RequestAliquotsTreeTable.this.shipment);
+                // .getGroupsForShipment(RequestSpecimensTreeTable.this.shipment);
             }
 
             @Override
@@ -158,7 +158,7 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                     menuItem.dispose();
                 }
 
-                RequestSpecimenWrapper ra = getSelectedAliquot();
+                RequestSpecimenWrapper ra = getSelectedSpecimen();
                 if (ra != null) {
                     addClipboardCopySupport(menu, labelProvider);
                     addSetUnavailableMenu(menu);
@@ -184,7 +184,7 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
         return null;
     }
 
-    protected RequestSpecimenWrapper getSelectedAliquot() {
+    protected RequestSpecimenWrapper getSelectedSpecimen() {
         Object node = getSelectedNode();
         if (node != null && node instanceof TreeItemAdapter) {
             return (RequestSpecimenWrapper) ((TreeItemAdapter) node)
@@ -231,10 +231,10 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                getSelectedAliquot().setState(
+                getSelectedSpecimen().setState(
                     RequestSpecimenState.UNAVAILABLE_STATE.getId());
                 try {
-                    getSelectedAliquot().persist();
+                    getSelectedSpecimen().persist();
                 } catch (Exception e) {
                     BiobankPlugin.openAsyncError("Save Error", e);
                 }

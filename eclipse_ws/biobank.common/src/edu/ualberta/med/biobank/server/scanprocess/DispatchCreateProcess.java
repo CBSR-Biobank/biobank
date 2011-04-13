@@ -120,7 +120,7 @@ public class DispatchCreateProcess extends ServerProcess {
         if (value == null) { // no specimen scanned
             scanCell.setStatus(CellStatus.MISSING);
             scanCell.setInformation(Messages.getString(
-                "ScanAssign.scanStatus.aliquot.missing", //$NON-NLS-1$
+                "ScanAssign.scanStatus.specimen.missing", //$NON-NLS-1$
                 expectedSpecimen.getInventoryId()));
             scanCell.setTitle("?"); //$NON-NLS-1$
         } else {
@@ -130,7 +130,7 @@ public class DispatchCreateProcess extends ServerProcess {
                 // not in database
                 scanCell.setStatus(CellStatus.ERROR);
                 scanCell.setInformation(Messages
-                    .getString("ScanAssign.scanStatus.aliquot.notlinked")); //$NON-NLS-1$
+                    .getString("ScanAssign.scanStatus.specimen.notlinked")); //$NON-NLS-1$
             } else {
                 if (expectedSpecimen != null
                     && !foundSpecimen.equals(expectedSpecimen)) {
@@ -138,7 +138,7 @@ public class DispatchCreateProcess extends ServerProcess {
                     scanCell.setStatus(CellStatus.ERROR);
                     scanCell
                         .setInformation(Messages
-                            .getString("ScanAssign.scanStatus.aliquot.positionTakenError")); //$NON-NLS-1$
+                            .getString("ScanAssign.scanStatus.specimen.positionTakenError")); //$NON-NLS-1$
                     scanCell.setTitle("!"); //$NON-NLS-1$
                 } else {
                     scanCell.setSpecimenId(foundSpecimen.getId());

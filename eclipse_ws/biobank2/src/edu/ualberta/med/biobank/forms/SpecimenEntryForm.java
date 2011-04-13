@@ -52,7 +52,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Aliquot " + specimen.getInventoryId() + " Information");
+        form.setText("Specimen " + specimen.getInventoryId() + " Information");
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true,
             false));
@@ -100,7 +100,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         setTextValue(siteLabel, specimen.getCenterString());
 
         sampleTypeComboViewer = createComboViewer(client, "Type", sampleTypes,
-            specimen.getSpecimenType(), "Aliquot must have a sample type",
+            specimen.getSpecimenType(), "Specimen must have a sample type",
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -153,11 +153,11 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         // FIXME
         // final BiobankText dateProcessed = createReadOnlyLabelledField(client,
-        // SWT.NONE, "Date Processed", aliquot.getParentProcessingEvent()
+        // SWT.NONE, "Date Processed", specimen.getParentProcessingEvent()
         // .getFormattedDateProcessed());
         //
         // final BiobankText dateDrawn = createReadOnlyLabelledField(client,
-        // SWT.NONE, "Date Drawn", aliquot.getParentProcessingEvent()
+        // SWT.NONE, "Date Drawn", specimen.getParentProcessingEvent()
         // .getFormattedCreatedAt());
         //
         // editPatientButton.addListener(SWT.MouseUp, new Listener() {
@@ -169,11 +169,11 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         // wizard);
         // int res = dialog.open();
         // if (res == Status.OK) {
-        // aliquot.setCollectionEvent(wizard.getCollectionEvent());
+        // specimen.setCollectionEvent(wizard.getCollectionEvent());
         //
-        // dateProcessed.setText(aliquot.getParentProcessingEvent()
+        // dateProcessed.setText(specimen.getParentProcessingEvent()
         // .getFormattedDateProcessed());
-        // dateDrawn.setText(aliquot.getParentProcessingEvent()
+        // dateDrawn.setText( specimen.getParentProcessingEvent()
         // .getFormattedCreatedAt());
         //
         // setDirty(true); // so changes can be saved
@@ -188,7 +188,8 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             "Activity Status",
             ActivityStatusWrapper.getAllActivityStatuses(appService),
             specimen.getActivityStatus(),
-            "Aliquot must have an activity status", new ComboSelectionUpdate() {
+            "Specimen must have an activity status",
+            new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     specimen
@@ -219,7 +220,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     @Override
     public void setFocus() {
-        // aliquots are not present in treeviews, unnecessary reloads can be
+        // specimens are not present in treeviews, unnecessary reloads can be
         // prevented with this method
     }
 

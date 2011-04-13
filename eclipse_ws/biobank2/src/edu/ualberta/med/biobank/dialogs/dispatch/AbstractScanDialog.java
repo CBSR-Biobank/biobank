@@ -52,6 +52,9 @@ import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManage
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     BiobankDialog {
 
+    private static final String TITLE = Messages
+        .getString("DispatchScanDialog.title"); //$NON-NLS-1$
+
     private BiobankText plateToScanText;
 
     private String plateToScan;
@@ -110,6 +113,16 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         };
     }
 
+    @Override
+    protected String getTitleAreaTitle() {
+        return TITLE;
+    }
+
+    @Override
+    protected String getDialogShellTitle() {
+        return TITLE;
+    }
+
     protected void setRescanMode(boolean isOn) {
         if (isOn) {
             scanButton.setText("Retry scan");
@@ -136,19 +149,22 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
     protected void processScanResult(IProgressMonitor monitor,
         CenterWrapper<?> currentCenter) throws Exception {
-        Map<RowColPos, PalletCell> cells = getCells();
-        // conversion for server side call
-        Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells = null;
-        if (cells != null) {
-            serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell>();
-            for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
-                serverCells
-                    .put(entry.getKey(), getServerCell(entry.getValue()));
+        if (checkBeforeProcessing(currentCenter)) {
+            Map<RowColPos, PalletCell> cells = getCells();
+            // conversion for server side call
+            Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells = null;
+            if (cells != null) {
+                serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell>();
+                for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
+                    serverCells.put(entry.getKey(),
+                        getServerCell(entry.getValue()));
+                }
             }
-        }
-        ScanProcessResult res = internalProcessScanResult(monitor, serverCells,
-            currentCenter);
-        if (res != null) {
+            // server side call
+            ScanProcessResult res = SessionManager.getAppService()
+                .processScanResult(serverCells, getProcessData(),
+                    isRescanMode(), SessionManager.getUser());
+
             if (cells != null) {
                 // for each cell, convert into a client side cell
                 for (Entry<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> entry : res
@@ -168,10 +184,11 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         }
     }
 
-    protected abstract ScanProcessResult internalProcessScanResult(
-        IProgressMonitor monitor,
-        Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells,
-        CenterWrapper<?> center) throws Exception;
+    @SuppressWarnings("unused")
+    protected boolean checkBeforeProcessing(CenterWrapper<?> currentCenter)
+        throws Exception {
+        return true;
+    }
 
     public static Cell getServerCell(PalletCell palletCell) {
         return new edu.ualberta.med.biobank.common.scanprocess.Cell(
@@ -239,7 +256,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), scanOkValue,
-            "Error in scan result. Please keep only aliquots with no errors.",
+            "Error in scan result. Please keep only specimens with no errors.",
             IStatus.ERROR);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), scanHasBeenLaunchedValue,

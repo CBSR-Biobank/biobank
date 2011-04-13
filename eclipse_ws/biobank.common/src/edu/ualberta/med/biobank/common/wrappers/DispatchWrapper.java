@@ -175,37 +175,37 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return list;
     }
 
-    public void addSpecimens(List<SpecimenWrapper> newSpecimens) {
+    public void addSpecimens(List<SpecimenWrapper> newSpecimens,
+        DispatchSpecimenState state) {
         if (newSpecimens == null)
             return;
 
         // already added dsa
         List<DispatchSpecimenWrapper> currentDaList = getDispatchSpecimenCollection(false);
         List<DispatchSpecimenWrapper> newDispatchSpecimens = new ArrayList<DispatchSpecimenWrapper>();
-        List<SpecimenWrapper> currentAliquotList = new ArrayList<SpecimenWrapper>();
+        List<SpecimenWrapper> currentSpecimenList = new ArrayList<SpecimenWrapper>();
 
         for (DispatchSpecimenWrapper dsa : currentDaList) {
-            currentAliquotList.add(dsa.getSpecimen());
+            currentSpecimenList.add(dsa.getSpecimen());
         }
 
-        // new aliquots added
-        for (SpecimenWrapper aliquot : newSpecimens) {
-            if (!currentAliquotList.contains(aliquot)) {
+        // new specimens added
+        for (SpecimenWrapper specimen : newSpecimens) {
+            if (!currentSpecimenList.contains(specimen)) {
                 DispatchSpecimenWrapper dsa = new DispatchSpecimenWrapper(
                     appService);
-                dsa.setSpecimen(aliquot);
+                dsa.setSpecimen(specimen);
                 dsa.setDispatch(this);
-                dsa.setDispatchSpecimenState(DispatchSpecimenState.NONE);
+                dsa.setDispatchSpecimenState(state);
                 newDispatchSpecimens.add(dsa);
                 dispatchSpecimenMap.get(DispatchSpecimenState.NONE).add(dsa);
             }
         }
-
         addToDispatchSpecimenCollection(newDispatchSpecimens);
-
         // make sure previously deleted ones, that have been re-added, are
         // no longer deleted
         deletedDispatchedSpecimens.removeAll(newDispatchSpecimens);
+        resetMap();
     }
 
     @Override
@@ -215,7 +215,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         resetMap();
     }
 
-    public void removeAliquots(List<DispatchSpecimenWrapper> dsaList) {
+    public void removeSpecimens(List<DispatchSpecimenWrapper> dsaList) {
         if (dsaList == null) {
             throw new NullPointerException();
         }
@@ -236,8 +236,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     public void receiveSpecimens(List<SpecimenWrapper> specimensToReceive) {
-        List<DispatchSpecimenWrapper> nonProcessedAliquots = getDispatchSpecimenCollectionWithState(DispatchSpecimenState.NONE);
-        for (DispatchSpecimenWrapper da : nonProcessedAliquots) {
+        List<DispatchSpecimenWrapper> nonProcessedSpecimens = getDispatchSpecimenCollectionWithState(DispatchSpecimenState.NONE);
+        for (DispatchSpecimenWrapper da : nonProcessedSpecimens) {
             if (specimensToReceive.contains(da.getSpecimen())) {
                 da.setDispatchSpecimenState(DispatchSpecimenState.RECEIVED);
                 da.getSpecimen().setCurrentCenter(getReceiverCenter());
@@ -328,19 +328,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return getDispatchSpecimenCollectionWithState(DispatchSpecimenState.RECEIVED);
     }
 
-    public void addExtraAliquots(List<SpecimenWrapper> extraAliquots) {
-        List<DispatchSpecimenWrapper> daws = new ArrayList<DispatchSpecimenWrapper>();
-        for (SpecimenWrapper a : extraAliquots) {
-            DispatchSpecimenWrapper da = new DispatchSpecimenWrapper(appService);
-            da.setSpecimen(a);
-            da.setDispatch(this);
-            da.setDispatchSpecimenState(DispatchSpecimenState.EXTRA);
-            daws.add(da);
-        }
-        addToDispatchSpecimenCollection(daws);
-        resetMap();
-    }
-
     private static final String FAST_DISPATCH_SPECIMEN_QRY = "select ra from "
         + DispatchSpecimen.class.getName() + " ra inner join fetch ra."
         + DispatchSpecimenPeer.SPECIMEN.getName()
@@ -368,19 +355,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             wrappedObject.setDispatchSpecimenCollection(results);
         }
         return getDispatchSpecimenCollection(false);
-    }
-
-    public void addAliquots(List<SpecimenWrapper> aliquots) {
-        List<DispatchSpecimenWrapper> daws = new ArrayList<DispatchSpecimenWrapper>();
-        for (SpecimenWrapper a : aliquots) {
-            DispatchSpecimenWrapper da = new DispatchSpecimenWrapper(appService);
-            da.setSpecimen(a);
-            da.setDispatch(this);
-            da.setDispatchSpecimenState(DispatchSpecimenState.NONE);
-            daws.add(da);
-        }
-        addToDispatchSpecimenCollection(daws);
-        resetMap();
     }
 
     public boolean canBeClosedBy(User user) {

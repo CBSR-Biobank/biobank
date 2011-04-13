@@ -20,11 +20,11 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class RequestWrapper extends RequestBaseWrapper {
 
-    private static final String NON_PROCESSED_ALIQUOTS_CACHE_KEY = "nonProcessedRequestSpecimenCollection";
+    private static final String NON_PROCESSED_SPECIMENS_CACHE_KEY = "nonProcessedRequestSpecimenCollection";
 
-    private static final String PROCESSED_ALIQUOTS_CACHE_KEY = "processedRequestSpecimens";
+    private static final String PROCESSED_SPECIMENS_CACHE_KEY = "processedRequestSpecimens";
 
-    private static final String UNAVAILABLE_ALIQUOTS_KEY = "unavailableRequestSpecimens";
+    private static final String UNAVAILABLE_SPECIMENS_KEY = "unavailableRequestSpecimens";
 
     public RequestWrapper(WritableApplicationService appService) {
         super(appService);
@@ -34,49 +34,50 @@ public class RequestWrapper extends RequestBaseWrapper {
         super(appService, request);
     }
 
-    public void receiveAliquots(List<SpecimenWrapper> aliquots)
+    public void receiveSpecimens(List<SpecimenWrapper> specimens)
         throws Exception {
         List<RequestSpecimenWrapper> flagged = new ArrayList<RequestSpecimenWrapper>();
         List<RequestSpecimenWrapper> ras = getNonProcessedRequestSpecimenCollection();
         for (RequestSpecimenWrapper r : ras)
-            for (SpecimenWrapper a : aliquots)
+            for (SpecimenWrapper a : specimens)
                 if (r.getSpecimen().getInventoryId().equals(a.getInventoryId())) {
                     flagged.add(r);
                 }
-        flagAliquots(flagged);
+        flagSpecimens(flagged);
     }
 
-    public void flagAliquots(List<RequestSpecimenWrapper> scanned)
+    public void flagSpecimens(List<RequestSpecimenWrapper> scanned)
         throws Exception {
         for (RequestSpecimenWrapper a : scanned) {
             a.setState(RequestSpecimenState.PROCESSED_STATE.getId());
             a.persist();
         }
-        cache.put(NON_PROCESSED_ALIQUOTS_CACHE_KEY, null);
-        cache.put(PROCESSED_ALIQUOTS_CACHE_KEY, null);
+        cache.put(NON_PROCESSED_SPECIMENS_CACHE_KEY, null);
+        cache.put(PROCESSED_SPECIMENS_CACHE_KEY, null);
     }
 
-    public void receiveAliquot(String text) throws Exception {
+    public void receiveSpecimen(String text) throws Exception {
         List<RequestSpecimenWrapper> ras = getNonProcessedRequestSpecimenCollection();
         for (RequestSpecimenWrapper r : ras)
             if (r.getSpecimen().getInventoryId().equals(text)) {
-                flagAliquots(Arrays.asList(r));
+                flagSpecimens(Arrays.asList(r));
                 return;
             }
-        throw new Exception("Aliquot " + text
+        throw new Exception("Specimen " + text
             + " is not in the non-processed list.");
 
     }
 
     public List<RequestSpecimenWrapper> getNonProcessedRequestSpecimenCollection() {
         return getRequestSpecimenCollectionWithState(
-            NON_PROCESSED_ALIQUOTS_CACHE_KEY, true,
+            NON_PROCESSED_SPECIMENS_CACHE_KEY, true,
             RequestSpecimenState.NONPROCESSED_STATE);
     }
 
     public List<RequestSpecimenWrapper> getProcessedRequestSpecimenCollection() {
-        return getRequestSpecimenCollectionWithState(PROCESSED_ALIQUOTS_CACHE_KEY,
-            true, RequestSpecimenState.PROCESSED_STATE);
+        return getRequestSpecimenCollectionWithState(
+            PROCESSED_SPECIMENS_CACHE_KEY, true,
+            RequestSpecimenState.PROCESSED_STATE);
     }
 
     @SuppressWarnings("unchecked")
@@ -108,14 +109,14 @@ public class RequestWrapper extends RequestBaseWrapper {
     }
 
     public List<RequestSpecimenWrapper> getUnavailableRequestSpecimenCollection() {
-        return getRequestSpecimenCollectionWithState(UNAVAILABLE_ALIQUOTS_KEY,
+        return getRequestSpecimenCollectionWithState(UNAVAILABLE_SPECIMENS_KEY,
             true, RequestSpecimenState.UNAVAILABLE_STATE);
     }
 
     public void resetStateLists() {
-        cache.put(UNAVAILABLE_ALIQUOTS_KEY, null);
-        cache.put(PROCESSED_ALIQUOTS_CACHE_KEY, null);
-        cache.put(NON_PROCESSED_ALIQUOTS_CACHE_KEY, null);
+        cache.put(UNAVAILABLE_SPECIMENS_KEY, null);
+        cache.put(PROCESSED_SPECIMENS_CACHE_KEY, null);
+        cache.put(NON_PROCESSED_SPECIMENS_CACHE_KEY, null);
     }
 
     public RequestSpecimenWrapper getRequestSpecimen(String inventoryId) {

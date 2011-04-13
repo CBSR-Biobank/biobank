@@ -49,8 +49,8 @@ public class DispatchSpecimensTreeTable extends BiobankWidget {
     protected List<DispatchTableGroup> groups;
 
     public DispatchSpecimensTreeTable(Composite parent,
-        final DispatchWrapper shipment, final boolean editAliquotsState,
-        final boolean editAliquotsComment) {
+        final DispatchWrapper shipment, final boolean editSpecimensState,
+        final boolean editSpecimensComment) {
         super(parent, SWT.NONE);
 
         this.shipment = shipment;
@@ -165,13 +165,13 @@ public class DispatchSpecimensTreeTable extends BiobankWidget {
                     menuItem.dispose();
                 }
                 addClipboardCopySupport(menu, labelProvider);
-                if (editAliquotsState || editAliquotsComment) {
-                    DispatchSpecimenWrapper dsa = getSelectedAliquot();
+                if (editSpecimensState || editSpecimensComment) {
+                    DispatchSpecimenWrapper dsa = getSelectedSpecimen();
                     if (dsa != null) {
-                        if (editAliquotsState
+                        if (editSpecimensState
                             && DispatchSpecimenState.getState(dsa.getState()) == DispatchSpecimenState.NONE)
                             addSetMissingMenu(menu);
-                        if (editAliquotsComment)
+                        if (editSpecimensComment)
                             addModifyCommentMenu(menu);
                     }
                 }
@@ -179,7 +179,7 @@ public class DispatchSpecimensTreeTable extends BiobankWidget {
         });
     }
 
-    protected DispatchSpecimenWrapper getSelectedAliquot() {
+    protected DispatchSpecimenWrapper getSelectedSpecimen() {
         IStructuredSelection selection = (IStructuredSelection) tv
             .getSelection();
         if (selection != null && selection.size() > 0

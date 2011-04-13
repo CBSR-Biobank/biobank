@@ -13,7 +13,7 @@ public class ProcessingEventHelper extends DbHelper {
      * Creates a new patient pevent wrapper. It is not saved to the database.
      * 
      * @param patient The patient that the patient pevent belongs to.
-     * @param createdAt The date the aliquot was processed.
+     * @param createdAt The date the specimen was processed.
      * @return A new patient pevent wrapper.
      */
     public static ProcessingEventWrapper newProcessingEvent(
@@ -31,7 +31,7 @@ public class ProcessingEventHelper extends DbHelper {
      * Adds a new patient pevent to the database.
      * 
      * @param patient The patient that the patient pevent belongs to.
-     * @param dateProcessed The date the aliquot was processed.
+     * @param dateProcessed The date the specimen was processed.
      * @return A new patient pevent wrapper.
      * @throws Exception if the object could not be saved to the database.
      */

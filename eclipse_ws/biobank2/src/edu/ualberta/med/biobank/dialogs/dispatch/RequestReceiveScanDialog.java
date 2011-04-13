@@ -14,9 +14,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -24,7 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.AliquotInfo;
+import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.SpecimenInfo;
 import edu.ualberta.med.biobank.forms.RequestEntryFormBase;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.UICellStatus;
@@ -35,9 +33,9 @@ public class RequestReceiveScanDialog extends
 
     private static final String TITLE = "Scanning received pallets";
 
-    private int pendingAliquotsNumber = 0;
+    private int pendingSpecimensNumber = 0;
 
-    private boolean aliquotsReceived = false;
+    private boolean specimensReceived = false;
 
     private int errors;
 
@@ -62,14 +60,14 @@ public class RequestReceiveScanDialog extends
     }
 
     /**
-     * set the status of the cell. return the aliquot if it is an extra one.
+     * set the status of the cell. return the specimen if it is an extra one.
      */
     protected void processCellStatus(PalletCell cell) {
-        AliquotInfo info = RequestEntryFormBase.getInfoForInventoryId(
+        SpecimenInfo info = RequestEntryFormBase.getInfoForInventoryId(
             currentShipment, cell.getValue());
-        if (info.aliquot != null) {
-            cell.setSpecimen(info.aliquot);
-            cell.setTitle(info.aliquot.getCollectionEvent().getPatient()
+        if (info.specimen != null) {
+            cell.setSpecimen(info.specimen);
+            cell.setTitle(info.specimen.getCollectionEvent().getPatient()
                 .getPnumber());
         }
         switch (info.type) {
@@ -78,30 +76,30 @@ public class RequestReceiveScanDialog extends
             break;
         case DUPLICATE:
             cell.setStatus(UICellStatus.ERROR);
-            cell.setInformation("Found more than one aliquot with inventoryId "
+            cell.setInformation("Found more than one specimen with inventoryId "
                 + cell.getValue());
             cell.setTitle("!");
             errors++;
             break;
         case NOT_IN_DB:
             cell.setStatus(UICellStatus.ERROR);
-            cell.setInformation("Aliquot " + cell.getValue()
+            cell.setInformation("Specimen " + cell.getValue()
                 + " not found in database");
             cell.setTitle("!");
             errors++;
             break;
         case NOT_IN_SHIPMENT:
             cell.setStatus(UICellStatus.EXTRA);
-            cell.setInformation("Aliquot should not be in shipment");
-            pendingAliquotsNumber++;
+            cell.setInformation("Specimen should not be in shipment");
+            pendingSpecimensNumber++;
             break;
         case OK:
             cell.setStatus(UICellStatus.IN_SHIPMENT_EXPECTED);
-            pendingAliquotsNumber++;
+            pendingSpecimensNumber++;
             break;
         case EXTRA:
             cell.setStatus(UICellStatus.EXTRA);
-            pendingAliquotsNumber++;
+            pendingSpecimensNumber++;
             break;
         }
     }
@@ -117,12 +115,12 @@ public class RequestReceiveScanDialog extends
 
     private void processCells(Collection<RowColPos> rcps,
         IProgressMonitor monitor) {
-        pendingAliquotsNumber = 0;
+        pendingSpecimensNumber = 0;
         errors = 0;
         Map<RowColPos, PalletCell> cells = getCells();
         if (cells != null) {
             setScanOkValue(false);
-            List<SpecimenWrapper> newExtraAliquots = new ArrayList<SpecimenWrapper>();
+            List<SpecimenWrapper> newExtraSpecimens = new ArrayList<SpecimenWrapper>();
             for (RowColPos rcp : rcps) {
                 if (monitor != null) {
                     monitor.subTask("Processing position "
@@ -131,21 +129,21 @@ public class RequestReceiveScanDialog extends
                 PalletCell cell = cells.get(rcp);
                 processCellStatus(cell);
                 if (cell.getStatus() == UICellStatus.EXTRA) {
-                    newExtraAliquots.add(cell.getSpecimen());
+                    newExtraSpecimens.add(cell.getSpecimen());
                 }
             }
-            addExtraCells(newExtraAliquots);
+            addExtraCells(newExtraSpecimens);
             setScanOkValue(errors == 0);
         }
     }
 
-    private void addExtraCells(final List<SpecimenWrapper> extraAliquots) {
-        if (extraAliquots.size() > 0) {
+    private void addExtraCells(final List<SpecimenWrapper> extraSpecimens) {
+        if (extraSpecimens.size() > 0) {
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    BiobankPlugin.openInformation("Extra aliquots",
-                        "Some of the aliquots in this pallet were not supposed"
+                    BiobankPlugin.openInformation("Extra specimens",
+                        "Some of the specimens in this pallet were not supposed"
                             + " to be in this shipment.");
                 }
             });
@@ -154,36 +152,36 @@ public class RequestReceiveScanDialog extends
 
     @Override
     protected String getProceedButtonlabel() {
-        return "Accept aliquots";
+        return "Accept specimens";
     }
 
     @Override
     protected boolean canActivateProceedButton() {
-        return pendingAliquotsNumber != 0;
+        return pendingSpecimensNumber != 0;
     }
 
     @Override
     protected boolean canActivateNextAndFinishButton() {
-        return pendingAliquotsNumber == 0;
+        return pendingSpecimensNumber == 0;
     }
 
     @Override
     protected void doProceed() {
-        List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>();
+        List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
         for (PalletCell cell : getCells().values()) {
             if (cell.getStatus() == UICellStatus.IN_SHIPMENT_EXPECTED) {
-                aliquots.add(cell.getSpecimen());
+                specimens.add(cell.getSpecimen());
                 cell.setStatus(UICellStatus.IN_SHIPMENT_RECEIVED);
             }
         }
         try {
-            (currentShipment).receiveAliquots(aliquots);
+            (currentShipment).receiveSpecimens(specimens);
             redrawPallet();
-            pendingAliquotsNumber = 0;
+            pendingSpecimensNumber = 0;
             setOkButtonEnabled(true);
-            aliquotsReceived = true;
+            specimensReceived = true;
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error receiving aliquots", e);
+            BiobankPlugin.openAsyncError("Error receiving specimens", e);
         }
         Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
         cancelButton.setEnabled(false);
@@ -222,22 +220,14 @@ public class RequestReceiveScanDialog extends
         return palletScanned;
     }
 
-    public boolean hasReceivedAliquots() {
-        return aliquotsReceived;
+    public boolean hasReceivedSpecimens() {
+        return specimensReceived;
     }
 
     @Override
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
         processCells(Arrays.asList(cell.getRowColPos()), null);
         super.postprocessScanTubeAlone(cell);
-    }
-
-    @Override
-    protected ScanProcessResult internalProcessScanResult(
-        IProgressMonitor monitor, Map<RowColPos, Cell> serverCells,
-        CenterWrapper<?> site) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

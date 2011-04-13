@@ -177,7 +177,7 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
     /* TODO move containers in tree view */
     @SuppressWarnings("unused")
     private void moveContainerTo(ContainerAdapter containerAdapter) {
-        // containerAdapter.moveAliquots();
+        // containerAdapter.moveSpecimens();
     }
 
 }

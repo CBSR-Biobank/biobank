@@ -14,12 +14,12 @@ public class ClinicVisitInfoTable extends
     class TableRowData {
         public Integer visit;
         public Long numSource;
-        public Long numAliquots;
+        public Long numSpecimens;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { visit.toString(),
-                numSource.toString(), numAliquots.toString() });
+                numSource.toString(), numSpecimens.toString() });
         }
     }
 
@@ -49,7 +49,7 @@ public class ClinicVisitInfoTable extends
                 case 1:
                     return item.numSource.toString();
                 case 2:
-                    return item.numAliquots.toString();
+                    return item.numSpecimens.toString();
                 default:
                     return "";
                 }
@@ -63,7 +63,7 @@ public class ClinicVisitInfoTable extends
         TableRowData info = new TableRowData();
         info.visit = p.getVisitNumber();
         info.numSource = p.getSourceSpecimensCount(true);
-        info.numAliquots = p.getAliquotedSpecimensCount(true);
+        info.numSpecimens = p.getAliquotedSpecimensCount(true);
         return info;
     }
 

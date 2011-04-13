@@ -138,7 +138,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         info.specimen = specimen;
         info.inventoryId = specimen.getInventoryId();
         SpecimenTypeWrapper type = specimen.getSpecimenType();
-        Assert.isNotNull(type, "aliquot with null for specimen type");
+        Assert.isNotNull(type, "specimen with null for specimen type");
         info.type = type.getName();
         CollectionEventWrapper cEvent = specimen.getCollectionEvent();
         info.patient = cEvent == null ? "" : cEvent.getPatient().getPnumber();

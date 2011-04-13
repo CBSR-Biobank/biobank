@@ -25,9 +25,9 @@ public class ReportsView extends ViewPart {
 
     private CTabFolder top;
 
-    private CTabItem aliquotTab;
+    private CTabItem specimenTab;
 
-    private ReportTreeWidget aliquotTree;
+    private ReportTreeWidget specimenTree;
     private ReportTreeWidget clinicTree;
     private ReportTreeWidget patientTree;
     private ReportTreeWidget sampleTypeTree;
@@ -52,18 +52,18 @@ public class ReportsView extends ViewPart {
         GridLayout treeLayout = new GridLayout();
         GridData treeGd = new GridData(GridData.FILL, GridData.FILL, true, true);
 
-        // Aliquots
-        aliquotTab = new CTabItem(top, SWT.NONE);
-        aliquotTab.setText("Aliquots");
-        Composite aliquotBody = new Composite(top, SWT.NONE);
-        aliquotBody.setLayout(treeLayout);
-        aliquotBody.setLayoutData(treeGd);
-        aliquotTab.setControl(aliquotBody);
-        aliquotTree = new ReportTreeWidget(aliquotBody);
-        AbstractReportTreeNode aliquotRoot = new AbstractReportTreeNode("");
-        aliquotTree.setLayoutData(treeGd);
+        // Specimens
+        specimenTab = new CTabItem(top, SWT.NONE);
+        specimenTab.setText("Specimens");
+        Composite specimenBody = new Composite(top, SWT.NONE);
+        specimenBody.setLayout(treeLayout);
+        specimenBody.setLayoutData(treeGd);
+        specimenTab.setControl(specimenBody);
+        specimenTree = new ReportTreeWidget(specimenBody);
+        AbstractReportTreeNode specimenRoot = new AbstractReportTreeNode("");
+        specimenTree.setLayoutData(treeGd);
 
-        top.setSelection(aliquotTab);
+        top.setSelection(specimenTab);
 
         // Clinics
         clinicTab = new CTabItem(top, SWT.NONE);
@@ -109,11 +109,11 @@ public class ReportsView extends ViewPart {
         AbstractReportTreeNode containerRoot = new AbstractReportTreeNode("");
         containerTree.setLayoutData(treeGd);
 
-        initializeNewReports(aliquotRoot, clinicRoot, patientRoot,
+        initializeNewReports(specimenRoot, clinicRoot, patientRoot,
             sampleTypeRoot, containerRoot);
 
-        aliquotTree.setInput(aliquotRoot);
-        aliquotTree.expandAll();
+        specimenTree.setInput(specimenRoot);
+        specimenTree.expandAll();
         clinicTree.setInput(clinicRoot);
         clinicTree.expandAll();
         patientTree.setInput(patientRoot);
@@ -125,7 +125,7 @@ public class ReportsView extends ViewPart {
 
     }
 
-    private void initializeNewReports(AbstractReportTreeNode aliquots,
+    private void initializeNewReports(AbstractReportTreeNode specimens,
         AbstractReportTreeNode clinics, AbstractReportTreeNode patients,
         AbstractReportTreeNode sampleTypes, AbstractReportTreeNode containers) {
         String[] names = BiobankReport.getReportNames();
@@ -133,22 +133,22 @@ public class ReportsView extends ViewPart {
             try {
                 ReportTreeNode child = new ReportTreeNode(
                     BiobankReport.getReportByName(names[i]));
-                addInTree(aliquots, clinics, patients, sampleTypes, containers,
-                    child);
+                addInTree(specimens, clinics, patients, sampleTypes,
+                    containers, child);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void addInTree(AbstractReportTreeNode aliquots,
+    private void addInTree(AbstractReportTreeNode specimens,
         AbstractReportTreeNode clinics, AbstractReportTreeNode patients,
         AbstractReportTreeNode sampleTypes, AbstractReportTreeNode containers,
         ReportTreeNode child) throws Exception {
-        if (child.getLabel().contains("Aliquot")) {
-            aliquots.addChild(child);
-            child.setParent(aliquots);
-        } else if (child.getLabel().contains("Sample Type")
+        if (child.getLabel().contains("Specimen")) {
+            specimens.addChild(child);
+            child.setParent(specimens);
+        } else if (child.getLabel().contains("Specimen Type")
             || child.getLabel().contains("Invoicing")) {
             sampleTypes.addChild(child);
             child.setParent(sampleTypes);
