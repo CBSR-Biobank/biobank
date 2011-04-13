@@ -52,7 +52,7 @@ public class LogQuery {
         return dbResults;
     }
 
-    public void queryDatabase() throws Exception {
+    public void queryDatabase() {
         String center = searchQuery.get(LogPeer.CENTER.getName());
         center = getValueForNoneAll(center);
 

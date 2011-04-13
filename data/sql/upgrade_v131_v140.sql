@@ -6,6 +6,15 @@
 
 
 /*****************************************************
+ * Address table
+ ****************************************************/
+
+ALTER TABLE address
+      ADD COLUMN EMAIL_ADDRESS VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '',
+      ADD COLUMN PHONE_NUMBER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '',
+      ADD COLUMN FAX_NUMBER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '';
+
+/*****************************************************
  * Merge clinics and sites into centers
  ****************************************************/
 
@@ -105,7 +114,7 @@ CREATE TABLE specimen (
   SPECIMEN_TYPE_ID int(11) NOT NULL,
   COLLECTION_EVENT_ID int(11) NOT NULL,
   PARENT_SPECIMEN_ID int(11) DEFAULT NULL,
-  TOP_SPECIMEN_ID int(11) DEFAULT NULL,
+  TOP_SPECIMEN_ID int(11) NULL DEFAULT NULL,
   CURRENT_CENTER_ID int(11) DEFAULT NULL,
   PV_ID INT(11),
   PV_SV_ID INT(11),
@@ -157,8 +166,8 @@ INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,
        JOIN source_vessel as sv on sv.id=pvsv.source_vessel_id
        join specimen_type on specimen_type.name=sv.name;
 
--- initialize the current center to be where they were created, dispatches are handled
--- in the next step
+-- initialize the current center on source specimens to be where they were
+-- created, dispatches are handled in the next step
 
 UPDATE specimen,patient_visit
        as pv, clinic_shipment_patient as csp,abstract_shipment as aship,
@@ -184,11 +193,17 @@ update specimen spc, aliquot aq,dispatch_shipment_aliquot dsa,abstract_shipment 
        and center.name=site.name
        and aship.discriminator='DispatchShipment';
 
+-- set the "top specimen" on source specimens to point to themselves
+
+update specimen as spc
+       set spc.top_specimen_id=spc.id
+       where spc.pv_sv_id is not null;
+
 -- set the aliquoted specimens to point to their parent specimen
 
 update specimen as spc_a, specimen as spc_b
        set spc_a.parent_specimen_id=spc_b.id, spc_a.top_specimen_id=spc_b.id
-	where spc_a.pv_id=spc_b.pv_id and spc_b.pv_sv_id is not null and spc_a.pv_sv_id is null;
+       where spc_a.pv_id=spc_b.pv_id and spc_b.pv_sv_id is not null and spc_a.pv_sv_id is null;
 
 ALTER TABLE specimen MODIFY COLUMN ID INT(11) NOT NULL;
 
@@ -209,7 +224,7 @@ CREATE TABLE specimen_type_specimen_type (
 CREATE TABLE shipment_info (
     ID INT(11) NOT NULL AUTO_INCREMENT,
     RECEIVED_AT DATETIME NULL DEFAULT NULL,
-    SENT_AT DATETIME NULL DEFAULT NULL,
+    PACKED_AT DATETIME NULL DEFAULT NULL,
     WAYBILL VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
     BOX_NUMBER VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
     SHIPPING_METHOD_ID INT(11) NOT NULL,
@@ -221,29 +236,47 @@ CREATE TABLE shipment_info (
 create index WAYBILL_IDX on shipment_info(WAYBILL);
 create index RECEIVED_AT_IDX on shipment_info(RECEIVED_AT);
 
-INSERT INTO shipment_info (aship_id,received_at,sent_at,waybill,box_number,shipping_method_id)
+INSERT INTO shipment_info (aship_id,received_at,packed_at,waybill,box_number,shipping_method_id)
 SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id FROM abstract_shipment
 WHERE discriminator='ClinicShipment';
+
+-- aship_type=0 for source specimens, aship_type=1 for aliquoted_specimens
 
 CREATE TABLE origin_info (
     ID INT(11) NOT NULL AUTO_INCREMENT,
     SHIPMENT_INFO_ID INT(11) NULL DEFAULT NULL,
     CENTER_ID INT(11) NOT NULL,
     ASHIP_ID INT(11) NOT NULL,
+    ASHIP_TYPE INT(11) NOT NULL,
     CONSTRAINT SHIPMENT_INFO_ID UNIQUE KEY(SHIPMENT_INFO_ID),
     INDEX FKE92E7A2792FAA705 (CENTER_ID),
     INDEX FKE92E7A27F59D873A (SHIPMENT_INFO_ID),
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-INSERT INTO origin_info (center_id,shipment_info_id,aship_id)
-SELECT center.id,shipment_info.id,abstract_shipment.id FROM abstract_shipment
+-- create origin info for source specimens
+
+INSERT INTO origin_info (center_id,shipment_info_id,aship_id,aship_type)
+SELECT center.id,shipment_info.id,abstract_shipment.id,0
+       FROM abstract_shipment
        JOIN clinic ON clinic.id=abstract_shipment.clinic_id
        JOIN center ON center.name=clinic.name
        join shipment_info on shipment_info.aship_id=abstract_shipment.id
        WHERE abstract_shipment.discriminator='ClinicShipment';
 
+-- create origin info for aliquoted specimens
+
+INSERT INTO origin_info (center_id,shipment_info_id,aship_id,aship_type)
+SELECT center.id,null,abstract_shipment.id,1
+       FROM abstract_shipment
+       JOIN site ON site.id=abstract_shipment.site_id
+       JOIN center ON center.name=site.name
+       join shipment_info on shipment_info.aship_id=abstract_shipment.id
+       WHERE abstract_shipment.discriminator='ClinicShipment';
+
 create index aship_id_idx on origin_info(aship_id);
+
+-- set origin info for source specimens
 
 UPDATE specimen,patient_visit as pv, clinic_shipment_patient as csp,
 abstract_shipment as aship, origin_info as oi
@@ -252,7 +285,22 @@ abstract_shipment as aship, origin_info as oi
        and aship.id=csp.CLINIC_SHIPMENT_ID
        and oi.aship_id=aship.id
        and aship.discriminator='ClinicShipment'
-       and specimen.pv_id=pv.id;
+       and oi.aship_type=0
+       and specimen.pv_id=pv.id
+       and specimen.pv_sv_id is not null;
+
+-- set origin info for aliquoted specimens
+
+UPDATE specimen,patient_visit as pv, clinic_shipment_patient as csp,
+abstract_shipment as aship, origin_info as oi
+       set specimen.origin_info_id=oi.id
+       where csp.id=pv.CLINIC_SHIPMENT_PATIENT_ID
+       and aship.id=csp.CLINIC_SHIPMENT_ID
+       and oi.aship_id=aship.id
+       and aship.discriminator='ClinicShipment'
+       and oi.aship_type=1
+       and specimen.pv_id=pv.id
+       and specimen.pv_sv_id is null;
 
 drop index aship_id_idx on origin_info;
 
@@ -262,7 +310,6 @@ CREATE TABLE dispatch (
     ID INT(11) NOT NULL AUTO_INCREMENT,
     STATE INT(11) NULL DEFAULT NULL,
     COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    PACKED_AT DATETIME NULL DEFAULT NULL,
     RECEIVER_CENTER_ID INT(11) NULL DEFAULT NULL,
     SHIPMENT_INFO_ID INT(11)  NULL DEFAULT NULL,
     SENDER_CENTER_ID INT(11) NULL DEFAULT NULL,
@@ -276,7 +323,7 @@ CREATE TABLE dispatch (
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-INSERT INTO shipment_info (aship_id,received_at,sent_at,waybill,box_number,
+INSERT INTO shipment_info (aship_id,received_at,packed_at,waybill,box_number,
        shipping_method_id)
        SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id
        FROM abstract_shipment
@@ -517,6 +564,8 @@ CREATE TABLE processing_event (
 create index CREATED_AT_IDX on processing_event(CREATED_AT);
 
 -- add a processing event for each patient visit
+-- (more than one processing event will have the same worksheet and same date/time.
+-- This won't be allowed anymore in future entries)
 
 insert into processing_event (created_at,comment,activity_status_id,center_id,pv_id)
        select pv.date_processed,pv.comment,
@@ -524,8 +573,8 @@ insert into processing_event (created_at,comment,activity_status_id,center_id,pv
        from patient_visit as pv
        join clinic_shipment_patient as csp on csp.id=pv.CLINIC_SHIPMENT_PATIENT_ID
        join abstract_shipment as aship on aship.id=csp.CLINIC_SHIPMENT_ID
-       join clinic on clinic.id=aship.clinic_id
-       join center on center.name=clinic.name;
+       join site s on s.id=aship.site_id
+       join center on center.name=s.name;
 
 update processing_event pe,collection_event ce,patient_visit pv,event_attr,study_event_attr
        set worksheet=event_attr.value
@@ -657,9 +706,6 @@ UPDATE abstract_position ap, container c, container_type ct
        WHERE ap.container_id = c.id AND ap.discriminator = 'AliquotPosition'
        AND c.container_type_id = ct.id and ct.child_labeling_scheme_id = 5;
 
-<<<<<<< HEAD
-=======
-
 /*****************************************************
  * log
  ****************************************************/
@@ -667,106 +713,6 @@ UPDATE abstract_position ap, container c, container_type ct
 alter table log
       change column SITE CENTER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT '';
 
-/*****************************************************
- * advanced reports
- ****************************************************/
-
-CREATE TABLE entity (
-    ID INT(11) NOT NULL,
-    CLASS_NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE entity_column (
-    ID INT(11) NOT NULL,
-    NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    ENTITY_PROPERTY_ID INT(11) NOT NULL,
-    INDEX FK16BD7321698D6AC (ENTITY_PROPERTY_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE entity_filter (
-    ID INT(11) NOT NULL,
-    FILTER_TYPE INT(11) NULL DEFAULT NULL,
-    NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    ENTITY_PROPERTY_ID INT(11) NOT NULL,
-    INDEX FK635CF541698D6AC (ENTITY_PROPERTY_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE entity_property (
-    ID INT(11) NOT NULL,
-    PROPERTY VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    PROPERTY_TYPE_ID INT(11) NOT NULL,
-    ENTITY_ID INT(11) NULL DEFAULT NULL,
-    INDEX FK3FC956B191CFD445 (ENTITY_ID),
-    INDEX FK3FC956B157C0C3B0 (PROPERTY_TYPE_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE property_modifier (
-    ID INT(11) NOT NULL,
-    NAME TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    PROPERTY_MODIFIER TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    PROPERTY_TYPE_ID INT(11) NULL DEFAULT NULL,
-    INDEX FK5DF9160157C0C3B0 (PROPERTY_TYPE_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE property_type (
-    ID INT(11) NOT NULL,
-    NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE report (
-    ID INT(11) NOT NULL,
-    NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    DESCRIPTION TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    USER_ID INT(11) NULL DEFAULT NULL,
-    IS_PUBLIC TINYINT(1) NULL DEFAULT NULL,
-    IS_COUNT TINYINT(1) NULL DEFAULT NULL,
-    ENTITY_ID INT(11) NOT NULL,
-    INDEX FK8FDF493491CFD445 (ENTITY_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE report_column (
-    ID INT(11) NOT NULL,
-    POSITION INT(11) NULL DEFAULT NULL,
-    COLUMN_ID INT(11) NOT NULL,
-    PROPERTY_MODIFIER_ID INT(11) NULL DEFAULT NULL,
-    REPORT_ID INT(11) NULL DEFAULT NULL,
-    INDEX FKF0B78C1BE9306A5 (REPORT_ID),
-    INDEX FKF0B78C1C2DE3790 (PROPERTY_MODIFIER_ID),
-    INDEX FKF0B78C1A946D8E8 (COLUMN_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE report_filter (
-    ID INT(11) NOT NULL,
-    POSITION INT(11) NULL DEFAULT NULL,
-    OPERATOR INT(11) NULL DEFAULT NULL,
-    ENTITY_FILTER_ID INT(11) NOT NULL,
-    REPORT_ID INT(11) NULL DEFAULT NULL,
-    INDEX FK13D570E3445CEC4C (ENTITY_FILTER_ID),
-    INDEX FK13D570E3BE9306A5 (REPORT_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-CREATE TABLE report_filter_value (
-    ID INT(11) NOT NULL,
-    POSITION INT(11) NULL DEFAULT NULL,
-    VALUE TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    SECOND_VALUE TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    REPORT_FILTER_ID INT(11) NULL DEFAULT NULL,
-    INDEX FK691EF6F59FFD1CEE (REPORT_FILTER_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-
->>>>>>> master
 /*****************************************************
  * research groups and sample orders
  ****************************************************/
@@ -1459,7 +1405,7 @@ drop index pv_id_idx on processing_event;
 drop index pv_id_idx on specimen;
 
 
-ALTER TABLE origin_info DROP COLUMN ASHIP_ID;
+ALTER TABLE origin_info DROP COLUMN ASHIP_ID, DROP COLUMN ASHIP_TYPE;
 
 ALTER TABLE collection_event DROP COLUMN PV_ID;
 

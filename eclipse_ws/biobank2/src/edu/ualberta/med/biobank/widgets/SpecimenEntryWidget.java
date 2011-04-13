@@ -189,11 +189,12 @@ public class SpecimenEntryWidget extends BiobankWidget {
             public void deleteItem(InfoTableEvent event) {
                 SpecimenWrapper specimen = specTable.getSelection();
                 if (specimen != null) {
-                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getShell(),
+                    if (!MessageDialog.openConfirm(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(),
                         "Delete Specimen",
-                        "Are you sure you want to remove specimen \""
-                            + specimen.getInventoryId())) {
+                        "Are you sure you want to remove specimen "
+                            + specimen.getInventoryId() + "?")) {
                         return;
                     }
 

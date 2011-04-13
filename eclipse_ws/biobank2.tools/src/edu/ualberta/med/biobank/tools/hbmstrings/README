@@ -1,5 +1,6 @@
-This tool is used by the main build file to alter the Hibernate mapping files for columns of type VARCHAR.
-As well this tool is used to generate the source code in
+This tool is built and used by the project's main build file to alter the 
+Hibernate mapping files for columns of type VARCHAR. As well this tool is used 
+to generate the source code in 
+
 <proj_dir>/eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/VarCharLengths.java.
 
-This project should be exported as a JAR to /home/loyola/proj/cbsr/biobank2/scripts/strfields.jar.

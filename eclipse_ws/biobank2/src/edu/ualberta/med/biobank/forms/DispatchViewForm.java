@@ -97,7 +97,8 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     public void reload() throws Exception {
         retrieveDispatch();
-        setPartName("Dispatch sent on " + dispatch.getPackedAt());
+        setPartName("Dispatch sent on "
+            + dispatch.getShipmentInfo().getPackedAt());
         setDispatchValues();
         aliquotsTree.refresh();
     }
@@ -105,7 +106,8 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         String dateString = "";
-        if (dispatch.getPackedAt() != null) {
+        if (dispatch.getShipmentInfo() != null
+            && dispatch.getShipmentInfo().getPackedAt() != null) {
             dateString = " on " + dispatch.getFormattedPackedAt();
         }
         canSeeEverything = true;
@@ -231,7 +233,7 @@ public class DispatchViewForm extends BiobankViewForm {
     private void createCloseButton() {
         Composite composite = toolkit.createComposite(page);
         composite.setLayout(new GridLayout(2, false));
-        Button sendButton = toolkit.createButton(composite, "Close", SWT.PUSH);
+        Button sendButton = toolkit.createButton(composite, "Done", SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -300,7 +302,7 @@ public class DispatchViewForm extends BiobankViewForm {
         if (dispatch.isInLostState())
             stateMessage = " Dispatch Lost ";
         else if (dispatch.isInClosedState())
-            stateMessage = " Dispatch Closed ";
+            stateMessage = " Dispatch Complete ";
         if (stateMessage != null) {
             Label label = widgetCreator.createLabel(client, stateMessage,
                 SWT.CENTER, false);

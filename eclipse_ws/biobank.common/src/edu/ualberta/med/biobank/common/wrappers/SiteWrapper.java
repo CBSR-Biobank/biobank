@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.base.SiteBaseWrapper;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
@@ -239,6 +240,24 @@ public class SiteWrapper extends SiteBaseWrapper {
             Arrays.asList(new Object[] { getId() }));
         List<Clinic> clinics = appService.query(c);
         return clinics.size();
+    }
+
+    private static final String PATIENT_COUNT_QRY = "select count(distinct cevent."
+        + CollectionEventPeer.PATIENT.getName()
+        + ") from "
+        + Center.class.getName()
+        + " as center join center."
+        + SitePeer.SPECIMEN_COLLECTION.getName()
+        + " as spcs join spcs."
+        + SpecimenPeer.COLLECTION_EVENT.getName()
+        + " as cevent where center."
+        + SitePeer.ID.getName() + "=?";
+
+    @Override
+    public Long getPatientCount() throws Exception {
+        HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
+            Arrays.asList(new Object[] { getId() }));
+        return getCountResult(appService, criteria);
     }
 
     /**

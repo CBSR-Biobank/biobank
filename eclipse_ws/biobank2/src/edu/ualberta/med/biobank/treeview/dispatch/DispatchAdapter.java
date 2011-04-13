@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchViewForm;
@@ -44,28 +45,32 @@ public class DispatchAdapter extends AdapterBase {
             return editable
                 && ((getWrapper().getSenderCenter().equals(
                     SessionManager.getUser().getCurrentWorkingCenter()) && (getWrapper()
-                    .isNew() || getWrapper().isInCreationState() || getWrapper()
-                    .isInTransitState())) || (getWrapper().getReceiverCenter()
+                    .isNew()
+                    || getWrapper().isInCreationState()
+                    || getWrapper().isInTransitState() || getWrapper()
+                    .isInLostState())) || (getWrapper().getReceiverCenter()
                     .equals(SessionManager.getUser().getCurrentWorkingCenter()) && (getWrapper()
-                    .isInReceivedState() || getWrapper().isInTransitState())));
+                    .isInReceivedState() || getWrapper().isInLostState() || getWrapper()
+                    .isInClosedState())));
         }
         return editable;
     }
 
     @Override
     protected String getLabelInternal() {
-        DispatchWrapper shipment = getWrapper();
-        Assert.isNotNull(shipment, "Dispatch is null");
+        DispatchWrapper dispatch = getWrapper();
+        Assert.isNotNull(dispatch, "Dispatch is null");
         String label = new String();
-        if (shipment.getSenderCenter() != null
-            && shipment.getReceiverCenter() != null)
-            label += shipment.getSenderCenter().getNameShort() + " -> "
-                + shipment.getReceiverCenter().getNameShort();
+        if (dispatch.getSenderCenter() != null
+            && dispatch.getReceiverCenter() != null)
+            label += dispatch.getSenderCenter().getNameShort() + " -> "
+                + dispatch.getReceiverCenter().getNameShort();
 
-        if (shipment.getPackedAt() != null)
-            label += " [" + shipment.getFormattedPackedAt() + "]";
+        ShipmentInfoWrapper shipInfo = dispatch.getShipmentInfo();
+        if ((shipInfo != null) && (shipInfo.getPackedAt() != null)) {
+            label += " [" + dispatch.getFormattedPackedAt() + "]";
+        }
         return label;
-
     }
 
     @Override
@@ -173,7 +178,7 @@ public class DispatchAdapter extends AdapterBase {
 
     private void setDispatchAsCreation() {
         getWrapper().setState(DispatchState.CREATION);
-        getWrapper().setPackedAt(null);
+        getWrapper().getShipmentInfo().setPackedAt(null);
         persistDispatch();
     }
 

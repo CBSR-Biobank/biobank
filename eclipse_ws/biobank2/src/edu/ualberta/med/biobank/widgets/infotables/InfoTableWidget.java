@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -114,7 +115,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
                 if (editItem == null)
                     return;
 
-                if (getSelection() instanceof ModelWrapper<?>)
+                if (getSelection() instanceof ModelWrapper<?>
+                    && !(getSelection() instanceof DispatchSpecimenWrapper))
                     editItem.setEnabled(((ModelWrapper<?>) getSelection())
                         .canUpdate(SessionManager.getUser()));
                 else

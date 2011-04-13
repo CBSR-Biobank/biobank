@@ -52,9 +52,10 @@ public abstract class AbstractViewWithAdapterTree extends
                     }
                 }
 
+                @SuppressWarnings("rawtypes")
                 @Override
                 public void sourceChanged(int sourcePriority,
-                    @SuppressWarnings("rawtypes") Map sourceValuesByName) {
+                    Map sourceValuesByName) {
                 }
             });
     }

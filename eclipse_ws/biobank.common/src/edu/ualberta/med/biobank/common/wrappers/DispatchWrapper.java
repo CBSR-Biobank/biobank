@@ -56,7 +56,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     public String getFormattedPackedAt() {
-        return DateFormatter.formatAsDateTime(getPackedAt());
+        if (getShipmentInfo() != null)
+            return DateFormatter.formatAsDateTime(getShipmentInfo()
+                .getPackedAt());
+        return null;
     }
 
     public boolean hasErrors() {
@@ -228,7 +231,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         boolean checkAlreadyAdded) {
         if (aliquot.isNew()) {
             return new CheckStatus(false, "Cannot add aliquot "
-                + aliquot.getInventoryId() + ": it has not already been saved");
+                + aliquot.getInventoryId() + ": it has not been saved");
         }
         if (!aliquot.isActive()) {
             return new CheckStatus(false, "Activity status of "
@@ -236,20 +239,21 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 + " Check comments on this aliquot for more information.");
         }
         if (!aliquot.getCurrentCenter().equals(getSenderCenter())) {
-            return new CheckStatus(false, "Aliquot " + aliquot.getInventoryId()
-                + " is currently assigned to site "
+            return new CheckStatus(false, "Specimen "
+                + aliquot.getInventoryId() + " is currently assigned to site "
                 + aliquot.getCurrentCenter().getNameShort()
                 + ". It should be first assigned to "
                 + getSenderCenter().getNameShort() + " site.");
         }
         if (checkAlreadyAdded && currentAliquots != null
             && currentAliquots.contains(aliquot)) {
-            return new CheckStatus(false, aliquot.getInventoryId()
-                + " is already in this Dispatch.");
+            return new CheckStatus(false, "Specimen "
+                + aliquot.getInventoryId() + " is already in this Dispatch.");
         }
         if (aliquot.isUsedInDispatch()) {
-            return new CheckStatus(false, aliquot.getInventoryId()
-                + " is already in a Dispatch in-transit or in creation.");
+            return new CheckStatus(false, "Specimen "
+                + aliquot.getInventoryId()
+                + " is already in an active dispatch.");
         }
         return new CheckStatus(true, "");
     }
@@ -261,19 +265,19 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         resetMap();
     }
 
-    public void removeAliquots(List<SpecimenWrapper> aliquotsToRemove) {
-        if (aliquotsToRemove == null) {
+    public void removeAliquots(List<DispatchSpecimenWrapper> dsaList) {
+        if (dsaList == null) {
             throw new NullPointerException();
         }
 
-        if (aliquotsToRemove.isEmpty())
+        if (dsaList.isEmpty())
             return;
 
         List<DispatchSpecimenWrapper> currentDaList = getDispatchSpecimenCollection(false);
         List<DispatchSpecimenWrapper> removeDispatchSpecimens = new ArrayList<DispatchSpecimenWrapper>();
 
         for (DispatchSpecimenWrapper dsa : currentDaList) {
-            if (aliquotsToRemove.contains(dsa.getSpecimen())) {
+            if (dsaList.contains(dsa)) {
                 removeDispatchSpecimens.add(dsa);
                 deletedDispatchedSpecimens.add(dsa);
             }
@@ -286,6 +290,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         for (DispatchSpecimenWrapper da : nonProcessedAliquots) {
             if (specimensToReceive.contains(da.getSpecimen())) {
                 da.setDispatchSpecimenState(DispatchSpecimenState.RECEIVED);
+                da.getSpecimen().setCurrentCenter(getReceiverCenter());
             }
         }
         resetMap();
@@ -497,7 +502,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private static final String DISPATCH_HQL_STRING = "from "
         + Dispatch.class.getName() + " as d inner join fetch d."
-        + DispatchPeer.SHIPMENT_INFO.getName() + " as s where s is not null";
+        + DispatchPeer.SHIPMENT_INFO.getName() + " as s ";
 
     /**
      * Search for shipments in the site with the given waybill
@@ -505,7 +510,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     public static List<DispatchWrapper> getDispatchesByWaybill(
         WritableApplicationService appService, String waybill)
         throws ApplicationException {
-        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING + " and s."
+        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING + " where s."
             + ShipmentInfoPeer.WAYBILL.getName() + " = ?");
         HQLCriteria criteria = new HQLCriteria(qry.toString(),
             Arrays.asList(new Object[] { waybill }));
@@ -526,10 +531,27 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         throws ApplicationException {
 
         StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING
-            + " and DATE(s." + ShipmentInfoPeer.RECEIVED_AT.getName()
+            + " where DATE(s." + ShipmentInfoPeer.RECEIVED_AT.getName()
             + ") = DATE(?)");
         HQLCriteria criteria = new HQLCriteria(qry.toString(),
             Arrays.asList(new Object[] { dateReceived }));
+
+        List<Dispatch> origins = appService.query(criteria);
+        List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(
+            appService, origins, DispatchWrapper.class);
+
+        return shipments;
+    }
+
+    public static List<DispatchWrapper> getDispatchesByDateSent(
+        WritableApplicationService appService, Date dateSent)
+        throws ApplicationException {
+
+        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING
+            + " where DATE(s." + ShipmentInfoPeer.PACKED_AT.getName()
+            + ") = DATE(?)");
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            Arrays.asList(new Object[] { dateSent }));
 
         List<Dispatch> origins = appService.query(criteria);
         List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(

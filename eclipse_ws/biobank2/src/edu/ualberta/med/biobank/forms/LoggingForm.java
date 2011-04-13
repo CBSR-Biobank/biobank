@@ -67,7 +67,8 @@ public class LoggingForm extends BiobankViewForm {
         toolkit.paintBordersFor(rightClient);
 
         /* a grid might make this easier */
-        centerLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "Center");
+        centerLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
+            "Center");
         userLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "User");
         typeLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "Type");
         actionLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
@@ -91,7 +92,7 @@ public class LoggingForm extends BiobankViewForm {
         generateSearchQueryTable();
     }
 
-    private void generateSearchQueryTable() throws Exception {
+    private void generateSearchQueryTable() {
         LogQuery.getInstance().queryDatabase();
 
         Composite client = createSectionWithClient("Search Results");

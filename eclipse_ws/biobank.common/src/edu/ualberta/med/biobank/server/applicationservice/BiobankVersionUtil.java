@@ -4,6 +4,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ClientVersi
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionInvalidException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionNewerException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionOlderException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.VersionInvalidException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 import java.io.FileNotFoundException;
@@ -17,7 +18,7 @@ public class BiobankVersionUtil {
 
     public static final String SERVER_VERSION_PROP_KEY = "server.version";
 
-    public static int[] serverVersionArr = null;
+    public static SwVersion serverVersion = null;
 
     private static Properties props = null;
 
@@ -36,13 +37,7 @@ public class BiobankVersionUtil {
         }
     }
 
-    private static void serverVersionStrToIntArray(String version) {
-        if (serverVersionArr != null)
-            return;
-        serverVersionArr = versionStrToIntArray(version);
-    }
-
-    public static void checkVersion(String clientVersion)
+    public static void checkVersion(String clientVersionStr)
         throws ApplicationException {
         if (props == null) {
             log.error("server does not have a version");
@@ -50,83 +45,62 @@ public class BiobankVersionUtil {
                 "The server version could not be determined.");
         }
 
-        String serverVersion = props.getProperty(SERVER_VERSION_PROP_KEY);
+        String serverVersionStr = props.getProperty(SERVER_VERSION_PROP_KEY);
 
-        if (serverVersion == null) {
+        if (serverVersionStr == null) {
             log.error("server does not have a version");
             throw new ServerVersionInvalidException(
                 "The server version could not be determined.");
         }
 
-        serverVersionStrToIntArray(serverVersion);
-        if (serverVersionArr == null) {
+        try {
+            serverVersion = new SwVersion(serverVersionStr);
+
+            if (clientVersionStr == null) {
+                log.error("client does not have a version");
+                throw new ClientVersionInvalidException(
+                    "Client authentication failed. "
+                        + "The Java Client version is not compatible with the server and must be upgraded.");
+            }
+
+            try {
+                SwVersion clientVersion = new SwVersion(clientVersionStr);
+
+                log.info("check version: server_version/" + serverVersionStr
+                    + " client_version/" + clientVersionStr);
+
+                if (clientVersion.getMajor() < serverVersion.getMajor()) {
+                    throw new ServerVersionNewerException(
+                        "Client authentication failed. "
+                            + "The Java Client version is too old to connect to this server.");
+                } else if (clientVersion.getMajor() > serverVersion.getMajor()) {
+                    throw new ServerVersionOlderException(
+                        "Client authentication failed. "
+                            + "The Java Client version is too new to connect to this server.");
+                } else {
+                    if (clientVersion.getMinor() < serverVersion.getMinor()) {
+                        throw new ServerVersionNewerException(
+                            "Client authentication failed. "
+                                + "The Java Client version is too old to connect to this server.");
+                    } else if (clientVersion.getMinor() > serverVersion
+                        .getMinor()) {
+                        throw new ServerVersionOlderException(
+                            "Client authentication failed. "
+                                + "The Java Client version is too new to connect to this server.");
+                    }
+                }
+            } catch (VersionInvalidException e) {
+                throw new ClientVersionInvalidException(
+                    "Client authentication failed. "
+                        + "The Java Client version is not compatible with the server and must be upgraded.");
+            }
+        } catch (VersionInvalidException e) {
             throw new ServerVersionInvalidException(
                 "The server version could not be determined.");
-        }
-
-        if (clientVersion == null) {
-            log.error("client does not have a version");
-            throw new ClientVersionInvalidException(
-                "Client authentication failed. "
-                    + "The Java Client version is not compatible with the server and must be upgraded.");
-        }
-
-        int[] clientVersionArr = versionStrToIntArray(clientVersion);
-        if (clientVersionArr == null) {
-            throw new ClientVersionInvalidException(
-                "The Java Client version is not valid.");
-        }
-
-        log.info("check version: server_version/" + serverVersion
-            + " client_version/" + clientVersion);
-
-        if (clientVersionArr[0] < serverVersionArr[0]) {
-            throw new ServerVersionNewerException(
-                "Client authentication failed. "
-                    + "The Java Client version is too old to connect to this server.");
-        } else if (clientVersionArr[0] > serverVersionArr[0]) {
-            throw new ServerVersionOlderException(
-                "Client authentication failed. "
-                    + "The Java Client version is too new to connect to this server.");
-        } else {
-            if (clientVersionArr[1] < serverVersionArr[1]) {
-                throw new ServerVersionNewerException(
-                    "Client authentication failed. "
-                        + "The Java Client version is too old to connect to this server.");
-            } else if (clientVersionArr[1] > serverVersionArr[1]) {
-                throw new ServerVersionOlderException(
-                    "Client authentication failed. "
-                        + "The Java Client version is too new to connect to this server.");
-            }
         }
     }
 
     public static String getServerVersion() {
         return props.getProperty(SERVER_VERSION_PROP_KEY);
     }
-
-    private static int[] versionStrToIntArray(String version) {
-        String[] versionSplit = version.split("\\.");
-
-        if ((versionSplit.length != 3) && (versionSplit.length != 4)) {
-            // split length is invalid
-            return null;
-        }
-
-        int[] result = new int[versionSplit.length];
-
-        for (int i = 0; i < versionSplit.length; i++) {
-            if (i < 3) {
-                try {
-                    result[i] = Integer.parseInt(versionSplit[i]);
-                } catch (NumberFormatException e) {
-                    return null;
-                }
-            } else if ((i == 3) && !versionSplit[3].equals("pre")) {
-                return null;
-            }
-        }
-        return result;
-    }
-
 }

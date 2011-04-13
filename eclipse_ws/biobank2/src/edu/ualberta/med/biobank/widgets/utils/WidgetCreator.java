@@ -44,7 +44,9 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -243,6 +245,7 @@ public class WidgetCreator {
                 modelObservableValue.removeValueChangeListener(changeListener);
             }
         });
+
         return combo;
     }
 
@@ -447,6 +450,15 @@ public class WidgetCreator {
         if (modifyListener != null) {
             combo.addModifyListener(modifyListener);
         }
+        combo.addListener(SWT.MouseWheel, new Listener() {
+
+            @Override
+            public void handleEvent(Event event) {
+                event.doit = false;
+            }
+
+        });
+
         return comboViewer;
     }
 

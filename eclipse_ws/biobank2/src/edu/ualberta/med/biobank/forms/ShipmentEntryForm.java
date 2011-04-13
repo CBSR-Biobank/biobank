@@ -158,8 +158,8 @@ public class ShipmentEntryForm extends BiobankEntryForm<OriginInfoWrapper> {
             });
 
         ShippingMethodWrapper shipMethod = shipInfo.getShippingMethod();
-        if (shipInfo.getSentAt() == null) {
-            shipInfo.setSentAt(new Date());
+        if (shipInfo.getPackedAt() == null) {
+            shipInfo.setPackedAt(new Date());
         }
 
         departedLabel = widgetCreator.createLabel(client, "Date Sent");
@@ -168,7 +168,7 @@ public class ShipmentEntryForm extends BiobankEntryForm<OriginInfoWrapper> {
         departedValidator = new NotNullValidator("Date Sent should be set");
 
         dateSentWidget = createDateTimeWidget(client, departedLabel,
-            shipInfo.getSentAt(), shipInfo, "sentAt", departedValidator,
+            shipInfo.getPackedAt(), shipInfo, "packedAt", departedValidator,
             SWT.DATE | SWT.TIME, DATE_SHIPPED_BINDING);
         activateDepartedWidget(shipMethod != null && shipMethod.needDate());
 
