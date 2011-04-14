@@ -23,7 +23,6 @@ public class ModifyStateDispatchDialog extends BiobankDialog {
     private class CommentValue {
         private String value;
 
-        @SuppressWarnings("unused")
         public void setValue(String value) {
             this.value = value;
         }
