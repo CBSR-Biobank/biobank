@@ -392,7 +392,7 @@
           description="generates the database schema for the caCORE SDK data model">
     <ant dir="${schema.dir}" target="schemaexport" inheritRefs="false" />
   </target>
-  <target name="dbcreate-add-tables" depends="hbmpostproc,prepare-webapp-orm">
+  <target name="dbcreate-add-tables" depends="sdk,package-webapp-orm">
     <sql driver="${DB_DRIVER}"
          url="${DB_CONNECTION_URL}"
          userid="${DB_USERNAME}"
