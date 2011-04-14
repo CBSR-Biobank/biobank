@@ -42,8 +42,6 @@ public class HbmModifier {
 
     private static HbmModifier instance = null;
 
-    private boolean documentChanged = false;
-
     private HbmModifier() {
 
     }
@@ -72,6 +70,7 @@ public class HbmModifier {
 
             String line = reader.readLine();
 
+            boolean documentChanged = false;
             boolean idPropertyFound = false;
 
             while (line != null) {
@@ -99,12 +98,13 @@ public class HbmModifier {
                     alteredLine = fixStringAttributes(line, className, attr);
                     alteredLine = addContraints(alteredLine, attrName,
                         uniqueList, notNullList);
-                    documentChanged |= !line.equals(alteredLine);
                 } else if (attrMatcher.find()) {
                     String attrName = attrMatcher.group(1);
                     alteredLine = addContraints(alteredLine, attrName,
                         uniqueList, notNullList);
                 }
+
+                documentChanged |= !line.equals(alteredLine);
 
                 writer.write(alteredLine);
                 writer.newLine();
@@ -124,7 +124,7 @@ public class HbmModifier {
             if (documentChanged) {
                 FileUtils.copyFile(outFile, new File(filename));
                 if (HbmPostProcess.getInstance().getVerbose()) {
-                    System.out.println("HBM Modified: " + filename);
+                    LOGGER.info("HBM Modified: " + filename);
                 }
             }
 
@@ -166,7 +166,6 @@ public class HbmModifier {
         if (notNullList.contains(attrName) && !s.contains("not-null="))
             s += " not-null=\"true\"";
         if (s.length() > 0) {
-            documentChanged = true;
             return line.replace("/>", s + "/>");
         }
         return line;
