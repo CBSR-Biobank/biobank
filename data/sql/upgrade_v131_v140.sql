@@ -374,6 +374,24 @@ ALTER TABLE shipping_method
       ADD CONSTRAINT NAME UNIQUE KEY(NAME);
 
 /*****************************************************
+ * patient changes
+ ****************************************************/
+
+ALTER TABLE patient ADD COLUMN CREATED_AT DATETIME NULL DEFAULT NULL COMMENT '';
+
+update patient p
+       join (select p.id,min(pv.date_drawn) as min_date_drawn
+       from patient p
+       join clinic_shipment_patient csp on csp.patient_id=p.id
+       join patient_visit pv on pv.clinic_shipment_patient_id=csp.id
+       group by p.id) as a on p.id=a.id
+       set p.created_at=a.min_date_drawn;
+
+update patient p
+       set p.created_at = '1970-01-01'
+       where p.created_at is null;
+
+/*****************************************************
  * study changes
  ****************************************************/
 
@@ -748,8 +766,6 @@ CREATE TABLE researcher (
     ID INT(11) NOT NULL,
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-ALTER TABLE patient ADD COLUMN CREATED_AT DATETIME NULL DEFAULT NULL COMMENT '';
 
 CREATE TABLE request (
     ID INT(11) NOT NULL,
@@ -1485,89 +1501,89 @@ alter table study_contact engine=InnoDB;
 alter table study_event_attr engine=InnoDB;
 
 /*****************************************************
- * Add Hibernate timestamp to achieve optimistic
+ * Add Hibernate version to achieve optimistic
  * concurrency control
  ****************************************************/
 
-ALTER TABLE abstract_position ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE activity_status ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE address ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE aliquoted_specimen ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE capacity ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE center ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE collection_event ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE contact ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE container ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE container_labeling_scheme ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE container_path ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE container_type ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE dispatch ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE dispatch_specimen ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE entity ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE entity_column ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE entity_filter ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE entity_property ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE event_attr ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE event_attr_type ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE global_event_attr ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE origin_info ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE patient ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE processing_event ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE property_modifier ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE property_type ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE report ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE report_column ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE report_filter ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE report_filter_value ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE request ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE request_specimen ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE shipment_info ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE shipping_method ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE source_specimen ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE specimen ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE specimen_type ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE study ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
-ALTER TABLE study_event_attr ADD COLUMN LAST_UPDATED TIMESTAMP NOT NULL DEFAULT NOW();
+ALTER TABLE abstract_position ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE activity_status ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE address ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE aliquoted_specimen ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE capacity ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE center ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE collection_event ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE contact ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE container ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE container_labeling_scheme ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE container_path ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE container_type ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE dispatch ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE dispatch_specimen ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE entity ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE entity_column ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE entity_filter ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE entity_property ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE event_attr ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE event_attr_type ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE global_event_attr ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE origin_info ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE patient ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE processing_event ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE property_modifier ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE property_type ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE report ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE report_column ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE report_filter ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE report_filter_value ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE request ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE request_specimen ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE shipment_info ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE shipping_method ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE source_specimen ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE specimen ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE specimen_type ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE study ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE study_event_attr ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
 
-update abstract_position set LAST_UPDATED='1970-01-01';
-update activity_status set LAST_UPDATED='1970-01-01';
-update address set LAST_UPDATED='1970-01-01';
-update aliquoted_specimen set LAST_UPDATED='1970-01-01';
-update capacity set LAST_UPDATED='1970-01-01';
-update center set LAST_UPDATED='1970-01-01';
-update collection_event set LAST_UPDATED='1970-01-01';
-update contact set LAST_UPDATED='1970-01-01';
-update container set LAST_UPDATED='1970-01-01';
-update container_labeling_scheme set LAST_UPDATED='1970-01-01';
-update container_path set LAST_UPDATED='1970-01-01';
-update container_type set LAST_UPDATED='1970-01-01';
-update dispatch set LAST_UPDATED='1970-01-01';
-update dispatch_specimen set LAST_UPDATED='1970-01-01';
-update entity set LAST_UPDATED='1970-01-01';
-update entity_column set LAST_UPDATED='1970-01-01';
-update entity_filter set LAST_UPDATED='1970-01-01';
-update entity_property set LAST_UPDATED='1970-01-01';
-update event_attr set LAST_UPDATED='1970-01-01';
-update event_attr_type set LAST_UPDATED='1970-01-01';
-update global_event_attr set LAST_UPDATED='1970-01-01';
-update origin_info set LAST_UPDATED='1970-01-01';
-update patient set LAST_UPDATED='1970-01-01';
-update processing_event set LAST_UPDATED='1970-01-01';
-update property_modifier set LAST_UPDATED='1970-01-01';
-update property_type set LAST_UPDATED='1970-01-01';
-update report set LAST_UPDATED='1970-01-01';
-update report_column set LAST_UPDATED='1970-01-01';
-update report_filter set LAST_UPDATED='1970-01-01';
-update report_filter_value set LAST_UPDATED='1970-01-01';
-update request set LAST_UPDATED='1970-01-01';
-update request_specimen set LAST_UPDATED='1970-01-01';
-update shipment_info set LAST_UPDATED='1970-01-01';
-update shipping_method set LAST_UPDATED='1970-01-01';
-update source_specimen set LAST_UPDATED='1970-01-01';
-update specimen set LAST_UPDATED='1970-01-01';
-update specimen_type set LAST_UPDATED='1970-01-01';
-update study set LAST_UPDATED='1970-01-01';
-update study_event_attr set LAST_UPDATED='1970-01-01';
+update abstract_position set VERSION=0;
+update activity_status set VERSION=0;
+update address set VERSION=0;
+update aliquoted_specimen set VERSION=0;
+update capacity set VERSION=0;
+update center set VERSION=0;
+update collection_event set VERSION=0;
+update contact set VERSION=0;
+update container set VERSION=0;
+update container_labeling_scheme set VERSION=0;
+update container_path set VERSION=0;
+update container_type set VERSION=0;
+update dispatch set VERSION=0;
+update dispatch_specimen set VERSION=0;
+update entity set VERSION=0;
+update entity_column set VERSION=0;
+update entity_filter set VERSION=0;
+update entity_property set VERSION=0;
+update event_attr set VERSION=0;
+update event_attr_type set VERSION=0;
+update global_event_attr set VERSION=0;
+update origin_info set VERSION=0;
+update patient set VERSION=0;
+update processing_event set VERSION=0;
+update property_modifier set VERSION=0;
+update property_type set VERSION=0;
+update report set VERSION=0;
+update report_column set VERSION=0;
+update report_filter set VERSION=0;
+update report_filter_value set VERSION=0;
+update request set VERSION=0;
+update request_specimen set VERSION=0;
+update shipment_info set VERSION=0;
+update shipping_method set VERSION=0;
+update source_specimen set VERSION=0;
+update specimen set VERSION=0;
+update specimen_type set VERSION=0;
+update study set VERSION=0;
+update study_event_attr set VERSION=0;
 
 /*****************************************************
  * mysql-diff changes to fully convert to InnoDB

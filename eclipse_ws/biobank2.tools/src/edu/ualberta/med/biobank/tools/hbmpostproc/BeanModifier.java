@@ -19,7 +19,7 @@ public class BeanModifier {
     private static Pattern BEAN_SERIAL_VERSION_DECL = Pattern
         .compile("private static final long serialVersionUID");
 
-    private static final String LAST_UPDATE_DECL = "        private java.sql.Timestamp lastUpdated;";
+    private static final String LAST_UPDATE_DECL = "        private int version;";
 
     private static BeanModifier instance = null;
 

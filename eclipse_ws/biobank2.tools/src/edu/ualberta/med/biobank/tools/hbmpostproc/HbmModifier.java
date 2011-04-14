@@ -36,9 +36,12 @@ public class HbmModifier {
 
     // see
     // http://www.mandubian.org/magnoliaPublic/mandubian-org/knowledge-garbage-collector/how-tos/hibernate-version-timestamp.html
-    private static final String TIMESTAMP_PROPERTY = "      <version name=\"lastUpdated\" access=\"field\" type=\"timestamp\" generated=\"always\" >\n"
-        + "         <column name=\"LAST_UPDATED\" sql-type=\"timestamp\" default=\"CURRENT_TIMESTAMP\" />\n"
-        + "    </version>";
+    // private static final String TIMESTAMP_PROPERTY =
+    // "      <version name=\"lastUpdated\" access=\"field\" type=\"timestamp\" generated=\"always\" >\n"
+    // +
+    // "         <column name=\"LAST_UPDATED\" sql-type=\"timestamp\" default=\"CURRENT_TIMESTAMP\" />\n"
+    // + "    </version>";
+    private static final String TIMESTAMP_PROPERTY = "          <version name=\"version\" column=\"VERSION\" access=\"field\" />";
 
     private static HbmModifier instance = null;
 
