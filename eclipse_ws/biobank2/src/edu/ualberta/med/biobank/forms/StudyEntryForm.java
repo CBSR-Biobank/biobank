@@ -348,7 +348,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     public void reset() throws Exception {
-        super.reset();
+        study.reset();
         ActivityStatusWrapper currentActivityStatus = study.getActivityStatus();
         if (currentActivityStatus != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
