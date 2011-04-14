@@ -13,9 +13,9 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.UICellStatus;
-import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileSettings;
 
@@ -104,8 +104,9 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     }
 
     @Override
-    protected String getMiddleTextForBox(Map<RowColPos, ? extends Cell> cells,
-        int indexRow, int indexCol) {
+    protected String getMiddleTextForBox(
+        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        int indexCol) {
         if (cells != null) {
             PalletCell cell = (PalletCell) cells.get(new RowColPos(indexRow,
                 indexCol));
@@ -116,16 +117,18 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     }
 
     @Override
-    protected String getTopTextForBox(Map<RowColPos, ? extends Cell> cells,
-        int indexRow, int indexCol) {
+    protected String getTopTextForBox(
+        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        int indexCol) {
         String row = new Character((char) (indexRow + 'A')).toString();
         String col = new Integer(indexCol + 1).toString();
         return row + col;
     }
 
     @Override
-    protected String getBottomTextForBox(Map<RowColPos, ? extends Cell> cells,
-        int indexRow, int indexCol) {
+    protected String getBottomTextForBox(
+        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        int indexCol) {
         if (cells != null) {
             PalletCell cell = (PalletCell) cells.get(new RowColPos(indexRow,
                 indexCol));

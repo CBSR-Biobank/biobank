@@ -159,7 +159,8 @@ public class SiteWrapper extends SiteBaseWrapper {
             }
             if (sort)
                 Collections.sort(topContainerCollection);
-            cache.put(TOP_CONTAINER_COLLECTION_CACHE_KEY, topContainerCollection);
+            cache.put(TOP_CONTAINER_COLLECTION_CACHE_KEY,
+                topContainerCollection);
         }
         return topContainerCollection;
     }
@@ -308,10 +309,6 @@ public class SiteWrapper extends SiteBaseWrapper {
         HQLCriteria c = new HQLCriteria(COLLECTION_EVENT_COUNT_FOR_STUDY_QRY,
             Arrays.asList(new Object[] { getId(), study.getId() }));
         return getCountResult(appService, c);
-    }
-
-    public String getShipmentCount() {
-        return null; // FIXME: no way to determine destination of shipinfos...
     }
 
     public static final String PATIENT_COUNT_FOR_STUDY_QRY = "select count(distinct patient) from "

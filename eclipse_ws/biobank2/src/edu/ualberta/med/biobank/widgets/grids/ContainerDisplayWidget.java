@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionManager;
 
 /**
@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionManager;
  */
 public class ContainerDisplayWidget extends Canvas {
 
-    protected Map<RowColPos, ? extends Cell> cells;
+    protected Map<RowColPos, ? extends AbstractUICell> cells;
 
     protected ContainerWrapper container;
 
@@ -59,7 +59,8 @@ public class ContainerDisplayWidget extends Canvas {
         this(parent, null);
     }
 
-    public ContainerDisplayWidget(Composite parent, List<UICellStatus> cellStatus) {
+    public ContainerDisplayWidget(Composite parent,
+        List<UICellStatus> cellStatus) {
         super(parent, SWT.DOUBLE_BUFFERED);
         addPaintListener(new PaintListener() {
             @Override
@@ -89,14 +90,14 @@ public class ContainerDisplayWidget extends Canvas {
         return super.computeSize(wHint, hHint, changed);
     }
 
-    public Cell getObjectAtCoordinates(int x, int y) {
+    public AbstractUICell getObjectAtCoordinates(int x, int y) {
         if (containerDisplay != null) {
             return containerDisplay.getObjectAtCoordinates(this, x, y);
         }
         return null;
     }
 
-    public void setCells(Map<RowColPos, ? extends Cell> cells) {
+    public void setCells(Map<RowColPos, ? extends AbstractUICell> cells) {
         this.cells = cells;
         redraw();
     }
@@ -209,7 +210,7 @@ public class ContainerDisplayWidget extends Canvas {
         return "";
     }
 
-    public Map<RowColPos, ? extends Cell> getCells() {
+    public Map<RowColPos, ? extends AbstractUICell> getCells() {
         return cells;
     }
 

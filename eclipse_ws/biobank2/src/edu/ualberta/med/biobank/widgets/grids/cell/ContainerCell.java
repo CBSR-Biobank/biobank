@@ -1,8 +1,8 @@
-package edu.ualberta.med.biobank.model;
+package edu.ualberta.med.biobank.widgets.grids.cell;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 
-public class ContainerCell extends Cell {
+public class ContainerCell extends AbstractUICell {
 
     private Integer row;
 

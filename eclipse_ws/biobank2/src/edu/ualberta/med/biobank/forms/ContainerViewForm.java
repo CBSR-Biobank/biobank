@@ -39,13 +39,13 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.ContainerCell;
-import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
+import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
+import edu.ualberta.med.biobank.widgets.grids.cell.ContainerCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionSpecificBehaviour;
@@ -247,7 +247,7 @@ public class ContainerViewForm extends BiobankViewForm {
         containerWidget.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
-                Cell cell = ((ContainerDisplayWidget) e.widget)
+                AbstractUICell cell = ((ContainerDisplayWidget) e.widget)
                     .getObjectAtCoordinates(e.x, e.y);
                 if (cell != null)
                     openFormFor((ContainerCell) cell);
@@ -256,11 +256,11 @@ public class ContainerViewForm extends BiobankViewForm {
         containerWidget.getMultiSelectionManager().enableMultiSelection(
             new MultiSelectionSpecificBehaviour() {
                 @Override
-                public void removeSelection(Cell cell) {
+                public void removeSelection(AbstractUICell cell) {
                 }
 
                 @Override
-                public boolean isSelectable(Cell cell) {
+                public boolean isSelectable(AbstractUICell cell) {
                     return true;
                 }
             });

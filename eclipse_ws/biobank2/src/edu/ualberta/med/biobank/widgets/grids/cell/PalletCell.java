@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.model;
+package edu.ualberta.med.biobank.widgets.grids.cell;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +15,7 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class PalletCell extends Cell {
+public class PalletCell extends AbstractUICell {
 
     private UICellStatus status;
 

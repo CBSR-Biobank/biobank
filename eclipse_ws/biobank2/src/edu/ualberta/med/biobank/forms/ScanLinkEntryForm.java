@@ -46,12 +46,12 @@ import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionSpecificBehaviour;
@@ -250,7 +250,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                     spw.getMultiSelectionManager().enableMultiSelection(
                         new MultiSelectionSpecificBehaviour() {
                             @Override
-                            public void removeSelection(Cell cell) {
+                            public void removeSelection(AbstractUICell cell) {
                                 PalletCell pCell = (PalletCell) cell;
                                 if (pCell != null && pCell.getValue() != null) {
                                     pCell.setSpecimenType(null);
@@ -259,7 +259,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                             }
 
                             @Override
-                            public boolean isSelectable(Cell cell) {
+                            public boolean isSelectable(AbstractUICell cell) {
                                 return ((PalletCell) cell).getValue() != null;
                             }
                         });
@@ -297,7 +297,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 SpecimenHierarchy selection = customSelectionWidget
                     .getSelection();
                 if (selection != null) {
-                    for (Cell cell : spw.getMultiSelectionManager()
+                    for (AbstractUICell cell : spw.getMultiSelectionManager()
                         .getSelectedCells()) {
                         PalletCell pCell = (PalletCell) cell;
                         setTypeToCell(pCell, selection);

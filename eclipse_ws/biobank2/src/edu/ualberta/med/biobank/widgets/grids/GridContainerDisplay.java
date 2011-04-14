@@ -9,9 +9,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.UICellStatus;
-import edu.ualberta.med.biobank.model.ContainerCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
+import edu.ualberta.med.biobank.widgets.grids.cell.ContainerCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 
 public class GridContainerDisplay extends AbstractGridDisplay {
 
@@ -56,8 +56,9 @@ public class GridContainerDisplay extends AbstractGridDisplay {
     }
 
     @Override
-    protected String getDefaultTextForBox(Map<RowColPos, ? extends Cell> cells,
-        int indexRow, int indexCol) {
+    protected String getDefaultTextForBox(
+        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        int indexCol) {
         String text = super.getDefaultTextForBox(cells, indexRow, indexCol);
         if (text.isEmpty()) {
             return "";
@@ -70,16 +71,18 @@ public class GridContainerDisplay extends AbstractGridDisplay {
     }
 
     @Override
-    protected String getBottomTextForBox(Map<RowColPos, ? extends Cell> cells,
-        int indexRow, int indexCol) {
+    protected String getBottomTextForBox(
+        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        int indexCol) {
         if (getCellHeight() > HEIGHT_TWO_LINES) {
             return getContainerTypeText(cells, indexRow, indexCol);
         }
         return "";
     }
 
-    protected String getContainerTypeText(Map<RowColPos, ? extends Cell> cells,
-        int indexRow, int indexCol) {
+    protected String getContainerTypeText(
+        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        int indexCol) {
         String sname = "";
         if (cells != null) {
             ContainerCell cell = (ContainerCell) cells.get(new RowColPos(

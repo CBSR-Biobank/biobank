@@ -11,9 +11,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.UICellStatus;
-import edu.ualberta.med.biobank.model.ContainerCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
+import edu.ualberta.med.biobank.widgets.grids.cell.ContainerCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 
 /**
  * Drawer 36 display.
@@ -119,7 +119,7 @@ public class Drawer36Display extends AbstractContainerDisplay {
 
             if (displayWidget.getCells() != null) {
                 if (displayWidget.getMultiSelectionManager().isEnabled()) {
-                    Cell cell = displayWidget.getCells().get(
+                    AbstractUICell cell = displayWidget.getCells().get(
                         new RowColPos(boxIndex - 1, 0));
                     if (cell != null && cell.isSelected()) {
                         Rectangle rect = new Rectangle(rectangle.x + 5,
@@ -140,8 +140,8 @@ public class Drawer36Display extends AbstractContainerDisplay {
         }
     }
 
-    private UICellStatus getStatus(Map<RowColPos, ? extends Cell> cells,
-        int boxIndex) {
+    private UICellStatus getStatus(
+        Map<RowColPos, ? extends AbstractUICell> cells, int boxIndex) {
         UICellStatus status = null;
         if (cells != null) {
             status = ((ContainerCell) cells.get(new RowColPos(boxIndex - 1, 0)))

@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -47,10 +46,6 @@ public class PatientTodayNode extends AbstractTodayNode<PatientWrapper> {
     @Override
     protected List<PatientWrapper> getTodayElements()
         throws ApplicationException {
-        if (SessionManager.getInstance().isConnected())
-            return PatientWrapper
-                .getPatientsInTodayCollectionEvents(SessionManager
-                    .getAppService());
         return new ArrayList<PatientWrapper>();
     }
 

@@ -33,6 +33,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
@@ -40,12 +41,12 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
-import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.model.UICellStatus;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
@@ -533,8 +534,15 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                     "ScanLink.scan.monitor.position", //$NON-NLS-1$
                     ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
                 PalletCell palletCell = cells.get(entry.getKey());
-                palletCell.merge(appService, entry.getValue());
-                // additional cell specific client conversion
+                Cell servercell = entry.getValue();
+                if (palletCell == null) { // can happened if missing
+                    palletCell = new PalletCell(new ScanCell(
+                        servercell.getRow(), servercell.getCol(),
+                        servercell.getValue()));
+                    cells.put(rcp, palletCell);
+                }
+                palletCell.merge(appService, servercell);
+                // additional cell specific client conversion if needed
                 processCellResult(rcp, palletCell);
             }
         }

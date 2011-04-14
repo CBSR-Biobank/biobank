@@ -35,8 +35,6 @@ public class AssignProcess extends ServerProcess {
         boolean rescanMode) throws Exception {
         AssignProcessData assignData = (AssignProcessData) data;
         CellStatus currentScanState = CellStatus.EMPTY;
-        // FIXME need to remember movedAndMissingSpecimensFromPallet when rescan
-        // ?
         Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet = new HashMap<RowColPos, Boolean>();
         for (int row = 0; row < assignData.getPalletRowCapacity(appService); row++) {
             for (int col = 0; col < assignData.getPalletColCapacity(appService); col++) {
@@ -63,6 +61,11 @@ public class AssignProcess extends ServerProcess {
                 CellStatus newStatus = CellStatus.EMPTY;
                 if (cell != null) {
                     newStatus = cell.getStatus();
+                    if (newStatus == null) {
+                        System.out.println(ContainerLabelingSchemeWrapper
+                            .rowColToSbs(new RowColPos(cell.getRow(), cell
+                                .getCol())));
+                    }
                 }
                 currentScanState = currentScanState.mergeWith(newStatus);
             }
@@ -116,6 +119,11 @@ public class AssignProcess extends ServerProcess {
                     expectedSpecimen, foundSpecimen);
             } else {
                 scanCell.setSpecimenId(foundSpecimen.getId());
+                System.out.println("expectedSpecimen="
+                    + expectedSpecimen
+                    + " in "
+                    + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(
+                        scanCell.getRow(), scanCell.getCol())));
                 if (expectedSpecimen != null) {
                     // specimen scanned is already registered at this
                     // position (everything is ok !)
@@ -128,7 +136,7 @@ public class AssignProcess extends ServerProcess {
                         .getContainerType(appService);
                     if (cType.getSpecimenTypeCollection().contains(
                         foundSpecimen.getSpecimenType())) {
-                        if (foundSpecimen.hasParent()) { // moved
+                        if (foundSpecimen.hasParent()) { // moved ?
                             processCellWithPreviousPosition(scanCell,
                                 positionString, foundSpecimen,
                                 movedAndMissingSpecimensFromPallet);
@@ -186,7 +194,6 @@ public class AssignProcess extends ServerProcess {
     /**
      * specimen not found in site (not yet linked ?)
      */
-    // FIXME not linked or not added into any cevent
     private void updateCellAsNotLinked(String position, Cell scanCell) {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages

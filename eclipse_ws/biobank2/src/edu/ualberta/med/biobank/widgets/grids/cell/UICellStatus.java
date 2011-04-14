@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.model;
+package edu.ualberta.med.biobank.widgets.grids.cell;
 
 import java.util.Arrays;
 import java.util.List;
