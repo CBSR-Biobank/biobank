@@ -32,16 +32,12 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createMainSection();
-<<<<<<< HEAD
+
         boolean editAliquots = !modelObject.isInClosedState()
             && !modelObject.isInLostState();
-=======
-        boolean editAliquots = !dispatch.isInClosedState()
-            && !dispatch.isInLostState();
 
         setFirstControl(form);
 
->>>>>>> master
         if (editAliquots)
             createAliquotsSelectionActions(page, true);
         aliquotsTree = new DispatchAliquotsTreeTable(page, modelObject,
@@ -202,7 +198,8 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
     @Override
     protected String getTextForPartName() {
-        return "Dispatch sent on " + modelObject.getShipmentInfo().getPackedAt();
+        return "Dispatch sent on "
+            + modelObject.getShipmentInfo().getPackedAt();
     }
 
     @Override

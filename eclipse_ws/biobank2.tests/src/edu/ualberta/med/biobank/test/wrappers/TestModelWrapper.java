@@ -25,7 +25,7 @@ public class TestModelWrapper extends TestDatabase {
         }
 
         @Override
-        protected List<Property<?, ?>> getProperties() {
+        protected List<Property<?, ? super Object>> getProperties() {
             return null;
         }
 
@@ -48,7 +48,7 @@ public class TestModelWrapper extends TestDatabase {
         }
 
         @Override
-        protected List<Property<?, ?>> getProperties() {
+        protected List<Property<?, ? super Site>> getProperties() {
             return null;
         }
 

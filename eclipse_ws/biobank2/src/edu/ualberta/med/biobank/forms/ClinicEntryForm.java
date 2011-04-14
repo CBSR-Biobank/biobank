@@ -64,9 +64,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon<ClinicWrapper> {
         clinicAdapter = (ClinicAdapter) adapter;
 
         String tabName;
-        if (modelObject.isNew())
+        if (modelObject.isNew()) {
             tabName = Messages.getString("ClinicEntryForm.title.new"); //$NON-NLS-1$
-            clinic.setActivityStatus(ActivityStatusWrapper
+            modelObject.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else
             tabName = Messages.getString("ClinicEntryForm.title.edit", //$NON-NLS-1$

@@ -196,8 +196,8 @@ public class ProcessingEventEntryForm extends
                     else if (specimen.getParentContainer() != null)
                         throw new VetoException(
                             "Specimen is currently listed as stored in a container.");
-                    else if (pEvent.getSpecimenCollection(false).size() > 0
-                        && !pEvent
+                    else if (modelObject.getSpecimenCollection(false).size() > 0
+                        && !modelObject
                             .getSpecimenCollection(false)
                             .get(0)
                             .getCollectionEvent()
