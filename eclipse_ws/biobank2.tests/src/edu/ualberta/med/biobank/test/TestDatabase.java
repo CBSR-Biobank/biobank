@@ -82,7 +82,8 @@ public class TestDatabase {
                 && !method.getReturnType().getName()
                     .startsWith("edu.ualberta.med.biobank.common")
                 && !method.getReturnType().getName()
-                    .startsWith("edu.ualberta.med.biobank.util")) {
+                    .startsWith("edu.ualberta.med.biobank.util")
+                && (method.getParameterTypes().length == 0)) {
                 GetterInfo getterInfo = new GetterInfo();
                 getterInfo.getMethod = method;
                 map.put(method.getName(), getterInfo);

@@ -494,7 +494,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return aliquots.get(new RowColPos(row, col));
     }
 
-    public void addAliquot(Integer row, Integer col, SpecimenWrapper aliquot)
+    public void addSpecimen(Integer row, Integer col, SpecimenWrapper aliquot)
         throws Exception {
         SpecimenPositionWrapper aliquotPosition = new SpecimenPositionWrapper(
             appService);
@@ -737,7 +737,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         Map<RowColPos, SpecimenWrapper> aliquots = getSpecimens();
         for (Entry<RowColPos, SpecimenWrapper> e : aliquots.entrySet()) {
             destination
-                .addAliquot(e.getKey().row, e.getKey().col, e.getValue());
+                .addSpecimen(e.getKey().row, e.getKey().col, e.getValue());
         }
         destination.persist();
     }

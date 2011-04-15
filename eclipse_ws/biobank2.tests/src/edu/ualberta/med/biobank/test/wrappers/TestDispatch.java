@@ -2,12 +2,14 @@ package edu.ualberta.med.biobank.test.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -31,6 +33,7 @@ import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestDispatch extends TestDatabase {
 
@@ -163,7 +166,7 @@ public class TestDispatch extends TestDatabase {
     }
 
     @Test
-    public void testCompatreTo() throws Exception {
+    public void testCompareTo() throws Exception {
         String name = "testCompareTo" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
@@ -180,21 +183,17 @@ public class TestDispatch extends TestDatabase {
 
         DispatchWrapper dispatch1 = DispatchHelper.addDispatch(senderSite,
             receiverSite, method);
-        // FIXME
-        // dispatch1.setDateReceived(DateFormatter.dateFormatter
-        // .parse("2010-02-01 23:00"));
+        dispatch1.getShipmentInfo().setReceivedAt(
+            DateFormatter.parseToDate("2010-02-01 23:00"));
 
         DispatchWrapper dispatch2 = DispatchHelper.addDispatch(senderSite,
             receiverSite, method);
-        // FIXME
-        // dispatch2.setDateReceived(DateFormatter.dateFormatter
-        // .parse("2009-12-01 23:00"));
+        dispatch2.getShipmentInfo().setReceivedAt(
+            DateFormatter.parseToDate("2009-12-01 23:00"));
 
-        Assert.assertTrue(dispatch1.compareTo(dispatch2) > 0);
-        Assert.assertTrue(dispatch2.compareTo(dispatch1) < 0);
+        Assert.assertTrue(dispatch1.compareTo(dispatch2) < 0);
+        Assert.assertTrue(dispatch2.compareTo(dispatch1) > 0);
 
-        Assert.assertTrue(dispatch1.compareTo(null) == 0);
-        Assert.assertTrue(dispatch2.compareTo(null) == 0);
     }
 
     @Test
@@ -384,22 +383,84 @@ public class TestDispatch extends TestDatabase {
 
     @Test
     public void testRemoveDispatchAliquots() {
-        Assert.fail("testcase missing");
+
     }
 
     @Test
     public void testGetDispatchesInSite() {
-        Assert.fail("testcase missing");
+        try {
+            SiteWrapper site = SiteHelper.addSite("newSite");
+            ClinicWrapper clinic = ClinicHelper.addClinic("testc");
+            DispatchWrapper testDispatch = DispatchHelper.addDispatch(site,
+                clinic, ShippingMethodWrapper.getShippingMethods(appService)
+                    .get(0));
+            Assert.assertTrue(site.getSrcDispatchCollection(false).size() == 1);
+            Assert
+                .assertTrue(clinic.getDstDispatchCollection(false).size() == 1);
+            testDispatch.setSenderCenter(clinic);
+            testDispatch.setReceiverCenter(site);
+            testDispatch.persist();
+            site.reload();
+            clinic.reload();
+            Assert
+                .assertTrue(clinic.getSrcDispatchCollection(false).size() == 1);
+            Assert.assertTrue(site.getDstDispatchCollection(false).size() == 1);
+        } catch (ApplicationException e) {
+            Assert.fail(e.getCause().getMessage());
+        } catch (Exception e) {
+            Assert.fail(e.getCause().getMessage());
+        }
+
     }
 
     @Test
     public void testGetDispatchesInSiteByDateSent() {
-        Assert.fail("testcase missing");
+        try {
+            Date date = new Date();
+            SiteWrapper site = SiteHelper.addSite("newSite");
+            ClinicWrapper clinic = ClinicHelper.addClinic("testc");
+            DispatchWrapper testDispatch = DispatchHelper.addDispatch(site,
+                clinic, ShippingMethodWrapper.getShippingMethods(appService)
+                    .get(0));
+            testDispatch.getShipmentInfo().setPackedAt(date);
+            testDispatch.getShipmentInfo().persist();
+            testDispatch.reload();
+            Assert.assertTrue(DispatchWrapper.getDispatchesByDateSent(
+                appService, date).size() == 1);
+            Assert.assertTrue(DispatchWrapper.getDispatchesByDateReceived(
+                appService, date).size() == 0);
+            testDispatch.setSenderCenter(clinic);
+            testDispatch.setReceiverCenter(site);
+        } catch (ApplicationException e) {
+            Assert.fail(e.getCause().getMessage());
+        } catch (Exception e) {
+            Assert.fail(e.getCause().getMessage());
+        }
     }
 
     @Test
     public void testGetDispatchesInSiteByDateReceived() {
-        Assert.fail("testcase missing");
+        try {
+            Date date = new Date();
+            SiteWrapper site = SiteHelper.addSite("newSite");
+            ClinicWrapper clinic = ClinicHelper.addClinic("testc");
+            DispatchWrapper testDispatch = DispatchHelper.addDispatch(site,
+                clinic, ShippingMethodWrapper.getShippingMethods(appService)
+                    .get(0));
+            testDispatch.getShipmentInfo().setReceivedAt(date);
+            testDispatch.getShipmentInfo().persist();
+            testDispatch.reload();
+            Assert.assertTrue(DispatchWrapper.getDispatchesByDateReceived(
+                appService, date).size() == 1);
+            Assert.assertTrue(DispatchWrapper.getDispatchesByDateSent(
+                appService, date).size() == 0);
+            testDispatch.setSenderCenter(clinic);
+            testDispatch.setReceiverCenter(site);
+        } catch (ApplicationException e) {
+            Assert.fail(e.getCause().getMessage());
+        } catch (Exception e) {
+            Assert.fail(e.getCause().getMessage());
+        }
     }
 
 }

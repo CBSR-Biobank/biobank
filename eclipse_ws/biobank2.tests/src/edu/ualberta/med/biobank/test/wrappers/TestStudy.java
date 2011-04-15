@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -27,9 +28,12 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSet
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
+import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
+import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -102,9 +106,13 @@ public class TestStudy extends TestDatabase {
         study.persist();
         study.reload();
         PatientWrapper patient = PatientHelper.addPatient(name, study);
-        // FIXME
-        // return ProcessingEventHelper.addProcessingEvents(site, patient);
-        return null;
+        return Arrays.asList(
+            ProcessingEventHelper.addProcessingEvent(site, patient,
+                Utils.getRandomDate()),
+            ProcessingEventHelper.addProcessingEvent(site, patient,
+                Utils.getRandomDate()),
+            ProcessingEventHelper.addProcessingEvent(site, patient,
+                Utils.getRandomDate()));
     }
 
     @Test
@@ -361,17 +369,18 @@ public class TestStudy extends TestDatabase {
         // add patient visit that uses the attribute and try to delete
         study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
         study.persist();
-        study.reload();
-        List<ProcessingEventWrapper> visits = studyAddProcessingEvents(study);
-        ProcessingEventWrapper visit = visits.get(0);
-        // FIXME
-        // visit.setPvAttrValue("Worksheet", Utils.getRandomString(10, 15));
+
+        SiteWrapper site = SiteHelper.addSite("testsite");
+
+        CollectionEventWrapper visit = CollectionEventHelper
+            .addCollectionEvent(site, PatientHelper.addPatient("testp", study),
+                1, OriginInfoHelper.addOriginInfo(site));
+        visit.setEventAttrValue("Worksheet", Utils.getRandomString(5));
         visit.persist();
 
-        // delete non existing label, expect exception
+        // delete existing label, expect exception
         try {
-            // FIXME
-            // study.deleteStudyPvAttr("Worksheet");
+            study.deleteStudyEventAttr("Worksheet");
             Assert.fail("call should generate an exception");
         } catch (Exception e) {
             Assert.assertTrue(true);
@@ -408,9 +417,6 @@ public class TestStudy extends TestDatabase {
         Assert.assertEquals(2, labels.size());
         Assert.assertTrue(labels.contains("Worksheet"));
         Assert.assertTrue(labels.contains("Visit Type"));
-        Assert.assertEquals("text", study.getStudyEventAttrType("Worksheet"));
-        Assert.assertEquals("select_single",
-            study.getStudyEventAttrType("Visit Type"));
 
         // get non existing label, expect exception
         try {
@@ -516,13 +522,14 @@ public class TestStudy extends TestDatabase {
                 ActivityStatusWrapper.CLOSED_STATUS_STRING));
         study.persist();
         study.reload();
-        List<ProcessingEventWrapper> visits = studyAddProcessingEvents(study);
-        ProcessingEventWrapper visit = visits.get(0);
-        visit.reload();
+        SiteWrapper site = SiteHelper.addSite("testsite");
 
+        CollectionEventWrapper visit = CollectionEventHelper
+            .addCollectionEvent(site, PatientHelper.addPatient("testp", study),
+                1, OriginInfoHelper.addOriginInfo(site));
         try {
-            // FIXME
-            // visit.setPvAttrValue("Worksheet", Utils.getRandomString(10, 15));
+            visit.setEventAttrValue("Worksheet", Utils.getRandomString(5));
+            visit.persist();
             Assert.fail("call should generate an exception");
         } catch (Exception e) {
             Assert.assertTrue(true);

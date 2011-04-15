@@ -11,8 +11,10 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -24,9 +26,11 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
+import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -502,79 +506,6 @@ public class TestPatient extends TestDatabase {
     }
 
     @Test
-    public void testGetPatientsInTodayCollectionEvents() throws Exception {
-        Assert
-            .fail("not sure if this case applies anymore after model changes");
-        // String name = "testTodayCollectionEvents_" + r.nextInt();
-        // PatientWrapper patient1 = PatientHelper.addPatient(name + "_1",
-        // study);
-        // ShippingMethodWrapper method = ShippingMethodWrapper
-        // .getShippingMethods(appService).get(0);
-        //
-        // CollectionEventWrapper cevent = CollectionEventHelper
-        // .addCollectionEvent(
-        // site,
-        // method,
-        // SourceVesselHelper.newSourceVessel(patient1,
-        // Utils.getRandomDate(), 0.1));
-        // cevent.persist();
-        //
-        // PatientWrapper patient2 = PatientHelper.addPatient(name + "_2",
-        // study);
-        // addClinic(patient2);
-        // PatientWrapper patient3 = PatientHelper.addPatient(name + "_3",
-        // study);
-        // addClinic(patient3);
-        // CollectionEventWrapper cevent2 = CollectionEventHelper
-        // .addCollectionEvent(
-        // site,
-        // method,
-        // SourceVesselHelper.newSourceVessel(patient2,
-        // Utils.getRandomDate(), 0.1),
-        // SourceVesselHelper.newSourceVessel(patient3,
-        // Utils.getRandomDate(), 0.2));
-        // cevent2.persist();
-        //
-        // cevent2.setDateReceived(Calendar.getInstance().getTime());
-        // cevent2.persist();
-        //
-        // List<PatientWrapper> todayPatients = PatientWrapper
-        // .getPatientsInTodayCollectionEvents(appService);
-        // Assert.assertEquals(2, todayPatients.size());
-        // Assert.assertTrue(todayPatients.contains(patient2));
-        // Assert.assertTrue(todayPatients.contains(patient3));
-    }
-
-    @Test
-    public void testGetLastWeekProcessingEvents() throws Exception {
-        Assert
-            .fail("not sure if this case applies anymore after model changes");
-        // String name = "testGetLastWeekProcessingEvents" + r.nextInt();
-        // PatientWrapper patient = PatientHelper.addPatient(name, study);
-        //
-        // Calendar calendar = Calendar.getInstance();
-        // calendar.add(Calendar.DATE, -10); // 10 days ago
-        // ProcessingEventHelper.addProcessingEvent(site, patient,
-        // calendar.getTime(), Utils.getRandomDate());
-        // calendar.add(Calendar.DATE, 3); // 7 days ago
-        // ProcessingEventWrapper visit2 = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, calendar.getTime(),
-        // Utils.getRandomDate());
-        // calendar.add(Calendar.DATE, 5); // 2 days ago
-        // ProcessingEventWrapper visit3 = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, calendar.getTime(),
-        // Utils.getRandomDate());
-        // patient.reload();
-        //
-        // List<ProcessingEventWrapper> pevents = patient
-        // .getLast7DaysProcessingEvents(site);
-        // Assert.assertEquals(2, pevents.size());
-        // Assert.assertTrue(pevents.contains(visit2));
-        // Assert.assertTrue(pevents.contains(visit3));
-
-    }
-
-    @Test
     public void testPatientMerge() throws Exception {
         String name = "testMerge" + r.nextInt();
         PatientWrapper patient = PatientHelper.addPatient(name + "_1", study);
@@ -641,30 +572,30 @@ public class TestPatient extends TestDatabase {
         PatientWrapper patient = PatientHelper.addPatient(name + "_1", study);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
 
-        // FIXME
-        // ProcessingEventWrapper visit1 = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, Utils.getRandomDate(),
-        // Utils.getRandomDate());
-        //
-        // ProcessingEventWrapper visit2 = ProcessingEventHelper
-        // .addProcessingEvent(site, patient2, Utils.getRandomDate(),
-        // Utils.getRandomDate());
-        //
-        // Assert.assertEquals(patient, visit1.getPatient());
-        // Assert.assertEquals(patient2, visit2.getPatient());
-        //
-        // try {
-        // patient.merge(patient2);
-        // Assert
-        // .fail("Should not be able to merge patients that are not in the same study");
-        // } catch (BiobankCheckException bce) {
-        // Assert.assertTrue(true);
-        // }
+        CollectionEventWrapper visit1 = CollectionEventHelper
+            .addCollectionEvent(site, patient, 1,
+                OriginInfoHelper.addOriginInfo(site));
+
+        CollectionEventWrapper visit2 = CollectionEventHelper
+            .addCollectionEvent(site, patient2, 1,
+                OriginInfoHelper.addOriginInfo(site));
+
+        Assert.assertEquals(patient, visit1.getPatient());
+        Assert.assertEquals(patient2, visit2.getPatient());
+
+        try {
+            patient.merge(patient2);
+            Assert
+                .fail("Should not be able to merge patients that are not in the same study");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
     public void testGetPatient() throws Exception {
-        Assert
-            .fail("static getPatient method of PatientWrapper are not tested");
+        PatientHelper.addPatient("testp", StudyHelper.addStudy("testst"));
+        Assert.assertEquals(PatientWrapper.getPatient(appService, "testp")
+            .getPnumber(), "testp");
     }
 }

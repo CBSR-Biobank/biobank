@@ -33,7 +33,8 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
     @Override
     protected void deleteChecks() throws BiobankDeleteException,
         ApplicationException {
-        List<CollectionEventWrapper> shipments = getCollectionEventCollection();
+        List<ShipmentInfoWrapper> shipments = ShipmentInfoWrapper
+            .getAllShipmentInfosByMethod(appService, this);
         if (shipments != null && shipments.size() > 0) {
             throw new BiobankDeleteException(
                 "Cannot delete this shipping company: shipments are still using it");
@@ -61,23 +62,6 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
             return getName().compareTo(o.getWrappedObject().getName());
         }
         return 0;
-    }
-
-    @SuppressWarnings("unused")
-    @Deprecated
-    public List<ShipmentInfoWrapper> getAllShipmentCollection(boolean sort) {
-        return null;
-    }
-
-    public List<CollectionEventWrapper> getCollectionEventCollection() {
-        return getCollectionEventCollection(false);
-    }
-
-    @SuppressWarnings("unused")
-    @Deprecated
-    public List<CollectionEventWrapper> getCollectionEventCollection(
-        boolean sort) {
-        return null;
     }
 
     public static List<ShippingMethodWrapper> getShippingMethods(

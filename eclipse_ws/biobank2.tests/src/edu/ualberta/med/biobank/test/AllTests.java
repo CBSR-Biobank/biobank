@@ -9,7 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.wrappers.TestActivityStatus;
-import edu.ualberta.med.biobank.test.wrappers.TestSpecimen;
+import edu.ualberta.med.biobank.test.wrappers.TestAliquotedSpecimen;
 import edu.ualberta.med.biobank.test.wrappers.TestClinic;
 import edu.ualberta.med.biobank.test.wrappers.TestCollectionEvent;
 import edu.ualberta.med.biobank.test.wrappers.TestContact;
@@ -21,13 +21,12 @@ import edu.ualberta.med.biobank.test.wrappers.TestDispatch;
 import edu.ualberta.med.biobank.test.wrappers.TestModelWrapper;
 import edu.ualberta.med.biobank.test.wrappers.TestPatient;
 import edu.ualberta.med.biobank.test.wrappers.TestProcessingEvent;
-import edu.ualberta.med.biobank.test.wrappers.TestAliquotedSpecimen;
-import edu.ualberta.med.biobank.test.wrappers.TestSpecimenType;
 import edu.ualberta.med.biobank.test.wrappers.TestShippingMethod;
 import edu.ualberta.med.biobank.test.wrappers.TestSite;
-import edu.ualberta.med.biobank.test.wrappers.TestSourceVessel;
-import edu.ualberta.med.biobank.test.wrappers.TestStudy;
 import edu.ualberta.med.biobank.test.wrappers.TestSourceSpecimen;
+import edu.ualberta.med.biobank.test.wrappers.TestSpecimen;
+import edu.ualberta.med.biobank.test.wrappers.TestSpecimenType;
+import edu.ualberta.med.biobank.test.wrappers.TestStudy;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 @RunWith(Suite.class)
@@ -35,9 +34,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
     TestCollectionEvent.class, TestContact.class, TestContainer.class,
     TestContainerLabelingScheme.class, TestContainerPath.class,
     TestContainerType.class, TestDispatch.class, TestModelWrapper.class,
-    TestPatient.class, TestProcessingEvent.class, TestSourceVessel.class,
-    TestAliquotedSpecimen.class, TestSpecimenType.class, TestShippingMethod.class,
-    TestSite.class, TestStudy.class, TestSourceSpecimen.class })
+    TestPatient.class, TestProcessingEvent.class, TestAliquotedSpecimen.class,
+    TestSpecimenType.class, TestShippingMethod.class, TestSite.class,
+    TestStudy.class, TestSourceSpecimen.class })
 public class AllTests {
     public static WritableApplicationService appService = null;
 

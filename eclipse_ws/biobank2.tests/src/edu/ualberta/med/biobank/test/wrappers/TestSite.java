@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
@@ -32,9 +33,13 @@ import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
+import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
+import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -741,22 +746,21 @@ public class TestSite extends TestDatabase {
         List<CollectionEventWrapper> cevents = new ArrayList<CollectionEventWrapper>();
         List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
         for (PatientWrapper p : Arrays.asList(patient1, patient2, patient3)) {
-            // FIXME
-            // CollectionEventWrapper cevent = CollectionEventHelper
-            // .addCollectionEvent(site, ShippingMethodWrapper
-            // .getShippingMethods(appService).get(0), SourceVesselHelper
-            // .newSourceVessel(p, Utils.getRandomDate(), 0.1),
-            // SourceVesselHelper.newSourceVessel(p,
-            // Utils.getRandomDate(), 0.1));
-            // cevents.add(cevent);
-            //
-            // ProcessingEventWrapper pevent = ProcessingEventHelper
-            // .addProcessingEvent(site, p, Utils.getRandomDate(),
-            // Utils.getRandomDate());
-            // pevent.addToSourceVesselCollection(cevent
-            // .getSourceVesselCollection(false));
-            // pevent.persist();
-            // pevents.add(pevent);
+            CollectionEventWrapper cevent = CollectionEventHelper
+                .addCollectionEvent(site, p, 1, OriginInfoHelper
+                    .addOriginInfo(site), SpecimenHelper
+                    .newSpecimen(SpecimenTypeHelper.addSpecimenType(Utils
+                        .getRandomNumericString(10))), SpecimenHelper
+                    .newSpecimen(SpecimenTypeHelper.addSpecimenType(Utils
+                        .getRandomNumericString(10))));
+            cevents.add(cevent);
+
+            ProcessingEventWrapper pevent = ProcessingEventHelper
+                .addProcessingEvent(site, p, Utils.getRandomDate());
+            pevent.addToSpecimenCollection(cevent
+                .getOriginalSpecimenCollection(false));
+            pevent.persist();
+            pevents.add(pevent);
         }
 
         site.reload();
@@ -764,9 +768,13 @@ public class TestSite extends TestDatabase {
 
         // delete patient 1
         patient1.reload();
-        // FIXME
-        // DbHelper.deleteFromList(patient1.getProcessingEventCollection(false));
-        // DbHelper.deleteFromList(patient1.getSourceVesselCollection(false));
+        for (CollectionEventWrapper ce : patient1
+            .getCollectionEventCollection(false)) {
+            for (SpecimenWrapper sp : ce.getOriginalSpecimenCollection(false))
+                sp.delete();
+        }
+        DbHelper.deleteFromList(patient1.getProcessingEventCollection());
+        DbHelper.deleteFromList(patient1.getCollectionEventCollection(false));
         patient1.delete();
 
         site.reload();
