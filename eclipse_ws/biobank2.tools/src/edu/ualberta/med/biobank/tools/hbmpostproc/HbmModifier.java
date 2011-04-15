@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.tools.hbmstrings;
+package edu.ualberta.med.biobank.tools.hbmpostproc;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -21,6 +21,10 @@ public class HbmModifier {
     private static final Logger LOGGER = Logger.getLogger(HbmModifier.class
         .getName());
 
+    private static Pattern HBM_ATTR_MAPPING_COMMENT_TAG = Pattern.compile(
+        "<!-- Attributes mapping for the .+ class -->",
+        Pattern.CASE_INSENSITIVE);
+
     private static Pattern HBM_STRING_ATTR = Pattern.compile(
         "<property.*type=\"string\"\\s*column=\"([^\"]*)\"/>",
         Pattern.CASE_INSENSITIVE);
@@ -30,9 +34,16 @@ public class HbmModifier {
 
     private static String HBM_FILE_EXTENSION = ".hbm.xml";
 
-    private static HbmModifier instance = null;
+    // see
+    // http://www.mandubian.org/magnoliaPublic/mandubian-org/knowledge-garbage-collector/how-tos/hibernate-version-timestamp.html
+    // private static final String TIMESTAMP_PROPERTY =
+    // "      <version name=\"lastUpdated\" access=\"field\" type=\"timestamp\" generated=\"always\" >\n"
+    // +
+    // "         <column name=\"LAST_UPDATED\" sql-type=\"timestamp\" default=\"CURRENT_TIMESTAMP\" />\n"
+    // + "    </version>";
+    private static final String TIMESTAMP_PROPERTY = "          <version name=\"version\" column=\"VERSION\" access=\"field\" />";
 
-    private boolean documentChanged = false;
+    private static HbmModifier instance = null;
 
     private HbmModifier() {
 
@@ -61,13 +72,24 @@ public class HbmModifier {
             BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
 
             String line = reader.readLine();
-            boolean lineChanged;
+
+            boolean documentChanged = false;
+            boolean idPropertyFound = false;
 
             while (line != null) {
-                lineChanged = false;
+                String alteredLine = new String(line);
+                Matcher idMatcher = HBM_ATTR_MAPPING_COMMENT_TAG.matcher(line);
                 Matcher stringAttrMatcher = HBM_STRING_ATTR.matcher(line);
                 Matcher attrMatcher = HBM_ATTR.matcher(line);
-                if (stringAttrMatcher.find() && !line.contains("length=\"")) {
+
+                if (!idPropertyFound && idMatcher.find()) {
+                    // has to be after discriminator tag and before first
+                    // property tag
+                    alteredLine = new StringBuffer(TIMESTAMP_PROPERTY)
+                        .append("\n").append(alteredLine).toString();
+                    idPropertyFound = true;
+                } else if (stringAttrMatcher.find()
+                    && !line.contains("length=\"")) {
                     String attrName = stringAttrMatcher.group(1);
                     Attribute attr = columnTypeMap.get(attrName);
 
@@ -76,36 +98,18 @@ public class HbmModifier {
                             + attrName);
                     }
 
-                    Integer attrLen = attr.getLength();
-
-                    if (attrLen != null) {
-                        line = line.replace(
-                            "type=\"string\"",
-                            "type=\"" + attr.getType() + "\" length=\""
-                                + attr.getLength() + "\"");
-                        lineChanged = true;
-                    } else {
-                        line = line.replace("type=\"string\"",
-                            "type=\"" + attr.getType() + "\"");
-                        lineChanged = true;
-                    }
-
-                    if (lineChanged) {
-                        LOGGER
-                            .debug("line changed: " + className + ": " + line);
-                    }
-
-                    documentChanged = true;
-                    line = addContraints(line, attrName, uniqueList,
-                        notNullList);
-                    documentChanged = true;
+                    alteredLine = fixStringAttributes(line, className, attr);
+                    alteredLine = addContraints(alteredLine, attrName,
+                        uniqueList, notNullList);
                 } else if (attrMatcher.find()) {
                     String attrName = attrMatcher.group(1);
-                    line = addContraints(line, attrName, uniqueList,
-                        notNullList);
+                    alteredLine = addContraints(alteredLine, attrName,
+                        uniqueList, notNullList);
                 }
 
-                writer.write(line);
+                documentChanged |= !line.equals(alteredLine);
+
+                writer.write(alteredLine);
                 writer.newLine();
                 line = reader.readLine();
             }
@@ -114,10 +118,16 @@ public class HbmModifier {
             writer.flush();
             writer.close();
 
+            if (!idPropertyFound) {
+                throw new Exception(
+                    "tag not found found for inserting timestamp in HBM file "
+                        + filename);
+            }
+
             if (documentChanged) {
                 FileUtils.copyFile(outFile, new File(filename));
-                if (HbmStrings.getInstance().getVerbose()) {
-                    System.out.println("HBM Modified: " + filename);
+                if (HbmPostProcess.getInstance().getVerbose()) {
+                    LOGGER.info("HBM Modified: " + filename);
                 }
             }
 
@@ -128,6 +138,29 @@ public class HbmModifier {
         }
     }
 
+    private String fixStringAttributes(String line, String className,
+        Attribute attr) {
+        boolean lineChanged = false;
+
+        Integer attrLen = attr.getLength();
+
+        if (attrLen != null) {
+            line = line.replace("type=\"string\"", "type=\"" + attr.getType()
+                + "\" length=\"" + attr.getLength() + "\"");
+            lineChanged = true;
+        } else {
+            line = line.replace("type=\"string\"", "type=\"" + attr.getType()
+                + "\"");
+            lineChanged = true;
+        }
+
+        if (lineChanged) {
+            LOGGER.debug("line changed: " + className + ": " + line);
+        }
+        return line;
+
+    }
+
     private String addContraints(String line, String attrName,
         Set<String> uniqueList, Set<String> notNullList) {
         String s = "";
@@ -136,7 +169,6 @@ public class HbmModifier {
         if (notNullList.contains(attrName) && !s.contains("not-null="))
             s += " not-null=\"true\"";
         if (s.length() > 0) {
-            documentChanged = true;
             return line.replace("/>", s + "/>");
         }
         return line;
