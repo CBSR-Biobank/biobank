@@ -161,12 +161,12 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     private void createAliquotsSelectionSection() {
         if (dispatch.isInCreationState()) {
-            Section section = createSection("Add Specimens");
+            Section section = createSection("Aliquot added");
             Composite composite = toolkit.createComposite(section);
             composite.setLayout(new GridLayout(1, false));
             section.setClient(composite);
             if (dispatch.isInCreationState()) {
-                addSectionToolbar(section, "Add specimens to this dispatch",
+                addSectionToolbar(section, "Add aliquots to this dispatch",
                     new SelectionAdapter() {
                         @Override
                         public void widgetSelected(SelectionEvent e) {
@@ -185,9 +185,9 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     }
 
     protected void createAliquotsNonProcessedSection(boolean edit) {
-        String title = "Specimens";
+        String title = "Non processed aliquots";
         if (dispatch.isInCreationState()) {
-            title = "Added specimens";
+            title = "Added aliquots";
         }
         Composite parent = createSectionWithClient(title);
         aliquotsNonProcessedTable = new DispatchAliquotListInfoTable(parent,
@@ -319,9 +319,9 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             label += dispatch.getSenderCenter().getNameShort() + " -> "
                 + dispatch.getReceiverCenter().getNameShort();
 
-            if (dispatch.getShipmentInfo() != null
-                && dispatch.getShipmentInfo().getPackedAt() != null)
-                label += "[" + dispatch.getFormattedPackedAt() + "]";
+            String packedAt = dispatch.getFormattedPackedAt();
+            if (packedAt != null)
+                label += " [" + packedAt + "]";
             return label;
         }
     }
