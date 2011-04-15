@@ -174,8 +174,15 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                         "DispatchCreateScanDialog.processCell.task.position", //$NON-NLS-1$
                         ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
                     PalletCell palletCell = cells.get(entry.getKey());
-                    palletCell.merge(SessionManager.getAppService(),
-                        entry.getValue());
+                    Cell servercell = entry.getValue();
+                    if (palletCell == null) { // can happened if missing
+                        palletCell = new PalletCell(new ScanCell(
+                            servercell.getRow(), servercell.getCol(),
+                            servercell.getValue()));
+                        cells.put(rcp, palletCell);
+                    }
+                    palletCell
+                        .merge(SessionManager.getAppService(), servercell);
                 }
             }
             setScanOkValue(res.getProcessStatus() != CellStatus.ERROR);
