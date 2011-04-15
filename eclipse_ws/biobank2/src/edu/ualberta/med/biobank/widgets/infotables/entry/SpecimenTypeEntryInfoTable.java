@@ -160,7 +160,7 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
     private boolean addEditOk(SpecimenTypeWrapper type) {
         try {
             for (SpecimenTypeWrapper sv : selectedSpecimenTypes)
-                if (sv.getId() != type.getId()
+                if (!sv.getId().equals(type.getId())
                     && sv.getName().equals(type.getName()))
                     throw new BiobankCheckException(
                         "That specimen type has already been added.");

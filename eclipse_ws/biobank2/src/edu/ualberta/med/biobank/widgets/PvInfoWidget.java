@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.dialogs.ListAddDialog;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 
@@ -45,20 +46,18 @@ public class PvInfoWidget extends BiobankWidget {
         }
     };
 
-    private static Map<String, LabelDialogInfo> LABEL_DLG_INFO =
-        new HashMap<String, LabelDialogInfo>() {
-            private static final long serialVersionUID = 1L;
-            {
-                put("Visit Type",
-                    new LabelDialogInfo("Visit Type Values",
-                        "Please enter a visit type:",
-                        "To enter multiple visit type values, separate with semicolon."));
-                put("Consent",
-                    new LabelDialogInfo("Consent Types",
-                        "Please enter a consent type:",
-                        "To enter multiple consent values, separate with semicolon."));
-            }
-        };
+    private static Map<String, LabelDialogInfo> LABEL_DLG_INFO = new HashMap<String, LabelDialogInfo>() {
+        private static final long serialVersionUID = 1L;
+        {
+            put("Visit Type",
+                new LabelDialogInfo("Visit Type Values",
+                    "Please enter a visit type:",
+                    "To enter multiple visit type values, separate with semicolon."));
+            put("Consent", new LabelDialogInfo("Consent Types",
+                "Please enter a consent type:",
+                "To enter multiple consent values, separate with semicolon."));
+        }
+    };
 
     public PvInfoWidget(Composite parent, int style,
         final PvAttrCustom pvCustomInfo, boolean selected) {
@@ -66,9 +65,8 @@ public class PvInfoWidget extends BiobankWidget {
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        hasListValues =
-            (pvCustomInfo.getType().equals("select_single") || pvCustomInfo
-                .getType().equals("select_multiple"));
+        hasListValues = pvCustomInfo.getType() == EventAttrTypeEnum.SELECT_SINGLE
+            || pvCustomInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE;
         selected |= (pvCustomInfo.getAllowedValues() != null);
 
         if (hasListValues) {
@@ -101,24 +99,22 @@ public class PvInfoWidget extends BiobankWidget {
                     Assert.isNotNull(labelDlgInfo, "no dialog info for label "
                         + pvCustomInfo.getLabel());
 
-                    ListAddDialog dlg =
-                        new ListAddDialog(PlatformUI.getWorkbench()
-                            .getActiveWorkbenchWindow().getShell(),
-                            labelDlgInfo.title, labelDlgInfo.prompt,
-                            labelDlgInfo.helpText);
+                    ListAddDialog dlg = new ListAddDialog(PlatformUI
+                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                        labelDlgInfo.title, labelDlgInfo.prompt,
+                        labelDlgInfo.helpText);
                     if (dlg.open() == Dialog.OK) {
-                        java.util.List<String> currentItems =
-                            new ArrayList<String>(Arrays.asList(itemList
-                                .getItems()));
-                        java.util.List<String> newItems =
-                            Arrays.asList(dlg.getResult());
+                        java.util.List<String> currentItems = new ArrayList<String>(
+                            Arrays.asList(itemList.getItems()));
+                        java.util.List<String> newItems = Arrays.asList(dlg
+                            .getResult());
 
                         if (currentItems.size() == 0) {
                             currentItems.addAll(newItems);
                         } else {
                             // make sure there are no duplicates
                             for (String item : newItems) {
-                                item.trim();
+                                item = item.trim();
                                 if (!currentItems.contains(item)) {
                                     currentItems.add(item);
                                 }
@@ -158,9 +154,8 @@ public class PvInfoWidget extends BiobankWidget {
                     itemList.add(item);
                 }
             }
-            Menu m =
-                new Menu(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                    .getShell(), SWT.POP_UP);
+            Menu m = new Menu(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), SWT.POP_UP);
 
             MenuItem mi = new MenuItem(m, SWT.CASCADE);
             mi.setText("Move to Top");

@@ -83,7 +83,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         public abstract String getColumnValue(TableRowData row, int columnIndex);
     }
 
-    protected class TableRowData {
+    protected static class TableRowData {
         public SpecimenWrapper specimen;
         public String inventoryId;
         public String type;

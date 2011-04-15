@@ -13,7 +13,7 @@ public class CeListInfoTable extends InfoTableWidget<CollectionEventWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 24;
 
-    protected class TableRowData {
+    protected static class TableRowData {
         CollectionEventWrapper pv;
         public String pnumber;
         public String studyNameShort;
@@ -69,7 +69,7 @@ public class CeListInfoTable extends InfoTableWidget<CollectionEventWrapper> {
         if (study != null) {
             info.studyNameShort = study.getNameShort();
         } else {
-            info.studyNameShort = new String();
+            info.studyNameShort = "";
         }
         info.numSVs = -1; // cEvent.getSpecimenCollection(false).size();
         return info;

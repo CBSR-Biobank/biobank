@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -618,9 +619,10 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 Map<RowColPos, PalletCell> cells = (Map<RowColPos, PalletCell>) spw
                     .getCells();
                 if (cells != null) {
-                    for (RowColPos rcp : cells.keySet()) {
+                    for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
+                        RowColPos rcp = entry.getKey();
                         if (rcp.row == indexRow) {
-                            PalletCell cell = cells.get(rcp);
+                            PalletCell cell = entry.getValue();
                             if (PalletCell.hasValue(cell)) {
                                 setTypeToCell(cell, selection);
                             }

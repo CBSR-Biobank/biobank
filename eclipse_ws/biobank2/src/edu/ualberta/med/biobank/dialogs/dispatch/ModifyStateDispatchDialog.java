@@ -20,7 +20,7 @@ public class ModifyStateDispatchDialog extends BiobankDialog {
     private String currentTitle;
     private String message;
 
-    private class CommentValue {
+    private static class CommentValue {
         private String value;
 
         public void setValue(String value) {

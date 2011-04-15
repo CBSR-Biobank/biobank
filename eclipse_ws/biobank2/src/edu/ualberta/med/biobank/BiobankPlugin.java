@@ -351,6 +351,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
                 registry.put(key, desc);
             }
         } catch (Exception e) {
+            logger.error("Error registering an image", e);
         }
     }
 

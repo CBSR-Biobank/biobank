@@ -204,9 +204,11 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     @Override
     public boolean onClose() {
-        plateToScanSessionString = (String) plateToScanValue.getValue();
-        if (finished || BiobankPlugin.getPlatesEnabledCount() != 1) {
-            plateToScanSessionString = "";
+        synchronized (plateToScanSessionString) {
+            plateToScanSessionString = (String) plateToScanValue.getValue();
+            if (finished || BiobankPlugin.getPlatesEnabledCount() != 1) {
+                plateToScanSessionString = "";
+            }
         }
         return super.onClose();
     }

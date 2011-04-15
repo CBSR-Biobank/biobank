@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import org.eclipse.core.runtime.Assert;
@@ -8,7 +9,9 @@ import org.eclipse.core.runtime.Assert;
  * Classes derived from InfoTableWidget should derive their table sorter from
  * this class.
  */
-public class BiobankTableSorter implements Comparator<Object> {
+public class BiobankTableSorter implements Comparator<Object>, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Override
     public int compare(Object o1, Object o2) {

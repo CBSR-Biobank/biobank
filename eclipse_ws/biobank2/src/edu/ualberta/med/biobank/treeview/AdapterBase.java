@@ -270,7 +270,7 @@ public abstract class AdapterBase {
             return;
         AdapterBase itemToRemove = null;
         for (AdapterBase child : children) {
-            if ((child.getId() == item.getId())
+            if ((child.getId().equals(item.getId()))
                 && child.getLabel().equals(item.getLabel()))
                 itemToRemove = child;
         }
@@ -309,7 +309,7 @@ public abstract class AdapterBase {
             return null;
 
         for (AdapterBase child : children) {
-            if ((child.getId() == item.getId())
+            if ((child.getId().equals(item.getId()))
                 && child.getLabel().equals(item.getLabel()))
                 return child;
         }

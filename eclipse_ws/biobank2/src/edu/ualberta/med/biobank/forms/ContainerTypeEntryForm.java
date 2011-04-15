@@ -398,11 +398,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void setSpecimenTypes() throws BiobankCheckException {
-        List<Integer> addedIds = new ArrayList<Integer>();
-        List<Integer> removedIds = new ArrayList<Integer>();
         if (hasSpecimens) {
-            addedIds = specimensMultiSelect.getAddedToSelection();
-            removedIds = specimensMultiSelect.getRemovedToSelection();
+            List<Integer> addedIds = specimensMultiSelect.getAddedToSelection();
+            List<Integer> removedIds = specimensMultiSelect
+                .getRemovedToSelection();
             List<SpecimenTypeWrapper> addedSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
             List<SpecimenTypeWrapper> removedSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
             for (SpecimenTypeWrapper sampleType : allSpecimenTypes) {
@@ -433,12 +432,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void setChildContainerTypes() throws BiobankCheckException {
-        List<Integer> addedTypesIds = new ArrayList<Integer>();
-        List<Integer> removedTypesIds = new ArrayList<Integer>();
         if (!hasSpecimens) {
-            addedTypesIds = childContainerTypesMultiSelect
+            List<Integer> addedTypesIds = childContainerTypesMultiSelect
                 .getAddedToSelection();
-            removedTypesIds = childContainerTypesMultiSelect
+            List<Integer> removedTypesIds = childContainerTypesMultiSelect
                 .getRemovedToSelection();
             List<ContainerTypeWrapper> addedContainerTypes = new ArrayList<ContainerTypeWrapper>();
             List<ContainerTypeWrapper> removedContainerTypes = new ArrayList<ContainerTypeWrapper>();

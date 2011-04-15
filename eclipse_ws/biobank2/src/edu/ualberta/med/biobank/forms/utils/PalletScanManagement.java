@@ -105,8 +105,9 @@ public class PalletScanManagement {
             if (rescanMode && oldCells != null) {
                 // rescan: merge previous scan with new in case the scanner
                 // wasn't able to scan well
-                for (RowColPos rcp : oldCells.keySet()) {
-                    PalletCell oldScannedCell = oldCells.get(rcp);
+                for (Entry<RowColPos, PalletCell> entry : oldCells.entrySet()) {
+                    RowColPos rcp = entry.getKey();
+                    PalletCell oldScannedCell = entry.getValue();
                     PalletCell newScannedCell = cells.get(rcp);
                     boolean copyOldValue = false;
                     if (PalletCell.hasValue(oldScannedCell)) {

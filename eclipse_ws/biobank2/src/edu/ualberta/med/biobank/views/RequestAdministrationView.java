@@ -32,7 +32,9 @@ public class RequestAdministrationView extends AbstractAdministrationView {
     private static RequestAdministrationView currentInstance;
 
     public RequestAdministrationView() {
-        currentInstance = this;
+        synchronized (currentInstance) {
+            currentInstance = this;
+        }
         SessionManager.addView(this);
     }
 

@@ -39,7 +39,7 @@ public class Drawer36Display extends AbstractContainerDisplay {
 
     private static final int DRAWER_SIZE = 36;
 
-    public static int LEGEND_WIDTH = 70;
+    public int LEGEND_WIDTH = 70;
 
     public static int LEGEND_HEIGHT = 20;
 

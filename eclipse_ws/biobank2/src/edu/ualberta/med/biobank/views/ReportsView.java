@@ -42,7 +42,9 @@ public class ReportsView extends ViewPart {
     private CTabItem containerTab;
 
     public ReportsView() {
-        currentInstance = this;
+        synchronized (currentInstance) {
+            currentInstance = this;
+        }
     }
 
     @Override

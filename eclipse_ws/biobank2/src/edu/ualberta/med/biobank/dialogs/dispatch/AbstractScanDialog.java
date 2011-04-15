@@ -451,10 +451,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                         } else {
                             cell.setValue(value);
                         }
-                        // TODO: log this?
-                        // appendLogNLS("linkAssign.activitylog.scanTubeAlone",
-                        // value,
-                        // ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
                         try {
                             postprocessScanTubeAlone(cell);
                         } catch (Exception ex) {

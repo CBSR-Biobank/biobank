@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
-    protected class TableRowData {
+    protected static class TableRowData {
         StudyWrapper study;
         String name;
         String nameShort;
@@ -74,7 +74,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         info.nameShort = study.getNameShort();
         info.status = study.getActivityStatus().getName();
         if (info.status == null) {
-            info.status = new String();
+            info.status = "";
         }
         info.patientCount = study.getPatientCount(true);
         info.visitCount = study.getCollectionEventCount(true);

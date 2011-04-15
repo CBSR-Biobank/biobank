@@ -38,10 +38,8 @@ public class RequestAdapter extends AdapterBase {
     protected String getLabelInternal() {
         RequestWrapper shipment = getWrapper();
         Assert.isNotNull(shipment, "Request is null");
-        String label = new String();
         StudyWrapper study = shipment.getStudy();
-
-        label += shipment.getId() + " - ";
+        String label = shipment.getId() + " - ";
         label += study.getNameShort() + " - ";
         label += DateFormatter.formatAsDate(shipment.getCreated());
         return label;

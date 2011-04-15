@@ -364,4 +364,18 @@ public class User implements Serializable, NotAProxy {
         }
         return ok;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof User)
+            return login.equals(((User) o).login);
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        if (login == null)
+            return super.hashCode();
+        return login.hashCode();
+    }
 }

@@ -58,7 +58,9 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     private static SpecimenTransitView currentInstance;
 
     public SpecimenTransitView() {
-        currentInstance = this;
+        synchronized (currentInstance) {
+            currentInstance = this;
+        }
         SessionManager.addView(this);
     }
 

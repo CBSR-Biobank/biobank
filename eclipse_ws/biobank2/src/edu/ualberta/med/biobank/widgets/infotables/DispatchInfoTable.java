@@ -16,7 +16,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
     SpecimenWrapper a;
 
-    protected class TableRowData {
+    protected static class TableRowData {
 
         DispatchWrapper ds;
         Date dispatchTime;

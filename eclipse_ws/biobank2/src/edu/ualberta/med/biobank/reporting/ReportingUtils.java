@@ -241,7 +241,6 @@ public class ReportingUtils {
                     try {
                         if (data.printToFile == true) {
                             printViaFile(data, jasperPrint);
-                            // TODO Auto-generated catch block
                         } else {
                             try {
                                 printViaPrinter(data, jasperPrint);

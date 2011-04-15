@@ -172,7 +172,9 @@ public abstract class BiobankFormBase extends EditorPart implements
             Assert.isNotNull(adapter, "Bad editor input (null value)");
             appService = (BiobankApplicationService) adapter.getAppService();
             if (!formInput.hasPreviousForm()) {
-                currentLinkedForms = new ArrayList<BiobankFormBase>();
+                synchronized (currentLinkedForms) {
+                    currentLinkedForms = new ArrayList<BiobankFormBase>();
+                }
             }
             linkedForms = currentLinkedForms;
             linkedForms.add(this);
@@ -390,7 +392,9 @@ public abstract class BiobankFormBase extends EditorPart implements
     }
 
     public void setBroughtToTop() {
-        currentLinkedForms = linkedForms;
+        synchronized (currentLinkedForms) {
+            currentLinkedForms = linkedForms;
+        }
     }
 
     public void setDeactivated() {

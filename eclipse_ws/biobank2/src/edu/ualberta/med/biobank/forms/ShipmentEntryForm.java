@@ -272,7 +272,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                     else if (specimen.getOriginInfo() != null
                         && specimen.getOriginInfo().getShipmentInfo() != null
                         && !specimen.getOriginInfo().getShipmentInfo()
-                            .equals(this))
+                            .equals(shipment.getShipmentInfo()))
                         throw new VetoException(
                             "Specimen is currently part of another shipment: "
                                 + specimen.getOriginInfo().getShipmentInfo()

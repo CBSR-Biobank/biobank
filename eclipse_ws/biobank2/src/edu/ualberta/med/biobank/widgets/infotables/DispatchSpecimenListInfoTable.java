@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public abstract class DispatchSpecimenListInfoTable extends
     InfoTableWidget<DispatchSpecimenWrapper> {
 
-    protected class TableRowData {
+    protected static class TableRowData {
         DispatchSpecimenWrapper dsa;
         String inventoryId;
         String type;

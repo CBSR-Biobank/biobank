@@ -22,7 +22,7 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
         super(parent, collection, HEADINGS, PAGE_SIZE_ROWS);
     }
 
-    class TableRowData {
+    private static class TableRowData {
         String center;
         String user;
         String date;

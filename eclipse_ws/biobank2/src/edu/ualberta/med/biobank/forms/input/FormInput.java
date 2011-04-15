@@ -112,6 +112,11 @@ public class FormInput implements IEditorInput {
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
     public boolean hasPreviousForm() {
         return hasPreviousForm;
     }

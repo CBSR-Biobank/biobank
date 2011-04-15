@@ -51,17 +51,18 @@ public class FileBrowser extends BiobankWidget {
 
     public void loadFile(File file) {
         if (file.isFile()) {
-            String contents = "";
+            StringBuffer contents = new StringBuffer();
             FileReader fileReader;
             try {
                 fileReader = new FileReader(file);
                 BufferedReader br = new BufferedReader(fileReader);
                 while (br.ready())
-                    contents += br.readLine() + "\n";
+                    contents.append(br.readLine()).append("\n");
+                br.close();
             } catch (Exception e1) {
                 BiobankPlugin.openError("IO Error", "Unable to read file.", e1);
             }
-            setText(contents);
+            setText(contents.toString());
         }
     }
 

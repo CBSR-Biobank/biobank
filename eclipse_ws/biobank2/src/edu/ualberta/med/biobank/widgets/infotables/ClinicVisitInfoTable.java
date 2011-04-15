@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class ClinicVisitInfoTable extends
     InfoTableWidget<CollectionEventWrapper> {
 
-    class TableRowData {
+    private static class TableRowData {
         public Integer visit;
         public Long numSource;
         public Long numSpecimens;

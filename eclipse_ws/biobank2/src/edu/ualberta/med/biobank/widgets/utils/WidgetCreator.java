@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.Binding;
@@ -96,10 +97,9 @@ public class WidgetCreator {
 
     public void createBoundWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
         Object bean, Composite client) {
-        FieldInfo fi;
-        for (String label : fieldsMap.keySet()) {
-            fi = fieldsMap.get(label);
-
+        for (Entry<String, FieldInfo> entry : fieldsMap.entrySet()) {
+            String label = entry.getKey();
+            FieldInfo fi = entry.getValue();
             Control control = createBoundWidgetWithLabel(client,
                 fi.widgetClass, fi.widgetOptions, fi.label, fi.widgetValues,
                 BeansObservables.observeValue(bean, label), fi.validatorClass,
@@ -659,14 +659,11 @@ public class WidgetCreator {
 
     public void createWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
         Composite parent) {
-        FieldInfo fi;
-
-        for (String label : fieldsMap.keySet()) {
-            fi = fieldsMap.get(label);
-
+        for (Entry<String, FieldInfo> entry : fieldsMap.entrySet()) {
+            FieldInfo fi = entry.getValue();
             Control control = createLabelledWidget(parent, fi.widgetClass,
                 SWT.NONE, fi.label, null);
-            controls.put(label, control);
+            controls.put(entry.getKey(), control);
         }
     }
 

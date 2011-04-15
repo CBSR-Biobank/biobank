@@ -11,7 +11,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
-    private class TableRowData {
+    private static class TableRowData {
         public StudyWrapper study;
         public String studyShortName;
         public Long patientCount;
@@ -72,7 +72,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         info.study = study;
         info.studyShortName = study.getNameShort();
         if (info.studyShortName == null) {
-            info.studyShortName = new String();
+            info.studyShortName = "";
         }
         info.patientCount = clinic.getPatientCountForStudy(study);
         info.visitCount = clinic.getCollectionEventCountForStudy(study);

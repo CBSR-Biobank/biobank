@@ -60,16 +60,15 @@ public class DispatchAdapter extends AdapterBase {
     protected String getLabelInternal() {
         DispatchWrapper dispatch = getWrapper();
         Assert.isNotNull(dispatch, "Dispatch is null");
-        String label = new String();
+        String label = "";
         if (dispatch.getSenderCenter() != null
             && dispatch.getReceiverCenter() != null)
             label += dispatch.getSenderCenter().getNameShort() + " -> "
                 + dispatch.getReceiverCenter().getNameShort();
 
         ShipmentInfoWrapper shipInfo = dispatch.getShipmentInfo();
-        if ((shipInfo != null) && (shipInfo.getPackedAt() != null)) {
+        if ((shipInfo != null) && (shipInfo.getPackedAt() != null))
             label += " [" + dispatch.getFormattedPackedAt() + "]";
-        }
         return label;
     }
 

@@ -14,7 +14,7 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 5;
 
-    protected class TableRowData {
+    protected static class TableRowData {
         ContactWrapper contact;
         public String name;
         public String title;

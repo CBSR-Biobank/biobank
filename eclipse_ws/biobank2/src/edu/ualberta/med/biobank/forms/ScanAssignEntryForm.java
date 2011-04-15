@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -645,8 +646,9 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             StringBuffer sb = new StringBuffer("SPECIMENS ASSIGNED:\n"); //$NON-NLS-1$
             try {
                 Map<RowColPos, PalletCell> cells = getCells();
-                for (RowColPos rcp : cells.keySet()) {
-                    PalletCell cell = cells.get(rcp);
+                for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
+                    RowColPos rcp = entry.getKey();
+                    PalletCell cell = entry.getValue();
                     if (cell != null
                         && (cell.getStatus() == UICellStatus.NEW || cell
                             .getStatus() == UICellStatus.MOVED)) {

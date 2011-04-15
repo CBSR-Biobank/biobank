@@ -39,7 +39,9 @@ public class ProcessingView extends AbstractAdministrationView {
 
     public ProcessingView() {
         super();
-        currentInstance = this;
+        synchronized (currentInstance) {
+            currentInstance = this;
+        }
         SessionManager.addView(this);
     }
 

@@ -287,11 +287,10 @@ public class PatientWrapper extends PatientBaseWrapper {
                 @Override
                 public int compare(CollectionEventWrapper ce1,
                     CollectionEventWrapper ce2) {
-                    int res = ce1.compareTo(ce2);
                     if (ascending) {
-                        return res;
+                        return ce1.compareTo(ce2);
                     }
-                    return -res;
+                    return ce2.compareTo(ce1);
                 }
             });
         }

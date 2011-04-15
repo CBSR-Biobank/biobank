@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -86,8 +87,9 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     }
 
     protected void setWidgetValues(Map<String, FieldInfo> fieldsMap, Object bean) {
-        for (String label : fieldsMap.keySet()) {
-            FieldInfo fi = fieldsMap.get(label);
+        for (Entry<String, FieldInfo> entry : fieldsMap.entrySet()) {
+            String label = entry.getKey();
+            FieldInfo fi = entry.getValue();
             IObservableValue ov = BeansObservables.observeValue(bean, label);
             Object value = ov.getValue();
             if (value != null) {

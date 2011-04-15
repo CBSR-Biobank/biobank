@@ -390,7 +390,6 @@ public abstract class ReportsEditor extends BiobankFormBase {
                     BiobankPlugin.openAsyncError("Exporting canceled.",
                         "Select a valid path and try again.");
                     return;
-                } else if (path.endsWith(".csv")) {
                 }
             } else if (exportPDF) {
                 String[] filterExt = new String[] { ".pdf" };

@@ -281,8 +281,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             return "New Dispatch";
         } else {
             Assert.isNotNull(dispatch, "Dispatch is null");
-            String label = new String();
-            label += dispatch.getSenderCenter().getNameShort() + " -> "
+            String label = dispatch.getSenderCenter().getNameShort() + " -> "
                 + dispatch.getReceiverCenter().getNameShort();
 
             if (dispatch.getShipmentInfo() != null

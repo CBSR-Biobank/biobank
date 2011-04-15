@@ -12,7 +12,7 @@ public class InfoTableEvent extends EventObject {
      */
     private static final long serialVersionUID = -8960426037179772430L;
 
-    protected ISelection selection;
+    protected transient ISelection selection;
 
     public InfoTableEvent(InfoTableWidget<?> source, ISelection selection) {
         super(source);

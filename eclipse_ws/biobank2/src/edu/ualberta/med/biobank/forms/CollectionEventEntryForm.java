@@ -68,7 +68,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private PatientWrapper patient;
 
-    private class FormPvCustomInfo extends PvAttrCustom {
+    private static class FormPvCustomInfo extends PvAttrCustom {
         private Control control;
     }
 
