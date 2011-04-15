@@ -131,10 +131,6 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             // BiobankPlugin.openError("Specimen not found",
             // "This specimen does not exist in the database.");
             // break;
-            // case DUPLICATE:
-            // BiobankPlugin.openError("Duplicate specimen !",
-            // "This specimen exists more that once in the database !");
-            // break;
             // case EXTRA:
             // BiobankPlugin.openInformation("Specimen already extra",
             // "Specimen with inventory id " + inventoryId

@@ -31,9 +31,7 @@ public class CollectionView extends AbstractAdministrationView {
 
     public CollectionView() {
         super();
-        synchronized (currentInstance) {
-            currentInstance = this;
-        }
+        currentInstance = this;
         SessionManager.addView(this);
     }
 

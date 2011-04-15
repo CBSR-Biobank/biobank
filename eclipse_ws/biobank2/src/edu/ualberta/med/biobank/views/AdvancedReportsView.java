@@ -14,9 +14,7 @@ public class AdvancedReportsView extends AbstractAdministrationView {
     private static AdvancedReportsView currentView;
 
     public AdvancedReportsView() {
-        synchronized (currentView) {
-            currentView = this;
-        }
+        currentView = this;
         SessionManager.addView(this);
     }
 
