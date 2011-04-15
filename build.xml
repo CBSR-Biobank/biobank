@@ -9,8 +9,8 @@
     <arg value="-f" />
   </exec>
 
-  <property name="server.version.num" value="1.4.0.rc3" />
-  <property name="java.client.version.num" value="1.4.0.rc3" />
+  <property name="server.version.num" value="1.4.0.rc4" />
+  <property name="java.client.version.num" value="1.4.0.rc4" />
 
   <property environment="env" />
   <property name="host" value="aicml-med.cs.ualberta.ca" />
@@ -392,7 +392,7 @@
           description="generates the database schema for the caCORE SDK data model">
     <ant dir="${schema.dir}" target="schemaexport" inheritRefs="false" />
   </target>
-  <target name="dbcreate-add-tables" depends="hbmstrings,prepare-webapp-orm">
+  <target name="dbcreate-add-tables" depends="sdk,package-webapp-orm">
     <sql driver="${DB_DRIVER}"
          url="${DB_CONNECTION_URL}"
          userid="${DB_USERNAME}"
@@ -530,7 +530,7 @@
   </fileset>
 
   <!--
-    build-validators uses a different destination directory from build-hbmstrings and
+    build-validators uses a different destination directory from build-hbmpostproc and
     build-modelextender due to dependency restrictions
   -->
   <target name="build-validators" depends="cacore-untar">
@@ -592,18 +592,18 @@
     </java>
   </target>
 
-  <fileset id="hbmstrings.class.files" dir="${eclipse.proj.dir.tools}/output">
-    <include name="**/tools/hbmstrings/*.class" />
+  <fileset id="hbmpostproc.class.files" dir="${eclipse.proj.dir.tools}/output">
+    <include name="**/tools/hbmpostproc/*.class" />
     <include name="**/tools/modelumlparser/*.class" />
     <include name="**/tools/utils/*.class" />
   </fileset>
 
-  <target name="build-hbmstrings" depends="sdk" unless="hmbstrings.uptodate">
+  <target name="build-hbmpostproc" depends="sdk" unless="hmbstrings.uptodate">
     <mkdir dir="${eclipse.proj.dir.tools}/output" />
     <dependset>
       <srcfilelist dir="${cacore.sdk.dir}/output/biobank2/build/jar"
                    files="biobank2-beans.jar" />
-      <targetfileset refid="hbmstrings.class.files" />
+      <targetfileset refid="hbmpostproc.class.files" />
     </dependset>
     <javac debug="on"
            debuglevel="source,lines,vars"
@@ -612,7 +612,7 @@
            source="1.6"
            target="1.6"
            includeantruntime="false">
-      <include name="**/tools/hbmstrings/*.java" />
+      <include name="**/tools/hbmpostproc/*.java" />
       <include name="**/tools/modelumlparser/*.java" />
       <include name="**/tools/utils/*.java" />
       <classpath>
@@ -627,28 +627,27 @@
     <touch file="${eclipse.proj.dir.tools}/output/build.timestamp" />
   </target>
 
-  <target name="check-run-hbmstrings">
-    <uptodate property="hbmstrings.uptodate"
+  <target name="check-run-hbmpostproc">
+    <uptodate property="hbmpostproc.uptodate"
               targetfile="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/VarCharLengths.java">
 
       <srcfiles dir="${cacore.sdk.dir}/output/biobank2/build/jar"
                 includes="biobank2-beans.jar" />
-      <srcfiles refid="hbmstrings.class.files" />
+      <srcfiles refid="hbmpostproc.class.files" />
     </uptodate>
   </target>
 
-  <target name="hbmstrings"
-          depends="build-hbmstrings,check-run-hbmstrings"
-          unless="hbmstrings.uptodate"
+  <target name="hbmpostproc"
+          depends="build-hbmpostproc,check-run-hbmpostproc"
+          unless="hbmpostproc.uptodate"
           description="Adds the length='#' field into *.hbm.xml files, references the biobank.uml file for the VARCHAR(#)">
-    <echo message="running HBM string fixing tool" />
     <dependset>
       <srcfilelist dir="${cacore.sdk.dir}/output/biobank2/build/jar"
                    files="biobank2-beans.jar" />
       <targetfilelist dir="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common"
                       files="VarCharLengths.java" />
     </dependset>
-    <java classname="edu.ualberta.med.biobank.tools.hbmstrings.HbmStrings"
+    <java classname="edu.ualberta.med.biobank.tools.hbmpostproc.HbmPostProcess"
           failonerror="true"
           fork="true">
       <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
@@ -665,7 +664,7 @@
   </target>
 
   <target name="build-common-project"
-          depends="sdk-files,hbmstrings,modelextender">
+          depends="sdk-files,modelextender">
     <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output">
@@ -685,11 +684,13 @@
     </javac>
   </target>
 
-  <target name="compile-generated-beans" description="REDO:: Compiles the generated beans">
+  <target name="compile-generated-beans"
+    description="REDO:: Compiles the generated beans">
     <copy todir="${cacore.sdk.dir}/${output.src.dir}/edu/ualberta/med/biobank/model"
       overwrite="true">
       <fileset dir="sdk_conf/specialSrc" />
     </copy>
+    <antcall target="hbmpostproc" />
     <delete>
       <fileset dir="${cacore.sdk.dir}/${build.classes.dir}"/>
     </delete>

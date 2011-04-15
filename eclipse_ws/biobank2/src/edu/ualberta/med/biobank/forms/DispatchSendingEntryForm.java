@@ -153,7 +153,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     private void createSpecimensSelectionSection() {
         if (dispatch.isInCreationState()) {
-            Section section = createSection("Add Specimens");
+            Section section = createSection("Specimens");
             Composite composite = toolkit.createComposite(section);
             composite.setLayout(new GridLayout(1, false));
             section.setClient(composite);
@@ -284,9 +284,9 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             String label = dispatch.getSenderCenter().getNameShort() + " -> "
                 + dispatch.getReceiverCenter().getNameShort();
 
-            if (dispatch.getShipmentInfo() != null
-                && dispatch.getShipmentInfo().getPackedAt() != null)
-                label += "[" + dispatch.getFormattedPackedAt() + "]";
+            String packedAt = dispatch.getFormattedPackedAt();
+            if (packedAt != null)
+                label += " [" + packedAt + "]";
             return label;
         }
     }
