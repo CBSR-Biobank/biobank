@@ -86,9 +86,8 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             dispatch, dispatch.getReceiverCenter());
         dialog.open();
-        if (dialog.hasReceivedSpecimens()) {
+        if (dispatch.hasNewSpecimens())
             setDirty(true);
-        }
         reloadSpecimens();
     }
 
@@ -121,21 +120,19 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                     "Specimen with inventory id " + inventoryId
                         + " has not been found in this dispatch."
                         + " It will be moved into the extra-pending list.");
+                if (specimen == null) {
+                    BiobankPlugin.openAsyncError("Problem with specimen",
+                        "Specimen is extra but object is null");
+                    break;
+                }
                 dispatch.addSpecimens(Arrays.asList(specimen),
                     DispatchSpecimenState.EXTRA);
                 reloadSpecimens();
                 setDirty(true);
                 break;
-            // FIXME
-            // case NOT_IN_DB:
-            // BiobankPlugin.openError("Specimen not found",
-            // "This specimen does not exist in the database.");
-            // break;
-            // case EXTRA:
-            // BiobankPlugin.openInformation("Specimen already extra",
-            // "Specimen with inventory id " + inventoryId
-            // + " is already in extra list.");
-            // break;
+            default:
+                BiobankPlugin.openInformation("Problem with specimen", res
+                    .getCell().getInformation());
             }
         } catch (Exception e) {
             BiobankPlugin.openAsyncError("Error",

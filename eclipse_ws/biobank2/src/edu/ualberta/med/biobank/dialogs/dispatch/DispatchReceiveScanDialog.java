@@ -9,6 +9,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
 
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
@@ -29,6 +30,8 @@ public class DispatchReceiveScanDialog extends
 
     private boolean specimensReceived = false;
 
+    private List<SpecimenWrapper> extras = new ArrayList<SpecimenWrapper>();
+
     public DispatchReceiveScanDialog(Shell parentShell,
         final DispatchWrapper currentShipment, CenterWrapper<?> currentSite) {
         super(parentShell, currentShipment, currentSite);
@@ -45,6 +48,12 @@ public class DispatchReceiveScanDialog extends
     }
 
     @Override
+    protected void specificScanPosProcess(PalletCell palletCell) {
+        if (palletCell.getStatus() == UICellStatus.EXTRA)
+            extras.add(palletCell.getSpecimen());
+    }
+
+    @Override
     protected String getProceedButtonlabel() {
         return Messages
             .getString("DispatchReceiveScanDialog.proceed.button.label"); //$NON-NLS-1$
@@ -58,6 +67,39 @@ public class DispatchReceiveScanDialog extends
     @Override
     protected boolean canActivateNextAndFinishButton() {
         return pendingSpecimensNumber == 0;
+    }
+
+    @Override
+    protected void buttonPressed(int buttonId) {
+        if (IDialogConstants.PROCEED_ID == buttonId
+            || IDialogConstants.FINISH_ID == buttonId
+            || IDialogConstants.NEXT_ID == buttonId) {
+            addExtraCells();
+        }
+        if (IDialogConstants.NEXT_ID == buttonId)
+            extras.clear();
+        super.buttonPressed(buttonId);
+    }
+
+    private void addExtraCells() {
+        if (extras != null && extras.size() > 0) {
+            BiobankPlugin
+                .openAsyncInformation(
+                    Messages
+                        .getString("DispatchReceiveScanDialog.notInDispatch.error.title"), //$NON-NLS-1$
+                    Messages
+                        .getString("DispatchReceiveScanDialog.notInDispatch.error.msg")); //$NON-NLS-1$
+            try {
+                currentShipment.addSpecimens(extras,
+                    DispatchSpecimenState.EXTRA);
+            } catch (Exception e) {
+                BiobankPlugin
+                    .openAsyncError(
+                        Messages
+                            .getString("DispatchReceiveScanDialog.flagging.error.title"), //$NON-NLS-1$
+                        e);
+            }
+        }
     }
 
     @Override
@@ -98,6 +140,8 @@ public class DispatchReceiveScanDialog extends
                             .getInventoryId())));
                 i++;
             }
+            palletScanned.put(new RowColPos(6, 6), new PalletCell(new ScanCell(
+                6, 6, "aaar")));
         }
         return palletScanned;
     }

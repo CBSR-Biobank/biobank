@@ -5,7 +5,6 @@ import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
-import edu.ualberta.med.biobank.common.scanprocess.result.DispatchCreateResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
@@ -29,7 +28,7 @@ public class DispatchCreateProcess extends ServerProcess {
     @Override
     protected ScanProcessResult getScanProcessResult(
         Map<RowColPos, Cell> cells, boolean isRescanMode) throws Exception {
-        DispatchCreateResult res = new DispatchCreateResult();
+        ScanProcessResult res = new ScanProcessResult();
         res.setResult(cells, createProcess(cells));
         return res;
     }

@@ -110,12 +110,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             @Override
             protected void postprocessScanTubeAlone(PalletCell cell)
                 throws Exception {
-                postprocessScanTubeAlone(cell);
+                AbstractScanDialog.this.postprocessScanTubeAlone(cell);
             }
 
             @Override
             protected boolean canScanTubeAlone(PalletCell cell) {
-                return canScanTubeAlone(cell);
+                return AbstractScanDialog.this.canScanTubeAlone(cell);
             }
         };
     }
@@ -190,12 +190,18 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                     }
                     palletCell
                         .merge(SessionManager.getAppService(), servercell);
+                    specificScanPosProcess(palletCell);
                 }
             }
             setScanOkValue(res.getProcessStatus() != CellStatus.ERROR);
         } else {
             setScanOkValue(false);
         }
+    }
+
+    @SuppressWarnings("unused")
+    protected void specificScanPosProcess(PalletCell palletCell) {
+        // default do nothing
     }
 
     @SuppressWarnings("unused")
@@ -454,6 +460,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             Button okButton = getButton(IDialogConstants.PROCEED_ID);
             okButton.setEnabled(false);
         }
+        specificScanPosProcess(cell);
         spw.redraw();
     }
 

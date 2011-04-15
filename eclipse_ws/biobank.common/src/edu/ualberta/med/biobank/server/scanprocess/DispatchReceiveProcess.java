@@ -5,7 +5,6 @@ import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
-import edu.ualberta.med.biobank.common.scanprocess.result.DispatchReceiveResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
@@ -34,8 +33,8 @@ public class DispatchReceiveProcess extends ServerProcess {
     @Override
     protected ScanProcessResult getScanProcessResult(
         Map<RowColPos, Cell> cells, boolean isRescanMode) throws Exception {
-        DispatchReceiveResult res = new DispatchReceiveResult();
-        res.setResult(cells, receiveProcess(cells), extraSpecimens);
+        ScanProcessResult res = new ScanProcessResult();
+        res.setResult(cells, receiveProcess(cells));
         return res;
     }
 
@@ -103,6 +102,7 @@ public class DispatchReceiveProcess extends ServerProcess {
                 .getCurrentDispatchSpecimenIds().get(foundSpecimen.getId());
             if (state == null) {
                 // not in the shipment
+                updateCellWithSpecimen(cell, foundSpecimen);
                 cell.setStatus(CellStatus.EXTRA);
                 cell.setInformation(Messages
                     .getString("DispatchReceiveScanDialog.cell.notInShipment.msg")); //$NON-NLS-1$
@@ -113,7 +113,8 @@ public class DispatchReceiveProcess extends ServerProcess {
                     cell.setStatus(CellStatus.IN_SHIPMENT_RECEIVED);
                 } else if (DispatchSpecimenState.EXTRA == state) {
                     updateCellWithSpecimen(cell, foundSpecimen);
-                    extraSpecimens.add(foundSpecimen.getId());
+                    if (extraSpecimens != null)
+                        extraSpecimens.add(foundSpecimen.getId());
                     cell.setStatus(CellStatus.EXTRA);
                 } else {
                     updateCellWithSpecimen(cell, foundSpecimen);

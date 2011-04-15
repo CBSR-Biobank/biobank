@@ -37,6 +37,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private List<DispatchSpecimenWrapper> deletedDispatchedSpecimens = new ArrayList<DispatchSpecimenWrapper>();
 
+    private boolean hasNewSpecimens = false;
+
     public DispatchWrapper(WritableApplicationService appService) {
         super(appService);
     }
@@ -198,6 +200,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 dsa.setDispatch(this);
                 dsa.setDispatchSpecimenState(state);
                 newDispatchSpecimens.add(dsa);
+                hasNewSpecimens = true;
                 dispatchSpecimenMap.get(DispatchSpecimenState.NONE).add(dsa);
             }
         }
@@ -368,9 +371,11 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
+    protected void resetInternalFields() {
+        super.resetInternalFields();
         resetMap();
+        deletedDispatchedSpecimens.clear();
+        hasNewSpecimens = false;
     }
 
     public void resetMap() {
@@ -500,5 +505,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         if (getReceiverCenter() != null)
             centers.add(getReceiverCenter());
         return centers;
+    }
+
+    public boolean hasNewSpecimens() {
+        return hasNewSpecimens;
     }
 }
