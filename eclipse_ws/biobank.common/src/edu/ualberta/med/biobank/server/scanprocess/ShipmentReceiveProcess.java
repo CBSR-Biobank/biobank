@@ -3,11 +3,12 @@ package edu.ualberta.med.biobank.server.scanprocess;
 import edu.ualberta.med.biobank.common.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
-import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
+import edu.ualberta.med.biobank.common.util.ItemState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -16,14 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class DispatchReceiveProcess extends ServerProcess {
+public class ShipmentReceiveProcess extends ServerProcess {
 
     private int pendingSpecimenNumber = 0;
 
     List<Integer> extraSpecimens = null;
 
-    public DispatchReceiveProcess(WritableApplicationService appService,
-        DispatchProcessData data, User user) {
+    public ShipmentReceiveProcess(WritableApplicationService appService,
+        ShipmentProcessData data, User user) {
         super(appService, data, user);
     }
 
@@ -98,7 +99,7 @@ public class DispatchReceiveProcess extends ServerProcess {
                 "DispatchReceiveScanDialog.cell.notInDb.msg", cell.getValue())); //$NON-NLS-1$
             cell.setTitle("!"); //$NON-NLS-1$
         } else {
-            DispatchSpecimenState state = ((DispatchProcessData) data)
+            ItemState state = ((ShipmentProcessData) data)
                 .getCurrentDispatchSpecimenIds().get(foundSpecimen.getId());
             if (state == null) {
                 // not in the shipment

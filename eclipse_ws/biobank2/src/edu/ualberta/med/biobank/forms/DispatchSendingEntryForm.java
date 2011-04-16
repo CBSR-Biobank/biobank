@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
@@ -223,7 +223,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     protected void doSpecimenTextAction(String inventoryId) {
         try {
             CellProcessResult res = appService.processCellStatus(new Cell(-1,
-                -1, inventoryId, null), new DispatchProcessData(null, dispatch,
+                -1, inventoryId, null), new ShipmentProcessData(null, dispatch,
                 true, true), SessionManager.getUser());
             switch (res.getProcessStatus()) {
             case FILLED:

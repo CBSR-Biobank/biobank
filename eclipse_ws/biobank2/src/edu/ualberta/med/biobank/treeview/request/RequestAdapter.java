@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.forms.RequestEntryFormBase;
+import edu.ualberta.med.biobank.forms.RequestEntryForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.RequestAdministrationView;
 
@@ -109,12 +109,12 @@ public class RequestAdapter extends AdapterBase {
 
     @Override
     public String getViewFormId() {
-        return RequestEntryFormBase.ID;
+        return RequestEntryForm.ID;
     }
 
     @Override
     public String getEntryFormId() {
-        return RequestEntryFormBase.ID;
+        return RequestEntryForm.ID;
     }
 
 }

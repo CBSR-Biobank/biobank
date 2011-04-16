@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -149,7 +149,7 @@ public class DispatchCreateScanDialog extends
 
     @Override
     protected ProcessData getProcessData() {
-        return new DispatchProcessData(currentPallet, currentShipment, true,
+        return new ShipmentProcessData(currentPallet, currentShipment, true,
             false);
     }
 

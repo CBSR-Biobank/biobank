@@ -3,11 +3,11 @@ package edu.ualberta.med.biobank.server.scanprocess;
 import edu.ualberta.med.biobank.common.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
-import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
+import edu.ualberta.med.biobank.common.util.ItemState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class DispatchCreateProcess extends ServerProcess {
 
     public DispatchCreateProcess(WritableApplicationService appService,
-        DispatchProcessData data, User user) {
+        ShipmentProcessData data, User user) {
         super(appService, data, user);
     }
 
@@ -40,7 +40,7 @@ public class DispatchCreateProcess extends ServerProcess {
     protected CellProcessResult getCellProcessResult(Cell cell)
         throws Exception {
         CellProcessResult res = new CellProcessResult();
-        DispatchProcessData dispatchData = (DispatchProcessData) data;
+        ShipmentProcessData dispatchData = (ShipmentProcessData) data;
         CenterWrapper<?> sender = null;
         if (dispatchData.getSenderId() != null) {
             sender = CenterWrapper.getCenterFromId(appService,
@@ -62,7 +62,7 @@ public class DispatchCreateProcess extends ServerProcess {
     private CellStatus createProcess(Map<RowColPos, Cell> cells)
         throws Exception {
         CellStatus currentScanState = CellStatus.EMPTY;
-        DispatchProcessData dispatchData = (DispatchProcessData) data;
+        ShipmentProcessData dispatchData = (ShipmentProcessData) data;
         CenterWrapper<?> sender = null;
         if (dispatchData.getSenderId() != null) {
             sender = CenterWrapper.getCenterFromId(appService,
@@ -142,7 +142,7 @@ public class DispatchCreateProcess extends ServerProcess {
                 } else {
                     scanCell.setSpecimenId(foundSpecimen.getId());
                     if (expectedSpecimen != null
-                        || ((DispatchProcessData) data).getPallet(appService) == null) {
+                        || ((ShipmentProcessData) data).getPallet(appService) == null) {
                         checkCanAddSpecimen(scanCell, foundSpecimen, sender,
                             checkAlreadyAdded);
                     } else {
@@ -187,7 +187,7 @@ public class DispatchCreateProcess extends ServerProcess {
                     .getInventoryId(), specimen.getCurrentCenter()
                     .getNameShort(), sender.getNameShort()));
         } else {
-            Map<Integer, DispatchSpecimenState> currentSpecimenIds = ((DispatchProcessData) data)
+            Map<Integer, ItemState> currentSpecimenIds = ((ShipmentProcessData) data)
                 .getCurrentDispatchSpecimenIds();
             boolean alreadyInShipment = currentSpecimenIds != null
                 && currentSpecimenIds.get(specimen.getId()) != null;

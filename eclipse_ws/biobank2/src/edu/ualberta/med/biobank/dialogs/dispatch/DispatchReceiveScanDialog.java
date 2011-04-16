@@ -1,17 +1,14 @@
 package edu.ualberta.med.biobank.dialogs.dispatch;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
-import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -23,14 +20,8 @@ import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
-public class DispatchReceiveScanDialog extends
-    AbstractScanDialog<DispatchWrapper> {
-
-    private int pendingSpecimensNumber = 0;
-
-    private boolean specimensReceived = false;
-
-    private List<SpecimenWrapper> extras = new ArrayList<SpecimenWrapper>();
+public class DispatchReceiveScanDialog<T> extends
+    ReceiveScanDialog<DispatchWrapper> {
 
     public DispatchReceiveScanDialog(Shell parentShell,
         final DispatchWrapper currentShipment, CenterWrapper<?> currentSite) {
@@ -38,50 +29,12 @@ public class DispatchReceiveScanDialog extends
     }
 
     @Override
-    protected String getTitleAreaMessage() {
-        return Messages.getString("DispatchReceiveScanDialog.description"); //$NON-NLS-1$
-    }
-
-    @Override
     protected ProcessData getProcessData() {
-        return new DispatchProcessData(null, currentShipment, false, false);
+        return new ShipmentProcessData(null, currentShipment, false, false);
     }
 
     @Override
-    protected void specificScanPosProcess(PalletCell palletCell) {
-        if (palletCell.getStatus() == UICellStatus.EXTRA)
-            extras.add(palletCell.getSpecimen());
-    }
-
-    @Override
-    protected String getProceedButtonlabel() {
-        return Messages
-            .getString("DispatchReceiveScanDialog.proceed.button.label"); //$NON-NLS-1$
-    }
-
-    @Override
-    protected boolean canActivateProceedButton() {
-        return pendingSpecimensNumber != 0;
-    }
-
-    @Override
-    protected boolean canActivateNextAndFinishButton() {
-        return pendingSpecimensNumber == 0;
-    }
-
-    @Override
-    protected void buttonPressed(int buttonId) {
-        if (IDialogConstants.PROCEED_ID == buttonId
-            || IDialogConstants.FINISH_ID == buttonId
-            || IDialogConstants.NEXT_ID == buttonId) {
-            addExtraCells();
-        }
-        if (IDialogConstants.NEXT_ID == buttonId)
-            extras.clear();
-        super.buttonPressed(buttonId);
-    }
-
-    private void addExtraCells() {
+    protected void addExtraCells() {
         if (extras != null && extras.size() > 0) {
             BiobankPlugin
                 .openAsyncInformation(
@@ -103,21 +56,8 @@ public class DispatchReceiveScanDialog extends
     }
 
     @Override
-    protected void doProceed() {
-        List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
-        for (PalletCell cell : getCells().values()) {
-            if (cell.getStatus() == UICellStatus.IN_SHIPMENT_EXPECTED) {
-                specimens.add(cell.getSpecimen());
-                cell.setStatus(UICellStatus.IN_SHIPMENT_RECEIVED);
-            }
-        }
+    protected void receiveSpecimens(List<SpecimenWrapper> specimens) {
         currentShipment.receiveSpecimens(specimens);
-        redrawPallet();
-        pendingSpecimensNumber = 0;
-        setOkButtonEnabled(true);
-        specimensReceived = true;
-        Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
-        cancelButton.setEnabled(false);
     }
 
     @Override
@@ -144,10 +84,6 @@ public class DispatchReceiveScanDialog extends
                 6, 6, "aaar")));
         }
         return palletScanned;
-    }
-
-    public boolean hasReceivedSpecimens() {
-        return specimensReceived;
     }
 
 }

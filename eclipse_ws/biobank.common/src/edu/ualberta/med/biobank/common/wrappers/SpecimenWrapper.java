@@ -463,7 +463,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                         DispatchState.IN_TRANSIT, DispatchState.RECEIVED)
                         .contains(dispatch.getDispatchState()))) {
                     if (DispatchSpecimenState.MISSING.equals(dsa
-                        .getDispatchSpecimenState())) {
+                        .getSpecimenState())) {
                         return false;
                     }
                     return true;

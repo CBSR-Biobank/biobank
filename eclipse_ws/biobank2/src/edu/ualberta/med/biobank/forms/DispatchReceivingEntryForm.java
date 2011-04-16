@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.data.DispatchProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -95,7 +95,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     protected void doSpecimenTextAction(String inventoryId) {
         try {
             CellProcessResult res = appService.processCellStatus(new Cell(-1,
-                -1, inventoryId, null), new DispatchProcessData(null, dispatch,
+                -1, inventoryId, null), new ShipmentProcessData(null, dispatch,
                 false, false), SessionManager.getUser());
             SpecimenWrapper specimen = null;
             if (res.getCell().getSpecimenId() != null) {
@@ -148,22 +148,6 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     @Override
     public String getNextOpenedFormID() {
         return DispatchViewForm.ID;
-    }
-
-    // FIXME remove when doesnt use anymore
-    public enum ResType {
-        OK, NOT_IN_SHIPMENT, NOT_IN_DB, DUPLICATE, RECEIVED, EXTRA;
-    }
-
-    // FIXME remove when doesnt use anymore
-    public static class SpecimenInfo {
-        public SpecimenWrapper specimen;
-        public ResType type;
-
-        public SpecimenInfo(SpecimenWrapper specimen, ResType type) {
-            this.specimen = specimen;
-            this.type = type;
-        }
     }
 
     @Override

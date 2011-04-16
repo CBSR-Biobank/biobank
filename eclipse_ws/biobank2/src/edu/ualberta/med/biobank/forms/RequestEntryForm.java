@@ -12,22 +12,15 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.RequestState;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.RequestReceiveScanDialog;
-import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.ResType;
-import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.SpecimenInfo;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.RequestSpecimensTreeTable;
 
-public class RequestEntryFormBase extends BiobankFormBase {
+public class RequestEntryForm extends BiobankFormBase {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.RequestEntryFormBase";
     private RequestWrapper request;
@@ -158,31 +151,4 @@ public class RequestEntryFormBase extends BiobankFormBase {
         setPartName("Request " + request.getId().toString());
     }
 
-    public static SpecimenInfo getInfoForInventoryId(
-        ModelWrapper<?> currentShipment, String inventoryId) {
-        RequestSpecimenWrapper dsa = ((RequestWrapper) currentShipment)
-            .getRequestSpecimen(inventoryId);
-        if (dsa == null) {
-            // specimen not in shipment. Check if exists in DB:
-            SpecimenWrapper specimen = null;
-            try {
-                specimen = SpecimenWrapper.getSpecimen(
-                    currentShipment.getAppService(), inventoryId,
-                    SessionManager.getUser());
-            } catch (Exception ae) {
-                BiobankPlugin.openAsyncError("Error retrieving specimen", ae);
-            }
-            if (specimen == null) {
-                return new SpecimenInfo(null, ResType.NOT_IN_DB);
-            }
-            return new SpecimenInfo(specimen, ResType.NOT_IN_SHIPMENT);
-        }
-        if (DispatchSpecimenState.RECEIVED.isEquals(dsa.getState())) {
-            return new SpecimenInfo(dsa.getSpecimen(), ResType.RECEIVED);
-        }
-        if (DispatchSpecimenState.EXTRA.isEquals(dsa.getState())) {
-            return new SpecimenInfo(dsa.getSpecimen(), ResType.EXTRA);
-        }
-        return new SpecimenInfo(dsa.getSpecimen(), ResType.OK);
-    }
 }

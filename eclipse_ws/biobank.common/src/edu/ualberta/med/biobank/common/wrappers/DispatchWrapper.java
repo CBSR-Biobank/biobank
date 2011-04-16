@@ -151,7 +151,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 map.put(state, new ArrayList<DispatchSpecimenWrapper>());
             }
             for (DispatchSpecimenWrapper wrapper : list) {
-                map.get(wrapper.getDispatchSpecimenState()).add(wrapper);
+                map.get(wrapper.getSpecimenState()).add(wrapper);
             }
         }
 

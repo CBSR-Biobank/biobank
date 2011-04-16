@@ -2033,7 +2033,7 @@
       name="Dispatch Sending Entry">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.RequestEntryFormBase"
+      class="edu.ualberta.med.biobank.forms.RequestEntryForm"
       default="false"
       icon="icons/request.png"
       id="edu.ualberta.med.biobank.forms.RequestEntryFormBase"
