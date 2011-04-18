@@ -227,4 +227,12 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
             return Arrays.asList(getCenter());
         return super.getSecuritySpecificCenters();
     }
+
+    public Long getChildSpecimenCount() {
+        List<SpecimenWrapper> parents = getSpecimenCollection(false);
+        Long count = new Long(0);
+        for (SpecimenWrapper sp : parents)
+            count += sp.getChildSpecimenCollection(false).size();
+        return count;
+    }
 }

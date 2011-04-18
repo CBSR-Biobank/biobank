@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.forms.CeListViewForm;
+import edu.ualberta.med.biobank.forms.PeListViewForm;
 import edu.ualberta.med.biobank.forms.SpecimenListViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -133,9 +133,9 @@ public enum SearchType {
                 // FIXME result is processing event and we display CEvent ???
                 PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                     .getActivePage()
-                    .openEditor(input, CeListViewForm.ID, false);
+                    .openEditor(input, PeListViewForm.ID, false);
             } catch (PartInitException e) {
-                logger.error("Can't open form with id " + CeListViewForm.ID, e);
+                logger.error("Can't open form with id " + PeListViewForm.ID, e);
             }
         }
     };
