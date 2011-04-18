@@ -21,9 +21,11 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -36,12 +38,16 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationE
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
+import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestContainer extends TestDatabase {
 
@@ -893,12 +899,15 @@ public class TestContainer extends TestDatabase {
 
         // reload because we changed container type
         childL3.reload();
-        ProcessingEventWrapper pv = addProcessingEvent();
-        SpecimenWrapper specimen = null;
-
+        SpecimenWrapper aliquot = null;
+        OriginInfoWrapper oi = OriginInfoHelper.addOriginInfo(site);
+        CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
+            site,
+            PatientHelper.addPatient(Utils.getRandomString(5),
+                StudyHelper.addStudy("tests")), 2, oi);
         for (SpecimenTypeWrapper st : allSampleTypes) {
-            // FIXME
-            // specimen = SpecimenHelper.newAliquot(st, childL3, pv, 0, 0);
+            aliquot = SpecimenHelper.newSpecimen(st, childL3, null, 0, 0, oi);
+            ce.addToAllSpecimenCollection(Arrays.asList(aliquot));
             if (selectedSampleTypes.contains(st)) {
                 Assert.assertTrue(childL3.canHoldSpecimen(specimen));
             } else {
@@ -906,8 +915,7 @@ public class TestContainer extends TestDatabase {
             }
         }
 
-        // FIXME
-        // aliquot = SpecimenHelper.newAliquot(null, childL3, pv, 0, 0);
+        aliquot = SpecimenHelper.newSpecimen(null, childL3, ce, 0, 0, oi);
         try {
             childL3.canHoldSpecimen(specimen);
             Assert
@@ -937,10 +945,7 @@ public class TestContainer extends TestDatabase {
 
         StudyWrapper study = StudyHelper.addStudy("Study1");
         ContactHelper.addContactsToStudy(study, "contactsStudy1");
-        // FIXME
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        // ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
-        // site, patient, Utils.getRandomDate(), Utils.getRandomDate());
 
         ContainerWrapper top = containerMap.get("Top");
         addContainerHierarchy(top);
@@ -948,6 +953,8 @@ public class TestContainer extends TestDatabase {
         Map<RowColPos, SpecimenTypeWrapper> samplesTypesMap = new TreeMap<RowColPos, SpecimenTypeWrapper>();
         SpecimenTypeWrapper sampleType;
 
+        CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
+            site, patient, 1, OriginInfoHelper.addOriginInfo(site));
         ContainerWrapper childL3 = containerMap.get("ChildL3");
         for (int row = 0, maxRow = childL3.getRowCapacity(), n = selectedSampleTypes
             .size(); row < maxRow; ++row) {
@@ -958,9 +965,8 @@ public class TestContainer extends TestDatabase {
                         .nextInt(unselectedSampleTypes.size()));
                     Assert.assertNull(childL3.getSpecimen(row, col));
                     try {
-                        // FIXME
-                        // childL3.addAliquot(row, col,
-                        // SpecimenHelper.newAliquot(sampleType));
+                        childL3.addSpecimen(row, col,
+                            SpecimenHelper.newSpecimen(sampleType));
                         Assert
                             .fail("should not be allowed to add invalid sample type");
                     } catch (Exception e) {
@@ -970,12 +976,10 @@ public class TestContainer extends TestDatabase {
 
                 sampleType = selectedSampleTypes.get(r.nextInt(n));
                 samplesTypesMap.put(new RowColPos(row, col), sampleType);
-                // FIXME
-                // childL3.addAliquot(row, col, SpecimenHelper.newAliquot(
-                // sampleType, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
-                // SpecimenWrapper aliquot = childL3.getSpecimen(row, col);
-                // aliquot.setProcessingEvent(pv);
-                // aliquot.persist();
+                childL3.addSpecimen(row, col, SpecimenHelper.addSpecimen(
+                    sampleType, null, ce, null, null, site));
+                SpecimenWrapper aliquot = childL3.getSpecimen(row, col);
+                aliquot.persist();
             }
         }
         childL3.persist();
@@ -985,8 +989,7 @@ public class TestContainer extends TestDatabase {
         sampleType = selectedSampleTypes.get(r.nextInt(selectedSampleTypes
             .size()));
         try {
-            // FIXME
-            // childL3.addAliquot(0, 0, SpecimenHelper.newAliquot(sampleType));
+            childL3.addSpecimen(0, 0, SpecimenHelper.newSpecimen(sampleType));
             Assert
                 .fail("should not be allowed to add second sample type in same position");
         } catch (Exception e) {
@@ -1193,7 +1196,21 @@ public class TestContainer extends TestDatabase {
 
     @Test
     public void testGetContainersByLabel() {
-        Assert.fail("missing test case");
+        try {
+            ContainerHelper.addContainer("01AA", "asdf", null, site,
+                ContainerTypeHelper.addContainerTypeRandom(site, "ct", true));
+        } catch (Exception e) {
+            Assert.fail();
+        }
+        List<ContainerWrapper> containers = null;
+        try {
+            containers = ContainerWrapper
+                .getContainersByLabel(appService, "01");
+        } catch (ApplicationException e) {
+            Assert.fail();
+        }
+        if (containers.size() == 1)
+            Assert.assertTrue(true);
     }
 
     @Test
@@ -1408,15 +1425,18 @@ public class TestContainer extends TestDatabase {
         // add a aliquot to childL4
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, true);
-        ProcessingEventWrapper pv = addProcessingEvent();
         ContainerWrapper childL4 = containerMap.get("ChildL4");
         SpecimenTypeWrapper sampleType = allSampleTypes.get(0);
-        // FIXME
-        // childL4.getContainerType().addToSampleTypeCollection(
-        // Arrays.asList(sampleType));
-        // childL4.getContainerType().persist();
-        // SpecimenWrapper aliquot = SpecimenHelper.addAliquot(sampleType,
-        // childL4, pv, 0, 0);
+        childL4.getContainerType().addToSpecimenTypeCollection(
+            Arrays.asList(sampleType));
+        childL4.getContainerType().persist();
+        OriginInfoWrapper oi = OriginInfoHelper.addOriginInfo(site);
+        CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
+            site,
+            PatientHelper.addPatient(Utils.getRandomString(5),
+                StudyHelper.addStudy("tests")), 1, oi);
+        SpecimenWrapper spc = SpecimenHelper.addSpecimen(sampleType, childL4,
+            ce, 3, 3, site);
 
         // attempt to delete the containers - should fail
         String[] names = new String[] { "ChildL4", "ChildL3", "ChildL2",
@@ -1436,8 +1456,7 @@ public class TestContainer extends TestDatabase {
         }
 
         // now delete again - should work this time
-        // FIXME
-        // aliquot.delete();
+        spc.delete();
         for (String name : names) {
             ContainerWrapper container = containerMap.get(name);
             container.reload();
@@ -1777,16 +1796,17 @@ public class TestContainer extends TestDatabase {
 
         StudyWrapper study = StudyHelper.addStudy("Study1");
         ContactHelper.addContactsToStudy(study, "contactsStudy1");
-        PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        // FIXME
-        // ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
-        // site, patient, Utils.getRandomDate(), Utils.getRandomDate());
-        //
-        // SpecimenTypeWrapper st = SpecimenTypeWrapper.getAllSpecimenTypes(
-        // appService, false).get(0);
-        // SpecimenHelper.addAliquot(st, child, pv, 0, 0);
-        // SpecimenHelper.addAliquot(st, child, pv, 0, 1);
-        // SpecimenHelper.addAliquot(st, child, pv, 0, 2);
+        for (int i = 0; i < 3; i++) {
+            SpecimenWrapper spc = SpecimenHelper.addSpecimen();
+            childType.addToSpecimenTypeCollection(Arrays.asList(spc
+                .getSpecimenType()));
+            child.setContainerType(childType);
+            child2.setContainerType(childType);
+            child.addSpecimen(0, i, spc);
+        }
+        childType.persist();
+        child.persist();
+        child2.persist();
 
         Assert.assertEquals(3, child.getSpecimens() == null ? 0 : child
             .getSpecimens().size());

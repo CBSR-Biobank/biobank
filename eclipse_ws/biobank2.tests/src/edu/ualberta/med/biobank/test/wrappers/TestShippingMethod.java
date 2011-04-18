@@ -10,17 +10,23 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
+import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestShippingMethod extends TestDatabase {
@@ -44,26 +50,42 @@ public class TestShippingMethod extends TestDatabase {
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
+        SpecimenTypeWrapper specimenType = SpecimenTypeHelper
+            .addSpecimenType("shipST");
+
         ShippingMethodWrapper method1 = ShippingMethodHelper
             .addShippingMethod(name);
         ShippingMethodWrapper method2 = ShippingMethodHelper
             .addShippingMethod(name + "_2");
 
-        // FIXME
-        // CollectionEventHelper.addCollectionEvent(site, method1,
-        // SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-        // 0.1));
-        // CollectionEventHelper.addCollectionEvent(site, method2,
-        // SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-        // 0.1));
-        // CollectionEventHelper.addCollectionEvent(site, method2,
-        // SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-        // 0.1));
+        ShipmentInfoWrapper ship1 = new ShipmentInfoWrapper(appService,
+            new ShipmentInfo());
+        ship1.setShippingMethod(method1);
+        OriginInfoWrapper oi1 = OriginInfoHelper.addOriginInfo(site);
+        oi1.setShipmentInfo(ship1);
 
-        method1.reload();
-        method2.reload();
-        Assert.assertEquals(1, method1.getCollectionEventCollection().size());
-        Assert.assertEquals(2, method2.getCollectionEventCollection().size());
+        ShipmentInfoWrapper ship2 = new ShipmentInfoWrapper(appService,
+            new ShipmentInfo());
+        ship2.setShippingMethod(method2);
+        OriginInfoWrapper oi2 = OriginInfoHelper.addOriginInfo(site);
+        oi2.setShipmentInfo(ship2);
+
+        ShipmentInfoWrapper ship3 = new ShipmentInfoWrapper(appService,
+            new ShipmentInfo());
+        ship3.setShippingMethod(method2);
+        OriginInfoWrapper oi3 = OriginInfoHelper.addOriginInfo(site);
+        oi3.setShipmentInfo(ship3);
+
+        oi1.persist();
+        oi2.persist();
+        oi3.persist();
+
+        Assert.assertEquals(1,
+            ShipmentInfoWrapper
+                .getAllShipmentInfosByMethod(appService, method1).size());
+        Assert.assertEquals(2,
+            ShipmentInfoWrapper
+                .getAllShipmentInfosByMethod(appService, method2).size());
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })

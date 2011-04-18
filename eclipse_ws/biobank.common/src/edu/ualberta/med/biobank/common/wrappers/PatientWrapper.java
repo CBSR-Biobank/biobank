@@ -272,10 +272,10 @@ public class PatientWrapper extends PatientBaseWrapper {
                 ((BiobankApplicationService) appService).logActivity("merge",
                     null, getPnumber(), null, null, getPnumber() + " <-- "
                         + patient2.getPnumber(), "Patient");
-            } else {
-                throw new BiobankCheckException(
-                    "Cannot merge patients from different studies.");
             }
+        } else {
+            throw new BiobankCheckException(
+                "Cannot merge patients from different studies.");
         }
     }
 
