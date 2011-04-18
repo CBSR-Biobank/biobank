@@ -72,7 +72,6 @@ public class GenericAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         parentContainerWidget.setVisible(false);
 
         new CancelConfirmWidget(page, this, true);
-        setCanLaunchScan(true);
     }
 
     private void createContainersVisualisationSection() {

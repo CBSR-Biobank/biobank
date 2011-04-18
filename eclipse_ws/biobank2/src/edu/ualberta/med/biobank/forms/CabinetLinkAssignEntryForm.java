@@ -506,7 +506,8 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                     getBinLabelMessage(fullLabel, labelsTested));
                 BiobankPlugin
                     .openError("Check position and specimen", errorMsg); //$NON-NLS-1$
-                appendLogNLS("Cabinet.activitylog.checkParent.error", errorMsg); //$NON-NLS-1$
+                appendLog(Messages.getString(
+                    "Cabinet.activitylog.checkParent.error", errorMsg)); //$NON-NLS-1$
                 typeWidget.setEnabled(false);
                 focusControlInError(newCabinetPositionText);
                 return;
@@ -539,10 +540,10 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         bin = cabinetContainer;
         drawer = bin.getParentContainer();
         cabinet = drawer.getParentContainer();
-        appendLogNLS(
+        appendLog(Messages.getString(
             "Cabinet.activitylog.containers.init", //$NON-NLS-1$
             cabinet.getFullInfoLabel(), drawer.getFullInfoLabel(),
-            bin.getFullInfoLabel());
+            bin.getFullInfoLabel()));
     }
 
     private String getBinLabelMessage(String fullLabel,
@@ -567,7 +568,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
             boolean enabled = (specimenMode == SpecimenMode.NEW_SPECIMEN);
 
             linkFormPatientManagement.enabledPatientText(enabled);
-            linkFormPatientManagement.enabledVisitsList(enabled);
+            // linkFormPatientManagement.enabledVisitsList(enabled);
             linkFormPatientManagement.enableValidators(enabled);
             inventoryIDValidator.setManageOldInventoryIDs(!enabled);
             // Validator has change: we need to re-validate
@@ -665,8 +666,9 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                         .getSelectedCollectionEvent();
                     specimen.setCollectionEvent(ce);
                     if (radioNew.getSelection()) {
-                        appendLogNLS("Cabinet.activitylog.checkingId", //$NON-NLS-1$
-                            specimen.getInventoryId());
+                        appendLog(Messages.getString(
+                            "Cabinet.activitylog.checkingId", //$NON-NLS-1$
+                            specimen.getInventoryId()));
                         specimen.checkInventoryIdUnique();
                     }
                     String positionString = newCabinetPositionText.getText();
@@ -675,8 +677,8 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                         displayPositions(false);
                         return;
                     }
-                    appendLogNLS(
-                        "Cabinet.activitylog.checkingPosition", positionString); //$NON-NLS-1$
+                    appendLog(Messages.getString(
+                        "Cabinet.activitylog.checkingPosition", positionString)); //$NON-NLS-1$
                     specimen.setSpecimenPositionFromString(positionString, bin);
                     if (specimen.isPositionFree(bin)) {
                         specimen.setParent(bin);
@@ -688,8 +690,9 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                             .getString(
                                 "Cabinet.checkStatus.error", positionString, //$NON-NLS-1$
                                 bin.getLabel()));
-                        appendLogNLS(
-                            "Cabinet.activitylog.checkPosition.error", positionString, bin.getLabel()); //$NON-NLS-1$
+                        appendLog(Messages.getString(
+                            "Cabinet.activitylog.checkPosition.error", //$NON-NLS-1$
+                            positionString, bin.getLabel()));
                         focusControlInError(newCabinetPositionText);
                         return;
                     }
@@ -786,8 +789,8 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         inventoryIdText.setText(inventoryId);
         oldCabinetPositionCheckText.setText("?");
 
-        appendLogNLS("Cabinet.activitylog.gettingInfoId", //$NON-NLS-1$
-            specimen.getInventoryId());
+        appendLog(Messages.getString("Cabinet.activitylog.gettingInfoId", //$NON-NLS-1$
+            specimen.getInventoryId()));
         SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(appService,
             specimen.getInventoryId(), SessionManager.getUser());
         if (foundSpecimen == null) {
@@ -832,9 +835,9 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         // + "(" + specimen.getParentSpecimen().getInventoryId() + ")");
         // specimenTypeText.setText(specimen.getSpecimenType().getName());
         page.layout(true, true);
-        appendLogNLS(
+        appendLog(Messages.getString(
             "Cabinet.activitylog.specimenInfo", specimen.getInventoryId(), //$NON-NLS-1$
-            positionString);
+            positionString));
     }
 
     private void displayPositions(boolean show) {
@@ -929,11 +932,11 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
             // {3} - Patient\: {4} - Visit\: {5}
             msgString = "Cabinet.activitylog.specimen.saveMove"; //$NON-NLS-1$
         }
-        appendLogNLS(msgString, posStr, specimen.getInventoryId(), specimen
-            .getCurrentCenter().getName(),
-            specimen.getSpecimenType().getName(), linkFormPatientManagement
-                .getCurrentPatient().getPnumber(), specimen
-                .getCollectionEvent().getVisitNumber());
+        appendLog(Messages.getString(msgString, posStr, specimen
+            .getInventoryId(), specimen.getCurrentCenter().getName(), specimen
+            .getSpecimenType().getName(), linkFormPatientManagement
+            .getCurrentPatient().getPnumber(), specimen.getCollectionEvent()
+            .getVisitNumber()));
         setFinished(false);
     }
 

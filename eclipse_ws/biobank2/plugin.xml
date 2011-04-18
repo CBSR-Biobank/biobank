@@ -299,6 +299,16 @@
              id="edu.ualberta.med.biobank.commands.ProcessingEventAdd"
              name="Add Processing Event">
        </command>
+       <command
+             categoryId="org.eclipse.ui.category.window"
+             id="edu.ualberta.med.biobank.commands.processing.assign"
+             name="Generic Assign">
+       </command>
+       <command
+             categoryId="org.eclipse.ui.category.window"
+             id="edu.ualberta.med.biobank.commands.processing.link"
+             name="Generic Link">
+       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -860,6 +870,44 @@
             </reference>
          </enabledWhen>
       </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.GenericAssignHandler"
+            commandId="edu.ualberta.med.biobank.commands.processing.assign">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.processingPerspectiveSelected">
+               </reference>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <reference
+                  definitionId="biobank2.processingPerspectiveSelected">
+            </reference>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.GenericLinkHandler"
+            commandId="edu.ualberta.med.biobank.commands.processing.link">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.processingPerspectiveSelected">
+               </reference>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <reference
+                  definitionId="biobank2.processingPerspectiveSelected">
+            </reference>
+         </enabledWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -1052,9 +1100,21 @@
                   style="push">
             </command>
             <command
+                  commandId="edu.ualberta.med.biobank.commands.processing.link"
+                  icon="icons/scanLink.png"
+                  label="Generic Link"
+                  style="push">
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.patients.scanAssign"
                   icon="icons/scanAssign.png"
                   label="Scan Assign"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.processing.assign"
+                  icon="icons/scanAssign.png"
+                  label="Generic Assign"
                   style="push">
             </command>
             <command
@@ -1323,9 +1383,33 @@
                </visibleWhen>
             </command>
             <command
+                  commandId="edu.ualberta.med.biobank.commands.processing.link"
+                  icon="icons/scanLink.png"
+                  label="Generic Link"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.processingPerspectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.patients.scanAssign"
                   icon="icons/scanAssign.png"
                   label="Scan Assign"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.processingPerspectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.processing.assign"
+                  icon="icons/scanAssign.png"
+                  label="Generic Assign"
                   style="push">
                <visibleWhen
                      checkEnabled="false">

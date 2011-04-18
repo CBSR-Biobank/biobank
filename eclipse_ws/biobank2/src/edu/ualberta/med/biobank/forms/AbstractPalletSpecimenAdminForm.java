@@ -50,6 +50,7 @@ import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManage
 public abstract class AbstractPalletSpecimenAdminForm extends
     AbstractSpecimenAdminForm {
 
+    private static final String PLATE_VALIDATOR = "plate-validator";
     private BiobankText plateToScanText;
     protected Button scanButton;
     private String scanButtonTitle;
@@ -102,7 +103,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                 if (isRescanMode()) {
                     msgKey = "linkAssign.activitylog.rescanning";//$NON-NLS-1$
                 }
-                appendLogNLS(msgKey, currentPlateToScan);
+                appendLog(Messages.getString(msgKey, currentPlateToScan));
 
             }
 
@@ -125,8 +126,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
             @Override
             protected void afterScan() {
-                appendLogNLS("linkAssign.activitylog.scanRes.total", //$NON-NLS-1$
-                    cells.keySet().size());
+                appendLog(Messages.getString(
+                    "linkAssign.activitylog.scanRes.total", //$NON-NLS-1$
+                    cells.keySet().size()));
             }
 
             @Override
@@ -301,11 +303,16 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void createPlateToScanField(Composite fieldsComposite) {
-        plateToScanText = (BiobankText) createBoundWidgetWithLabel(
-            fieldsComposite, BiobankText.class, SWT.NONE,
-            Messages.getString("linkAssign.plateToScan.label"), //$NON-NLS-1$
-            new String[0], plateToScanValue, new ScannerBarcodeValidator(
-                Messages.getString("linkAssign.plateToScan.validationMsg"))); //$NON-NLS-1$
+        plateToScanText = (BiobankText) widgetCreator
+            .createBoundWidgetWithLabel(
+                fieldsComposite,
+                BiobankText.class,
+                SWT.NONE,
+                Messages.getString("linkAssign.plateToScan.label"), //$NON-NLS-1$
+                new String[0],
+                plateToScanValue,
+                new ScannerBarcodeValidator(Messages
+                    .getString("linkAssign.plateToScan.validationMsg")), PLATE_VALIDATOR); //$NON-NLS-1$
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
@@ -339,6 +346,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             form.setMessage(getOkMessage(), IMessageProvider.NONE);
             cancelConfirmWidget.setConfirmEnabled(true);
             setConfirmEnabled(true);
+            setDirty(true);
         } else {
             form.setMessage(status.getMessage(), IMessageProvider.ERROR);
             cancelConfirmWidget.setConfirmEnabled(false);
@@ -402,6 +410,16 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         plateToScanValue.setValue(""); //$NON-NLS-1$
     }
 
+    protected void useScanner(boolean use) {
+        setCanLaunchScan(!use);
+        setScanHasBeenLauched(!use);
+        if (use)
+            widgetCreator.addBinding(PLATE_VALIDATOR);
+        else
+            widgetCreator.removeBinding(PLATE_VALIDATOR);
+
+    }
+
     protected void setCanLaunchScan(boolean canLauch) {
         canLaunchScanValue.setValue(canLauch);
     }
@@ -413,10 +431,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected void postprocessScanTubeAlone(PalletCell palletCell)
         throws Exception {
-        appendLogNLS("linkAssign.activitylog.scanTubeAlone",
-            palletCell.getValue(),
-            ContainerLabelingSchemeWrapper.rowColToSbs(palletCell
-                .getRowColPos()));
+        appendLog(Messages.getString("linkAssign.activitylog.scanTubeAlone",
+            palletCell.getValue(), ContainerLabelingSchemeWrapper
+                .rowColToSbs(palletCell.getRowColPos())));
         beforeScanTubeAlone();
         CellProcessResult res = appService.processCellStatus(
             getServerCell(palletCell), getProcessData(),

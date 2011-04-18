@@ -275,8 +275,8 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                 BiobankPlugin
                     .openError(
                         Messages.getString("ScanAssign.validation.error.title"), ex); //$NON-NLS-1$
-                appendLogNLS("ScanAssign.activitylog.error", //$NON-NLS-1$
-                    ex.getMessage());
+                appendLog(Messages.getString("ScanAssign.activitylog.error", //$NON-NLS-1$
+                    ex.getMessage()));
                 if (ex instanceof ContainerLabelSearchException) {
                     nextFocusWidget = palletPositionText;
                 }
@@ -494,11 +494,12 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             palletTypesViewer.getCombo().setEnabled(false);
             palletTypesViewer.setSelection(new StructuredSelection(
                 palletFoundWithProductBarcode.getContainerType()));
-            appendLogNLS("ScanAssign.activitylog.pallet.productBarcode.exists",
+            appendLog(Messages.getString(
+                "ScanAssign.activitylog.pallet.productBarcode.exists",
                 currentPalletWrapper.getProductBarcode(),
                 palletFoundWithProductBarcode.getLabel(), currentPalletWrapper
                     .getSite().getNameShort(), palletFoundWithProductBarcode
-                    .getContainerType().getName());
+                    .getContainerType().getName()));
             if (!currentLabel.isEmpty()
                 && !currentLabel.equals(palletFoundWithProductBarcodeLabel)) {
                 currentPalletWrapper.setLabel(currentLabel);
@@ -673,9 +674,10 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                 throw ex;
             }
             appendLog(sb.toString());
-            appendLogNLS("ScanAssign.activitylog.save.summary", totalNb, //$NON-NLS-1$
+            appendLog(Messages.getString(
+                "ScanAssign.activitylog.save.summary", totalNb, //$NON-NLS-1$
                 currentPalletWrapper.getLabel(), currentPalletWrapper.getSite()
-                    .getNameShort());
+                    .getNameShort()));
             setFinished(false);
         }
     }
@@ -713,13 +715,13 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         String palletLabel = currentPalletWrapper.getLabel();
         String siteName = currentPalletWrapper.getSite().getNameShort();
         if (palletFoundWithProductBarcodeLabel == null)
-            appendLogNLS("ScanAssign.activitylog.pallet.added", //$NON-NLS-1$
-                productBarcode, containerType, palletLabel, siteName);
+            appendLog(Messages.getString("ScanAssign.activitylog.pallet.added", //$NON-NLS-1$
+                productBarcode, containerType, palletLabel, siteName));
         else if (!palletLabel.equals(palletFoundWithProductBarcodeLabel))
-            appendLogNLS(
+            appendLog(Messages.getString(
                 "ScanAssign.activitylog.pallet.moved", //$NON-NLS-1$
                 productBarcode, containerType,
-                palletFoundWithProductBarcodeLabel, palletLabel, siteName);
+                palletFoundWithProductBarcodeLabel, palletLabel, siteName));
     }
 
     @Override
@@ -799,11 +801,11 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         if (palletFoundWithProductBarcodeLabel != null) {
             // a pallet with this product barcode already exists in the
             // database.
-            appendLogNLS(
+            appendLog(Messages.getString(
                 "ScanAssign.activitylog.pallet.checkLabelForProductBarcode", //$NON-NLS-1$
-                currentPalletWrapper.getLabel(),
-                currentPalletWrapper.getProductBarcode(), currentPalletWrapper
-                    .getSite().getNameShort());
+                currentPalletWrapper.getLabel(), currentPalletWrapper
+                    .getProductBarcode(), currentPalletWrapper.getSite()
+                    .getNameShort()));
             // need to compare with this value, in case the container has
             // been copied to the current pallet
             if (palletFoundWithProductBarcodeLabel.equals(currentPalletWrapper
@@ -819,18 +821,19 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                 if (canContinue) {
                     // Move the pallet.
                     type = currentPalletWrapper.getContainerType();
-                    appendLogNLS(
+                    appendLog(Messages.getString(
                         "ScanAssign.activitylog.pallet.moveInfo", //$NON-NLS-1$
                         currentPalletWrapper.getProductBarcode(),
                         palletFoundWithProductBarcodeLabel,
-                        currentPalletWrapper.getLabel());
+                        currentPalletWrapper.getLabel()));
                 } else {
                     return false;
                 }
             }
             if (type != null) {
-                appendLogNLS("ScanAssign.activitylog.pallet.typeUsed", //$NON-NLS-1$
-                    type.getName());
+                appendLog(Messages.getString(
+                    "ScanAssign.activitylog.pallet.typeUsed", //$NON-NLS-1$
+                    type.getName()));
             }
         }
         if (needToCheckPosition) {
@@ -885,25 +888,28 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                 // Position already physically used
                 boolean ok = openDialogPositionUsed(barcode);
                 if (!ok) {
-                    appendLogNLS(
-                        "ScanAssign.activitylog.pallet.positionUsedMsg", barcode, //$NON-NLS-1$
-                        currentPalletWrapper.getLabel(), currentPalletWrapper
-                            .getSite().getNameShort()); //$NON-NLS-1$
+                    appendLog(Messages
+                        .getString(
+                            "ScanAssign.activitylog.pallet.positionUsedMsg", barcode, //$NON-NLS-1$
+                            currentPalletWrapper.getLabel(),
+                            currentPalletWrapper.getSite().getNameShort()));
                     return false;
                 }
             }
             if (useNewProductBarcode) {
                 // Position exists but no product barcode set before
-                appendLogNLS(
-                    "ScanAssign.activitylog.pallet.positionUsedWithNoProductBarcode",
-                    palletLabel, containerAtPosition.getContainerType()
-                        .getName(), currentPalletWrapper.getProductBarcode());
+                appendLog(Messages
+                    .getString(
+                        "ScanAssign.activitylog.pallet.positionUsedWithNoProductBarcode",
+                        palletLabel, containerAtPosition.getContainerType()
+                            .getName(), currentPalletWrapper
+                            .getProductBarcode()));
             } else {
                 // Position initialised but not physically used
-                appendLogNLS(
+                appendLog(Messages.getString(
                     "ScanAssign.activitylog.pallet.positionInitialized",
                     palletLabel, containerAtPosition.getContainerType()
-                        .getName());
+                        .getName()));
             }
 
             palletTypes = Arrays.asList(containerAtPosition.getContainerType());

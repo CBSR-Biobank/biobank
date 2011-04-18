@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.logs.ActivityLogAppender;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -152,10 +151,6 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
             activityLogger.trace(message);
         }
         printed = false;
-    }
-
-    public void appendLogNLS(String key, Object... params) {
-        appendLog(Messages.getString(key, params));
     }
 
     protected void setFinished(boolean finished) {

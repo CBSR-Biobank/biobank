@@ -601,9 +601,9 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         appendLog(sb.toString());
 
         // SCAN-LINK\: {0} specimens linked to patient {1} on center {2}
-        appendLogNLS("ScanLink.activitylog.save.summary", nber, //$NON-NLS-1$
+        appendLog(Messages.getString("ScanLink.activitylog.save.summary", nber, //$NON-NLS-1$
             linkFormPatientManagement.getCurrentPatient().getPnumber(),
-            currentSelectedCenter.getNameShort());
+            currentSelectedCenter.getNameShort()));
         setFinished(false);
     }
 

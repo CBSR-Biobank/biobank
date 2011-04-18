@@ -1,18 +1,15 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StackLayout;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -22,24 +19,25 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.scanprocess.SpecimenHierarchy;
 import edu.ualberta.med.biobank.common.scanprocess.data.LinkProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.forms.LinkFormPatientManagement.CEventComboCallback;
 import edu.ualberta.med.biobank.forms.LinkFormPatientManagement.PatientTextCallback;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
@@ -60,22 +58,25 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
     private Composite multipleLinkComposite;
 
+    private boolean singleMode;
+
+    // list of source specimen / type widget for multiple linking
     private List<AliquotedSpecimenSelectionWidget> specimenTypesWidgets;
 
     private ScanPalletWidget palletWidget;
 
-    private BiobankText inventoryIdText;
-
+    // when link only one specimen
     private SpecimenWrapper singleSpecimen;
 
-    private CabinetInventoryIDValidator inventoryIDValidator;
-
+    // source specimen / type relation when only one specimen
     private AliquotedSpecimenSelectionWidget singleTypesWidget;
+
+    private ScrolledComposite multipleContainerDrawingScroll;
 
     @Override
     protected void init() throws Exception {
         super.init();
-        setPartName("Linking specimens");
+        setPartName(Messages.getString("GenericLinkEntryForm.tab.title")); //$NON-NLS-1$
         linkFormPatientManagement = new LinkFormPatientManagement(
             widgetCreator, this);
         singleSpecimen = new SpecimenWrapper(appService);
@@ -83,7 +84,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
     @Override
     protected String getActivityTitle() {
-        return "Generic Link";
+        return Messages.getString("GenericLinkEntryForm.activity.title"); //$NON-NLS-1$
     }
 
     @Override
@@ -92,57 +93,73 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     @Override
-    protected void saveForm() throws Exception {
-        BiobankPlugin.openInformation("TODO", "Not yet implemented");
-    }
-
-    @Override
     protected String getOkMessage() {
-        return "Link specimens to their source specimens";
+        return Messages.getString("GenericLinkEntryForm.description.ok"); //$NON-NLS-1$
     }
 
     @Override
     public String getNextOpenedFormID() {
+        // FIXME if checkbox to open assign form, should be assign form instead
         return ID;
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Linking specimen"); //$NON-NLS-1$
-        GridLayout layout = new GridLayout(2, false);
-        page.setLayout(layout);
+        form.setText(Messages.getString("GenericLinkEntryForm.form.title")); //$NON-NLS-1$
+        GridLayout gl = new GridLayout(1, false);
+        gl.marginWidth = 0;
+        gl.horizontalSpacing = 0;
+        gl.verticalSpacing = 0;
+        page.setLayout(gl);
 
-        createLeftSection();
+        Composite mainComposite = new Composite(page, SWT.NONE);
+        gl = new GridLayout(2, false);
+        gl.marginWidth = 0;
+        gl.horizontalSpacing = 0;
+        gl.verticalSpacing = 0;
+        mainComposite.setLayout(gl);
+        GridData gd = new GridData();
+        gd.grabExcessHorizontalSpace = true;
+        gd.grabExcessVerticalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        gd.verticalAlignment = SWT.TOP;
+        mainComposite.setLayoutData(gd);
 
-        createPalletSection();
-        palletWidget.setVisible(false);
+        createLeftSection(mainComposite);
 
-        new CancelConfirmWidget(page, this, true);
-        setCanLaunchScan(true);
+        createPalletSection(mainComposite);
+
+        createCancelConfirmWidget();
+
+        toolkit.adapt(mainComposite);
     }
 
-    private void createLeftSection() {
-        Composite leftComposite = toolkit.createComposite(page);
-        GridLayout layout = new GridLayout(1, false);
-        leftComposite.setLayout(layout);
+    private void createLeftSection(Composite parent) {
+        Composite leftComposite = toolkit.createComposite(parent);
+        GridLayout gl = new GridLayout(1, false);
+        gl.marginWidth = 0;
+        gl.horizontalSpacing = 0;
+        gl.verticalSpacing = 0;
+        leftComposite.setLayout(gl);
         toolkit.paintBordersFor(leftComposite);
         GridData gd = new GridData();
+        // TODO fix width ? Can be smaller ?
         gd.widthHint = 600;
         gd.verticalAlignment = SWT.TOP;
         leftComposite.setLayoutData(gd);
 
         Composite commonFieldsComposite = toolkit
             .createComposite(leftComposite);
-        layout = new GridLayout(2, false);
-        layout.horizontalSpacing = 10;
-        commonFieldsComposite.setLayout(layout);
+        gl = new GridLayout(2, false);
+        gl.horizontalSpacing = 10;
+        commonFieldsComposite.setLayout(gl);
         gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commonFieldsComposite.setLayoutData(gd);
         toolkit.paintBordersFor(commonFieldsComposite);
 
-        // Patient number + visits list
+        // Patient number
         linkFormPatientManagement
             .createPatientNumberText(commonFieldsComposite);
         linkFormPatientManagement
@@ -156,9 +173,16 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 public void textModified() {
                 }
             });
-
+        // Collection events list
         linkFormPatientManagement
             .createCollectionEventWidgets(commonFieldsComposite);
+        linkFormPatientManagement
+            .setCEventComboCallback(new CEventComboCallback() {
+                @Override
+                public void selectionChanged() {
+                    setTypeCombos();
+                }
+            });
 
         createLinkingSection(leftComposite);
     }
@@ -176,45 +200,60 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
         // radio button to choose single or multiple
         final Button radioSingle = toolkit.createButton(linkComposite,
-            "Single", SWT.RADIO);
+            Messages.getString("GenericLinkEntryForm.choice.radio.single"), //$NON-NLS-1$
+            SWT.RADIO);
         final Button radioMultiple = toolkit.createButton(linkComposite,
-            "Multiple", SWT.RADIO);
+            Messages.getString("GenericLinkEntryForm.choice.radio.multiple"), //$NON-NLS-1$
+            SWT.RADIO);
 
-        // stackLayout
-        final Composite selectionComp = toolkit.createComposite(linkComposite);
-        final StackLayout selectionStackLayout = new StackLayout();
+        // stack for single or multiple
+        final Composite stackComposite = toolkit.createComposite(linkComposite);
+        final StackLayout stackLayout = new StackLayout();
         gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
-        selectionComp.setLayoutData(gd);
-        selectionComp.setLayout(selectionStackLayout);
+        stackComposite.setLayoutData(gd);
+        stackComposite.setLayout(stackLayout);
 
-        createSingleLinkComposite(selectionComp);
-        createMultipleLink(selectionComp);
-        radioSingle.setSelection(true);
-        selectionStackLayout.topControl = singleLinkComposite;
+        createSingleLinkComposite(stackComposite);
+        createMultipleLink(stackComposite);
 
         radioSingle.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (radioSingle.getSelection()) {
-                    selectionStackLayout.topControl = singleLinkComposite;
-                    page.layout(true, true);
-                    palletWidget.setVisible(false);
+                    setStackTopComposite(stackLayout, true);
                 }
             }
+
         });
         radioMultiple.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (radioMultiple.getSelection()) {
-                    selectionStackLayout.topControl = multipleLinkComposite;
-                    page.layout(true, true);
-                    palletWidget.setVisible(true);
+                    setStackTopComposite(stackLayout, false);
                 }
             }
         });
+
+        radioSingle.setSelection(true);
+        setStackTopComposite(stackLayout, true);
+    }
+
+    private void setStackTopComposite(final StackLayout stackLayout,
+        boolean single) {
+        singleMode = single;
+        if (single) {
+            stackLayout.topControl = singleLinkComposite;
+            useScanner(false);
+        } else {
+            stackLayout.topControl = multipleLinkComposite;
+            useScanner(true);
+        }
+        if (multipleContainerDrawingScroll != null)
+            widgetCreator.showWidget(multipleContainerDrawingScroll, !single);
+        page.layout(true, true);
     }
 
     private void createMultipleLink(Composite parent) {
@@ -234,9 +273,9 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
         toolkit.createLabel(multipleLinkComposite, ""); //$NON-NLS-1$
         toolkit.createLabel(multipleLinkComposite,
-            Messages.getString("ScanLink.source.column.title")); //$NON-NLS-1$
+            Messages.getString("GenericLinkEntryForm.source.column.title")); //$NON-NLS-1$
         toolkit.createLabel(multipleLinkComposite,
-            Messages.getString("ScanLink.result.column.title")); //$NON-NLS-1$
+            Messages.getString("GenericLinkEntryForm.result.column.title")); //$NON-NLS-1$
         toolkit.createLabel(multipleLinkComposite, ""); //$NON-NLS-1$
 
         specimenTypesWidgets = new ArrayList<AliquotedSpecimenSelectionWidget>();
@@ -272,6 +311,57 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     protected void createScanButton(Composite parent) {
         super.createScanButton(parent);
         scanButton.setEnabled(true);
+    }
+
+    /**
+     * Pallet visualisation
+     */
+    private void createPalletSection(Composite parent) {
+        multipleContainerDrawingScroll = new ScrolledComposite(parent,
+            SWT.H_SCROLL);
+        multipleContainerDrawingScroll.setExpandHorizontal(true);
+        multipleContainerDrawingScroll.setExpandVertical(true);
+        multipleContainerDrawingScroll.setLayout(new FillLayout());
+        GridData scrollData = new GridData();
+        scrollData.horizontalAlignment = SWT.FILL;
+        scrollData.grabExcessHorizontalSpace = true;
+        multipleContainerDrawingScroll.setLayoutData(scrollData);
+        Composite client = toolkit
+            .createComposite(multipleContainerDrawingScroll);
+        GridLayout layout = new GridLayout(2, false);
+        client.setLayout(layout);
+        GridData gd = new GridData();
+        gd.horizontalAlignment = SWT.CENTER;
+        gd.grabExcessHorizontalSpace = true;
+        client.setLayoutData(gd);
+        multipleContainerDrawingScroll.setContent(client);
+
+        palletWidget = new ScanPalletWidget(client,
+            UICellStatus.DEFAULT_PALLET_SCAN_LINK_STATUS_LIST);
+        toolkit.adapt(palletWidget);
+        palletWidget.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true,
+            false));
+
+        palletWidget.getMultiSelectionManager().addMultiSelectionListener(
+            new MultiSelectionListener() {
+                @Override
+                public void selectionChanged(MultiSelectionEvent mse) {
+                    // customSelectionWidget.setNumber(mse.selections);
+                }
+            });
+        palletWidget.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                scanTubeAlone(e);
+            }
+        });
+        // palletWidget.loadProfile(profilesCombo.getCombo().getText());
+
+        createScanTubeAloneButton(client);
+
+        multipleContainerDrawingScroll.setMinSize(client.computeSize(
+            SWT.DEFAULT, SWT.DEFAULT));
+        widgetCreator.hideWidget(multipleContainerDrawingScroll);
     }
 
     /**
@@ -319,45 +409,25 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         singleLinkComposite.setLayoutData(gd);
 
         // inventoryID
-        inventoryIDValidator = new CabinetInventoryIDValidator();
-        inventoryIdText = (BiobankText) createBoundWidgetWithLabel(
-            singleLinkComposite, BiobankText.class, SWT.NONE,
-            Messages.getString("Cabinet.inventoryId.label"), new String[0], //$NON-NLS-1$
-            singleSpecimen, "inventoryId", //$NON-NLS-1$
-            inventoryIDValidator);
+        BiobankText inventoryIdText = (BiobankText) createBoundWidgetWithLabel(
+            singleLinkComposite,
+            BiobankText.class,
+            SWT.NONE,
+            Messages.getString("GenericLinkEntryForm.inventoryId.label"), new String[0], //$NON-NLS-1$
+            singleSpecimen,
+            SpecimenPeer.INVENTORY_ID.getName(),
+            new NonEmptyStringValidator(Messages
+                .getString("GenericLinkEntryForm.inventoryId.validator.msg"))); //$NON-NLS-1$
         inventoryIdText.addKeyListener(textFieldKeyListener);
-        inventoryIdText.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                // if (inventoryIdModified && !radioNew.getSelection()) {
-                // // Move Mode only
-                // try {
-                // retrieveAliquotDataForMoving();
-                // } catch (Exception ex) {
-                //                        BiobankPlugin.openError("Move - aliquot error", ex); //$NON-NLS-1$
-                // focusControlInError(inventoryIdText);
-                // }
-                // }
-                // inventoryIdModified = false;
-            }
-        });
-        // inventoryIdText.addModifyListener(new ModifyListener() {
-        // @Override
-        // public void modifyText(ModifyEvent e) {
-        // inventoryIdModified = true;
-        // positionTextModified = true;
-        // resultShownValue.setValue(Boolean.FALSE);
-        // displayPositions(false);
-        // }
-        // });
 
+        // widget to select the source and the type
         singleTypesWidget = new AliquotedSpecimenSelectionWidget(
             singleLinkComposite, null, widgetCreator, false);
         singleTypesWidget.addBindings();
 
         widgetCreator.createLabel(singleLinkComposite,
-            "Go to assign after linking");
-        toolkit.createButton(singleLinkComposite, "", SWT.CHECK);
+            Messages.getString("GenericLinkEntryForm.checkbox.assign")); //$NON-NLS-1$
+        toolkit.createButton(singleLinkComposite, "", SWT.CHECK); //$NON-NLS-1$
     }
 
     /**
@@ -369,77 +439,17 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             .getStudyAliquotedTypes(null, null);
         List<SpecimenWrapper> availableSourceSpecimens = linkFormPatientManagement
             .getSpecimenInCollectionEvent();
-        for (int row = 0; row < specimenTypesWidgets.size(); row++) {
-            AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets
-                .get(row);
-            // if (isFirstSuccessfulScan()) {
-            widget.setSourceSpecimens(availableSourceSpecimens);
-            widget.setResultTypes(studiesAliquotedTypes);
-            // }
-        }
+        if (isFirstSuccessfulScan())
+            // for multiple
+            for (int row = 0; row < specimenTypesWidgets.size(); row++) {
+                AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets
+                    .get(row);
+                widget.setSourceSpecimens(availableSourceSpecimens);
+                widget.setResultTypes(studiesAliquotedTypes);
+            }
+        // for single
         singleTypesWidget.setSourceSpecimens(availableSourceSpecimens);
         singleTypesWidget.setResultTypes(studiesAliquotedTypes);
-    }
-
-    private void setCombosListsNumber(Map<Integer, Integer> typesRows) {
-        for (int row = 0; row < specimenTypesWidgets.size(); row++) {
-            AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets
-                .get(row);
-            Integer number = typesRows.get(row);
-            if (number != null)
-                widget.setNumber(number);
-        }
-    }
-
-    /**
-     * Pallet visualisation
-     */
-    private void createPalletSection() {
-        ScrolledComposite containersScroll = new ScrolledComposite(page,
-            SWT.H_SCROLL);
-        containersScroll.setExpandHorizontal(true);
-        containersScroll.setExpandVertical(true);
-        containersScroll.setLayout(new FillLayout());
-        GridData scrollData = new GridData();
-        scrollData.horizontalAlignment = SWT.FILL;
-        scrollData.grabExcessHorizontalSpace = true;
-        containersScroll.setLayoutData(scrollData);
-        Composite client = toolkit.createComposite(containersScroll);
-        GridLayout layout = new GridLayout(2, false);
-        client.setLayout(layout);
-        GridData gd = new GridData();
-        gd.horizontalAlignment = SWT.CENTER;
-        gd.grabExcessHorizontalSpace = true;
-        client.setLayoutData(gd);
-        containersScroll.setContent(client);
-
-        palletWidget = new ScanPalletWidget(client,
-            UICellStatus.DEFAULT_PALLET_SCAN_LINK_STATUS_LIST);
-        palletWidget.setVisible(true);
-        toolkit.adapt(palletWidget);
-        palletWidget.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true,
-            false));
-
-        palletWidget.getMultiSelectionManager().addMultiSelectionListener(
-            new MultiSelectionListener() {
-                @Override
-                public void selectionChanged(MultiSelectionEvent mse) {
-                    // customSelectionWidget.setNumber(mse.selections);
-                }
-            });
-        palletWidget.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseDoubleClick(MouseEvent e) {
-                scanTubeAlone(e);
-            }
-        });
-        // spw.loadProfile(profilesCombo.getCombo().getText());
-
-        createScanTubeAloneButton(client);
-
-        containersScroll.setMinSize(client
-            .computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
     }
 
     @Override
@@ -453,136 +463,71 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     @Override
-    protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-        UICellStatus status = processCellStatus(cell, true);
-        boolean ok = isScanValid() && (status != UICellStatus.ERROR);
-        setScanValid(ok);
-        // typesSelectionPerRowComposite.setEnabled(ok);
-        palletWidget.redraw();
-        form.layout();
-    }
-
-    /**
-     * Process the cell: apply a status and set correct information
-     * 
-     * @throws Exception
-     */
-    private UICellStatus processCellStatus(PalletCell cell,
-        boolean independantProcess) throws Exception {
-        if (cell == null) {
-            return UICellStatus.EMPTY;
-        } else {
-            String value = cell.getValue();
-            if (value != null) {
-                SpecimenWrapper foundAliquot = SpecimenWrapper.getSpecimen(
-                    appService, value, SessionManager.getUser());
-                if (foundAliquot != null) {
-                    cell.setStatus(UICellStatus.ERROR);
-                    cell.setInformation(Messages
-                        .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
-                    String palletPosition = ContainerLabelingSchemeWrapper
-                        .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
-                    appendLogNLS("ScanLink.activitylog.aliquot.existsError",
-                        palletPosition, value, foundAliquot
-                            .getCollectionEvent().getVisitNumber(),
-                        foundAliquot.getCollectionEvent().getPatient()
-                            .getPnumber(), foundAliquot.getCurrentCenter()
-                            .getNameShort());
-                } else {
-                    cell.setStatus(UICellStatus.NO_TYPE);
-                    if (independantProcess) {
-                        AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets
-                            .get(cell.getRow());
-                        widget.increaseNumber();
-                    }
-                    // ModelWrapper<?>[] selection = preSelections.get(cell
-                    // .getRow());
-                    // if (selection != null)
-                    // setTypeToCell(cell, selection);
-                }
-            } else {
-                cell.setStatus(UICellStatus.EMPTY);
-            }
-            return cell.getStatus();
-        }
-    }
-
-    /**
-     * go through cells retrieved from scan, set status and update the types
-     * combos components
-     */
-    @Override
-    protected void processScanResult(IProgressMonitor monitor) throws Exception {
-        // processScanResult = false;
-        boolean everythingOk = true;
-        Map<RowColPos, PalletCell> cells = getCells();
-        if (cells != null) {
-            final Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
-            for (RowColPos rcp : cells.keySet()) {
-                monitor.subTask(Messages.getString(
-                    "ScanLink.scan.monitor.position", //$NON-NLS-1$
-                    ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
-                Integer typesRowsCount = typesRows.get(rcp.row);
-                if (typesRowsCount == null) {
-                    typesRowsCount = 0;
-                    specimenTypesWidgets.get(rcp.row).resetValues(
-                        !isRescanMode(), true, true);
-                }
-                PalletCell cell = null;
-                cell = cells.get(rcp);
-                if (!isRescanMode()
-                    || (cell != null && cell.getStatus() != UICellStatus.TYPE && cell
-                        .getStatus() != UICellStatus.NO_TYPE)) {
-                    // processCellStatus(cell, false);
-                }
-                everythingOk = cell.getStatus() != UICellStatus.ERROR
-                    && everythingOk;
-                if (PalletCell.hasValue(cell)) {
-                    typesRowsCount++;
-                    typesRows.put(rcp.row, typesRowsCount);
-                }
-            }
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    setCombosListsNumber(typesRows);
-                }
-            });
-            // processScanResult = everythingOk;
-        }
-    }
-
-    @Override
-    protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
-        return PalletCell.getRandomScanLink();
-    }
-
-    @Override
-    protected void afterScanAndProcess(Integer rowOnly) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                // typesSelectionPerRowComposite.setEnabled(processScanResult);
-                for (AliquotedSpecimenSelectionWidget typeWidget : specimenTypesWidgets) {
-                    if (typeWidget.canFocus()) {
-                        typeWidget.setFocus();
-                        break;
-                    }
-                }
-                // Show result in grid
-                palletWidget.setCells(getCells());
-                setRescanMode();
-                // not needed on windows. This was if the textfield number
-                // go after 9, needed to resize on linux : need to check that
-                // again form.layout(true, true);
-            }
-        });
-        setScanValid(true);
-    }
-
-    @Override
     protected ProcessData getProcessData() {
         return new LinkProcessData();
+    }
+
+    @Override
+    protected void doBeforeSave() throws Exception {
+        // can't acces the combos in another thread, so do it now
+        if (singleMode) {
+            SpecimenHierarchy selection = singleTypesWidget.getSelection();
+            singleSpecimen.setParentSpecimen(selection.getParentSpecimen());
+            singleSpecimen
+                .setSpecimenType(selection.getAliquotedSpecimenType());
+            singleSpecimen.setCollectionEvent(linkFormPatientManagement
+                .getSelectedCollectionEvent());
+        }
+    }
+
+    @Override
+    protected void saveForm() throws Exception {
+        if (singleMode)
+            saveSingleSpecimen();
+    }
+
+    private void saveSingleSpecimen() throws Exception {
+        singleSpecimen.setCreatedAt(new Date());
+        singleSpecimen.setQuantityFromType();
+        singleSpecimen.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
+        singleSpecimen.setCurrentCenter(SessionManager.getUser()
+            .getCurrentWorkingCenter());
+
+        OriginInfoWrapper originInfo = new OriginInfoWrapper(
+            SessionManager.getAppService());
+        originInfo
+            .setCenter(SessionManager.getUser().getCurrentWorkingCenter());
+        originInfo.persist();
+
+        singleSpecimen.setOriginInfo(originInfo);
+        singleSpecimen.persist();
+        String posStr = singleSpecimen.getPositionString(true, false);
+        if (posStr == null) {
+            posStr = Messages
+                .getString("GenericLinkEntryForm.position.label.none"); //$NON-NLS-1$
+        }
+        // LINKED\: specimen {0} of type\: {1} to source\: {2} ({3}) -
+        // Patient\: {4} - Visit\: {5} - Center\: {6} \n
+        appendLog(Messages.getString(
+            "GenericLinkEntryForm.activitylog.specimen.linked", singleSpecimen //$NON-NLS-1$
+                .getInventoryId(), singleSpecimen.getSpecimenType().getName(),
+            singleSpecimen.getParentSpecimen().getInventoryId(), singleSpecimen
+                .getParentSpecimen().getSpecimenType().getNameShort(),
+            linkFormPatientManagement.getCurrentPatient().getPnumber(),
+            singleSpecimen.getCollectionEvent().getVisitNumber(),
+            singleSpecimen.getCurrentCenter().getNameShort()));
+        setFinished(false);
+    }
+
+    @Override
+    public void reset() throws Exception {
+        super.reset();
+        singleSpecimen.reset(); // reset internal values
+        linkFormPatientManagement.reset(true);
+        singleTypesWidget.deselectAll();
+        setDirty(false);
+        setFocus();
     }
 
 }
