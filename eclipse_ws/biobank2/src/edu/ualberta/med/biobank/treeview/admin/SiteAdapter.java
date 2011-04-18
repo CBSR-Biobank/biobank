@@ -119,8 +119,6 @@ public class SiteAdapter extends AdapterBase {
     }
 
     public void createNodes() {
-        addChild(new SiteStudyGroup(this, nodeIdOffset + STUDIES_BASE_NODE_ID));
-        addChild(new SiteClinicGroup(this, nodeIdOffset + CLINICS_BASE_ID));
         addChild(new ContainerTypeGroup(this, nodeIdOffset
             + CONTAINER_TYPES_BASE_NODE_ID));
         addChild(new ContainerGroup(this, nodeIdOffset
