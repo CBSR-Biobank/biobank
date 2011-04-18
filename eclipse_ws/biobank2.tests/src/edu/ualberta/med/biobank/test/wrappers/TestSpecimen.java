@@ -14,6 +14,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
+import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -593,7 +594,7 @@ public class TestSpecimen extends TestDatabase {
                 site.getId()).size() > 0);
             Assert.assertTrue(DebugUtil
                 .getRandomNonAssignedNonDispatchedSpecimens(appService,
-                    site.getId()).size() > 0);
+                    site.getId(), 10).size() > 0);
         } catch (Exception e) {
             Assert.fail(e.getCause().getMessage());
         }
@@ -608,7 +609,7 @@ public class TestSpecimen extends TestDatabase {
             .getShippingMethods(appService).get(0);
         DispatchWrapper d = DispatchHelper.newDispatch(site, destSite, method);
 
-        d.addSpecimens(Arrays.asList(spc));
+        d.addSpecimens(Arrays.asList(spc), DispatchSpecimenState.NONE);
         d.persist();
         spc.reload();
 
@@ -634,7 +635,7 @@ public class TestSpecimen extends TestDatabase {
 
         DispatchWrapper d2 = DispatchHelper.newDispatch(destSite, destSite2,
             method);
-        d2.addSpecimens(Arrays.asList(spc));
+        d2.addSpecimens(Arrays.asList(spc), DispatchSpecimenState.NONE);
 
         spc.reload();
         // assign a position to this specimen
@@ -656,7 +657,7 @@ public class TestSpecimen extends TestDatabase {
         spc.persist();
 
         // add to new shipment
-        d2.addSpecimens(Arrays.asList(spc));
+        d2.addSpecimens(Arrays.asList(spc), DispatchSpecimenState.NONE);
         d2.persist();
 
         spc.reload();

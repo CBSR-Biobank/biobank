@@ -899,15 +899,15 @@ public class TestContainer extends TestDatabase {
 
         // reload because we changed container type
         childL3.reload();
-        SpecimenWrapper aliquot = null;
+        SpecimenWrapper specimen = null;
         OriginInfoWrapper oi = OriginInfoHelper.addOriginInfo(site);
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
             site,
             PatientHelper.addPatient(Utils.getRandomString(5),
                 StudyHelper.addStudy("tests")), 2, oi);
         for (SpecimenTypeWrapper st : allSampleTypes) {
-            aliquot = SpecimenHelper.newSpecimen(st, childL3, null, 0, 0, oi);
-            ce.addToAllSpecimenCollection(Arrays.asList(aliquot));
+            specimen = SpecimenHelper.newSpecimen(st, childL3, null, 0, 0, oi);
+            ce.addToAllSpecimenCollection(Arrays.asList(specimen));
             if (selectedSampleTypes.contains(st)) {
                 Assert.assertTrue(childL3.canHoldSpecimen(specimen));
             } else {
@@ -915,7 +915,7 @@ public class TestContainer extends TestDatabase {
             }
         }
 
-        aliquot = SpecimenHelper.newSpecimen(null, childL3, ce, 0, 0, oi);
+        specimen = SpecimenHelper.newSpecimen(null, childL3, ce, 0, 0, oi);
         try {
             childL3.canHoldSpecimen(specimen);
             Assert

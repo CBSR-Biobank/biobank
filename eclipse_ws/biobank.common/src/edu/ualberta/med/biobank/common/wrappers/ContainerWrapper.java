@@ -733,7 +733,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             type);
     }
 
-    public void moveAliquots(ContainerWrapper destination) throws Exception {
+    public void moveSpecimens(ContainerWrapper destination) throws Exception {
         Map<RowColPos, SpecimenWrapper> aliquots = getSpecimens();
         for (Entry<RowColPos, SpecimenWrapper> e : aliquots.entrySet()) {
             destination
