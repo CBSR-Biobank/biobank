@@ -245,6 +245,14 @@ public class WidgetCreator {
                 modelObservableValue.removeValueChangeListener(changeListener);
             }
         });
+        combo.addListener(SWT.MouseWheel, new Listener() {
+
+            @Override
+            public void handleEvent(Event event) {
+                event.doit = false;
+            }
+
+        });
 
         return combo;
     }
@@ -350,6 +358,11 @@ public class WidgetCreator {
             widgetValues, modelObservableValue, validator, bindingKey);
     }
 
+    public <T> ComboViewer createComboViewerWithoutLabel(Composite parent,
+        Collection<T> input, T selection) {
+        return createComboViewer(parent, null, input, selection, null, null);
+    }
+
     /**
      * Create combo viewer with no validator on selection and with the default
      * comparator.
@@ -388,7 +401,9 @@ public class WidgetCreator {
         String fieldLabel, Collection<T> input, T selection,
         String errorMessage, boolean useDefaultComparator, String bindingKey,
         final ComboSelectionUpdate csu) {
-        Label label = createLabel(parent, fieldLabel);
+        Label label = null;
+        if (fieldLabel != null)
+            label = createLabel(parent, fieldLabel);
         return createComboViewer(parent, label, input, selection, errorMessage,
             useDefaultComparator, bindingKey, csu);
     }
@@ -414,7 +429,7 @@ public class WidgetCreator {
         }
 
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        if (dbc != null) {
+        if (dbc != null && fieldLabel != null) {
             NonEmptyStringValidator validator = new NonEmptyStringValidator(
                 errorMessage);
             validator.setControlDecoration(BiobankWidget.createDecorator(
