@@ -190,7 +190,8 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                cache.put(IN_TRANSIT_SENT_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
+                cache.put(IN_TRANSIT_SENT_DISPATCH_COLLECTION_CACHE_KEY,
+                    shipCollection);
             }
         }
         return shipCollection;
@@ -210,7 +211,8 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                cache.put(IN_TRANSIT_RECEIVE_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
+                cache.put(IN_TRANSIT_RECEIVE_DISPATCH_COLLECTION_CACHE_KEY,
+                    shipCollection);
             }
         }
         return shipCollection;
@@ -230,7 +232,8 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                cache.put(RECEIVING_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
+                cache.put(RECEIVING_DISPATCH_COLLECTION_CACHE_KEY,
+                    shipCollection);
             }
         }
         return shipCollection;
@@ -271,7 +274,8 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                cache.put(IN_CREATION_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
+                cache.put(IN_CREATION_DISPATCH_COLLECTION_CACHE_KEY,
+                    shipCollection);
             }
         }
         return shipCollection;
@@ -335,6 +339,12 @@ public abstract class CenterWrapper<E extends Center> extends
         HQLCriteria criteria = new HQLCriteria(COLLECTION_EVENT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
         return getCountResult(appService, criteria);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
+        return Arrays.asList(this);
     }
 
 }
