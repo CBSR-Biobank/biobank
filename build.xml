@@ -933,6 +933,7 @@
       <src path="${eclipse.proj.dir.junit}/src" />
       <src path="${eclipse.proj.dir.tools}/src" />
       <include name="**/tools/utils/*.java" />
+      <include name="**/test/reports/**/*.java" />
       <include name="**/Test*.java" />
       <classpath>
         <pathelement location="${eclipse.proj.dir.common}/output" />

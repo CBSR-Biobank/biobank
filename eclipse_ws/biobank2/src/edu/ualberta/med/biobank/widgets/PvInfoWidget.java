@@ -49,6 +49,10 @@ public class PvInfoWidget extends BiobankWidget {
     private static Map<String, LabelDialogInfo> LABEL_DLG_INFO = new HashMap<String, LabelDialogInfo>() {
         private static final long serialVersionUID = 1L;
         {
+            put("Patient Type",
+                new LabelDialogInfo("Patient Type Values",
+                    "Please enter a patient type:",
+                    "To enter multiple patient type values, separate with semicolon."));
             put("Visit Type",
                 new LabelDialogInfo("Visit Type Values",
                     "Please enter a visit type:",

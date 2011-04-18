@@ -55,6 +55,7 @@ public class TestDatabase {
 
     @After
     public void tearDown() throws Exception {
+        Assert.assertNotNull("appService is null", appService);
         try {
             SiteHelper.deleteCreatedSites();
             StudyHelper.deleteCreatedStudies();
