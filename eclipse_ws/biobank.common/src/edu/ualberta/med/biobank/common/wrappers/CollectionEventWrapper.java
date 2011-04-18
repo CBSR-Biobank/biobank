@@ -503,9 +503,4 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return 0;
     }
 
-    @Deprecated
-    public ClinicWrapper getClinic() {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

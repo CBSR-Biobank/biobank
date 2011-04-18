@@ -1,7 +1,7 @@
 LOCK TABLES `ACTIVITY_STATUS` WRITE;
-INSERT INTO `ACTIVITY_STATUS` (ID, NAME) VALUES
-( 1, "Active"),
-( 2, "Closed"),
-( 4, "Flagged");
+INSERT INTO `ACTIVITY_STATUS` (ID, NAME, VERSION) VALUES
+( 1, "Active",  0),
+( 2, "Closed",  0),
+( 4, "Flagged", 0);
 UNLOCK TABLES;
 

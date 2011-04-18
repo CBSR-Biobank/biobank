@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.tools.hbmstrings;
+package edu.ualberta.med.biobank.tools.hbmpostproc;
 
 import jargs.gnu.CmdLineParser;
 import jargs.gnu.CmdLineParser.Option;
@@ -27,22 +27,24 @@ import edu.ualberta.med.biobank.tools.modelumlparser.ModelClass;
 import edu.ualberta.med.biobank.tools.modelumlparser.ModelUmlParser;
 import edu.ualberta.med.biobank.tools.utils.CamelCase;
 
-public class HbmStrings {
+public class HbmPostProcess {
     private static final String NOT_EMPTY_STEREOTYPE = "not-empty";
 
     private static final String NOT_NULL_STEREOTYPE = "not-null";
 
     private static final String UNIQUE_STEREOTYPE = "unique";
 
-    private static final Logger LOGGER = Logger.getLogger(HbmStrings.class
+    private static final Logger LOGGER = Logger.getLogger(HbmPostProcess.class
         .getName());
 
     private static String USAGE = "Usage: strfields [options] UMLFILE HBMDIR TEMPLATE\n\n"
         + "Options\n" + "  -v, --verbose    Shows verbose output";
 
-    private static HbmStrings instance = null;
+    private static HbmPostProcess instance = null;
 
     private static String HBM_FILE_EXTENSION = ".hbm.xml";
+
+    private static String BEAN_FILE_EXTENSION = ".java";
 
     private static Pattern VARCHAR_LEN = Pattern.compile("VARCHAR\\((\\d+)\\)");
 
@@ -52,13 +54,13 @@ public class HbmStrings {
 
     private Map<String, ModelClass> dmTables;
 
-    private HbmStrings() {
+    private HbmPostProcess() {
 
     }
 
-    public static HbmStrings getInstance() {
+    public static HbmPostProcess getInstance() {
         if (instance == null) {
-            instance = new HbmStrings();
+            instance = new HbmPostProcess();
         }
         return instance;
     }
@@ -90,8 +92,14 @@ public class HbmStrings {
             }
         }
 
-        for (String file : getHbmFiles(appArgs.hbmDir)) {
+        for (String file : getDirFilesWithExtension(appArgs.hbmDir,
+            HBM_FILE_EXTENSION)) {
             updateHbmFile(file);
+        }
+
+        for (String file : getDirFilesWithExtension(appArgs.hbmDir,
+            BEAN_FILE_EXTENSION)) {
+            updateBeanFile(file);
         }
 
         createVarCharLengthsSourceCode();
@@ -107,21 +115,22 @@ public class HbmStrings {
     /*
      * Returns all "*.hbm.xml" files found in directory hbmDir
      */
-    private List<String> getHbmFiles(String hbmDir) {
-        File dir = new File(hbmDir);
+    private List<String> getDirFilesWithExtension(String dirname,
+        String extension) {
+        File dir = new File(dirname);
         String[] files = dir.list();
         if (files == null) {
-            LOGGER.info("Error: no files found in directory " + hbmDir);
+            LOGGER.info("Error: no files found in directory " + dirname);
             System.exit(-1);
         }
 
-        List<String> hbmFiles = new ArrayList<String>();
+        List<String> resultFiles = new ArrayList<String>();
         for (String file : files) {
-            if (!file.endsWith(HBM_FILE_EXTENSION))
+            if (!file.endsWith(extension))
                 continue;
-            hbmFiles.add(file);
+            resultFiles.add(file);
         }
-        return hbmFiles;
+        return resultFiles;
     }
 
     /*
@@ -166,6 +175,28 @@ public class HbmStrings {
 
         HbmModifier.getInstance().alterMapping(hbmFilePath, className,
             tableName, attrTypeMap, uniqueList, notNullList);
+    }
+
+    private void updateBeanFile(String beanFileName) throws Exception {
+        String className = beanFileName.replace(BEAN_FILE_EXTENSION, "");
+
+        ModelClass modelClass = dmClasses.get(className);
+
+        if (modelClass == null) {
+            throw new Exception("Model class with bean file name not found "
+                + beanFileName + ", classname " + className);
+        }
+
+        if (modelClass.getExtendsClass() != null) {
+            // no need to update this class
+            return;
+        }
+
+        // Create a new bean file with a declaration for lastUpdate time.
+        String beanFilePath = appArgs.hbmDir + "/" + beanFileName;
+
+        BeanModifier.getInstance().alterBean(beanFilePath, className);
+
     }
 
     private void createVarCharLengthsSourceCode() throws Exception {
@@ -259,7 +290,7 @@ public class HbmStrings {
     }
 
     public static void main(String argv[]) throws Exception {
-        HbmStrings.getInstance().doWork(parseCommandLine(argv));
+        HbmPostProcess.getInstance().doWork(parseCommandLine(argv));
     }
 
     /*

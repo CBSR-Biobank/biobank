@@ -16,7 +16,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 
@@ -70,9 +69,11 @@ public class SelectShipmentClinicDialog extends BiobankDialog {
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                ClinicWrapper clinic = ((CollectionEventWrapper) element)
-                    .getClinic();
-                return clinic.getName();
+                // FIXME
+                // ClinicWrapper clinic = ((CollectionEventWrapper) element)
+                // .getClinic();
+                // return clinic.getName();
+                return null;
             }
         });
         comboViewer

@@ -159,9 +159,9 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
 
     private boolean addEditOk(ActivityStatusWrapper type) {
         try {
-            for (ActivityStatusWrapper sv : selectedActivityStatus)
-                if (sv.getId() != type.getId()
-                    && sv.getName().equals(type.getName()))
+            for (ActivityStatusWrapper selectedAs : selectedActivityStatus)
+                if (!selectedAs.getId().equals(type.getId())
+                    && selectedAs.getName().equals(type.getName()))
                     throw new BiobankCheckException(
                         "That activity status has already been added.");
         } catch (BiobankException bce) {

@@ -309,21 +309,23 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
      * not null, will return only Specimen that is linked to a visit which site
      * can be read by the user
      * 
-     * @throws BiobankCheckException
+     * @throws Exception
      */
     public static SpecimenWrapper getSpecimen(
         WritableApplicationService appService, String inventoryId, User user)
-        throws ApplicationException, BiobankCheckException {
+        throws Exception {
         SpecimenWrapper specimen = getSpecimen(appService, inventoryId);
         if (specimen != null && user != null) {
             CenterWrapper<?> center = specimen.getCurrentCenter();
-            // site might be null if can't access it !
-            if (center == null) {
-                throw new ApplicationException(
-                    "Specimen "
-                        + inventoryId
-                        + " exists but you don't have access to it."
-                        + " Its current site location should be a site you can access.");
+            if (center != null
+                && !user.getWorkingCenters(appService).contains(center)) {
+                String name = "none";
+                if (center != null)
+                    name = center.getNameShort();
+                throw new ApplicationException("Specimen " + inventoryId
+                    + " exists but you don't have access to it."
+                    + " Its current center location (" + name
+                    + ") should be a center you can access.");
             }
         }
         return specimen;
@@ -461,7 +463,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                         DispatchState.IN_TRANSIT, DispatchState.RECEIVED)
                         .contains(dispatch.getDispatchState()))) {
                     if (DispatchSpecimenState.MISSING.equals(dsa
-                        .getDispatchSpecimenState())) {
+                        .getSpecimenState())) {
                         return false;
                     }
                     return true;
@@ -481,7 +483,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
         boolean parentChanged = (originalSpecimen != null
             && originalSpecimen.getParentSpecimen() != null && originalSpecimen
-            .getParentSpecimen().equals(getParentSpecimen()));
+            .getParentSpecimen().getId().equals(getParentSpecimen().getId()));
 
         if (isNew() || parentChanged) {
             updateChildren();

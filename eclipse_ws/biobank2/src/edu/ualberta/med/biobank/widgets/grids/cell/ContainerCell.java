@@ -1,8 +1,8 @@
-package edu.ualberta.med.biobank.model;
+package edu.ualberta.med.biobank.widgets.grids.cell;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 
-public class ContainerCell extends Cell {
+public class ContainerCell extends AbstractUICell {
 
     private Integer row;
 
@@ -10,7 +10,7 @@ public class ContainerCell extends Cell {
 
     private ContainerWrapper container;
 
-    private CellStatus status;
+    private UICellStatus status;
 
     public ContainerCell() {
     }
@@ -25,11 +25,11 @@ public class ContainerCell extends Cell {
         this(row, col, null);
     }
 
-    public CellStatus getStatus() {
+    public UICellStatus getStatus() {
         return status;
     }
 
-    public void setStatus(CellStatus status) {
+    public void setStatus(UICellStatus status) {
         this.status = status;
     }
 

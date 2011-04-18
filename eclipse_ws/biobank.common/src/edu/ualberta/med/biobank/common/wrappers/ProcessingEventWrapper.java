@@ -83,14 +83,12 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankDeleteException,
-        ApplicationException {
-        // FIXME
-        // if (getChildSpecimenCount(false) > 0) {
-        // throw new BiobankCheckException(
-        // "Unable to delete processing event " + getCreatedAt()
-        // + " since it has child specimens stored in database.");
-        // }
+    protected void deleteChecks() throws BiobankException, ApplicationException {
+        if (getSpecimenCount(false) > 0) {
+            throw new BiobankDeleteException(
+                "Unable to delete processing event " + getCreatedAt()
+                    + " since it has child specimens stored in database.");
+        }
     }
 
     private static final String SPECIMEN_COUNT_QRY = "select count(specimen) from "

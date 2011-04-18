@@ -44,7 +44,7 @@ public abstract class LinkAssignCommonHandler extends AbstractHandler implements
             }
         } catch (WorkbenchException e) {
             throw new ExecutionException(
-                "Error while opening aliquot management perspective", e);
+                "Error while opening specimen management perspective", e);
         }
         return null;
     }

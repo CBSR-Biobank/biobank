@@ -347,4 +347,19 @@ public abstract class CenterWrapper<E extends Center> extends
         return Arrays.asList(this);
     }
 
+    public static final String CENTER_FROM_ID_QRY = "from "
+        + Center.class.getName() + " where " + CenterPeer.ID.getName() + " = ?";
+
+    public static CenterWrapper<?> getCenterFromId(
+        WritableApplicationService appService, Integer centerId)
+        throws Exception {
+        HQLCriteria criteria = new HQLCriteria(CENTER_FROM_ID_QRY,
+            Arrays.asList(new Object[] { centerId }));
+        List<Center> centers = appService.query(criteria);
+        if (centers.size() == 0)
+            return null;
+        else
+            return wrapModel(appService, centers.get(0), null);
+
+    }
 }

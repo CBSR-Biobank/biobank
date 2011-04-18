@@ -41,7 +41,6 @@ public class Sleak {
     Label label;
 
     Object[] oldObjects = new Object[0];
-    Error[] oldErrors = new Error[0];
     Object[] objects = new Object[0];
     Error[] errors = new Error[0];
 
@@ -218,7 +217,7 @@ public class Sleak {
                 return;
             gc.setFont((Font) object);
             FontData[] array = gc.getFont().getFontData();
-            String string = "";
+            StringBuffer sb = new StringBuffer();
             String lf = text.getLineDelimiter();
             for (int i = 0; i < array.length; i++) {
                 FontData data = array[i];
@@ -230,10 +229,10 @@ public class Sleak {
                     if ((bits & SWT.ITALIC) != 0)
                         style += "ITALIC";
                 }
-                string += data.getName() + " " + data.getHeight() + " " + style
-                    + lf;
+                sb.append(data.getName()).append(" ").append(data.getHeight())
+                    .append(" ").append(style).append(lf);
             }
-            gc.drawString(string, 0, 0);
+            gc.drawString(sb.toString(), 0, 0);
             return;
         }
         // NOTHING TO DRAW FOR GC
@@ -275,10 +274,8 @@ public class Sleak {
 
     void refreshAll() {
         oldObjects = new Object[0];
-        oldErrors = new Error[0];
         refreshDifference();
         oldObjects = objects;
-        oldErrors = errors;
     }
 
     void layout() {
@@ -296,8 +293,8 @@ public class Sleak {
         Point size3 = check.computeSize(SWT.DEFAULT, SWT.DEFAULT);
         Point size4 = label.computeSize(SWT.DEFAULT, SWT.DEFAULT);
         width = Math.max(size1.x, Math.max(size2.x, Math.max(size3.x, width)));
-        width = Math.max(64, Math.max(size4.x, list.computeSize(width,
-            SWT.DEFAULT).x));
+        width = Math.max(64,
+            Math.max(size4.x, list.computeSize(width, SWT.DEFAULT).x));
         start.setBounds(0, 0, width, size1.y);
         stop.setBounds(0, size1.y, width, size2.y);
         check.setBounds(0, size1.y + size2.y, width, size3.y);

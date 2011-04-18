@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.security;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,9 +31,12 @@ public class User implements Serializable, NotAProxy {
     private String email;
     private boolean isLockedOut;
 
-    private List<CenterWrapper<?>> workingCenters;
+    private transient List<CenterWrapper<?>> workingCenters;
 
     private transient CenterWrapper<?> currentWorkingCenter;
+
+    // only the current working center id will be serialized
+    private Integer currentWorkingCenterId;
 
     private boolean needToChangePassword;
 
@@ -233,7 +237,13 @@ public class User implements Serializable, NotAProxy {
                     .getConstructor(WritableApplicationService.class);
                 wrapper = (ModelWrapper<?>) constructor
                     .newInstance((WritableApplicationService) null);
-            } catch (Exception e) {
+            } catch (NoSuchMethodException e) {
+                return false;
+            } catch (InvocationTargetException e) {
+                return false;
+            } catch (IllegalAccessException e) {
+                return false;
+            } catch (InstantiationException e) {
                 return false;
             }
             type = wrapper.getWrappedClass().getName();
@@ -306,12 +316,15 @@ public class User implements Serializable, NotAProxy {
     }
 
     public void setCurrentWorkingCenter(CenterWrapper<?> center) {
-        this.currentWorkingCenter = center;
+        currentWorkingCenter = center;
+        // only the id is serialized
+        if (center == null)
+            currentWorkingCenterId = null;
+        else
+            currentWorkingCenterId = center.getId();
     }
 
     public CenterWrapper<?> getCurrentWorkingCenter() {
-        // TODO: removed reload... called way too often, should manage reloads
-        // in forms
         return currentWorkingCenter;
     }
 
@@ -319,6 +332,21 @@ public class User implements Serializable, NotAProxy {
         if (currentWorkingCenter instanceof SiteWrapper)
             return (SiteWrapper) currentWorkingCenter;
         return null;
+    }
+
+    /**
+     * To use on the server side to initialize the currentWorkingCenter from the
+     * id
+     */
+    public void initCurrentWorkingCenter(WritableApplicationService appService) {
+        if (currentWorkingCenter == null && currentWorkingCenterId != null) {
+            try {
+                currentWorkingCenter = CenterWrapper.getCenterFromId(
+                    appService, currentWorkingCenterId);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public boolean canPerformActions(SecurityFeature... features) {
@@ -335,5 +363,19 @@ public class User implements Serializable, NotAProxy {
                     feature.getName());
         }
         return ok;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof User)
+            return login.equals(((User) o).login);
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        if (login == null)
+            return super.hashCode();
+        return login.hashCode();
     }
 }

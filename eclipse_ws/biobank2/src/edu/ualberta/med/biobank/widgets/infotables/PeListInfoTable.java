@@ -70,7 +70,7 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
         if (study != null) {
             info.studyNameShort = study.getNameShort();
         } else {
-            info.studyNameShort = new String();
+            info.studyNameShort = "";
         }
         info.numSVs = pEvent.getSpecimenCount(false);
         info.numAliquots = pEvent.getChildSpecimenCount();

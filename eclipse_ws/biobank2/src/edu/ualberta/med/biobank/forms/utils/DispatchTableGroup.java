@@ -68,7 +68,7 @@ public class DispatchTableGroup extends TableGroup<DispatchWrapper> {
 
         for (DispatchSpecimenWrapper wrapper : cache) {
             adapters.add(new TreeItemAdapter(null, wrapper));
-            numAliquots++;
+            numSpecimens++;
         }
 
         this.tops = adapters;

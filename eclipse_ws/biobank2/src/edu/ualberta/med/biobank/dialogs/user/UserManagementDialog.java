@@ -32,8 +32,8 @@ import edu.ualberta.med.biobank.widgets.infotables.UserInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserManagementDialog extends BiobankDialog {
-    private final String TITLE = "User Management";
-    private final String TITLE_AREA_MESSAGE = "Right-click to modify, delete or unlock users and groups.";
+    private static final String TITLE = "User Management";
+    private static final String TITLE_AREA_MESSAGE = "Right-click to modify, delete or unlock users and groups.";
     private UserInfoTable userInfoTable;
     private List<User> currentUserList;
     private GroupInfoTable groupInfoTable;

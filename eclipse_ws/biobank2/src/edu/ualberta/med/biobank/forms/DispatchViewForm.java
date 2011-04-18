@@ -35,8 +35,8 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
-import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.DispatchSpecimensTreeTable;
+import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -66,9 +66,9 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private BiobankText commentLabel;
 
-    private DispatchAliquotsTreeTable aliquotsTree;
+    private DispatchSpecimensTreeTable specimensTree;
 
-    private DispatchAliquotListInfoTable aliquotsNonProcessedTable;
+    private DispatchSpecimenListInfoTable specimensNonProcessedTable;
 
     private boolean canSeeEverything;
 
@@ -100,7 +100,7 @@ public class DispatchViewForm extends BiobankViewForm {
         setPartName("Dispatch sent on "
             + dispatch.getShipmentInfo().getPackedAt());
         setDispatchValues();
-        aliquotsTree.refresh();
+        specimensTree.refresh();
     }
 
     @Override
@@ -161,17 +161,17 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private void createTreeTableSection() {
         if (dispatch.isInCreationState()) {
-            Composite parent = createSectionWithClient("Aliquot added");
-            aliquotsNonProcessedTable = new DispatchAliquotListInfoTable(
+            Composite parent = createSectionWithClient("Specimen added");
+            specimensNonProcessedTable = new DispatchSpecimenListInfoTable(
                 parent, dispatch, false) {
                 @Override
-                public List<DispatchSpecimenWrapper> getInternalDispatchAliquots() {
+                public List<DispatchSpecimenWrapper> getInternalDispatchSpecimens() {
                     return dispatch.getNonProcessedDispatchSpecimenCollection();
                 }
 
             };
-            aliquotsNonProcessedTable.adaptToToolkit(toolkit, true);
-            aliquotsNonProcessedTable
+            specimensNonProcessedTable.adaptToToolkit(toolkit, true);
+            specimensNonProcessedTable
                 .addClickListener(new IDoubleClickListener() {
                     @Override
                     public void doubleClick(DoubleClickEvent event) {
@@ -186,16 +186,16 @@ public class DispatchViewForm extends BiobankViewForm {
                         }
                     }
                 });
-            aliquotsNonProcessedTable
+            specimensNonProcessedTable
                 .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                     @Override
                     public void selectionChanged(MultiSelectEvent event) {
-                        aliquotsNonProcessedTable.reloadCollection();
+                        specimensNonProcessedTable.reloadCollection();
                     }
                 });
         } else {
-            aliquotsTree = new DispatchAliquotsTreeTable(page, dispatch, false,
-                false);
+            specimensTree = new DispatchSpecimensTreeTable(page, dispatch,
+                false, false);
         }
     }
 

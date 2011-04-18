@@ -179,7 +179,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
             String loginName = user.getLogin();
             String message;
 
-            if (SessionManager.getUser().equals(loginName)) {
+            if (SessionManager.getUser().equals(user)) {
                 message = CONFIRM_SUICIDE_MESSAGE;
             } else {
                 message = MessageFormat.format(CONFIRM_DELETE_MESSAGE,

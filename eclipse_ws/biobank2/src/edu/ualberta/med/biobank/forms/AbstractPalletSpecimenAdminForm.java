@@ -2,13 +2,14 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -26,20 +27,22 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
-import edu.ualberta.med.biobank.model.CellStatus;
-import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
-import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
@@ -68,8 +71,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     private PalletScanManagement palletScanManagement;
 
-    private boolean scanTubeAloneMode = false;
-
     private Label scanTubeAloneSwitch;
 
     protected ComboViewer profilesCombo;
@@ -77,6 +78,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     private IPropertyChangeListener propertyListener;
 
     protected String currentPlateToScan;
+
+    // global state of the pallet process
+    protected UICellStatus currentScanState;
 
     @Override
     protected void init() throws Exception {
@@ -127,7 +131,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
             @Override
             protected void afterScanAndProcess() {
-                AbstractPalletSpecimenAdminForm.this.afterScanAndProcess();
+                AbstractPalletSpecimenAdminForm.this.afterScanAndProcess(null);
             }
 
             @Override
@@ -141,6 +145,17 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             @Override
             protected void plateError() {
                 setScanHasBeenLauched(false, true);
+            }
+
+            @Override
+            protected void postprocessScanTubeAlone(PalletCell cell)
+                throws Exception {
+                postprocessScanTubeAlone(cell);
+            }
+
+            @Override
+            protected boolean canScanTubeAlone(PalletCell cell) {
+                return canScanTubeAlone(cell);
             }
         };
     }
@@ -180,7 +195,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     }
 
-    protected void afterScanAndProcess() {
+    protected void afterScanAndProcess(
+        @SuppressWarnings("unused") Integer rowOnly) {
 
     }
 
@@ -193,17 +209,21 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     @Override
     public boolean onClose() {
-        plateToScanSessionString = (String) plateToScanValue.getValue();
-        if (finished || BiobankPlugin.getPlatesEnabledCount() != 1) {
-            plateToScanSessionString = "";
+        synchronized (plateToScanSessionString) {
+            plateToScanSessionString = (String) plateToScanValue.getValue();
+            if (finished || BiobankPlugin.getPlatesEnabledCount() != 1) {
+                plateToScanSessionString = "";
+            }
         }
         return super.onClose();
     }
 
     protected void setRescanMode() {
-        scanButton.setText("Retry scan");
-        rescanMode = true;
-        disableFields();
+        if (palletScanManagement.getSuccessfulScansCount() > 0) {
+            scanButton.setText("Retry scan");
+            rescanMode = true;
+            disableFields();
+        }
     }
 
     protected abstract void disableFields();
@@ -386,56 +406,37 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         canLaunchScanValue.setValue(canLauch);
     }
 
-    private String scanTubeAloneDialog(RowColPos rcp) {
-        ScanOneTubeDialog dlg = new ScanOneTubeDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(),
-            palletScanManagement.getCells(), rcp);
-        if (dlg.open() == Dialog.OK) {
-            return dlg.getScannedValue();
-        }
-        return null;
-    }
-
     protected void scanTubeAlone(MouseEvent e) {
-        if (scanTubeAloneMode && isScanHasBeenLaunched()) {
-            RowColPos rcp = ((ScanPalletWidget) e.widget)
-                .getPositionAtCoordinates(e.x, e.y);
-            Map<RowColPos, PalletCell> cells = palletScanManagement.getCells();
-            if (rcp != null) {
-                PalletCell cell = cells.get(rcp);
-                if (canScanTubeAlone(cell)) {
-                    String value = scanTubeAloneDialog(rcp);
-                    if (value != null && !value.isEmpty()) {
-                        if (cell == null) {
-                            cell = new PalletCell(new ScanCell(rcp.row,
-                                rcp.col, value));
-                            cells.put(rcp, cell);
-                        } else {
-                            cell.setValue(value);
-                        }
-                        appendLogNLS("linkAssign.activitylog.scanTubeAlone",
-                            value,
-                            ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
-                        try {
-                            postprocessScanTubeAlone(cell);
-                        } catch (Exception ex) {
-                            BiobankPlugin.openAsyncError("Scan tube error", ex);
-                        }
-                    }
-                }
-            }
-        }
+        if (isScanHasBeenLaunched())
+            palletScanManagement.scanTubeAlone(e);
     }
 
-    protected boolean canScanTubeAlone(PalletCell cell) {
-        return cell == null || cell.getStatus() == CellStatus.EMPTY;
+    protected void postprocessScanTubeAlone(PalletCell palletCell)
+        throws Exception {
+        appendLogNLS("linkAssign.activitylog.scanTubeAlone",
+            palletCell.getValue(),
+            ContainerLabelingSchemeWrapper.rowColToSbs(palletCell
+                .getRowColPos()));
+        beforeScanTubeAlone();
+        CellProcessResult res = appService.processCellStatus(
+            getServerCell(palletCell), getProcessData(),
+            SessionManager.getUser());
+        palletCell.merge(appService, res.getCell());
+        appendLogs(res.getLogs());
+        processCellResult(palletCell.getRowColPos(), palletCell);
+        currentScanState = currentScanState.mergeWith(palletCell.getStatus());
+        boolean ok = isScanValid()
+            && (palletCell.getStatus() != UICellStatus.ERROR);
+        setScanValid(ok);
+        afterScanAndProcess(palletCell.getRow());
     }
 
-    protected abstract void postprocessScanTubeAlone(PalletCell cell)
-        throws Exception;
+    protected void beforeScanTubeAlone() {
+
+    }
 
     protected boolean isScanTubeAloneMode() {
-        return scanTubeAloneMode;
+        return palletScanManagement.isScanTubeAloneMode();
     }
 
     protected void createScanTubeAloneButton(Composite parent) {
@@ -449,8 +450,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             @Override
             public void mouseDown(MouseEvent e) {
                 if (isScanHasBeenLaunched()) {
-                    scanTubeAloneMode = !scanTubeAloneMode;
-                    if (scanTubeAloneMode) {
+                    palletScanManagement.toggleScanTubeAloneMode();
+                    if (palletScanManagement.isScanTubeAloneMode()) {
                         scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
                             .getImageRegistry()
                             .get(BiobankPlugin.IMG_SCAN_CLOSE_EDIT));
@@ -474,10 +475,74 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         palletScanManagement.reset();
     }
 
-    protected abstract void processScanResult(IProgressMonitor monitor)
-        throws Exception;
+    /**
+     * go through cells retrieved from scan, set status and update the types
+     * combos components
+     */
+    protected void processScanResult(IProgressMonitor monitor) throws Exception {
+        Map<RowColPos, PalletCell> cells = getCells();
+        // conversion for server side call
+        Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells = null;
+        if (cells != null) {
+            serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell>();
+            for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
+                serverCells
+                    .put(entry.getKey(), getServerCell(entry.getValue()));
+            }
+        }
+        // server side call
+        ScanProcessResult res = appService.processScanResult(serverCells,
+            getProcessData(), isRescanMode(), SessionManager.getUser());
+        // print result logs
+        appendLogs(res.getLogs());
+
+        if (cells != null) {
+            // for each cell, convert into a client side cell
+            for (Entry<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> entry : res
+                .getCells().entrySet()) {
+                RowColPos rcp = entry.getKey();
+                monitor.subTask(Messages.getString(
+                    "ScanLink.scan.monitor.position", //$NON-NLS-1$
+                    ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
+                PalletCell palletCell = cells.get(entry.getKey());
+                Cell servercell = entry.getValue();
+                if (palletCell == null) { // can happened if missing
+                    palletCell = new PalletCell(new ScanCell(
+                        servercell.getRow(), servercell.getCol(),
+                        servercell.getValue()));
+                    cells.put(rcp, palletCell);
+                }
+                palletCell.merge(appService, servercell);
+                // additional cell specific client conversion if needed
+                processCellResult(rcp, palletCell);
+            }
+        }
+        currentScanState = UICellStatus.valueOf(res.getProcessStatus().name());
+        setScanValid(!getCells().isEmpty()
+            && currentScanState != UICellStatus.ERROR);
+    }
+
+    protected abstract ProcessData getProcessData();
+
+    protected void processCellResult(@SuppressWarnings("unused") RowColPos rcp,
+        @SuppressWarnings("unused") PalletCell palletCell) {
+        // nothing done by default
+    }
 
     protected boolean isFirstSuccessfulScan() {
         return palletScanManagement.getSuccessfulScansCount() == 1;
+    }
+
+    protected edu.ualberta.med.biobank.common.scanprocess.Cell getServerCell(
+        PalletCell palletCell) {
+        return new edu.ualberta.med.biobank.common.scanprocess.Cell(
+            palletCell.getRow(), palletCell.getCol(), palletCell.getValue(),
+            palletCell.getStatus() == null ? null
+                : edu.ualberta.med.biobank.common.scanprocess.CellStatus
+                    .valueOf(palletCell.getStatus().name()));
+    }
+
+    protected boolean canScanTubeAlone(PalletCell cell) {
+        return cell == null || cell.getStatus() == UICellStatus.EMPTY;
     }
 }

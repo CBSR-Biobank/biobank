@@ -135,9 +135,6 @@ public class CollectionView extends AbstractAdministrationView {
                 nodeRes = searchedNode.search(searchedObject);
             }
             if (nodeRes.size() > 0) {
-                // FIXME: why do this here when BiobankFormBase.setFocus() sets
-                // sets the selected node also?
-                // setSelectedNodeAsync(nodeRes.get(0));
                 if (doubleClick) {
                     nodeRes.get(0).performDoubleClick();
                 }

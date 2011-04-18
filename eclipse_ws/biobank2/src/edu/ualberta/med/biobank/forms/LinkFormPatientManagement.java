@@ -43,7 +43,7 @@ public class LinkFormPatientManagement {
 
     private WidgetCreator widgetCreator;
 
-    private AbstractSpecimenAdminForm aliquotAdminForm;
+    private AbstractSpecimenAdminForm specimenAdminForm;
 
     private PatientTextCallback patientTextCallback;
     private Label patientLabel;
@@ -56,9 +56,9 @@ public class LinkFormPatientManagement {
     protected boolean worksheetNumberModified;
 
     public LinkFormPatientManagement(WidgetCreator widgetCreator,
-        AbstractSpecimenAdminForm aliquotAdminForm) {
+        AbstractSpecimenAdminForm specimenAdminForm) {
         this.widgetCreator = widgetCreator;
-        this.aliquotAdminForm = aliquotAdminForm;
+        this.specimenAdminForm = specimenAdminForm;
     }
 
     protected void createPatientNumberText(Composite parent) {
@@ -93,7 +93,7 @@ public class LinkFormPatientManagement {
                 }
             }
         });
-        patientNumberText.addKeyListener(aliquotAdminForm.textFieldKeyListener);
+        patientNumberText.addKeyListener(specimenAdminForm.textFieldKeyListener);
         setFirstControl();
     }
 
@@ -123,7 +123,7 @@ public class LinkFormPatientManagement {
                     CollectionEventWrapper ce = (CollectionEventWrapper) selection
                         .getFirstElement();
                     if (ce != null) {
-                        aliquotAdminForm.appendLogNLS(
+                        specimenAdminForm.appendLogNLS(
                             "linkAssign.activitylog.visit.selection", ce //$NON-NLS-1$
                                 .getVisitNumber());
                     }
@@ -152,10 +152,10 @@ public class LinkFormPatientManagement {
         currentPatient = null;
         try {
             currentPatient = PatientWrapper.getPatient(
-                aliquotAdminForm.appService, patientNumberText.getText());
+                specimenAdminForm.appService, patientNumberText.getText());
             if (currentPatient != null) {
-                aliquotAdminForm.appendLog("--------"); //$NON-NLS-1$
-                aliquotAdminForm.appendLogNLS("linkAssign.activitylog.patient", //$NON-NLS-1$
+                specimenAdminForm.appendLog("--------"); //$NON-NLS-1$
+                specimenAdminForm.appendLogNLS("linkAssign.activitylog.patient", //$NON-NLS-1$
                     currentPatient.getPnumber());
             }
         } catch (ApplicationException e) {
@@ -232,7 +232,7 @@ public class LinkFormPatientManagement {
     }
 
     public void setFirstControl() {
-        aliquotAdminForm.setFirstControl(patientNumberText);
+        specimenAdminForm.setFirstControl(patientNumberText);
     }
 
     public boolean fieldsValid() {

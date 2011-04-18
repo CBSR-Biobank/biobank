@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
@@ -47,7 +48,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private SpecimenInfoTable aliquotedSpecimenTable;
 
-    private class FormPvCustomInfo extends PvAttrCustom {
+    private static class FormPvCustomInfo extends PvAttrCustom {
         BiobankText widget;
     }
 
@@ -114,12 +115,12 @@ public class CollectionEventViewForm extends BiobankViewForm {
             combinedPvInfo.setType(study.getStudyEventAttrType(label));
 
             int style = SWT.NONE;
-            if (combinedPvInfo.getType().equals("select_multiple")) {
+            if (combinedPvInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE) {
                 style |= SWT.WRAP;
             }
 
             String value = cevent.getEventAttrValue(label);
-            if (combinedPvInfo.getType().equals("select_multiple")
+            if (combinedPvInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE
                 && (value != null)) {
                 combinedPvInfo.setValue(value.replace(';', '\n'));
             } else {

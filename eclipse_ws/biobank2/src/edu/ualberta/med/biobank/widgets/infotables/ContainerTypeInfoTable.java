@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class ContainerTypeInfoTable extends
     InfoTableWidget<ContainerTypeWrapper> {
 
-    class TableRowData {
+    private static class TableRowData {
         ContainerTypeWrapper containerType;
         String name;
         String nameShort;

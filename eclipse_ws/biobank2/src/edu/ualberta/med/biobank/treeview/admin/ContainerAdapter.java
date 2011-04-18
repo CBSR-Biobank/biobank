@@ -25,8 +25,8 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.dialogs.MoveAliquotsToDialog;
 import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
+import edu.ualberta.med.biobank.dialogs.MoveSpecimensToDialog;
 import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerViewForm;
@@ -90,7 +90,7 @@ public class ContainerAdapter extends AdapterBase {
         Boolean topLevel = getContainer().getContainerType().getTopLevel();
         if (isEditable() && (topLevel == null || !topLevel)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Move Container");
+            mi.setText("Move container");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -101,11 +101,11 @@ public class ContainerAdapter extends AdapterBase {
 
         if (isEditable() && getContainer().hasSpecimens()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Move All Aliquots To");
+            mi.setText("Move all specimens to");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    moveAliquots();
+                    moveSpecimens();
                 }
             });
         }
@@ -113,8 +113,8 @@ public class ContainerAdapter extends AdapterBase {
         addDeleteMenu(menu, "Container");
     }
 
-    public void moveAliquots() {
-        final MoveAliquotsToDialog mc = new MoveAliquotsToDialog(PlatformUI
+    public void moveSpecimens() {
+        final MoveSpecimensToDialog mc = new MoveSpecimensToDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
             getContainer());
         if (mc.open() == Dialog.OK) {
@@ -125,28 +125,28 @@ public class ContainerAdapter extends AdapterBase {
                 context.run(true, false, new IRunnableWithProgress() {
                     @Override
                     public void run(final IProgressMonitor monitor) {
-                        monitor.beginTask("Moving aliquots from container "
+                        monitor.beginTask("Moving specimens from container "
                             + getContainer().getFullInfoLabel() + " to "
                             + newContainer.getFullInfoLabel(),
                             IProgressMonitor.UNKNOWN);
                         try {
-                            getContainer().moveAliquots(newContainer);
+                            getContainer().moveSpecimens(newContainer);
                             // newContainer.persist();
                             newContainer.reload();
                             monitor.done();
                             BiobankPlugin.openAsyncInformation(
-                                "Aliquots moved", newContainer.getSpecimens()
+                                "Specimens moved", newContainer.getSpecimens()
                                     .size()
-                                    + " aliquots are now in "
+                                    + " specimens are now in "
                                     + newContainer.getFullInfoLabel() + ".");
                         } catch (Exception e) {
                             BiobankPlugin.openAsyncError("Move problem", e);
                         }
                         monitor.done();
                         BiobankPlugin.openAsyncInformation(
-                            "Aliquots moved",
+                            "Specimens moved",
                             newContainer.getSpecimens().size()
-                                + " aliquots are now in "
+                                + " specimens are now in "
                                 + newContainer.getFullInfoLabel() + ".");
                     }
                 });
@@ -159,7 +159,7 @@ public class ContainerAdapter extends AdapterBase {
                 getContainer().reload();
                 SessionManager.openViewForm(getContainer());
             } catch (Exception e) {
-                BiobankPlugin.openError("Problem while moving aliquots", e);
+                BiobankPlugin.openError("Problem while moving specimens", e);
             }
         }
     }

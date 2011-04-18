@@ -4,14 +4,20 @@ import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
+import edu.ualberta.med.biobank.server.scanprocess.ServerProcess;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
 import gov.nih.nci.system.dao.Request;
@@ -19,6 +25,7 @@ import gov.nih.nci.system.dao.Response;
 import gov.nih.nci.system.util.ClassCache;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -185,6 +192,29 @@ public class BiobankApplicationServiceImpl extends
     @Override
     public String getServerVersion() {
         return BiobankVersionUtil.getServerVersion();
+    }
+
+    @Override
+    public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
+        ProcessData processData, boolean isRescanMode, User user)
+        throws ApplicationException {
+        try {
+            ServerProcess process = processData.getProcessInstance(this, user);
+            return process.processScanResult(cells, isRescanMode);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public CellProcessResult processCellStatus(Cell cell,
+        ProcessData processData, User user) throws ApplicationException {
+        try {
+            ServerProcess process = processData.getProcessInstance(this, user);
+            return process.processCellStatus(cell);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
     }
 
 }

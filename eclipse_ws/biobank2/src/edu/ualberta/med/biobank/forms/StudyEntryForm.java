@@ -71,7 +71,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private SourceSpecimenEntryInfoTable sourceSpecimenEntryTable;
 
-    private class StudyPvAttrCustom extends PvAttrCustom {
+    private static class StudyPvAttrCustom extends PvAttrCustom {
         public PvInfoWidget widget;
         public boolean inStudy;
     }
@@ -324,8 +324,8 @@ public class StudyEntryForm extends BiobankEntryForm {
             } else if (studyPvAttrCustom.widget.getSelected()) {
                 newPvInfoLabels.add(studyPvAttrCustom.getLabel());
                 String value = studyPvAttrCustom.widget.getValues();
-                if (studyPvAttrCustom.getType().equals("select_single") //$NON-NLS-1$
-                    || studyPvAttrCustom.getType().equals("select_multiple")) { //$NON-NLS-1$
+                if (studyPvAttrCustom.getType() == EventAttrTypeEnum.SELECT_SINGLE
+                    || studyPvAttrCustom.getType() == EventAttrTypeEnum.SELECT_MULTIPLE) { //$NON-NLS-1$
                     if (value.length() > 0) {
                         study.setStudyEventAttr(studyPvAttrCustom.getLabel(),
                             studyPvAttrCustom.getType(), value.split(";")); //$NON-NLS-1$

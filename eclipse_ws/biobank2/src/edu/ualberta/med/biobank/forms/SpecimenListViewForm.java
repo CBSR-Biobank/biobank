@@ -24,16 +24,16 @@ public class SpecimenListViewForm extends BiobankViewForm {
         Assert.isTrue(adapter == null, "adapter should be null");
         FormInput input = (FormInput) getEditorInput();
         speicmens = (List<SpecimenWrapper>) input.getAdapter(ArrayList.class);
-        Assert.isNotNull(speicmens, "aliquots are null");
-        setPartName("Non Active Aliquots");
+        Assert.isNotNull(speicmens, "specimens are null");
+        setPartName("Non active specimens");
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Non Active Aliquots");
+        form.setText("Non active Specimens");
         page.setLayout(new GridLayout(1, false));
         form.setImage(BiobankPlugin.getDefault().getImage(
-            BiobankPlugin.IMG_ALIQUOT));
+            BiobankPlugin.IMG_SPECIMEN));
 
         specimensWidget = new SpecimenInfoTable(page, speicmens,
             SpecimenInfoTable.ColumnsShown.ALL, 20);

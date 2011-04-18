@@ -479,7 +479,7 @@ public class LoginDialog extends TitleAreaDialog {
             }
     }
 
-    public class Authentication {
+    public static class Authentication {
         public static final String SERVER_PROPERTY_NAME = "server"; //$NON-NLS-1$
         public static final String USERNAME_PROPERTY_NAME = "username"; //$NON-NLS-1$
         public static final String PASSWORD_PROPERTY_NAME = "password"; //$NON-NLS-1$

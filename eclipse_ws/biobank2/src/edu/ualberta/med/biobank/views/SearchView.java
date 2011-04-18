@@ -41,7 +41,7 @@ public class SearchView extends ViewPart {
 
     private Button searchButton;
 
-    protected static boolean loggedIn;
+    protected boolean loggedIn;
 
     @Override
     public void createPartControl(Composite parent) {

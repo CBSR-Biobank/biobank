@@ -10,8 +10,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import org.eclipse.jface.wizard.IWizardPage;
 
 @Deprecated
-// FIXME do we still need this functionality with new model ? (see aliquot entry
-// form)
+// FIXME do we still need this functionality with new model ? (see specimen
+// entry form)
 public class SelectPatientVisitWizard extends BiobankWizard {
     private final WritableApplicationService appService;
     private EnterPnumberPage pnumberPage;

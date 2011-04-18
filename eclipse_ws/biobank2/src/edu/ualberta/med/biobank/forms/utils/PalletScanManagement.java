@@ -2,17 +2,22 @@ package edu.ualberta.med.biobank.forms.utils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
+import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
@@ -21,6 +26,8 @@ public class PalletScanManagement {
 
     protected Map<RowColPos, PalletCell> cells;
     private int successfulScansCount = 0;
+
+    private boolean scanTubeAloneMode = false;
 
     public void launchScanAndProcessResult(final String plateToScan) {
         launchScanAndProcessResult(plateToScan,
@@ -89,6 +96,7 @@ public class PalletScanManagement {
                             "Scan error", //$NON-NLS-1$
                             ex,
                             "Barcodes can still be scanned with the handheld 2D scanner.");
+                    return;
                 }
             }
         } else {
@@ -99,29 +107,93 @@ public class PalletScanManagement {
         if (cells == null) {
             cells = new HashMap<RowColPos, PalletCell>();
         } else {
+            Map<String, PalletCell> cellValues = getValuesMap(cells);
             if (rescanMode && oldCells != null) {
                 // rescan: merge previous scan with new in case the scanner
-                // wasn't
-                // able to scan well
-                for (RowColPos rcp : oldCells.keySet()) {
-                    PalletCell oldScannedCell = oldCells.get(rcp);
+                // wasn't able to scan well
+                for (Entry<RowColPos, PalletCell> entry : oldCells.entrySet()) {
+                    RowColPos rcp = entry.getKey();
+                    PalletCell oldScannedCell = entry.getValue();
                     PalletCell newScannedCell = cells.get(rcp);
-                    if (PalletCell.hasValue(oldScannedCell)
-                        && PalletCell.hasValue(newScannedCell)
-                        && !oldScannedCell.getValue().equals(
-                            newScannedCell.getValue())) {
-                        cells = oldCells;
-                        throw new Exception(
-                            "Scan Aborted: previously scanned aliquot has been replaced. "
-                                + "If this is not a re-scan, reset and start again.");
-                    }
+                    boolean copyOldValue = false;
                     if (PalletCell.hasValue(oldScannedCell)) {
+                        copyOldValue = true;
+                        if (PalletCell.hasValue(newScannedCell)
+                            && !oldScannedCell.getValue().equals(
+                                newScannedCell.getValue())) {
+                            // Different values at same position
+                            cells = oldCells;
+                            throw new Exception(
+                                "Scan Aborted: previously scanned specimens has been replaced. "
+                                    + "If this is not a re-scan, reset and start again.");
+                        } else if (!PalletCell.hasValue(newScannedCell)) {
+                            // previous position has value - new has none
+                            PalletCell newPosition = cellValues
+                                .get(oldScannedCell.getValue());
+                            if (newPosition != null) {
+                                // still there but moved to another position, so
+                                // don't copy previous scanned position
+                                copyOldValue = false;
+                            }
+                        }
+                    }
+                    if (copyOldValue) {
                         cells.put(rcp, oldScannedCell);
                     }
                 }
             }
             afterScan();
         }
+    }
+
+    public void scanTubeAlone(MouseEvent e) {
+        if (scanTubeAloneMode) {
+            RowColPos rcp = ((ScanPalletWidget) e.widget)
+                .getPositionAtCoordinates(e.x, e.y);
+            if (rcp != null) {
+                PalletCell cell = cells.get(rcp);
+                if (canScanTubeAlone(cell)) {
+                    String value = scanTubeAloneDialog(rcp);
+                    if (value != null && !value.isEmpty()) {
+                        if (cell == null) {
+                            cell = new PalletCell(new ScanCell(rcp.row,
+                                rcp.col, value));
+                            cells.put(rcp, cell);
+                        } else {
+                            cell.setValue(value);
+                        }
+                        try {
+                            postprocessScanTubeAlone(cell);
+                        } catch (Exception ex) {
+                            BiobankPlugin.openAsyncError("Scan tube error", ex);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected boolean canScanTubeAlone(PalletCell cell) {
+        return true;
+    }
+
+    private String scanTubeAloneDialog(RowColPos rcp) {
+        ScanOneTubeDialog dlg = new ScanOneTubeDialog(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), cells, rcp);
+        if (dlg.open() == Dialog.OK) {
+            return dlg.getScannedValue();
+        }
+        return null;
+    }
+
+    private Map<String, PalletCell> getValuesMap(
+        Map<RowColPos, PalletCell> cells) {
+        Map<String, PalletCell> valuesMap = new HashMap<String, PalletCell>();
+        for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
+            PalletCell cell = entry.getValue();
+            valuesMap.put(cell.getValue(), cell);
+        }
+        return valuesMap;
     }
 
     protected void beforeThreadStart() {
@@ -139,6 +211,11 @@ public class PalletScanManagement {
 
     @SuppressWarnings("unused")
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
+
+    }
+
+    @SuppressWarnings("unused")
+    protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
 
     }
 
@@ -174,5 +251,14 @@ public class PalletScanManagement {
 
     public int getSuccessfulScansCount() {
         return successfulScansCount;
+    }
+
+    public void toggleScanTubeAloneMode() {
+        scanTubeAloneMode = !scanTubeAloneMode;
+        ;
+    }
+
+    public boolean isScanTubeAloneMode() {
+        return scanTubeAloneMode;
     }
 }

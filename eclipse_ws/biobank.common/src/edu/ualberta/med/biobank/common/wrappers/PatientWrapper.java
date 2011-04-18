@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -195,13 +194,6 @@ public class PatientWrapper extends PatientBaseWrapper {
         return total;
     }
 
-    @Deprecated
-    public boolean canBeAddedToCollectionEvent(CollectionEventWrapper cevent)
-        throws ApplicationException, BiobankException {
-        // TODO: does this make sense anymore?
-        return false;
-    }
-
     @Override
     public int compareTo(ModelWrapper<Patient> wrapper) {
         if (wrapper instanceof PatientWrapper) {
@@ -215,88 +207,6 @@ public class PatientWrapper extends PatientBaseWrapper {
     @Override
     public String toString() {
         return getPnumber();
-    }
-
-    // private static final String PATIENTS_IN_TODAYS_COLLECTION_EVENTS_QRY =
-    // "select p from "
-    // + Patient.class.getName()
-    // + " as p join p."
-    // + PatientPeer.SOURCE_VESSEL_COLLECTION.getName()
-    // + " as svc join svc."
-    // + SpecimenPeer.COLLECTION_EVENT.getName()
-    // + " as ces where ces."
-    // + CollectionEventPeer.DATE_RECEIVED.getName()
-    // + ">=? and ces."
-    // + CollectionEventPeer.DATE_RECEIVED.getName() + "<=?";
-
-    @Deprecated
-    public static List<PatientWrapper> getPatientsInTodayCollectionEvents(
-        WritableApplicationService appService) throws ApplicationException {
-        // Calendar cal = Calendar.getInstance();
-        // // yesterday midnight
-        // cal.set(Calendar.AM_PM, Calendar.AM);
-        // cal.set(Calendar.HOUR, 0);
-        // cal.set(Calendar.MINUTE, 0);
-        // cal.set(Calendar.SECOND, 0);
-        // Date startDate = cal.getTime();
-        // // today midnight
-        // cal.add(Calendar.DATE, 1);
-        // Date endDate = cal.getTime();
-        // HQLCriteria criteria = new HQLCriteria(
-        // PATIENTS_IN_TODAYS_COLLECTION_EVENTS_QRY,
-        // Arrays.asList(new Object[] { startDate, endDate }));
-        // List<Patient> res = appService.query(criteria);
-        // List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
-        // for (Patient p : res) {
-        // patients.add(new PatientWrapper(appService, p));
-        // }
-        // return patients;
-        return null;
-    }
-
-    // private static final String LAST_7_DAYS_PROCESSING_EVENTS_QRY =
-    // "select pEvent from "
-    // + Patient.class.getName()
-    // + " as p join p."
-    // + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
-    // + " as ces join ces."
-    // + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
-    // + " as specimens join specimens."
-    // + SpecimenPeer.SPECIMEN_LINK_COLLECTION.getName()
-    // + " as spLink join spLink."
-    // + SpecimenLinkPeer.PROCESSING_EVENT
-    // + " as pes where p."
-    // + PatientPeer.ID.getName()
-    // + "=? and pes."
-    // + ProcessingEventPeer.CREATED_AT.getName()
-    // + ">? and pes."
-    // + ProcessingEventPeer.CREATED_AT.getName() + "<?";
-
-    @Deprecated
-    // FIXME :in Scan Link, wants the collection event instead. ? What is a last
-    // 7
-    // days collection events if we don't have the date drawn on the collection
-    // event itself ?
-    public List<ProcessingEventWrapper> getLast7DaysProcessingEvents(
-        SiteWrapper site) throws ApplicationException {
-        Calendar cal = Calendar.getInstance();
-        // today midnight
-        cal.add(Calendar.DATE, 1);
-        cal.set(Calendar.AM_PM, Calendar.AM);
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        Date endDate = cal.getTime();
-        // 7 days ago, at midnight
-        cal.add(Calendar.DATE, -8);
-        Date startDate = cal.getTime();
-        // HQLCriteria criteria = new HQLCriteria(
-        // LAST_7_DAYS_PROCESSING_EVENTS_QRY, Arrays.asList(new Object[] {
-        // getId(), site.getId(), startDate, endDate }));
-        // List<ProcessingEvent> res = appService.query(criteria);
-        // return ModelWrapper.wrapModelCollection(appService, res,
-        // ProcessingEventWrapper.class);
-        return new ArrayList<ProcessingEventWrapper>();
     }
 
     @Override
@@ -377,11 +287,10 @@ public class PatientWrapper extends PatientBaseWrapper {
                 @Override
                 public int compare(CollectionEventWrapper ce1,
                     CollectionEventWrapper ce2) {
-                    int res = ce1.compareTo(ce2);
                     if (ascending) {
-                        return res;
+                        return ce1.compareTo(ce2);
                     }
-                    return -res;
+                    return ce2.compareTo(ce1);
                 }
             });
         }
@@ -399,12 +308,6 @@ public class PatientWrapper extends PatientBaseWrapper {
                 pes.add(spec.getProcessingEvent());
         }
         return new ArrayList<ProcessingEventWrapper>(pes);
-    }
-
-    @Deprecated
-    public boolean canBeAddedToShipment(CollectionEventWrapper shipment) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     private static final String CEVENT_COUNT_QRY = "select count(cevent) from "

@@ -37,8 +37,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.cglib.proxy.Enhancer;
+
+import org.hibernate.proxy.HibernateProxy;
+import org.springframework.aop.TargetSource;
+import org.springframework.aop.framework.Advised;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
@@ -69,9 +74,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             if (classType != null) {
                 throw new RuntimeException(
                     "was not able to create new object of type "
-                        + classType.getName());
+                        + classType.getName(), e);
             } else {
-                throw new RuntimeException("was not able to create new object");
+                throw new RuntimeException("was not able to create new object",
+                    e);
             }
         }
     }
@@ -584,9 +590,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
     }
 
-    protected Log getLogMessage(@SuppressWarnings("unused") String action,
-        @SuppressWarnings("unused") String site,
-        @SuppressWarnings("unused") String details) throws Exception {
+    @SuppressWarnings("unused")
+    protected Log getLogMessage(String action, String site, String details)
+        throws Exception {
         return null;
     }
 
@@ -595,6 +601,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return this.getId().compareTo(arg0.getId());
     }
 
+    @SuppressWarnings("unchecked")
     public static <W extends ModelWrapper<? extends M>, M> W wrapModel(
         WritableApplicationService appService, M model, Class<W> wrapperKlazz)
         throws Exception {
@@ -602,14 +609,31 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         Class<?> modelKlazz = model.getClass();
         if (Enhancer.isEnhanced(modelKlazz)) {
             // if the given model's Class is 'enhanced' by CGLIB, then the
-            // superclass should be the real (non-proxied/non-enhanced) model
-            // class
+            // superclass container the real class
             modelKlazz = modelKlazz.getSuperclass();
+            if (Modifier.isAbstract(modelKlazz.getModifiers())) {
+                // The super class can be a problem when the class is abstract,
+                // but it should be an instance of Advised, that contain the
+                // real (non-proxied/non-enhanced) model object.
+                if (model instanceof Advised) { // ok for client side
+                    TargetSource ts = ((Advised) model).getTargetSource();
+                    modelKlazz = ts.getTarget().getClass();
+                } else if (model instanceof HibernateProxy) {
+                    // only on server side (?).
+                    Object implementation = ((HibernateProxy) model)
+                        .getHibernateLazyInitializer().getImplementation();
+                    modelKlazz = implementation.getClass();
+                    // Is this bad to do that ? On server side, will get a proxy
+                    // that inherit from Center, not from Site, so won't be able
+                    // to create a SiteWrapper unless is using the direct
+                    // implementation
+                    model = (M) implementation;
+                }
+            }
         }
 
         if (wrapperKlazz == null
             || Modifier.isAbstract(wrapperKlazz.getModifiers())) {
-            @SuppressWarnings("unchecked")
             Class<W> tmp = (Class<W>) ModelWrapperHelper
                 .getWrapperClass(modelKlazz);
             wrapperKlazz = tmp;
@@ -682,7 +706,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                         wrapperKlazz);
                     wrappers.add(wrapper);
                 } catch (Exception e) {
-                    throw new RuntimeException(e.getMessage());
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -713,7 +737,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                         wrapperKlazz);
                     wrapper = tmp;
                 } catch (Exception e) {
-                    throw new RuntimeException(e.getMessage());
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -980,5 +1004,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
         return Collections.emptyList();
+    }
+
+    public static <T> void persistBatch(Set<? extends ModelWrapper<T>> wrappers)
+        throws Exception {
+        // once the persist method is using batch queries, we should use batch
+        // queries here
+        for (ModelWrapper<T> wrapper : wrappers) {
+            wrapper.persist();
+        }
     }
 }

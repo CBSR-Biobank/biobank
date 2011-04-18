@@ -13,8 +13,8 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 
 /**
  * Draw a grid according to specific parameters : total number of rows, total
@@ -126,7 +126,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         e.gc.drawRectangle(rectangle);
         if (displayWidget.getCells() != null) {
             if (displayWidget.getMultiSelectionManager().isEnabled()) {
-                Cell cell = displayWidget.getCells().get(
+                AbstractUICell cell = displayWidget.getCells().get(
                     new RowColPos(indexRow, indexCol));
                 if (cell != null && cell.isSelected()) {
                     Rectangle rect = new Rectangle(rectangle.x + 5,
@@ -146,23 +146,26 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     protected Color getDefaultBackgroundColor(PaintEvent e,
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
         int indexRow, int indexCol) {
-        return CellStatus.EMPTY.getColor();
+        return UICellStatus.EMPTY.getColor();
     }
 
     @SuppressWarnings("unused")
-    protected String getTopTextForBox(Map<RowColPos, ? extends Cell> cells,
-        int indexRow, int indexCol) {
+    protected String getTopTextForBox(
+        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        int indexCol) {
         return null;
     }
 
-    protected String getMiddleTextForBox(Map<RowColPos, ? extends Cell> cells,
-        int indexRow, int indexCol) {
+    protected String getMiddleTextForBox(
+        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        int indexCol) {
         return getDefaultTextForBox(cells, indexRow, indexCol);
     }
 
     @SuppressWarnings("unused")
-    protected String getBottomTextForBox(Map<RowColPos, ? extends Cell> cells,
-        int indexRow, int indexCol) {
+    protected String getBottomTextForBox(
+        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        int indexCol) {
         return null;
     }
 

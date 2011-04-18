@@ -33,7 +33,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
     protected BiobankEntryFormWidgetListener biobankListener = new BiobankEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
-            reloadAliquots();
+            reloadSpecimens();
             setDirty(true);
         }
     };
@@ -63,26 +63,30 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     protected abstract String getTextForPartName();
 
-    protected void createAliquotsSelectionActions(Composite composite,
+    /**
+     * Create a field to enter inventory id one by one + a button to open a scan
+     * dialog
+     */
+    protected void createSpecimensSelectionActions(Composite composite,
         boolean setAsFirstControl) {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
         toolkit.createLabel(addComposite, "Enter inventory ID to add:");
-        final BiobankText newAliquotText = new BiobankText(addComposite,
+        final BiobankText newSpecimenText = new BiobankText(addComposite,
             SWT.NONE, toolkit);
         GridData gd = new GridData();
         gd.widthHint = 100;
-        newAliquotText.setLayoutData(gd);
-        newAliquotText.addListener(SWT.DefaultSelection, new Listener() {
+        newSpecimenText.setLayoutData(gd);
+        newSpecimenText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
-                doAliquotTextAction(newAliquotText.getText());
-                newAliquotText.setFocus();
-                newAliquotText.setText("");
+                doSpecimenTextAction(newSpecimenText.getText());
+                newSpecimenText.setFocus();
+                newSpecimenText.setText("");
             }
         });
         if (setAsFirstControl) {
-            setFirstControl(newAliquotText);
+            setFirstControl(newSpecimenText);
         }
         Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
         addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
@@ -90,16 +94,16 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                doAliquotTextAction(newAliquotText.getText());
-                newAliquotText.setFocus();
-                newAliquotText.setText("");
+                doSpecimenTextAction(newSpecimenText.getText());
+                newSpecimenText.setFocus();
+                newSpecimenText.setText("");
             }
         });
         toolkit.createLabel(addComposite, "or open scan dialog:");
         Button openScanButton = toolkit
             .createButton(addComposite, "", SWT.PUSH);
         openScanButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT));
+            .get(BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -108,9 +112,15 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         });
     }
 
+    /**
+     * open scan when click on button
+     */
     protected abstract void openScanDialog();
 
-    protected abstract void doAliquotTextAction(String text);
+    /**
+     * add specimen represented by the inventoryid entered in the text field
+     */
+    protected abstract void doSpecimenTextAction(String text);
 
     @Override
     protected void saveForm() throws Exception {
@@ -128,6 +138,13 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         });
     }
 
-    protected abstract void reloadAliquots();
+    protected abstract void reloadSpecimens();
+
+    @Override
+    public void reset() throws Exception {
+        super.reset();
+        dispatch.reset();
+        reloadSpecimens();
+    }
 
 }
