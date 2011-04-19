@@ -251,7 +251,7 @@ public class ProcessingEventEntryForm extends
     }
 
     @Override
-    public void reset() throws Exception {
+    protected void onReset() throws Exception {
         modelObject.reset();
         if (modelObject.getActivityStatus() != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
@@ -259,6 +259,5 @@ public class ProcessingEventEntryForm extends
         }
         specimenEntryWidget.setSpecimens(modelObject
             .getSpecimenCollection(true));
-        setDirty(false);
     }
 }

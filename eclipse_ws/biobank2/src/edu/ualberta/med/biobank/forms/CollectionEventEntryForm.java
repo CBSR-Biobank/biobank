@@ -355,15 +355,25 @@ public class CollectionEventEntryForm extends
     }
 
     @Override
-    public void reset() throws Exception {
+    protected void onReset() throws Exception {
+        // patient should not be modified, so remember and set whether new or
+        // not
+        PatientWrapper patient = modelObject.getPatient();
         modelObject.reset();
+        modelObject.setPatient(patient);
+
+        if (modelObject.isNew()) {
+            modelObject.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
+        }
+
         if (modelObject.getActivityStatus() != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
                 modelObject.getActivityStatus()));
         }
+
         specimensTable.reload(modelObject.getOriginalSpecimenCollection(true));
         resetPvCustomInfo();
-        setDirty(false);
     }
 
     private void resetPvCustomInfo() throws Exception {

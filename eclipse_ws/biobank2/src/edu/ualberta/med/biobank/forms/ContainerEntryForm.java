@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -24,6 +23,7 @@ import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class ContainerEntryForm extends BiobankEntryForm<ContainerWrapper> {
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerEntryForm";
@@ -65,12 +65,6 @@ public class ContainerEntryForm extends BiobankEntryForm<ContainerWrapper> {
             tabName = "Container";
             modelObject.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
-            if (modelObject.hasParentContainer()) {
-                modelObject.setLabel(modelObject.getParentContainer()
-                    .getLabel() + modelObject.getPositionString());
-                modelObject.setTemperature(modelObject.getParentContainer()
-                    .getTemperature());
-            }
         } else {
             tabName = "Container " + modelObject.getLabel();
             oldContainerLabel = modelObject.getLabel();
@@ -162,8 +156,10 @@ public class ContainerEntryForm extends BiobankEntryForm<ContainerWrapper> {
             containerTypes = modelObject.getParentContainer()
                 .getContainerType().getChildContainerTypeCollection();
         }
-        if (modelObject.isNew() && containerTypes.size() == 1)
+        if (modelObject.isNew() && containerTypes.size() == 1) {
             currentType = containerTypes.get(0);
+            modelObject.setContainerType(currentType);
+        }
 
         containerTypeComboViewer = createComboViewer(client, "Container Type",
             containerTypes, currentType, MSG_CONTAINER_TYPE_EMPTY,
@@ -242,15 +238,20 @@ public class ContainerEntryForm extends BiobankEntryForm<ContainerWrapper> {
     }
 
     @Override
-    public void reset() throws Exception {
+    protected void onReset() throws Exception {
+        // Remember the Site
+        SiteWrapper site = modelObject.getSite();
         modelObject.reset();
-        ActivityStatusWrapper activity = modelObject.getActivityStatus();
-        if (activity != null) {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                activity));
-        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
-            activityStatusComboViewer.getCombo().deselectAll();
+        modelObject.setSite(site);
+
+        if (modelObject.isNew()) {
+            modelObject.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         }
-        setDirty(false);
+
+        GuiUtil.resetComboViewer(activityStatusComboViewer,
+            modelObject.getActivityStatus());
+        GuiUtil.resetComboViewer(containerTypeComboViewer,
+            modelObject.getContainerType());
     }
 }

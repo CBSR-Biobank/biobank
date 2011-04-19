@@ -119,16 +119,15 @@ public class BaseWrapperBuilder extends BaseBuilder {
             .append(
                 "import gov.nih.nci.system.applicationservice.WritableApplicationService;\n")
             .append("import ").append(mc.getPkg()).append(".")
-            .append(mc.getName()).append(";\n").append("\nimport ")
-            .append(Property.class.getName()).append(";");
-
-        contents.append("\nimport ").append(ArrayList.class.getName())
-            .append(";");
+            .append(mc.getName()).append(";\n").append("import ")
+            .append(Property.class.getName()).append(";\n");
 
         if (mc.getExtendsClass() == null)
             contents.append("import ").append(wrapperPackageName)
                 .append(".ModelWrapper;\n");
-        else
+
+        if (modelBaseClasses.containsKey(mc.getName())
+            || mc.getExtendsClass() != null)
             // need this for the getPropertyChangeNames method
             contents.append("import ").append(ArrayList.class.getName())
                 .append(";\n");
@@ -199,6 +198,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
             .append(" wrappedObject) {\n")
             .append("        super(appService, wrappedObject);\n")
             .append("    }\n\n");
+
         return result.toString();
     }
 
@@ -217,6 +217,32 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String wrappedObjectType = mc.getName();
         if (modelBaseClasses.containsKey(mc.getName())) {
             wrappedObjectType = "E";
+        }
+
+        boolean hasBooleanAttributes = false;
+        StringBuilder getNewObject = new StringBuilder();
+
+        getNewObject.append("    @Override\n").append("   protected ")
+            .append(wrappedObjectType)
+            .append(" getNewObject() throws Exception {\n").append("        ")
+            .append(wrappedObjectType)
+            .append(" newObject = super.getNewObject();\n");
+
+        // by default, set Boolean attributes to false when a new object is
+        // constructed.
+        for (Attribute attr : mc.getAttrMap().values()) {
+            if (attr.getType().equals("Boolean")) {
+                getNewObject.append("        newObject.set")
+                    .append(CamelCase.toCamelCase(attr.getName(), true))
+                    .append("(false);\n");
+                hasBooleanAttributes = true;
+            }
+        }
+
+        getNewObject.append("        return newObject;\n").append("    }\n\n");
+
+        if (hasBooleanAttributes) {
+            result.append(getNewObject);
         }
 
         result.append("    @Override\n")

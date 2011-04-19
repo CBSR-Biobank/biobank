@@ -11,13 +11,21 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.PostalCodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
-public abstract class AddressEntryFormCommon<E extends ModelWrapper<?>> extends
-    BiobankEntryForm<E> {
+public abstract class AddressEntryFormCommon<E extends CenterWrapper<?>>
+    extends BiobankEntryForm<E> {
+
+    @Override
+    protected void init() throws Exception {
+        super.init();
+        setDefaults();
+    }
 
     /*
      * Want to preserve insert order so using ListOrderedMap.
@@ -49,4 +57,16 @@ public abstract class AddressEntryFormCommon<E extends ModelWrapper<?>> extends
         createBoundWidgetsFromMap(ADDRESS_FIELDS, wrapperObject, client);
     }
 
+    @Override
+    protected void onReset() throws Exception {
+        modelObject.reset();
+        setDefaults();
+    }
+
+    private void setDefaults() throws Exception {
+        if (modelObject.isNew()) {
+            modelObject.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
+        }
+    }
 }

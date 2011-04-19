@@ -346,7 +346,7 @@ public class ShipmentEntryForm extends BiobankEntryForm<OriginInfoWrapper> {
     }
 
     @Override
-    public void reset() throws Exception {
+    protected void onReset() throws Exception {
         dateSentWidget.setDate(new Date());
         dateReceivedWidget.setDate(new Date());
 
@@ -367,6 +367,5 @@ public class ShipmentEntryForm extends BiobankEntryForm<OriginInfoWrapper> {
         } else if (shippingMethodComboViewer.getCombo().getItemCount() > 1) {
             shippingMethodComboViewer.getCombo().deselectAll();
         }
-        setDirty(false);
     }
 }

@@ -264,7 +264,7 @@ public class PatientMergeForm extends BiobankEntryForm<PatientWrapper> {
     }
 
     @Override
-    public void reset() throws Exception {
+    protected void onReset() throws Exception {
         modelObject.reset();
         pnumber1Text.setText(patient1.getPnumber());
         study1Text.setText(patient1.getStudy().getNameShort());
@@ -275,7 +275,6 @@ public class PatientMergeForm extends BiobankEntryForm<PatientWrapper> {
         patient2VisitsTable
             .setCollection(new ArrayList<CollectionEventWrapper>());
         patient2 = null;
-        setDirty(false);
     }
 
     @Override

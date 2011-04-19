@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
@@ -140,7 +141,6 @@ public class ContainerTypeEntryForm extends
                 availSubContainerTypes.add(type);
             }
         }
-        setDirty(true);
 
         BiobankText name = (BiobankText) createBoundWidgetWithLabel(
             client,
@@ -222,8 +222,10 @@ public class ContainerTypeEntryForm extends
                 @Override
                 public void doSelection(Object selectedObject) {
                     try {
-                        modelObject
-                            .setChildLabelingSchemeName((String) selectedObject);
+                        if (selectedObject != null) {
+                            modelObject
+                                .setChildLabelingSchemeName((String) selectedObject);
+                        }
                     } catch (Exception e) {
                         BiobankPlugin.openAsyncError(
                             Messages
@@ -475,17 +477,22 @@ public class ContainerTypeEntryForm extends
     }
 
     @Override
-    public void reset() throws Exception {
+    protected void onReset() throws Exception {
+        // Remember the Site
+        SiteWrapper site = modelObject.getSite();
         modelObject.reset();
-        if (modelObject.getTopLevel() == null) {
-            modelObject.setTopLevel(false);
+        modelObject.setSite(site);
+
+        if (modelObject.isNew()) {
+            modelObject.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         }
+
         setChildContainerTypeSelection();
         setSpecimenTypesSelection();
         showContainersOrSpecimens();
         setLabelingScheme();
         setActivityStatus();
-        setDirty(false);
     }
 
     private void showContainersOrSpecimens() {
@@ -500,6 +507,9 @@ public class ContainerTypeEntryForm extends
         String currentScheme = modelObject.getChildLabelingSchemeName();
         if (currentScheme == null) {
             labelingSchemeComboViewer.getCombo().deselectAll();
+            labelingSchemeComboViewer.getCombo().clearSelection();
+            labelingSchemeComboViewer.refresh(true);
+            labelingSchemeComboViewer.refresh();
         } else {
             labelingSchemeComboViewer.setSelection(new StructuredSelection(
                 currentScheme));

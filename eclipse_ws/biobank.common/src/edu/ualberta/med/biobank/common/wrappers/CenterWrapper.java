@@ -54,6 +54,9 @@ public abstract class CenterWrapper<E extends Center> extends
         aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.PROVINCE));
         aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.STREET1));
         aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.STREET2));
+        aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.PHONE_NUMBER));
+        aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.FAX_NUMBER));
+        aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.EMAIL_ADDRESS));
 
         return aList;
     }
@@ -105,6 +108,30 @@ public abstract class CenterWrapper<E extends Center> extends
 
     public void setPostalCode(String postalCode) {
         initAddress().setProperty(AddressPeer.POSTAL_CODE, postalCode);
+    }
+
+    public String getPhoneNumber() {
+        return getProperty(getAddress(), AddressPeer.PHONE_NUMBER);
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        initAddress().setProperty(AddressPeer.PHONE_NUMBER, phoneNumber);
+    }
+
+    public String getFaxNumber() {
+        return getProperty(getAddress(), AddressPeer.FAX_NUMBER);
+    }
+
+    public void setFaxNumber(String faxNumber) {
+        initAddress().setProperty(AddressPeer.FAX_NUMBER, faxNumber);
+    }
+
+    public String getEmailAddress() {
+        return getProperty(getAddress(), AddressPeer.EMAIL_ADDRESS);
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        initAddress().setProperty(AddressPeer.EMAIL_ADDRESS, emailAddress);
     }
 
     public static final String PROCESSING_EVENT_COUNT_QRY = "select count(proc) from "

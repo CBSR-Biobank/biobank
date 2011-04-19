@@ -127,8 +127,9 @@ public class ReportWrapper extends ReportBaseWrapper {
 
         wrappedObject.setReportColumnCollection(newReportColumns);
         cache.remove(REPORT_COLUMN_COLLECTION_CACHE_KEY);
-        propertyChangeSupport.firePropertyChange(
-            REPORT_COLUMN_COLLECTION_CACHE_KEY, oldReportColumns, reportColumns);
+        propertyChangeSupport
+            .firePropertyChange(REPORT_COLUMN_COLLECTION_CACHE_KEY,
+                oldReportColumns, reportColumns);
     }
 
     public List<ReportFilter> getReportFilterCollection() {
@@ -167,8 +168,9 @@ public class ReportWrapper extends ReportBaseWrapper {
 
         wrappedObject.setReportFilterCollection(newReportFilters);
         cache.remove(REPORT_FILTER_COLLECTION_CACHE_KEY);
-        propertyChangeSupport.firePropertyChange(
-            REPORT_FILTER_COLLECTION_CACHE_KEY, oldReportFilters, reportFilters);
+        propertyChangeSupport
+            .firePropertyChange(REPORT_FILTER_COLLECTION_CACHE_KEY,
+                oldReportFilters, reportFilters);
     }
 
     public static Collection<String> getFilterValueStrings(

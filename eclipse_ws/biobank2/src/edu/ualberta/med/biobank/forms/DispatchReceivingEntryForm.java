@@ -190,10 +190,9 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     }
 
     @Override
-    public void reset() throws Exception {
+    protected void onReset() throws Exception {
         modelObject.reset();
         aliquotsTree.refresh();
-        setDirty(false);
     }
 
     @Override

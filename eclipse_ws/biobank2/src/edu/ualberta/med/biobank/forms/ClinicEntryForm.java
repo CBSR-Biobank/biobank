@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -26,6 +25,7 @@ import edu.ualberta.med.biobank.widgets.infotables.entry.ContactEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicEntryForm extends AddressEntryFormCommon<ClinicWrapper> {
@@ -66,8 +66,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon<ClinicWrapper> {
         String tabName;
         if (modelObject.isNew()) {
             tabName = Messages.getString("ClinicEntryForm.title.new"); //$NON-NLS-1$
-            modelObject.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
         } else
             tabName = Messages.getString("ClinicEntryForm.title.edit", //$NON-NLS-1$
                 modelObject.getNameShort());
@@ -181,16 +179,12 @@ public class ClinicEntryForm extends AddressEntryFormCommon<ClinicWrapper> {
     }
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
-        ActivityStatusWrapper currentActivityStatus = modelObject
-            .getActivityStatus();
-        if (currentActivityStatus != null) {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                currentActivityStatus));
-        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
-            activityStatusComboViewer.getCombo().deselectAll();
-        }
+    protected void onReset() throws Exception {
+        super.onReset();
+
+        GuiUtil.resetComboViewer(activityStatusComboViewer,
+            modelObject.getActivityStatus());
+
         contactEntryWidget.reload();
     }
 }

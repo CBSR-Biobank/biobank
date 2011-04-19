@@ -60,11 +60,15 @@ import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class WidgetCreator {
 
-    protected DataBindingContext dbc;
+    protected DataBindingContext modelDbc;
+
+    protected DataBindingContext validatorDbc;
 
     protected Map<String, Control> controls;
 
-    protected Map<String, Binding> bindings;
+    protected Map<String, Binding> modelBindings;
+
+    protected Map<String, Binding> validatorBindings;
 
     private FormToolkit toolkit;
 
@@ -82,8 +86,10 @@ public class WidgetCreator {
     }
 
     public void initDataBinding() {
-        dbc = new DataBindingContext();
-        bindings = new HashMap<String, Binding>();
+        modelDbc = new DataBindingContext();
+        validatorDbc = new DataBindingContext();
+        modelBindings = new HashMap<String, Binding>();
+        validatorBindings = new HashMap<String, Binding>();
     }
 
     public void setToolkit(FormToolkit toolkit) {
@@ -165,7 +171,7 @@ public class WidgetCreator {
         Class<? extends Widget> widgetClass, int widgetOptions,
         String[] widgetValues, IObservableValue modelObservableValue,
         IValidator validator, String bindingKey) {
-        Assert.isNotNull(dbc);
+        Assert.isNotNull(modelDbc);
         UpdateValueStrategy uvs = null;
         if (validator != null) {
             uvs = new UpdateValueStrategy();
@@ -194,11 +200,11 @@ public class WidgetCreator {
         if (toolkit != null) {
             toolkit.adapt(button, true, true);
         }
-        Binding binding = dbc.bindValue(
+        Binding binding = modelDbc.bindValue(
             SWTObservables.observeSelection(button), modelObservableValue, uvs,
             null);
         if (bindingKey != null) {
-            bindings.put(bindingKey, binding);
+            modelBindings.put(bindingKey, binding);
         }
         if (selectionListener != null) {
             button.addSelectionListener(selectionListener);
@@ -217,10 +223,11 @@ public class WidgetCreator {
         if (toolkit != null) {
             toolkit.adapt(combo, true, true);
         }
-        Binding binding = dbc.bindValue(SWTObservables.observeSelection(combo),
-            modelObservableValue, uvs, null);
+        Binding binding = modelDbc.bindValue(
+            SWTObservables.observeSelection(combo), modelObservableValue, uvs,
+            null);
         if (bindingKey != null) {
-            bindings.put(bindingKey, binding);
+            modelBindings.put(bindingKey, binding);
         }
         if (selectionListener != null) {
             combo.addSelectionListener(selectionListener);
@@ -313,16 +320,21 @@ public class WidgetCreator {
             // problem(s). So, the text-field is bound to the model property
             // without validation and the text-field is bound to some observable
             // string whose sole purpose is to validate the text-field's value.
-            dbc.bindValue(
+            Binding modelBinding = modelDbc.bindValue(
                 SWTObservables.observeText(text.getTextBox(), SWT.Modify),
                 modelObservableValue, null, null);
-            Binding binding = dbc
+
+            // add the validation observable in a different data binding context
+            // so that (hopefully) a gui object is bound to only one model
+            // object withing a data-binding context
+            Binding validatorBinding = validatorDbc
                 .bindValue(SWTObservables.observeText(text.getTextBox(),
                     SWT.Modify),
                     new WritableValue(modelObservableValue.getValue(),
                         String.class), uvs, null);
             if (bindingKey != null) {
-                bindings.put(bindingKey, binding);
+                modelBindings.put(bindingKey, modelBinding);
+                validatorBindings.put(bindingKey, validatorBinding);
             }
         }
         return text;
@@ -414,7 +426,7 @@ public class WidgetCreator {
         }
 
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        if (dbc != null) {
+        if (modelDbc != null) {
             NonEmptyStringValidator validator = new NonEmptyStringValidator(
                 errorMessage);
             validator.setControlDecoration(BiobankWidget.createDecorator(
@@ -422,12 +434,15 @@ public class WidgetCreator {
             UpdateValueStrategy uvs = new UpdateValueStrategy();
             uvs.setAfterGetValidator(validator);
             IObservableValue selectedValue = new WritableValue("", String.class);
-            Binding binding = dbc.bindValue(
+            Binding binding = modelDbc.bindValue(
                 SWTObservables.observeSelection(combo), selectedValue, uvs,
                 null);
             if (bindingKey != null) {
-                bindings.put(bindingKey, binding);
+                modelBindings.put(bindingKey, binding);
             }
+        }
+        if (selection != null) {
+            comboViewer.setSelection(new StructuredSelection(selection));
         }
         if (csu != null) {
             comboViewer
@@ -443,9 +458,6 @@ public class WidgetCreator {
                         }
                     }
                 });
-        }
-        if (selection != null) {
-            comboViewer.setSelection(new StructuredSelection(selection));
         }
         if (modifyListener != null) {
             combo.addModifyListener(modifyListener);
@@ -534,11 +546,10 @@ public class WidgetCreator {
                 uvs = new UpdateValueStrategy();
                 uvs.setAfterConvertValidator(validator);
             }
-            Binding binding = dbc.bindValue(
-                new DateTimeObservableValue(widget), modelObservableValue, uvs,
-                null);
+            Binding binding = modelDbc.bindValue(new DateTimeObservableValue(
+                widget), modelObservableValue, uvs, null);
             if (bindingKey != null) {
-                bindings.put(bindingKey, binding);
+                modelBindings.put(bindingKey, binding);
             }
         }
 
@@ -561,7 +572,7 @@ public class WidgetCreator {
     public void addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, final String errorMsg,
         final int statusType) {
-        Assert.isNotNull(dbc);
+        Assert.isNotNull(modelDbc);
         UpdateValueStrategy uvs = null;
         if (errorMsg != null) {
             uvs = new UpdateValueStrategy();
@@ -580,14 +591,13 @@ public class WidgetCreator {
 
             });
         }
-        dbc.bindValue(writableValue, observableValue, uvs, uvs);
+        modelDbc.bindValue(writableValue, observableValue, uvs, uvs);
     }
 
     public void addGlobalBindValue(IObservableValue statusObservable) {
-        Assert.isNotNull(dbc);
-        dbc.bindValue(statusObservable,
-            new AggregateValidationStatus(dbc.getBindings(),
-                AggregateValidationStatus.MAX_SEVERITY));
+        Assert.isNotNull(modelDbc);
+        modelDbc.bindValue(statusObservable, new AggregateValidationStatus(
+            modelDbc.getBindings(), AggregateValidationStatus.MAX_SEVERITY));
     }
 
     protected AbstractValidator createValidator(
@@ -626,34 +636,39 @@ public class WidgetCreator {
     public Binding bindValue(IObservableValue targetObservableValue,
         IObservableValue modelObservableValue,
         UpdateValueStrategy targetToModel, UpdateValueStrategy modelToTarget) {
-        Assert.isNotNull(dbc);
-        return dbc.bindValue(targetObservableValue, modelObservableValue,
+        Assert.isNotNull(modelDbc);
+        return modelDbc.bindValue(targetObservableValue, modelObservableValue,
             targetToModel, modelToTarget);
     }
 
     public void removeBinding(Binding binding) {
-        Assert.isNotNull(dbc);
-        dbc.removeBinding(binding);
+        Assert.isNotNull(modelDbc);
+        modelDbc.removeBinding(binding);
     }
 
     public void removeBinding(String bindingKey) {
-        Assert.isNotNull(dbc);
-        Binding binding = bindings.get(bindingKey);
-        Assert.isNotNull(binding);
-        dbc.removeBinding(binding);
+        Assert.isNotNull(modelDbc);
+        Binding modelBinding = modelBindings.get(bindingKey);
+        Assert.isNotNull(modelBinding);
+        modelDbc.removeBinding(modelBinding);
+
+        Binding validatorBinding = validatorBindings.get(bindingKey);
+        if (validatorBinding != null) {
+            validatorDbc.removeBinding(validatorBinding);
+        }
     }
 
     public void addBinding(Binding binding) {
-        Assert.isNotNull(dbc);
-        dbc.addBinding(binding);
+        Assert.isNotNull(modelDbc);
+        modelDbc.addBinding(binding);
     }
 
     public void addBinding(String bindingKey) {
-        Assert.isNotNull(dbc);
-        Binding binding = bindings.get(bindingKey);
+        Assert.isNotNull(modelDbc);
+        Binding binding = modelBindings.get(bindingKey);
         Assert.isNotNull(binding);
-        if (!dbc.getBindings().contains(binding)) {
-            dbc.addBinding(binding);
+        if (!modelDbc.getBindings().contains(binding)) {
+            modelDbc.addBinding(binding);
         }
     }
 
@@ -752,5 +767,9 @@ public class WidgetCreator {
         int widgetOptions, String fieldLabel) {
         return createReadOnlyLabelledField(parent, widgetOptions, fieldLabel,
             null);
+    }
+
+    public void updateObservables() {
+        modelDbc.updateTargets();
     }
 }

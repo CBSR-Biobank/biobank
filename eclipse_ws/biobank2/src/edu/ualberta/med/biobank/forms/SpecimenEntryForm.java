@@ -220,7 +220,7 @@ public class SpecimenEntryForm extends BiobankEntryForm<SpecimenWrapper> {
     }
 
     @Override
-    public void reset() throws Exception {
+    protected void onReset() throws Exception {
         modelObject.reset();
 
         ActivityStatusWrapper currentActivityStatus = modelObject
@@ -236,8 +236,6 @@ public class SpecimenEntryForm extends BiobankEntryForm<SpecimenWrapper> {
         if (currentSampleType != null)
             sampleTypeComboViewer.setSelection(new StructuredSelection(
                 currentSampleType));
-
-        setDirty(false);
     }
 
 }

@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -160,7 +159,7 @@ public class PatientEntryForm extends BiobankEntryForm<PatientWrapper> {
     }
 
     @Override
-    public void reset() throws Exception {
+    protected void onReset() throws Exception {
         createdAtWidget.setDate(new Date());
         studiesViewer.setSelection(null);
         pnumberNonEmptyValidator.validate(null);
@@ -170,6 +169,5 @@ public class PatientEntryForm extends BiobankEntryForm<PatientWrapper> {
         if (study != null) {
             studiesViewer.setSelection(new StructuredSelection(study));
         }
-        setDirty(false);
     }
 }

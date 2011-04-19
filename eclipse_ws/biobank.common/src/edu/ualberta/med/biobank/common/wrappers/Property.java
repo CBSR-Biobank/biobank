@@ -66,13 +66,15 @@ public class Property<T, W> {
             @Override
             public T2 get(W model) {
                 T association = Property.this.accessor.get(model);
-                return property.get(association);
+                return association == null ? null : property.get(association);
             }
 
             @Override
             public void set(W model, T2 value) {
                 T association = Property.this.accessor.get(model);
-                property.set(association, value);
+                if (association != null) {
+                    property.set(association, value);
+                }
             }
         };
 

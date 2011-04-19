@@ -346,7 +346,7 @@ public class StudyEntryForm extends BiobankEntryForm<StudyWrapper> {
     }
 
     @Override
-    public void reset() throws Exception {
+    protected void onReset() throws Exception {
         modelObject.reset();
 
         ActivityStatusWrapper currentActivityStatus = modelObject
@@ -363,8 +363,6 @@ public class StudyEntryForm extends BiobankEntryForm<StudyWrapper> {
         sourceSpecimenEntryTable.reload();
 
         resetPvCustomInfo();
-
-        setDirty(false);
     }
 
     private void resetPvCustomInfo() throws Exception {

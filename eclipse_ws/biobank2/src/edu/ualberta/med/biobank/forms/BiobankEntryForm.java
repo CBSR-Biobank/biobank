@@ -299,7 +299,7 @@ public abstract class BiobankEntryForm<E extends ModelWrapper<?>> extends
         return dirty;
     }
 
-    protected void setDirty(boolean d) {
+    public void setDirty(boolean d) {
         dirty = d;
         firePropertyChange(ISaveablePart.PROP_DIRTY);
     }
@@ -564,8 +564,23 @@ public abstract class BiobankEntryForm<E extends ModelWrapper<?>> extends
         }
     }
 
-    public void reset() throws Exception {
+    protected void onReset() throws Exception {
         modelObject.reset();
+    }
+
+    public void reset() throws Exception {
+        onReset();
+
+        // An example of why this is necessary: if the value "aaa" is typed into
+        // a text field bound to an Integer property that cannot be converted to
+        // an Integer, then the model object's value will be null. When the form
+        // is reset, the model object's old value to new value changes from null
+        // to null. The IObservableValue implementation returned by
+        // BeansObservables will not notify the widget that the value has
+        // changed (since it sort of has not), so the value "aaa" remains
+        // instead of being cleared (set to null).
+        widgetCreator.updateObservables();
+
         setDirty(false);
     }
 

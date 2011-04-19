@@ -43,11 +43,19 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
     private Set<SpecimenTypeWrapper> deletedSpecimenTypes = new HashSet<SpecimenTypeWrapper>();
 
+    public static final Property<Integer, ContainerType> ROW_CAPACITY = ContainerTypePeer.CAPACITY
+        .wrap(CapacityPeer.ROW_CAPACITY);
+    public static final Property<Integer, ContainerType> COL_CAPACITY = ContainerTypePeer.CAPACITY
+        .wrap(CapacityPeer.COL_CAPACITY);
+
     public static final List<Property<?, ? super ContainerType>> PROPERTIES;
     static {
         List<Property<?, ? super ContainerType>> aList = new ArrayList<Property<?, ? super ContainerType>>();
         aList.addAll(ContainerTypePeer.PROPERTIES);
-        aList.addAll(ContainerTypePeer.CAPACITY.wrap(CapacityPeer.PROPERTIES));
+        aList.add(ROW_CAPACITY);
+        aList.add(COL_CAPACITY);
+        aList.add(ContainerTypePeer.CHILD_LABELING_SCHEME.wrap(
+            "childLabelingSchemeName", ContainerLabelingSchemePeer.NAME));
         PROPERTIES = Collections.unmodifiableList(aList);
     };
 
