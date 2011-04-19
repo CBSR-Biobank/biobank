@@ -426,7 +426,7 @@ public class WidgetCreator {
         }
 
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        if (modelDbc != null) {
+        if (validatorDbc != null) {
             NonEmptyStringValidator validator = new NonEmptyStringValidator(
                 errorMessage);
             validator.setControlDecoration(BiobankWidget.createDecorator(
@@ -434,11 +434,11 @@ public class WidgetCreator {
             UpdateValueStrategy uvs = new UpdateValueStrategy();
             uvs.setAfterGetValidator(validator);
             IObservableValue selectedValue = new WritableValue("", String.class);
-            Binding binding = modelDbc.bindValue(
+            Binding binding = validatorDbc.bindValue(
                 SWTObservables.observeSelection(combo), selectedValue, uvs,
                 null);
             if (bindingKey != null) {
-                modelBindings.put(bindingKey, binding);
+                validatorBindings.put(bindingKey, binding);
             }
         }
         if (selection != null) {
@@ -649,8 +649,9 @@ public class WidgetCreator {
     public void removeBinding(String bindingKey) {
         Assert.isNotNull(modelDbc);
         Binding modelBinding = modelBindings.get(bindingKey);
-        Assert.isNotNull(modelBinding);
-        modelDbc.removeBinding(modelBinding);
+        if (modelBinding != null) {
+            modelDbc.removeBinding(modelBinding);
+        }
 
         Binding validatorBinding = validatorBindings.get(bindingKey);
         if (validatorBinding != null) {
