@@ -86,10 +86,6 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
     private BiobankText oldCabinetPositionCheckText;
     private Label newCabinetPositionLabel;
     private BiobankText newCabinetPositionText;
-    // private Label sourceSpecimenTextLabel;
-    // private BiobankText sourceSpecimenText;
-    // private Label specimenTypeTextLabel;
-    // private BiobankText specimenTypeText;
 
     private Button checkButton;
 
@@ -571,7 +567,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
             // Validator has change: we need to re-validate
             inventoryIDValidator.validate("");
             displayOldCabinetFields(!enabled);
-            enableAndShowSampleTypeCombo();
+            typeWidget.setEnabled(enabled);
             canLaunchCheck.setValue(true);
             if (enabled) {
                 linkFormPatientManagement.setFirstControl();
@@ -588,44 +584,10 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         }
     }
 
-    private void enableAndShowSampleTypeCombo() {
-        boolean enabled = (aliquotMode == AliquotMode.NEW_ALIQUOT);
-        // if (enabled) {
-        // typeWidget.addBindings();
-        // } else {
-        // typeWidget.removeBindings();
-        // }
-        typeWidget.setEnabled(enabled);
-        // typeWidget.showWidget(enabled);
-        // widgetCreator.showWidget(sourceSpecimenTextLabel, !enabled);
-        // widgetCreator.showWidget(sourceSpecimenText, !enabled);
-        // widgetCreator.showWidget(specimenTypeTextLabel, !enabled);
-        // widgetCreator.showWidget(specimenTypeText, !enabled);
-    }
-
     private void createTypeCombo(Composite fieldsComposite) {
         typeWidget = new AliquotedSpecimenSelectionWidget(fieldsComposite,
             null, widgetCreator, false);
         typeWidget.addBindings();
-
-        // for move mode
-        // sourceSpecimenTextLabel = widgetCreator.createLabel(fieldsComposite,
-        // Messages.getString("Cabinet.sourceSpecimen.label"));
-        // sourceSpecimenTextLabel.setLayoutData(new GridData(
-        // GridData.VERTICAL_ALIGN_BEGINNING));
-        // sourceSpecimenText = (BiobankText) widgetCreator.createBoundWidget(
-        // fieldsComposite, BiobankText.class, SWT.NONE,
-        // sourceSpecimenTextLabel, new String[0], null, null);
-        // sourceSpecimenText.setEnabled(false);
-        //
-        // specimenTypeTextLabel = widgetCreator.createLabel(fieldsComposite,
-        // Messages.getString("Cabinet.sampleType.label"));
-        // specimenTypeTextLabel.setLayoutData(new GridData(
-        // GridData.VERTICAL_ALIGN_BEGINNING));
-        // specimenTypeText = (BiobankText) widgetCreator.createBoundWidget(
-        // fieldsComposite, BiobankText.class, SWT.NONE,
-        // specimenTypeTextLabel, new String[0], null, null);
-        // specimenTypeText.setEnabled(false);
     }
 
     private void initCabinetContainerTypesList() throws ApplicationException {
@@ -808,8 +770,10 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         }
         canLaunchCheck.setValue(true);
         PatientWrapper patient = specimen.getCollectionEvent().getPatient();
-        linkFormPatientManagement.setCurrentPatientAndVisit(patient,
-            specimen.getCollectionEvent());
+        linkFormPatientManagement.setCurrentPatientPEventCEvent(patient,
+            specimen.getParentSpecimen() == null ? null : specimen
+                .getParentSpecimen().getProcessingEvent(), specimen
+                .getCollectionEvent());
         String positionString = specimen.getPositionString(true, false);
         if (positionString == null) {
             widgetCreator.hideWidget(oldCabinetPositionCheckLabel);

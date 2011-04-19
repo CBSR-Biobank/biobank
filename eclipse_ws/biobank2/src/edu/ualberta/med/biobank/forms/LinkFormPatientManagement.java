@@ -160,7 +160,7 @@ public class LinkFormPatientManagement {
         // Will replace the combo in some specific situations (like cabinet
         // form):
         pEventTextLabel = widgetCreator.createLabel(compositeFields,
-            Messages.getString("ScanLink.pEvent.label")); //$NON-NLS-1$
+            Messages.getString("ScanLink.pEvent.date")); //$NON-NLS-1$
         pEventTextLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         pEventText = (BiobankText) widgetCreator.createWidget(compositeFields,
@@ -258,11 +258,18 @@ public class LinkFormPatientManagement {
         return currentPatient;
     }
 
-    public void setCurrentPatientAndVisit(PatientWrapper patient,
-        CollectionEventWrapper cEvent) throws Exception {
+    public void setCurrentPatientPEventCEvent(PatientWrapper patient,
+        ProcessingEventWrapper pEvent, CollectionEventWrapper cEvent)
+        throws Exception {
         patient.reload();
         this.currentPatient = patient;
         patientNumberText.setText(patient.getPnumber());
+        viewerProcessingEvents.setInput(Arrays.asList(pEvent));
+        viewerProcessingEvents.setSelection(new StructuredSelection(pEvent));
+        if (pEventText != null) {
+            pEventText.setText(pEvent.getFormattedCreatedAt() + " - "
+                + pEvent.getWorksheet());
+        }
         viewerCollectionEvents.setInput(Arrays.asList(cEvent));
         viewerCollectionEvents.setSelection(new StructuredSelection(cEvent));
         if (cEventText != null) {
