@@ -388,17 +388,25 @@ public class PatientWrapper extends PatientBaseWrapper {
         return cEvents;
     }
 
-    public List<ProcessingEventWrapper> getProcessingEventCollection() {
+    public List<ProcessingEventWrapper> getProcessingEventCollection(
+        boolean originalOnly) {
         List<CollectionEventWrapper> ces = getCollectionEventCollection(false);
-        List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>();
         Set<ProcessingEventWrapper> pes = new HashSet<ProcessingEventWrapper>();
         for (CollectionEventWrapper ce : ces)
-            specs.addAll(ce.getAllSpecimenCollection(false));
-        for (SpecimenWrapper spec : specs) {
+            if (originalOnly)
+                addProcessingEvents(pes,
+                    ce.getOriginalSpecimenCollection(false));
+            else
+                addProcessingEvents(pes, ce.getAllSpecimenCollection(false));
+        return new ArrayList<ProcessingEventWrapper>(pes);
+    }
+
+    private void addProcessingEvents(Set<ProcessingEventWrapper> pes,
+        List<SpecimenWrapper> specimens) {
+        for (SpecimenWrapper spec : specimens) {
             if (spec.getProcessingEvent() != null)
                 pes.add(spec.getProcessingEvent());
         }
-        return new ArrayList<ProcessingEventWrapper>(pes);
     }
 
     @Deprecated

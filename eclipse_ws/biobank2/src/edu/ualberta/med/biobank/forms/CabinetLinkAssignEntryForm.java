@@ -261,7 +261,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                 }
             });
 
-        linkFormPatientManagement.createCollectionEventWidgets(fieldsComposite);
+        linkFormPatientManagement.createEventsWidgets(fieldsComposite);
 
         // inventoryID
         inventoryIDValidator = new CabinetInventoryIDValidator();
@@ -737,7 +737,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         if (linkFormPatientManagement.getCurrentPatient() != null
             && bin != null) {
             availableSourceSpecimenLinks = linkFormPatientManagement
-                .getSpecimenInCollectionEvent();
+                .getParentSpecimenForPEventAndCEvent();
 
             List<SpecimenTypeWrapper> binTypes = bin.getContainerType()
                 .getSpecimenTypeCollection();

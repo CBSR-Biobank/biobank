@@ -375,12 +375,12 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         fieldsComposite.setLayout(layout);
         toolkit.paintBordersFor(fieldsComposite);
         gd = new GridData();
-        gd.widthHint = 500;
+        gd.widthHint = 600;
         gd.verticalAlignment = SWT.TOP;
         fieldsComposite.setLayoutData(gd);
 
         linkFormPatientManagement.createPatientNumberText(fieldsComposite);
-        linkFormPatientManagement.createCollectionEventWidgets(fieldsComposite);
+        linkFormPatientManagement.createEventsWidgets(fieldsComposite);
 
         createProfileComboBox(fieldsComposite);
         // specific for scan link:
@@ -521,7 +521,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 .getStudyAliquotedTypes(null, null);
         }
         List<SpecimenWrapper> availableSourceSpecimens = linkFormPatientManagement
-            .getSpecimenInCollectionEvent();
+            .getParentSpecimenForPEventAndCEvent();
         // set the list of aliquoted types to all widgets, in case the list is
         // activated using the handheld scanner
         for (int row = 0; row < specimenTypesWidgets.size(); row++) {

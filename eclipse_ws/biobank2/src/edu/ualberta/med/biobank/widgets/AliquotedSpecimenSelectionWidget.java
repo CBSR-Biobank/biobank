@@ -98,7 +98,7 @@ public class AliquotedSpecimenSelectionWidget {
         });
         if (oneRow) {
             GridData gd = new GridData();
-            gd.widthHint = 250;
+            gd.widthHint = 300;
             cvSource.getControl().setLayoutData(gd);
         }
 
