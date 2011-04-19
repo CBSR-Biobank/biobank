@@ -385,11 +385,11 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
             // then reset fields
             internalSpecimen.reset();
             inventoryIdWidget.setText(""); //$NON-NLS-1$
+            inventoryIdWidget.setFocus();
             quantityText.setText(""); //$NON-NLS-1$
             timeDrawnWidget.setDate(null);
             quantityText.setText(""); //$NON-NLS-1$
             specimenTypeComboViewer.getCombo().deselectAll();
-            specimenTypeComboViewer.getCombo().setFocus();
             activityStatusComboViewer.getCombo().deselectAll();
             activityStatusComboViewer.setSelection(new StructuredSelection(
                 activeActivityStatus));
