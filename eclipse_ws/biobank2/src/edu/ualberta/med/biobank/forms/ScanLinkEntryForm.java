@@ -101,6 +101,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
     private CenterWrapper<?> currentSelectedCenter;
 
+    private List<SpecimenTypeWrapper> palletSpecimenTypes;
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -271,7 +273,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     /**
-     * Give a sample type to selected aliquots
+     * Give a sample type to selected specimens
      */
     private void createTypeSelectionCustom(Composite parent) {
         typesSelectionCustomComposite = toolkit.createComposite(parent);
@@ -359,7 +361,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         }
     }
 
-    private void createFieldsComposite() {
+    private void createFieldsComposite() throws Exception {
         Composite leftSideComposite = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -398,6 +400,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         createScanButton(leftSideComposite);
 
         createTypesSelectionSection(leftSideComposite);
+
+        initPalletSpecimenTypes();
     }
 
     @Override
@@ -518,7 +522,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         List<SpecimenTypeWrapper> studiesAliquotedTypes = null;
         if (isFirstSuccessfulScan()) {
             studiesAliquotedTypes = linkFormPatientManagement
-                .getStudyAliquotedTypes(null, null);
+                .getStudyAliquotedTypes(palletSpecimenTypes, null);
         }
         List<SpecimenWrapper> availableSourceSpecimens = linkFormPatientManagement
             .getParentSpecimenForPEventAndCEvent();
@@ -534,6 +538,21 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 widget.setSourceSpecimens(availableSourceSpecimens);
                 widget.setResultTypes(studiesAliquotedTypes);
             }
+        }
+    }
+
+    /**
+     * If the current center is a site, and if this site defines containers of
+     * 8*12 size, then get the specimen types these containers can contain
+     */
+    private void initPalletSpecimenTypes() throws ApplicationException {
+        palletSpecimenTypes = null;
+        if (SessionManager.getUser().getCurrentWorkingSite() != null) {
+            List<SpecimenTypeWrapper> res = SpecimenTypeWrapper
+                .getSpecimenTypeForPallet96(appService, SessionManager
+                    .getUser().getCurrentWorkingSite());
+            if (res.size() != 0)
+                palletSpecimenTypes = res;
         }
     }
 
