@@ -212,7 +212,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
                         specTable.setCollection(specimens);
 
                         notifyListeners();
-                        hasSpecimens.setValue(true);
+                        hasSpecimens.setValue(specimens.size() > 0);
 
                         vetoListenerSupport.notifyListeners(postDelete);
                     } catch (VetoException e) {
