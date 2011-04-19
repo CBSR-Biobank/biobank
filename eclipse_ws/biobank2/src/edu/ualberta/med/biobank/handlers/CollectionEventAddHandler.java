@@ -28,7 +28,7 @@ public class CollectionEventAddHandler extends AbstractHandler {
                 patientAdapter, ceWrapper);
             adapter.openEntryForm();
         } catch (Exception exp) {
-            logger.error("Error while opening the patient visit entry form",
+            logger.error("Error while opening the collection event entry form",
                 exp);
         }
         return null;
