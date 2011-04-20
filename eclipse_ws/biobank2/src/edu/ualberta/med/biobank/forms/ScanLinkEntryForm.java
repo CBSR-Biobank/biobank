@@ -57,6 +57,7 @@ import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionSpecificBehaviour;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Link aliquoted specimens to their source specimens
@@ -101,6 +102,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     private CenterWrapper<?> currentSelectedCenter;
 
     private Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
+    private List<SpecimenTypeWrapper> palletSpecimenTypes;
 
     @Override
     protected void init() throws Exception {
@@ -360,7 +362,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         }
     }
 
-    private void createFieldsComposite() {
+    private void createFieldsComposite() throws Exception {
         Composite leftSideComposite = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -376,12 +378,12 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         fieldsComposite.setLayout(layout);
         toolkit.paintBordersFor(fieldsComposite);
         gd = new GridData();
-        gd.widthHint = 500;
+        gd.widthHint = 600;
         gd.verticalAlignment = SWT.TOP;
         fieldsComposite.setLayoutData(gd);
 
         linkFormPatientManagement.createPatientNumberText(fieldsComposite);
-        linkFormPatientManagement.createCollectionEventWidgets(fieldsComposite);
+        linkFormPatientManagement.createEventsWidgets(fieldsComposite);
 
         createProfileComboBox(fieldsComposite);
         // specific for scan link:
@@ -399,6 +401,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         createScanButton(leftSideComposite);
 
         createTypesSelectionSection(leftSideComposite);
+
+        initPalletSpecimenTypes();
     }
 
     @Override
@@ -521,10 +525,10 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         List<SpecimenTypeWrapper> studiesAliquotedTypes = null;
         if (isFirstSuccessfulScan()) {
             studiesAliquotedTypes = linkFormPatientManagement
-                .getStudyAliquotedTypes(null, null);
+                .getStudyAliquotedTypes(palletSpecimenTypes, null);
         }
         List<SpecimenWrapper> availableSourceSpecimens = linkFormPatientManagement
-            .getSpecimenInCollectionEvent();
+            .getParentSpecimenForPEventAndCEvent();
         // set the list of aliquoted types to all widgets, in case the list is
         // activated using the handheld scanner
         for (int row = 0; row < specimenTypesWidgets.size(); row++) {
@@ -547,6 +551,21 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         }
         widget.setNumber(number);
         return widget;
+    }
+
+    /**
+     * If the current center is a site, and if this site defines containers of
+     * 8*12 size, then get the specimen types these containers can contain
+     */
+    private void initPalletSpecimenTypes() throws ApplicationException {
+        palletSpecimenTypes = null;
+        if (SessionManager.getUser().getCurrentWorkingSite() != null) {
+            List<SpecimenTypeWrapper> res = SpecimenTypeWrapper
+                .getSpecimenTypeForPallet96(appService, SessionManager
+                    .getUser().getCurrentWorkingSite());
+            if (res.size() != 0)
+                palletSpecimenTypes = res;
+        }
     }
 
     @SuppressWarnings("unchecked")

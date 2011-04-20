@@ -243,13 +243,13 @@ public class StudyEntryForm extends BiobankEntryForm {
         List<String> studyEventInfoLabels = Arrays.asList(study
             .getStudyEventAttrLabels());
 
-        for (GlobalEventAttrWrapper pvAttr : GlobalEventAttrWrapper
+        for (GlobalEventAttrWrapper geAttr : GlobalEventAttrWrapper
             .getAllGlobalEventAttrs(appService)) {
-            String label = pvAttr.getLabel();
+            String label = geAttr.getLabel();
             boolean selected = false;
             studyPvAttrCustom = new StudyPvAttrCustom();
             studyPvAttrCustom.setLabel(label);
-            studyPvAttrCustom.setType(pvAttr.getTypeName());
+            studyPvAttrCustom.setType(geAttr.getTypeName());
             if (studyEventInfoLabels.contains(label)) {
                 studyPvAttrCustom.setAllowedValues(study
                     .getStudyEventAttrPermissible(label));

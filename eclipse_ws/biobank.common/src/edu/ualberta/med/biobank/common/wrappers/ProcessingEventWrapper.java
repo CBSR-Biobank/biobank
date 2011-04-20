@@ -126,7 +126,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     @Override
     public String toString() {
-        return "Date created:" + getFormattedCreatedAt();
+        return "Date created:" + getFormattedCreatedAt() + " - Worksheet:"
+            + getWorksheet();
     }
 
     public String getFormattedCreatedAt() {
@@ -224,5 +225,13 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         if (getCenter() != null)
             return Arrays.asList(getCenter());
         return super.getSecuritySpecificCenters();
+    }
+
+    public List<CollectionEventWrapper> getCollectionEventFromSpecimens() {
+        Set<CollectionEventWrapper> cEvents = new HashSet<CollectionEventWrapper>();
+        for (SpecimenWrapper spec : getSpecimenCollection(false)) {
+            cEvents.add(spec.getCollectionEvent());
+        }
+        return new ArrayList<CollectionEventWrapper>(cEvents);
     }
 }

@@ -336,7 +336,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     /**
-     * get container with type name that contains 'palletNameContains'
+     * get containers of size 8*12
      */
     private List<ContainerTypeWrapper> getPalletContainerTypes()
         throws ApplicationException {
