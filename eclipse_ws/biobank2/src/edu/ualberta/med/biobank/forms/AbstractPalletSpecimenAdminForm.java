@@ -20,7 +20,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -238,7 +237,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         }
         scanButton = toolkit.createButton(parent, scanButtonTitle, SWT.PUSH);
         GridData gd = new GridData();
-        gd.horizontalSpan = ((GridLayout) parent.getLayout()).numColumns;
+        // gd.horizontalSpan = ((GridLayout) parent.getLayout()).numColumns;
         gd.widthHint = 100;
         scanButton.setLayoutData(gd);
         scanButton.addSelectionListener(new SelectionAdapter() {
@@ -324,6 +323,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         GridData gd = (GridData) plateToScanText.getLayoutData();
         gd.horizontalAlignment = SWT.FILL;
         plateToScanText.setLayoutData(gd);
+
+        createScanButton(fieldsComposite);
     }
 
     protected void createFakeOptions(
@@ -410,13 +411,13 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         plateToScanValue.setValue(""); //$NON-NLS-1$
     }
 
-    protected void useScanner(boolean use) {
-        setCanLaunchScan(!use);
-        setScanHasBeenLauched(!use);
-        if (use)
-            widgetCreator.addBinding(PLATE_VALIDATOR);
-        else
+    protected void setBindings(boolean isSingleMode) {
+        setCanLaunchScan(true);
+        setScanHasBeenLauched(isSingleMode);
+        if (isSingleMode)
             widgetCreator.removeBinding(PLATE_VALIDATOR);
+        else
+            widgetCreator.addBinding(PLATE_VALIDATOR);
 
     }
 

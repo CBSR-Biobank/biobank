@@ -49,6 +49,8 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.GenericLinkEntryForm"; //$NON-NLS-1$
 
+    private static final String INVENTORY_ID_BINDING = "inventoryId-binding";
+
     private static BiobankLogger logger = BiobankLogger
         .getLogger(GenericLinkEntryForm.class.getName());
 
@@ -245,11 +247,10 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         singleMode = single;
         if (single) {
             stackLayout.topControl = singleLinkComposite;
-            useScanner(false);
         } else {
             stackLayout.topControl = multipleLinkComposite;
-            useScanner(true);
         }
+        setBindings(single);
         if (multipleContainerDrawingScroll != null)
             widgetCreator.showWidget(multipleContainerDrawingScroll, !single);
         page.layout(true, true);
@@ -259,6 +260,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         multipleLinkComposite = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(4, false);
         layout.horizontalSpacing = 10;
+        layout.marginWidth = 0;
         multipleLinkComposite.setLayout(layout);
         toolkit.paintBordersFor(multipleLinkComposite);
         GridData gd = new GridData();
@@ -267,8 +269,19 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         gd.horizontalAlignment = SWT.FILL;
         multipleLinkComposite.setLayoutData(gd);
 
-        createPlateToScanField(multipleLinkComposite);
-        createScanButton(multipleLinkComposite);
+        Composite additionalFields = toolkit
+            .createComposite(multipleLinkComposite);
+        layout = new GridLayout(3, false);
+        layout.horizontalSpacing = 10;
+        layout.marginWidth = 0;
+        additionalFields.setLayout(layout);
+        toolkit.paintBordersFor(additionalFields);
+        gd = new GridData();
+        gd.horizontalSpan = 4;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        additionalFields.setLayoutData(gd);
+        createPlateToScanField(additionalFields);
 
         toolkit.createLabel(multipleLinkComposite, ""); //$NON-NLS-1$
         toolkit.createLabel(multipleLinkComposite,
@@ -304,12 +317,6 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             precedent = typeWidget;
             typeWidget.setEnabled(true);
         }
-    }
-
-    @Override
-    protected void createScanButton(Composite parent) {
-        super.createScanButton(parent);
-        scanButton.setEnabled(true);
     }
 
     /**
@@ -412,11 +419,13 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             singleLinkComposite,
             BiobankText.class,
             SWT.NONE,
-            Messages.getString("GenericLinkEntryForm.inventoryId.label"), new String[0], //$NON-NLS-1$
+            Messages.getString("GenericLinkEntryForm.inventoryId.label"), //$NON-NLS-1$
+            new String[0],
             singleSpecimen,
             SpecimenPeer.INVENTORY_ID.getName(),
             new NonEmptyStringValidator(Messages
-                .getString("GenericLinkEntryForm.inventoryId.validator.msg"))); //$NON-NLS-1$
+                .getString("GenericLinkEntryForm.inventoryId.validator.msg")), //$NON-NLS-1$
+            INVENTORY_ID_BINDING);
         inventoryIdText.addKeyListener(textFieldKeyListener);
 
         // widget to select the source and the type
@@ -427,6 +436,18 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         widgetCreator.createLabel(singleLinkComposite,
             Messages.getString("GenericLinkEntryForm.checkbox.assign")); //$NON-NLS-1$
         toolkit.createButton(singleLinkComposite, "", SWT.CHECK); //$NON-NLS-1$
+    }
+
+    @Override
+    protected void setBindings(boolean isSingleMode) {
+        super.setBindings(isSingleMode);
+        if (isSingleMode) {
+            widgetCreator.addBinding(INVENTORY_ID_BINDING);
+            singleTypesWidget.addBindings();
+        } else {
+            widgetCreator.removeBinding(INVENTORY_ID_BINDING);
+            singleTypesWidget.removeBindings();
+        }
     }
 
     /**
@@ -458,7 +479,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
     @Override
     protected boolean fieldsValid() {
-        return true;
+        return isPlateValid() && linkFormPatientManagement.fieldsValid();
     }
 
     @Override

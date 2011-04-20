@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -359,6 +360,8 @@ public class LinkFormPatientManagement {
     }
 
     protected List<SpecimenWrapper> getParentSpecimenForPEventAndCEvent() {
+        if (currentCEventSelected == null)
+            return Collections.emptyList();
         List<SpecimenWrapper> specs = currentCEventSelected
             .getSourceSpecimenCollectionInProcess(currentPEventSelected, true);
         if (specs.size() == 0) {
