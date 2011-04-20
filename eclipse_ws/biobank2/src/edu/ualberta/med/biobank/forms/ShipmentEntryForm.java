@@ -211,6 +211,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 widgetCreator.addBinding(WAYBILL_BINDING);
             } else {
                 widgetCreator.removeBinding(WAYBILL_BINDING);
+                waybillWidget.setText("");
             }
         }
         form.layout(true, true);

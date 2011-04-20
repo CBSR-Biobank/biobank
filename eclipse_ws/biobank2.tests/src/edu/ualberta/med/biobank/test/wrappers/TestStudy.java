@@ -13,6 +13,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -20,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.Study;
@@ -27,6 +29,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationE
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.AliquotedSpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
@@ -34,10 +37,9 @@ import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
-import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SourceSpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
-import edu.ualberta.med.biobank.test.internal.StudySourceVesselHelper;
 
 public class TestStudy extends TestDatabase {
 
@@ -196,152 +198,111 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testGetSampleStorageCollection() throws Exception {
-        String name = "testGetSampleStorageCollection" + r.nextInt();
+    public void testAliquotedSpecimens() throws Exception {
+        String name = "testGetAliquotedSpecimens" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(name);
-        int nber = SampleStorageHelper.addSampleStorages(study, site, name);
+        List<AliquotedSpecimenWrapper> set1 = AliquotedSpecimenHelper
+            .addRandAliquotedSpecimens(study, site, name + "_set1");
 
-        // FIXME
-        // List<AliquotedSpecimenWrapper> storages = study
-        // .getSampleStorageCollection(false);
-        // int sizeFound = storages.size();
-        //
-        // Assert.assertEquals(nber, sizeFound);
-    }
+        Assert.assertEquals(set1.size(),
+            study.getAliquotedSpecimenCollection(false).size());
 
-    @Test
-    public void testGetSampleStorageCollectionBoolean() throws Exception {
-        String name = "testGetSampleStorageCollectionBoolean" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
-        SampleStorageHelper.addSampleStorages(study, site, name);
+        List<AliquotedSpecimenWrapper> set2 = AliquotedSpecimenHelper
+            .addRandAliquotedSpecimens(study, site, name + "_set2");
 
-        // FIXME
-        // List<AliquotedSpecimenWrapper> storages = study
-        // .getSampleStorageCollection(true);
-        // if (storages.size() > 1) {
-        // for (int i = 0; i < storages.size() - 1; i++) {
-        // AliquotedSpecimenWrapper storage1 = storages.get(i);
-        // AliquotedSpecimenWrapper storage2 = storages.get(i + 1);
-        // Assert.assertTrue(storage1.compareTo(storage2) <= 0);
-        // }
-        // }
-    }
+        Assert.assertEquals(set1.size() + set2.size(), study
+            .getAliquotedSpecimenCollection(false).size());
 
-    @Test
-    public void testAddSampleStorages() throws Exception {
-        String name = "testAddSampleStorages" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
-        int nber = SampleStorageHelper.addSampleStorages(study, site, name);
-        // FIXME
-        // SpecimenTypeWrapper type = SpecimenTypeHelper.addSampleType(name);
-        // AliquotedSpecimenWrapper newStorage = SampleStorageHelper
-        // .newSampleStorage(study, type);
-        // study.addToSampleStorageCollection(Arrays.asList(newStorage));
-        // study.persist();
-        //
-        // study.reload();
-        // // one storage added
-        // Assert.assertEquals(nber + 1, study.getSampleStorageCollection(false)
-        // .size());
-    }
-
-    @Test
-    public void testRemoveSampleStorages() throws Exception {
-        String name = "testRemoveSampleStorages" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
-        int nber = SampleStorageHelper.addSampleStorages(study, site, name);
-        // FIXME
-        // List<AliquotedSpecimenWrapper> storages = study
-        // .getSampleStorageCollection(false);
-        // AliquotedSpecimenWrapper storage = DbHelper
-        // .chooseRandomlyInList(storages);
-        // study.removeFromSampleStorageCollection(Arrays.asList(storage));
-        // study.persist();
-        //
-        // study.reload();
-        // // one storage removed
-        // List<AliquotedSpecimenWrapper> ssList = study
-        // .getSampleStorageCollection(false);
-        // Assert.assertEquals(nber - 1, ssList.size());
-        // Assert.assertTrue(!ssList.contains(storage));
-    }
-
-    @Test
-    public void testGetStudySourceVesselCollection() throws Exception {
-        String name = "testGetStudySourceVesselCollection" + r.nextInt();
-        StudyWrapper study = StudyHelper.addStudy(name);
-        int nber = StudySourceVesselHelper.addStudySourceVessels(study, name,
-            true, true);
-        // FIXME
-        // List<SourceSpecimenWrapper> storages = study
-        // .getStudySourceVesselCollection(false);
-        // int sizeFound = storages.size();
-        //
-        // Assert.assertEquals(nber, sizeFound);
-    }
-
-    @Test
-    public void testGetStudySourceVesselCollectionBoolean() throws Exception {
-        String name = "testGetStudySourceVesselCollectionBoolean" + r.nextInt();
-        StudyWrapper study = StudyHelper.addStudy(name);
-        StudySourceVesselHelper.addStudySourceVessels(study, name, true, true);
-        // FIXME
-        // List<SourceSpecimenWrapper> sources = study
-        // .getStudySourceVesselCollection(true);
-        // if (sources.size() > 1) {
-        // for (int i = 0; i < sources.size() - 1; i++) {
-        // SourceSpecimenWrapper source1 = sources.get(i);
-        // SourceSpecimenWrapper source2 = sources.get(i + 1);
-        // Assert.assertTrue(source1.compareTo(source2) <= 0);
-        // }
-        // }
-    }
-
-    @Test
-    public void testAddStudySourceVessels() throws Exception {
-        String name = "testAddStudySourceVessels" + r.nextInt();
-        StudyWrapper study = StudyHelper.addStudy(name);
-        int nber = StudySourceVesselHelper.addStudySourceVessels(study, name,
-            true, true);
-
-        study.persist();
+        for (AliquotedSpecimenWrapper aqSpc : set1) {
+            aqSpc.delete();
+        }
 
         study.reload();
-        // one storage added
-        // FIXME
-        // Assert.assertEquals(nber, study.getStudySourceVesselCollection(false)
-        // .size());
+        Assert.assertEquals(set2.size(),
+            study.getAliquotedSpecimenCollection(false).size());
+
+        for (AliquotedSpecimenWrapper aqSpc : set2) {
+            aqSpc.delete();
+        }
+
+        study.reload();
+        Assert.assertEquals(0, study.getAliquotedSpecimenCollection(false)
+            .size());
     }
 
     @Test
-    public void testRemoveStudySourceVessels() throws Exception {
-        String name = "testRemoveStudySourceVessels" + r.nextInt();
+    public void testGetAliquotedSpecimenCollectionBoolean() throws Exception {
+        // exceed short name max length for specimen type if we use full method
+        // name
+        String name = "testGetASCB" + r.nextInt();
+
+        SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(name);
-        // FIXME
-        // int nber = StudySourceVesselHelper.addStudySourceVessels(study, name,
-        // true, true);
-        // List<SourceSpecimenWrapper> sources = study
-        // .getStudySourceVesselCollection(false);
-        // SourceSpecimenWrapper source =
-        // DbHelper.chooseRandomlyInList(sources);
-        // // don't have to delete the storage thanks to
-        // // deleteSourceVesselDifference method
-        // SourceVesselHelper.createdSourceVessels.remove(source);
-        // study.removeFromStudySourceVesselCollection(Arrays.asList(source));
-        // study.persist();
-        //
-        // study.reload();
-        // // one storage added
-        // Assert.assertEquals(nber - 1,
-        // study.getStudySourceVesselCollection(false).size());
+        AliquotedSpecimenHelper.addAliquotedSpecimens(study, site, name);
+
+        List<AliquotedSpecimenWrapper> storages = study
+            .getAliquotedSpecimenCollection(true);
+        if (storages.size() > 1) {
+            for (int i = 0; i < storages.size() - 1; i++) {
+                AliquotedSpecimenWrapper storage1 = storages.get(i);
+                AliquotedSpecimenWrapper storage2 = storages.get(i + 1);
+                Assert.assertTrue(storage1.compareTo(storage2) <= 0);
+            }
+        }
     }
 
     @Test
-    public void testSetStudyPvAttr() throws Exception {
+    public void testGetSourceSpecimenCollection() throws Exception {
+        String name = "testGetSourceSpecimenCollection" + r.nextInt();
+        StudyWrapper study = StudyHelper.addStudy(name);
+        List<SourceSpecimenWrapper> set1 = SourceSpecimenHelper
+            .addRandSourceSpecimens(study, name, true, true);
+
+        Assert.assertEquals(set1.size(),
+            study.getSourceSpecimenCollection(false).size());
+
+        List<SourceSpecimenWrapper> set2 = SourceSpecimenHelper
+            .addRandSourceSpecimens(study, name, true, true);
+
+        Assert.assertEquals(set1.size() + set2.size(), study
+            .getSourceSpecimenCollection(false).size());
+
+        for (SourceSpecimenWrapper srcSpc : set1) {
+            srcSpc.delete();
+        }
+
+        study.reload();
+        Assert.assertEquals(set2.size(),
+            study.getSourceSpecimenCollection(false).size());
+
+        for (SourceSpecimenWrapper srcSpc : set2) {
+            srcSpc.delete();
+        }
+
+        study.reload();
+        Assert.assertEquals(0, study.getSourceSpecimenCollection(false).size());
+    }
+
+    @Test
+    public void testGetSourceSpecimenCollectionBoolean() throws Exception {
+        String name = "testGetSourceSpecimenCollectionBoolean" + r.nextInt();
+        StudyWrapper study = StudyHelper.addStudy(name);
+        SourceSpecimenHelper.addSourceSpecimens(study, name, true, true);
+
+        List<SourceSpecimenWrapper> sources = study
+            .getSourceSpecimenCollection(true);
+        if (sources.size() > 1) {
+            for (int i = 0; i < sources.size() - 1; i++) {
+                SourceSpecimenWrapper source1 = sources.get(i);
+                SourceSpecimenWrapper source2 = sources.get(i + 1);
+                Assert.assertTrue(source1.compareTo(source2) <= 0);
+            }
+        }
+    }
+
+    @Test
+    public void testSetStudyEventAttr() throws Exception {
         String name = "testSetStudyPvAttr" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
@@ -350,7 +311,7 @@ public class TestStudy extends TestDatabase {
         Assert.assertTrue(types.contains("text"));
         Assert.assertTrue(types.contains("select_single"));
 
-        study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
+        study.setStudyEventAttr("Patient Type 2", EventAttrTypeEnum.TEXT);
         study.setStudyEventAttr("Visit Type", EventAttrTypeEnum.SELECT_SINGLE,
             new String[] { "toto", "titi", "tata" });
         study.persist();
@@ -358,7 +319,7 @@ public class TestStudy extends TestDatabase {
 
         Assert.assertEquals(2, study.getStudyEventAttrLabels().length);
 
-        study.deleteStudyEventAttr("Worksheet");
+        study.deleteStudyEventAttr("Patient Type 2");
         study.persist();
         Assert.assertEquals(1, study.getStudyEventAttrLabels().length);
 
@@ -367,20 +328,20 @@ public class TestStudy extends TestDatabase {
         Assert.assertEquals(0, study.getStudyEventAttrLabels().length);
 
         // add patient visit that uses the attribute and try to delete
-        study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
+        study.setStudyEventAttr("Patient Type 2", EventAttrTypeEnum.TEXT);
         study.persist();
 
         SiteWrapper site = SiteHelper.addSite("testsite");
 
-        CollectionEventWrapper visit = CollectionEventHelper
+        CollectionEventWrapper cevent = CollectionEventHelper
             .addCollectionEvent(site, PatientHelper.addPatient("testp", study),
                 1, OriginInfoHelper.addOriginInfo(site));
-        visit.setEventAttrValue("Worksheet", Utils.getRandomString(5));
-        visit.persist();
+        cevent.setEventAttrValue("Patient Type 2", Utils.getRandomString(5));
+        cevent.persist();
 
         // delete existing label, expect exception
         try {
-            study.deleteStudyEventAttr("Worksheet");
+            study.deleteStudyEventAttr("Patient Type 2");
             Assert.fail("call should generate an exception");
         } catch (Exception e) {
             Assert.assertTrue(true);
@@ -392,7 +353,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGetSetStudyPvAttrLabels" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
+        study.setStudyEventAttr("Patient Type 2", EventAttrTypeEnum.TEXT);
         study.setStudyEventAttr("Consent", EventAttrTypeEnum.SELECT_MULTIPLE,
             new String[] { "a", "b" });
         Assert.assertEquals(2, study.getStudyEventAttrLabels().length);
@@ -408,14 +369,14 @@ public class TestStudy extends TestDatabase {
         String name = "testGetStudyPvAttrType" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
+        study.setStudyEventAttr("Patient Type 2", EventAttrTypeEnum.TEXT);
         study.setStudyEventAttr("Visit Type", EventAttrTypeEnum.SELECT_SINGLE,
             new String[] { "toto", "titi", "tata" });
         study.persist();
 
         List<String> labels = Arrays.asList(study.getStudyEventAttrLabels());
         Assert.assertEquals(2, labels.size());
-        Assert.assertTrue(labels.contains("Worksheet"));
+        Assert.assertTrue(labels.contains("Patient Type 2"));
         Assert.assertTrue(labels.contains("Visit Type"));
 
         // get non existing label, expect exception
@@ -432,7 +393,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGetStudyPvAttrType" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
+        study.setStudyEventAttr("Patient Type 2", EventAttrTypeEnum.TEXT);
         String pvInfoLabel = "Visit Type";
 
         for (int i = 0; i < 4; ++i) {
@@ -482,20 +443,20 @@ public class TestStudy extends TestDatabase {
         String name = "testGetStudyPvAttrType" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
+        study.setStudyEventAttr("Patient Type 2", EventAttrTypeEnum.TEXT);
         study.persist();
         study.reload();
 
         // attributes are not locked by default
         Assert.assertEquals(ActivityStatusWrapper.ACTIVE_STATUS_STRING, study
-            .getStudyEventAttrActivityStatus("Worksheet").getName());
+            .getStudyEventAttrActivityStatus("Patient Type 2").getName());
 
         // lock the attribute
-        study.setStudyEventAttrActivityStatus("Worksheet",
+        study.setStudyEventAttrActivityStatus("Patient Type 2",
             ActivityStatusWrapper.getActivityStatus(appService,
                 ActivityStatusWrapper.CLOSED_STATUS_STRING));
         Assert.assertEquals(ActivityStatusWrapper.CLOSED_STATUS_STRING, study
-            .getStudyEventAttrActivityStatus("Worksheet").getName());
+            .getStudyEventAttrActivityStatus("Patient Type 2").getName());
 
         // get lock for non existing label, expect exception
         try {
@@ -516,8 +477,8 @@ public class TestStudy extends TestDatabase {
             Assert.assertTrue(true);
         }
         // add patient visit that uses the locked attribute
-        study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
-        study.setStudyEventAttrActivityStatus("Worksheet",
+        study.setStudyEventAttr("Patient Type 2", EventAttrTypeEnum.TEXT);
+        study.setStudyEventAttrActivityStatus("Patient Type 2",
             ActivityStatusWrapper.getActivityStatus(appService,
                 ActivityStatusWrapper.CLOSED_STATUS_STRING));
         study.persist();
@@ -528,7 +489,7 @@ public class TestStudy extends TestDatabase {
             .addCollectionEvent(site, PatientHelper.addPatient("testp", study),
                 1, OriginInfoHelper.addOriginInfo(site));
         try {
-            visit.setEventAttrValue("Worksheet", Utils.getRandomString(5));
+            visit.setEventAttrValue("Patient Type 2", Utils.getRandomString(5));
             visit.persist();
             Assert.fail("call should generate an exception");
         } catch (Exception e) {

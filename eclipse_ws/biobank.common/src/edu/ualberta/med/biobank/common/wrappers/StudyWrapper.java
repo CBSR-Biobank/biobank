@@ -297,7 +297,7 @@ public class StudyWrapper extends StudyBaseWrapper {
     public void deleteStudyEventAttr(String label) throws Exception {
         getStudyEventAttrMap();
         StudyEventAttrWrapper studyEventAttr = getStudyEventAttr(label);
-        if (studyEventAttr.isUsedByProcessingEvents()) {
+        if (studyEventAttr.isUsedByCollectionEvents()) {
             throw new BiobankCheckException("StudyEventAttr with label \""
                 + label + "\" is in use by patient visits");
         }

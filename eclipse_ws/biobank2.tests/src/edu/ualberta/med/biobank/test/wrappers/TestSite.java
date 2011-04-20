@@ -773,7 +773,7 @@ public class TestSite extends TestDatabase {
             for (SpecimenWrapper sp : ce.getOriginalSpecimenCollection(false))
                 sp.delete();
         }
-        DbHelper.deleteFromList(patient1.getProcessingEventCollection());
+        DbHelper.deleteFromList(patient1.getProcessingEventCollection(false));
         DbHelper.deleteFromList(patient1.getCollectionEventCollection(false));
         patient1.delete();
 

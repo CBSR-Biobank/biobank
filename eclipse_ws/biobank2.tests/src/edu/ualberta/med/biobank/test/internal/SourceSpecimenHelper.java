@@ -41,18 +41,25 @@ public class SourceSpecimenHelper extends DbHelper {
         return ssv;
     }
 
-    public static int addSourceSpecimens(StudyWrapper study, String name,
-        boolean needTimeDrawn, boolean needOriginalVolume) throws Exception {
+    public static List<SourceSpecimenWrapper> addRandSourceSpecimens(
+        StudyWrapper study, String name, boolean needTimeDrawn,
+        boolean needOriginalVolume) throws Exception {
         int nber = r.nextInt(15) + 1;
-        List<SourceSpecimenWrapper> ssvs = new ArrayList<SourceSpecimenWrapper>();
+        List<SourceSpecimenWrapper> sourceSpcs = new ArrayList<SourceSpecimenWrapper>();
         for (int i = 0; i < nber; i++) {
             SpecimenTypeWrapper svType = SpecimenTypeHelper
                 .addSpecimenType("newST" + Utils.getRandomString(11));
-            ssvs.add(addSourceSpecimen(study, svType, needTimeDrawn,
+            sourceSpcs.add(addSourceSpecimen(study, svType, needTimeDrawn,
                 needOriginalVolume));
         }
-        study.addToSourceSpecimenCollection(ssvs);
+        study.addToSourceSpecimenCollection(sourceSpcs);
         study.persist();
-        return nber;
+        return sourceSpcs;
+    }
+
+    public static int addSourceSpecimens(StudyWrapper study, String name,
+        boolean needTimeDrawn, boolean needOriginalVolume) throws Exception {
+        return addRandSourceSpecimens(study, name, needTimeDrawn,
+            needOriginalVolume).size();
     }
 }

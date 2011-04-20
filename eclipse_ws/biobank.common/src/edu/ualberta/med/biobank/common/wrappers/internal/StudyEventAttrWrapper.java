@@ -29,7 +29,7 @@ public class StudyEventAttrWrapper extends StudyEventAttrBaseWrapper {
 
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
-        if (isUsedByProcessingEvents()) {
+        if (isUsedByCollectionEvents()) {
             throw new BiobankDeleteException(
                 "Unable to delete EventAttr with id " + getId()
                     + ". A patient visit using it exists in storage."
@@ -37,14 +37,14 @@ public class StudyEventAttrWrapper extends StudyEventAttrBaseWrapper {
         }
     }
 
-    public static final String IS_USED_BY_PROC_EVENTS_QRY = "select count(pva) from "
+    public static final String IS_USED_BY_COL_EVENTS_QRY = "select count(ea) from "
         + EventAttr.class.getName()
-        + " as pva where pva."
+        + " as ea where ea."
         + EventAttrPeer.STUDY_EVENT_ATTR.getName() + "=?)";
 
-    public boolean isUsedByProcessingEvents() throws ApplicationException,
+    public boolean isUsedByCollectionEvents() throws ApplicationException,
         BiobankException {
-        HQLCriteria c = new HQLCriteria(IS_USED_BY_PROC_EVENTS_QRY,
+        HQLCriteria c = new HQLCriteria(IS_USED_BY_COL_EVENTS_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
         return getCountResult(appService, c) > 0;
     }
