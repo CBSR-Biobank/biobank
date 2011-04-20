@@ -418,7 +418,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             widgetCreator.removeBinding(PLATE_VALIDATOR);
         else
             widgetCreator.addBinding(PLATE_VALIDATOR);
-
     }
 
     protected void setCanLaunchScan(boolean canLauch) {

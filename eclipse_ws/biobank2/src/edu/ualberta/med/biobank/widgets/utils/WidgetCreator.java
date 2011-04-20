@@ -75,6 +75,10 @@ public class WidgetCreator {
 
     private SelectionListener selectionListener;
 
+    private Binding globalBinding;
+
+    private IObservableValue globalStatusObservable;
+
     public static final Color READ_ONLY_TEXT_BGR = Display.getCurrent()
         .getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
 
@@ -594,9 +598,21 @@ public class WidgetCreator {
 
     public void addGlobalBindValue(IObservableValue statusObservable) {
         Assert.isNotNull(dbc);
-        dbc.bindValue(statusObservable,
+        globalStatusObservable = statusObservable;
+        System.out.println("add global :" + dbc.getBindings().size());
+        globalBinding = dbc.bindValue(statusObservable,
             new AggregateValidationStatus(dbc.getBindings(),
                 AggregateValidationStatus.MAX_SEVERITY));
+    }
+
+    private void resetGlobalBinding() {
+        // if (globalBinding != null) {
+        // dbc.removeBinding(globalBinding);
+        // System.out.println("reset:" + dbc.getBindings().size());
+        // globalBinding = dbc.bindValue(globalStatusObservable,
+        // new AggregateValidationStatus(dbc.getBindings(),
+        // AggregateValidationStatus.MAX_SEVERITY));
+        // }
     }
 
     protected AbstractValidator createValidator(
@@ -643,26 +659,33 @@ public class WidgetCreator {
     public void removeBinding(Binding binding) {
         Assert.isNotNull(dbc);
         dbc.removeBinding(binding);
+        if (globalBinding != null) {
+            resetGlobalBinding();
+        }
     }
 
     public void removeBinding(String bindingKey) {
-        Assert.isNotNull(dbc);
         Binding binding = bindings.get(bindingKey);
+        System.out.println("removeBinding :" + bindingKey);
         Assert.isNotNull(binding);
-        dbc.removeBinding(binding);
+        removeBinding(binding);
     }
 
     public void addBinding(Binding binding) {
         Assert.isNotNull(dbc);
         dbc.addBinding(binding);
+        if (globalBinding != null) {
+            resetGlobalBinding();
+        }
     }
 
     public void addBinding(String bindingKey) {
         Assert.isNotNull(dbc);
+        System.out.println("addBinding :" + bindingKey);
         Binding binding = bindings.get(bindingKey);
         Assert.isNotNull(binding);
         if (!dbc.getBindings().contains(binding)) {
-            dbc.addBinding(binding);
+            addBinding(binding);
         }
     }
 

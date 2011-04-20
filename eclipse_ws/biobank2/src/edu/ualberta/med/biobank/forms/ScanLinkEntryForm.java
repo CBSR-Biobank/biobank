@@ -398,8 +398,6 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
         createPlateToScanField(fieldsComposite);
 
-        createScanButton(leftSideComposite);
-
         createTypesSelectionSection(leftSideComposite);
 
         initPalletSpecimenTypes();

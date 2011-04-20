@@ -479,7 +479,8 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
     @Override
     protected boolean fieldsValid() {
-        return isPlateValid() && linkFormPatientManagement.fieldsValid();
+        return (singleMode ? true : isPlateValid())
+            && linkFormPatientManagement.fieldsValid();
     }
 
     @Override
@@ -489,7 +490,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
     @Override
     protected void doBeforeSave() throws Exception {
-        // can't acces the combos in another thread, so do it now
+        // can't access the combos in another thread, so do it now
         if (singleMode) {
             SpecimenHierarchy selection = singleTypesWidget.getSelection();
             singleSpecimen.setParentSpecimen(selection.getParentSpecimen());
@@ -548,6 +549,11 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         singleTypesWidget.deselectAll();
         setDirty(false);
         setFocus();
+    }
+
+    @Override
+    protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
+        return PalletCell.getRandomScanLink();
     }
 
 }

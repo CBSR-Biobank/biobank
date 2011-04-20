@@ -380,7 +380,10 @@ public class LinkFormPatientManagement {
     public List<SpecimenTypeWrapper> getStudyAliquotedTypes(
         List<SpecimenTypeWrapper> authorizedSpecimenTypesInContainer,
         String containerLabel) {
-        StudyWrapper study = getCurrentPatient().getStudy();
+        if (currentPatient == null)
+            return Collections.emptyList();
+
+        StudyWrapper study = currentPatient.getStudy();
         try {
             // need to reload study to avoid performance problem when using
             // the same lots of time (like is try different positions for
@@ -392,7 +395,7 @@ public class LinkFormPatientManagement {
         List<SpecimenTypeWrapper> studiesAliquotedTypes;
         // done at first successful scan
         studiesAliquotedTypes = new ArrayList<SpecimenTypeWrapper>();
-        for (AliquotedSpecimenWrapper ss : getCurrentPatient().getStudy()
+        for (AliquotedSpecimenWrapper ss : study
             .getAliquotedSpecimenCollection(true)) {
             if (ss.getActivityStatus().isActive()) {
                 SpecimenTypeWrapper type = ss.getSpecimenType();
@@ -405,7 +408,7 @@ public class LinkFormPatientManagement {
         if (studiesAliquotedTypes.size() == 0) {
             String studyNameShort = "unknown";
             if (getCurrentPatient() != null)
-                studyNameShort = getCurrentPatient().getStudy().getNameShort();
+                studyNameShort = study.getNameShort();
             if (containerLabel == null)
                 BiobankPlugin.openAsyncError(Messages
                     .getString("ScanLink.aliquotedSpecimenTypes.error.title"), //$NON-NLS-1$
