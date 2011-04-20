@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -32,6 +33,7 @@ import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.Event;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingEventEntryForm extends
@@ -252,11 +254,19 @@ public class ProcessingEventEntryForm extends
 
     @Override
     protected void onReset() throws Exception {
+        // Remember center
+        CenterWrapper<?> center = modelObject.getCenter();
         modelObject.reset();
-        if (modelObject.getActivityStatus() != null) {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                modelObject.getActivityStatus()));
+        modelObject.setCenter(center);
+
+        if (modelObject.isNew()) {
+            modelObject.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         }
+
+        GuiUtil.resetComboViewer(activityStatusComboViewer,
+            modelObject.getActivityStatus());
+
         specimenEntryWidget.setSpecimens(modelObject
             .getSpecimenCollection(true));
     }

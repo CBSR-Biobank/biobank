@@ -100,6 +100,7 @@ public class PatientEntryForm extends BiobankEntryForm<PatientWrapper> {
         if (modelObject.isNew()) {
             if (studies.size() == 1) {
                 selectedStudy = studies.get(0);
+                modelObject.setStudy(selectedStudy);
             }
         } else {
             selectedStudy = modelObject.getStudy();
