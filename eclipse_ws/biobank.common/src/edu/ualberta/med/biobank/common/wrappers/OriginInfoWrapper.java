@@ -233,13 +233,4 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         log.setType("Shipment");
         return log;
     }
-
-    public String getWaybill() {
-        ShipmentInfoWrapper shipInfo = getShipmentInfo();
-        return shipInfo != null ? shipInfo.getWaybill() : null;
-    }
-
-    public void setWaybill(String waybill) {
-        getShipmentInfo().setWaybill(waybill);
-    }
 }

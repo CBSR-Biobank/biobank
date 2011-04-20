@@ -9,7 +9,6 @@ import java.util.Set;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -18,6 +17,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
@@ -40,6 +40,7 @@ import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.Event;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentEntryForm extends BiobankEntryForm<OriginInfoWrapper> {
@@ -79,6 +80,8 @@ public class ShipmentEntryForm extends BiobankEntryForm<OriginInfoWrapper> {
 
     private Set<SpecimenWrapper> specimensToPersist = new HashSet<SpecimenWrapper>();
 
+    private ShipmentInfoWrapper shipmentInfo;
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -92,6 +95,7 @@ public class ShipmentEntryForm extends BiobankEntryForm<OriginInfoWrapper> {
             tabName = "Shipment "
                 + modelObject.getShipmentInfo().getFormattedDateReceived();
         }
+        shipmentInfo = modelObject.getShipmentInfo();
         setPartName(tabName);
     }
 
@@ -138,7 +142,8 @@ public class ShipmentEntryForm extends BiobankEntryForm<OriginInfoWrapper> {
             "A waybill should be set");
         waybillWidget = (BiobankText) createBoundWidget(client,
             BiobankText.class, SWT.NONE, waybillLabel, new String[0],
-            modelObject, "asdf", waybillValidator, WAYBILL_BINDING);
+            shipmentInfo, ShipmentInfoPeer.WAYBILL.getName(), waybillValidator,
+            WAYBILL_BINDING);
 
         shippingMethodComboViewer = createComboViewer(client,
             "Shipping Method",
@@ -347,10 +352,11 @@ public class ShipmentEntryForm extends BiobankEntryForm<OriginInfoWrapper> {
 
     @Override
     protected void onReset() throws Exception {
-        dateSentWidget.setDate(new Date());
-        dateReceivedWidget.setDate(new Date());
-
         modelObject.reset();
+
+        shipmentInfo.reset();
+        modelObject.setShipmentInfo(shipmentInfo);
+
         if (modelObject.isNew()
             && senderComboViewer.getCombo().getItemCount() > 1) {
             senderComboViewer.getCombo().deselectAll();
@@ -358,14 +364,8 @@ public class ShipmentEntryForm extends BiobankEntryForm<OriginInfoWrapper> {
 
         specimenEntryWidget.setSpecimens(modelObject
             .getSpecimenCollection(false));
-        ShippingMethodWrapper shipMethod = null;
-        if (modelObject.getShipmentInfo() != null)
-            shipMethod = modelObject.getShipmentInfo().getShippingMethod();
-        if (shipMethod != null) {
-            shippingMethodComboViewer.setSelection(new StructuredSelection(
-                shipMethod));
-        } else if (shippingMethodComboViewer.getCombo().getItemCount() > 1) {
-            shippingMethodComboViewer.getCombo().deselectAll();
-        }
+
+        GuiUtil.resetComboViewer(shippingMethodComboViewer,
+            shipmentInfo.getShippingMethod());
     }
 }
