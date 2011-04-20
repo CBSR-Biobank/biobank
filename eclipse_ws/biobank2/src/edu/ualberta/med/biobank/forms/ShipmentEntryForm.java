@@ -116,7 +116,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
         createMainSection();
-        createPatientsSection();
+        createSpecimensSection();
     }
 
     private void createMainSection() throws ApplicationException {
@@ -233,7 +233,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     }
 
-    private void createPatientsSection() {
+    private void createSpecimensSection() {
         Composite client = createSectionWithClient("Specimens");
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
