@@ -546,10 +546,15 @@ public class WidgetCreator {
                 uvs = new UpdateValueStrategy();
                 uvs.setAfterConvertValidator(validator);
             }
-            Binding binding = modelDbc.bindValue(new DateTimeObservableValue(
-                widget), modelObservableValue, uvs, null);
+            Binding modelBinding = modelDbc.bindValue(
+                new DateTimeObservableValue(widget), modelObservableValue,
+                null, null);
+            Binding validatorBinding = validatorDbc.bindValue(
+                new DateTimeObservableValue(widget), new WritableValue(
+                    modelObservableValue.getValue(), Date.class), uvs, null);
             if (bindingKey != null) {
-                modelBindings.put(bindingKey, binding);
+                modelBindings.put(bindingKey, modelBinding);
+                validatorBindings.put(bindingKey, validatorBinding);
             }
         }
 
