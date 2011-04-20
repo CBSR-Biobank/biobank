@@ -32,16 +32,12 @@ public class HbmModifier {
     private static Pattern HBM_ATTR = Pattern.compile(
         "<property.*column=\"([^\"]*)\"/>", Pattern.CASE_INSENSITIVE);
 
+    private static Pattern HBM_LOG_GENERATOR_TAG = Pattern.compile(
+        "<generator.*class=\"([^\"]*)\"/>", Pattern.CASE_INSENSITIVE);
+
     private static String HBM_FILE_EXTENSION = ".hbm.xml";
 
-    // see
-    // http://www.mandubian.org/magnoliaPublic/mandubian-org/knowledge-garbage-collector/how-tos/hibernate-version-timestamp.html
-    // private static final String TIMESTAMP_PROPERTY =
-    // "      <version name=\"lastUpdated\" access=\"field\" type=\"timestamp\" generated=\"always\" >\n"
-    // +
-    // "         <column name=\"LAST_UPDATED\" sql-type=\"timestamp\" default=\"CURRENT_TIMESTAMP\" />\n"
-    // + "    </version>";
-    private static final String TIMESTAMP_PROPERTY = "          <version name=\"version\" column=\"VERSION\" access=\"field\" />";
+    private static final String VERSION_PROPERTY = "          <version name=\"version\" column=\"VERSION\" access=\"field\" />";
 
     private static HbmModifier instance = null;
 
@@ -82,14 +78,32 @@ public class HbmModifier {
                 Matcher stringAttrMatcher = HBM_STRING_ATTR.matcher(line);
                 Matcher attrMatcher = HBM_ATTR.matcher(line);
 
-                if (!idPropertyFound && idMatcher.find()) {
+                if (className.equals("Log")) {
+                    // make the ID attribute auto increment
+                    Matcher logGeneratorTag = HBM_LOG_GENERATOR_TAG
+                        .matcher(line);
+                    if (logGeneratorTag.find()) {
+                        String classAttr = logGeneratorTag.group(1);
+
+                        if (classAttr.equals("increment")) {
+                            alteredLine = alteredLine.replace("increment",
+                                "identity");
+                        }
+                    }
+                }
+
+                if (!idPropertyFound && idMatcher.find()
+                    && !className.equals("Log")) {
                     // has to be after discriminator tag and before first
                     // property tag
-                    alteredLine = new StringBuffer(TIMESTAMP_PROPERTY)
+                    //
+                    // Do not add version field to Log class
+                    alteredLine = new StringBuffer(VERSION_PROPERTY)
                         .append("\n").append(alteredLine).toString();
                     idPropertyFound = true;
-                } else if (stringAttrMatcher.find()
-                    && !line.contains("length=\"")) {
+                }
+
+                if (stringAttrMatcher.find() && !line.contains("length=\"")) {
                     String attrName = stringAttrMatcher.group(1);
                     Attribute attr = columnTypeMap.get(attrName);
 
@@ -118,7 +132,7 @@ public class HbmModifier {
             writer.flush();
             writer.close();
 
-            if (!idPropertyFound) {
+            if (!className.equals("Log") && !idPropertyFound) {
                 throw new Exception(
                     "tag not found found for inserting timestamp in HBM file "
                         + filename);
