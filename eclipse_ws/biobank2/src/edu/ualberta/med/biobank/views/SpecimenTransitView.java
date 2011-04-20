@@ -49,8 +49,6 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     private DispatchCenterAdapter centerNode;
 
-    private AbstractSearchedNode searchedNode;
-
     private Button radioDateReceived;
 
     private Button radioDateSent;
