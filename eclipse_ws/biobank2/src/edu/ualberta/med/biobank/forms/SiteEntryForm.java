@@ -163,6 +163,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     @Override
     protected void saveForm() throws Exception {
         site.persist();
+        siteAdapter.getParent().performExpand();
     }
 
     @Override

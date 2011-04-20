@@ -55,6 +55,7 @@ public class TestDatabase {
 
     @After
     public void tearDown() throws Exception {
+        Assert.assertNotNull("appService is null", appService);
         try {
             SiteHelper.deleteCreatedSites();
             StudyHelper.deleteCreatedStudies();
@@ -82,7 +83,8 @@ public class TestDatabase {
                 && !method.getReturnType().getName()
                     .startsWith("edu.ualberta.med.biobank.common")
                 && !method.getReturnType().getName()
-                    .startsWith("edu.ualberta.med.biobank.util")) {
+                    .startsWith("edu.ualberta.med.biobank.util")
+                && (method.getParameterTypes().length == 0)) {
                 GetterInfo getterInfo = new GetterInfo();
                 getterInfo.getMethod = method;
                 map.put(method.getName(), getterInfo);

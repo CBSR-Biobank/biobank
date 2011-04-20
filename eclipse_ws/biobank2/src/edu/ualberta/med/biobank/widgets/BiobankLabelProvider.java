@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
@@ -153,6 +154,13 @@ public class BiobankLabelProvider extends LabelProvider implements
         } else if (element instanceof CollectionEventWrapper) {
             return ((CollectionEventWrapper) element).getVisitNumber()
                 .toString();
+        } else if (element instanceof ProcessingEventWrapper) {
+            ProcessingEventWrapper pevent = (ProcessingEventWrapper) element;
+            StringBuffer res = new StringBuffer(pevent.getFormattedCreatedAt());
+            if (pevent.getWorksheet() != null
+                && !pevent.getWorksheet().isEmpty())
+                res.append(" - ").append(pevent.getWorksheet());
+            return res.toString();
         } else if (element instanceof SpecimenTypeWrapper) {
             return ((SpecimenTypeWrapper) element).getNameShort();
         } else if (element instanceof SourceSpecimenWrapper) {

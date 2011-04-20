@@ -85,8 +85,8 @@ public class AliquotedSpecimenSelectionWidget {
                     Messages
                         .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
         }
-        cvSource = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
-            | SWT.BORDER);
+        cvSource = widgetCreator.createComboViewerWithoutLabel(parent, null,
+            null);
         setComboProperties(cvSource, widgetCreator.getToolkit(), 0);
         cvSource.setLabelProvider(new LabelProvider() {
             @Override
@@ -98,7 +98,7 @@ public class AliquotedSpecimenSelectionWidget {
         });
         if (oneRow) {
             GridData gd = new GridData();
-            gd.widthHint = 250;
+            gd.widthHint = 300;
             cvSource.getControl().setLayoutData(gd);
         }
 
@@ -111,8 +111,8 @@ public class AliquotedSpecimenSelectionWidget {
                     Messages
                         .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
         }
-        cvResult = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
-            | SWT.BORDER);
+        cvResult = widgetCreator.createComboViewerWithoutLabel(parent, null,
+            null);
         setComboProperties(cvResult, widgetCreator.getToolkit(), 1);
         cvResult.setLabelProvider(new LabelProvider() {
             @Override

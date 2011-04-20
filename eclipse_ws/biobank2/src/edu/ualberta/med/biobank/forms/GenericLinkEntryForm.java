@@ -174,8 +174,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 }
             });
         // Collection events list
-        linkFormPatientManagement
-            .createCollectionEventWidgets(commonFieldsComposite);
+        linkFormPatientManagement.createEventsWidgets(commonFieldsComposite);
         linkFormPatientManagement
             .setCEventComboCallback(new CEventComboCallback() {
                 @Override
@@ -438,7 +437,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         List<SpecimenTypeWrapper> studiesAliquotedTypes = linkFormPatientManagement
             .getStudyAliquotedTypes(null, null);
         List<SpecimenWrapper> availableSourceSpecimens = linkFormPatientManagement
-            .getSpecimenInCollectionEvent();
+            .getParentSpecimenForPEventAndCEvent();
         if (isFirstSuccessfulScan())
             // for multiple
             for (int row = 0; row < specimenTypesWidgets.size(); row++) {

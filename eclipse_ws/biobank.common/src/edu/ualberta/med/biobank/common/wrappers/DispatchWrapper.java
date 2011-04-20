@@ -198,7 +198,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                     appService);
                 dsa.setSpecimen(specimen);
                 dsa.setDispatch(this);
-                dsa.setDispatchSpecimenState(state);
+                dsa.setDispatchSpecimenState(DispatchSpecimenState.NONE);
+                dispatchSpecimenMap.put(DispatchSpecimenState.NONE,
+                    new ArrayList<DispatchSpecimenWrapper>());
                 newDispatchSpecimens.add(dsa);
                 hasNewSpecimens = true;
                 dispatchSpecimenMap.get(DispatchSpecimenState.NONE).add(dsa);

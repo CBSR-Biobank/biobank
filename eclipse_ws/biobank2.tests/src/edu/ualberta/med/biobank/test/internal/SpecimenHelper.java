@@ -9,8 +9,11 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
@@ -54,6 +57,7 @@ public class SpecimenHelper extends DbHelper {
             specimen.setPosition(new RowColPos(row, col));
         }
         specimen.setOriginInfo(oi);
+        specimen.setCurrentCenter(oi.getCenter());
         return specimen;
     }
 
@@ -73,6 +77,28 @@ public class SpecimenHelper extends DbHelper {
             container, cevent, row, col, oi);
         specimen.persist();
         return specimen;
+    }
+
+    public static SpecimenWrapper addSpecimen() throws Exception {
+        SpecimenTypeWrapper st = SpecimenTypeHelper.addSpecimenType("testst"
+            + r.nextInt());
+        st.persist();
+        SpecimenWrapper newSpec = newSpecimen(st);
+        newSpec.setCreatedAt(Utils.getRandomDate());
+        newSpec.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
+
+        StudyWrapper study = StudyHelper.addStudy("Study-" + r.nextInt());
+        SiteWrapper site = SiteHelper.addSite("testsite" + r.nextInt());
+        PatientWrapper patient = PatientHelper.addPatient(
+            "testp" + r.nextInt(), study);
+        OriginInfoWrapper oi = OriginInfoHelper.addOriginInfo(site);
+
+        newSpec.setSpecimenType(st);
+        newSpec.setOriginInfo(oi);
+        CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
+            site, patient, 2, oi, newSpec);
+        return ce.getOriginalSpecimenCollection(false).get(0);
     }
 
     public static SpecimenWrapper addSpecimen(SpecimenTypeWrapper specimenType,

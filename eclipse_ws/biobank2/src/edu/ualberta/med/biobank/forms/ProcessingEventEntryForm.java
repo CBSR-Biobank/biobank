@@ -236,6 +236,9 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             }
         };
 
+        specimenEntryWidget.addBinding(widgetCreator,
+            "Specimens should be added to a processing event");
+
         specimenEntryWidget.addVetoListener(ItemAction.PRE_ADD, vetoListener);
         specimenEntryWidget.addVetoListener(ItemAction.POST_ADD, vetoListener);
         specimenEntryWidget

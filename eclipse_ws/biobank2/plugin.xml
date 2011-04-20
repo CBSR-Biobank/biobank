@@ -2337,7 +2337,7 @@
       </key>   
 	  <key
          commandId="edu.ualberta.med.biobank.commands.print"
-         contextId="edu.ualberta.med.biobank.perspective.specimensManagement"
+         contextId="edu.ualberta.med.biobank.perspective.linkAssign"
          schemeId="biobank2.scheme"
          sequence="M1+P">
       </key>    
@@ -2534,7 +2534,7 @@
          <with
                variable="activeWorkbenchWindow.activePerspective">
             <equals
-                  value="edu.ualberta.med.biobank.perspective.specimensManagement">
+                  value="edu.ualberta.med.biobank.perspective.linkAssign">
             </equals>
          </with>
       </definition>
@@ -2715,8 +2715,8 @@
             name="Not in Reports">
       </context>  
    <context
-         id="edu.ualberta.med.biobank.perspective.specimensManagement"
-         name="Samples Processing View">
+         id="edu.ualberta.med.biobank.perspective.linkAssign"
+         name="Link or Assign perspective">
    </context>  
    </extension>
     <extension
