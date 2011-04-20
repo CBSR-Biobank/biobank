@@ -85,8 +85,8 @@ public class AliquotedSpecimenSelectionWidget {
                     Messages
                         .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
         }
-        cvSource = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
-            | SWT.BORDER);
+        cvSource = widgetCreator.createComboViewerWithoutLabel(parent, null,
+            null);
         setComboProperties(cvSource, widgetCreator.getToolkit(), 0);
         cvSource.setLabelProvider(new LabelProvider() {
             @Override
