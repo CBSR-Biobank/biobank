@@ -154,8 +154,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         waybillWidget = (BiobankText) createBoundWidget(client,
             BiobankText.class, SWT.NONE, waybillLabel, new String[0], shipment,
             "shipmentInfo.waybill", waybillValidator, WAYBILL_BINDING);
-        activateWaybillWidget(((ClinicWrapper) shipment.getCenter())
-            .getSendsShipments());
+
+        ClinicWrapper clinic = (ClinicWrapper) shipment.getCenter();
+        if (clinic != null) {
+            activateWaybillWidget(clinic.getSendsShipments());
+        }
 
         shippingMethodComboViewer = createComboViewer(client,
             "Shipping Method",
