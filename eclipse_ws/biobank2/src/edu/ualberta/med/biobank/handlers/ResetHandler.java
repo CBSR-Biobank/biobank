@@ -19,7 +19,7 @@ public class ResetHandler extends AbstractHandler implements IHandler {
             @Override
             public void run() {
                 try {
-                    BiobankEntryForm<?> biobankEntryForm = (BiobankEntryForm<?>) PlatformUI
+                    BiobankEntryForm biobankEntryForm = (BiobankEntryForm) PlatformUI
                         .getWorkbench().getActiveWorkbenchWindow()
                         .getActivePage().getActiveEditor();
                     biobankEntryForm.reset();

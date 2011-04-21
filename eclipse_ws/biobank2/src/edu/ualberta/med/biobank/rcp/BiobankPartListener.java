@@ -54,7 +54,7 @@ public class BiobankPartListener implements IPartListener {
         }
         if (part instanceof BiobankEntryForm)
             try {
-                ((BiobankEntryForm<?>) part).formClosed();
+                ((BiobankEntryForm) part).formClosed();
             } catch (Exception e) {
                 logger.error("Error in formClosed method", e);
             }

@@ -28,7 +28,7 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicVisitInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class PatientMergeForm extends BiobankEntryForm<PatientWrapper> {
+public class PatientMergeForm extends BiobankEntryForm {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(PatientMergeForm.class.getName());
@@ -60,14 +60,21 @@ public class PatientMergeForm extends BiobankEntryForm<PatientWrapper> {
     private boolean canMerge;
 
     @Override
-    public void init() throws Exception {
-        super.init();
+    public void init() {
         Assert.isTrue((adapter instanceof PatientAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         patient1Adapter = (PatientAdapter) adapter;
-        patient1 = modelObject;
+        if (patient1Adapter.getWrapper().isNew())
+            patient1 = patient1Adapter.getWrapper();
+        else
+            try {
+                patient1 = (PatientWrapper) patient1Adapter
+                    .getModelObjectClone();
+            } catch (Exception e) {
+                logger.error("Error getting patient clone", e);
+            }
         String tabName = "Merging Patient " + patient1.getPnumber();
         setPartName(tabName);
         patientNotNullValue = new WritableValue(Boolean.FALSE, Boolean.class);
@@ -264,8 +271,8 @@ public class PatientMergeForm extends BiobankEntryForm<PatientWrapper> {
     }
 
     @Override
-    protected void onReset() throws Exception {
-        modelObject.reset();
+    public void reset() throws Exception {
+        super.reset();
         pnumber1Text.setText(patient1.getPnumber());
         study1Text.setText(patient1.getStudy().getNameShort());
         patient1VisitsTable.setCollection(patient1

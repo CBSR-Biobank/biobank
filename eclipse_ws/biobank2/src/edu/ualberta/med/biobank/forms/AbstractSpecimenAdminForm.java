@@ -23,14 +23,12 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.logs.ActivityLogAppender;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.logs.LogInfo;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
-public abstract class AbstractSpecimenAdminForm<E extends ModelWrapper<?>>
-    extends BiobankEntryForm<E> {
+public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
 
     protected boolean finished = true;
     protected boolean printed = false;
