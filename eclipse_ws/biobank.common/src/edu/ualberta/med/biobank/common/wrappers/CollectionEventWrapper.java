@@ -85,10 +85,10 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     @Override
     protected void deleteChecks() throws BiobankDeleteException,
         ApplicationException {
-        List<SpecimenWrapper> sourceVessels = getAllSpecimenCollection(false);
-        if (sourceVessels != null && !sourceVessels.isEmpty()) {
+        List<SpecimenWrapper> specimens = getAllSpecimenCollection(false);
+        if (specimens != null && !specimens.isEmpty()) {
             throw new BiobankDeleteException(
-                "Source Vessels are still linked to this Collection Event. "
+                "Specimens are still linked to this Collection Event. "
                     + "Delete them before attempting to remove this Collection Event");
         }
     }

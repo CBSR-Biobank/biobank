@@ -421,10 +421,17 @@ public class LoggingView extends ViewPart {
             Date startDateDate = startDateWidget.getDate();
             Date endDateDate = endDateWidget.getDate();
 
-            LogQuery.getInstance().setSearchQueryItem(LogQuery.START_DATE_KEY,
-                DateFormatter.formatAsDate(startDateDate));
-            LogQuery.getInstance().setSearchQueryItem(LogQuery.END_DATE_KEY,
-                DateFormatter.formatAsDate(endDateDate));
+            String startDateStr = DateFormatter.formatAsDate(startDateDate);
+            if (startDateStr != null && startDateStr.length() > 0) {
+                LogQuery.getInstance().setSearchQueryItem(
+                    LogQuery.START_DATE_KEY, startDateStr);
+            }
+
+            String endDateStr = DateFormatter.formatAsDate(endDateDate);
+            if (endDateStr != null && endDateStr.length() > 0) {
+                LogQuery.getInstance().setSearchQueryItem(
+                    LogQuery.END_DATE_KEY, endDateStr);
+            }
             /*
              * LogQuery.getInstance().setSearchQueryItem( "containerType",
              * containerTypeCombo.getText()); LogQuery.getInstance()

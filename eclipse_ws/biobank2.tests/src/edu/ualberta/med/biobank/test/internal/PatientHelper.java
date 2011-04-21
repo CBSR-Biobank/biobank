@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
@@ -26,14 +29,19 @@ public class PatientHelper extends DbHelper {
         return patient;
     }
 
-    public static int addPatients(String number, StudyWrapper study)
-        throws Exception {
+    public static List<PatientWrapper> addRandPatients(String number,
+        StudyWrapper study) throws Exception {
+        List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
         int nber = r.nextInt(15) + 1;
         for (int i = 0; i < nber; i++) {
-            addPatient(number + i, study);
+            patients.add(addPatient(number + i, study));
         }
         study.reload();
-        return nber;
+        return patients;
     }
 
+    public static int addPatients(String number, StudyWrapper study)
+        throws Exception {
+        return addRandPatients(number, study).size();
+    }
 }
