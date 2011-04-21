@@ -48,6 +48,13 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         super(appService, dispatch);
     }
 
+    @Override
+    public Dispatch getNewObject() throws Exception {
+        Dispatch newObject = super.getNewObject();
+        newObject.setState(DispatchState.CREATION.getId());
+        return newObject;
+    }
+
     public String getStateDescription() {
         DispatchState state = DispatchState
             .getState(getProperty(DispatchPeer.STATE));
