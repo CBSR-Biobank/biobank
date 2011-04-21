@@ -116,7 +116,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         });
 
         radioDateSent = new Button(composite, SWT.RADIO);
-        radioDateSent.setText("Date Sent");
+        radioDateSent.setText("Date Packed");
         radioDateSent.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -252,24 +252,33 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         ModelWrapper<?> wrapper) {
         if (currentInstance != null && wrapper instanceof OriginInfoWrapper) {
             OriginInfoWrapper originInfo = (OriginInfoWrapper) wrapper;
-
+            String text = "";
             AdapterBase topNode = parentNode;
             if (parentNode.equals(currentInstance.searchedNode)
                 && !currentInstance.radioWaybill.getSelection()) {
-                Date date = (Date) originInfo.getShipmentInfo().getReceivedAt()
-                    .clone();
+                Date date;
+                if (currentInstance.radioDateReceived.getSelection()) {
+                    text = "Received";
+                    date = (Date) originInfo.getShipmentInfo().getReceivedAt()
+                        .clone();
+                } else {
+                    text = "Packed";
+                    date = (Date) originInfo.getShipmentInfo().getPackedAt()
+                        .clone();
+                }
                 Calendar c = Calendar.getInstance();
                 c.setTime(date);
                 c.set(Calendar.SECOND, 0);
                 c.set(Calendar.MINUTE, 0);
                 c.set(Calendar.HOUR_OF_DAY, 0);
                 date = c.getTime();
-                List<AdapterBase> dateNodeRes = parentNode.search(date);
+                List<AdapterBase> dateNodeRes = parentNode.search((int) date
+                    .getTime() + text.hashCode());
                 AdapterBase dateNode = null;
                 if (dateNodeRes.size() > 0)
                     dateNode = dateNodeRes.get(0);
                 else {
-                    dateNode = new DateNode(parentNode, date);
+                    dateNode = new DateNode(parentNode, text, date);
                     parentNode.addChild(dateNode);
                 }
                 topNode = dateNode;
