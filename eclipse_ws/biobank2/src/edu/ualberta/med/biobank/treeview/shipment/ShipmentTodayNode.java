@@ -43,8 +43,11 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
     @Override
     protected List<OriginInfoWrapper> getTodayElements()
         throws ApplicationException {
-        return OriginInfoWrapper.getTodayShipments(SessionManager
-            .getAppService());
+        if (SessionManager.getInstance().isConnected())
+            return OriginInfoWrapper.getTodayShipments(SessionManager
+                .getAppService());
+        else
+            return null;
     }
 
     @Override

@@ -49,8 +49,6 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     private DispatchCenterAdapter centerNode;
 
-    private AbstractSearchedNode searchedNode;
-
     private Button radioDateReceived;
 
     private Button radioDateSent;
@@ -242,11 +240,12 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 searchedNode.addSearchObject(searchedObject);
         }
         searchedNode.performExpand();
-        for (ModelWrapper<?> searchedObject : searchedObjects) {
-            List<AdapterBase> nodeRes = rootNode.search(searchedObject);
-            if (doubleClick)
-                nodeRes.get(0).performDoubleClick();
-        }
+        if (searchedObjects.size() == 1) {
+            List<AdapterBase> nodeRes = rootNode.search(searchedObjects.get(0));
+            nodeRes.get(0).performDoubleClick();
+        } else
+            BiobankPlugin.openMessage("Shipments", searchedObjects.size()
+                + " found.");
     }
 
     public static AdapterBase addToNode(AdapterBase parentNode,

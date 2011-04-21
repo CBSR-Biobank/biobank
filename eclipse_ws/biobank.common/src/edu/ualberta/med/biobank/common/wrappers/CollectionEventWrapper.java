@@ -504,4 +504,17 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return 0;
     }
 
+    public static Integer getNextVisitNumber(
+        WritableApplicationService appService, CollectionEventWrapper cevent)
+        throws Exception {
+        HQLCriteria c = new HQLCriteria("select max(ce.visitNumber) from "
+            + CollectionEvent.class.getName() + " ce where ce.patient.id=?",
+            Arrays.asList(cevent.getPatient().getId()));
+        List<Object> result = appService.query(c);
+        if (result == null || result.size() == 0 || result.get(0) == null)
+            return 1;
+        else
+            return (Integer) result.get(0) + 1;
+    }
+
 }
