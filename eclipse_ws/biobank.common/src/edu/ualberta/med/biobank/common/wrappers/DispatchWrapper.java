@@ -15,8 +15,11 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
+import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
+import edu.ualberta.med.biobank.common.peer.DispatchSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
@@ -33,6 +36,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     private final Map<DispatchSpecimenState, List<DispatchSpecimenWrapper>> dispatchSpecimenMap = new HashMap<DispatchSpecimenState, List<DispatchSpecimenWrapper>>();
 
     private List<DispatchSpecimenWrapper> deletedDispatchedSpecimens = new ArrayList<DispatchSpecimenWrapper>();
+
+    private boolean hasNewSpecimens = false;
 
     public DispatchWrapper(WritableApplicationService appService) {
         super(appService);
@@ -146,7 +151,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 map.put(state, new ArrayList<DispatchSpecimenWrapper>());
             }
             for (DispatchSpecimenWrapper wrapper : list) {
-                map.get(wrapper.getDispatchSpecimenState()).add(wrapper);
+                map.get(wrapper.getSpecimenState()).add(wrapper);
             }
         }
 
@@ -172,90 +177,40 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return list;
     }
 
-    public List<SpecimenWrapper> getSpecimenCollection() {
-        return getSpecimenCollection(true);
-    }
-
-    public void addSpecimens(List<SpecimenWrapper> newSpecimens) {
+    public void addSpecimens(List<SpecimenWrapper> newSpecimens,
+        DispatchSpecimenState state) {
         if (newSpecimens == null)
             return;
 
         // already added dsa
         List<DispatchSpecimenWrapper> currentDaList = getDispatchSpecimenCollection(false);
         List<DispatchSpecimenWrapper> newDispatchSpecimens = new ArrayList<DispatchSpecimenWrapper>();
-        List<SpecimenWrapper> currentAliquotList = new ArrayList<SpecimenWrapper>();
+        List<SpecimenWrapper> currentSpecimenList = new ArrayList<SpecimenWrapper>();
 
         for (DispatchSpecimenWrapper dsa : currentDaList) {
-            currentAliquotList.add(dsa.getSpecimen());
+            currentSpecimenList.add(dsa.getSpecimen());
         }
 
-        // new aliquots added
-        for (SpecimenWrapper aliquot : newSpecimens) {
-            if (!currentAliquotList.contains(aliquot)) {
+        // new specimens added
+        for (SpecimenWrapper specimen : newSpecimens) {
+            if (!currentSpecimenList.contains(specimen)) {
                 DispatchSpecimenWrapper dsa = new DispatchSpecimenWrapper(
                     appService);
-                dsa.setSpecimen(aliquot);
+                dsa.setSpecimen(specimen);
                 dsa.setDispatch(this);
                 dsa.setDispatchSpecimenState(DispatchSpecimenState.NONE);
+                dispatchSpecimenMap.put(DispatchSpecimenState.NONE,
+                    new ArrayList<DispatchSpecimenWrapper>());
                 newDispatchSpecimens.add(dsa);
+                hasNewSpecimens = true;
                 dispatchSpecimenMap.get(DispatchSpecimenState.NONE).add(dsa);
             }
         }
-
         addToDispatchSpecimenCollection(newDispatchSpecimens);
-
         // make sure previously deleted ones, that have been re-added, are
         // no longer deleted
         deletedDispatchedSpecimens.removeAll(newDispatchSpecimens);
-    }
-
-    public static class CheckStatus {
-        public CheckStatus(boolean b, String string) {
-            this.ok = b;
-            this.message = string;
-        }
-
-        public boolean ok = true;
-        public String message;
-
-    }
-
-    public CheckStatus checkCanAddSpecimen(SpecimenWrapper spc,
-        boolean checkAlreadyAdded) {
-        return checkCanAddSpecimen(getSpecimenCollection(), spc,
-            checkAlreadyAdded);
-    }
-
-    public CheckStatus checkCanAddSpecimen(
-        List<SpecimenWrapper> currentAliquots, SpecimenWrapper aliquot,
-        boolean checkAlreadyAdded) {
-        if (aliquot.isNew()) {
-            return new CheckStatus(false, "Cannot add aliquot "
-                + aliquot.getInventoryId() + ": it has not been saved");
-        }
-        if (!aliquot.isActive()) {
-            return new CheckStatus(false, "Activity status of "
-                + aliquot.getInventoryId() + " is not 'Active'."
-                + " Check comments on this aliquot for more information.");
-        }
-        if (!aliquot.getCurrentCenter().equals(getSenderCenter())) {
-            return new CheckStatus(false, "Specimen "
-                + aliquot.getInventoryId() + " is currently assigned to site "
-                + aliquot.getCurrentCenter().getNameShort()
-                + ". It should be first assigned to "
-                + getSenderCenter().getNameShort() + " site.");
-        }
-        if (checkAlreadyAdded && currentAliquots != null
-            && currentAliquots.contains(aliquot)) {
-            return new CheckStatus(false, "Specimen "
-                + aliquot.getInventoryId() + " is already in this Dispatch.");
-        }
-        if (aliquot.isUsedInDispatch()) {
-            return new CheckStatus(false, "Specimen "
-                + aliquot.getInventoryId()
-                + " is already in an active dispatch.");
-        }
-        return new CheckStatus(true, "");
+        resetMap();
     }
 
     @Override
@@ -265,7 +220,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         resetMap();
     }
 
-    public void removeAliquots(List<DispatchSpecimenWrapper> dsaList) {
+    public void removeSpecimens(List<DispatchSpecimenWrapper> dsaList) {
         if (dsaList == null) {
             throw new NullPointerException();
         }
@@ -286,8 +241,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     public void receiveSpecimens(List<SpecimenWrapper> specimensToReceive) {
-        List<DispatchSpecimenWrapper> nonProcessedAliquots = getDispatchSpecimenCollectionWithState(DispatchSpecimenState.NONE);
-        for (DispatchSpecimenWrapper da : nonProcessedAliquots) {
+        List<DispatchSpecimenWrapper> nonProcessedSpecimens = getDispatchSpecimenCollectionWithState(DispatchSpecimenState.NONE);
+        for (DispatchSpecimenWrapper da : nonProcessedSpecimens) {
             if (specimensToReceive.contains(da.getSpecimen())) {
                 da.setDispatchSpecimenState(DispatchSpecimenState.RECEIVED);
                 da.getSpecimen().setCurrentCenter(getReceiverCenter());
@@ -344,8 +299,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     public boolean hasDispatchSpecimens() {
-        return getSpecimenCollection() != null
-            && !getSpecimenCollection().isEmpty();
+        return getSpecimenCollection(false) != null
+            && !getSpecimenCollection(false).isEmpty();
     }
 
     public boolean canBeReceivedBy(User user) {
@@ -378,29 +333,24 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return getDispatchSpecimenCollectionWithState(DispatchSpecimenState.RECEIVED);
     }
 
-    public void addExtraAliquots(List<SpecimenWrapper> extraAliquots) {
-        List<DispatchSpecimenWrapper> daws = new ArrayList<DispatchSpecimenWrapper>();
-        for (SpecimenWrapper a : extraAliquots) {
-            DispatchSpecimenWrapper da = new DispatchSpecimenWrapper(appService);
-            da.setSpecimen(a);
-            da.setDispatch(this);
-            da.setDispatchSpecimenState(DispatchSpecimenState.EXTRA);
-            daws.add(da);
-        }
-        addToDispatchSpecimenCollection(daws);
-        resetMap();
-    }
+    private static final String FAST_DISPATCH_SPECIMEN_QRY = "select ra from "
+        + DispatchSpecimen.class.getName() + " ra inner join fetch ra."
+        + DispatchSpecimenPeer.SPECIMEN.getName()
+        + " as spec inner join fetch spec."
+        + SpecimenPeer.SPECIMEN_TYPE.getName() + " inner join fetch spec."
+        + SpecimenPeer.COLLECTION_EVENT.getName()
+        + " as cevent inner join fetch cevent."
+        + CollectionEventPeer.PATIENT.getName() + " inner join fetch spec."
+        + SpecimenPeer.ACTIVITY_STATUS.getName() + " where ra."
+        + Property.concatNames(DispatchSpecimenPeer.DISPATCH, DispatchPeer.ID)
+        + " = ?";
 
     // fast... from db. should only call this once then use the cached value
     public List<DispatchSpecimenWrapper> getFastDispatchSpecimenCollection() {
         if (!isPropertyCached(DispatchPeer.DISPATCH_SPECIMEN_COLLECTION)) {
-            List<DispatchSpecimen> results = new ArrayList<DispatchSpecimen>();
+            List<DispatchSpecimen> results;
             // test hql
-            HQLCriteria query = new HQLCriteria(
-                "select ra from "
-                    + DispatchSpecimen.class.getName()
-                    + " ra inner join fetch ra.specimen inner join fetch ra.specimen.specimenType inner join fetch ra.specimen.collectionEvent inner join fetch ra.specimen.collectionEvent.patient inner join fetch ra.specimen.activityStatus "
-                    + " where ra.dispatch.id = ?",
+            HQLCriteria query = new HQLCriteria(FAST_DISPATCH_SPECIMEN_QRY,
                 Arrays.asList(new Object[] { getId() }));
             try {
                 results = appService.query(query);
@@ -410,19 +360,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             wrappedObject.setDispatchSpecimenCollection(results);
         }
         return getDispatchSpecimenCollection(false);
-    }
-
-    public void addAliquots(List<SpecimenWrapper> aliquots) {
-        List<DispatchSpecimenWrapper> daws = new ArrayList<DispatchSpecimenWrapper>();
-        for (SpecimenWrapper a : aliquots) {
-            DispatchSpecimenWrapper da = new DispatchSpecimenWrapper(appService);
-            da.setSpecimen(a);
-            da.setDispatch(this);
-            da.setDispatchSpecimenState(DispatchSpecimenState.NONE);
-            daws.add(da);
-        }
-        addToDispatchSpecimenCollection(daws);
-        resetMap();
     }
 
     public boolean canBeClosedBy(User user) {
@@ -436,9 +373,11 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
+    protected void resetInternalFields() {
+        super.resetInternalFields();
         resetMap();
+        deletedDispatchedSpecimens.clear();
+        hasNewSpecimens = false;
     }
 
     public void resetMap() {
@@ -568,5 +507,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         if (getReceiverCenter() != null)
             centers.add(getReceiverCenter());
         return centers;
+    }
+
+    public boolean hasNewSpecimens() {
+        return hasNewSpecimens;
     }
 }

@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
 
-    class TableRowData {
+    private static class TableRowData {
         public ClinicWrapper clinic;
         public String clinicName;
         public String clinicNameShort;

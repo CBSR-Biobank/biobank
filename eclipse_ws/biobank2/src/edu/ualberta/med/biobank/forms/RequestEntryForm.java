@@ -12,26 +12,19 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.RequestState;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.RequestReceiveScanDialog;
-import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.AliquotInfo;
-import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.ResType;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.RequestAliquotsTreeTable;
+import edu.ualberta.med.biobank.widgets.RequestSpecimensTreeTable;
 
-public class RequestEntryFormBase extends BiobankFormBase {
+public class RequestEntryForm extends BiobankFormBase {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.RequestEntryFormBase";
     private RequestWrapper request;
-    private RequestAliquotsTreeTable aliquotsTree;
+    private RequestSpecimensTreeTable specimensTree;
     private Button button;
 
     @Override
@@ -75,14 +68,14 @@ public class RequestEntryFormBase extends BiobankFormBase {
         setTextValue(submittedLabel,
             DateFormatter.formatAsDateTime(request.getSubmitted()));
         createReadOnlyLabelledField(client, SWT.NONE, "Comments");
-        Section s = createSection("Aliquots");
+        Section s = createSection("Specimens");
         Composite c = toolkit.createComposite(s);
         s.setClient(c);
         c.setLayout(new GridLayout());
         c.setLayoutData(new GridData());
-        createAliquotsSelectionActions(c, false);
+        createSpecimensSelectionActions(c, false);
 
-        aliquotsTree = new RequestAliquotsTreeTable(c, request);
+        specimensTree = new RequestSpecimensTreeTable(c, request);
 
         button = new Button(c, SWT.PUSH);
         button.setVisible(false);
@@ -91,12 +84,12 @@ public class RequestEntryFormBase extends BiobankFormBase {
     }
 
     @SuppressWarnings("unused")
-    protected void createAliquotsSelectionActions(Composite composite,
+    protected void createSpecimensSelectionActions(Composite composite,
         boolean setAsFirstControl) {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
         toolkit.createLabel(addComposite, "Enter inventory ID to add:");
-        final BiobankText newAliquotText = new BiobankText(addComposite,
+        final BiobankText newSpecimenText = new BiobankText(addComposite,
             SWT.NONE, toolkit);
         Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
         addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
@@ -105,13 +98,13 @@ public class RequestEntryFormBase extends BiobankFormBase {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 try {
-                    request.receiveAliquot(newAliquotText.getText());
+                    request.receiveSpecimen(newSpecimenText.getText());
                 } catch (Exception e1) {
                     BiobankPlugin.openAsyncError("Save Error", e1);
                 }
-                newAliquotText.setFocus();
-                newAliquotText.setText("");
-                aliquotsTree.refresh();
+                newSpecimenText.setFocus();
+                newSpecimenText.setText("");
+                specimensTree.refresh();
                 try {
                     button.setEnabled(request.isAllProcessed());
                 } catch (Exception ex) {
@@ -123,7 +116,7 @@ public class RequestEntryFormBase extends BiobankFormBase {
         Button openScanButton = toolkit
             .createButton(addComposite, "", SWT.PUSH);
         openScanButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT));
+            .get(BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -137,10 +130,10 @@ public class RequestEntryFormBase extends BiobankFormBase {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             request, request.getRequester());
         dialog.open();
-        if (dialog.hasReceivedAliquots()) {
+        if (dialog.hasReceivedSpecimens()) {
             // setDirty(true);
         }
-        aliquotsTree.refresh();
+        specimensTree.refresh();
         try {
             button.setEnabled(request.isAllProcessed());
         } catch (Exception e) {
@@ -158,31 +151,4 @@ public class RequestEntryFormBase extends BiobankFormBase {
         setPartName("Request " + request.getId().toString());
     }
 
-    public static AliquotInfo getInfoForInventoryId(
-        ModelWrapper<?> currentShipment, String inventoryId) {
-        RequestSpecimenWrapper dsa = ((RequestWrapper) currentShipment)
-            .getRequestSpecimen(inventoryId);
-        if (dsa == null) {
-            // aliquot not in shipment. Check if exists in DB:
-            SpecimenWrapper aliquot = null;
-            try {
-                aliquot = SpecimenWrapper.getSpecimen(
-                    currentShipment.getAppService(), inventoryId,
-                    SessionManager.getUser());
-            } catch (Exception ae) {
-                BiobankPlugin.openAsyncError("Error retrieving aliquot", ae);
-            }
-            if (aliquot == null) {
-                return new AliquotInfo(null, ResType.NOT_IN_DB);
-            }
-            return new AliquotInfo(aliquot, ResType.NOT_IN_SHIPMENT);
-        }
-        if (DispatchSpecimenState.RECEIVED.isEquals(dsa.getState())) {
-            return new AliquotInfo(dsa.getSpecimen(), ResType.RECEIVED);
-        }
-        if (DispatchSpecimenState.EXTRA.isEquals(dsa.getState())) {
-            return new AliquotInfo(dsa.getSpecimen(), ResType.EXTRA);
-        }
-        return new AliquotInfo(dsa.getSpecimen(), ResType.OK);
-    }
 }

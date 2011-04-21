@@ -175,8 +175,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             newTitle.append(" - Center ").append(currentCenterText);
         }
 
-        if (!newTitle.equals(oldTitle)) {
-            configurer.setTitle(newTitle.toString());
+        String newTitleString = newTitle.toString();
+        if (!newTitleString.equals(oldTitle)) {
+            configurer.setTitle(newTitleString);
         }
     }
 

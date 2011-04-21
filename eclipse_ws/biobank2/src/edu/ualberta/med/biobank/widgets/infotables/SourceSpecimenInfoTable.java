@@ -18,7 +18,7 @@ public class SourceSpecimenInfoTable extends
 
     private static final int PAGE_SIZE_ROWS = 5;
 
-    protected class TableRowData {
+    protected static class TableRowData {
         SourceSpecimenWrapper studySourceVessel;
         public String name;
         public String needTimeDrawn;

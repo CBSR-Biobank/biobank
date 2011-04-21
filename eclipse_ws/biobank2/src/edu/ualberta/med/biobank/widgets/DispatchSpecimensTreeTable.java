@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -28,26 +29,28 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
-import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
+import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
+import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.dialogs.dispatch.ModifyStateDispatchDialog;
 import edu.ualberta.med.biobank.forms.utils.DispatchTableGroup;
-import edu.ualberta.med.biobank.forms.utils.RequestTableGroup;
+import edu.ualberta.med.biobank.forms.utils.TableGroup;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 
-public class RequestAliquotsTreeTable extends BiobankWidget {
+public class DispatchSpecimensTreeTable extends BiobankWidget {
 
     private TreeViewer tv;
-    private RequestWrapper shipment;
+    private DispatchWrapper shipment;
     protected List<DispatchTableGroup> groups;
 
-    public RequestAliquotsTreeTable(Composite parent, RequestWrapper shipment) {
+    public DispatchSpecimensTreeTable(Composite parent,
+        final DispatchWrapper shipment, final boolean editSpecimensState,
+        final boolean editSpecimensComment) {
         super(parent, SWT.NONE);
 
         this.shipment = shipment;
@@ -73,11 +76,15 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Location");
+        tc.setText("Patient Number");
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Claimed By");
+        tc.setText("Activity Status");
+        tc.setWidth(120);
+
+        tc = new TreeColumn(tree, SWT.LEFT);
+        tc.setText("Dispatch comment");
         tc.setWidth(100);
 
         ITreeContentProvider contentProvider = new ITreeContentProvider() {
@@ -88,8 +95,8 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
-                // groups = RequestTableGroup
-                // .getGroupsForShipment(RequestAliquotsTreeTable.this.shipment);
+                groups = DispatchTableGroup
+                    .getGroupsForShipment(DispatchSpecimensTreeTable.this.shipment);
             }
 
             @Override
@@ -117,9 +124,9 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
         final BiobankLabelProvider labelProvider = new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                if (element instanceof RequestTableGroup) {
+                if (element instanceof TableGroup) {
                     if (columnIndex == 0)
-                        return ((RequestTableGroup) element).getTitle();
+                        return ((TableGroup<?>) element).getTitle();
                     return "";
                 } else if (element instanceof RequestContainerAdapter) {
                     if (columnIndex == 0)
@@ -141,9 +148,9 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             public void doubleClick(DoubleClickEvent event) {
                 Object o = ((IStructuredSelection) tv.getSelection())
                     .getFirstElement();
-                if (o instanceof TreeItemAdapter) {
-                    ItemWrapper ra = ((TreeItemAdapter) o).getSpecimen();
-                    SessionManager.openViewForm(ra.getSpecimen());
+                if (o instanceof DispatchSpecimenWrapper) {
+                    DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) o;
+                    SessionManager.openViewForm(dsa.getSpecimen());
                 }
             }
         });
@@ -157,90 +164,85 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                 for (MenuItem menuItem : menu.getItems()) {
                     menuItem.dispose();
                 }
-
-                RequestSpecimenWrapper ra = getSelectedAliquot();
-                if (ra != null) {
-                    addClipboardCopySupport(menu, labelProvider);
-                    addSetUnavailableMenu(menu);
-                    addClaimMenu(menu);
-                } else {
-                    Object node = getSelectedNode();
-                    if (node != null) {
-                        addClaimMenu(menu);
+                addClipboardCopySupport(menu, labelProvider);
+                if (editSpecimensState || editSpecimensComment) {
+                    DispatchSpecimenWrapper dsa = getSelectedSpecimen();
+                    if (dsa != null) {
+                        if (editSpecimensState
+                            && DispatchSpecimenState.getState(dsa.getState()) == DispatchSpecimenState.NONE)
+                            addSetMissingMenu(menu);
+                        if (editSpecimensComment)
+                            addModifyCommentMenu(menu);
                     }
                 }
             }
         });
     }
 
-    protected Object getSelectedNode() {
+    protected DispatchSpecimenWrapper getSelectedSpecimen() {
         IStructuredSelection selection = (IStructuredSelection) tv
             .getSelection();
-        if (selection != null
-            && selection.size() > 0
-            && (selection.getFirstElement() instanceof TreeItemAdapter || selection
-                .getFirstElement() instanceof RequestContainerAdapter))
-            return selection.getFirstElement();
-        return null;
-    }
-
-    protected RequestSpecimenWrapper getSelectedAliquot() {
-        Object node = getSelectedNode();
-        if (node != null && node instanceof TreeItemAdapter) {
-            return (RequestSpecimenWrapper) ((TreeItemAdapter) node)
-                .getSpecimen();
+        if (selection != null && selection.size() > 0
+            && selection.getFirstElement() instanceof TreeItemAdapter) {
+            return (DispatchSpecimenWrapper) ((TreeItemAdapter) selection
+                .getFirstElement()).getSpecimen();
         }
         return null;
     }
 
-    protected void addClaimMenu(Menu menu) {
+    protected void addModifyCommentMenu(Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Claim");
+        item.setText("Modify comment");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                claim(getSelectedNode());
-                refresh();
+                modifyCommentAndState((IStructuredSelection) tv.getSelection(),
+                    null);
             }
         });
     }
 
-    protected void claim(Object node) {
-        try {
-            if (node instanceof TreeItemAdapter) {
-                RequestSpecimenWrapper a = (RequestSpecimenWrapper) ((TreeItemAdapter) node)
-                    .getSpecimen();
-                a.setClaimedBy(SessionManager.getUser().getFirstName());
-                a.persist();
-            } else {
-                List<Node> children = ((RequestContainerAdapter) node)
-                    .getChildren();
-                for (Object child : children)
-                    claim(child);
-            }
-        } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Failed to claim", e);
-        }
-    }
-
-    private void addSetUnavailableMenu(final Menu menu) {
+    private void addSetMissingMenu(final Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Flag as unavailable");
+        item.setText("Set as missing");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                getSelectedAliquot().setState(
-                    RequestSpecimenState.UNAVAILABLE_STATE.getId());
-                try {
-                    getSelectedAliquot().persist();
-                } catch (Exception e) {
-                    BiobankPlugin.openAsyncError("Save Error", e);
+                modifyCommentAndState((IStructuredSelection) tv.getSelection(),
+                    DispatchSpecimenState.MISSING);
+            }
+        });
+    }
+
+    private void modifyCommentAndState(
+        IStructuredSelection iStructuredSelection,
+        DispatchSpecimenState newState) {
+        String previousComment = null;
+        if (iStructuredSelection.size() == 1) {
+            previousComment = ((DispatchSpecimenWrapper) ((TreeItemAdapter) iStructuredSelection
+                .getFirstElement()).getSpecimen()).getComment();
+        }
+        ModifyStateDispatchDialog dialog = new ModifyStateDispatchDialog(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+            previousComment, newState);
+        int res = dialog.open();
+        if (res == Dialog.OK) {
+            String comment = dialog.getComment();
+            for (Iterator<?> iter = iStructuredSelection.iterator(); iter
+                .hasNext();) {
+                DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) ((TreeItemAdapter) iter
+                    .next()).getSpecimen();
+                dsa.setComment(comment);
+                if (newState != null) {
+                    dsa.setDispatchSpecimenState(newState);
                 }
-                refresh();
             }
-        });
+            shipment.resetMap();
+            tv.refresh();
+            notifyListeners();
+        }
     }
 
     public void refresh() {

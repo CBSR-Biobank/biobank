@@ -374,6 +374,24 @@ ALTER TABLE shipping_method
       ADD CONSTRAINT NAME UNIQUE KEY(NAME);
 
 /*****************************************************
+ * patient changes
+ ****************************************************/
+
+ALTER TABLE patient ADD COLUMN CREATED_AT DATETIME NULL DEFAULT NULL COMMENT '';
+
+update patient p
+       join (select p.id,min(pv.date_drawn) as min_date_drawn
+       from patient p
+       join clinic_shipment_patient csp on csp.patient_id=p.id
+       join patient_visit pv on pv.clinic_shipment_patient_id=csp.id
+       group by p.id) as a on p.id=a.id
+       set p.created_at=a.min_date_drawn;
+
+update patient p
+       set p.created_at = '1970-01-01'
+       where p.created_at is null;
+
+/*****************************************************
  * study changes
  ****************************************************/
 
@@ -748,8 +766,6 @@ CREATE TABLE researcher (
     ID INT(11) NOT NULL,
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-ALTER TABLE patient ADD COLUMN CREATED_AT DATETIME NULL DEFAULT NULL COMMENT '';
 
 CREATE TABLE request (
     ID INT(11) NOT NULL,
@@ -1484,7 +1500,94 @@ alter table study engine=InnoDB;
 alter table study_contact engine=InnoDB;
 alter table study_event_attr engine=InnoDB;
 
--- mysql-diff changes to fully convert to InnoDB
+/*****************************************************
+ * Add Hibernate version to achieve optimistic
+ * concurrency control
+ ****************************************************/
+
+ALTER TABLE abstract_position ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE activity_status ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE address ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE aliquoted_specimen ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE capacity ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE center ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE collection_event ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE contact ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE container ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE container_labeling_scheme ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE container_path ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE container_type ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE dispatch ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE dispatch_specimen ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE entity ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE entity_column ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE entity_filter ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE entity_property ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE event_attr ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE event_attr_type ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE global_event_attr ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE origin_info ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE patient ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE processing_event ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE property_modifier ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE property_type ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE report ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE report_column ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE report_filter ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE report_filter_value ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE request ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE request_specimen ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE shipment_info ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE shipping_method ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE source_specimen ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE specimen ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE specimen_type ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE study ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+ALTER TABLE study_event_attr ADD COLUMN VERSION INT(11) NOT NULL COMMENT '';
+
+update abstract_position set VERSION=0;
+update activity_status set VERSION=0;
+update address set VERSION=0;
+update aliquoted_specimen set VERSION=0;
+update capacity set VERSION=0;
+update center set VERSION=0;
+update collection_event set VERSION=0;
+update contact set VERSION=0;
+update container set VERSION=0;
+update container_labeling_scheme set VERSION=0;
+update container_path set VERSION=0;
+update container_type set VERSION=0;
+update dispatch set VERSION=0;
+update dispatch_specimen set VERSION=0;
+update entity set VERSION=0;
+update entity_column set VERSION=0;
+update entity_filter set VERSION=0;
+update entity_property set VERSION=0;
+update event_attr set VERSION=0;
+update event_attr_type set VERSION=0;
+update global_event_attr set VERSION=0;
+update origin_info set VERSION=0;
+update patient set VERSION=0;
+update processing_event set VERSION=0;
+update property_modifier set VERSION=0;
+update property_type set VERSION=0;
+update report set VERSION=0;
+update report_column set VERSION=0;
+update report_filter set VERSION=0;
+update report_filter_value set VERSION=0;
+update request set VERSION=0;
+update request_specimen set VERSION=0;
+update shipment_info set VERSION=0;
+update shipping_method set VERSION=0;
+update source_specimen set VERSION=0;
+update specimen set VERSION=0;
+update specimen_type set VERSION=0;
+update study set VERSION=0;
+update study_event_attr set VERSION=0;
+
+/*****************************************************
+ * mysql-diff changes to fully convert to InnoDB
+ ****************************************************/
 
 ALTER TABLE abstract_position
       ADD CONSTRAINT FKBC4AE0A69BFD88CF FOREIGN KEY FKBC4AE0A69BFD88CF (CONTAINER_ID) REFERENCES container (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,

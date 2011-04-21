@@ -9,6 +9,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
@@ -66,9 +67,9 @@ public class SiteAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Site");
         addViewMenu(menu, "Site");
-        // FIXME should not be able to delete a site if it is currently the
-        // working center
-        addDeleteMenu(menu, "Site");
+        if (!getModelObject().equals(
+            SessionManager.getUser().getCurrentWorkingCenter()))
+            addDeleteMenu(menu, "Site");
     }
 
     @Override

@@ -13,9 +13,9 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.CellStatus;
-import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileSettings;
 
@@ -66,7 +66,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     }
 
     @Override
-    public void initLegend(List<CellStatus> status) {
+    public void initLegend(List<UICellStatus> status) {
         super.initLegend(status);
         hasLegend = true;
         legendWidth = PALLET_WIDTH / legendStatus.size();
@@ -84,7 +84,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         super.paintGrid(e, displayWidget);
         if (hasLegend) {
             for (int i = 0; i < legendStatus.size(); i++) {
-                CellStatus status = legendStatus.get(i);
+                UICellStatus status = legendStatus.get(i);
                 drawLegend(e, status.getColor(), i, status.getLegend());
             }
         }
@@ -104,8 +104,9 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     }
 
     @Override
-    protected String getMiddleTextForBox(Map<RowColPos, ? extends Cell> cells,
-        int indexRow, int indexCol) {
+    protected String getMiddleTextForBox(
+        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        int indexCol) {
         if (cells != null) {
             PalletCell cell = (PalletCell) cells.get(new RowColPos(indexRow,
                 indexCol));
@@ -116,16 +117,18 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     }
 
     @Override
-    protected String getTopTextForBox(Map<RowColPos, ? extends Cell> cells,
-        int indexRow, int indexCol) {
-        String row = new Character((char) (indexRow + 'A')).toString();
-        String col = new Integer(indexCol + 1).toString();
+    protected String getTopTextForBox(
+        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        int indexCol) {
+        String row = Character.valueOf((char) (indexRow + 'A')).toString();
+        String col = Integer.valueOf(indexCol + 1).toString();
         return row + col;
     }
 
     @Override
-    protected String getBottomTextForBox(Map<RowColPos, ? extends Cell> cells,
-        int indexRow, int indexCol) {
+    protected String getBottomTextForBox(
+        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        int indexCol) {
         if (cells != null) {
             PalletCell cell = (PalletCell) cells.get(new RowColPos(indexRow,
                 indexCol));

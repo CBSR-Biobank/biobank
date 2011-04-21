@@ -31,7 +31,7 @@ public class ContactAddDialog extends BiobankDialog {
 
     @Override
     protected String getDialogShellTitle() {
-        String title = new String();
+        String title;
         if (contactWrapper.getName() == null) {
             title = "Add";
         } else {

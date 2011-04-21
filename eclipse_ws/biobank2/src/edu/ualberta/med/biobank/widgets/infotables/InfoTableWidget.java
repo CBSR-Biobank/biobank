@@ -139,7 +139,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
             && (collection.size() > pageInfo.rowsPerPage)) {
             Double size = new Double(collection.size());
             Double pageSize = new Double(pageInfo.rowsPerPage);
-            pageInfo.pageTotal = new Double(Math.ceil(size / pageSize))
+            pageInfo.pageTotal = Double.valueOf(Math.ceil(size / pageSize))
                 .intValue();
             paginationRequired = true;
             if (pageInfo.page == pageInfo.pageTotal)

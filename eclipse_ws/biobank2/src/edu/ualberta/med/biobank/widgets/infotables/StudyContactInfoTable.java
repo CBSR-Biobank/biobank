@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
  */
 public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
-    protected class TableRowData {
+    protected static class TableRowData {
         ContactWrapper contact;
         String clinicNameShort;
         Long patientCount;
@@ -27,8 +27,8 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         public String toString() {
             return StringUtils.join(new String[] { clinicNameShort,
                 (patientCount != null) ? patientCount.toString() : "",
-                (ceventCount != null) ? ceventCount.toString() : "", contactName,
-                contactTitle }, "\t");
+                (ceventCount != null) ? ceventCount.toString() : "",
+                contactName, contactTitle }, "\t");
 
         }
     }

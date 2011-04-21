@@ -106,14 +106,16 @@ public class TestCollectionEvent extends TestDatabase {
         CollectionEventWrapper cevent = CollectionEventHelper
             .addCollectionEvent(site, patient1, 1, oi, newSpecs);
 
-        Assert.assertEquals(newSpecs.length, cevent.getAllSpecimensCount(true));
+        Assert
+            .assertEquals(newSpecs.length, cevent.getAllSpecimensCount(false));
 
         SpecimenWrapper spec = DbHelper.chooseRandomlyInList(cevent
             .getAllSpecimenCollection(false));
         cevent.removeFromAllSpecimenCollection(Arrays.asList(spec));
         cevent.persist();
         // one specimen removed
-        Assert.assertEquals(1, cevent.getAllSpecimensCount(true));
+        Assert.assertEquals(newSpecs.length - 1,
+            cevent.getAllSpecimensCount(false));
     }
 
     @Test

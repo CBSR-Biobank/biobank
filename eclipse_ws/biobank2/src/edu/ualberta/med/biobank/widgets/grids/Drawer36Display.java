@@ -11,9 +11,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.CellStatus;
-import edu.ualberta.med.biobank.model.ContainerCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
+import edu.ualberta.med.biobank.widgets.grids.cell.ContainerCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 
 /**
  * Drawer 36 display.
@@ -39,12 +39,12 @@ public class Drawer36Display extends AbstractContainerDisplay {
 
     private static final int DRAWER_SIZE = 36;
 
-    public static int LEGEND_WIDTH = 70;
+    public int LEGEND_WIDTH = 70;
 
     public static int LEGEND_HEIGHT = 20;
 
     @Override
-    public void initLegend(List<CellStatus> status) {
+    public void initLegend(List<UICellStatus> status) {
         super.initLegend(status);
         hasLegend = true;
     }
@@ -119,7 +119,7 @@ public class Drawer36Display extends AbstractContainerDisplay {
 
             if (displayWidget.getCells() != null) {
                 if (displayWidget.getMultiSelectionManager().isEnabled()) {
-                    Cell cell = displayWidget.getCells().get(
+                    AbstractUICell cell = displayWidget.getCells().get(
                         new RowColPos(boxIndex - 1, 0));
                     if (cell != null && cell.isSelected()) {
                         Rectangle rect = new Rectangle(rectangle.x + 5,
@@ -134,21 +134,21 @@ public class Drawer36Display extends AbstractContainerDisplay {
         }
         if (hasLegend) {
             for (int i = 0; i < legendStatus.size(); i++) {
-                CellStatus status = legendStatus.get(i);
+                UICellStatus status = legendStatus.get(i);
                 drawLegend(e, status.getColor(), i, status.getLegend());
             }
         }
     }
 
-    private CellStatus getStatus(Map<RowColPos, ? extends Cell> cells,
-        int boxIndex) {
-        CellStatus status = null;
+    private UICellStatus getStatus(
+        Map<RowColPos, ? extends AbstractUICell> cells, int boxIndex) {
+        UICellStatus status = null;
         if (cells != null) {
             status = ((ContainerCell) cells.get(new RowColPos(boxIndex - 1, 0)))
                 .getStatus();
         }
         if (status == null)
-            status = CellStatus.NOT_INITIALIZED;
+            status = UICellStatus.NOT_INITIALIZED;
         return status;
     }
 

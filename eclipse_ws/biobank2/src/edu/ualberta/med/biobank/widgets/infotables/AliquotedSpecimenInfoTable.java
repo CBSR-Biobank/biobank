@@ -17,7 +17,7 @@ public class AliquotedSpecimenInfoTable extends
 
     private static final int PAGE_SIZE_ROWS = 5;
 
-    protected class TableRowData {
+    protected static class TableRowData {
         public AliquotedSpecimenWrapper sampleStorage;
         public String typeName;
         public Double volume;

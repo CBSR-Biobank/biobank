@@ -24,13 +24,13 @@ public class CeListViewForm extends BiobankViewForm {
         Assert.isTrue(adapter == null, "adapter should be null");
         FormInput input = (FormInput) getEditorInput();
         pvs = (List<CollectionEventWrapper>) input.getAdapter(ArrayList.class);
-        Assert.isNotNull(pvs, "aliquots are null");
-        setPartName("Patient Visits");
+        Assert.isNotNull(pvs, "Collection event list is null");
+        setPartName("Collection events");
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Patient Visits");
+        form.setText("Collection events");
         page.setLayout(new GridLayout(1, false));
         // FIXME should we use this icon ?
         form.setImage(BiobankPlugin.getDefault().getImageRegistry()

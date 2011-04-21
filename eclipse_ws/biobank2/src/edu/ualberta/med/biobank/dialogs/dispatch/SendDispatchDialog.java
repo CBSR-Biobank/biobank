@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class SendDispatchDialog extends BiobankDialog {
 
-    private static final String TITLE = "Dispatching aliquots";
+    private static final String TITLE = "Dispatching specimens";
     private DispatchWrapper shipment;
 
     public SendDispatchDialog(Shell parentShell, DispatchWrapper shipment) {

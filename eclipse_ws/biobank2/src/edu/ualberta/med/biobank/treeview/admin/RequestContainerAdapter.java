@@ -39,15 +39,15 @@ public class RequestContainerAdapter implements Node {
     }
 
     private Integer getSpecimenCount() {
-        Integer aliquots = 0;
+        Integer specimens = 0;
         for (Object child : getChildren()) {
             if (child instanceof RequestContainerAdapter)
-                aliquots += ((RequestContainerAdapter) child)
+                specimens += ((RequestContainerAdapter) child)
                     .getSpecimenCount();
             else
-                aliquots++;
+                specimens++;
         }
-        return aliquots;
+        return specimens;
     }
 
     public void addChild(Node c) {

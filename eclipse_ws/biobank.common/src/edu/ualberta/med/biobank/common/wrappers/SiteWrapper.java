@@ -297,10 +297,6 @@ public class SiteWrapper extends SiteBaseWrapper {
         return getCountResult(appService, c);
     }
 
-    public String getShipmentCount() {
-        return null; // FIXME: no way to determine destination of shipinfos...
-    }
-
     public static final String PATIENT_COUNT_FOR_STUDY_QRY = "select count(distinct patient) from "
         + Site.class.getName()
         + " as site join site."

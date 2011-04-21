@@ -47,7 +47,7 @@ public class StudyViewForm extends BiobankViewForm {
     private AliquotedSpecimenInfoTable aliquotedSpecimenTable;
     private SourceSpecimenInfoTable sourceSpecimenTable;
 
-    private class StudyPvCustomInfo extends PvAttrCustom {
+    private static class StudyPvCustomInfo extends PvAttrCustom {
         public BiobankText wiget;
     }
 

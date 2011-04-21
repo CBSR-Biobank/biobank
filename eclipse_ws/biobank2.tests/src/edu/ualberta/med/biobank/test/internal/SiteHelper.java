@@ -14,6 +14,7 @@ public class SiteHelper extends DbHelper {
     public static SiteWrapper newSite(String name) throws Exception {
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
+        site.setNameShort(name);
         if (name != null) {
             if (name.length() <= 50) {
                 site.setNameShort(name);

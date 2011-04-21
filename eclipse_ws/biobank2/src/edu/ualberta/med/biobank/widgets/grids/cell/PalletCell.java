@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.model;
+package edu.ualberta.med.biobank.widgets.grids.cell;
 
 import java.util.HashMap;
 import java.util.List;
@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
+import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -14,9 +15,9 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class PalletCell extends Cell {
+public class PalletCell extends AbstractUICell {
 
-    private CellStatus status;
+    private UICellStatus status;
 
     private String information;
 
@@ -80,8 +81,8 @@ public class PalletCell extends Cell {
         WritableApplicationService appService, Integer siteId, Integer studyId)
         throws Exception {
         Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
-        List<SpecimenWrapper> specimens = DebugUtil
-            .getRandomAssignedSpecimens(appService, siteId, studyId);
+        List<SpecimenWrapper> specimens = DebugUtil.getRandomAssignedSpecimens(
+            appService, siteId, studyId);
         if (specimens.size() > 0) {
             palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
                 0, 0, specimens.get(0).getInventoryId())));
@@ -98,14 +99,13 @@ public class PalletCell extends Cell {
         throws ApplicationException {
         Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
         List<SpecimenWrapper> specimens = DebugUtil
-            .getRandomNonAssignedNonDispatchedSpecimens(appService, siteId);
+            .getRandomNonAssignedNonDispatchedSpecimens(appService, siteId, 30);
         int i = 0;
         while (i < specimens.size() && i < 30) {
             int row = i / 12;
             int col = i % 12;
-            palletScanned
-                .put(new RowColPos(row, col), new PalletCell(new ScanCell(row,
-                    col, specimens.get(i).getInventoryId())));
+            palletScanned.put(new RowColPos(row, col), new PalletCell(
+                new ScanCell(row, col, specimens.get(i).getInventoryId())));
             i++;
         }
         return palletScanned;
@@ -121,19 +121,19 @@ public class PalletCell extends Cell {
         while (i < randomSpecimens.size()) {
             int row = i / 12;
             int col = i % 12;
-            palletScanned
-                .put(new RowColPos(row, col), new PalletCell(new ScanCell(row,
-                    col, randomSpecimens.get(i).getInventoryId())));
+            palletScanned.put(new RowColPos(row, col),
+                new PalletCell(new ScanCell(row, col, randomSpecimens.get(i)
+                    .getInventoryId())));
             i++;
         }
         return palletScanned;
     }
 
-    public CellStatus getStatus() {
+    public UICellStatus getStatus() {
         return status;
     }
 
-    public void setStatus(CellStatus status) {
+    public void setStatus(UICellStatus status) {
         this.status = status;
     }
 
@@ -250,6 +250,34 @@ public class PalletCell extends Cell {
 
     public SpecimenWrapper getSourceSpecimen() {
         return sourceSpecimen;
+    }
+
+    public void merge(WritableApplicationService appService,
+        edu.ualberta.med.biobank.common.scanprocess.Cell cell) throws Exception {
+        setStatus(cell.getStatus());
+        setInformation(cell.getInformation());
+        setValue(cell.getValue());
+        setTitle(cell.getTitle());
+        SpecimenWrapper expectedSpecimen = null;
+        if (cell.getExpectedSpecimenId() != null) {
+            expectedSpecimen = new SpecimenWrapper(appService);
+            expectedSpecimen.getWrappedObject().setId(
+                cell.getExpectedSpecimenId());
+            expectedSpecimen.reload();
+        }
+        setExpectedSpecimen(expectedSpecimen);
+        SpecimenWrapper specimen = null;
+        if (cell.getSpecimenId() != null) {
+            specimen = new SpecimenWrapper(appService);
+            specimen.getWrappedObject().setId(cell.getSpecimenId());
+            specimen.reload();
+        }
+        setSpecimen(specimen);
+    }
+
+    public void setStatus(CellStatus status) {
+        if (status != null)
+            setStatus(UICellStatus.valueOf(status.name()));
     }
 
 }

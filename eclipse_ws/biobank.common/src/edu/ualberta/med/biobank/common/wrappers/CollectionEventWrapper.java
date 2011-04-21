@@ -296,10 +296,11 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
      * source specimen that are in a process event
      */
     public List<SpecimenWrapper> getSourceSpecimenCollectionInProcess(
-        boolean sort) {
+        ProcessingEventWrapper pEvent, boolean sort) {
         List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
         for (SpecimenWrapper specimen : getOriginalSpecimenCollection(sort)) {
-            if (specimen.getProcessingEvent() != null)
+            if (specimen.getProcessingEvent() != null
+                && specimen.getProcessingEvent().equals(pEvent))
                 specimens.add(specimen);
         }
         return specimens;
@@ -503,9 +504,4 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return 0;
     }
 
-    @Deprecated
-    public ClinicWrapper getClinic() {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

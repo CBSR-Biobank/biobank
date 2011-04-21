@@ -1,6 +1,10 @@
 package edu.ualberta.med.biobank.common.util;
 
-public class RowColPos implements Comparable<RowColPos> {
+import java.io.Serializable;
+
+public class RowColPos implements Comparable<RowColPos>, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public static int PALLET_96_ROW_MAX = 8;
 

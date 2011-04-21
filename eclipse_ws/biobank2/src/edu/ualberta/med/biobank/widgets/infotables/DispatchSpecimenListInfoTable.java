@@ -16,10 +16,10 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public abstract class DispatchAliquotListInfoTable extends
+public abstract class DispatchSpecimenListInfoTable extends
     InfoTableWidget<DispatchSpecimenWrapper> {
 
-    protected class TableRowData {
+    protected static class TableRowData {
         DispatchSpecimenWrapper dsa;
         String inventoryId;
         String type;
@@ -39,10 +39,10 @@ public abstract class DispatchAliquotListInfoTable extends
 
     private boolean editMode = false;
 
-    public DispatchAliquotListInfoTable(Composite parent,
+    public DispatchSpecimenListInfoTable(Composite parent,
         final DispatchWrapper shipment, boolean editMode) {
         super(parent, null, HEADINGS, 15);
-        setCollection(getInternalDispatchAliquots());
+        setCollection(getInternalDispatchSpecimens());
         this.editMode = editMode;
         if (editMode) {
             if (shipment.isInCreationState()) {
@@ -52,20 +52,22 @@ public abstract class DispatchAliquotListInfoTable extends
                         List<DispatchSpecimenWrapper> dsaList = getSelectedItems();
                         if (dsaList.size() > 0) {
                             if (dsaList.size() == 1
-                                && !BiobankPlugin.openConfirm("Remove Aliquot",
-                                    "Are you sure you want to remove aliquot \""
+                                && !BiobankPlugin.openConfirm(
+                                    "Remove Specimen",
+                                    "Are you sure you want to remove specimen \""
                                         + dsaList.get(0).getSpecimen()
                                             .getInventoryId()
                                         + "\" from this shipment ?"))
                                 return;
                             if (dsaList.size() > 1
-                                && !BiobankPlugin.openConfirm("Remove Aliquot",
+                                && !BiobankPlugin.openConfirm(
+                                    "Remove Specimen",
                                     "Are you sure you want to remove these "
                                         + dsaList.size()
-                                        + " aliquots from this shipment ?"))
+                                        + " specimens from this shipment ?"))
                                 return;
                             try {
-                                shipment.removeAliquots(dsaList);
+                                shipment.removeSpecimens(dsaList);
                                 reloadCollection();
                                 notifyListeners();
                             } catch (Exception e) {
@@ -79,7 +81,7 @@ public abstract class DispatchAliquotListInfoTable extends
         }
     }
 
-    public abstract List<DispatchSpecimenWrapper> getInternalDispatchAliquots();
+    public abstract List<DispatchSpecimenWrapper> getInternalDispatchSpecimens();
 
     @Override
     protected boolean isEditMode() {
@@ -125,7 +127,7 @@ public abstract class DispatchAliquotListInfoTable extends
         info.pnumber = dsa.getSpecimen().getCollectionEvent().getPatient()
             .getPnumber();
         SpecimenTypeWrapper type = dsa.getSpecimen().getSpecimenType();
-        Assert.isNotNull(type, "aliquot with null for sample type");
+        Assert.isNotNull(type, "specimen with null type");
         info.type = type.getName();
         info.status = dsa.getSpecimen().getActivityStatus().toString();
         info.comment = dsa.getComment();
@@ -186,7 +188,7 @@ public abstract class DispatchAliquotListInfoTable extends
     }
 
     public void reloadCollection() {
-        List<DispatchSpecimenWrapper> dsaList = getInternalDispatchAliquots();
+        List<DispatchSpecimenWrapper> dsaList = getInternalDispatchSpecimens();
         if (dsaList == null) {
             dsaList = new ArrayList<DispatchSpecimenWrapper>();
         }

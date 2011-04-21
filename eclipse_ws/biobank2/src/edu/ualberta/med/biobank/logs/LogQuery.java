@@ -14,8 +14,8 @@ public class LogQuery {
 
     private static LogQuery instance = null;
 
-    private static HashMap<String, String> searchQuery = new HashMap<String, String>();
-    private static List<LogWrapper> dbResults = new ArrayList<LogWrapper>();
+    private HashMap<String, String> searchQuery = new HashMap<String, String>();
+    private List<LogWrapper> dbResults = new ArrayList<LogWrapper>();
 
     public static final String START_DATE_KEY = "startDate";
     public static final String END_DATE_KEY = "endDate";
@@ -38,7 +38,6 @@ public class LogQuery {
         searchQuery.put(LogPeer.DETAILS.getName(), "");
         searchQuery.put(START_DATE_KEY, "");
         searchQuery.put(END_DATE_KEY, "");
-        dbResults.clear();
     }
 
     public static LogQuery getInstance() {
@@ -118,7 +117,7 @@ public class LogQuery {
     public String getSearchQueryItem(String key) throws Exception {
         String value = searchQuery.get(key);
         if (value == null) {
-            throw new NullPointerException("Search Query key: " + value
+            throw new NullPointerException("Search Query key: " + key
                 + " does not exist.");
         }
         return value;

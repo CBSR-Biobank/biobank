@@ -30,9 +30,9 @@ public class SpecimenAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        SpecimenWrapper aliquot = getSpecimen();
-        Assert.isNotNull(aliquot, "specimen is null");
-        return aliquot.getInventoryId();
+        SpecimenWrapper specimen = getSpecimen();
+        Assert.isNotNull(specimen, "specimen is null");
+        return specimen.getInventoryId();
     }
 
     @Override

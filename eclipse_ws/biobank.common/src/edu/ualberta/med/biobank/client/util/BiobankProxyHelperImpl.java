@@ -9,6 +9,7 @@ import gov.nih.nci.system.client.proxy.ProxyHelperImpl;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Map;
 
 import org.aopalliance.intercept.MethodInvocation;
 
@@ -106,5 +107,14 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
         }
 
         return null;
+    }
+
+    @Override
+    protected Object convertObjectToProxy(ApplicationService as, Object obj) {
+        if (null == obj)
+            return null;
+        if (obj instanceof Map)
+            return obj;
+        return super.convertObjectToProxy(as, obj);
     }
 }

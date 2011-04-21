@@ -32,7 +32,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
@@ -266,6 +268,14 @@ public class LoginDialog extends TitleAreaDialog {
         }
         arrangeAndBindControl(combo, validator,
             SWTObservables.observeSelection(combo), propertyObserved);
+        combo.addListener(SWT.MouseWheel, new Listener() {
+
+            @Override
+            public void handleEvent(Event event) {
+                event.doit = false;
+            }
+
+        });
         return combo;
     }
 
@@ -469,7 +479,7 @@ public class LoginDialog extends TitleAreaDialog {
             }
     }
 
-    public class Authentication {
+    public static class Authentication {
         public static final String SERVER_PROPERTY_NAME = "server"; //$NON-NLS-1$
         public static final String USERNAME_PROPERTY_NAME = "username"; //$NON-NLS-1$
         public static final String PASSWORD_PROPERTY_NAME = "password"; //$NON-NLS-1$

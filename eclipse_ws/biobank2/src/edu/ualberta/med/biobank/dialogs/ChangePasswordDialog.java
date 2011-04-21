@@ -156,7 +156,7 @@ public class ChangePasswordDialog extends TitleAreaDialog {
 
             LogoutHandler lh = new LogoutHandler();
             lh.execute(null);
-            // TODO find a way to reconnect the user automatically
+            // FIXME find a way to reconnect the user automatically ?
             super.okPressed();
         } catch (Exception e) {
             BiobankPlugin.openAsyncError("Error changing password", e);
