@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.Binding;
@@ -60,15 +61,11 @@ import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class WidgetCreator {
 
-    protected DataBindingContext modelDbc;
-
-    protected DataBindingContext validatorDbc;
+    protected DataBindingContext dbc;
 
     protected Map<String, Control> controls;
 
-    protected Map<String, Binding> modelBindings;
-
-    protected Map<String, Binding> validatorBindings;
+    protected Map<String, Binding> bindings;
 
     private FormToolkit toolkit;
 
@@ -86,10 +83,8 @@ public class WidgetCreator {
     }
 
     public void initDataBinding() {
-        modelDbc = new DataBindingContext();
-        validatorDbc = new DataBindingContext();
-        modelBindings = new HashMap<String, Binding>();
-        validatorBindings = new HashMap<String, Binding>();
+        dbc = new DataBindingContext();
+        bindings = new HashMap<String, Binding>();
     }
 
     public void setToolkit(FormToolkit toolkit) {
@@ -102,10 +97,9 @@ public class WidgetCreator {
 
     public void createBoundWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
         Object bean, Composite client) {
-        FieldInfo fi;
-        for (String label : fieldsMap.keySet()) {
-            fi = fieldsMap.get(label);
-
+        for (Entry<String, FieldInfo> entry : fieldsMap.entrySet()) {
+            String label = entry.getKey();
+            FieldInfo fi = entry.getValue();
             Control control = createBoundWidgetWithLabel(client,
                 fi.widgetClass, fi.widgetOptions, fi.label, fi.widgetValues,
                 BeansObservables.observeValue(bean, label), fi.validatorClass,
@@ -171,7 +165,7 @@ public class WidgetCreator {
         Class<? extends Widget> widgetClass, int widgetOptions,
         String[] widgetValues, IObservableValue modelObservableValue,
         IValidator validator, String bindingKey) {
-        Assert.isNotNull(modelDbc);
+        Assert.isNotNull(dbc);
         UpdateValueStrategy uvs = null;
         if (validator != null) {
             uvs = new UpdateValueStrategy();
@@ -200,11 +194,11 @@ public class WidgetCreator {
         if (toolkit != null) {
             toolkit.adapt(button, true, true);
         }
-        Binding binding = modelDbc.bindValue(
+        Binding binding = dbc.bindValue(
             SWTObservables.observeSelection(button), modelObservableValue, uvs,
             null);
         if (bindingKey != null) {
-            modelBindings.put(bindingKey, binding);
+            bindings.put(bindingKey, binding);
         }
         if (selectionListener != null) {
             button.addSelectionListener(selectionListener);
@@ -223,11 +217,10 @@ public class WidgetCreator {
         if (toolkit != null) {
             toolkit.adapt(combo, true, true);
         }
-        Binding binding = modelDbc.bindValue(
-            SWTObservables.observeSelection(combo), modelObservableValue, uvs,
-            null);
+        Binding binding = dbc.bindValue(SWTObservables.observeSelection(combo),
+            modelObservableValue, uvs, null);
         if (bindingKey != null) {
-            modelBindings.put(bindingKey, binding);
+            bindings.put(bindingKey, binding);
         }
         if (selectionListener != null) {
             combo.addSelectionListener(selectionListener);
@@ -251,6 +244,14 @@ public class WidgetCreator {
             public void widgetDisposed(DisposeEvent e) {
                 modelObservableValue.removeValueChangeListener(changeListener);
             }
+        });
+        combo.addListener(SWT.MouseWheel, new Listener() {
+
+            @Override
+            public void handleEvent(Event event) {
+                event.doit = false;
+            }
+
         });
 
         return combo;
@@ -320,21 +321,16 @@ public class WidgetCreator {
             // problem(s). So, the text-field is bound to the model property
             // without validation and the text-field is bound to some observable
             // string whose sole purpose is to validate the text-field's value.
-            Binding modelBinding = modelDbc.bindValue(
+            dbc.bindValue(
                 SWTObservables.observeText(text.getTextBox(), SWT.Modify),
                 modelObservableValue, null, null);
-
-            // add the validation observable in a different data binding context
-            // so that (hopefully) a gui object is bound to only one model
-            // object withing a data-binding context
-            Binding validatorBinding = validatorDbc
+            Binding binding = dbc
                 .bindValue(SWTObservables.observeText(text.getTextBox(),
                     SWT.Modify),
                     new WritableValue(modelObservableValue.getValue(),
                         String.class), uvs, null);
             if (bindingKey != null) {
-                modelBindings.put(bindingKey, modelBinding);
-                validatorBindings.put(bindingKey, validatorBinding);
+                bindings.put(bindingKey, binding);
             }
         }
         return text;
@@ -360,6 +356,11 @@ public class WidgetCreator {
 
         return createBoundWidget(composite, widgetClass, widgetOptions,
             widgetValues, modelObservableValue, validator, bindingKey);
+    }
+
+    public <T> ComboViewer createComboViewerWithoutLabel(Composite parent,
+        Collection<T> input, T selection) {
+        return createComboViewer(parent, null, input, selection, null, null);
     }
 
     /**
@@ -400,7 +401,9 @@ public class WidgetCreator {
         String fieldLabel, Collection<T> input, T selection,
         String errorMessage, boolean useDefaultComparator, String bindingKey,
         final ComboSelectionUpdate csu) {
-        Label label = createLabel(parent, fieldLabel);
+        Label label = null;
+        if (fieldLabel != null)
+            label = createLabel(parent, fieldLabel);
         return createComboViewer(parent, label, input, selection, errorMessage,
             useDefaultComparator, bindingKey, csu);
     }
@@ -426,7 +429,7 @@ public class WidgetCreator {
         }
 
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        if (validatorDbc != null) {
+        if (dbc != null && fieldLabel != null) {
             NonEmptyStringValidator validator = new NonEmptyStringValidator(
                 errorMessage);
             validator.setControlDecoration(BiobankWidget.createDecorator(
@@ -434,15 +437,12 @@ public class WidgetCreator {
             UpdateValueStrategy uvs = new UpdateValueStrategy();
             uvs.setAfterGetValidator(validator);
             IObservableValue selectedValue = new WritableValue("", String.class);
-            Binding binding = validatorDbc.bindValue(
+            Binding binding = dbc.bindValue(
                 SWTObservables.observeSelection(combo), selectedValue, uvs,
                 null);
             if (bindingKey != null) {
-                validatorBindings.put(bindingKey, binding);
+                bindings.put(bindingKey, binding);
             }
-        }
-        if (selection != null) {
-            comboViewer.setSelection(new StructuredSelection(selection));
         }
         if (csu != null) {
             comboViewer
@@ -458,6 +458,9 @@ public class WidgetCreator {
                         }
                     }
                 });
+        }
+        if (selection != null) {
+            comboViewer.setSelection(new StructuredSelection(selection));
         }
         if (modifyListener != null) {
             combo.addModifyListener(modifyListener);
@@ -546,15 +549,11 @@ public class WidgetCreator {
                 uvs = new UpdateValueStrategy();
                 uvs.setAfterConvertValidator(validator);
             }
-            Binding modelBinding = modelDbc.bindValue(
-                new DateTimeObservableValue(widget), modelObservableValue,
-                null, null);
-            Binding validatorBinding = validatorDbc.bindValue(
-                new DateTimeObservableValue(widget), new WritableValue(
-                    modelObservableValue.getValue(), Date.class), uvs, null);
+            Binding binding = dbc.bindValue(
+                new DateTimeObservableValue(widget), modelObservableValue, uvs,
+                null);
             if (bindingKey != null) {
-                modelBindings.put(bindingKey, modelBinding);
-                validatorBindings.put(bindingKey, validatorBinding);
+                bindings.put(bindingKey, binding);
             }
         }
 
@@ -577,7 +576,7 @@ public class WidgetCreator {
     public void addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, final String errorMsg,
         final int statusType) {
-        Assert.isNotNull(modelDbc);
+        Assert.isNotNull(dbc);
         UpdateValueStrategy uvs = null;
         if (errorMsg != null) {
             uvs = new UpdateValueStrategy();
@@ -596,13 +595,14 @@ public class WidgetCreator {
 
             });
         }
-        modelDbc.bindValue(writableValue, observableValue, uvs, uvs);
+        dbc.bindValue(writableValue, observableValue, uvs, uvs);
     }
 
     public void addGlobalBindValue(IObservableValue statusObservable) {
-        Assert.isNotNull(modelDbc);
-        modelDbc.bindValue(statusObservable, new AggregateValidationStatus(
-            modelDbc.getBindings(), AggregateValidationStatus.MAX_SEVERITY));
+        Assert.isNotNull(dbc);
+        dbc.bindValue(statusObservable,
+            new AggregateValidationStatus(dbc.getBindings(),
+                AggregateValidationStatus.MAX_SEVERITY));
     }
 
     protected AbstractValidator createValidator(
@@ -641,53 +641,44 @@ public class WidgetCreator {
     public Binding bindValue(IObservableValue targetObservableValue,
         IObservableValue modelObservableValue,
         UpdateValueStrategy targetToModel, UpdateValueStrategy modelToTarget) {
-        Assert.isNotNull(modelDbc);
-        return modelDbc.bindValue(targetObservableValue, modelObservableValue,
+        Assert.isNotNull(dbc);
+        return dbc.bindValue(targetObservableValue, modelObservableValue,
             targetToModel, modelToTarget);
     }
 
     public void removeBinding(Binding binding) {
-        Assert.isNotNull(modelDbc);
-        modelDbc.removeBinding(binding);
+        Assert.isNotNull(dbc);
+        dbc.removeBinding(binding);
     }
 
     public void removeBinding(String bindingKey) {
-        Assert.isNotNull(modelDbc);
-        Binding modelBinding = modelBindings.get(bindingKey);
-        if (modelBinding != null) {
-            modelDbc.removeBinding(modelBinding);
-        }
-
-        Binding validatorBinding = validatorBindings.get(bindingKey);
-        if (validatorBinding != null) {
-            validatorDbc.removeBinding(validatorBinding);
-        }
+        Assert.isNotNull(dbc);
+        Binding binding = bindings.get(bindingKey);
+        Assert.isNotNull(binding);
+        dbc.removeBinding(binding);
     }
 
     public void addBinding(Binding binding) {
-        Assert.isNotNull(modelDbc);
-        modelDbc.addBinding(binding);
+        Assert.isNotNull(dbc);
+        dbc.addBinding(binding);
     }
 
     public void addBinding(String bindingKey) {
-        Assert.isNotNull(modelDbc);
-        Binding binding = modelBindings.get(bindingKey);
+        Assert.isNotNull(dbc);
+        Binding binding = bindings.get(bindingKey);
         Assert.isNotNull(binding);
-        if (!modelDbc.getBindings().contains(binding)) {
-            modelDbc.addBinding(binding);
+        if (!dbc.getBindings().contains(binding)) {
+            dbc.addBinding(binding);
         }
     }
 
     public void createWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
         Composite parent) {
-        FieldInfo fi;
-
-        for (String label : fieldsMap.keySet()) {
-            fi = fieldsMap.get(label);
-
+        for (Entry<String, FieldInfo> entry : fieldsMap.entrySet()) {
+            FieldInfo fi = entry.getValue();
             Control control = createLabelledWidget(parent, fi.widgetClass,
                 SWT.NONE, fi.label, null);
-            controls.put(label, control);
+            controls.put(entry.getKey(), control);
         }
     }
 
@@ -773,9 +764,5 @@ public class WidgetCreator {
         int widgetOptions, String fieldLabel) {
         return createReadOnlyLabelledField(parent, widgetOptions, fieldLabel,
             null);
-    }
-
-    public void updateObservables() {
-        modelDbc.updateTargets();
     }
 }

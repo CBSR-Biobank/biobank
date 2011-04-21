@@ -49,8 +49,7 @@ import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class CollectionEventEntryForm extends
-    BiobankEntryForm<CollectionEventWrapper> {
+public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(CollectionEventEntryForm.class.getName());
@@ -65,9 +64,11 @@ public class CollectionEventEntryForm extends
 
     private CollectionEventAdapter ceventAdapter;
 
+    private CollectionEventWrapper cevent;
+
     private PatientWrapper patient;
 
-    private class FormPvCustomInfo extends PvAttrCustom {
+    private static class FormPvCustomInfo extends PvAttrCustom {
         private Control control;
     }
 
@@ -89,25 +90,44 @@ public class CollectionEventEntryForm extends
 
     @Override
     public void init() throws Exception {
-        super.init();
         Assert.isTrue(adapter instanceof CollectionEventAdapter,
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         ceventAdapter = (CollectionEventAdapter) adapter;
-        patient = modelObject.getPatient();
-        SessionManager.logEdit(modelObject);
+        if (ceventAdapter.getWrapper().isNew())
+            cevent = ceventAdapter.getWrapper();
+        else
+            cevent = (CollectionEventWrapper) ceventAdapter.getWrapper()
+                .getDatabaseClone();
+        patient = cevent.getPatient();
+        retrieve();
+        SessionManager.logEdit(cevent);
         String tabName;
-        if (modelObject.isNew()) {
+        if (cevent.isNew()) {
             tabName = Messages.getString("CollectionEventEntryForm.title.new");
-            modelObject.setActivityStatus(ActivityStatusWrapper
+            cevent.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else {
             tabName = Messages.getString("CollectionEventEntryForm.title.edit",
-                modelObject.getVisitNumber());
+                cevent.getVisitNumber());
         }
 
         setPartName(tabName);
+    }
+
+    private void retrieve() {
+        try {
+            if (!cevent.isNew()) {
+                cevent.reload();
+            }
+            patient.reload();
+        } catch (Exception e) {
+            logger.error(
+                "Error while retrieving patient visit "
+                    + cevent.getVisitNumber() + " (Patient "
+                    + cevent.getPatient() + ")", e);
+        }
     }
 
     @Override
@@ -117,7 +137,7 @@ public class CollectionEventEntryForm extends
         page.setLayout(new GridLayout(1, false));
         createMainSection();
         createSpecimensSection();
-        if (modelObject.isNew()) {
+        if (cevent.isNew()) {
             setDirty(true);
         }
     }
@@ -145,7 +165,7 @@ public class CollectionEventEntryForm extends
             Messages
                 .getString("CollectionEventEntryForm.field.visitNumber.label"),
             null,
-            modelObject,
+            cevent,
             CollectionEventPeer.VISIT_NUMBER.getName(),
             new IntegerNumberValidator(
                 Messages
@@ -159,15 +179,15 @@ public class CollectionEventEntryForm extends
             client,
             Messages.getString("label.activity"),
             ActivityStatusWrapper.getAllActivityStatuses(appService),
-            modelObject.getActivityStatus(),
+            cevent.getActivityStatus(),
             Messages
                 .getString("CollectionEventEntryForm.field.activity.validation.msg"),
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    if (!selectedObject.equals(modelObject.getActivityStatus()))
+                    if (!selectedObject.equals(cevent.getActivityStatus()))
                         setDirty(true);
-                    modelObject
+                    cevent
                         .setActivityStatus((ActivityStatusWrapper) selectedObject);
                 }
             });
@@ -180,7 +200,7 @@ public class CollectionEventEntryForm extends
         createPvDataSection(client);
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            Messages.getString("label.comments"), null, modelObject,
+            Messages.getString("label.comments"), null, cevent,
             CollectionEventPeer.COMMENT.getName(), null);
     }
 
@@ -188,7 +208,7 @@ public class CollectionEventEntryForm extends
         Section section = createSection(Messages
             .getString("CollectionEventEntryForm.specimens.title"));
         specimensTable = new CEventSpecimenEntryInfoTable(section,
-            modelObject.getOriginalSpecimenCollection(true),
+            cevent.getOriginalSpecimenCollection(true),
             ColumnsShown.CEVENT_FORM);
         specimensTable.adaptToToolkit(toolkit, true);
         specimensTable.addSelectionChangedListener(listener);
@@ -196,7 +216,7 @@ public class CollectionEventEntryForm extends
         try {
             final List<SpecimenTypeWrapper> allSpecimenTypes = SpecimenTypeWrapper
                 .getAllSpecimenTypes(SessionManager.getAppService(), true);
-            specimensTable.addEditSupport(modelObject.getPatient().getStudy()
+            specimensTable.addEditSupport(cevent.getPatient().getStudy()
                 .getSourceSpecimenCollection(true), allSpecimenTypes);
             addSectionToolbar(section,
                 Messages
@@ -204,11 +224,10 @@ public class CollectionEventEntryForm extends
                 new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {
-                        specimensTable.addOrEditSpecimen(true, null,
-                            modelObject.getPatient().getStudy()
-                                .getSourceSpecimenCollection(true),
-                            allSpecimenTypes, modelObject,
-                            timeDrawnWidget.getDate());
+                        specimensTable.addOrEditSpecimen(true, null, cevent
+                            .getPatient().getStudy()
+                            .getSourceSpecimenCollection(true),
+                            allSpecimenTypes, cevent, timeDrawnWidget.getDate());
                     }
                 });
         } catch (ApplicationException e) {
@@ -222,7 +241,7 @@ public class CollectionEventEntryForm extends
     }
 
     private void createPvDataSection(Composite client) throws Exception {
-        StudyWrapper study = modelObject.getPatient().getStudy();
+        StudyWrapper study = cevent.getPatient().getStudy();
         String[] labels = study.getStudyEventAttrLabels();
         if (labels == null)
             return;
@@ -235,7 +254,7 @@ public class CollectionEventEntryForm extends
             pvCustomInfo.setType(study.getStudyEventAttrType(label));
             pvCustomInfo.setAllowedValues(study
                 .getStudyEventAttrPermissible(label));
-            pvCustomInfo.setValue(modelObject.getEventAttrValue(label));
+            pvCustomInfo.setValue(cevent.getEventAttrValue(label));
             pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
             pvCustomInfoList.add(pvCustomInfo);
         }
@@ -287,7 +306,7 @@ public class CollectionEventEntryForm extends
 
     @Override
     protected String getOkMessage() {
-        return (modelObject.isNew()) ? MSG_NEW_PATIENT_VISIT_OK
+        return (cevent.isNew()) ? MSG_NEW_PATIENT_VISIT_OK
             : MSG_PATIENT_VISIT_OK;
     }
 
@@ -296,10 +315,10 @@ public class CollectionEventEntryForm extends
         PatientAdapter patientAdapter = (PatientAdapter) ceventAdapter
             .getParent();
         if (patientAdapter != null)
-            modelObject.setPatient(patientAdapter.getWrapper());
-        modelObject.addToOriginalSpecimenCollection(specimensTable
+            cevent.setPatient(patientAdapter.getWrapper());
+        cevent.addToOriginalSpecimenCollection(specimensTable
             .getAddedSpecimens());
-        modelObject.removeFromOriginalSpecimenCollection(specimensTable
+        cevent.removeFromOriginalSpecimenCollection(specimensTable
             .getRemovedSpecimens());
         savePvCustomInfo();
     }
@@ -318,7 +337,7 @@ public class CollectionEventEntryForm extends
             }
         }
         // save the collection event
-        modelObject.persist();
+        cevent.persist();
         SessionManager.updateAllSimilarNodes(ceventAdapter, true);
     }
 
@@ -329,7 +348,7 @@ public class CollectionEventEntryForm extends
             if (value == null)
                 continue;
 
-            modelObject.setEventAttrValue(combinedPvInfo.getLabel(), value);
+            cevent.setEventAttrValue(combinedPvInfo.getLabel(), value);
         }
     }
 
@@ -355,35 +374,28 @@ public class CollectionEventEntryForm extends
     }
 
     @Override
-    protected void onReset() throws Exception {
-        // patient should not be modified, so remember and set whether new or
-        // not
-        PatientWrapper patient = modelObject.getPatient();
-        modelObject.reset();
-        modelObject.setPatient(patient);
-
-        if (modelObject.isNew()) {
-            modelObject.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
-        }
-
-        if (modelObject.getActivityStatus() != null) {
+    public void reset() throws Exception {
+        PatientWrapper patient = cevent.getPatient();
+        patient.reload();
+        cevent.reload();
+        super.reset();
+        cevent.setPatient(patient);
+        if (cevent.getActivityStatus() != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
-                modelObject.getActivityStatus()));
+                cevent.getActivityStatus()));
         }
-
-        specimensTable.reload(modelObject.getOriginalSpecimenCollection(true));
+        specimensTable.reload(cevent.getOriginalSpecimenCollection(true));
         resetPvCustomInfo();
     }
 
     private void resetPvCustomInfo() throws Exception {
-        StudyWrapper study = modelObject.getPatient().getStudy();
+        StudyWrapper study = cevent.getPatient().getStudy();
         String[] labels = study.getStudyEventAttrLabels();
         if (labels == null)
             return;
 
         for (FormPvCustomInfo pvCustomInfo : pvCustomInfoList) {
-            pvCustomInfo.setValue(modelObject.getEventAttrValue(pvCustomInfo
+            pvCustomInfo.setValue(cevent.getEventAttrValue(pvCustomInfo
                 .getLabel()));
             if (EventAttrTypeEnum.DATE_TIME == pvCustomInfo.getType()) {
                 DateTimeWidget dateWidget = (DateTimeWidget) pvCustomInfo.control;

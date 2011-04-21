@@ -23,29 +23,30 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
-public abstract class AbstractDispatchEntryForm extends
-    BiobankEntryForm<DispatchWrapper> {
+public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(AbstractDispatchEntryForm.class.getName());
 
+    protected DispatchWrapper dispatch;
+
     protected BiobankEntryFormWidgetListener biobankListener = new BiobankEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
-            reloadAliquots();
+            reloadSpecimens();
             setDirty(true);
         }
     };
 
     @Override
     protected void init() throws Exception {
-        super.init();
         Assert.isNotNull(adapter, "Adapter should be no null");
         Assert.isTrue((adapter instanceof DispatchAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        SessionManager.logEdit(modelObject);
+        dispatch = (DispatchWrapper) adapter.getModelObject();
+        SessionManager.logEdit(dispatch);
         retrieveShipment();
 
         setPartName(getTextForPartName());
@@ -53,35 +54,39 @@ public abstract class AbstractDispatchEntryForm extends
 
     private void retrieveShipment() {
         try {
-            modelObject.reload();
+            dispatch.reload();
         } catch (Exception ex) {
             logger.error("Error while retrieving shipment "
-                + modelObject.getShipmentInfo().getWaybill(), ex);
+                + dispatch.getShipmentInfo().getWaybill(), ex);
         }
     }
 
     protected abstract String getTextForPartName();
 
-    protected void createAliquotsSelectionActions(Composite composite,
+    /**
+     * Create a field to enter inventory id one by one + a button to open a scan
+     * dialog
+     */
+    protected void createSpecimensSelectionActions(Composite composite,
         boolean setAsFirstControl) {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
         toolkit.createLabel(addComposite, "Enter inventory ID to add:");
-        final BiobankText newAliquotText = new BiobankText(addComposite,
+        final BiobankText newSpecimenText = new BiobankText(addComposite,
             SWT.NONE, toolkit);
         GridData gd = new GridData();
         gd.widthHint = 100;
-        newAliquotText.setLayoutData(gd);
-        newAliquotText.addListener(SWT.DefaultSelection, new Listener() {
+        newSpecimenText.setLayoutData(gd);
+        newSpecimenText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
-                doAliquotTextAction(newAliquotText.getText());
-                newAliquotText.setFocus();
-                newAliquotText.setText("");
+                doSpecimenTextAction(newSpecimenText.getText());
+                newSpecimenText.setFocus();
+                newSpecimenText.setText("");
             }
         });
         if (setAsFirstControl) {
-            setFirstControl(newAliquotText);
+            setFirstControl(newSpecimenText);
         }
         Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
         addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
@@ -89,16 +94,16 @@ public abstract class AbstractDispatchEntryForm extends
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                doAliquotTextAction(newAliquotText.getText());
-                newAliquotText.setFocus();
-                newAliquotText.setText("");
+                doSpecimenTextAction(newSpecimenText.getText());
+                newSpecimenText.setFocus();
+                newSpecimenText.setText("");
             }
         });
         toolkit.createLabel(addComposite, "or open scan dialog:");
         Button openScanButton = toolkit
             .createButton(addComposite, "", SWT.PUSH);
         openScanButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT));
+            .get(BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -107,17 +112,23 @@ public abstract class AbstractDispatchEntryForm extends
         });
     }
 
+    /**
+     * open scan when click on button
+     */
     protected abstract void openScanDialog();
 
-    protected abstract void doAliquotTextAction(String text);
+    /**
+     * add specimen represented by the inventoryid entered in the text field
+     */
+    protected abstract void doSpecimenTextAction(String text);
 
     @Override
     protected void saveForm() throws Exception {
-        for (DispatchSpecimenWrapper da : modelObject
+        for (DispatchSpecimenWrapper da : dispatch
             .getDispatchSpecimenCollection(false)) {
             da.getSpecimen().persist();
         }
-        modelObject.persist();
+        dispatch.persist();
 
         Display.getDefault().asyncExec(new Runnable() {
             @Override
@@ -127,6 +138,13 @@ public abstract class AbstractDispatchEntryForm extends
         });
     }
 
-    protected abstract void reloadAliquots();
+    protected abstract void reloadSpecimens();
+
+    @Override
+    public void reset() throws Exception {
+        super.reset();
+        dispatch.reset();
+        reloadSpecimens();
+    }
 
 }

@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
@@ -43,8 +42,7 @@ import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ContainerTypeEntryForm extends
-    BiobankEntryForm<ContainerTypeWrapper> {
+public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     @SuppressWarnings("unused")
     private static BiobankLogger logger = BiobankLogger
@@ -59,6 +57,8 @@ public class ContainerTypeEntryForm extends
         .getString("ContainerTypeEntryForm.edition.msg"); //$NON-NLS-1$
 
     private ContainerTypeAdapter containerTypeAdapter;
+
+    private ContainerTypeWrapper containerType;
 
     private MultiSelectWidget specimensMultiSelect;
 
@@ -94,20 +94,20 @@ public class ContainerTypeEntryForm extends
 
     @Override
     public void init() throws Exception {
-        super.init();
         Assert.isTrue((adapter instanceof ContainerTypeAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
+        containerType = containerTypeAdapter.getContainerType();
         String tabName;
-        if (modelObject.isNew()) {
+        if (containerType.isNew()) {
             tabName = Messages.getString("ContainerTypeEntryForm.new.title"); //$NON-NLS-1$
-            modelObject.setActivityStatus(ActivityStatusWrapper
+            containerType.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else {
             tabName = Messages.getString("ContainerTypeEntryForm.edit.title", //$NON-NLS-1$
-                modelObject.getName());
+                containerType.getName());
         }
         setPartName(tabName);
     }
@@ -133,14 +133,15 @@ public class ContainerTypeEntryForm extends
 
         availSubContainerTypes = new ArrayList<ContainerTypeWrapper>();
         adapter.setParent(((SiteAdapter) SessionManager
-            .searchFirstNode(modelObject.getSite()))
+            .searchFirstNode(containerType.getSite()))
             .getContainerTypesGroupNode());
-        for (ContainerTypeWrapper type : modelObject.getSite()
+        for (ContainerTypeWrapper type : containerType.getSite()
             .getContainerTypeCollection()) {
             if (type.getTopLevel().equals(Boolean.FALSE)) {
                 availSubContainerTypes.add(type);
             }
         }
+        setDirty(true);
 
         BiobankText name = (BiobankText) createBoundWidgetWithLabel(
             client,
@@ -148,7 +149,7 @@ public class ContainerTypeEntryForm extends
             SWT.NONE,
             Messages.getString("label.name"), //$NON-NLS-1$
             null,
-            modelObject,
+            containerType,
             ContainerTypePeer.NAME.getName(),
             new NonEmptyStringValidator(Messages
                 .getString("ContainerTypeEntryForm.name.validation.msg"))); //$NON-NLS-1$
@@ -161,17 +162,17 @@ public class ContainerTypeEntryForm extends
             SWT.NONE,
             Messages.getString("label.nameShort"), //$NON-NLS-1$
             null,
-            modelObject,
+            containerType,
             ContainerTypePeer.NAME_SHORT.getName(),
             new NonEmptyStringValidator(Messages
                 .getString("ContainerTypeEntryForm.nameShort.validation.msg"))); //$NON-NLS-1$
 
-        if (modelObject.getTopLevel() == null) {
-            modelObject.setTopLevel(false);
+        if (containerType.getTopLevel() == null) {
+            containerType.setTopLevel(false);
         }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
             Messages.getString("containerType.field.label.topLevel"), null, //$NON-NLS-1$
-            modelObject, ContainerTypePeer.TOP_LEVEL.getName(), null);
+            containerType, ContainerTypePeer.TOP_LEVEL.getName(), null);
         toolkit.paintBordersFor(client);
 
         createBoundWidgetWithLabel(
@@ -180,7 +181,7 @@ public class ContainerTypeEntryForm extends
             SWT.NONE,
             Messages.getString("containerType.field.label.rows"), //$NON-NLS-1$
             null,
-            modelObject,
+            containerType,
             CapacityPeer.ROW_CAPACITY.getName(),
             new IntegerNumberValidator(Messages
                 .getString("ContainerTypeEntryForm.rows.validation.msg"), false)); //$NON-NLS-1$
@@ -191,7 +192,7 @@ public class ContainerTypeEntryForm extends
             SWT.NONE,
             Messages.getString("containerType.field.label.cols"), //$NON-NLS-1$
             null,
-            modelObject,
+            containerType,
             CapacityPeer.COL_CAPACITY.getName(),
             new IntegerNumberValidator(Messages
                 .getString("ContainerTypeEntryForm.cols.validation.msg"), false)); //$NON-NLS-1$
@@ -202,12 +203,12 @@ public class ContainerTypeEntryForm extends
             SWT.NONE,
             Messages.getString("containerType.field.label.temperature"), //$NON-NLS-1$
             null,
-            modelObject,
+            containerType,
             ContainerTypePeer.DEFAULT_TEMPERATURE.getName(),
             new DoubleNumberValidator(Messages
                 .getString("ContainerTypeEntryForm.temperature.validation.msg"))); //$NON-NLS-1$
 
-        String currentScheme = modelObject.getChildLabelingSchemeName();
+        String currentScheme = containerType.getChildLabelingSchemeName();
         labelingSchemeMap = new HashMap<Integer, String>();
         for (ContainerLabelingSchemeWrapper scheme : ContainerLabelingSchemeWrapper
             .getAllLabelingSchemesMap(appService).values()) {
@@ -222,10 +223,8 @@ public class ContainerTypeEntryForm extends
                 @Override
                 public void doSelection(Object selectedObject) {
                     try {
-                        if (selectedObject != null) {
-                            modelObject
-                                .setChildLabelingSchemeName((String) selectedObject);
-                        }
+                        containerType
+                            .setChildLabelingSchemeName((String) selectedObject);
                     } catch (Exception e) {
                         BiobankPlugin.openAsyncError(
                             Messages
@@ -239,19 +238,19 @@ public class ContainerTypeEntryForm extends
             client,
             Messages.getString("label.activity"), //$NON-NLS-1$
             ActivityStatusWrapper.getAllActivityStatuses(appService),
-            modelObject.getActivityStatus(),
+            containerType.getActivityStatus(),
             Messages
                 .getString("ContainerTypeEntryForm.activity.validation.msg"), //$NON-NLS-1$
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    modelObject
+                    containerType
                         .setActivityStatus((ActivityStatusWrapper) selectedObject);
                 }
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            Messages.getString("label.comments"), null, modelObject, //$NON-NLS-1$
+            Messages.getString("label.comments"), null, containerType, //$NON-NLS-1$
             ContainerTypePeer.COMMENT.getName(), null);
 
     }
@@ -319,7 +318,7 @@ public class ContainerTypeEntryForm extends
     }
 
     private void setSpecimenTypesSelection() {
-        Collection<SpecimenTypeWrapper> stSamplesTypes = modelObject
+        Collection<SpecimenTypeWrapper> stSamplesTypes = containerType
             .getSpecimenTypeCollection();
         LinkedHashMap<Integer, String> availSpecimenTypes = new LinkedHashMap<Integer, String>();
         List<Integer> selSpecimenTypes = new ArrayList<Integer>();
@@ -359,7 +358,7 @@ public class ContainerTypeEntryForm extends
 
     private void setChildContainerTypeSelection() {
         List<Integer> selChildContainerTypes = new ArrayList<Integer>();
-        Collection<ContainerTypeWrapper> childContainerTypes = modelObject
+        Collection<ContainerTypeWrapper> childContainerTypes = containerType
             .getChildContainerTypeCollection();
         if (childContainerTypes != null) {
             for (ContainerTypeWrapper childContainerType : childContainerTypes) {
@@ -369,7 +368,7 @@ public class ContainerTypeEntryForm extends
         LinkedHashMap<Integer, String> availContainerTypes = new LinkedHashMap<Integer, String>();
         if (availSubContainerTypes != null) {
             for (ContainerTypeWrapper type : availSubContainerTypes) {
-                if (modelObject.isNew() || !modelObject.equals(type)) {
+                if (containerType.isNew() || !containerType.equals(type)) {
                     availContainerTypes.put(type.getId(), type.getName());
                 }
             }
@@ -380,7 +379,7 @@ public class ContainerTypeEntryForm extends
 
     @Override
     protected String getOkMessage() {
-        if (modelObject.getId() == null) {
+        if (containerType.getId() == null) {
             return MSG_NEW_STORAGE_TYPE_OK;
         }
         return MSG_STORAGE_TYPE_OK;
@@ -393,17 +392,16 @@ public class ContainerTypeEntryForm extends
     protected void saveForm() throws Exception {
         setSpecimenTypes();
         setChildContainerTypes();
-        modelObject.persist();
+        containerType.persist();
         SessionManager.updateAllSimilarNodes(containerTypeAdapter, true);
 
     }
 
     private void setSpecimenTypes() throws BiobankCheckException {
-        List<Integer> addedIds = new ArrayList<Integer>();
-        List<Integer> removedIds = new ArrayList<Integer>();
         if (hasSpecimens) {
-            addedIds = specimensMultiSelect.getAddedToSelection();
-            removedIds = specimensMultiSelect.getRemovedToSelection();
+            List<Integer> addedIds = specimensMultiSelect.getAddedToSelection();
+            List<Integer> removedIds = specimensMultiSelect
+                .getRemovedToSelection();
             List<SpecimenTypeWrapper> addedSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
             List<SpecimenTypeWrapper> removedSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
             for (SpecimenTypeWrapper sampleType : allSpecimenTypes) {
@@ -424,21 +422,20 @@ public class ContainerTypeEntryForm extends
                     Messages
                         .getString("ContainerTypeEntryForm.save.error.msg.specimen.removed")); //$NON-NLS-1$
             }
-            modelObject.addToSpecimenTypeCollection(addedSpecimenTypes);
-            modelObject.removeFromSpecimenTypeCollection(removedSpecimenTypes);
+            containerType.addToSpecimenTypeCollection(addedSpecimenTypes);
+            containerType
+                .removeFromSpecimenTypeCollection(removedSpecimenTypes);
         } else {
-            modelObject.removeFromSpecimenTypeCollection(modelObject
+            containerType.removeFromSpecimenTypeCollection(containerType
                 .getSpecimenTypeCollection());
         }
     }
 
     private void setChildContainerTypes() throws BiobankCheckException {
-        List<Integer> addedTypesIds = new ArrayList<Integer>();
-        List<Integer> removedTypesIds = new ArrayList<Integer>();
         if (!hasSpecimens) {
-            addedTypesIds = childContainerTypesMultiSelect
+            List<Integer> addedTypesIds = childContainerTypesMultiSelect
                 .getAddedToSelection();
-            removedTypesIds = childContainerTypesMultiSelect
+            List<Integer> removedTypesIds = childContainerTypesMultiSelect
                 .getRemovedToSelection();
             List<ContainerTypeWrapper> addedContainerTypes = new ArrayList<ContainerTypeWrapper>();
             List<ContainerTypeWrapper> removedContainerTypes = new ArrayList<ContainerTypeWrapper>();
@@ -462,11 +459,12 @@ public class ContainerTypeEntryForm extends
                     Messages
                         .getString("ContainerTypeEntryForm.save.error.msg.subcontainer.removed")); //$NON-NLS-1$
             }
-            modelObject.addToChildContainerTypeCollection(addedContainerTypes);
-            modelObject
+            containerType
+                .addToChildContainerTypeCollection(addedContainerTypes);
+            containerType
                 .removeFromChildContainerTypeCollection(removedContainerTypes);
         } else {
-            modelObject.removeFromChildContainerTypeCollection(modelObject
+            containerType.removeFromChildContainerTypeCollection(containerType
                 .getChildContainerTypeCollection());
         }
     }
@@ -477,17 +475,11 @@ public class ContainerTypeEntryForm extends
     }
 
     @Override
-    protected void onReset() throws Exception {
-        // Remember the Site
-        SiteWrapper site = modelObject.getSite();
-        modelObject.reset();
-        modelObject.setSite(site);
-
-        if (modelObject.isNew()) {
-            modelObject.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+    public void reset() throws Exception {
+        super.reset();
+        if (containerType.getTopLevel() == null) {
+            containerType.setTopLevel(false);
         }
-
         setChildContainerTypeSelection();
         setSpecimenTypesSelection();
         showContainersOrSpecimens();
@@ -496,20 +488,17 @@ public class ContainerTypeEntryForm extends
     }
 
     private void showContainersOrSpecimens() {
-        hasSpecimens = modelObject.getSpecimenTypeCollection() != null
-            && modelObject.getSpecimenTypeCollection().size() > 0;
+        hasSpecimens = containerType.getSpecimenTypeCollection() != null
+            && containerType.getSpecimenTypeCollection().size() > 0;
         showSpecimens(hasSpecimens);
         hasSpecimensRadio.setSelection(hasSpecimens);
         hasContainersRadio.setSelection(!hasSpecimens);
     }
 
     private void setLabelingScheme() {
-        String currentScheme = modelObject.getChildLabelingSchemeName();
+        String currentScheme = containerType.getChildLabelingSchemeName();
         if (currentScheme == null) {
             labelingSchemeComboViewer.getCombo().deselectAll();
-            labelingSchemeComboViewer.getCombo().clearSelection();
-            labelingSchemeComboViewer.refresh(true);
-            labelingSchemeComboViewer.refresh();
         } else {
             labelingSchemeComboViewer.setSelection(new StructuredSelection(
                 currentScheme));
@@ -517,7 +506,7 @@ public class ContainerTypeEntryForm extends
     }
 
     private void setActivityStatus() {
-        ActivityStatusWrapper activity = modelObject.getActivityStatus();
+        ActivityStatusWrapper activity = containerType.getActivityStatus();
         if (activity == null) {
             activityStatusComboViewer.getCombo().deselectAll();
         } else {

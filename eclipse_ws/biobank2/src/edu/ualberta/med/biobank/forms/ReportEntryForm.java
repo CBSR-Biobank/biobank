@@ -58,7 +58,6 @@ import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.report.ReportAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.views.AdvancedReportsView;
@@ -70,7 +69,7 @@ import edu.ualberta.med.biobank.widgets.report.ColumnSelectWidget;
 import edu.ualberta.med.biobank.widgets.report.FilterChangeEvent;
 import edu.ualberta.med.biobank.widgets.report.FilterSelectWidget;
 
-public class ReportEntryForm extends BiobankEntryForm<ReportWrapper> {
+public class ReportEntryForm extends BiobankEntryForm {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ReportEntryForm.class.getName());
@@ -147,9 +146,9 @@ public class ReportEntryForm extends BiobankEntryForm<ReportWrapper> {
 
     @Override
     protected void init() throws Exception {
-        super.init();
         reportAdapter = (ReportAdapter) adapter;
-        report = modelObject;
+        report = reportAdapter.getWrapper();
+        report.reload();
 
         updatePartName();
     }
@@ -272,8 +271,7 @@ public class ReportEntryForm extends BiobankEntryForm<ReportWrapper> {
                         @Override
                         public void run() {
                             results = (List<Object>) new ReportListProxy(
-                                (BiobankApplicationService) appService,
-                                rawReport).init();
+                                appService, rawReport).init();
 
                             if (results instanceof AbstractBiobankListProxy)
                                 ((AbstractBiobankListProxy<?>) results)
@@ -328,8 +326,7 @@ public class ReportEntryForm extends BiobankEntryForm<ReportWrapper> {
 
                     Log logMessage = new Log();
                     logMessage.action = "report";
-                    ((BiobankApplicationService) appService)
-                        .logActivity(logMessage);
+                    appService.logActivity(logMessage);
 
                 } catch (Exception e) {
                     BiobankPlugin.openAsyncError("Report Generation Error", e);

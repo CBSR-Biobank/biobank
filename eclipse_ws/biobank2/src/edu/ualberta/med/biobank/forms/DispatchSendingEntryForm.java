@@ -9,6 +9,7 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -21,26 +22,25 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper.CheckStatus;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
-import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.DispatchSpecimensTreeTable;
+import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
-
-    // private static BiobankLogger logger = BiobankLogger
-    // .getLogger(DispatchSendingEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchSendingEntryForm";
 
@@ -50,13 +50,9 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     private ComboViewer destSiteComboViewer;
 
-    protected DispatchAliquotListInfoTable aliquotsNonProcessedTable;
+    protected DispatchSpecimenListInfoTable specimensNonProcessedTable;
 
-    private DispatchAliquotsTreeTable aliquotsTreeTable;
-
-    private ComboViewer shippingMethodComboViewer;
-
-    private ShipmentInfoWrapper shipInfo;
+    private DispatchSpecimensTreeTable specimensTreeTable;
 
     @Override
     public void createPartControl(Composite parent) {
@@ -64,7 +60,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         // if the shipment is new, and if the combos hold only one element,
         // there will be default selections but dirty will be set to false by
         // default anyway
-        if (modelObject.isNew()) {
+        if (dispatch.isNew()) {
             setDirty(true);
         }
 
@@ -83,34 +79,33 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        if (modelObject.isNew()) {
-            modelObject.setSenderCenter(SessionManager.getUser()
+        if (dispatch.isNew()) {
+            dispatch.setSenderCenter(SessionManager.getUser()
                 .getCurrentWorkingCenter());
-            modelObject.setState(DispatchState.CREATION);
+            dispatch.setState(DispatchState.CREATION);
         }
 
         setFirstControl(client);
 
         createReceiverCombo(client);
 
-        if (!modelObject.isNew() && !modelObject.isInCreationState()) {
-            ShippingMethodWrapper selectedShippingMethod = modelObject
+        if (!dispatch.isNew() && !dispatch.isInCreationState()) {
+            ShippingMethodWrapper selectedShippingMethod = dispatch
                 .getShipmentInfo().getShippingMethod();
-            shippingMethodComboViewer = widgetCreator.createComboViewer(client,
-                "Shipping Method", ShippingMethodWrapper
-                    .getShippingMethods(SessionManager.getAppService()),
-                selectedShippingMethod, null, new ComboSelectionUpdate() {
+            widgetCreator.createComboViewer(client, "Shipping Method",
+                ShippingMethodWrapper.getShippingMethods(SessionManager
+                    .getAppService()), selectedShippingMethod, null,
+                new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
-                        modelObject.getShipmentInfo().setShippingMethod(
+                        dispatch.getShipmentInfo().setShippingMethod(
                             (ShippingMethodWrapper) selectedObject);
                     }
                 });
 
-            shipInfo = modelObject.getShipmentInfo();
-
             createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-                "Waybill", null, shipInfo, "waybill", null);
+                "Waybill", null, dispatch.getShipmentInfo(),
+                ShipmentInfoPeer.WAYBILL.getName(), null);
         }
 
         createBoundWidgetWithLabel(
@@ -119,34 +114,36 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             SWT.MULTI,
             "Comments",
             null,
-            BeansObservables.observeValue(modelObject,
+            BeansObservables.observeValue(dispatch,
                 DispatchPeer.COMMENT.getName()), null);
 
-        createAliquotsSelectionSection();
+        createSpecimensSelectionSection();
 
     }
 
     private void createReceiverCombo(Composite client) {
-        if (modelObject.isInTransitState()) {
+        if (dispatch.isInTransitState()) {
             BiobankText receiverLabel = createReadOnlyLabelledField(client,
                 SWT.NONE, "Receiver");
-            setTextValue(receiverLabel, modelObject.getReceiverCenter()
+            setTextValue(receiverLabel, dispatch.getReceiverCenter()
                 .getNameShort());
         } else {
             try {
                 destSiteComboViewer = createComboViewer(client, "Receiver",
                     CenterWrapper.getOtherCenters(appService, SessionManager
-                        .getUser().getCurrentWorkingCenter()),
-                    modelObject.getReceiverCenter(),
+                        .getUser().getCurrentWorkingCenter()), null,
                     "Dispatch must have a receiver",
                     new ComboSelectionUpdate() {
                         @Override
                         public void doSelection(Object selectedObject) {
-                            modelObject
+                            dispatch
                                 .setReceiverCenter((CenterWrapper<?>) selectedObject);
                             setDirty(true);
                         }
                     });
+                if (dispatch.getReceiverCenter() != null)
+                    destSiteComboViewer.setSelection(new StructuredSelection(
+                        dispatch.getReceiverCenter()));
             } catch (ApplicationException e) {
                 BiobankPlugin.openAsyncError("Error",
                     "Unable to retrieve Centers");
@@ -154,56 +151,47 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         }
     }
 
-    @Override
-    public void formClosed() throws Exception {
-        // FIXME why formClosed is overridden ? reload is already done in
-        // default
-        // method
-        onReset();
-    }
-
-    private void createAliquotsSelectionSection() {
-        if (modelObject.isInCreationState()) {
-            Section section = createSection("Add Specimens");
+    private void createSpecimensSelectionSection() {
+        if (dispatch.isInCreationState()) {
+            Section section = createSection("Specimens");
             Composite composite = toolkit.createComposite(section);
             composite.setLayout(new GridLayout(1, false));
             section.setClient(composite);
-            if (modelObject.isInCreationState()) {
+            if (dispatch.isInCreationState()) {
                 addSectionToolbar(section, "Add specimens to this dispatch",
                     new SelectionAdapter() {
                         @Override
                         public void widgetSelected(SelectionEvent e) {
                             openScanDialog();
                         }
-                    }, null, BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT);
+                    }, null, BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN);
 
-                createAliquotsSelectionActions(composite, false);
-                createAliquotsNonProcessedSection(true);
+                createSpecimensSelectionActions(composite, false);
+                createSpecimensNonProcessedSection(true);
             }
         } else {
-            aliquotsTreeTable = new DispatchAliquotsTreeTable(page,
-                modelObject, !modelObject.isInClosedState()
-                    && !modelObject.isInLostState(), true);
-            aliquotsTreeTable.addSelectionChangedListener(biobankListener);
+            specimensTreeTable = new DispatchSpecimensTreeTable(page, dispatch,
+                !dispatch.isInClosedState() && !dispatch.isInLostState(), true);
+            specimensTreeTable.addSelectionChangedListener(biobankListener);
         }
     }
 
-    protected void createAliquotsNonProcessedSection(boolean edit) {
+    protected void createSpecimensNonProcessedSection(boolean edit) {
         String title = "Specimens";
-        if (modelObject.isInCreationState()) {
+        if (dispatch.isInCreationState()) {
             title = "Added specimens";
         }
         Composite parent = createSectionWithClient(title);
-        aliquotsNonProcessedTable = new DispatchAliquotListInfoTable(parent,
-            modelObject, edit) {
+        specimensNonProcessedTable = new DispatchSpecimenListInfoTable(parent,
+            dispatch, edit) {
             @Override
-            public List<DispatchSpecimenWrapper> getInternalDispatchAliquots() {
-                return modelObject.getNonProcessedDispatchSpecimenCollection();
+            public List<DispatchSpecimenWrapper> getInternalDispatchSpecimens() {
+                return dispatch.getNonProcessedDispatchSpecimenCollection();
             }
 
         };
-        aliquotsNonProcessedTable.adaptToToolkit(toolkit, true);
-        aliquotsNonProcessedTable.addClickListener(new IDoubleClickListener() {
+        specimensNonProcessedTable.adaptToToolkit(toolkit, true);
+        specimensNonProcessedTable.addClickListener(new IDoubleClickListener() {
             @Override
             public void doubleClick(DoubleClickEvent event) {
                 Object selection = event.getSelection();
@@ -217,63 +205,51 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 }
             }
         });
-        aliquotsNonProcessedTable.addSelectionChangedListener(biobankListener);
+        specimensNonProcessedTable.addSelectionChangedListener(biobankListener);
     }
 
     @Override
     protected void openScanDialog() {
         DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            modelObject, SessionManager.getUser().getCurrentWorkingCenter());
+            dispatch, SessionManager.getUser().getCurrentWorkingCenter());
         dialog.open();
-        setDirty(true); // FIXME need to do this better !
-        reloadAliquots();
+        setDirty(true); // FIXME add a boolean in the dialog to know if
+                        // specimens were added
+        reloadSpecimens();
     }
 
     @Override
-    protected void doAliquotTextAction(String text) {
-        addAliquot(text);
-    }
-
-    protected void addAliquot(String inventoryId) {
-        if (!inventoryId.isEmpty()) {
-            SpecimenWrapper existingAliquot;
-            try {
-                existingAliquot = SpecimenWrapper.getSpecimen(
-                    modelObject.getAppService(), inventoryId,
-                    SessionManager.getUser());
-                CheckStatus status = modelObject.checkCanAddSpecimen(
-                    existingAliquot, true);
-                if (status.ok)
-                    addAliquot(existingAliquot);
-                else
-                    BiobankPlugin.openAsyncError("Error", status.message);
-            } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Error",
-                    "Unable to retrieve specimen info");
-            }
-        }
-    }
-
-    private void addAliquot(SpecimenWrapper aliquot) {
-        List<SpecimenWrapper> aliquots = modelObject.getSpecimenCollection();
-        if (aliquots != null && aliquots.contains(aliquot)) {
-            BiobankPlugin.openAsyncError("Error",
-                "Aliquot " + aliquot.getInventoryId()
-                    + " has already been added to this dispatch");
-            return;
-        }
+    protected void doSpecimenTextAction(String inventoryId) {
         try {
-            modelObject.addSpecimens(Arrays.asList(aliquot));
+            CellProcessResult res = appService.processCellStatus(new Cell(-1,
+                -1, inventoryId, null), new ShipmentProcessData(null, dispatch,
+                true, true), SessionManager.getUser());
+            switch (res.getProcessStatus()) {
+            case FILLED:
+                // ok
+                SpecimenWrapper specimen = new SpecimenWrapper(appService);
+                specimen.getWrappedObject()
+                    .setId(res.getCell().getSpecimenId());
+                specimen.reload();
+                dispatch.addSpecimens(Arrays.asList(specimen),
+                    DispatchSpecimenState.NONE);
+                reloadSpecimens();
+                break;
+            case ERROR:
+                BiobankPlugin.openAsyncError("Invalid specimen", res.getCell()
+                    .getInformation());
+                break;
+            }
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error adding aliquots", e);
+            BiobankPlugin.openAsyncError("Error", "Error adding the specimen",
+                e);
         }
-        reloadAliquots();
     }
 
     @Override
     protected String getOkMessage() {
-        return (modelObject.isNew()) ? MSG_NEW_DISPATCH_OK : MSG_DISPATCH_OK;
+        return (dispatch.isNew()) ? MSG_NEW_DISPATCH_OK : MSG_DISPATCH_OK;
     }
 
     @Override
@@ -282,51 +258,48 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     }
 
     @Override
-    protected void onReset() throws Exception {
-        modelObject.reset();
-        modelObject.setSenderCenter(SessionManager.getUser()
+    public void reset() throws Exception {
+        super.reset();
+        dispatch.setSenderCenter(SessionManager.getUser()
             .getCurrentWorkingCenter());
-
-        if (shipInfo != null) {
-            shipInfo.setWrappedObject(modelObject.getWrappedObject()
-                .getShipmentInfo());
-
-            GuiUtil.resetComboViewer(shippingMethodComboViewer, modelObject
-                .getShipmentInfo().getShippingMethod());
-        }
-
-        GuiUtil.resetComboViewer(destSiteComboViewer,
-            modelObject.getReceiverCenter());
-
-        reloadAliquots();
-    }
-
-    @Override
-    protected void reloadAliquots() {
-        if (aliquotsNonProcessedTable != null) {
-            aliquotsNonProcessedTable.reloadCollection();
-            page.layout(true, true);
-            book.reflow(true);
-        }
-        if (aliquotsTreeTable != null) {
-            aliquotsTreeTable.refresh();
+        if (destSiteComboViewer != null) {
+            CenterWrapper<?> destSite = dispatch.getReceiverCenter();
+            if (destSite != null) {
+                destSiteComboViewer.setSelection(new StructuredSelection(
+                    destSite));
+            } else if (destSiteComboViewer.getCombo().getItemCount() == 1)
+                destSiteComboViewer.setSelection(new StructuredSelection(
+                    destSiteComboViewer.getElementAt(0)));
+            else
+                destSiteComboViewer.getCombo().deselectAll();
         }
     }
 
     @Override
     protected String getTextForPartName() {
-        if (modelObject.isNew()) {
+        if (dispatch.isNew()) {
             return "New Dispatch";
         } else {
-            Assert.isNotNull(modelObject, "Dispatch is null");
-            String label = new String();
-            label += modelObject.getSenderCenter().getNameShort() + " -> "
-                + modelObject.getReceiverCenter().getNameShort();
+            Assert.isNotNull(dispatch, "Dispatch is null");
+            String label = dispatch.getSenderCenter().getNameShort() + " -> "
+                + dispatch.getReceiverCenter().getNameShort();
 
-            if (modelObject.getShipmentInfo() != null
-                && modelObject.getShipmentInfo().getPackedAt() != null)
-                label += "[" + modelObject.getFormattedPackedAt() + "]";
+            String packedAt = dispatch.getFormattedPackedAt();
+            if (packedAt != null)
+                label += " [" + packedAt + "]";
             return label;
+        }
+    }
+
+    @Override
+    protected void reloadSpecimens() {
+        if (specimensNonProcessedTable != null) {
+            specimensNonProcessedTable.reloadCollection();
+            page.layout(true, true);
+            book.reflow(true);
+        }
+        if (specimensTreeTable != null) {
+            specimensTreeTable.refresh();
         }
     }
 }

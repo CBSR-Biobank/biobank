@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -29,7 +30,7 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
-public class PatientEntryForm extends BiobankEntryForm<PatientWrapper> {
+public class PatientEntryForm extends BiobankEntryForm {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(PatientEntryForm.class.getName());
@@ -44,6 +45,8 @@ public class PatientEntryForm extends BiobankEntryForm<PatientWrapper> {
     public static final String MSG_PATIENT_OK = Messages
         .getString("PatientEntryForm.edition.msg");
 
+    private PatientWrapper patient;
+
     private ComboViewer studiesViewer;
 
     private Label createdAtLabel;
@@ -57,18 +60,34 @@ public class PatientEntryForm extends BiobankEntryForm<PatientWrapper> {
 
     @Override
     public void init() throws Exception {
-        super.init();
         Assert.isTrue((adapter instanceof PatientAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        SessionManager.logEdit(modelObject);
+        if (adapter.getModelObject().isNew()) {
+            patient = (PatientWrapper) adapter.getModelObject();
+
+            Calendar c = Calendar.getInstance();
+            c.setTime(new Date());
+            c.set(Calendar.SECOND, 0);
+            patient.setCreatedAt(c.getTime());
+
+        } else {
+            try {
+                patient = (PatientWrapper) adapter.getModelObjectClone();
+            } catch (Exception e1) {
+                logger.error("Error getting patient clone", e1);
+            }
+        }
+
+        retrievePatient();
+        SessionManager.logEdit(patient);
         String tabName;
-        if (modelObject.isNew()) {
+        if (patient.isNew()) {
             tabName = Messages.getString("PatientEntryForm.new.title");
         } else {
             tabName = Messages.getString("PatientEntryForm.edit.title",
-                modelObject.getPnumber());
+                patient.getPnumber());
         }
         setPartName(tabName);
     }
@@ -81,7 +100,7 @@ public class PatientEntryForm extends BiobankEntryForm<PatientWrapper> {
 
         createPatientSection();
 
-        if (modelObject.isNew()) {
+        if (patient.isNew()) {
             setDirty(true);
         }
     }
@@ -97,13 +116,12 @@ public class PatientEntryForm extends BiobankEntryForm<PatientWrapper> {
         List<StudyWrapper> studies = new ArrayList<StudyWrapper>(
             StudyWrapper.getAllStudies(appService));
         StudyWrapper selectedStudy = null;
-        if (modelObject.isNew()) {
+        if (patient.isNew()) {
             if (studies.size() == 1) {
                 selectedStudy = studies.get(0);
-                modelObject.setStudy(selectedStudy);
             }
         } else {
-            selectedStudy = modelObject.getStudy();
+            selectedStudy = patient.getStudy();
         }
 
         studiesViewer = createComboViewer(client,
@@ -113,15 +131,14 @@ public class PatientEntryForm extends BiobankEntryForm<PatientWrapper> {
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    modelObject.setStudy((StudyWrapper) selectedObject);
+                    patient.setStudy((StudyWrapper) selectedObject);
                 }
             });
         setFirstControl(studiesViewer.getControl());
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             Messages.getString("PatientEntryForm.field.pNumber.label"), null,
-            modelObject, PatientPeer.PNUMBER.getName(),
-            pnumberNonEmptyValidator);
+            patient, PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
 
         createdAtLabel = widgetCreator.createLabel(client, "Created At");
         createdAtLabel.setLayoutData(new GridData(
@@ -129,13 +146,13 @@ public class PatientEntryForm extends BiobankEntryForm<PatientWrapper> {
         createdAtValidator = new NotNullValidator("Created At should be set");
 
         createdAtWidget = createDateTimeWidget(client, createdAtLabel,
-            modelObject.getCreatedAt(), modelObject, "createdAt",
-            createdAtValidator, SWT.DATE | SWT.TIME, CREATED_AT_BINDING);
+            patient.getCreatedAt(), patient, "createdAt", createdAtValidator,
+            SWT.DATE | SWT.TIME, CREATED_AT_BINDING);
     }
 
     @Override
     protected String getOkMessage() {
-        if (modelObject.isNew()) {
+        if (patient.isNew()) {
             return MSG_NEW_PATIENT_OK;
         }
         return MSG_PATIENT_OK;
@@ -143,13 +160,13 @@ public class PatientEntryForm extends BiobankEntryForm<PatientWrapper> {
 
     @Override
     protected void saveForm() throws Exception {
-        modelObject.persist();
+        patient.persist();
         // to update patient view:
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
                 CollectionView.reloadCurrent();
-                CollectionView.showPatient(modelObject);
+                CollectionView.showPatient(patient);
             }
         });
     }
@@ -159,16 +176,27 @@ public class PatientEntryForm extends BiobankEntryForm<PatientWrapper> {
         return PatientViewForm.ID;
     }
 
-    @Override
-    protected void onReset() throws Exception {
-        createdAtWidget.setDate(new Date());
-        studiesViewer.setSelection(null);
-        pnumberNonEmptyValidator.validate(null);
+    private void retrievePatient() {
+        try {
+            patient.reload();
+        } catch (Exception e) {
+            logger
+                .error(
+                    Messages.getString("PatientEntryForm.retrieve.error.msg",
+                        patient.getPnumber()), e);
+        }
+    }
 
-        modelObject.reset();
-        StudyWrapper study = modelObject.getStudy();
+    @Override
+    public void reset() throws Exception {
+        super.reset();
+        StudyWrapper study = patient.getStudy();
         if (study != null) {
             studiesViewer.setSelection(new StructuredSelection(study));
         }
+        createdAtWidget.setDate(new Date());
+        studiesViewer.setSelection(null);
+        patient.reset();
+        pnumberNonEmptyValidator.validate(null);
     }
 }

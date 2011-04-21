@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -33,11 +32,9 @@ import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.Event;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ProcessingEventEntryForm extends
-    BiobankEntryForm<ProcessingEventWrapper> {
+public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ProcessingEventEntryForm"; //$NON-NLS-1$
 
@@ -50,6 +47,7 @@ public class ProcessingEventEntryForm extends
         .getString("ProcessingEventEntryForm.edition.msg"); //$NON-NLS-1$
 
     private ProcessingEventAdapter pEventAdapter;
+    private ProcessingEventWrapper pEvent;
 
     private ComboViewer activityStatusComboViewer;
 
@@ -59,29 +57,45 @@ public class ProcessingEventEntryForm extends
 
     @Override
     protected void init() throws Exception {
-        super.init();
         Assert.isTrue(adapter instanceof ProcessingEventAdapter,
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         pEventAdapter = (ProcessingEventAdapter) adapter;
+        if (pEventAdapter.getWrapper().isNew())
+            pEvent = pEventAdapter.getWrapper();
+        else
+            pEvent = (ProcessingEventWrapper) pEventAdapter.getWrapper()
+                .getDatabaseClone();
+        retrieve();
         String tabName;
-        if (modelObject.isNew()) {
+        if (pEvent.isNew()) {
             tabName = Messages.getString("ProcessingEventEntryForm.title.new"); //$NON-NLS-1$
-            modelObject.setActivityStatus(ActivityStatusWrapper
+            pEvent.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else {
-            if (modelObject.getWorksheet() == null)
+            if (pEvent.getWorksheet() == null)
                 tabName = Messages.getString(
                     "ProcessingEventEntryForm.title.edit.worksheet", //$NON-NLS-1$
-                    modelObject.getWorksheet(),
-                    modelObject.getFormattedCreatedAt());
+                    pEvent.getWorksheet(), pEvent.getFormattedCreatedAt());
             else
                 tabName = Messages.getString(
                     "ProcessingEventEntryForm.title.edit.noworksheet", //$NON-NLS-1$
-                    modelObject.getFormattedCreatedAt());
+                    pEvent.getFormattedCreatedAt());
         }
         setPartName(tabName);
+    }
+
+    private void retrieve() {
+        try {
+            if (!pEvent.isNew()) {
+                pEvent.reload();
+            }
+        } catch (Exception e) {
+            logger.error("Error while retrieving processing event " //$NON-NLS-1$
+                + pEvent.getFormattedCreatedAt() + " (Worksheet " //$NON-NLS-1$
+                + pEvent.getWorksheet() + ")", e); //$NON-NLS-1$
+        }
     }
 
     @Override
@@ -101,17 +115,15 @@ public class ProcessingEventEntryForm extends
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        createReadOnlyLabelledField(
-            client,
-            SWT.NONE,
-            Messages.getString("ProcessingEvent.field.center.label"), modelObject //$NON-NLS-1$
+        createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("ProcessingEvent.field.center.label"), pEvent //$NON-NLS-1$
                 .getCenter().getName());
 
         dateWidget = createDateTimeWidget(
             client,
             Messages.getString("ProcessingEvent.field.date.label"), //$NON-NLS-1$
-            modelObject.getCreatedAt(),
-            modelObject,
+            pEvent.getCreatedAt(),
+            pEvent,
             ProcessingEventPeer.CREATED_AT.getName(),
             new NotNullValidator(
                 Messages
@@ -121,31 +133,31 @@ public class ProcessingEventEntryForm extends
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             Messages.getString("ProcessingEvent.field.worksheet.label"), null, //$NON-NLS-1$
-            modelObject, ProcessingEventPeer.WORKSHEET.getName(),
-            (!modelObject.isNew() && modelObject.getWorksheet() == null) ? null
+            pEvent, ProcessingEventPeer.WORKSHEET.getName(),
+            (!pEvent.isNew() && pEvent.getWorksheet() == null) ? null
                 : new NonEmptyStringValidator("Worksheet cannot be null"));
 
         activityStatusComboViewer = createComboViewer(
             client,
             Messages.getString("label.activity"), //$NON-NLS-1$
             ActivityStatusWrapper.getAllActivityStatuses(appService),
-            modelObject.getActivityStatus(),
+            pEvent.getActivityStatus(),
             Messages
                 .getString("ProcessingEventEntryForm.field.activity.validation.msg"), //$NON-NLS-1$
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     setDirty(true);
-                    modelObject
+                    pEvent
                         .setActivityStatus((ActivityStatusWrapper) selectedObject);
                 }
             });
-        if (modelObject.getActivityStatus() != null)
+        if (pEvent.getActivityStatus() != null)
             activityStatusComboViewer.setSelection(new StructuredSelection(
-                modelObject.getActivityStatus()));
+                pEvent.getActivityStatus()));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            Messages.getString("label.comments"), null, modelObject, //$NON-NLS-1$
+            Messages.getString("label.comments"), null, pEvent, //$NON-NLS-1$
             ProcessingEventPeer.COMMENT.getName(), null);
     }
 
@@ -157,8 +169,7 @@ public class ProcessingEventEntryForm extends
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
         toolkit.paintBordersFor(client);
 
-        List<SpecimenWrapper> specimens = modelObject
-            .getSpecimenCollection(true);
+        List<SpecimenWrapper> specimens = pEvent.getSpecimenCollection(true);
 
         specimenEntryWidget = new SpecimenEntryWidget(client, SWT.NONE,
             toolkit, appService, true);
@@ -198,8 +209,8 @@ public class ProcessingEventEntryForm extends
                     else if (specimen.getParentContainer() != null)
                         throw new VetoException(
                             "Specimen is currently listed as stored in a container.");
-                    else if (modelObject.getSpecimenCollection(false).size() > 0
-                        && !modelObject
+                    else if (pEvent.getSpecimenCollection(false).size() > 0
+                        && !pEvent
                             .getSpecimenCollection(false)
                             .get(0)
                             .getCollectionEvent()
@@ -212,19 +223,21 @@ public class ProcessingEventEntryForm extends
                             "All specimens must be part of the same study.");
                     break;
                 case POST_ADD:
-                    specimen.setProcessingEvent(modelObject);
-                    modelObject
-                        .addToSpecimenCollection(Arrays.asList(specimen));
+                    specimen.setProcessingEvent(pEvent);
+                    pEvent.addToSpecimenCollection(Arrays.asList(specimen));
                     break;
                 case PRE_DELETE:
                     break;
                 case POST_DELETE:
-                    modelObject.removeFromSpecimenCollection(Arrays
-                        .asList(specimen));
+                    pEvent
+                        .removeFromSpecimenCollection(Arrays.asList(specimen));
                     break;
                 }
             }
         };
+
+        specimenEntryWidget.addBinding(widgetCreator,
+            "Specimens should be added to a processing event");
 
         specimenEntryWidget.addVetoListener(ItemAction.PRE_ADD, vetoListener);
         specimenEntryWidget.addVetoListener(ItemAction.POST_ADD, vetoListener);
@@ -238,13 +251,13 @@ public class ProcessingEventEntryForm extends
 
     @Override
     protected void saveForm() throws Exception {
-        modelObject.persist();
+        pEvent.persist();
         SessionManager.updateAllSimilarNodes(pEventAdapter, true);
     }
 
     @Override
     protected String getOkMessage() {
-        return (modelObject.isNew()) ? MSG_NEW_PEVENT_OK : MSG_PEVENT_OK;
+        return (pEvent.isNew()) ? MSG_NEW_PEVENT_OK : MSG_PEVENT_OK;
     }
 
     @Override
@@ -253,21 +266,12 @@ public class ProcessingEventEntryForm extends
     }
 
     @Override
-    protected void onReset() throws Exception {
-        // Remember center
-        CenterWrapper<?> center = modelObject.getCenter();
-        modelObject.reset();
-        modelObject.setCenter(center);
-
-        if (modelObject.isNew()) {
-            modelObject.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+    public void reset() throws Exception {
+        super.reset();
+        if (pEvent.getActivityStatus() != null) {
+            activityStatusComboViewer.setSelection(new StructuredSelection(
+                pEvent.getActivityStatus()));
         }
-
-        GuiUtil.resetComboViewer(activityStatusComboViewer,
-            modelObject.getActivityStatus());
-
-        specimenEntryWidget.setSpecimens(modelObject
-            .getSpecimenCollection(true));
+        specimenEntryWidget.setSpecimens(pEvent.getSpecimenCollection(true));
     }
 }
