@@ -57,7 +57,7 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
     };
 
     @Override
-    protected void init() throws Exception {
+    protected synchronized void init() throws Exception {
         if (activityLogger == null) {
             activityLogger = Logger.getLogger(ActivityLogAppender.class
                 .getPackage().getName());
@@ -137,6 +137,15 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
     }
 
     protected abstract String getActivityTitle();
+
+    public void appendLogs(List<String> messages) {
+        if (activityLogger != null) {
+            for (String msg : messages) {
+                activityLogger.trace(msg);
+            }
+        }
+        printed = false;
+    }
 
     public void appendLog(String message) {
         if (activityLogger != null) {

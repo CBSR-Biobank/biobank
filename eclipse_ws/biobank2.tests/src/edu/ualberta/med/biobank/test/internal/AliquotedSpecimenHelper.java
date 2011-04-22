@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -30,15 +33,21 @@ public class AliquotedSpecimenHelper extends DbHelper {
         return aliquotedSpecimen;
     }
 
-    public static int addAliquotedSpecimens(StudyWrapper study,
-        SiteWrapper site, String name) throws Exception {
+    public static List<AliquotedSpecimenWrapper> addRandAliquotedSpecimens(
+        StudyWrapper study, SiteWrapper site, String name) throws Exception {
         int nber = r.nextInt(15) + 1;
+        List<AliquotedSpecimenWrapper> list = new ArrayList<AliquotedSpecimenWrapper>();
         for (int i = 0; i < nber; i++) {
             SpecimenTypeWrapper type = SpecimenTypeHelper.addSpecimenType(name
                 + i);
-            addAliquotedSpecimen(study, type);
+            list.add(addAliquotedSpecimen(study, type));
         }
         study.reload();
-        return nber;
+        return list;
+    }
+
+    public static int addAliquotedSpecimens(StudyWrapper study,
+        SiteWrapper site, String name) throws Exception {
+        return addRandAliquotedSpecimens(study, site, name).size();
     }
 }

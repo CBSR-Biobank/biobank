@@ -117,7 +117,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
     public static final String IMG_DISPATCH_SHIPMENT_TRANSIT = "dispatchTransit";
     public static final String IMG_DISPATCH_SHIPMENT_RECEIVING = "dispatchReceiving";
     public static final String IMG_DISPATCH_SHIPMENT_ERROR = "dispatchError";
-    public static final String IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT = "dispatchAddAliquot";
+    public static final String IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN = "dispatchAddSpecimen";
     public static final String IMG_SITE = "site";
     public static final String IMG_SITES = "sites";
     public static final String IMG_STUDIES = "studies";
@@ -137,7 +137,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
     public static final String IMG_REQUEST_EDIT = "request_edit";
     public static final String IMG_REQUEST_SHIPPED = "request_shipped";
     public static final String IMG_REQUEST_FILLED = "request_filled";
-    public static final String IMG_ALIQUOT = "aliquot";
+    public static final String IMG_SPECIMEN = "specimen";
     public static final String IMG_LOCK = "lock";
     public static final String IMG_UP = "bullet_arrow_up";
     public static final String IMG_DOWN = "bullet_arrow_down";
@@ -209,7 +209,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
         classToImageKey.put(RequestAdapter.class.getName(),
             BiobankPlugin.IMG_REQUEST);
         classToImageKey.put(SpecimenAdapter.class.getName(),
-            BiobankPlugin.IMG_ALIQUOT);
+            BiobankPlugin.IMG_SPECIMEN);
         classToImageKey.put(ProcessingEventAdapter.class.getName(),
             BiobankPlugin.IMG_PROCESSING_EVENT);
         classToImageKey.put(ProcessingEventGroup.class.getName(),
@@ -311,7 +311,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
             "dispatch_receiving.png");
         registerImage(registry, IMG_DISPATCH_SHIPMENT_ERROR,
             "dispatch_error.png");
-        registerImage(registry, IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT,
+        registerImage(registry, IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN,
             "dispatchScanAdd.png");
         registerImage(registry, IMG_REQUEST, "request.png");
         registerImage(registry, IMG_REQUEST_EDIT, "request_edit.png");
@@ -327,7 +327,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_TODAY, "today.png");
         registerImage(registry, IMG_RECEIVED, "received.png");
         registerImage(registry, IMG_SENT, "sent.png");
-        registerImage(registry, IMG_ALIQUOT, "aliquot.png");
+        registerImage(registry, IMG_SPECIMEN, "specimen.png");
         registerImage(registry, IMG_LOCK, "lock.png");
         registerImage(registry, IMG_UP, "bullet_arrow_up.png");
         registerImage(registry, IMG_DOWN, "bullet_arrow_down.png");
@@ -351,6 +351,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
                 registry.put(key, desc);
             }
         } catch (Exception e) {
+            logger.error("Error registering an image", e);
         }
     }
 

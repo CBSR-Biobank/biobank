@@ -1,6 +1,6 @@
-package edu.ualberta.med.biobank.model;
+package edu.ualberta.med.biobank.widgets.grids.cell;
 
-public abstract class Cell {
+public abstract class AbstractUICell {
 
     private boolean selected = false;
 

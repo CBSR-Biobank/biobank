@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class CollectionEventInfoTable extends
     InfoTableWidget<CollectionEventWrapper> {
 
-    class TableRowData {
+    private static class TableRowData {
         CollectionEventWrapper collectionEvent;
         Integer visitNumber;
         long sourceSpecimenCount;

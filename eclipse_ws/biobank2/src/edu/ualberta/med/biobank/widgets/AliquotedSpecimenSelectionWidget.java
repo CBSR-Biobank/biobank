@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.Messages;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.scanprocess.SpecimenHierarchy;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
@@ -85,8 +85,8 @@ public class AliquotedSpecimenSelectionWidget {
                     Messages
                         .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
         }
-        cvSource = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
-            | SWT.BORDER);
+        cvSource = widgetCreator.createComboViewerWithoutLabel(parent, null,
+            null);
         setComboProperties(cvSource, widgetCreator.getToolkit(), 0);
         cvSource.setLabelProvider(new LabelProvider() {
             @Override
@@ -98,7 +98,7 @@ public class AliquotedSpecimenSelectionWidget {
         });
         if (oneRow) {
             GridData gd = new GridData();
-            gd.widthHint = 250;
+            gd.widthHint = 300;
             cvSource.getControl().setLayoutData(gd);
         }
 
@@ -111,8 +111,8 @@ public class AliquotedSpecimenSelectionWidget {
                     Messages
                         .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
         }
-        cvResult = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
-            | SWT.BORDER);
+        cvResult = widgetCreator.createComboViewerWithoutLabel(parent, null,
+            null);
         setComboProperties(cvResult, widgetCreator.getToolkit(), 1);
         cvResult.setLabelProvider(new LabelProvider() {
             @Override
@@ -352,10 +352,10 @@ public class AliquotedSpecimenSelectionWidget {
     /**
      * @return an array of [SpecimenLink (source), SpecimenType (result)]
      */
-    public ModelWrapper<?>[] getSelection() {
+    public SpecimenHierarchy getSelection() {
         if (getSourceSelection() != null && getResultTypeSelection() != null)
-            return new ModelWrapper<?>[] { getSourceSelection(),
-                getResultTypeSelection() };
+            return new SpecimenHierarchy(getSourceSelection(),
+                getResultTypeSelection());
         return null;
     }
 
@@ -385,4 +385,5 @@ public class AliquotedSpecimenSelectionWidget {
         cvResult.setInput(Arrays.asList(resultType));
         cvResult.setSelection(new StructuredSelection(resultType));
     }
+
 }

@@ -40,7 +40,8 @@ public class DispatchSpecimenWrapper extends DispatchSpecimenBaseWrapper
         return super.equals(object);
     }
 
-    public DispatchSpecimenState getDispatchSpecimenState() {
+    @Override
+    public DispatchSpecimenState getSpecimenState() {
         return DispatchSpecimenState.getState(getState());
     }
 

@@ -71,7 +71,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private SourceSpecimenEntryInfoTable sourceSpecimenEntryTable;
 
-    private class StudyPvAttrCustom extends PvAttrCustom {
+    private static class StudyPvAttrCustom extends PvAttrCustom {
         public PvInfoWidget widget;
         public boolean inStudy;
     }
@@ -243,13 +243,13 @@ public class StudyEntryForm extends BiobankEntryForm {
         List<String> studyEventInfoLabels = Arrays.asList(study
             .getStudyEventAttrLabels());
 
-        for (GlobalEventAttrWrapper pvAttr : GlobalEventAttrWrapper
+        for (GlobalEventAttrWrapper geAttr : GlobalEventAttrWrapper
             .getAllGlobalEventAttrs(appService)) {
-            String label = pvAttr.getLabel();
+            String label = geAttr.getLabel();
             boolean selected = false;
             studyPvAttrCustom = new StudyPvAttrCustom();
             studyPvAttrCustom.setLabel(label);
-            studyPvAttrCustom.setType(pvAttr.getTypeName());
+            studyPvAttrCustom.setType(geAttr.getTypeName());
             if (studyEventInfoLabels.contains(label)) {
                 studyPvAttrCustom.setAllowedValues(study
                     .getStudyEventAttrPermissible(label));
@@ -324,8 +324,8 @@ public class StudyEntryForm extends BiobankEntryForm {
             } else if (studyPvAttrCustom.widget.getSelected()) {
                 newPvInfoLabels.add(studyPvAttrCustom.getLabel());
                 String value = studyPvAttrCustom.widget.getValues();
-                if (studyPvAttrCustom.getType().equals("select_single") //$NON-NLS-1$
-                    || studyPvAttrCustom.getType().equals("select_multiple")) { //$NON-NLS-1$
+                if (studyPvAttrCustom.getType() == EventAttrTypeEnum.SELECT_SINGLE
+                    || studyPvAttrCustom.getType() == EventAttrTypeEnum.SELECT_MULTIPLE) { //$NON-NLS-1$
                     if (value.length() > 0) {
                         study.setStudyEventAttr(studyPvAttrCustom.getLabel(),
                             studyPvAttrCustom.getType(), value.split(";")); //$NON-NLS-1$
@@ -348,7 +348,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     public void reset() throws Exception {
-        super.reset();
+        study.reset();
         ActivityStatusWrapper currentActivityStatus = study.getActivityStatus();
         if (currentActivityStatus != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(

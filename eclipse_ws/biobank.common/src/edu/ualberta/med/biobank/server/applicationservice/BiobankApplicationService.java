@@ -2,9 +2,14 @@ package edu.ualberta.med.biobank.server.applicationservice;
 
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
+import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
@@ -12,6 +17,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Application service interface obtained through
@@ -71,4 +77,27 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public List<Object> startQuery(QueryHandle qh) throws Exception;
 
     public void stopQuery(QueryHandle qh) throws Exception;
+
+    // public ScanProcessResult processScanLinkResult(Map<RowColPos, Cell>
+    // cells,
+    // boolean isRescanMode, User user) throws ApplicationException;
+    //
+    // public CellProcessResult processCellLinkStatus(Cell cell, User user)
+    // throws ApplicationException;
+    //
+    // public ScanProcessResult processScanAssignResult(
+    // Map<RowColPos, Cell> cells, Map<RowColPos, Integer> expectedSpecimens,
+    // AssignProcessData palletData, boolean rescanMode, User user)
+    // throws ApplicationException;
+    //
+    // public CellProcessResult processCellAssignStatus(Cell cell,
+    // AssignProcessData palletData, User user) throws ApplicationException;
+
+    public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
+        ProcessData processData, boolean rescanMode, User user)
+        throws ApplicationException;
+
+    public CellProcessResult processCellStatus(Cell cell,
+        ProcessData processData, User user) throws ApplicationException;
+
 }

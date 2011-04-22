@@ -182,7 +182,7 @@ public class UserEditDialog extends BiobankDialog {
         }
 
         final boolean warnOfRightsDemotion = SessionManager.getUser().equals(
-            originalUser.getLogin())
+            originalUser)
             && originalUser.isSuperAdministrator();
         groupsWidget = new MultiSelectWidget(parent, SWT.NONE,
             "Available Groups", "Assigned Groups", 75);

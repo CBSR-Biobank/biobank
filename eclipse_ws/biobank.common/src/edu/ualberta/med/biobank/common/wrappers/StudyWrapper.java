@@ -20,6 +20,8 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
+import edu.ualberta.med.biobank.common.security.Privilege;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
@@ -295,7 +297,7 @@ public class StudyWrapper extends StudyBaseWrapper {
     public void deleteStudyEventAttr(String label) throws Exception {
         getStudyEventAttrMap();
         StudyEventAttrWrapper studyEventAttr = getStudyEventAttr(label);
-        if (studyEventAttr.isUsedByProcessingEvents()) {
+        if (studyEventAttr.isUsedByCollectionEvents()) {
             throw new BiobankCheckException("StudyEventAttr with label \""
                 + label + "\" is in use by patient visits");
         }
@@ -492,6 +494,13 @@ public class StudyWrapper extends StudyBaseWrapper {
             cEvents.addAll(p.getCollectionEventCollection(false));
         }
         return cEvents;
+    }
+
+    @Override
+    public boolean canUpdate(User user) {
+        return user.isInSuperAdminMode()
+            && user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass(),
+                getSecuritySpecificCenters());
     }
 
 }

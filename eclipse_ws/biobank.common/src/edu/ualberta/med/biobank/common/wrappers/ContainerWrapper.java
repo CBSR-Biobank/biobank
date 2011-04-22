@@ -41,13 +41,13 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     private static final String CHILDREN_CACHE_KEY = "children";
 
-    private static final String ALIQUOTS_CACHE_KEY = "aliquots";
+    private static final String SPECIMENS_CACHE_KEY = "specimens";
 
     private AbstractObjectWithPositionManagement<ContainerPosition, ContainerWrapper> objectWithPositionManagement;
 
     private List<ContainerWrapper> addedChildren = new ArrayList<ContainerWrapper>();
 
-    private List<SpecimenWrapper> addedAliquots = new ArrayList<SpecimenWrapper>();
+    private List<SpecimenWrapper> addedSpecimens = new ArrayList<SpecimenWrapper>();
 
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
@@ -197,7 +197,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             }
         }
         persistChildren(labelChanged);
-        persistAliquots();
+        persistSpecimens();
     }
 
     public RowColPos getPositionAsRowCol() {
@@ -231,10 +231,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return objectWithPositionManagement.hasParentContainer();
     }
 
-    private void persistAliquots() throws Exception {
-        for (SpecimenWrapper aliquot : addedAliquots) {
-            aliquot.setParent(this);
-            aliquot.persist();
+    private void persistSpecimens() throws Exception {
+        for (SpecimenWrapper specimen : addedSpecimens) {
+            specimen.setParent(this);
+            specimen.persist();
         }
     }
 
@@ -451,14 +451,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     @SuppressWarnings("unchecked")
     public Map<RowColPos, SpecimenWrapper> getSpecimens() {
-        Map<RowColPos, SpecimenWrapper> aliquots = (Map<RowColPos, SpecimenWrapper>) cache
-            .get(ALIQUOTS_CACHE_KEY);
-        if (aliquots == null) {
+        Map<RowColPos, SpecimenWrapper> specimens = (Map<RowColPos, SpecimenWrapper>) cache
+            .get(SPECIMENS_CACHE_KEY);
+        if (specimens == null) {
             List<SpecimenPositionWrapper> positions = getWrapperCollection(
                 ContainerPeer.SPECIMEN_POSITION_COLLECTION,
                 SpecimenPositionWrapper.class, false);
 
-            aliquots = new TreeMap<RowColPos, SpecimenWrapper>();
+            specimens = new TreeMap<RowColPos, SpecimenWrapper>();
             for (SpecimenPositionWrapper position : positions) {
                 try {
                     position.reload();
@@ -466,12 +466,12 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                     // do nothing
                 }
                 SpecimenWrapper spc = position.getSpecimen();
-                aliquots.put(
+                specimens.put(
                     new RowColPos(position.getRow(), position.getCol()), spc);
             }
-            cache.put(ALIQUOTS_CACHE_KEY, aliquots);
+            cache.put(SPECIMENS_CACHE_KEY, specimens);
         }
-        return aliquots;
+        return specimens;
     }
 
     public boolean hasSpecimens() {
@@ -482,47 +482,47 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     public SpecimenWrapper getSpecimen(Integer row, Integer col)
         throws BiobankCheckException {
-        SpecimenPositionWrapper aliquotPosition = new SpecimenPositionWrapper(
+        SpecimenPositionWrapper specimenPosition = new SpecimenPositionWrapper(
             appService);
-        aliquotPosition.setRow(row);
-        aliquotPosition.setCol(col);
-        aliquotPosition.checkPositionValid(this);
-        Map<RowColPos, SpecimenWrapper> aliquots = getSpecimens();
-        if (aliquots == null) {
+        specimenPosition.setRow(row);
+        specimenPosition.setCol(col);
+        specimenPosition.checkPositionValid(this);
+        Map<RowColPos, SpecimenWrapper> specimens = getSpecimens();
+        if (specimens == null) {
             return null;
         }
-        return aliquots.get(new RowColPos(row, col));
+        return specimens.get(new RowColPos(row, col));
     }
 
-    public void addAliquot(Integer row, Integer col, SpecimenWrapper aliquot)
+    public void addSpecimen(Integer row, Integer col, SpecimenWrapper specimen)
         throws Exception {
-        SpecimenPositionWrapper aliquotPosition = new SpecimenPositionWrapper(
+        SpecimenPositionWrapper specimenPosition = new SpecimenPositionWrapper(
             appService);
-        aliquotPosition.setRow(row);
-        aliquotPosition.setCol(col);
-        aliquotPosition.checkPositionValid(this);
-        Map<RowColPos, SpecimenWrapper> aliquots = getSpecimens();
-        if (aliquots == null) {
-            aliquots = new TreeMap<RowColPos, SpecimenWrapper>();
-            cache.put(ALIQUOTS_CACHE_KEY, aliquots);
-        } else if (!canHoldAliquot(aliquot)) {
+        specimenPosition.setRow(row);
+        specimenPosition.setCol(col);
+        specimenPosition.checkPositionValid(this);
+        Map<RowColPos, SpecimenWrapper> specimens = getSpecimens();
+        if (specimens == null) {
+            specimens = new TreeMap<RowColPos, SpecimenWrapper>();
+            cache.put(SPECIMENS_CACHE_KEY, specimens);
+        } else if (!canHoldSpecimen(specimen)) {
             throw new BiobankCheckException("Container " + getFullInfoLabel()
                 + " does not allow inserts of type "
-                + aliquot.getSpecimenType().getName() + ".");
+                + specimen.getSpecimenType().getName() + ".");
         } else {
             SpecimenWrapper sampleAtPosition = getSpecimen(row, col);
             if (sampleAtPosition != null) {
                 throw new BiobankCheckException("Container "
                     + getFullInfoLabel()
-                    + " is already holding an aliquot at position "
+                    + " is already holding an specimen at position "
                     + sampleAtPosition.getPositionString(false, false) + " ("
                     + row + ":" + col + ")");
             }
         }
-        aliquot.setPosition(new RowColPos(row, col));
-        aliquot.setParent(this);
-        aliquots.put(new RowColPos(row, col), aliquot);
-        addedAliquots.add(aliquot);
+        specimen.setPosition(new RowColPos(row, col));
+        specimen.setParent(this);
+        specimens.put(new RowColPos(row, col), specimen);
+        addedSpecimens.add(specimen);
     }
 
     /**
@@ -724,8 +724,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * 
      * @throws Exception if the sample type is null.
      */
-    public boolean canHoldAliquot(SpecimenWrapper aliquot) throws Exception {
-        SpecimenTypeWrapper type = aliquot.getSpecimenType();
+    public boolean canHoldSpecimen(SpecimenWrapper specimen) throws Exception {
+        SpecimenTypeWrapper type = specimen.getSpecimenType();
         if (type == null) {
             throw new BiobankCheckException("sample type is null");
         }
@@ -733,11 +733,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             type);
     }
 
-    public void moveAliquots(ContainerWrapper destination) throws Exception {
+    public void moveSpecimens(ContainerWrapper destination) throws Exception {
         Map<RowColPos, SpecimenWrapper> aliquots = getSpecimens();
         for (Entry<RowColPos, SpecimenWrapper> e : aliquots.entrySet()) {
             destination
-                .addAliquot(e.getKey().row, e.getKey().col, e.getValue());
+                .addSpecimen(e.getKey().row, e.getKey().col, e.getValue());
         }
         destination.persist();
     }
@@ -762,7 +762,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         ApplicationException {
         if (hasSpecimens()) {
             throw new BiobankDeleteException("Unable to delete container "
-                + getLabel() + ". All aliquots must be removed first.");
+                + getLabel() + ". All specimens must be removed first.");
         }
         if (hasChildren()) {
             throw new BiobankDeleteException("Unable to delete container "
@@ -802,7 +802,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     /**
      * Get containers with a given label that can have a child (container or
-     * aliquot) with label 'childLabel'. If child is not null and is a
+     * specimen) with label 'childLabel'. If child is not null and is a
      * container, then will check that the parent can contain this type of
      * container
      * 
@@ -955,9 +955,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     /**
      * Retrieve a list of empty containers in a specific site. These containers
-     * should be able to hold aliquots of type sampleTypes and should have a row
-     * capacity equals or greater than minRwCapacity and a column capacity equal
-     * or greater than minColCapacity.
+     * should be able to hold specimens of type specimen type and should have a
+     * row capacity equals or greater than minRwCapacity and a column capacity
+     * equal or greater than minColCapacity.
      * 
      * @param appService
      * @param siteWrapper
@@ -1149,7 +1149,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     @Override
     protected void resetInternalFields() {
         addedChildren.clear();
-        addedAliquots.clear();
+        addedSpecimens.clear();
         objectWithPositionManagement.resetInternalFields();
     }
 

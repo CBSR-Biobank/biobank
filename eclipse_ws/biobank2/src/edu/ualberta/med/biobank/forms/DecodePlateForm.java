@@ -19,10 +19,10 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.model.CellStatus;
-import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
@@ -74,8 +74,8 @@ public class DecodePlateForm extends PlateForm {
             }
         });
 
-        spw = new ScanPalletWidget(page, Arrays.asList(CellStatus.EMPTY,
-            CellStatus.FILLED));
+        spw = new ScanPalletWidget(page, Arrays.asList(UICellStatus.EMPTY,
+            UICellStatus.FILLED));
         spw.setVisible(true);
         toolkit.adapt(spw);
 
@@ -175,8 +175,8 @@ public class DecodePlateForm extends PlateForm {
      */
     private void processCellStatus(PalletCell cell) {
         if (cell != null) {
-            cell.setStatus((cell.getValue() != null) ? CellStatus.FILLED
-                : CellStatus.EMPTY);
+            cell.setStatus((cell.getValue() != null) ? UICellStatus.FILLED
+                : UICellStatus.EMPTY);
             cell.setTitle(cell.getValue());
         }
     }

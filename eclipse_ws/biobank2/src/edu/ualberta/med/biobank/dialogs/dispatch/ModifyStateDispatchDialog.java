@@ -15,15 +15,14 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class ModifyStateDispatchDialog extends BiobankDialog {
 
-    private static final String TITLE_STATE = "Setting {0} state to aliquots in current dispatch";
-    private static final String TITLE_COMMENT_ONLY = "Modifying comment of aliquots in current dispatch";
+    private static final String TITLE_STATE = "Setting {0} state to specimens in current dispatch";
+    private static final String TITLE_COMMENT_ONLY = "Modifying comment of specimens in current dispatch";
     private String currentTitle;
     private String message;
 
-    private class CommentValue {
+    private static class CommentValue {
         private String value;
 
-        @SuppressWarnings("unused")
         public void setValue(String value) {
             this.value = value;
         }
@@ -35,9 +34,10 @@ public class ModifyStateDispatchDialog extends BiobankDialog {
 
     private CommentValue commentValue = new CommentValue();
 
-    public ModifyStateDispatchDialog(Shell parentShell,
+    public ModifyStateDispatchDialog(Shell parentShell, String oldComment,
         DispatchSpecimenState newState) {
         super(parentShell);
+        commentValue.setValue(oldComment);
         if (newState == null) {
             currentTitle = TITLE_COMMENT_ONLY;
             message = "Set a comment";

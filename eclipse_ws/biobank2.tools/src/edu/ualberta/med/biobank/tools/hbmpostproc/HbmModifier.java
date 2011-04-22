@@ -32,13 +32,14 @@ public class HbmModifier {
     private static Pattern HBM_ATTR = Pattern.compile(
         "<property.*column=\"([^\"]*)\"/>", Pattern.CASE_INSENSITIVE);
 
+    private static Pattern HBM_LOG_GENERATOR_TAG = Pattern.compile(
+        "<generator.*class=\"([^\"]*)\"/>", Pattern.CASE_INSENSITIVE);
+
     private static String HBM_FILE_EXTENSION = ".hbm.xml";
 
-    private static final String TIMESTAMP_PROPERTY = "<timestamp name=\"lastModifyDateTime\" column=\"LAST_MODIFIY_DATE_TIME\" access=\"field\" />";
+    private static final String VERSION_PROPERTY = "          <version name=\"version\" column=\"VERSION\" access=\"field\" />";
 
     private static HbmModifier instance = null;
-
-    private boolean documentChanged = false;
 
     private HbmModifier() {
 
@@ -68,6 +69,7 @@ public class HbmModifier {
 
             String line = reader.readLine();
 
+            boolean documentChanged = false;
             boolean idPropertyFound = false;
 
             while (line != null) {
@@ -76,14 +78,32 @@ public class HbmModifier {
                 Matcher stringAttrMatcher = HBM_STRING_ATTR.matcher(line);
                 Matcher attrMatcher = HBM_ATTR.matcher(line);
 
-                if (!idPropertyFound && idMatcher.find()) {
+                if (className.equals("Log")) {
+                    // make the ID attribute auto increment
+                    Matcher logGeneratorTag = HBM_LOG_GENERATOR_TAG
+                        .matcher(line);
+                    if (logGeneratorTag.find()) {
+                        String classAttr = logGeneratorTag.group(1);
+
+                        if (classAttr.equals("increment")) {
+                            alteredLine = alteredLine.replace("increment",
+                                "identity");
+                        }
+                    }
+                }
+
+                if (!idPropertyFound && idMatcher.find()
+                    && !className.equals("Log")) {
                     // has to be after discriminator tag and before first
                     // property tag
-                    alteredLine = new StringBuffer(TIMESTAMP_PROPERTY)
+                    //
+                    // Do not add version field to Log class
+                    alteredLine = new StringBuffer(VERSION_PROPERTY)
                         .append("\n").append(alteredLine).toString();
                     idPropertyFound = true;
-                } else if (stringAttrMatcher.find()
-                    && !line.contains("length=\"")) {
+                }
+
+                if (stringAttrMatcher.find() && !line.contains("length=\"")) {
                     String attrName = stringAttrMatcher.group(1);
                     Attribute attr = columnTypeMap.get(attrName);
 
@@ -95,13 +115,13 @@ public class HbmModifier {
                     alteredLine = fixStringAttributes(line, className, attr);
                     alteredLine = addContraints(alteredLine, attrName,
                         uniqueList, notNullList);
-                    documentChanged |= !line.equals(alteredLine);
                 } else if (attrMatcher.find()) {
                     String attrName = attrMatcher.group(1);
                     alteredLine = addContraints(alteredLine, attrName,
                         uniqueList, notNullList);
                 }
 
+                documentChanged |= !line.equals(alteredLine);
                 writer.write(alteredLine);
                 writer.newLine();
                 line = reader.readLine();
@@ -111,7 +131,7 @@ public class HbmModifier {
             writer.flush();
             writer.close();
 
-            if (!idPropertyFound) {
+            if (!className.equals("Log") && !idPropertyFound) {
                 throw new Exception(
                     "tag not found found for inserting timestamp in HBM file "
                         + filename);
@@ -120,7 +140,7 @@ public class HbmModifier {
             if (documentChanged) {
                 FileUtils.copyFile(outFile, new File(filename));
                 if (HbmPostProcess.getInstance().getVerbose()) {
-                    System.out.println("HBM Modified: " + filename);
+                    LOGGER.info("HBM Modified: " + filename);
                 }
             }
 
@@ -162,7 +182,6 @@ public class HbmModifier {
         if (notNullList.contains(attrName) && !s.contains("not-null="))
             s += " not-null=\"true\"";
         if (s.length() > 0) {
-            documentChanged = true;
             return line.replace("/>", s + "/>");
         }
         return line;

@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public abstract class LinkAssignCommonHandler extends AbstractHandler implements
     IHandler {
 
-    public Object openLinkAssignPerspective(String editorId)
+    public Object openLinkAssignPerspective(String editorId, AdapterBase adapter)
         throws ExecutionException {
         IWorkbench workbench = BiobankPlugin.getDefault().getWorkbench();
         try {
@@ -38,13 +38,12 @@ public abstract class LinkAssignCommonHandler extends AbstractHandler implements
                 IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
                     .getActivePage();
                 // open the editor
-                AdapterBase.openForm(new FormInput(SessionManager.getInstance()
-                    .getSession()), editorId, true);
+                AdapterBase.openForm(new FormInput(adapter), editorId, true);
                 hideConsoleViewIcons(page);
             }
         } catch (WorkbenchException e) {
             throw new ExecutionException(
-                "Error while opening aliquot management perspective", e);
+                "Error while opening specimen management perspective", e);
         }
         return null;
     }

@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -61,6 +63,30 @@ public class CollectionEventHelper extends DbHelper {
         originInfo.persist();
         return addCollectionEvent(center, patient, visitNumber, originInfo,
             originSpecimen);
+    }
+
+    public static List<CollectionEventWrapper> addCollectionEvents(
+        CenterWrapper<?> center, StudyWrapper study, String name)
+        throws Exception {
+        List<CollectionEventWrapper> cevents = new ArrayList<CollectionEventWrapper>();
+        SpecimenTypeWrapper spcType = SpecimenTypeWrapper.getAllSpecimenTypes(
+            appService, false).get(0);
+        int num = r.nextInt(15) + 1;
+
+        for (int i = 0; i < num; i++) {
+            PatientWrapper patient = PatientHelper.addPatient(name + "_p" + i,
+                study);
+            SpecimenWrapper originSpecimen = SpecimenHelper
+                .newSpecimen(spcType);
+
+            OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
+            originInfo.setCenter(center);
+            originInfo.persist();
+
+            cevents.add(addCollectionEvent(center, patient, 1, originInfo,
+                originSpecimen));
+        }
+        return cevents;
     }
 
 }

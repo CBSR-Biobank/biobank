@@ -451,7 +451,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
     /**
      * Get containers types with the given capacity in the given site. The
-     * container types returned are ones that can only hold aliquots.
+     * container types returned are ones that can only hold specimens.
      */
     public static List<ContainerTypeWrapper> getContainerTypesByCapacity(
         WritableApplicationService appService, SiteWrapper siteWrapper,

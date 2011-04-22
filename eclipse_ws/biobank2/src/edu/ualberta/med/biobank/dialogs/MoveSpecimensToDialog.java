@@ -35,9 +35,9 @@ import edu.ualberta.med.biobank.widgets.BiobankWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
- * Allows the user to choose a container to which aliquots will be moved
+ * Allows the user to choose a container to which specimens will be moved
  */
-public class MoveAliquotsToDialog extends BiobankDialog {
+public class MoveSpecimensToDialog extends BiobankDialog {
 
     private ContainerWrapper oldContainer;
 
@@ -51,7 +51,7 @@ public class MoveAliquotsToDialog extends BiobankDialog {
 
     private WritableValue selectedValue;
 
-    public MoveAliquotsToDialog(Shell parent, ContainerWrapper oldContainer) {
+    public MoveSpecimensToDialog(Shell parent, ContainerWrapper oldContainer) {
         super(parent);
         Assert.isNotNull(oldContainer);
         this.oldContainer = oldContainer;
@@ -59,19 +59,19 @@ public class MoveAliquotsToDialog extends BiobankDialog {
 
     @Override
     protected String getDialogShellTitle() {
-        return "Move aliquots from one container to another";
+        return "Move specimens from one container to another";
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Select the new container that can hold the aliquots.\n"
+        return "Select the new container that can hold the specimens.\n"
             + "It should be initialized, empty, as big as the previous one,"
-            + " and should accept these aliquots.";
+            + " and should accept these specimens.";
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return "Move aliquots from container " + oldContainer.getLabel()
+        return "Move specimens from container " + oldContainer.getLabel()
             + " to another";
     }
 
@@ -87,7 +87,7 @@ public class MoveAliquotsToDialog extends BiobankDialog {
         buildContainersMap();
         if (!SessionManager.getUser().isSuperAdministrator()) {
             siteLabel
-                .setToolTipText("Only Website administrator can move aliquot to another site");
+                .setToolTipText("Only Website administrator can move specimens to another site");
         }
 
         newLabelText = (BiobankText) createBoundWidgetWithLabel(contents,
@@ -132,7 +132,7 @@ public class MoveAliquotsToDialog extends BiobankDialog {
         gd.grabExcessHorizontalSpace = true;
         lv.getControl().setLayoutData(gd);
 
-        // "Destination container should accept these aliquots, "
+        // "Destination container should accept these specimens, "
         // + "must be initialized but empty, "
         // + " and as big as the previous one.") {
 
@@ -177,7 +177,7 @@ public class MoveAliquotsToDialog extends BiobankDialog {
     @Override
     public void okPressed() {
         boolean sure = BiobankPlugin.openConfirm("Other site",
-            "You are about to move these aliquots into a container that belongs "
+            "You are about to move these specimens into a container that belongs "
                 + "to another site. Are you sure ?");
         if (sure)
             super.okPressed();

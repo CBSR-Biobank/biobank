@@ -14,7 +14,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
 
     private static final int PAGE_SIZE_ROWS = 5;
 
-    protected class TableRowData {
+    protected static class TableRowData {
         ContactWrapper contact;
         String clinicNameShort;
         String name;
@@ -87,7 +87,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         info.name = contact.getName();
         info.title = contact.getTitle();
         if (info.title == null) {
-            info.title = new String();
+            info.title = "";
         }
         info.emailAddress = contact.getEmailAddress();
         info.mobileNumber = contact.getMobileNumber();

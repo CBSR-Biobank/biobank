@@ -81,6 +81,9 @@ public class TestHibernateLocking extends TestDatabase {
             } catch (ApplicationException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
+            } catch (Exception ex) {
+                // TODO Auto-generated catch block
+                ex.printStackTrace();
             }
         }
 

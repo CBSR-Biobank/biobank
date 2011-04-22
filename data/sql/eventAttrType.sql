@@ -1,8 +1,8 @@
 LOCK TABLES `EVENT_ATTR_TYPE` WRITE;
-INSERT INTO `EVENT_ATTR_TYPE` (ID, NAME, LAST_MODIFIY_DATE_TIME) VALUES
-       ( 1, 'number',           "1970-01-01"),
-       ( 2, 'text',             "1970-01-01"),
-       ( 3, 'date_time',        "1970-01-01"),
-       ( 4, 'select_single',    "1970-01-01"),
-       ( 5, 'select_multiple',  "1970-01-01");
+INSERT INTO `EVENT_ATTR_TYPE` (ID, NAME, VERSION) VALUES
+       ( 1, 'number',           0),
+       ( 2, 'text',             0),
+       ( 3, 'date_time',        0),
+       ( 4, 'select_single',    0),
+       ( 5, 'select_multiple',  0);
 UNLOCK TABLES;

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.Binding;
@@ -96,10 +97,9 @@ public class WidgetCreator {
 
     public void createBoundWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
         Object bean, Composite client) {
-        FieldInfo fi;
-        for (String label : fieldsMap.keySet()) {
-            fi = fieldsMap.get(label);
-
+        for (Entry<String, FieldInfo> entry : fieldsMap.entrySet()) {
+            String label = entry.getKey();
+            FieldInfo fi = entry.getValue();
             Control control = createBoundWidgetWithLabel(client,
                 fi.widgetClass, fi.widgetOptions, fi.label, fi.widgetValues,
                 BeansObservables.observeValue(bean, label), fi.validatorClass,
@@ -245,7 +245,12 @@ public class WidgetCreator {
                 modelObservableValue.removeValueChangeListener(changeListener);
             }
         });
-
+        combo.addListener(SWT.MouseWheel, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                event.doit = false;
+            }
+        });
         return combo;
     }
 
@@ -350,6 +355,11 @@ public class WidgetCreator {
             widgetValues, modelObservableValue, validator, bindingKey);
     }
 
+    public <T> ComboViewer createComboViewerWithoutLabel(Composite parent,
+        Collection<T> input, T selection) {
+        return createComboViewer(parent, null, input, selection, null, null);
+    }
+
     /**
      * Create combo viewer with no validator on selection and with the default
      * comparator.
@@ -388,7 +398,9 @@ public class WidgetCreator {
         String fieldLabel, Collection<T> input, T selection,
         String errorMessage, boolean useDefaultComparator, String bindingKey,
         final ComboSelectionUpdate csu) {
-        Label label = createLabel(parent, fieldLabel);
+        Label label = null;
+        if (fieldLabel != null)
+            label = createLabel(parent, fieldLabel);
         return createComboViewer(parent, label, input, selection, errorMessage,
             useDefaultComparator, bindingKey, csu);
     }
@@ -414,7 +426,7 @@ public class WidgetCreator {
         }
 
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        if (dbc != null) {
+        if (dbc != null && fieldLabel != null) {
             NonEmptyStringValidator validator = new NonEmptyStringValidator(
                 errorMessage);
             validator.setControlDecoration(BiobankWidget.createDecorator(
@@ -451,14 +463,11 @@ public class WidgetCreator {
             combo.addModifyListener(modifyListener);
         }
         combo.addListener(SWT.MouseWheel, new Listener() {
-
             @Override
             public void handleEvent(Event event) {
                 event.doit = false;
             }
-
         });
-
         return comboViewer;
     }
 
@@ -659,14 +668,11 @@ public class WidgetCreator {
 
     public void createWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
         Composite parent) {
-        FieldInfo fi;
-
-        for (String label : fieldsMap.keySet()) {
-            fi = fieldsMap.get(label);
-
+        for (Entry<String, FieldInfo> entry : fieldsMap.entrySet()) {
+            FieldInfo fi = entry.getValue();
             Control control = createLabelledWidget(parent, fi.widgetClass,
                 SWT.NONE, fi.label, null);
-            controls.put(label, control);
+            controls.put(entry.getKey(), control);
         }
     }
 

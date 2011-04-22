@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -29,28 +28,26 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.dialogs.dispatch.ModifyStateDispatchDialog;
+import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
+import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.forms.utils.DispatchTableGroup;
-import edu.ualberta.med.biobank.forms.utils.TableGroup;
+import edu.ualberta.med.biobank.forms.utils.RequestTableGroup;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 
-public class DispatchAliquotsTreeTable extends BiobankWidget {
+public class RequestSpecimensTreeTable extends BiobankWidget {
 
     private TreeViewer tv;
-    private DispatchWrapper shipment;
+    private RequestWrapper shipment;
     protected List<DispatchTableGroup> groups;
 
-    public DispatchAliquotsTreeTable(Composite parent,
-        final DispatchWrapper shipment, final boolean editAliquotsState,
-        final boolean editAliquotsComment) {
+    public RequestSpecimensTreeTable(Composite parent, RequestWrapper shipment) {
         super(parent, SWT.NONE);
 
         this.shipment = shipment;
@@ -76,15 +73,11 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Patient Number");
+        tc.setText("Location");
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Activity Status");
-        tc.setWidth(120);
-
-        tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Dispatch comment");
+        tc.setText("Claimed By");
         tc.setWidth(100);
 
         ITreeContentProvider contentProvider = new ITreeContentProvider() {
@@ -95,8 +88,8 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
-                groups = DispatchTableGroup
-                    .getGroupsForShipment(DispatchAliquotsTreeTable.this.shipment);
+                // groups = RequestTableGroup
+                // .getGroupsForShipment(RequestSpecimensTreeTable.this.shipment);
             }
 
             @Override
@@ -124,9 +117,9 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
         final BiobankLabelProvider labelProvider = new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                if (element instanceof TableGroup) {
+                if (element instanceof RequestTableGroup) {
                     if (columnIndex == 0)
-                        return ((TableGroup<?>) element).getTitle();
+                        return ((RequestTableGroup) element).getTitle();
                     return "";
                 } else if (element instanceof RequestContainerAdapter) {
                     if (columnIndex == 0)
@@ -148,9 +141,9 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
             public void doubleClick(DoubleClickEvent event) {
                 Object o = ((IStructuredSelection) tv.getSelection())
                     .getFirstElement();
-                if (o instanceof DispatchSpecimenWrapper) {
-                    DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) o;
-                    SessionManager.openViewForm(dsa.getSpecimen());
+                if (o instanceof TreeItemAdapter) {
+                    ItemWrapper ra = ((TreeItemAdapter) o).getSpecimen();
+                    SessionManager.openViewForm(ra.getSpecimen());
                 }
             }
         });
@@ -164,80 +157,90 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
                 for (MenuItem menuItem : menu.getItems()) {
                     menuItem.dispose();
                 }
-                addClipboardCopySupport(menu, labelProvider);
-                if (editAliquotsState || editAliquotsComment) {
-                    DispatchSpecimenWrapper dsa = getSelectedAliquot();
-                    if (dsa != null) {
-                        if (editAliquotsState
-                            && DispatchSpecimenState.getState(dsa.getState()) == DispatchSpecimenState.NONE)
-                            addSetMissingMenu(menu);
-                        if (editAliquotsComment)
-                            addModifyCommentMenu(menu);
+
+                RequestSpecimenWrapper ra = getSelectedSpecimen();
+                if (ra != null) {
+                    addClipboardCopySupport(menu, labelProvider);
+                    addSetUnavailableMenu(menu);
+                    addClaimMenu(menu);
+                } else {
+                    Object node = getSelectedNode();
+                    if (node != null) {
+                        addClaimMenu(menu);
                     }
                 }
             }
         });
     }
 
-    protected DispatchSpecimenWrapper getSelectedAliquot() {
+    protected Object getSelectedNode() {
         IStructuredSelection selection = (IStructuredSelection) tv
             .getSelection();
-        if (selection != null && selection.size() > 0
-            && selection.getFirstElement() instanceof TreeItemAdapter) {
-            return (DispatchSpecimenWrapper) ((TreeItemAdapter) selection
-                .getFirstElement()).getSpecimen();
+        if (selection != null
+            && selection.size() > 0
+            && (selection.getFirstElement() instanceof TreeItemAdapter || selection
+                .getFirstElement() instanceof RequestContainerAdapter))
+            return selection.getFirstElement();
+        return null;
+    }
+
+    protected RequestSpecimenWrapper getSelectedSpecimen() {
+        Object node = getSelectedNode();
+        if (node != null && node instanceof TreeItemAdapter) {
+            return (RequestSpecimenWrapper) ((TreeItemAdapter) node)
+                .getSpecimen();
         }
         return null;
     }
 
-    protected void addModifyCommentMenu(Menu menu) {
+    protected void addClaimMenu(Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Modify comment");
+        item.setText("Claim");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                modifyCommentAndState((IStructuredSelection) tv.getSelection(),
-                    null);
+                claim(getSelectedNode());
+                refresh();
             }
         });
     }
 
-    private void addSetMissingMenu(final Menu menu) {
-        MenuItem item;
-        item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Set as missing");
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                modifyCommentAndState((IStructuredSelection) tv.getSelection(),
-                    DispatchSpecimenState.MISSING);
+    protected void claim(Object node) {
+        try {
+            if (node instanceof TreeItemAdapter) {
+                RequestSpecimenWrapper a = (RequestSpecimenWrapper) ((TreeItemAdapter) node)
+                    .getSpecimen();
+                a.setClaimedBy(SessionManager.getUser().getFirstName());
+                a.persist();
+            } else {
+                List<Node> children = ((RequestContainerAdapter) node)
+                    .getChildren();
+                for (Object child : children)
+                    claim(child);
             }
-        });
-    }
-
-    private void modifyCommentAndState(
-        IStructuredSelection iStructuredSelection,
-        DispatchSpecimenState newState) {
-        ModifyStateDispatchDialog dialog = new ModifyStateDispatchDialog(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            newState);
-        int res = dialog.open();
-        if (res == Dialog.OK) {
-            String comment = dialog.getComment();
-            for (Iterator<?> iter = iStructuredSelection.iterator(); iter
-                .hasNext();) {
-                DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) ((TreeItemAdapter) iter
-                    .next()).getSpecimen();
-                dsa.setComment(comment);
-                if (newState != null) {
-                    dsa.setDispatchSpecimenState(newState);
-                }
-            }
-            shipment.resetMap();
-            tv.refresh();
-            notifyListeners();
+        } catch (Exception e) {
+            BiobankPlugin.openAsyncError("Failed to claim", e);
         }
+    }
+
+    private void addSetUnavailableMenu(final Menu menu) {
+        MenuItem item;
+        item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Flag as unavailable");
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                getSelectedSpecimen().setState(
+                    RequestSpecimenState.UNAVAILABLE_STATE.getId());
+                try {
+                    getSelectedSpecimen().persist();
+                } catch (Exception e) {
+                    BiobankPlugin.openAsyncError("Save Error", e);
+                }
+                refresh();
+            }
+        });
     }
 
     public void refresh() {

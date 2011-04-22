@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.Arrays;
 import java.util.Date;
 
+import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
@@ -15,7 +16,7 @@ public class DispatchHelper extends DbHelper {
 
     public static DispatchWrapper newDispatch(CenterWrapper<?> sender,
         CenterWrapper<?> receiver, ShippingMethodWrapper method,
-        String waybill, Date dateReceived, SpecimenWrapper... aliquots)
+        String waybill, Date dateReceived, SpecimenWrapper... specimens)
         throws Exception {
         DispatchWrapper dispatch = new DispatchWrapper(appService);
         dispatch.setSenderCenter(sender);
@@ -33,8 +34,9 @@ public class DispatchHelper extends DbHelper {
 
         shipInfo.setPackedAt(Utils.getRandomDate());
 
-        if (aliquots != null) {
-            dispatch.addSpecimens(Arrays.asList(aliquots));
+        if (specimens != null) {
+            dispatch.addSpecimens(Arrays.asList(specimens),
+                DispatchSpecimenState.NONE);
         }
 
         return dispatch;

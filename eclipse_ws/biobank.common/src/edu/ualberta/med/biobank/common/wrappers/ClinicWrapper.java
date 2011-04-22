@@ -37,6 +37,8 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     public ClinicWrapper(WritableApplicationService appService,
         Clinic wrappedObject) {
         super(appService, wrappedObject);
+        setSendsShipments(getSendsShipments() == null ? false
+            : getSendsShipments());
     }
 
     @Override

@@ -27,25 +27,25 @@ import org.eclipse.swt.widgets.Display;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.scanprocess.SpecimenHierarchy;
+import edu.ualberta.med.biobank.common.scanprocess.data.LinkProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.LinkFormPatientManagement.PatientTextCallback;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.model.CellStatus;
-import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
 import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
@@ -157,8 +157,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 }
             });
 
-        linkFormPatientManagement
-            .createCollectionEventWidgets(commonFieldsComposite);
+        linkFormPatientManagement.createEventsWidgets(commonFieldsComposite);
 
         createLinkingSection(leftComposite);
     }
@@ -281,7 +280,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     private void updateRowType(AliquotedSpecimenSelectionWidget typeWidget,
         int indexRow) {
         if (typeWidget.needToSave()) {
-            ModelWrapper<?>[] selection = typeWidget.getSelection();
+            SpecimenHierarchy selection = typeWidget.getSelection();
             if (selection != null) {
                 Map<RowColPos, PalletCell> cells = (Map<RowColPos, PalletCell>) palletWidget
                     .getCells();
@@ -300,10 +299,10 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         }
     }
 
-    private void setTypeToCell(PalletCell cell, ModelWrapper<?>[] selection) {
-        cell.setSourceSpecimen((SpecimenWrapper) selection[0]);
-        cell.setSpecimenType((SpecimenTypeWrapper) selection[1]);
-        cell.setStatus(CellStatus.TYPE);
+    private void setTypeToCell(PalletCell cell, SpecimenHierarchy selection) {
+        cell.setSourceSpecimen(selection.getParentSpecimen());
+        cell.setSpecimenType(selection.getAliquotedSpecimenType());
+        cell.setStatus(UICellStatus.TYPE);
     }
 
     private void createSingleLinkComposite(Composite parent) {
@@ -368,7 +367,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         List<SpecimenTypeWrapper> studiesAliquotedTypes = linkFormPatientManagement
             .getStudyAliquotedTypes(null, null);
         List<SpecimenWrapper> availableSourceSpecimens = linkFormPatientManagement
-            .getSpecimenInCollectionEvent();
+            .getParentSpecimenForPEventAndCEvent();
         for (int row = 0; row < specimenTypesWidgets.size(); row++) {
             AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets
                 .get(row);
@@ -414,7 +413,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         containersScroll.setContent(client);
 
         palletWidget = new ScanPalletWidget(client,
-            CellStatus.DEFAULT_PALLET_SCAN_LINK_STATUS_LIST);
+            UICellStatus.DEFAULT_PALLET_SCAN_LINK_STATUS_LIST);
         palletWidget.setVisible(true);
         toolkit.adapt(palletWidget);
         palletWidget.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true,
@@ -454,8 +453,8 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
     @Override
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-        CellStatus status = processCellStatus(cell, true);
-        boolean ok = isScanValid() && (status != CellStatus.ERROR);
+        UICellStatus status = processCellStatus(cell, true);
+        boolean ok = isScanValid() && (status != UICellStatus.ERROR);
         setScanValid(ok);
         // typesSelectionPerRowComposite.setEnabled(ok);
         palletWidget.redraw();
@@ -465,20 +464,19 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     /**
      * Process the cell: apply a status and set correct information
      * 
-     * @throws BiobankCheckException
+     * @throws Exception
      */
-    private CellStatus processCellStatus(PalletCell cell,
-        boolean independantProcess) throws ApplicationException,
-        BiobankCheckException {
+    private UICellStatus processCellStatus(PalletCell cell,
+        boolean independantProcess) throws Exception {
         if (cell == null) {
-            return CellStatus.EMPTY;
+            return UICellStatus.EMPTY;
         } else {
             String value = cell.getValue();
             if (value != null) {
                 SpecimenWrapper foundAliquot = SpecimenWrapper.getSpecimen(
                     appService, value, SessionManager.getUser());
                 if (foundAliquot != null) {
-                    cell.setStatus(CellStatus.ERROR);
+                    cell.setStatus(UICellStatus.ERROR);
                     cell.setInformation(Messages
                         .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
                     String palletPosition = ContainerLabelingSchemeWrapper
@@ -490,7 +488,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                             .getPnumber(), foundAliquot.getCurrentCenter()
                             .getNameShort());
                 } else {
-                    cell.setStatus(CellStatus.NO_TYPE);
+                    cell.setStatus(UICellStatus.NO_TYPE);
                     if (independantProcess) {
                         AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets
                             .get(cell.getRow());
@@ -502,7 +500,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                     // setTypeToCell(cell, selection);
                 }
             } else {
-                cell.setStatus(CellStatus.EMPTY);
+                cell.setStatus(UICellStatus.EMPTY);
             }
             return cell.getStatus();
         }
@@ -532,11 +530,11 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 PalletCell cell = null;
                 cell = cells.get(rcp);
                 if (!isRescanMode()
-                    || (cell != null && cell.getStatus() != CellStatus.TYPE && cell
-                        .getStatus() != CellStatus.NO_TYPE)) {
+                    || (cell != null && cell.getStatus() != UICellStatus.TYPE && cell
+                        .getStatus() != UICellStatus.NO_TYPE)) {
                     // processCellStatus(cell, false);
                 }
-                everythingOk = cell.getStatus() != CellStatus.ERROR
+                everythingOk = cell.getStatus() != UICellStatus.ERROR
                     && everythingOk;
                 if (PalletCell.hasValue(cell)) {
                     typesRowsCount++;
@@ -559,7 +557,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     @Override
-    protected void afterScanAndProcess() {
+    protected void afterScanAndProcess(Integer rowOnly) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -579,6 +577,11 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             }
         });
         setScanValid(true);
+    }
+
+    @Override
+    protected ProcessData getProcessData() {
+        return new LinkProcessData();
     }
 
 }

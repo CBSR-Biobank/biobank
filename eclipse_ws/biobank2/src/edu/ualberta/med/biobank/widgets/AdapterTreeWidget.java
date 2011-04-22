@@ -2,9 +2,7 @@ package edu.ualberta.med.biobank.widgets;
 
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeViewerListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -122,27 +120,6 @@ public class AdapterTreeWidget extends Composite {
             }
         });
         treeViewer.setUseHashlookup(true);
-        treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                // TODO don't work well. Something prevent the status to be well
-                // printed all the time - see #123
-                // ISelection selection = event.getSelection();
-                // if (!selection.isEmpty()
-                // && selection instanceof IStructuredSelection) {
-                // AdapterBase node = (AdapterBase) ((IStructuredSelection)
-                // selection)
-                // .getFirstElement();
-                // IWorkbenchPartSite site = PlatformUI.getWorkbench()
-                // .getActiveWorkbenchWindow().getActivePage()
-                // .getActivePart().getSite();
-                // if (site instanceof IViewSite) {
-                // ((IViewSite) site).getActionBars()
-                // .getStatusLineManager().setMessage(node.getName());
-                // }
-                // }
-            }
-        });
         treeViewer.getTree().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDown(MouseEvent e) {

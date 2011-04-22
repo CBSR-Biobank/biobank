@@ -9,16 +9,13 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import org.eclipse.jface.wizard.IWizardPage;
 
-@Deprecated
-// FIXME do we still need this functionality with new model ? (see aliquot entry
-// form)
-public class SelectPatientVisitWizard extends BiobankWizard {
+public class SelectCollectionEventWizard extends BiobankWizard {
     private final WritableApplicationService appService;
     private EnterPnumberPage pnumberPage;
     private SelectPatientVisitPage pvPage;
     private CollectionEventWrapper visit;
 
-    public SelectPatientVisitWizard(WritableApplicationService appService) {
+    public SelectCollectionEventWizard(WritableApplicationService appService) {
         this.appService = appService;
     }
 
@@ -37,7 +34,8 @@ public class SelectPatientVisitWizard extends BiobankWizard {
 
     @Override
     public boolean canFinish() {
-        return getContainer().getCurrentPage() == pvPage;
+        return getContainer().getCurrentPage() == pvPage
+            && pvPage.getCollectionEvent() != null;
     }
 
     @Override

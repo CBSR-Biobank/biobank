@@ -190,7 +190,8 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                cache.put(IN_TRANSIT_SENT_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
+                cache.put(IN_TRANSIT_SENT_DISPATCH_COLLECTION_CACHE_KEY,
+                    shipCollection);
             }
         }
         return shipCollection;
@@ -210,7 +211,8 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                cache.put(IN_TRANSIT_RECEIVE_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
+                cache.put(IN_TRANSIT_RECEIVE_DISPATCH_COLLECTION_CACHE_KEY,
+                    shipCollection);
             }
         }
         return shipCollection;
@@ -230,7 +232,8 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                cache.put(RECEIVING_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
+                cache.put(RECEIVING_DISPATCH_COLLECTION_CACHE_KEY,
+                    shipCollection);
             }
         }
         return shipCollection;
@@ -271,7 +274,8 @@ public abstract class CenterWrapper<E extends Center> extends
                         shipCollection.add(dispatch);
                     }
                 }
-                cache.put(IN_CREATION_DISPATCH_COLLECTION_CACHE_KEY, shipCollection);
+                cache.put(IN_CREATION_DISPATCH_COLLECTION_CACHE_KEY,
+                    shipCollection);
             }
         }
         return shipCollection;
@@ -337,4 +341,25 @@ public abstract class CenterWrapper<E extends Center> extends
         return getCountResult(appService, criteria);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
+        return Arrays.asList(this);
+    }
+
+    public static final String CENTER_FROM_ID_QRY = "from "
+        + Center.class.getName() + " where " + CenterPeer.ID.getName() + " = ?";
+
+    public static CenterWrapper<?> getCenterFromId(
+        WritableApplicationService appService, Integer centerId)
+        throws Exception {
+        HQLCriteria criteria = new HQLCriteria(CENTER_FROM_ID_QRY,
+            Arrays.asList(new Object[] { centerId }));
+        List<Center> centers = appService.query(criteria);
+        if (centers.size() == 0)
+            return null;
+        else
+            return wrapModel(appService, centers.get(0), null);
+
+    }
 }

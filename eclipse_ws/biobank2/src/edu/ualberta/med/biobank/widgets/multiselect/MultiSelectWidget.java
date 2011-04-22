@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.widgets.multiselect;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -172,13 +173,15 @@ public class MultiSelectWidget extends BiobankWidget {
 
     public void addSelections(LinkedHashMap<Integer, String> available,
         List<Integer> selected) {
-        for (Integer key : available.keySet()) {
+        for (Entry<Integer, String> entry : available.entrySet()) {
+            Integer key = entry.getKey();
+            String string = entry.getValue();
             if (selected.contains(key)) {
                 selTreeRootNode.addChild(new MultiSelectNode(selTreeRootNode,
-                    key, available.get(key)));
+                    key, string));
             } else {
                 availTreeRootNode.addChild(new MultiSelectNode(
-                    availTreeRootNode, key, available.get(key)));
+                    availTreeRootNode, key, string));
             }
         }
     }
@@ -202,7 +205,7 @@ public class MultiSelectWidget extends BiobankWidget {
     public List<Integer> getSelected() {
         List<Integer> result = new ArrayList<Integer>();
         for (MultiSelectNode node : selTreeRootNode.getChildren()) {
-            result.add(new Integer(node.getId()));
+            result.add(node.getId());
         }
         return result;
     }
@@ -210,7 +213,7 @@ public class MultiSelectWidget extends BiobankWidget {
     public List<Integer> getAddedToSelection() {
         List<Integer> result = new ArrayList<Integer>();
         for (MultiSelectNode node : selTreeRootNode.getAddedChildren()) {
-            result.add(new Integer(node.getId()));
+            result.add(node.getId());
         }
         return result;
     }
@@ -218,7 +221,7 @@ public class MultiSelectWidget extends BiobankWidget {
     public List<Integer> getRemovedToSelection() {
         List<Integer> result = new ArrayList<Integer>();
         for (MultiSelectNode node : selTreeRootNode.getRemovedChildren()) {
-            result.add(new Integer(node.getId()));
+            result.add(node.getId());
         }
         return result;
     }

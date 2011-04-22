@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.treeview.Node;
 
 public abstract class TableGroup<T extends ModelWrapper<?>> implements Node {
 
-    protected Integer numAliquots = 0;
+    protected Integer numSpecimens = 0;
     protected ItemState state;
     protected String alternateLabel;
     protected List<Node> tops;
@@ -35,7 +35,7 @@ public abstract class TableGroup<T extends ModelWrapper<?>> implements Node {
 
     public String getTitle() {
         return (alternateLabel == null ? state.getLabel() : alternateLabel)
-            + " (" + numAliquots + ")";
+            + " (" + numSpecimens + ")";
     }
 
     protected abstract void createAdapterTree(Integer state, T request);

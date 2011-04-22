@@ -1,10 +1,10 @@
 package edu.ualberta.med.biobank.widgets.grids.selection;
 
-import edu.ualberta.med.biobank.model.Cell;
+import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
 
 public abstract class MultiSelectionSpecificBehaviour {
 
-    public abstract void removeSelection(Cell cell);
+    public abstract void removeSelection(AbstractUICell cell);
 
-    public abstract boolean isSelectable(Cell cell);
+    public abstract boolean isSelectable(AbstractUICell cell);
 }

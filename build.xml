@@ -9,8 +9,8 @@
     <arg value="-f" />
   </exec>
 
-  <property name="server.version.num" value="1.4.0.rc3" />
-  <property name="java.client.version.num" value="1.4.0.rc3" />
+  <property name="server.version.num" value="1.4.0.rc5" />
+  <property name="java.client.version.num" value="1.4.0.rc5" />
 
   <property environment="env" />
   <property name="host" value="aicml-med.cs.ualberta.ca" />
@@ -392,7 +392,7 @@
           description="generates the database schema for the caCORE SDK data model">
     <ant dir="${schema.dir}" target="schemaexport" inheritRefs="false" />
   </target>
-  <target name="dbcreate-add-tables" depends="hbmpostproc,prepare-webapp-orm">
+  <target name="dbcreate-add-tables" depends="sdk,package-webapp-orm">
     <sql driver="${DB_DRIVER}"
          url="${DB_CONNECTION_URL}"
          userid="${DB_USERNAME}"
@@ -420,7 +420,6 @@
       <transaction src="${data.sql.dir}/containerLabelingScheme.sql" />
       <transaction src="${data.sql.dir}/shippingMethod.sql" />
       <transaction src="${secu-log.dir}/schemaSecurity.sql" />
-      <transaction src="${secu-log.dir}/schemaLog.sql" />
       <transaction>commit;</transaction>
       <classpath>
         <fileset dir="${cacore.sdk.dir}/system/lib">
@@ -664,7 +663,7 @@
   </target>
 
   <target name="build-common-project"
-          depends="sdk-files,hbmpostproc,modelextender">
+          depends="sdk-files,modelextender">
     <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output">
@@ -684,11 +683,13 @@
     </javac>
   </target>
 
-  <target name="compile-generated-beans" description="REDO:: Compiles the generated beans">
+  <target name="compile-generated-beans"
+    description="REDO:: Compiles the generated beans">
     <copy todir="${cacore.sdk.dir}/${output.src.dir}/edu/ualberta/med/biobank/model"
       overwrite="true">
       <fileset dir="sdk_conf/specialSrc" />
     </copy>
+    <antcall target="hbmpostproc" />
     <delete>
       <fileset dir="${cacore.sdk.dir}/${build.classes.dir}"/>
     </delete>
@@ -931,6 +932,7 @@
       <src path="${eclipse.proj.dir.junit}/src" />
       <src path="${eclipse.proj.dir.tools}/src" />
       <include name="**/tools/utils/*.java" />
+      <include name="**/test/reports/**/*.java" />
       <include name="**/Test*.java" />
       <classpath>
         <pathelement location="${eclipse.proj.dir.common}/output" />

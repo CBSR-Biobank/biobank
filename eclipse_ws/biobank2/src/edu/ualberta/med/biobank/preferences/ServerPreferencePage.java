@@ -44,13 +44,13 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
 
         @Override
         protected String createList(String[] items) {
-            String appendedList = "";
+            StringBuffer appendedList = new StringBuffer();
             for (int i = 0; i < items.length; i++) {
-                appendedList += items[i];
+                appendedList.append(items[i]);
                 if (i < items.length - 1)
-                    appendedList += "\n";
+                    appendedList.append("\n");
             }
-            return appendedList;
+            return appendedList.toString();
         }
 
         /**
@@ -93,8 +93,7 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
         public Composite getButtonBoxControl(Composite parent) {
             Composite buttonBoxControl = super.getButtonBoxControl(parent);
             if (editButton == null) {
-                editButton = createPushButton(buttonBoxControl, "Edit"); // TODO
-                // I18N
+                editButton = createPushButton(buttonBoxControl, "Edit");
                 editButton.setEnabled(false);
                 editButton.addSelectionListener(new SelectionAdapter() {
                     @Override

@@ -68,7 +68,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private PatientWrapper patient;
 
-    private class FormPvCustomInfo extends PvAttrCustom {
+    private static class FormPvCustomInfo extends PvAttrCustom {
         private Control control;
     }
 
@@ -95,9 +95,11 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         ceventAdapter = (CollectionEventAdapter) adapter;
-        if (ceventAdapter.getWrapper().isNew())
+        if (ceventAdapter.getWrapper().isNew()) {
             cevent = ceventAdapter.getWrapper();
-        else
+            cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
+                appService, cevent));
+        } else
             cevent = (CollectionEventWrapper) ceventAdapter.getWrapper()
                 .getDatabaseClone();
         patient = cevent.getPatient();

@@ -9,8 +9,8 @@ import org.eclipse.swt.graphics.Point;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 
 /**
  * This class is there to give a common parent class to grid container widgets
@@ -36,10 +36,10 @@ public abstract class AbstractContainerDisplay {
      */
     protected int maxHeight = -1;
 
-    protected List<CellStatus> legendStatus;
+    protected List<UICellStatus> legendStatus;
 
-    public Cell getObjectAtCoordinates(ContainerDisplayWidget displayWidget,
-        int x, int y) {
+    public AbstractUICell getObjectAtCoordinates(
+        ContainerDisplayWidget displayWidget, int x, int y) {
         if (displayWidget.getCells() == null) {
             return null;
         }
@@ -52,7 +52,7 @@ public abstract class AbstractContainerDisplay {
 
     public abstract RowColPos getPositionAtCoordinates(int x, int y);
 
-    public void initLegend(List<CellStatus> status) {
+    public void initLegend(List<UICellStatus> status) {
         this.legendStatus = status;
     }
 
@@ -77,7 +77,7 @@ public abstract class AbstractContainerDisplay {
      * the cell position and the containerType.
      */
     protected String getDefaultTextForBox(
-        @SuppressWarnings("unused") Map<RowColPos, ? extends Cell> cells,
+        @SuppressWarnings("unused") Map<RowColPos, ? extends AbstractUICell> cells,
         int indexRow, int indexCol) {
         RowColPos rowcol = new RowColPos();
         rowcol.row = indexRow;

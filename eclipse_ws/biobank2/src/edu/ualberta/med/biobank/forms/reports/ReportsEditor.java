@@ -43,7 +43,6 @@ import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 
@@ -211,8 +210,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
         }
 
         try {
-            query = ((BiobankApplicationService) appService)
-                .createQuery(report);
+            query = appService.createQuery(report);
 
             IRunnableContext context = new ProgressMonitorDialog(Display
                 .getDefault().getActiveShell());
@@ -223,8 +221,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                         @Override
                         public void run() {
                             try {
-                                reportData = ((BiobankApplicationService) appService)
-                                    .startQuery(query);
+                                reportData = appService.startQuery(query);
                             } catch (Exception e) {
                                 reportData = new ArrayList<Object>();
                                 BiobankPlugin.openAsyncError("Query Error", e);
@@ -237,8 +234,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                     while (true) {
                         if (monitor.isCanceled()) {
                             try {
-                                ((BiobankApplicationService) appService)
-                                    .stopQuery(query);
+                                appService.stopQuery(query);
                             } catch (Exception e) {
                                 BiobankPlugin.openAsyncError("Stop Failed", e);
                             }
@@ -394,7 +390,6 @@ public abstract class ReportsEditor extends BiobankFormBase {
                     BiobankPlugin.openAsyncError("Exporting canceled.",
                         "Select a valid path and try again.");
                     return;
-                } else if (path.endsWith(".csv")) {
                 }
             } else if (exportPDF) {
                 String[] filterExt = new String[] { ".pdf" };

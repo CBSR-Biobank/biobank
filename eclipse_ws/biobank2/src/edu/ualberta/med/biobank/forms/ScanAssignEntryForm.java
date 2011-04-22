@@ -5,11 +5,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -38,22 +38,23 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.ContainerLabelSearchException;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.scanprocess.data.AssignProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.model.CellStatus;
-import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -84,12 +85,9 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     private ScrolledComposite containersScroll;
     private Composite containersComposite;
 
-    // global state of the pallet process
-    private CellStatus currentScanState;
-
-    // contains moved and missing aliquots. a missing one is set to into the
+    // contains moved and missing specimens. a missing one is set to into the
     // missing rowColPos. A moved one is set into its old RowColPos
-    private Map<RowColPos, PalletCell> movedAndMissingAliquotsFromPallet = new HashMap<RowColPos, PalletCell>();
+    private Map<RowColPos, PalletCell> movedAndMissingSpecimensFromPallet = new HashMap<RowColPos, PalletCell>();
 
     private Composite fieldsComposite;
 
@@ -338,7 +336,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     /**
-     * get container with type name that contains 'palletNameContains'
+     * get containers of size 8*12
      */
     private List<ContainerTypeWrapper> getPalletContainerTypes()
         throws ApplicationException {
@@ -362,10 +360,10 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         gd.horizontalSpan = 2;
         comp.setLayoutData(gd);
         fakeScanLinkedOnlyButton = toolkit.createButton(comp,
-            "Select linked only aliquots", SWT.RADIO); //$NON-NLS-1$
+            "Select linked only specimens", SWT.RADIO); //$NON-NLS-1$
         fakeScanLinkedOnlyButton.setSelection(true);
         toolkit.createButton(comp,
-            "Select linked and assigned aliquots", SWT.RADIO); //$NON-NLS-1$
+            "Select linked and assigned specimens", SWT.RADIO); //$NON-NLS-1$
     }
 
     private void createContainersVisualisationSection() {
@@ -421,7 +419,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         palletComposite.setLayoutData(new GridData());
         palletLabel = toolkit.createLabel(palletComposite, "Pallet"); //$NON-NLS-1$
         palletWidget = new ScanPalletWidget(palletComposite,
-            CellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST);
+            UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST);
         toolkit.adapt(palletWidget);
         palletWidget.addMouseListener(new MouseAdapter() {
             @Override
@@ -458,15 +456,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     @Override
     protected boolean canScanTubeAlone(PalletCell cell) {
         return super.canScanTubeAlone(cell)
-            || cell.getStatus() == CellStatus.MISSING;
-    }
-
-    @Override
-    protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-        processCellStatus(cell);
-        currentScanState = currentScanState.mergeWith(cell.getStatus());
-        setScanValid(currentScanState != CellStatus.ERROR);
-        palletWidget.redraw();
+            || cell.getStatus() == UICellStatus.MISSING;
     }
 
     private GridLayout getNeutralGridLayout() {
@@ -551,7 +541,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     @Override
-    protected void afterScanAndProcess() {
+    protected void afterScanAndProcess(Integer rowOnly) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -586,52 +576,6 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             return PalletCell.getRandomSpecimensAlreadyAssigned(appService,
                 currentPalletWrapper.getSite().getId());
         }
-    }
-
-    /**
-     * go through cells retrieved from scan, set status of aliquots to be added
-     * to the current pallet
-     */
-    @Override
-    protected void processScanResult(IProgressMonitor monitor) throws Exception {
-        Map<RowColPos, SpecimenWrapper> expectedAliquots = currentPalletWrapper
-            .getSpecimens();
-        currentScanState = CellStatus.EMPTY;
-        for (int row = 0; row < currentPalletWrapper.getRowCapacity(); row++) {
-            for (int col = 0; col < currentPalletWrapper.getColCapacity(); col++) {
-                RowColPos rcp = new RowColPos(row, col);
-                monitor.subTask("Processing position "
-                    + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
-                PalletCell cell = getCells().get(rcp);
-                if (!isRescanMode() || cell == null || cell.getStatus() == null
-                    || cell.getStatus() == CellStatus.EMPTY
-                    || cell.getStatus() == CellStatus.ERROR
-                    || cell.getStatus() == CellStatus.MISSING) {
-                    SpecimenWrapper expectedAliquot = null;
-                    if (expectedAliquots != null) {
-                        expectedAliquot = expectedAliquots.get(rcp);
-                        if (expectedAliquot != null) {
-                            if (cell == null) {
-                                cell = new PalletCell(new ScanCell(rcp.row,
-                                    rcp.col, null));
-                                getCells().put(rcp, cell);
-                            }
-                            cell.setExpectedSpecimen(expectedAliquot);
-                        }
-                    }
-                    if (cell != null) {
-                        processCellStatus(cell);
-                    }
-                }
-                CellStatus newStatus = CellStatus.EMPTY;
-                if (cell != null) {
-                    newStatus = cell.getStatus();
-                }
-                currentScanState = currentScanState.mergeWith(newStatus);
-            }
-        }
-        setScanValid(!getCells().isEmpty()
-            && currentScanState != CellStatus.ERROR);
     }
 
     private void showOnlyPallet(boolean show) {
@@ -680,225 +624,14 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         }
     }
 
-    /**
-     * set the status of the cell
-     */
-    protected void processCellStatus(PalletCell scanCell) throws Exception {
-        SpecimenWrapper expectedAliquot = scanCell.getExpectedSpecimen();
-        String value = scanCell.getValue();
-        String positionString = currentPalletWrapper.getLabel()
-            + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(scanCell
-                .getRow(), scanCell.getCol()));
-        if (value == null) { // no aliquot scanned
-            updateCellAsMissing(positionString, scanCell, expectedAliquot);
-        } else {
-            // FIXME test what happen if don't have read rights on the site
-            SpecimenWrapper foundAliquot = SpecimenWrapper.getSpecimen(
-                appService, value, SessionManager.getUser());
-            if (foundAliquot == null) {
-                updateCellAsNotLinked(positionString, scanCell);
-            } else if (expectedAliquot != null
-                && !foundAliquot.equals(expectedAliquot)) {
-                updateCellAsPositionAlreadyTaken(positionString, scanCell,
-                    expectedAliquot, foundAliquot);
-            } else {
-                scanCell.setSpecimen(foundAliquot);
-                if (expectedAliquot != null) {
-                    // aliquot scanned is already registered at this
-                    // position (everything is ok !)
-                    scanCell.setStatus(CellStatus.FILLED);
-                    scanCell.setTitle(foundAliquot.getCollectionEvent()
-                        .getPatient().getPnumber());
-                    scanCell.setSpecimen(expectedAliquot);
-                } else {
-                    if (currentPalletWrapper.canHoldAliquot(foundAliquot)) {
-                        if (foundAliquot.hasParent()) { // moved
-                            processCellWithPreviousPosition(scanCell,
-                                positionString, foundAliquot);
-                        } else { // new in pallet
-                            if (foundAliquot.isUsedInDispatch()) {
-                                updateCellAsDispatchedError(positionString,
-                                    scanCell, foundAliquot);
-                            } else {
-                                scanCell.setStatus(CellStatus.NEW);
-                                scanCell.setTitle(foundAliquot
-                                    .getCollectionEvent().getPatient()
-                                    .getPnumber());
-                            }
-                        }
-                    } else {
-                        // pallet can't hold this aliquot type
-                        updateCellAsTypeError(positionString, scanCell,
-                            foundAliquot);
-                    }
-                }
-            }
-        }
-    }
-
-    private void updateCellAsDispatchedError(String positionString,
-        PalletCell scanCell, SpecimenWrapper foundAliquot) {
-        scanCell.setTitle(foundAliquot.getCollectionEvent().getPatient()
-            .getPnumber());
-        scanCell.setStatus(CellStatus.ERROR);
-        scanCell.setInformation(Messages
-            .getString("ScanAssign.scanStatus.aliquot.dispatchedError")); //$NON-NLS-1$
-        appendLogNLS("ScanAssign.activitylog.aliquot.dispatchedError",
-            positionString);
-
-    }
-
-    /**
-     * this cell has already a position. Check if it was on the pallet or not
-     */
-    private void processCellWithPreviousPosition(PalletCell scanCell,
-        String positionString, SpecimenWrapper foundAliquot) {
-        if (foundAliquot.getParentContainer().getSite()
-            .equals(currentPalletWrapper.getSite())) {
-            if (foundAliquot.getParentContainer().equals(currentPalletWrapper)) {
-                // same pallet
-                RowColPos rcp = new RowColPos(scanCell.getRow(),
-                    scanCell.getCol());
-                if (!foundAliquot.getPosition().equals(rcp)) {
-                    // moved inside the same pallet
-                    updateCellAsMoved(positionString, scanCell, foundAliquot);
-                    RowColPos movedFromPosition = foundAliquot.getPosition();
-                    PalletCell missingAliquot = movedAndMissingAliquotsFromPallet
-                        .get(movedFromPosition);
-                    if (missingAliquot == null) {
-                        // missing position has not yet been processed
-                        movedAndMissingAliquotsFromPallet.put(
-                            movedFromPosition, scanCell);
-                    } else {
-                        // missing position has already been processed: remove
-                        // the
-                        // MISSING flag
-                        missingAliquot.setStatus(CellStatus.EMPTY);
-                        missingAliquot.setTitle("");
-                        movedAndMissingAliquotsFromPallet
-                            .remove(movedFromPosition);
-                    }
-                }
-            } else {
-                // old position was on another pallet
-                updateCellAsMoved(positionString, scanCell, foundAliquot);
-            }
-        } else {
-            updateCellAsInOtherSite(positionString, scanCell, foundAliquot);
-        }
-    }
-
-    private void updateCellAsTypeError(String position, PalletCell scanCell,
-        SpecimenWrapper foundAliquot) {
-        String palletType = currentPalletWrapper.getContainerType().getName();
-        String sampleType = foundAliquot.getSpecimenType().getName();
-
-        scanCell.setTitle(foundAliquot.getCollectionEvent().getPatient()
-            .getPnumber());
-        scanCell.setStatus(CellStatus.ERROR);
-        scanCell.setInformation(Messages.getString(
-            "ScanAssign.scanStatus.aliquot.typeError", palletType, sampleType)); //$NON-NLS-1$
-        appendLogNLS(
-            "ScanAssign.activitylog.aliquot.typeError", position, palletType, //$NON-NLS-1$
-            sampleType);
-    }
-
-    private void updateCellAsMoved(String position, PalletCell scanCell,
-        SpecimenWrapper foundAliquot) {
-        String expectedPosition = foundAliquot.getPositionString(true, false);
-        if (expectedPosition == null) {
-            expectedPosition = "none"; //$NON-NLS-1$
-        }
-
-        scanCell.setStatus(CellStatus.MOVED);
-        scanCell.setTitle(foundAliquot.getCollectionEvent().getPatient()
-            .getPnumber());
-        scanCell.setInformation(Messages.getString(
-            "ScanAssign.scanStatus.aliquot.moved", expectedPosition)); //$NON-NLS-1$
-
-        appendLogNLS(
-            "ScanAssign.activitylog.aliquot.moved", position, scanCell.getValue(), //$NON-NLS-1$
-            expectedPosition);
-    }
-
-    private void updateCellAsInOtherSite(String position, PalletCell scanCell,
-        SpecimenWrapper foundAliquot) {
-        String currentPosition = foundAliquot.getPositionString(true, false);
-        if (currentPosition == null) {
-            currentPosition = "none"; //$NON-NLS-1$
-        }
-        String siteName = foundAliquot.getParentContainer().getSite()
-            .getNameShort();
-        scanCell.setStatus(CellStatus.ERROR);
-        scanCell.setTitle(foundAliquot.getCollectionEvent().getPatient()
-            .getPnumber());
-        scanCell.setInformation(Messages.getString(
-            "ScanAssign.scanStatus.aliquot.otherSite", siteName)); //$NON-NLS-1$
-
-        appendLogNLS(
-            "ScanAssign.activitylog.aliquot.otherSite", position, scanCell.getValue(), //$NON-NLS-1$
-            siteName, currentPosition);
-    }
-
-    /**
-     * aliquot found but another aliquot already at this position
-     */
-    private void updateCellAsPositionAlreadyTaken(String position,
-        PalletCell scanCell, SpecimenWrapper expectedAliquot,
-        SpecimenWrapper foundAliquot) {
-        scanCell.setStatus(CellStatus.ERROR);
-        scanCell.setInformation(Messages
-            .getString("ScanAssign.scanStatus.aliquot.positionTakenError")); //$NON-NLS-1$
-        scanCell.setTitle("!"); //$NON-NLS-1$
-        appendLogNLS(
-            "ScanAssign.activitylog.aliquot.positionTaken", position, expectedAliquot //$NON-NLS-1$
-                .getInventoryId(), expectedAliquot.getCollectionEvent()
-                .getPatient().getPnumber(), foundAliquot.getInventoryId(),
-            foundAliquot.getCollectionEvent().getPatient().getPnumber());
-    }
-
-    /**
-     * aliquot not found in site (not yet linked ?)
-     */
-    private void updateCellAsNotLinked(String position, PalletCell scanCell) {
-        scanCell.setStatus(CellStatus.ERROR);
-        scanCell.setInformation(Messages
-            .getString("ScanAssign.scanStatus.aliquot.notlinked")); //$NON-NLS-1$
-        appendLogNLS(
-            "ScanAssign.activitylog.aliquot.notlinked", position, scanCell.getValue()); //$NON-NLS-1$
-    }
-
-    /**
-     * aliquot missing
-     */
-    private void updateCellAsMissing(String position, PalletCell scanCell,
-        SpecimenWrapper missingAliquot) {
-        RowColPos rcp = new RowColPos(scanCell.getRow(), scanCell.getCol());
-        PalletCell movedAliquot = movedAndMissingAliquotsFromPallet.get(rcp);
-        if (movedAliquot == null) {
-            scanCell.setStatus(CellStatus.MISSING);
-            scanCell
-                .setInformation(Messages
-                    .getString(
-                        "ScanAssign.scanStatus.aliquot.missing", missingAliquot.getInventoryId())); //$NON-NLS-1$
-            scanCell.setTitle("?"); //$NON-NLS-1$
-            // MISSING in {0}\: specimen {1} from visit {2} (patient {3})
-            // missing
-            appendLogNLS(
-                "ScanAssign.activitylog.aliquot.missing", position, missingAliquot //$NON-NLS-1$
-                    .getInventoryId(), missingAliquot.getCollectionEvent()
-                    .getVisitNumber(), missingAliquot.getCollectionEvent()
-                    .getPatient().getPnumber());
-            movedAndMissingAliquotsFromPallet.put(rcp, scanCell);
-        } else {
-            movedAndMissingAliquotsFromPallet.remove(rcp);
-            scanCell.setStatus(CellStatus.EMPTY);
-        }
+    @Override
+    protected ProcessData getProcessData() {
+        return new AssignProcessData(currentPalletWrapper);
     }
 
     @Override
     protected void doBeforeSave() throws Exception {
-        saveEvenIfMissing = saveEvenIfAliquotsMissing();
+        saveEvenIfMissing = saveEvenIfSpecimensMissing();
     }
 
     @Override
@@ -910,25 +643,27 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             currentPalletWrapper.persist();
             displayPalletPositionInfo();
             int totalNb = 0;
-            StringBuffer sb = new StringBuffer("ALIQUOTS ASSIGNED:\n"); //$NON-NLS-1$
+            StringBuffer sb = new StringBuffer("SPECIMENS ASSIGNED:\n"); //$NON-NLS-1$
             try {
                 Map<RowColPos, PalletCell> cells = getCells();
-                for (RowColPos rcp : cells.keySet()) {
-                    PalletCell cell = cells.get(rcp);
+                for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
+                    RowColPos rcp = entry.getKey();
+                    PalletCell cell = entry.getValue();
                     if (cell != null
-                        && (cell.getStatus() == CellStatus.NEW || cell
-                            .getStatus() == CellStatus.MOVED)) {
-                        SpecimenWrapper aliquot = cell.getSpecimen();
-                        if (aliquot != null) {
-                            aliquot.setPosition(rcp);
-                            aliquot.setParent(currentPalletWrapper);
-                            aliquot.persist();
-                            String posStr = aliquot.getPositionString(true,
+                        && (cell.getStatus() == UICellStatus.NEW || cell
+                            .getStatus() == UICellStatus.MOVED)) {
+                        SpecimenWrapper specimen = cell.getSpecimen();
+                        if (specimen != null) {
+                            specimen.setPosition(rcp);
+                            specimen.setParent(currentPalletWrapper);
+                            specimen.persist();
+                            String posStr = specimen.getPositionString(true,
                                 false);
                             if (posStr == null) {
                                 posStr = "none"; //$NON-NLS-1$
                             }
-                            computeActivityLogMessage(sb, cell, aliquot, posStr);
+                            computeActivityLogMessage(sb, cell, specimen,
+                                posStr);
                             totalNb++;
                         }
                     }
@@ -946,17 +681,18 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     private void computeActivityLogMessage(StringBuffer sb, PalletCell cell,
-        SpecimenWrapper aliquot, String posStr) {
-        CollectionEventWrapper visit = aliquot.getCollectionEvent();
-        sb.append(Messages.getString("ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
+        SpecimenWrapper specimen, String posStr) {
+        CollectionEventWrapper visit = specimen.getCollectionEvent();
+        sb.append(Messages.getString(
+            "ScanAssign.activitylog.specimen.assigned", //$NON-NLS-1$
             posStr, currentPalletWrapper.getSite().getNameShort(), cell
-                .getValue(), aliquot.getSpecimenType().getName(), visit
+                .getValue(), specimen.getSpecimenType().getName(), visit
                 .getPatient().getPnumber(), visit.getVisitNumber()));
     }
 
-    private boolean saveEvenIfAliquotsMissing() {
-        if (currentScanState == CellStatus.MISSING
-            && movedAndMissingAliquotsFromPallet.size() > 0) {
+    private boolean saveEvenIfSpecimensMissing() {
+        if (currentScanState == UICellStatus.MISSING
+            && movedAndMissingSpecimensFromPallet.size() > 0) {
             boolean save = BiobankPlugin.openConfirm(
                 Messages.getString("ScanAssign.dialog.reallySave.title"), //$NON-NLS-1$
                 Messages.getString("ScanAssign.dialog.saveWithMissing.msg")); //$NON-NLS-1$
@@ -1016,7 +752,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             hotelWidget.setSelection(null);
             palletWidget.setCells(null);
         }
-        movedAndMissingAliquotsFromPallet.clear();
+        movedAndMissingSpecimensFromPallet.clear();
         setScanHasBeenLauched(false);
         initPalletValues();
 
@@ -1257,4 +993,5 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     public BiobankLogger getErrorLogger() {
         return logger;
     }
+
 }

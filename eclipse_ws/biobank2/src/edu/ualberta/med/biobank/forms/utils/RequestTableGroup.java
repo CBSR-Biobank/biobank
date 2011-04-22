@@ -91,7 +91,7 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
                     adapters.get(Integer.parseInt(cIds[i - 1])),
                     new RequestSpecimenWrapper(SessionManager.getAppService(),
                         ra)));
-            numAliquots++;
+            numSpecimens++;
         }
 
         // this.tops = tops;

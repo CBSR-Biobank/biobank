@@ -1838,7 +1838,7 @@
             name="Specimen List">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.CeListViewForm"
+            class="edu.ualberta.med.biobank.forms.PeListViewForm"
             default="false"
             icon="icons/collectionEvent.png"
             id="edu.ualberta.med.biobank.forms.PvListViewForm"
@@ -2033,7 +2033,7 @@
       name="Dispatch Sending Entry">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.RequestEntryFormBase"
+      class="edu.ualberta.med.biobank.forms.RequestEntryForm"
       default="false"
       icon="icons/request.png"
       id="edu.ualberta.med.biobank.forms.RequestEntryFormBase"
@@ -2253,7 +2253,7 @@
       </key>   
 	  <key
          commandId="edu.ualberta.med.biobank.commands.print"
-         contextId="edu.ualberta.med.biobank.perspective.aliquotsManagement"
+         contextId="edu.ualberta.med.biobank.perspective.linkAssign"
          schemeId="biobank2.scheme"
          sequence="M1+P">
       </key>    
@@ -2450,7 +2450,7 @@
          <with
                variable="activeWorkbenchWindow.activePerspective">
             <equals
-                  value="edu.ualberta.med.biobank.perspective.aliquotsManagement">
+                  value="edu.ualberta.med.biobank.perspective.linkAssign">
             </equals>
          </with>
       </definition>
@@ -2631,8 +2631,8 @@
             name="Not in Reports">
       </context>  
    <context
-         id="edu.ualberta.med.biobank.perspective.aliquotsManagement"
-         name="Samples Processing View">
+         id="edu.ualberta.med.biobank.perspective.linkAssign"
+         name="Link or Assign perspective">
    </context>  
    </extension>
     <extension
