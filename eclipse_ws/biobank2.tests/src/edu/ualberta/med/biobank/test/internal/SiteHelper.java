@@ -65,8 +65,8 @@ public class SiteHelper extends DbHelper {
         site.reload();
         deleteFromList(site.getProcessingEventCollection(false));
         site.reload();
-        deleteDispatchs(site.getSrcDispatchCollection(false));
-        deleteDispatchs(site.getDstDispatchCollection(false));
+        deleteDispatches(site.getSrcDispatchCollection(false));
+        deleteDispatches(site.getDstDispatchCollection(false));
         site.reload();
 
         deleteFromList(site.getSpecimenCollection(false));
