@@ -4,7 +4,7 @@ Created-By: 1.6.0_22-b04 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
 Bundle-Name: BioBank2 Common
 Bundle-SymbolicName: biobank.common
-Bundle-Version: 1.4.0.rc4
+Bundle-Version: 1.4.0.rc5
 Bundle-ClassPath: conf/,lib/client/acegi-security-1.0.4.jar,lib/client
  /antlr-2.7.6.jar,lib/client/asm.jar,lib/client/axis.jar,lib/client/bi
  obank2-beans.jar,lib/client/caGrid-CQL-cql.1.0-1.2.jar,lib/client/cas

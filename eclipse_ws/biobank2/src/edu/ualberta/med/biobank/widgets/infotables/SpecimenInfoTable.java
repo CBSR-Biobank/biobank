@@ -9,8 +9,10 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
@@ -48,7 +50,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             }
         },
         SOURCE_SPECIMENS(new String[] { "Inventory ID", "Type", "Time drawn",
-            "Current Center", "Quantity (ml)", "Activity status" }) {
+            "Quantity (ml)", "Activity status", "Study", "Patient #",
+            "Current Center" }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -59,19 +62,23 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 2:
                     return row.createdAt;
                 case 3:
-                    return row.center;
-                case 4:
                     return row.quantity;
-                case 5:
+                case 4:
                     return row.activityStatus;
+                case 5:
+                    return row.studyName;
+                case 6:
+                    return row.patient;
+                case 7:
+                    return row.center;
                 default:
                     return "";
                 }
             }
         },
-        ALIQUOTS(new String[] { "Inventory ID", "Type",
-            "Time created", "Current Center", "Quantity (ml)",
-            "Activity status" }) {
+        ALIQUOTS(new String[] { "Inventory ID", "Type", "Time created",
+            "Quantity (ml)", "Activity status", "Study", "Patient #",
+            "Current Center" }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -112,6 +119,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         public String type;
         public String patient;
         public String pvNumber;
+        public String studyName;
         public String createdAt;
         public String center;
         public String quantity;
@@ -164,9 +172,26 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         Assert.isNotNull(type, "specimen with null for specimen type");
         info.type = type.getName();
         CollectionEventWrapper cEvent = specimen.getCollectionEvent();
-        info.patient = cEvent == null ? "" : cEvent.getPatient().getPnumber();
-        Integer visitNumber = cEvent == null ? null : cEvent.getVisitNumber();
-        info.pvNumber = (visitNumber == null) ? "" : visitNumber.toString();
+
+        info.patient = "";
+        info.studyName = "";
+        info.pvNumber = "";
+
+        if (cEvent != null) {
+            PatientWrapper patient = cEvent.getPatient();
+
+            if (patient != null) {
+                info.patient = patient.getPnumber();
+                StudyWrapper study = patient.getStudy();
+                if (study != null) {
+                    info.studyName = study.getNameShort();
+                }
+            }
+
+            Integer visitNumber = cEvent.getVisitNumber();
+            info.pvNumber = (visitNumber == null) ? "" : visitNumber.toString();
+        }
+
         info.createdAt = specimen.getFormattedCreatedAt();
         Double quantity = specimen.getQuantity();
         info.quantity = (quantity == null) ? "" : quantity.toString();

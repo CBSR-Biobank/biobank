@@ -116,7 +116,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
         createMainSection();
-        createPatientsSection();
+        createSpecimensSection();
     }
 
     private void createMainSection() throws ApplicationException {
@@ -154,6 +154,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         waybillWidget = (BiobankText) createBoundWidget(client,
             BiobankText.class, SWT.NONE, waybillLabel, new String[0], shipment,
             "shipmentInfo.waybill", waybillValidator, WAYBILL_BINDING);
+
+        ClinicWrapper clinic = (ClinicWrapper) shipment.getCenter();
+        if (clinic != null) {
+            activateWaybillWidget(clinic.getSendsShipments());
+        }
 
         shippingMethodComboViewer = createComboViewer(client,
             "Shipping Method",
@@ -231,7 +236,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     }
 
-    private void createPatientsSection() {
+    private void createSpecimensSection() {
         Composite client = createSectionWithClient("Specimens");
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);

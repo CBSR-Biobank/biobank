@@ -58,11 +58,13 @@ public class ClinicHelper extends DbHelper {
         return clinic;
     }
 
-    public static void addClinics(String name, int count, boolean addContacts)
-        throws Exception {
+    public static List<ClinicWrapper> addClinics(String name, int count,
+        boolean addContacts) throws Exception {
+        List<ClinicWrapper> clinics = new ArrayList<ClinicWrapper>();
         for (int i = 0; i < count; i++) {
-            addClinic(name + i, addContacts);
+            clinics.add(addClinic(name + i, addContacts));
         }
+        return clinics;
     }
 
     public static void addClinics(String name, int count) throws Exception {

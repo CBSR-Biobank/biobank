@@ -24,8 +24,8 @@ public class ContactHelper extends DbHelper {
         return contact;
     }
 
-    public static int addContactsToStudy(StudyWrapper study, String name)
-        throws Exception {
+    public static List<ContactWrapper> addRandContactsToStudy(
+        StudyWrapper study, String name) throws Exception {
         ClinicHelper.addClinics(name, r.nextInt(15) + 3, true);
         List<ClinicWrapper> clinics = ClinicWrapper.getAllClinics(appService);
         int nber = r.nextInt(clinics.size() - 2) + 1;
@@ -38,7 +38,12 @@ public class ContactHelper extends DbHelper {
         }
         study.addToContactCollection(contacts);
         study.persist();
-        return nber;
+        return contacts;
+    }
+
+    public static int addContactsToStudy(StudyWrapper study, String name)
+        throws Exception {
+        return addRandContactsToStudy(study, name).size();
     }
 
     public static int addContactsToClinic(ClinicWrapper clinic, String name,

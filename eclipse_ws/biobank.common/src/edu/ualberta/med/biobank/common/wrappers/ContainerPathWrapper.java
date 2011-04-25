@@ -28,19 +28,19 @@ public class ContainerPathWrapper extends ContainerPathBaseWrapper {
         if ((container == null) || container.isNew())
             return;
 
-        String path;
+        StringBuffer path = new StringBuffer();
         ContainerWrapper parent = container.getParentContainer();
         if (parent == null) {
-            path = "" + container.getId();
+            path.append(container.getId());
         } else {
             String parentPath = container.getParentContainer().getPath();
             if (parentPath == null) {
                 throw new Exception("parent container does not have a path");
             }
-            path = parentPath + "/" + container.getId();
+            path.append(parentPath).append("/").append(container.getId());
         }
 
-        setPath(path);
+        setPath(path.toString());
         ContainerWrapper topContainer = container.getTop();
         if (topContainer == null) {
             throw new Exception("no top container");

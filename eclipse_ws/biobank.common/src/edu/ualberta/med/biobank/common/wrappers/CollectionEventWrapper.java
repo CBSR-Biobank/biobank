@@ -85,10 +85,10 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     @Override
     protected void deleteChecks() throws BiobankDeleteException,
         ApplicationException {
-        List<SpecimenWrapper> sourceVessels = getAllSpecimenCollection(false);
-        if (sourceVessels != null && !sourceVessels.isEmpty()) {
+        List<SpecimenWrapper> specimens = getAllSpecimenCollection(false);
+        if (specimens != null && !specimens.isEmpty()) {
             throw new BiobankDeleteException(
-                "Source Vessels are still linked to this Collection Event. "
+                "Specimens are still linked to this Collection Event. "
                     + "Delete them before attempting to remove this Collection Event");
         }
     }
@@ -502,6 +502,19 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             }
         }
         return 0;
+    }
+
+    public static Integer getNextVisitNumber(
+        WritableApplicationService appService, CollectionEventWrapper cevent)
+        throws Exception {
+        HQLCriteria c = new HQLCriteria("select max(ce.visitNumber) from "
+            + CollectionEvent.class.getName() + " ce where ce.patient.id=?",
+            Arrays.asList(cevent.getPatient().getId()));
+        List<Object> result = appService.query(c);
+        if (result == null || result.size() == 0 || result.get(0) == null)
+            return 1;
+        else
+            return (Integer) result.get(0) + 1;
     }
 
 }

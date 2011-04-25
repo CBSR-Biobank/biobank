@@ -32,20 +32,22 @@ public class ProcessingEventGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add processing event");
-        mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                ProcessingEventWrapper pEvent = new ProcessingEventWrapper(
-                    SessionManager.getAppService());
-                pEvent.setCenter(SessionManager.getUser()
-                    .getCurrentWorkingCenter());
-                ProcessingEventAdapter adapter = new ProcessingEventAdapter(
-                    ProcessingEventGroup.this, pEvent);
-                adapter.openEntryForm();
-            }
-        });
+        if (SessionManager.getInstance().isConnected()) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Add processing event");
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    ProcessingEventWrapper pEvent = new ProcessingEventWrapper(
+                        SessionManager.getAppService());
+                    pEvent.setCenter(SessionManager.getUser()
+                        .getCurrentWorkingCenter());
+                    ProcessingEventAdapter adapter = new ProcessingEventAdapter(
+                        ProcessingEventGroup.this, pEvent);
+                    adapter.openEntryForm();
+                }
+            });
+        }
     }
 
     @Override
