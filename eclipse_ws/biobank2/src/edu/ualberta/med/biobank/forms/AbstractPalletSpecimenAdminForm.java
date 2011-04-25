@@ -260,6 +260,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
+        gd.horizontalSpan = 2;
         profilesCombo.getCombo().setLayoutData(gd);
         loadProfileCombo();
     }
@@ -296,6 +297,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         });
         GridData gd = (GridData) plateToScanText.getLayoutData();
         gd.horizontalAlignment = SWT.FILL;
+        gd.horizontalSpan = 2;
         plateToScanText.setLayoutData(gd);
     }
 
