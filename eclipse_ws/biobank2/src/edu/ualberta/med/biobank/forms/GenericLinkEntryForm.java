@@ -152,7 +152,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
         Composite commonFieldsComposite = toolkit
             .createComposite(leftComposite);
-        gl = new GridLayout(2, false);
+        gl = new GridLayout(3, false);
         gl.horizontalSpacing = 10;
         commonFieldsComposite.setLayout(gl);
         gd = new GridData();
@@ -238,8 +238,8 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             }
         });
 
-        radioSingle.setSelection(true);
-        setStackTopComposite(stackLayout, true);
+        radioMultiple.setSelection(true);
+        setStackTopComposite(stackLayout, false);
     }
 
     private void setStackTopComposite(final StackLayout stackLayout,

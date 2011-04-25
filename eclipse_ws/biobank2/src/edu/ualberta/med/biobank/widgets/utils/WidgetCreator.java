@@ -606,13 +606,13 @@ public class WidgetCreator {
     }
 
     private void resetGlobalBinding() {
-        // if (globalBinding != null) {
-        // dbc.removeBinding(globalBinding);
-        // System.out.println("reset:" + dbc.getBindings().size());
-        // globalBinding = dbc.bindValue(globalStatusObservable,
-        // new AggregateValidationStatus(dbc.getBindings(),
-        // AggregateValidationStatus.MAX_SEVERITY));
-        // }
+        if (globalBinding != null && globalStatusObservable != null) {
+            dbc.removeBinding(globalBinding);
+            System.out.println("reset:" + dbc.getBindings().size());
+            globalBinding = dbc.bindValue(globalStatusObservable,
+                new AggregateValidationStatus(dbc.getBindings(),
+                    AggregateValidationStatus.MAX_SEVERITY));
+        }
     }
 
     protected AbstractValidator createValidator(
