@@ -706,4 +706,9 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         return isPlateValid() && linkFormPatientManagement.fieldsValid();
     }
 
+    @Override
+    public boolean onClose() {
+        linkFormPatientManagement.onClose();
+        return super.onClose();
+    }
 }
