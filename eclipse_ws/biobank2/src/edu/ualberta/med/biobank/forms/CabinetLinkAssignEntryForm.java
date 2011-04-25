@@ -213,7 +213,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         fieldsComposite.setLayout(layout);
         toolkit.paintBordersFor(fieldsComposite);
         GridData gd = new GridData();
-        gd.widthHint = 500;
+        gd.widthHint = 600;
         gd.verticalAlignment = SWT.TOP;
         fieldsComposite.setLayoutData(gd);
 
@@ -951,6 +951,12 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
     @Override
     public BiobankLogger getErrorLogger() {
         return logger;
+    }
+
+    @Override
+    public boolean onClose() {
+        linkFormPatientManagement.onClose();
+        return super.onClose();
     }
 
 }
