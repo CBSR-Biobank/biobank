@@ -209,7 +209,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
 
     private void createFieldsSection() throws ApplicationException {
         Composite fieldsComposite = toolkit.createComposite(page);
-        GridLayout layout = new GridLayout(2, false);
+        GridLayout layout = new GridLayout(3, false);
         layout.horizontalSpacing = 10;
         fieldsComposite.setLayout(layout);
         toolkit.paintBordersFor(fieldsComposite);
@@ -240,6 +240,9 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                 }
             }
         });
+        gd = new GridData();
+        gd.horizontalSpan = 2;
+        radioMove.setLayoutData(gd);
 
         // Patient number + visits list
         linkFormPatientManagement.createPatientNumberText(fieldsComposite);
@@ -267,6 +270,8 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
             Messages.getString("Cabinet.inventoryId.label"), new String[0], //$NON-NLS-1$
             specimen, SpecimenPeer.INVENTORY_ID.getName(), //$NON-NLS-1$
             inventoryIDValidator);
+        gd = (GridData) inventoryIdText.getLayoutData();
+        gd.horizontalSpan = 2;
         inventoryIdText.addKeyListener(textFieldKeyListener);
         inventoryIdText.addFocusListener(new FocusAdapter() {
             @Override
@@ -329,6 +334,8 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         oldCabinetPositionText.setEnabled(false);
         oldCabinetPositionText
             .addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+        GridData gd = (GridData) oldCabinetPositionText.getLayoutData();
+        gd.horizontalSpan = 2;
 
         // for move mode: field to enter old position. Check needed to be sure
         // nothing is wrong with the specimen
@@ -361,6 +368,8 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
             .createBoundWidget(fieldsComposite, BiobankText.class, SWT.NONE,
                 oldCabinetPositionCheckLabel, new String[0], new WritableValue(
                     "", String.class), oldCabinetPositionCheckValidator);
+        gd = (GridData) oldCabinetPositionCheckText.getLayoutData();
+        gd.horizontalSpan = 2;
         oldCabinetPositionCheckText
             .addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
@@ -376,6 +385,8 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
             fieldsComposite, BiobankText.class, SWT.NONE,
             newCabinetPositionLabel, new String[0], new WritableValue(
                 "", String.class), newCabinetPositionValidator); //$NON-NLS-1$
+        gd = (GridData) newCabinetPositionText.getLayoutData();
+        gd.horizontalSpan = 2;
         newCabinetPositionText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
