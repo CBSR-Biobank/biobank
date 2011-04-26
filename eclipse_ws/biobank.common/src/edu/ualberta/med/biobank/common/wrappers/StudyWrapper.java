@@ -306,18 +306,14 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     public List<ClinicWrapper> getClinicCollection() {
-        // FIXME: is it faster to do an HQL query here?
-        // FIXME answer: might be faster but need to check when this is needed
-        // (what if
-        // want to show the current modification in the studyEntryform, before
-        // it is saved in the DB)
+        // unique clinics
         List<ContactWrapper> contacts = getContactCollection(false);
-        List<ClinicWrapper> clinicWrappers = new ArrayList<ClinicWrapper>();
+        HashSet<ClinicWrapper> clinicWrappers = new HashSet<ClinicWrapper>();
         if (contacts != null)
             for (ContactWrapper contact : contacts) {
                 clinicWrappers.add(contact.getClinic());
             }
-        return clinicWrappers;
+        return Arrays.asList(clinicWrappers.toArray(new ClinicWrapper[] {}));
     }
 
     private static final String PATIENT_QRY = "select patients from "
