@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -868,21 +867,6 @@ public class TestContainer extends TestDatabase {
         Assert.assertTrue(containerMap.get("ChildL3").hasParentContainer());
     }
 
-    private ProcessingEventWrapper addProcessingEvent() throws Exception {
-        // FIXME
-        // StudyWrapper study = StudyHelper.addStudy("Study1");
-        // ContactHelper.addContactsToStudy(study, "contactsStudy1");
-        // SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(
-        // PatientHelper.newPatient("testP"), Utils.getRandomDate(), 0.01);
-        // PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        // ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
-        // site, patient, Utils.getRandomDate(), Utils.getRandomDate());
-        // pv.addToSourceVesselCollection(Arrays
-        // .asList(new SourceVesselWrapper[] { sv }));
-        // return pv;
-        return null;
-    }
-
     @Test
     public void testCanHoldSample() throws Exception {
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
@@ -978,8 +962,8 @@ public class TestContainer extends TestDatabase {
                 samplesTypesMap.put(new RowColPos(row, col), sampleType);
                 childL3.addSpecimen(row, col, SpecimenHelper.addSpecimen(
                     sampleType, null, ce, null, null, site));
-                SpecimenWrapper aliquot = childL3.getSpecimen(row, col);
-                aliquot.persist();
+                SpecimenWrapper spc = childL3.getSpecimen(row, col);
+                spc.persist();
             }
         }
         childL3.persist();
@@ -998,25 +982,25 @@ public class TestContainer extends TestDatabase {
 
         // force samples to be loaded from DB
         childL3 = containerMap.get("ChildL2").getChild(0, 0);
-        Map<RowColPos, SpecimenWrapper> samples = childL3.getSpecimens();
-        Assert.assertEquals(samplesTypesMap.size(), samples.size());
-        for (RowColPos pos : samples.keySet()) {
-            SpecimenWrapper aliquot = samples.get(pos);
+        Map<RowColPos, SpecimenWrapper> spcs = childL3.getSpecimens();
+        Assert.assertEquals(samplesTypesMap.size(), spcs.size());
+        for (RowColPos pos : spcs.keySet()) {
+            SpecimenWrapper spc = spcs.get(pos);
             Assert.assertTrue((pos.row >= 0)
                 && (pos.row < CONTAINER_CHILD_L3_ROWS));
             Assert.assertTrue((pos.col >= 0)
                 && (pos.col < CONTAINER_CHILD_L3_COLS));
-            Assert.assertEquals(samplesTypesMap.get(pos),
-                aliquot.getSpecimenType());
+            Assert
+                .assertEquals(samplesTypesMap.get(pos), spc.getSpecimenType());
         }
 
         for (int row = 0, maxRow = childL3.getRowCapacity(); row < maxRow; ++row) {
             for (int col = 0, maxCol = childL3.getColCapacity(); col < maxCol; ++col) {
-                SpecimenWrapper aliquot = childL3.getSpecimen(row, col);
+                SpecimenWrapper spc = childL3.getSpecimen(row, col);
                 Assert.assertEquals(
                     samplesTypesMap.get(new RowColPos(row, col)),
-                    aliquot.getSpecimenType());
-                aliquot.delete();
+                    spc.getSpecimenType());
+                spc.delete();
                 childL3.reload();
                 Assert.assertNull(childL3.getSpecimen(row, col));
             }
@@ -1797,7 +1781,7 @@ public class TestContainer extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy("Study1");
         ContactHelper.addContactsToStudy(study, "contactsStudy1");
         for (int i = 0; i < 3; i++) {
-            SpecimenWrapper spc = SpecimenHelper.addSpecimen();
+            SpecimenWrapper spc = SpecimenHelper.addParentSpecimen();
             childType.addToSpecimenTypeCollection(Arrays.asList(spc
                 .getSpecimenType()));
             child.setContainerType(childType);
