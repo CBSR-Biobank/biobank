@@ -4,7 +4,7 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 
 public class GuiUtil {
-    public static void resetComboViewer(ComboViewer comboViewer,
+    public static void reset(ComboViewer comboViewer,
         Object defaultValue) {
         if (comboViewer != null) {
             if (defaultValue != null) {

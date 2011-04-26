@@ -53,6 +53,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
@@ -135,6 +136,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     public void formClosed() throws Exception {
+        // TODO: is this necessary if making copies?
         if ((adapter != null) && (adapter.getModelObject() != null)) {
             adapter.getModelObject().reload();
         }
@@ -538,8 +540,21 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     public void reset() throws Exception {
-        adapter.resetObject();
+        onReset();
+
         setDirty(false);
+    }
+
+    protected abstract void onReset() throws Exception;
+
+    protected ModelWrapper<?> getModelObject() throws Exception {
+        ModelWrapper<?> modelObject = adapter.getModelObject();
+
+        if (!modelObject.isNew()) {
+            modelObject = modelObject.getDatabaseClone();
+        }
+
+        return modelObject;
     }
 
     /**

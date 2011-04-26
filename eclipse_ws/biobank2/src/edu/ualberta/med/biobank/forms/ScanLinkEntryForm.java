@@ -660,8 +660,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
+    protected void onReset() throws Exception {
+        super.onReset();
         setDirty(false);
         fieldsComposite.setEnabled(true);
         setScanValid(true);

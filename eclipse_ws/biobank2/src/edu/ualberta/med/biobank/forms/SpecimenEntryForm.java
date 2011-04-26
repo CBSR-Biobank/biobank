@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -21,9 +20,9 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 public class SpecimenEntryForm extends BiobankEntryForm {
@@ -44,8 +43,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     @Override
     protected void init() throws Exception {
-        SpecimenAdapter specimenAdapter = (SpecimenAdapter) adapter;
-        specimen = specimenAdapter.getSpecimen();
+        specimen = (SpecimenWrapper) getModelObject();
         SessionManager.logEdit(specimen);
         setPartName("Specimen Entry");
     }
@@ -225,22 +223,11 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
-        ActivityStatusWrapper currentActivityStatus = specimen
-            .getActivityStatus();
-        if (currentActivityStatus != null) {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                currentActivityStatus));
-        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
-            activityStatusComboViewer.getCombo().deselectAll();
-        }
+    protected void onReset() throws Exception {
+        specimen.reset();
 
-        SpecimenTypeWrapper currentSampleType = specimen.getSpecimenType();
-        if (currentSampleType != null)
-            sampleTypeComboViewer.setSelection(new StructuredSelection(
-                currentSampleType));
-
+        GuiUtil.reset(activityStatusComboViewer, specimen.getActivityStatus());
+        GuiUtil.reset(sampleTypeComboViewer, specimen.getSpecimenType());
     }
 
 }

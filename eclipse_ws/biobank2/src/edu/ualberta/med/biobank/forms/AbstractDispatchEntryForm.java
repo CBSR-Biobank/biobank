@@ -45,7 +45,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        dispatch = (DispatchWrapper) adapter.getModelObject();
+        dispatch = (DispatchWrapper) getModelObject();
         SessionManager.logEdit(dispatch);
         retrieveShipment();
 
@@ -141,10 +141,8 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
     protected abstract void reloadSpecimens();
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
+    protected void onReset() throws Exception {
         dispatch.reset();
         reloadSpecimens();
     }
-
 }

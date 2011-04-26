@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -35,6 +36,18 @@ public class PatientWrapper extends PatientBaseWrapper {
 
     public PatientWrapper(WritableApplicationService appService) {
         super(appService);
+    }
+
+    @Override
+    protected Patient getNewObject() throws Exception {
+        Patient newObject = super.getNewObject();
+
+        Calendar createdAt = Calendar.getInstance();
+        createdAt.setTime(new Date());
+        createdAt.set(Calendar.SECOND, 0);
+
+        newObject.setCreatedAt(createdAt.getTime());
+        return newObject;
     }
 
     @Override

@@ -558,7 +558,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
     protected void setSpecimenMode(SpecimenMode mode) {
         try {
             specimenMode = mode;
-            reset();
+            onReset();
 
             boolean enabled = (specimenMode == SpecimenMode.NEW_SPECIMEN);
 
@@ -741,7 +741,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
             inventoryId = "C" + inventoryId; //$NON-NLS-1$
         }
         resultShownValue.setValue(false);
-        reset();
+        onReset();
         specimen.setInventoryId(inventoryId);
         inventoryIdText.setText(inventoryId);
         oldCabinetPositionCheckText.setText("?");
@@ -822,7 +822,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
     }
 
     @Override
-    public void reset() throws Exception {
+    protected void onReset() throws Exception {
         specimen.reset(); // reset internal values
         resetParentContainers();
         resultShownValue.setValue(Boolean.FALSE);
