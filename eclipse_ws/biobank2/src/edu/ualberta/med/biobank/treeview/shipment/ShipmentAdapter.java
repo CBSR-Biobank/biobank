@@ -42,7 +42,9 @@ public class ShipmentAdapter extends AdapterBase {
         OriginInfoWrapper originInfo = getWrapper();
         ShipmentInfoWrapper shipmentInfo = originInfo.getShipmentInfo();
 
-        String label = shipmentInfo.getFormattedDateReceived();
+        String label = "";
+        if (shipmentInfo.getId() != null)
+            label += shipmentInfo.getId().toString();
         if (shipmentInfo.getWaybill() != null) {
             label += " (" + shipmentInfo.getWaybill() + ")";
         }

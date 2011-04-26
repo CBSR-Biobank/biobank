@@ -6,6 +6,7 @@ import edu.ualberta.med.biobank.common.exception.CheckFieldLimitsException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.StringValueLengthServerException;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
@@ -57,6 +58,7 @@ public class TestDatabase {
     public void tearDown() throws Exception {
         Assert.assertNotNull("appService is null", appService);
         try {
+            DispatchHelper.deleteCreatedDispatches();
             SiteHelper.deleteCreatedSites();
             StudyHelper.deleteCreatedStudies();
             ClinicHelper.deleteCreatedClinics();

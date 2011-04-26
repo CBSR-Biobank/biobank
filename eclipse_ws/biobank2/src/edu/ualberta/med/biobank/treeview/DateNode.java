@@ -14,11 +14,12 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 
 public class DateNode extends AdapterBase {
 
+    private String text;
     private Date date;
 
-    public DateNode(AdapterBase parent, Date date) {
-        super(parent, (int) date.getTime(), DateFormatter.formatAsDate(date),
-            true, false);
+    public DateNode(AdapterBase parent, String text, Date date) {
+        super(parent, (int) date.getTime() + text.hashCode(), text + ": "
+            + DateFormatter.formatAsDate(date), true, false);
         this.setDate(date);
     }
 
@@ -78,6 +79,14 @@ public class DateNode extends AdapterBase {
 
     public Date getDate() {
         return date;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public String getText() {
+        return text;
     }
 
 }

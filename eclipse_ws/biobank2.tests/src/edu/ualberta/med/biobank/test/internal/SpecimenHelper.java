@@ -79,7 +79,7 @@ public class SpecimenHelper extends DbHelper {
         return specimen;
     }
 
-    public static SpecimenWrapper addSpecimen() throws Exception {
+    public static SpecimenWrapper addParentSpecimen() throws Exception {
         SpecimenTypeWrapper st = SpecimenTypeHelper.addSpecimenType("testst"
             + r.nextInt());
         st.persist();

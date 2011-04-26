@@ -7,10 +7,12 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -49,18 +51,21 @@ public class CollectionEventAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        CollectionEventWrapper cevent = getWrapper();
-        if (cevent != null) {
-            PatientWrapper patient = cevent.getPatient();
-            if (patient != null) {
-                StudyWrapper study = patient.getStudy();
-                Assert.isNotNull(study, "study is null");
-                return new StringBuilder(study.getNameShort()).append(" - ")
-                    .append(getTooltipText("")).toString();
-
+        String tabName;
+        if (modelObject.isNew()) {
+            tabName = Messages.getString("CollectionEventEntryForm.title.new");
+            try {
+                ((CollectionEventWrapper) modelObject)
+                    .setActivityStatus(ActivityStatusWrapper
+                        .getActiveActivityStatus(SessionManager.getAppService()));
+            } catch (Exception e) {
+                BiobankPlugin.openAsyncError("Error",
+                    "Unable to create collection event.");
             }
-        }
-        return getTooltipText("Visit");
+        } else
+            tabName = Messages.getString("CollectionEventEntryForm.title.edit",
+                ((CollectionEventWrapper) modelObject).getVisitNumber());
+        return tabName;
     }
 
     @Override

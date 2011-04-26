@@ -63,6 +63,7 @@ public class TestStudy extends TestDatabase {
         // delete a site
         sites.remove(site);
         site.delete();
+        SiteHelper.createdSites.remove(site);
 
         study.reload();
         studySites = study.getSiteCollection(false);
@@ -505,7 +506,7 @@ public class TestStudy extends TestDatabase {
     public void testClinicCollection() throws Exception {
         String name = "testGetClinicCollection" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
-        List<ClinicWrapper> set1 = ClinicHelper.addClinics(name + "_set1_",
+        List<ClinicWrapper> set1 = ClinicHelper.addClinics(name + "_set1",
             r.nextInt(15) + 1, true);
         for (ClinicWrapper clinic : set1) {
             study.addToContactCollection(clinic.getContactCollection(false));
@@ -513,25 +514,27 @@ public class TestStudy extends TestDatabase {
         study.persist();
         Assert.assertEquals(set1.size(), study.getClinicCollection().size());
 
-        List<ClinicWrapper> set2 = ClinicHelper.addClinics(name + "_set1_",
+        List<ClinicWrapper> set2 = ClinicHelper.addClinics(name + "_set2",
             r.nextInt(15) + 1, true);
-        for (ClinicWrapper clinic : set1) {
+        for (ClinicWrapper clinic : set2) {
             study.addToContactCollection(clinic.getContactCollection(false));
         }
         study.persist();
         Assert.assertEquals(set1.size() + set2.size(), study
             .getClinicCollection().size());
 
-        for (ClinicWrapper contact : set1) {
-            contact.delete();
+        for (ClinicWrapper clinic : set1) {
+            study.removeFromContactCollection(clinic
+                .getContactCollection(false));
         }
-        study.reload();
+        study.persist();
         Assert.assertEquals(set2.size(), study.getClinicCollection().size());
 
-        for (ClinicWrapper contact : set2) {
-            contact.delete();
+        for (ClinicWrapper clinic : set2) {
+            study.removeFromContactCollection(clinic
+                .getContactCollection(false));
         }
-        study.reload();
+        study.persist();
         Assert.assertEquals(0, study.getClinicCollection().size());
     }
 
