@@ -373,7 +373,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         toolkit.paintBordersFor(leftSideComposite);
 
         fieldsComposite = toolkit.createComposite(leftSideComposite);
-        layout = new GridLayout(2, false);
+        layout = new GridLayout(3, false);
         layout.horizontalSpacing = 10;
         fieldsComposite.setLayout(layout);
         toolkit.paintBordersFor(fieldsComposite);
@@ -708,4 +708,9 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         return isPlateValid() && linkFormPatientManagement.fieldsValid();
     }
 
+    @Override
+    public boolean onClose() {
+        linkFormPatientManagement.onClose();
+        return super.onClose();
+    }
 }
