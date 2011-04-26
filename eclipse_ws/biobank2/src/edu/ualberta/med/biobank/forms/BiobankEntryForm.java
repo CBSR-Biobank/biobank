@@ -311,7 +311,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         return firstControl;
     }
 
-    protected void setFirstControl(Control c) {
+    public void setFirstControl(Control c) {
         firstControl = c;
     }
 

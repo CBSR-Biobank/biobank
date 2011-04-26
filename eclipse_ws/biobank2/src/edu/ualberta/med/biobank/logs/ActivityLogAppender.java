@@ -11,9 +11,9 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
-import edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm;
-import edu.ualberta.med.biobank.forms.ScanAssignEntryForm;
-import edu.ualberta.med.biobank.forms.ScanLinkEntryForm;
+import edu.ualberta.med.biobank.forms.linkassign.CabinetLinkAssignEntryForm;
+import edu.ualberta.med.biobank.forms.linkassign.ScanAssignEntryForm;
+import edu.ualberta.med.biobank.forms.linkassign.ScanLinkEntryForm;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 
 /**

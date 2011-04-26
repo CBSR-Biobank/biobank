@@ -36,6 +36,7 @@ import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.forms.linkassign.AbstractSpecimenAdminForm;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -197,7 +198,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void afterScanAndProcess(
-        @SuppressWarnings("unused") Integer rowOnly) {
+        @SuppressWarnings("unused") Integer rowToProcess) {
 
     }
 
@@ -323,7 +324,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         });
         GridData gd = (GridData) plateToScanText.getLayoutData();
         gd.horizontalAlignment = SWT.FILL;
-        gd.horizontalSpan = 2;
         plateToScanText.setLayoutData(gd);
 
         createScanButton(fieldsComposite);
@@ -414,7 +414,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void setBindings(boolean isSingleMode) {
-        setCanLaunchScan(true);
         setScanHasBeenLauched(isSingleMode);
         if (isSingleMode)
             widgetCreator.removeBinding(PLATE_VALIDATOR);
@@ -563,5 +562,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected boolean canScanTubeAlone(PalletCell cell) {
         return cell == null || cell.getStatus() == UICellStatus.EMPTY;
+    }
+
+    protected String getPlateToScanValue() {
+        return plateToScanValue.getValue().toString();
     }
 }

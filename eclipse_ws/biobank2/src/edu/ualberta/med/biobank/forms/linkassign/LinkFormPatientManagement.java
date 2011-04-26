@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.forms;
+package edu.ualberta.med.biobank.forms.linkassign;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -166,7 +166,7 @@ public class LinkFormPatientManagement {
                 }
             }
         });
-        pEventListCheck = specimenAdminForm.toolkit.createButton(
+        pEventListCheck = specimenAdminForm.getToolkit().createButton(
             compositeFields, "Last 7 days", SWT.CHECK);
         pEventListCheck.setSelection(pEventListCheckSelection);
         pEventListCheck.addSelectionListener(new SelectionAdapter() {
@@ -237,7 +237,7 @@ public class LinkFormPatientManagement {
         currentPatient = null;
         try {
             currentPatient = PatientWrapper.getPatient(
-                specimenAdminForm.appService, patientNumberText.getText());
+                SessionManager.getAppService(), patientNumberText.getText());
             if (currentPatient != null) {
                 specimenAdminForm.appendLog("--------"); //$NON-NLS-1$
                 specimenAdminForm.appendLog(Messages.getString(

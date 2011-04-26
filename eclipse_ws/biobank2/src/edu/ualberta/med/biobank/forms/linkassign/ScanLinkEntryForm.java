@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.forms;
+package edu.ualberta.med.biobank.forms.linkassign;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +46,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.forms.AbstractPalletSpecimenAdminForm;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;

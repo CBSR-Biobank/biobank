@@ -6,7 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.SecurityFeature;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.forms.GenericLinkEntryForm;
+import edu.ualberta.med.biobank.forms.linkassign.GenericLinkEntryForm;
 import edu.ualberta.med.biobank.treeview.processing.AssignAdapter;
 
 public class GenericLinkHandler extends LinkAssignCommonHandler {

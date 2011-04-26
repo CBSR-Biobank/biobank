@@ -6,7 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.SecurityFeature;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.forms.ScanLinkEntryForm;
+import edu.ualberta.med.biobank.forms.linkassign.ScanLinkEntryForm;
 import edu.ualberta.med.biobank.treeview.processing.ScanLinkAdapter;
 
 public class ScanLinkHandler extends LinkAssignCommonHandler {

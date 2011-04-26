@@ -1819,21 +1819,21 @@
             name="Container View">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.ScanLinkEntryForm"
+            class="edu.ualberta.med.biobank.forms.linkassign.ScanLinkEntryForm"
             default="false"
             icon="icons/scanLink.png"
             id="edu.ualberta.med.biobank.forms.ScanLinkEntryForm"
             name="Scan Link Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.ScanAssignEntryForm"
+            class="edu.ualberta.med.biobank.forms.linkassign.ScanAssignEntryForm"
             default="false"
             icon="icons/scanAssign.png"
             id="edu.ualberta.med.biobank.forms.ScanAssignEntryForm"
             name="Scan Assign Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm"
+            class="edu.ualberta.med.biobank.forms.linkassign.CabinetLinkAssignEntryForm"
             default="false"
             icon="icons/cabinetLinkAssign.png"
             id="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm"
@@ -2138,13 +2138,13 @@
       name="Processing Event View">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.GenericLinkEntryForm"
+      class="edu.ualberta.med.biobank.forms.linkassign.GenericLinkEntryForm"
       default="false"
       id="edu.ualberta.med.biobank.forms.GenericLinkEntryForm"
       name="Generic Link">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.GenericAssignEntryForm"
+      class="edu.ualberta.med.biobank.forms.linkassign.GenericAssignEntryForm"
       default="false"
       id="edu.ualberta.med.biobank.forms.GenericAssignEntryForm"
       name="Generic Assign">

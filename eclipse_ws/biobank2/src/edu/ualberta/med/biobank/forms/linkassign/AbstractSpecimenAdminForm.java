@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.forms;
+package edu.ualberta.med.biobank.forms.linkassign;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -22,6 +22,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 import edu.ualberta.med.biobank.logs.ActivityLogAppender;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.logs.LogInfo;
