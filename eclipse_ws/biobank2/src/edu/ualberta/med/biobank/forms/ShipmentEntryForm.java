@@ -145,7 +145,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             shipmentInfo, ShipmentInfoPeer.WAYBILL.getName(), waybillValidator,
             WAYBILL_BINDING);
 
-        ClinicWrapper clinic = (ClinicWrapper) shipment.getCenter();
+        ClinicWrapper clinic = (ClinicWrapper) originInfo.getCenter();
         if (clinic != null) {
             activateWaybillWidget(clinic.getSendsShipments());
         }
