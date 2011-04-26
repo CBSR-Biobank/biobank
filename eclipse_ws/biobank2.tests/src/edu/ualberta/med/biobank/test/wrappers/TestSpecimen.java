@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -40,6 +41,7 @@ import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
+import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
@@ -58,7 +60,7 @@ public class TestSpecimen extends TestDatabase {
     public void setUp() throws Exception {
         super.setUp();
 
-        spc = SpecimenHelper.addSpecimen();
+        spc = SpecimenHelper.addParentSpecimen();
         site = (SiteWrapper) spc.getCurrentCenter();
         ContainerTypeWrapper typeChild = ContainerTypeHelper.addContainerType(
             site, "ctTypeChild" + r.nextInt(), "ctChild", 1, 4, 5, false);
@@ -584,18 +586,25 @@ public class TestSpecimen extends TestDatabase {
     public void testDebugRandomMethods() throws Exception {
         ContainerWrapper container = spc.getParentContainer();
         ContainerTypeWrapper containerType = container.getContainerType();
-        CollectionEventWrapper pv = spc.getCollectionEvent();
-        SpecimenTypeWrapper sampleType = containerType
-            .getSpecimenTypeCollection(false).get(0);
-        Assert.assertNotNull(sampleType);
+        CollectionEventWrapper cevent = spc.getCollectionEvent();
+        SpecimenTypeWrapper spcType = containerType.getSpecimenTypeCollection(
+            false).get(0);
+        Assert.assertNotNull(spcType);
 
-        SpecimenHelper.addSpecimen(sampleType, container, pv, 1, 1,
-            spc.getOriginInfo());
-        SpecimenWrapper specimen = SpecimenHelper.newSpecimen(sampleType,
-            container, pv, 2, 3, spc.getOriginInfo());
+        ProcessingEventWrapper pevent = ProcessingEventHelper
+            .addProcessingEvent(spc.getCurrentCenter(), spc
+                .getCollectionEvent().getPatient(), Utils.getRandomDate());
+
+        // add aliquoted specimen
+        SpecimenWrapper specimen = SpecimenHelper.newSpecimen(spcType,
+            container, cevent, 2, 3, spc.getOriginInfo());
         specimen.setInventoryId(Utils.getRandomString(5));
         specimen.persist();
-        SpecimenHelper.addSpecimen(sampleType, null, pv, null, null,
+
+        pevent.addToSpecimenCollection(Arrays.asList(specimen));
+        pevent.persist();
+
+        SpecimenHelper.addSpecimen(spcType, null, cevent, null, null,
             spc.getOriginInfo());
 
         try {

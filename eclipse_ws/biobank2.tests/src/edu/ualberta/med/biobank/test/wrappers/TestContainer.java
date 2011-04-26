@@ -1781,7 +1781,7 @@ public class TestContainer extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy("Study1");
         ContactHelper.addContactsToStudy(study, "contactsStudy1");
         for (int i = 0; i < 3; i++) {
-            SpecimenWrapper spc = SpecimenHelper.addSpecimen();
+            SpecimenWrapper spc = SpecimenHelper.addParentSpecimen();
             childType.addToSpecimenTypeCollection(Arrays.asList(spc
                 .getSpecimenType()));
             child.setContainerType(childType);
