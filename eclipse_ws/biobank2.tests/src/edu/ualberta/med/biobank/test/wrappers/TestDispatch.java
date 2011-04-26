@@ -10,13 +10,16 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -26,14 +29,15 @@ import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestDispatch extends TestDatabase {
 
@@ -83,6 +87,7 @@ public class TestDispatch extends TestDatabase {
 
         dispatch.setSenderCenter(senderSite);
         dispatch.persist();
+        DispatchHelper.createdDispatches.add(dispatch);
 
         Assert.assertEquals(senderSite, dispatch.getSenderCenter());
 
@@ -111,6 +116,7 @@ public class TestDispatch extends TestDatabase {
 
         dispatch.setReceiverCenter(receiverSite);
         dispatch.persist();
+        DispatchHelper.createdDispatches.add(dispatch);
 
         Assert.assertEquals(receiverSite, dispatch.getReceiverCenter());
 
@@ -282,6 +288,7 @@ public class TestDispatch extends TestDatabase {
             .size();
 
         dispatch.delete();
+        DispatchHelper.createdDispatches.remove(dispatch);
 
         int countAfter = appService.search(Dispatch.class, new Dispatch())
             .size();
@@ -289,22 +296,26 @@ public class TestDispatch extends TestDatabase {
         Assert.assertEquals(countBefore - 1, countAfter);
     }
 
-    private List<SpecimenWrapper> addAliquotsToContainerRow(
-        ProcessingEventWrapper visit, ContainerWrapper container, int row,
+    private List<SpecimenWrapper> addSpecimensToContainerRow(
+        CollectionEventWrapper cevent, ContainerWrapper container, int row,
         List<SpecimenTypeWrapper> sampleTypes) throws Exception {
         int numSampletypes = sampleTypes.size();
         int colCapacity = container.getColCapacity();
-        List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>();
+
+        OriginInfoWrapper oi = new OriginInfoWrapper(appService);
+        oi.setCenter(container.getSite());
+        oi.persist();
+
+        List<SpecimenWrapper> spcs = new ArrayList<SpecimenWrapper>();
         for (int i = 0; i < colCapacity; ++i) {
-            // FIXME
-            // aliquots.add(SpecimenHelper.addAliquot(
-            // sampleTypes.get(r.nextInt(numSampletypes)),
-            // ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, visit,
-            // row, i));
+            spcs.add(SpecimenHelper.addSpecimen(
+                sampleTypes.get(r.nextInt(numSampletypes)),
+                ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, cevent,
+                row, i, oi));
         }
         container.reload();
-        visit.reload();
-        return aliquots;
+        cevent.reload();
+        return spcs;
     }
 
     @Test
@@ -345,122 +356,104 @@ public class TestDispatch extends TestDatabase {
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
         study.reload();
-        // FIXME
-        // ProcessingEventWrapper visit = ProcessingEventHelper
-        // .addProcessingEvent(clinic, patient, Utils.getRandomDate(),
-        // Utils.getRandomDate());
-        //
-        // List<SpecimenWrapper> aliquotSet1 = addAliquotsToContainerRow(visit,
-        // container, 0, sampleTypes);
-        // List<SpecimenWrapper> aliquotSet2 = addAliquotsToContainerRow(visit,
-        // container, 1, sampleTypes);
-        //
-        // dispatch.addSpecimens(aliquotSet1);
-        // dispatch.persist();
-        // dispatch.reload();
-        //
-        // List<SpecimenWrapper> shipmentAliquots = dispatch
-        // .getSpecimenCollection();
-        // Assert.assertEquals(aliquotSet1.size(), shipmentAliquots.size());
-        //
-        // // add more aliquots to row 2
-        //
-        // dispatch.addSpecimens(aliquotSet2);
-        // dispatch.persist();
-        // dispatch.reload();
-        //
-        // shipmentAliquots = dispatch.getSpecimenCollection();
-        // Assert.assertEquals(aliquotSet1.size() + aliquotSet2.size(),
-        // shipmentAliquots.size());
-        //
-        // dispatch.removeAliquots(aliquotSet1);
-        // dispatch.persist();
-        // dispatch.reload();
-        //
-        // shipmentAliquots = dispatch.getSpecimenCollection();
-        // Assert.assertEquals(aliquotSet2.size(), shipmentAliquots.size());
+
+        OriginInfoWrapper oi = new OriginInfoWrapper(appService);
+        oi.setCenter(container.getSite());
+        oi.persist();
+
+        CollectionEventWrapper cevent = CollectionEventHelper
+            .addCollectionEvent(clinic, patient, 1, oi);
+
+        List<SpecimenWrapper> spcSet1 = addSpecimensToContainerRow(cevent,
+            container, 0, sampleTypes);
+        List<SpecimenWrapper> spcSet2 = addSpecimensToContainerRow(cevent,
+            container, 1, sampleTypes);
+
+        dispatch.addSpecimens(spcSet1, DispatchSpecimenState.NONE);
+        dispatch.persist();
+        dispatch.reload();
+
+        List<SpecimenWrapper> dispatchSpcs = dispatch
+            .getSpecimenCollection(false);
+        Assert.assertEquals(spcSet1.size(), dispatchSpcs.size());
+
+        // add more specimens to row 2
+
+        dispatch.addSpecimens(spcSet2, DispatchSpecimenState.NONE);
+        dispatch.persist();
+        dispatch.reload();
+
+        dispatchSpcs = dispatch.getSpecimenCollection(false);
+        Assert.assertEquals(spcSet1.size() + spcSet2.size(),
+            dispatchSpcs.size());
+
+        dispatch.removeSpecimens(spcSet1);
+        dispatch.persist();
+        dispatch.reload();
+
+        dispatchSpcs = dispatch.getSpecimenCollection(false);
+        Assert.assertEquals(spcSet2.size(), dispatchSpcs.size());
     }
 
     @Test
     public void testRemoveDispatchAliquots() {
-
+        Assert.fail("testRemoveDispatchAliquots needs implementation");
     }
 
     @Test
-    public void testGetDispatchesInSite() {
-        try {
-            SiteWrapper site = SiteHelper.addSite("newSite");
-            ClinicWrapper clinic = ClinicHelper.addClinic("testc");
-            DispatchWrapper testDispatch = DispatchHelper.addDispatch(site,
-                clinic, ShippingMethodWrapper.getShippingMethods(appService)
-                    .get(0));
-            Assert.assertTrue(site.getSrcDispatchCollection(false).size() == 1);
-            Assert
-                .assertTrue(clinic.getDstDispatchCollection(false).size() == 1);
-            testDispatch.setSenderCenter(clinic);
-            testDispatch.setReceiverCenter(site);
-            testDispatch.persist();
-            site.reload();
-            clinic.reload();
-            Assert
-                .assertTrue(clinic.getSrcDispatchCollection(false).size() == 1);
-            Assert.assertTrue(site.getDstDispatchCollection(false).size() == 1);
-        } catch (ApplicationException e) {
-            Assert.fail(e.getCause().getMessage());
-        } catch (Exception e) {
-            Assert.fail(e.getCause().getMessage());
-        }
-
+    public void testGetDispatchesInSite() throws Exception {
+        String name = "testGetDispatchesInSite" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name + "_clinic");
+        DispatchWrapper testDispatch = DispatchHelper.addDispatch(site, clinic,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0));
+        Assert.assertTrue(site.getSrcDispatchCollection(false).size() == 1);
+        Assert.assertTrue(clinic.getDstDispatchCollection(false).size() == 1);
+        testDispatch.setSenderCenter(clinic);
+        testDispatch.setReceiverCenter(site);
+        testDispatch.persist();
+        site.reload();
+        clinic.reload();
+        Assert.assertTrue(clinic.getSrcDispatchCollection(false).size() == 1);
+        Assert.assertTrue(site.getDstDispatchCollection(false).size() == 1);
     }
 
     @Test
-    public void testGetDispatchesInSiteByDateSent() {
-        try {
-            Date date = new Date();
-            SiteWrapper site = SiteHelper.addSite("newSite");
-            ClinicWrapper clinic = ClinicHelper.addClinic("testc");
-            DispatchWrapper testDispatch = DispatchHelper.addDispatch(site,
-                clinic, ShippingMethodWrapper.getShippingMethods(appService)
-                    .get(0));
-            testDispatch.getShipmentInfo().setPackedAt(date);
-            testDispatch.getShipmentInfo().persist();
-            testDispatch.reload();
-            Assert.assertTrue(DispatchWrapper.getDispatchesByDateSent(
-                appService, date).size() == 1);
-            Assert.assertTrue(DispatchWrapper.getDispatchesByDateReceived(
-                appService, date).size() == 0);
-            testDispatch.setSenderCenter(clinic);
-            testDispatch.setReceiverCenter(site);
-        } catch (ApplicationException e) {
-            Assert.fail(e.getCause().getMessage());
-        } catch (Exception e) {
-            Assert.fail(e.getCause().getMessage());
-        }
+    public void testGetDispatchesInSiteByDateSent() throws Exception {
+        String name = "testGetDispatchesInSiteByDateSent" + r.nextInt();
+        Date date = new Date();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name + "_clinic");
+        DispatchWrapper testDispatch = DispatchHelper.addDispatch(site, clinic,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0));
+        testDispatch.getShipmentInfo().setPackedAt(date);
+        testDispatch.getShipmentInfo().persist();
+        testDispatch.reload();
+        Assert.assertTrue(DispatchWrapper.getDispatchesByDateSent(appService,
+            date).size() == 1);
+        Assert.assertTrue(DispatchWrapper.getDispatchesByDateReceived(
+            appService, date).size() == 0);
+        testDispatch.setSenderCenter(clinic);
+        testDispatch.setReceiverCenter(site);
     }
 
     @Test
-    public void testGetDispatchesInSiteByDateReceived() {
-        try {
-            Date date = new Date();
-            SiteWrapper site = SiteHelper.addSite("newSite");
-            ClinicWrapper clinic = ClinicHelper.addClinic("testc");
-            DispatchWrapper testDispatch = DispatchHelper.addDispatch(site,
-                clinic, ShippingMethodWrapper.getShippingMethods(appService)
-                    .get(0));
-            testDispatch.getShipmentInfo().setReceivedAt(date);
-            testDispatch.getShipmentInfo().persist();
-            testDispatch.reload();
-            Assert.assertTrue(DispatchWrapper.getDispatchesByDateReceived(
-                appService, date).size() == 1);
-            Assert.assertTrue(DispatchWrapper.getDispatchesByDateSent(
-                appService, date).size() == 0);
-            testDispatch.setSenderCenter(clinic);
-            testDispatch.setReceiverCenter(site);
-        } catch (ApplicationException e) {
-            Assert.fail(e.getCause().getMessage());
-        } catch (Exception e) {
-            Assert.fail(e.getCause().getMessage());
-        }
+    public void testGetDispatchesInSiteByDateReceived() throws Exception {
+        String name = "testGetDispatchesInSiteByDateReceived" + r.nextInt();
+        Date date = new Date();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name + "_clinic");
+        DispatchWrapper testDispatch = DispatchHelper.addDispatch(site, clinic,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0));
+        testDispatch.getShipmentInfo().setReceivedAt(date);
+        testDispatch.getShipmentInfo().persist();
+        testDispatch.reload();
+        Assert.assertTrue(DispatchWrapper.getDispatchesByDateReceived(
+            appService, date).size() == 1);
+        Assert.assertTrue(DispatchWrapper.getDispatchesByDateSent(appService,
+            date).size() == 0);
+        testDispatch.setSenderCenter(clinic);
+        testDispatch.setReceiverCenter(site);
     }
 
 }

@@ -70,6 +70,7 @@ public class DispatchHelper extends DbHelper {
         DispatchWrapper dispatch = newDispatch(sender, receiver, method,
             waybill, dateReceived, containers);
         dispatch.persist();
+        dispatch.reload();
         if (addToCreatedList) {
             createdDispatches.add(dispatch);
         }

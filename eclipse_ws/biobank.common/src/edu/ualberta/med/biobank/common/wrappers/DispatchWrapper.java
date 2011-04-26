@@ -227,7 +227,26 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         resetMap();
     }
 
-    public void removeSpecimens(List<DispatchSpecimenWrapper> dsaList) {
+    public void removeSpecimens(List<SpecimenWrapper> spcs) {
+        if (spcs == null) {
+            throw new NullPointerException();
+        }
+
+        if (spcs.isEmpty())
+            return;
+
+        List<DispatchSpecimenWrapper> removeDispatchSpecimens = new ArrayList<DispatchSpecimenWrapper>();
+
+        for (DispatchSpecimenWrapper dsa : getDispatchSpecimenCollection(false)) {
+            if (spcs.contains(dsa.getSpecimen())) {
+                removeDispatchSpecimens.add(dsa);
+                deletedDispatchedSpecimens.add(dsa);
+            }
+        }
+        removeFromDispatchSpecimenCollection(removeDispatchSpecimens);
+    }
+
+    public void removeDispatchSpecimens(List<DispatchSpecimenWrapper> dsaList) {
         if (dsaList == null) {
             throw new NullPointerException();
         }
@@ -402,7 +421,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
         if (site != null) {
             log.setCenter(site);
-        } else {
+        } else if (state != null) {
             if (state.equals(DispatchState.CREATION)
                 || state.equals(DispatchState.IN_TRANSIT)) {
                 log.setCenter(getSenderCenter().getNameShort());
@@ -419,9 +438,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         detailsList.add(new StringBuilder("state: ").append(
             getStateDescription()).toString());
 
-        if (state.equals(DispatchState.CREATION)
-            || state.equals(DispatchState.IN_TRANSIT)
-            || state.equals(DispatchState.LOST)) {
+        if ((state != null)
+            && ((state.equals(DispatchState.CREATION)
+                || state.equals(DispatchState.IN_TRANSIT) || state
+                .equals(DispatchState.LOST)))) {
             String packedAt = getFormattedPackedAt();
             if ((packedAt != null) && (packedAt.length() > 0)) {
                 detailsList.add(new StringBuilder("packed at: ").append(
