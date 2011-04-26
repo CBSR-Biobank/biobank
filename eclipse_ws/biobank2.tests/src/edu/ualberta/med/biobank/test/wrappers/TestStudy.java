@@ -63,6 +63,7 @@ public class TestStudy extends TestDatabase {
         // delete a site
         sites.remove(site);
         site.delete();
+        SiteHelper.createdSites.remove(site);
 
         study.reload();
         studySites = study.getSiteCollection(false);
