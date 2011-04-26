@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
@@ -124,10 +123,6 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        for (DispatchSpecimenWrapper da : dispatch
-            .getDispatchSpecimenCollection(false)) {
-            da.getSpecimen().persist();
-        }
         dispatch.persist();
 
         Display.getDefault().asyncExec(new Runnable() {

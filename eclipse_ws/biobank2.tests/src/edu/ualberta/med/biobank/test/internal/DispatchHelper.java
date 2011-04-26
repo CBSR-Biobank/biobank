@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -13,6 +15,8 @@ import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
 public class DispatchHelper extends DbHelper {
+
+    public static List<DispatchWrapper> createdDispatches = new ArrayList<DispatchWrapper>();
 
     public static DispatchWrapper newDispatch(CenterWrapper<?> sender,
         CenterWrapper<?> receiver, ShippingMethodWrapper method,
@@ -26,7 +30,10 @@ public class DispatchHelper extends DbHelper {
         dispatch.setShipmentInfo(shipInfo);
 
         shipInfo.setShippingMethod(method);
-        shipInfo.setWaybill(waybill);
+
+        if (waybill != null) {
+            shipInfo.setWaybill(waybill);
+        }
 
         if (dateReceived != null) {
             shipInfo.setReceivedAt(dateReceived);
@@ -58,28 +65,41 @@ public class DispatchHelper extends DbHelper {
 
     public static DispatchWrapper addDispatch(CenterWrapper<?> sender,
         CenterWrapper<?> receiver, ShippingMethodWrapper method,
-        String waybill, Date dateReceived, SpecimenWrapper... containers)
-        throws Exception {
+        String waybill, Date dateReceived, boolean addToCreatedList,
+        SpecimenWrapper... containers) throws Exception {
         DispatchWrapper dispatch = newDispatch(sender, receiver, method,
             waybill, dateReceived, containers);
         dispatch.persist();
+        if (addToCreatedList) {
+            createdDispatches.add(dispatch);
+        }
         return dispatch;
+
+    }
+
+    public static DispatchWrapper addDispatch(CenterWrapper<?> sender,
+        CenterWrapper<?> receiver, ShippingMethodWrapper method,
+        String waybill, Date dateReceived, SpecimenWrapper... containers)
+        throws Exception {
+        return addDispatch(sender, receiver, method, waybill, dateReceived,
+            true, containers);
     }
 
     public static DispatchWrapper addDispatch(CenterWrapper<?> sender,
         CenterWrapper<?> receiver, ShippingMethodWrapper method,
         String waybill, Date dateReceived) throws Exception {
-        DispatchWrapper dispatch = newDispatch(sender, receiver, method,
-            waybill, dateReceived);
-        dispatch.persist();
-        return dispatch;
+        return addDispatch(sender, receiver, method, waybill, dateReceived,
+            true);
     }
 
     public static DispatchWrapper addDispatch(CenterWrapper<?> sender,
         CenterWrapper<?> receiver, ShippingMethodWrapper method)
         throws Exception {
-        DispatchWrapper dispatch = newDispatch(sender, receiver, method);
-        dispatch.persist();
-        return dispatch;
+        return addDispatch(sender, receiver, method, null, null, true);
+    }
+
+    public static void deleteCreatedDispatches() throws Exception {
+        DbHelper.deleteDispatches(createdDispatches);
+        createdDispatches.clear();
     }
 }

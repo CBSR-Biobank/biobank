@@ -620,7 +620,7 @@ public class TestSpecimen extends TestDatabase {
         PatientWrapper patient = PatientHelper.addPatient(name, study);
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        DispatchWrapper d = DispatchHelper.newDispatch(site, destSite, method);
+        DispatchWrapper d = DispatchHelper.addDispatch(site, destSite, method);
 
         spc = SpecimenHelper.newSpecimen(name);
         OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
@@ -651,10 +651,14 @@ public class TestSpecimen extends TestDatabase {
         d.persist();
         Assert.assertTrue(d.isInReceivedState());
 
+        // make sure spc now belongs to destSite
+        destSite.reload();
+        Assert.assertTrue(destSite.getSpecimenCollection(false).contains(spc));
+
         // dispatch specimen to second site
         SiteWrapper destSite2 = SiteHelper.addSite(name + "_2");
 
-        DispatchWrapper d2 = DispatchHelper.newDispatch(destSite, destSite2,
+        DispatchWrapper d2 = DispatchHelper.addDispatch(destSite, destSite2,
             method);
         d2.addSpecimens(Arrays.asList(spc), DispatchSpecimenState.NONE);
 
@@ -677,9 +681,13 @@ public class TestSpecimen extends TestDatabase {
         cont.addSpecimen(2, 3, spc);
         spc.persist();
 
-        // add to new shipment
+        // add to new dispatch
         d2.addSpecimens(Arrays.asList(spc), DispatchSpecimenState.NONE);
         d2.persist();
+
+        // make sure spc still belongs to destSite
+        destSite2.reload();
+        Assert.assertTrue(destSite.getSpecimenCollection(false).contains(spc));
 
         spc.reload();
         specimenDispatches = spc.getDispatches();
