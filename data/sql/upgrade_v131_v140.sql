@@ -729,7 +729,14 @@ UPDATE abstract_position ap, container c, container_type ct
  ****************************************************/
 
 alter table log
-      change column SITE CENTER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT '';
+      change column SITE CENTER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN USERNAME VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN ACTION VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN PATIENT_NUMBER VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN INVENTORY_ID VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN LOCATION_LABEL VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN DETAILS TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN TYPE VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
 
 /*****************************************************
  * research groups and sample orders

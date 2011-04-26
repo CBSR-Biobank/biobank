@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -36,7 +35,6 @@ import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
-import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceSpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -91,30 +89,6 @@ public class TestStudy extends TestDatabase {
             SiteWrapper study2 = sitesSorted.get(i + 1);
             Assert.assertTrue(study1.compareTo(study2) <= 0);
         }
-    }
-
-    private static List<ProcessingEventWrapper> studyAddProcessingEvents(
-        StudyWrapper study) throws Exception {
-        String name = study.getName();
-        String randStr = Utils.getRandomString(5, 10);
-        SiteWrapper site = SiteHelper.addSite("SITE_" + randStr);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name + "CLINIC_"
-            + randStr);
-        ContactWrapper contact = ContactHelper.addContact(clinic, name
-            + "CONTACT1");
-        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
-        contacts.add(contact);
-        study.addToContactCollection(contacts);
-        study.persist();
-        study.reload();
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
-        return Arrays.asList(
-            ProcessingEventHelper.addProcessingEvent(site, patient,
-                Utils.getRandomDate()),
-            ProcessingEventHelper.addProcessingEvent(site, patient,
-                Utils.getRandomDate()),
-            ProcessingEventHelper.addProcessingEvent(site, patient,
-                Utils.getRandomDate()));
     }
 
     @Test
@@ -349,7 +323,7 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testGetStudyPvAttrLabels() throws Exception {
+    public void testGetStudyEventAttrLabels() throws Exception {
         String name = "testGetSetStudyPvAttrLabels" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
@@ -365,7 +339,7 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testGetStudyPvAttrType() throws Exception {
+    public void testGetStudyEventAttrType() throws Exception {
         String name = "testGetStudyPvAttrType" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
@@ -389,7 +363,7 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testGetStudyPvAttrPermissible() throws Exception {
+    public void testGetStudyEventAttrPermissible() throws Exception {
         String name = "testGetStudyPvAttrType" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
@@ -439,7 +413,7 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testGetStudyPvAttrClosed() throws Exception {
+    public void testGetStudyEventAttrClosed() throws Exception {
         String name = "testGetStudyPvAttrType" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
@@ -498,7 +472,7 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testRemoveStudyPvAttr() throws Exception {
+    public void testRemoveStudyEventAttr() throws Exception {
         String name = "testRemoveStudyPvAttr" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(name);
@@ -528,28 +502,67 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testGetClinicCollection() throws Exception {
+    public void testClinicCollection() throws Exception {
         String name = "testGetClinicCollection" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(name);
-        int nber = ContactHelper.addContactsToStudy(study, name);
+        List<ClinicWrapper> set1 = ClinicHelper.addClinics(name + "_set1_",
+            r.nextInt(15) + 1, true);
+        for (ClinicWrapper clinic : set1) {
+            study.addToContactCollection(clinic.getContactCollection(false));
+        }
+        study.persist();
+        Assert.assertEquals(set1.size(), study.getClinicCollection().size());
 
-        List<ClinicWrapper> clinics = study.getClinicCollection();
-        int sizeFound = clinics.size();
+        List<ClinicWrapper> set2 = ClinicHelper.addClinics(name + "_set1_",
+            r.nextInt(15) + 1, true);
+        for (ClinicWrapper clinic : set1) {
+            study.addToContactCollection(clinic.getContactCollection(false));
+        }
+        study.persist();
+        Assert.assertEquals(set1.size() + set2.size(), study
+            .getClinicCollection().size());
 
-        Assert.assertEquals(nber, sizeFound);
+        for (ClinicWrapper contact : set1) {
+            contact.delete();
+        }
+        study.reload();
+        Assert.assertEquals(set2.size(), study.getClinicCollection().size());
+
+        for (ClinicWrapper contact : set2) {
+            contact.delete();
+        }
+        study.reload();
+        Assert.assertEquals(0, study.getClinicCollection().size());
     }
 
     @Test
     public void testGetPatientCollection() throws Exception {
         String name = "testGetPatientCollection" + r.nextInt();
-        StudyWrapper study = StudyHelper.addStudy(name);
-        int nber = PatientHelper.addPatients(name, study);
+        StudyWrapper study = StudyHelper.addStudy(name + "_set1");
+        List<PatientWrapper> set1 = PatientHelper.addRandPatients(name, study);
 
-        List<PatientWrapper> patients = study.getPatientCollection(false);
-        int sizeFound = patients.size();
+        study.reload();
+        Assert.assertEquals(set1.size(), study.getPatientCollection(false)
+            .size());
 
-        Assert.assertEquals(nber, sizeFound);
+        List<PatientWrapper> set2 = PatientHelper.addRandPatients(name
+            + "_set2", study);
+        study.reload();
+        Assert.assertEquals(set1.size() + set2.size(), study
+            .getPatientCollection(false).size());
+
+        for (PatientWrapper patient : set1) {
+            patient.delete();
+        }
+        study.reload();
+        Assert.assertEquals(set2.size(), study.getPatientCollection(false)
+            .size());
+
+        for (PatientWrapper patient : set2) {
+            patient.delete();
+        }
+        study.reload();
+        Assert.assertEquals(0, study.getPatientCollection(false).size());
     }
 
     @Test
@@ -642,160 +655,7 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testGetProcessingEventCountForSite() throws Exception {
-        String name = "testGetProcessingEventCountForSite" + r.nextInt();
-        SiteWrapper site1 = SiteHelper.addSite(name + "s1");
-        SiteWrapper site2 = SiteHelper.addSite(name + "s2");
-
-        ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
-        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
-            + "CONTACT1");
-
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "CLINIC2");
-        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
-            + "CONTACT2");
-
-        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
-        contacts.add(contact1);
-        contacts.add(contact2);
-
-        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addToContactCollection(contacts);
-        study1.persist();
-
-        StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
-        study2.addToContactCollection(Arrays.asList(contact2));
-        study2.persist();
-
-        PatientWrapper patient1 = PatientHelper
-            .addPatient(name + "_p1", study1);
-        PatientWrapper patient2 = PatientHelper
-            .addPatient(name + "_p2", study2);
-        PatientWrapper patient3 = PatientHelper
-            .addPatient(name + "_p3", study1);
-
-        // site1 has processing events for patient1 and patient3
-        // FIXME
-        // long nber = ProcessingEventHelper.addProcessingEvents(site1,
-        // patient1,
-        // true).size();
-        // long nber2 = ProcessingEventHelper.addProcessingEvents(site1,
-        // patient3,
-        // true).size();
-        //
-        // // site2 has processing events for patient1 and patient2
-        // long nber3 = ProcessingEventHelper.addProcessingEvents(site2,
-        // patient1,
-        // true).size();
-        // long nber4 = ProcessingEventHelper.addProcessingEvents(site2,
-        // patient2,
-        // true).size();
-        //
-        // site1.reload();
-        // site2.reload();
-        // study1.reload();
-        // study2.reload();
-        //
-        // Assert.assertEquals(nber + nber2,
-        // study1.getProcessingEventCountForCenter(site1));
-        // Assert.assertEquals(0,
-        // study2.getProcessingEventCountForCenter(site1));
-        // Assert.assertEquals(nber3,
-        // study1.getProcessingEventCountForCenter(site2));
-        // Assert.assertEquals(nber4,
-        // study2.getProcessingEventCountForCenter(site2));
-    }
-
-    @Test
-    public void testGetPatientCountForClinic() throws Exception {
-        String name = "testGetPatientCountForClinic" + r.nextInt();
-
-        ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
-        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
-            + "CONTACT1");
-
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "CLINIC2");
-        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
-            + "CONTACT2");
-
-        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
-        contacts.add(contact1);
-        contacts.add(contact2);
-
-        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addToContactCollection(contacts);
-        study1.persist();
-        PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
-            study1);
-        PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
-            study1);
-        // clinic 1 = 1 patient for study 1
-        // FIXME
-        // ProcessingEventHelper.addProcessingEvents(clinic1, patient1);
-        // // clinic 2 = 2 patients for study 1
-        // ProcessingEventHelper.addProcessingEvents(clinic2, patient1);
-        // ProcessingEventHelper.addProcessingEvents(clinic2, patient2);
-        // study1.reload();
-        // clinic1.reload();
-        // clinic2.reload();
-        // Assert.assertEquals(1, study1.getPatientCountForCenter(clinic1));
-        // Assert.assertEquals(2, study1.getPatientCountForCenter(clinic2));
-    }
-
-    @Test
-    public void testGetProcessingEventCountForClinic() throws Exception {
-        String name = "testGetProcessingEventCountForClinic" + r.nextInt();
-
-        ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
-        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
-            + "CONTACT1");
-
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "CLINIC2");
-        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
-            + "CONTACT2");
-
-        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addToContactCollection(Arrays.asList(contact1, contact2));
-        study1.persist();
-
-        StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
-        study2.addToContactCollection(Arrays.asList(contact2));
-        study2.persist();
-
-        PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
-        PatientWrapper patient2 = PatientHelper
-            .addPatient(name + "_p2", study2);
-        PatientWrapper patient3 = PatientHelper
-            .addPatient(name + "_p3", study1);
-
-        // shipment1 has patient visits for patient1 and patient3
-        // FIXME
-        // int nber = ProcessingEventHelper.addProcessingEvents(clinic1,
-        // patient1,
-        // true).size();
-        // int nber2 = ProcessingEventHelper.addProcessingEvents(clinic1,
-        // patient3, true).size();
-        //
-        // // shipment 2 has patient visits for patient1 and patient2
-        // int nber3 = ProcessingEventHelper.addProcessingEvents(clinic2,
-        // patient1, true).size();
-        // int nber4 = ProcessingEventHelper.addProcessingEvents(clinic2,
-        // patient2, true).size();
-        //
-        // study1.reload();
-        // clinic1.reload();
-        // clinic2.reload();
-        //
-        // Assert.assertEquals(nber + nber2,
-        // study1.getProcessingEventCountForCenter(clinic1));
-        // Assert.assertEquals(nber3,
-        // study1.getProcessingEventCountForCenter(clinic2));
-        // Assert.assertEquals(nber4,
-        // study2.getProcessingEventCountForCenter(clinic2));
-    }
-
-    @Test
-    public void testGetProcessingEventCount() throws Exception {
+    public void testGetCollectionEventCount() throws Exception {
         String name = "testGetProcessingEventCount" + r.nextInt();
 
         ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
@@ -813,24 +673,48 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
         study1.addToContactCollection(contacts);
         study1.persist();
-        PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
 
         StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
         study2.addToContactCollection(contacts);
         study2.persist();
-        // FIXME
-        // PatientWrapper patient2 = PatientHelper.addPatient(name + "2",
-        // study2);
-        // int nber = ProcessingEventHelper.addProcessingEvents(clinic1,
-        // patient1,
-        // true).size();
-        // int nber2 = ProcessingEventHelper.addProcessingEvents(clinic1,
-        // patient1, true).size();
-        // ProcessingEventHelper.addProcessingEvents(clinic1, patient2, true);
-        // ProcessingEventHelper.addProcessingEvents(clinic2, patient2, true);
-        //
-        // study1.reload();
-        // Assert.assertEquals(nber + nber2, study1.getProcessingEventCount());
+
+        List<CollectionEventWrapper> set1_1 = CollectionEventHelper
+            .addCollectionEvents(clinic1, study1, study1.getName() + "_set1");
+        study1.reload();
+        Assert
+            .assertEquals(set1_1.size(), study1.getCollectionEventCount(true));
+
+        List<CollectionEventWrapper> set1_2 = CollectionEventHelper
+            .addCollectionEvents(clinic1, study1, study1.getName() + "_set2");
+        study1.reload();
+        Assert.assertEquals(set1_1.size() + set1_2.size(),
+            study1.getCollectionEventCount(true));
+
+        List<CollectionEventWrapper> set2_1 = CollectionEventHelper
+            .addCollectionEvents(clinic2, study2, study2.getName() + "_set1");
+        study2.reload();
+        Assert
+            .assertEquals(set2_1.size(), study2.getCollectionEventCount(true));
+        // ensure count for study1 does not change
+        Assert.assertEquals(set1_1.size() + set1_2.size(),
+            study1.getCollectionEventCount(true));
+
+        DbHelper.deleteCollectionEvents(set1_1);
+        study1.reload();
+        Assert
+            .assertEquals(set1_2.size(), study1.getCollectionEventCount(true));
+
+        // ensure count does not change for study2
+        Assert
+            .assertEquals(set2_1.size(), study2.getCollectionEventCount(true));
+
+        DbHelper.deleteCollectionEvents(set1_2);
+        study1.reload();
+        Assert.assertEquals(0, study1.getCollectionEventCount(true));
+
+        // ensure count does not change for study2
+        Assert
+            .assertEquals(set2_1.size(), study2.getCollectionEventCount(true));
     }
 
     @Test

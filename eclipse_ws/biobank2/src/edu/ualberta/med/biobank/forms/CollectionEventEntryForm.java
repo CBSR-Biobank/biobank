@@ -104,6 +104,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             tabName = Messages.getString("CollectionEventEntryForm.title.new");
             cevent.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
+			cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
+                appService, cevent));
         } else {
             tabName = Messages.getString("CollectionEventEntryForm.title.edit",
                 cevent.getVisitNumber());
@@ -362,6 +364,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         if (cevent.isNew()) {
             cevent.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
+			cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
+                appService, cevent));
         }
 
         patient.reset();

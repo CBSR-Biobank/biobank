@@ -1838,7 +1838,7 @@
             name="Specimen List">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.CeListViewForm"
+            class="edu.ualberta.med.biobank.forms.PeListViewForm"
             default="false"
             icon="icons/collectionEvent.png"
             id="edu.ualberta.med.biobank.forms.PvListViewForm"

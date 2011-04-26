@@ -246,14 +246,11 @@ public class WidgetCreator {
             }
         });
         combo.addListener(SWT.MouseWheel, new Listener() {
-
             @Override
             public void handleEvent(Event event) {
                 event.doit = false;
             }
-
         });
-
         return combo;
     }
 
@@ -466,14 +463,11 @@ public class WidgetCreator {
             combo.addModifyListener(modifyListener);
         }
         combo.addListener(SWT.MouseWheel, new Listener() {
-
             @Override
             public void handleEvent(Event event) {
                 event.doit = false;
             }
-
         });
-
         return comboViewer;
     }
 

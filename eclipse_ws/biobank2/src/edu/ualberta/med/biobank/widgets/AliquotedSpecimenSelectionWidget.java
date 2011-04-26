@@ -24,6 +24,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -96,11 +97,6 @@ public class AliquotedSpecimenSelectionWidget {
                     + spc.getInventoryId() + ")";
             }
         });
-        if (oneRow) {
-            GridData gd = new GridData();
-            gd.widthHint = 300;
-            cvSource.getControl().setLayoutData(gd);
-        }
 
         if (!oneRow) {
             resultLabel = widgetCreator.createLabel(parent,
@@ -120,17 +116,14 @@ public class AliquotedSpecimenSelectionWidget {
                 return ((SpecimenTypeWrapper) element).getName();
             }
         });
-
         if (oneRow) {
             textNumber = widgetCreator.getToolkit().createLabel(parent, "",
                 SWT.BORDER);
-            GridData data = new GridData();
-            data.widthHint = 20;
-            data.horizontalAlignment = SWT.LEFT;
-            textNumber.setLayoutData(data);
-
+            GridData gd = new GridData();
+            gd.widthHint = 20;
+            gd.horizontalAlignment = SWT.LEFT;
+            textNumber.setLayoutData(gd);
             setNumber(null);
-
             rowControlDecoration = BiobankWidget
                 .createDecorator(
                     textNumber,
@@ -141,8 +134,15 @@ public class AliquotedSpecimenSelectionWidget {
 
     private void setComboProperties(ComboViewer cv, FormToolkit toolkit,
         final int selectionPosition) {
-        cv.getControl().setLayoutData(
-            new GridData(SWT.FILL, SWT.TOP, true, false));
+        GridData gd = new GridData(SWT.FILL, SWT.TOP, true, false);
+        int parentColumns = ((GridLayout) cv.getControl().getParent()
+            .getLayout()).numColumns;
+        if (oneRow) {
+            if (selectionPosition == 0)
+                gd.widthHint = 300;
+        } else if (parentColumns > 2)
+            gd.horizontalSpan = parentColumns - 1;
+        cv.getControl().setLayoutData(gd);
         toolkit.adapt(cv.getControl(), true, true);
         cv.setContentProvider(new ArrayContentProvider());
         cv.addSelectionChangedListener(new ISelectionChangedListener() {

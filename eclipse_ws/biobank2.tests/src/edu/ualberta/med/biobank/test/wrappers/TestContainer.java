@@ -1769,7 +1769,7 @@ public class TestContainer extends TestDatabase {
     }
 
     @Test
-    public void testMoveAliquots() throws Exception {
+    public void testMoveSpecimens() throws Exception {
         ContainerWrapper top = containerMap.get("Top");
 
         ContainerTypeWrapper childType = ContainerTypeHelper.addContainerType(

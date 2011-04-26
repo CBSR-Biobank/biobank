@@ -109,10 +109,9 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
                         "A waybill should be set on this shipment");
                 }
                 if (!checkWaybillUniqueForClinic(clinic)) {
-                    throw new BiobankCheckException(
-                        "A collection event with waybill " + waybill
-                            + " already exist in clinic "
-                            + clinic.getNameShort());
+                    throw new BiobankCheckException("A shipment with waybill "
+                        + waybill + " already exist in clinic "
+                        + clinic.getNameShort());
                 }
             } else {
                 if (waybill != null) {

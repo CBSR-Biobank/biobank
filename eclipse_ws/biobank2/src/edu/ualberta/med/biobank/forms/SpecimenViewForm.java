@@ -42,8 +42,6 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private BiobankText patientLabel;
 
-    private BiobankText dateProcessedLabel;
-
     private BiobankText activityStatusLabel;
 
     private BiobankText commentLabel;
@@ -111,14 +109,13 @@ public class SpecimenViewForm extends BiobankViewForm {
             "Volume (ml)");
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
-        dateProcessedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Date Processed");
+        positionLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Position");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
         commentLabel = createReadOnlyLabelledField(client,
             SWT.WRAP | SWT.MULTI, "Comment");
-        positionLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Position");
+
     }
 
     private void createContainersSection() {
@@ -174,12 +171,10 @@ public class SpecimenViewForm extends BiobankViewForm {
             .getStudy().getNameShort());
         setTextValue(patientLabel, specimen.getCollectionEvent().getPatient()
             .getPnumber());
-        if (specimen.getParentSpecimen() != null)
-            setTextValue(dateProcessedLabel, specimen.getParentSpecimen()
-                .getProcessingEvent().getFormattedCreatedAt());
+        setTextValue(positionLabel, specimen.getPositionString(true, false));
         setTextValue(activityStatusLabel, specimen.getActivityStatus());
         setTextValue(commentLabel, specimen.getComment());
-        setTextValue(positionLabel, specimen.getPositionString(true, false));
+
     }
 
     @Override
