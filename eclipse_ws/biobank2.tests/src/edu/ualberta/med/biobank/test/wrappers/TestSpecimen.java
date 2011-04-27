@@ -39,7 +39,6 @@ import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
-import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -107,9 +106,8 @@ public class TestSpecimen extends TestDatabase {
     public void testCheckInventoryIdUnique() throws BiobankCheckException,
         Exception {
         SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(
-            spc.getSpecimenType(), spc.getParentContainer(),
-            spc.getCollectionEvent(), 2, 2,
-            OriginInfoHelper.addOriginInfo(site));
+            spc.getSpecimenType(), ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            spc.getParentContainer(), spc.getCollectionEvent(), 2, 2, site);
 
         duplicate.setInventoryId(spc.getInventoryId());
         try {
@@ -127,9 +125,8 @@ public class TestSpecimen extends TestDatabase {
         spc.setInventoryId("toto" + i);
         spc.persist();
         SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(
-            spc.getSpecimenType(), spc.getParentContainer(),
-            spc.getCollectionEvent(), 2, 2,
-            OriginInfoHelper.addOriginInfo(site));
+            spc.getSpecimenType(), ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            spc.getParentContainer(), spc.getCollectionEvent(), 2, 2, site);
 
         duplicate.setInventoryId("TOTO" + i);
         try {
@@ -145,9 +142,9 @@ public class TestSpecimen extends TestDatabase {
         throws BiobankCheckException, Exception {
 
         SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(
-            spc.getSpecimenType(), spc.getParentContainer(),
-            spc.getCollectionEvent(), 2, 2,
-            OriginInfoHelper.addOriginInfo(spc.getCurrentCenter()));
+            spc.getSpecimenType(), ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            spc.getParentContainer(), spc.getCollectionEvent(), 2, 2,
+            spc.getCurrentCenter());
         duplicate.setInventoryId(spc.getInventoryId());
 
         try {
@@ -177,8 +174,8 @@ public class TestSpecimen extends TestDatabase {
         spc.persist();
 
         SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(
-            spc.getSpecimenType(), spc.getParentContainer(),
-            spc.getCollectionEvent(), 2, 2, spc.getOriginInfo());
+            spc.getSpecimenType(), ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            spc.getParentContainer(), spc.getCollectionEvent(), 2, 2, site);
         duplicate.setInventoryId("toto" + i);
 
         try {
@@ -199,8 +196,9 @@ public class TestSpecimen extends TestDatabase {
         RowColPos pos = spc.getPosition();
 
         SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(
-            spc.getSpecimenType(), spc.getParentContainer(),
-            spc.getCollectionEvent(), pos.row, pos.col, spc.getOriginInfo());
+            spc.getSpecimenType(), ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            spc.getParentContainer(), spc.getCollectionEvent(), pos.row,
+            pos.col, site);
 
         try {
             duplicate.persist();
@@ -450,8 +448,8 @@ public class TestSpecimen extends TestDatabase {
         spc.setInventoryId("defgh");
         spc.persist();
         SpecimenWrapper sample2 = SpecimenHelper.newSpecimen(
-            spc.getSpecimenType(), spc.getParentContainer(),
-            spc.getCollectionEvent(), 2, 3, spc.getOriginInfo());
+            spc.getSpecimenType(), ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            spc.getParentContainer(), spc.getCollectionEvent(), 2, 3, site);
         sample2.setInventoryId("awert");
         sample2.persist();
         Assert.assertTrue(spc.compareTo(sample2) > 0);
@@ -507,10 +505,11 @@ public class TestSpecimen extends TestDatabase {
         activeSpecimens.add(spc);
         for (int i = 1, n = container.getColCapacity(); i < n; ++i) {
             activeSpecimens.add(SpecimenHelper.addSpecimen(sampleType,
-                container, pv, 0, i, spc.getOriginInfo()));
+                container, pv, 0, i, site));
 
             SpecimenWrapper a = SpecimenHelper.newSpecimen(sampleType,
-                container, pv, 1, i, spc.getOriginInfo());
+                ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, pv, 1,
+                i, site);
             a.setActivityStatus(activityStatusNonActive);
             a.persist();
             nonActiveSpecimens.add(a);
@@ -537,9 +536,11 @@ public class TestSpecimen extends TestDatabase {
         OriginInfoWrapper oi = new OriginInfoWrapper(appService);
         oi.setCenter(container.getSite());
         oi.persist();
-        SpecimenHelper.addSpecimen(sampleType, container, pv, 0, 1, oi);
-        SpecimenHelper.addSpecimen(sampleType, container, pv, 1, 0, oi);
-        spc = SpecimenHelper.newSpecimen(sampleType, container, pv, 0, 2, oi);
+        SpecimenHelper.addSpecimen(sampleType, container, pv, 0, 1, site);
+        SpecimenHelper.addSpecimen(sampleType, container, pv, 1, 0, site);
+        spc = SpecimenHelper.newSpecimen(sampleType,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, pv, 0, 2,
+            site);
         spc.setInventoryId(Utils.getRandomString(5));
         spc.persist();
 
@@ -597,15 +598,15 @@ public class TestSpecimen extends TestDatabase {
 
         // add aliquoted specimen
         SpecimenWrapper specimen = SpecimenHelper.newSpecimen(spcType,
-            container, cevent, 2, 3, spc.getOriginInfo());
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, cevent, 2,
+            3, site);
         specimen.setInventoryId(Utils.getRandomString(5));
         specimen.persist();
 
         pevent.addToSpecimenCollection(Arrays.asList(specimen));
         pevent.persist();
 
-        SpecimenHelper.addSpecimen(spcType, null, cevent, null, null,
-            spc.getOriginInfo());
+        SpecimenHelper.addSpecimen(spcType, null, cevent, null, null, site);
 
         try {
             Assert.assertTrue(DebugUtil.getRandomLinkedAliquotedSpecimens(
