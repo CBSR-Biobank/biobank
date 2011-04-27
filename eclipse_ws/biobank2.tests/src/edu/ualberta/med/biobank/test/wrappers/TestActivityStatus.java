@@ -99,20 +99,16 @@ public class TestActivityStatus extends TestDatabase {
 
         // should not be allowed to remove an activity status that is used
 
-        // Center
-        SiteWrapper site = SiteHelper.newSite("center" + name);
-        site.persist();
-        // Container
+        SiteWrapper site = SiteHelper.addSite("center" + name, false);
         ContainerWrapper topContainer = ContainerHelper.addTopContainerRandom(
             site, name, 2, 2);
-        // ContainerType
         ContainerTypeWrapper topContainerType = topContainer.getContainerType();
         topContainerType.addToSpecimenTypeCollection(SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, false));
         topContainerType.persist();
 
         ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name, false,
-            false);
+            true);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         // Study
@@ -180,8 +176,9 @@ public class TestActivityStatus extends TestDatabase {
             StudyHelper.deleteStudyAndDependencies((StudyWrapper) wrapper);
         else if (wrapper instanceof SiteWrapper) {
             SiteHelper.deleteSiteAndDependencies(((SiteWrapper) wrapper));
-        } else
+        } else {
             wrapper.delete();
+        }
 
         try {
             as.delete();
