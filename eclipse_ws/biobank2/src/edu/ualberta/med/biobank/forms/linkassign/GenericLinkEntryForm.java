@@ -12,16 +12,10 @@ import java.util.Set;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
@@ -40,7 +34,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.forms.AbstractPalletSpecimenAdminForm;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.CEventComboCallback;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.PatientTextCallback;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -55,7 +48,7 @@ import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 // FIXME the custom selection is not done in this version. 
-public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
+public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.GenericLinkEntryForm"; //$NON-NLS-1$
 
@@ -69,29 +62,15 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     // TODO do not need a composite class anymore if only one link form is left
     private LinkFormPatientManagement linkFormPatientManagement;
 
-    // composite containing common fields to single and multiple
-    private Composite commonFieldsComposite;
-
-    private Button radioSingle;
-    private Button radioMultiple;
-    private StackLayout stackLayout;
-
     // single linking
-    private Composite singleLinkComposite;
-    // when link only one specimen
-    private SpecimenWrapper singleSpecimen;
     // source specimen / type relation when only one specimen
     private AliquotedSpecimenSelectionWidget singleTypesWidget;
 
     // Multiple linking
-    private Composite multipleLinkComposite;
+    private ScanPalletWidget palletWidget;
     // list of source specimen / type widget for multiple linking
     private List<AliquotedSpecimenSelectionWidget> specimenTypesWidgets;
-    private ScanPalletWidget palletWidget;
-    private ScrolledComposite multipleContainerDrawingScroll;
     private Composite multipleOptionsFields;
-    private Button fakeScanRandom;
-    private boolean isFakeScanRandom;
     // contains widgets to select type row by row
     private Composite typesSelectionPerRowComposite;
     // row:total (for one row number, associate the number of specimen found on
@@ -108,7 +87,6 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         setPartName(Messages.getString("GenericLinkEntryForm.tab.title")); //$NON-NLS-1$
         linkFormPatientManagement = new LinkFormPatientManagement(
             widgetCreator, this);
-        singleSpecimen = new SpecimenWrapper(appService);
         setCanLaunchScan(true);
 
         // If the current center is a site, and if this site defines containers
@@ -121,6 +99,21 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             if (res.size() != 0)
                 palletSpecimenTypes = res;
         }
+    }
+
+    @Override
+    protected String getFormTitle() {
+        return Messages.getString("GenericLinkEntryForm.form.title");
+    }
+
+    @Override
+    protected boolean isSingleMode() {
+        return singleMode;
+    }
+
+    @Override
+    protected void setSingleMode(boolean single) {
+        singleMode = single;
     }
 
     @Override
@@ -145,63 +138,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     @Override
-    protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("GenericLinkEntryForm.form.title")); //$NON-NLS-1$
-        GridLayout gl = new GridLayout(1, false);
-        gl.marginWidth = 0;
-        gl.horizontalSpacing = 0;
-        gl.verticalSpacing = 0;
-        page.setLayout(gl);
-
-        Composite mainComposite = new Composite(page, SWT.NONE);
-        gl = new GridLayout(2, false);
-        gl.marginWidth = 0;
-        gl.horizontalSpacing = 0;
-        gl.verticalSpacing = 0;
-        mainComposite.setLayout(gl);
-        GridData gd = new GridData();
-        gd.grabExcessHorizontalSpace = true;
-        gd.grabExcessVerticalSpace = true;
-        gd.horizontalAlignment = SWT.FILL;
-        gd.verticalAlignment = SWT.TOP;
-        mainComposite.setLayoutData(gd);
-
-        createLeftSection(mainComposite);
-
-        createPalletSection(mainComposite);
-
-        createCancelConfirmWidget();
-
-        radioSingle.setSelection(singleMode);
-        radioMultiple.setSelection(!singleMode);
-        setStackTopComposite(singleMode);
-
-        toolkit.adapt(mainComposite);
-    }
-
-    private void createLeftSection(Composite parent) {
-        Composite leftComposite = toolkit.createComposite(parent);
-        GridLayout gl = new GridLayout(1, false);
-        gl.marginWidth = 0;
-        gl.horizontalSpacing = 0;
-        gl.verticalSpacing = 0;
-        leftComposite.setLayout(gl);
-        toolkit.paintBordersFor(leftComposite);
-        GridData gd = new GridData();
-        gd.widthHint = 600;
-        gd.verticalAlignment = SWT.TOP;
-        leftComposite.setLayoutData(gd);
-
-        commonFieldsComposite = toolkit.createComposite(leftComposite);
-        gl = new GridLayout(3, false);
-        gl.horizontalSpacing = 10;
-        commonFieldsComposite.setLayout(gl);
-        gd = new GridData();
-        gd.grabExcessHorizontalSpace = true;
-        gd.horizontalAlignment = SWT.FILL;
-        commonFieldsComposite.setLayoutData(gd);
-        toolkit.paintBordersFor(commonFieldsComposite);
-
+    protected void createCommonFields(Composite commonFieldsComposite) {
         // Patient number
         linkFormPatientManagement
             .createPatientNumberText(commonFieldsComposite);
@@ -225,109 +162,26 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                     setTypeCombos();
                 }
             });
-
-        createLinkingSection(leftComposite);
     }
 
-    private void createLinkingSection(Composite leftComposite) {
-        Composite linkComposite = toolkit.createComposite(leftComposite);
-        GridLayout layout = new GridLayout(2, false);
-        layout.horizontalSpacing = 10;
-        linkComposite.setLayout(layout);
-        GridData gd = new GridData();
-        gd.grabExcessHorizontalSpace = true;
-        gd.horizontalAlignment = SWT.FILL;
-        linkComposite.setLayoutData(gd);
-        toolkit.paintBordersFor(linkComposite);
-
-        // radio button to choose single or multiple
-        radioSingle = toolkit.createButton(linkComposite,
-            Messages.getString("GenericLinkEntryForm.choice.radio.single"), //$NON-NLS-1$
-            SWT.RADIO);
-        radioMultiple = toolkit.createButton(linkComposite,
-            Messages.getString("GenericLinkEntryForm.choice.radio.multiple"), //$NON-NLS-1$
-            SWT.RADIO);
-
-        // stack for single or multiple
-        final Composite stackComposite = toolkit.createComposite(linkComposite);
-        stackLayout = new StackLayout();
-        gd = new GridData();
-        gd.horizontalSpan = 2;
-        gd.grabExcessHorizontalSpace = true;
-        gd.horizontalAlignment = SWT.FILL;
-        stackComposite.setLayoutData(gd);
-        stackComposite.setLayout(stackLayout);
-
-        createSingleLinkComposite(stackComposite);
-        createMultipleLink(stackComposite);
-
-        radioSingle.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (radioSingle.getSelection()) {
-                    setStackTopComposite(true);
-                }
-            }
-
-        });
-        radioMultiple.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (radioMultiple.getSelection()) {
-                    setStackTopComposite(false);
-                }
-            }
-        });
-    }
-
-    /**
-     * Show either single or multiple selection for linking
-     */
-    private void setStackTopComposite(boolean single) {
-        singleMode = single;
-        if (single) {
-            stackLayout.topControl = singleLinkComposite;
-        } else {
-            stackLayout.topControl = multipleLinkComposite;
-        }
-        setBindings(single);
-        if (multipleContainerDrawingScroll != null)
-            widgetCreator.showWidget(multipleContainerDrawingScroll, !single);
-        page.layout(true, true);
-    }
-
-    /**
-     * Widgets to link a pallet of specimens
-     */
-    private void createMultipleLink(Composite parent) {
-        multipleLinkComposite = toolkit.createComposite(parent);
-        GridLayout layout = new GridLayout(1, false);
-        layout.horizontalSpacing = 10;
-        layout.marginWidth = 0;
-        multipleLinkComposite.setLayout(layout);
-        toolkit.paintBordersFor(multipleLinkComposite);
-        GridData gd = new GridData();
-        gd.horizontalSpan = 2;
-        gd.grabExcessHorizontalSpace = true;
-        gd.horizontalAlignment = SWT.FILL;
-        multipleLinkComposite.setLayoutData(gd);
-
-        multipleOptionsFields = toolkit.createComposite(multipleLinkComposite);
-        layout = new GridLayout(3, false);
+    @Override
+    protected void createMultipleFields(Composite parent) {
+        multipleOptionsFields = toolkit.createComposite(parent);
+        GridLayout layout = new GridLayout(3, false);
         layout.horizontalSpacing = 10;
         layout.marginWidth = 0;
         multipleOptionsFields.setLayout(layout);
         toolkit.paintBordersFor(multipleOptionsFields);
-        gd = new GridData();
+        GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         multipleOptionsFields.setLayoutData(gd);
         // plate selection
         createPlateToScanField(multipleOptionsFields);
+        createScanButton(parent);
 
         // source/type hierarchy widgets
-        typesSelectionPerRowComposite = toolkit
-            .createComposite(multipleLinkComposite);
+        typesSelectionPerRowComposite = toolkit.createComposite(parent);
         layout = new GridLayout(4, false);
         layout.horizontalSpacing = 10;
         typesSelectionPerRowComposite.setLayout(layout);
@@ -394,48 +248,16 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     @Override
-    /**
-     * when creating the scan button in debug mode, add options to create random values 
-     */
-    protected void createFakeOptions(Composite fieldsComposite) {
-        GridData gd;
-        Composite comp = toolkit.createComposite(fieldsComposite);
-        comp.setLayout(new GridLayout());
-        gd = new GridData();
-        gd.horizontalSpan = 3;
-        gd.widthHint = 400;
-        comp.setLayoutData(gd);
-        fakeScanRandom = toolkit.createButton(comp, "Get random scan values", //$NON-NLS-1$
-            SWT.RADIO);
-        fakeScanRandom.setSelection(true);
-        toolkit.createButton(comp,
-            "Get random and already linked specimens", SWT.RADIO); //$NON-NLS-1$
-    }
-
-    /**
-     * Pallet visualisation
-     */
-    private void createPalletSection(Composite parent) {
-        multipleContainerDrawingScroll = new ScrolledComposite(parent,
-            SWT.H_SCROLL);
-        multipleContainerDrawingScroll.setExpandHorizontal(true);
-        multipleContainerDrawingScroll.setExpandVertical(true);
-        multipleContainerDrawingScroll.setLayout(new FillLayout());
-        GridData scrollData = new GridData();
-        scrollData.horizontalAlignment = SWT.FILL;
-        scrollData.grabExcessHorizontalSpace = true;
-        multipleContainerDrawingScroll.setLayoutData(scrollData);
-        Composite client = toolkit
-            .createComposite(multipleContainerDrawingScroll);
+    protected void createContainersVisualisation(Composite parent) {
+        Composite comp = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(2, false);
-        client.setLayout(layout);
+        comp.setLayout(layout);
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.CENTER;
         gd.grabExcessHorizontalSpace = true;
-        client.setLayoutData(gd);
-        multipleContainerDrawingScroll.setContent(client);
+        comp.setLayoutData(gd);
 
-        palletWidget = new ScanPalletWidget(client,
+        palletWidget = new ScanPalletWidget(comp,
             UICellStatus.DEFAULT_PALLET_SCAN_LINK_STATUS_LIST);
         toolkit.adapt(palletWidget);
         palletWidget.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true,
@@ -456,27 +278,25 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         });
         // palletWidget.loadProfile(profilesCombo.getCombo().getText());
 
-        createScanTubeAloneButton(client);
-
-        multipleContainerDrawingScroll.setMinSize(client.computeSize(
-            SWT.DEFAULT, SWT.DEFAULT));
+        createScanTubeAloneButton(comp);
     }
 
-    private void createSingleLinkComposite(Composite parent) {
-        singleLinkComposite = toolkit.createComposite(parent);
+    @Override
+    protected void createSingleFields(Composite parent) {
+        Composite fieldsComposite = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
-        singleLinkComposite.setLayout(layout);
-        toolkit.paintBordersFor(singleLinkComposite);
+        fieldsComposite.setLayout(layout);
+        toolkit.paintBordersFor(fieldsComposite);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
-        singleLinkComposite.setLayoutData(gd);
+        fieldsComposite.setLayoutData(gd);
 
         // inventoryID
         BiobankText inventoryIdText = (BiobankText) createBoundWidgetWithLabel(
-            singleLinkComposite,
+            fieldsComposite,
             BiobankText.class,
             SWT.NONE,
             Messages.getString("GenericLinkEntryForm.inventoryId.label"), //$NON-NLS-1$
@@ -490,12 +310,12 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
         // widget to select the source and the type
         singleTypesWidget = new AliquotedSpecimenSelectionWidget(
-            singleLinkComposite, null, widgetCreator, false);
+            fieldsComposite, null, widgetCreator, false);
         singleTypesWidget.addBindings();
 
-        widgetCreator.createLabel(singleLinkComposite,
+        widgetCreator.createLabel(fieldsComposite,
             Messages.getString("GenericLinkEntryForm.checkbox.assign")); //$NON-NLS-1$
-        toolkit.createButton(singleLinkComposite, "", SWT.CHECK); //$NON-NLS-1$
+        toolkit.createButton(fieldsComposite, "", SWT.CHECK); //$NON-NLS-1$
     }
 
     @Override
@@ -533,18 +353,6 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     @Override
-    protected void disableFields() {
-        enableFields(false);
-    }
-
-    private void enableFields(boolean enable) {
-        commonFieldsComposite.setEnabled(enable);
-        multipleOptionsFields.setEnabled(enable);
-        radioSingle.setEnabled(enable);
-        radioMultiple.setEnabled(enable);
-    }
-
-    @Override
     protected boolean fieldsValid() {
         return (singleMode ? true : isPlateValid())
             && linkFormPatientManagement.fieldsValid();
@@ -574,6 +382,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             saveSingleSpecimen(originInfo);
         else
             saveMultipleSpecimens(originInfo);
+        setFinished(false);
     }
 
     private void saveMultipleSpecimens(OriginInfoWrapper originInfo)
@@ -628,8 +437,6 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         appendLog(Messages.getString("ScanLink.activitylog.save.summary", nber, //$NON-NLS-1$
             linkFormPatientManagement.getCurrentPatient().getPnumber(),
             currentSelectedCenter.getNameShort()));
-        setFinished(false);
-
     }
 
     private void saveSingleSpecimen(OriginInfoWrapper originInfo)
@@ -658,34 +465,25 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             linkFormPatientManagement.getCurrentPatient().getPnumber(),
             singleSpecimen.getCollectionEvent().getVisitNumber(),
             singleSpecimen.getCurrentCenter().getNameShort()));
-        setFinished(false);
     }
 
     @Override
     public void reset() throws Exception {
         super.reset();
-        enableFields(true);
-        singleSpecimen.reset(); // reset internal values
         linkFormPatientManagement.reset(true);
         singleTypesWidget.deselectAll();
-        setDirty(false);
-        setFocus();
-        reset(true);
     }
 
+    @Override
     public void reset(boolean resetAll) {
         linkFormPatientManagement.reset(resetAll);
-        cancelConfirmWidget.reset();
-        removeRescanMode();
-        setScanHasBeenLauched(false);
         if (resetAll) {
-            resetPlateToScan();
             palletWidget.setCells(null);
             for (AliquotedSpecimenSelectionWidget stw : specimenTypesWidgets) {
                 stw.resetValues(true, true);
             }
         }
-        setFocus();
+        super.reset(resetAll);
     }
 
     @Override
@@ -699,6 +497,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
      * Multiple linking: do this before multiple scan is made
      */
     protected void beforeScanThreadStart() {
+        super.beforeScanThreadStart();
         beforeScans(true);
     }
 
@@ -707,6 +506,7 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
      * Multiple linking: do this before scan of one tube is really made
      */
     protected void beforeScanTubeAlone() {
+        super.beforeScanTubeAlone();
         beforeScans(false);
     }
 
@@ -714,8 +514,6 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
      * Multiple linking: do this before any scan is really launched
      */
     private void beforeScans(boolean resetTypeRows) {
-        isFakeScanRandom = fakeScanRandom != null
-            && fakeScanRandom.getSelection();
         preSelections = new ArrayList<SpecimenHierarchy>();
         for (AliquotedSpecimenSelectionWidget stw : specimenTypesWidgets) {
             preSelections.add(stw.getSelection());

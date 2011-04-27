@@ -152,12 +152,14 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             @Override
             protected void postprocessScanTubeAlone(PalletCell cell)
                 throws Exception {
-                postprocessScanTubeAlone(cell);
+                AbstractPalletSpecimenAdminForm.this
+                    .postprocessScanTubeAlone(cell);
             }
 
             @Override
             protected boolean canScanTubeAlone(PalletCell cell) {
-                return canScanTubeAlone(cell);
+                return AbstractPalletSpecimenAdminForm.this
+                    .canScanTubeAlone(cell);
             }
         };
     }
@@ -325,8 +327,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         GridData gd = (GridData) plateToScanText.getLayoutData();
         gd.horizontalAlignment = SWT.FILL;
         plateToScanText.setLayoutData(gd);
-
-        createScanButton(fieldsComposite);
     }
 
     protected void createFakeOptions(
@@ -334,8 +334,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     }
 
-    protected void createCancelConfirmWidget() {
-        cancelConfirmWidget = new CancelConfirmWidget(page, this, true);
+    protected void createCancelConfirmWidget(Composite parent) {
+        cancelConfirmWidget = new CancelConfirmWidget(parent, this, true);
     }
 
     @SuppressWarnings("unused")
@@ -415,10 +415,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected void setBindings(boolean isSingleMode) {
         setScanHasBeenLauched(isSingleMode);
-        if (isSingleMode)
-            widgetCreator.removeBinding(PLATE_VALIDATOR);
-        else
-            widgetCreator.addBinding(PLATE_VALIDATOR);
+        widgetCreator.setBinding(PLATE_VALIDATOR, !isSingleMode);
     }
 
     protected void setCanLaunchScan(boolean canLauch) {

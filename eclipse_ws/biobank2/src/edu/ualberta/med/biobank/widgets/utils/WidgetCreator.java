@@ -665,6 +665,13 @@ public class WidgetCreator {
         }
     }
 
+    public void setBinding(String bindingKey, boolean set) {
+        if (set)
+            addBinding(bindingKey);
+        else
+            removeBinding(bindingKey);
+    }
+
     public void createWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
         Composite parent) {
         for (Entry<String, FieldInfo> entry : fieldsMap.entrySet()) {

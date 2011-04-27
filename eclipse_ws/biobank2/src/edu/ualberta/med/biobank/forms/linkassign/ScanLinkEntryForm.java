@@ -129,7 +129,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
         createPalletSection();
 
-        createCancelConfirmWidget();
+        createCancelConfirmWidget(page);
 
         AliquotedSpecimenSelectionWidget lastWidget = specimenTypesWidgets
             .get(specimenTypesWidgets.size() - 1);
@@ -398,6 +398,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         profilesCombo.getCombo().notifyListeners(666, new Event());
 
         createPlateToScanField(fieldsComposite);
+
+        createScanButton(leftSideComposite);
 
         createTypesSelectionSection(leftSideComposite);
 

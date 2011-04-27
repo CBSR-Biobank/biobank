@@ -146,7 +146,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
 
         createContainersVisualisationSection();
 
-        createCancelConfirmWidget();
+        createCancelConfirmWidget(page);
     }
 
     private void createFieldsSection() throws Exception {
@@ -247,6 +247,8 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         createPalletTypesViewer(fieldsComposite);
 
         createPlateToScanField(fieldsComposite);
+
+        createScanButton(leftSideComposite);
     }
 
     protected void validateValues() {
