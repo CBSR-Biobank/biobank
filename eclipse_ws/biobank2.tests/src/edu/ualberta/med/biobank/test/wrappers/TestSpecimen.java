@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -48,7 +49,9 @@ import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestSpecimen extends TestDatabase {
 
-    private SpecimenWrapper spc;
+    private SpecimenWrapper parentSpc;
+
+    private SpecimenWrapper childSpc;
 
     private SiteWrapper site;
 
@@ -59,11 +62,11 @@ public class TestSpecimen extends TestDatabase {
     public void setUp() throws Exception {
         super.setUp();
 
-        spc = SpecimenHelper.addParentSpecimen();
-        site = (SiteWrapper) spc.getCurrentCenter();
+        parentSpc = SpecimenHelper.addParentSpecimen();
+        site = (SiteWrapper) parentSpc.getOriginInfo().getCenter();
         ContainerTypeWrapper typeChild = ContainerTypeHelper.addContainerType(
             site, "ctTypeChild" + r.nextInt(), "ctChild", 1, 4, 5, false);
-        typeChild.addToSpecimenTypeCollection(Arrays.asList(spc
+        typeChild.addToSpecimenTypeCollection(Arrays.asList(parentSpc
             .getSpecimenType()));
         typeChild.persist();
 
@@ -77,39 +80,42 @@ public class TestSpecimen extends TestDatabase {
 
         ContainerWrapper container = ContainerHelper.addContainer(null, "2nd",
             topContainer, site, typeChild, 3, 3);
-        container.addSpecimen(0, 0, spc);
-        container.persist();
-        spc.setParent(container);
-        spc.persist();
+
+        childSpc = SpecimenHelper.addSpecimens(
+            parentSpc.getCollectionEvent().getPatient(),
+            (ClinicWrapper) parentSpc.getOriginInfo().getCenter(), container,
+            0, 0, 1).get(0);
     }
 
     @Test
     public void testGettersAndSetters() throws Exception {
-        testGettersAndSetters(spc);
+        testGettersAndSetters(parentSpc);
     }
 
     @Test
     public void testPersistFailActivityStatusNull() throws Exception {
-        spc.setActivityStatus(null);
+        parentSpc.setActivityStatus(null);
         try {
-            spc.persist();
+            parentSpc.persist();
             Assert.fail("Should not insert the specimen : no activity status");
         } catch (ValueNotSetException vnse) {
             Assert.assertTrue(true);
         }
-        spc.setActivityStatus(ActivityStatusWrapper
+        parentSpc.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
-        spc.persist();
+        parentSpc.persist();
     }
 
     @Test
     public void testCheckInventoryIdUnique() throws BiobankCheckException,
         Exception {
-        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(
-            spc.getSpecimenType(), ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            spc.getParentContainer(), spc.getCollectionEvent(), 2, 2, site);
+        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
+            childSpc.getSpecimenType(),
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
+            childSpc.getParentContainer(), 2, 2);
 
-        duplicate.setInventoryId(spc.getInventoryId());
+        duplicate.setInventoryId(parentSpc.getInventoryId());
         try {
             duplicate.checkInventoryIdUnique();
             Assert.fail("The check should detect that this is the same");
@@ -122,11 +128,13 @@ public class TestSpecimen extends TestDatabase {
     public void testCheckInventoryIdUniqueCaseSensitive()
         throws BiobankCheckException, Exception {
         int i = r.nextInt();
-        spc.setInventoryId("toto" + i);
-        spc.persist();
-        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(
-            spc.getSpecimenType(), ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            spc.getParentContainer(), spc.getCollectionEvent(), 2, 2, site);
+        parentSpc.setInventoryId("toto" + i);
+        parentSpc.persist();
+        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
+            childSpc.getSpecimenType(),
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
+            childSpc.getParentContainer(), 2, 2);
 
         duplicate.setInventoryId("TOTO" + i);
         try {
@@ -141,11 +149,12 @@ public class TestSpecimen extends TestDatabase {
     public void testPersistCheckInventoryIdUnique()
         throws BiobankCheckException, Exception {
 
-        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(
-            spc.getSpecimenType(), ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            spc.getParentContainer(), spc.getCollectionEvent(), 2, 2,
-            spc.getCurrentCenter());
-        duplicate.setInventoryId(spc.getInventoryId());
+        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
+            childSpc.getSpecimenType(),
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
+            childSpc.getParentContainer(), 2, 2);
+        duplicate.setInventoryId(parentSpc.getInventoryId());
 
         try {
             duplicate.persist();
@@ -156,7 +165,7 @@ public class TestSpecimen extends TestDatabase {
         duplicate.setInventoryId("qqqq" + r.nextInt());
         duplicate.persist();
 
-        duplicate.setInventoryId(spc.getInventoryId());
+        duplicate.setInventoryId(parentSpc.getInventoryId());
         try {
             duplicate.persist();
             Assert
@@ -170,12 +179,14 @@ public class TestSpecimen extends TestDatabase {
     public void testPersistCheckInventoryIdUniqueCaseSensitive()
         throws BiobankCheckException, Exception {
         int i = r.nextInt();
-        spc.setInventoryId("toto" + i);
-        spc.persist();
+        parentSpc.setInventoryId("toto" + i);
+        parentSpc.persist();
 
-        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(
-            spc.getSpecimenType(), ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            spc.getParentContainer(), spc.getCollectionEvent(), 2, 2, site);
+        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
+            childSpc.getSpecimenType(),
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
+            childSpc.getParentContainer(), 2, 2);
         duplicate.setInventoryId("toto" + i);
 
         try {
@@ -192,13 +203,14 @@ public class TestSpecimen extends TestDatabase {
     @Test
     public void testPersistPositionAlreadyUsed() throws BiobankCheckException,
         Exception {
-        spc.persist();
-        RowColPos pos = spc.getPosition();
+        parentSpc.persist();
+        RowColPos pos = parentSpc.getPosition();
 
-        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(
-            spc.getSpecimenType(), ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            spc.getParentContainer(), spc.getCollectionEvent(), pos.row,
-            pos.col, site);
+        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
+            childSpc.getSpecimenType(),
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
+            childSpc.getParentContainer(), pos.row, pos.col);
 
         try {
             duplicate.persist();
@@ -218,20 +230,20 @@ public class TestSpecimen extends TestDatabase {
     @Test
     public void testPersistCheckParentAcceptSpecimenType()
         throws BiobankCheckException, Exception {
-        SpecimenTypeWrapper oldSpecimenType = spc.getSpecimenType();
+        SpecimenTypeWrapper oldSpecimenType = parentSpc.getSpecimenType();
 
         SpecimenTypeWrapper type2 = SpecimenTypeHelper
             .addSpecimenType("sampletype_2");
-        spc.setSpecimenType(type2);
+        parentSpc.setSpecimenType(type2);
         try {
-            spc.persist();
+            parentSpc.persist();
             Assert.fail("Container can't hold this type !");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
 
-        spc.setSpecimenType(oldSpecimenType);
-        spc.persist();
+        parentSpc.setSpecimenType(oldSpecimenType);
+        parentSpc.persist();
 
         ContainerWrapper container = new ContainerWrapper(appService);
         SpecimenWrapper specimen = new SpecimenWrapper(appService);
@@ -247,9 +259,9 @@ public class TestSpecimen extends TestDatabase {
     @Test
     public void testCheckProcessingEventNotNull() throws BiobankCheckException,
         Exception {
-        spc.setCollectionEvent(null);
+        parentSpc.setCollectionEvent(null);
         try {
-            spc.persist();
+            parentSpc.persist();
             Assert.fail("Patient visit should be set!");
         } catch (ValueNotSetException vnse) {
             Assert.assertTrue(true);
@@ -258,7 +270,7 @@ public class TestSpecimen extends TestDatabase {
 
     @Test
     public void testDelete() throws Exception {
-        SpecimenTypeWrapper type1 = spc.getSpecimenType();
+        SpecimenTypeWrapper type1 = parentSpc.getSpecimenType();
         SpecimenTypeWrapper type2 = SpecimenTypeHelper
             .addSpecimenType("sampletype_2");
         SpecimenTypeHelper.removeFromCreated(type2);
@@ -276,7 +288,7 @@ public class TestSpecimen extends TestDatabase {
         DbHelper.deleteContainers(site.getTopContainerCollection(false));
         DbHelper.deleteFromList(site.getContainerTypeCollection(false));
 
-        spc.delete();
+        parentSpc.delete();
         SpecimenTypeHelper.removeFromCreated(type1);
         type1.delete();
     }
@@ -284,26 +296,32 @@ public class TestSpecimen extends TestDatabase {
     @Test
     public void testGetSetCollectionEvent() {
         CollectionEventWrapper cevent = new CollectionEventWrapper(appService);
-        spc.setCollectionEvent(cevent);
-        Assert.assertTrue(spc.getCollectionEvent().getId() == cevent.getId());
+        parentSpc.setCollectionEvent(cevent);
+        Assert.assertTrue(parentSpc.getCollectionEvent().getId() == cevent
+            .getId());
     }
 
     @Test
     public void testSetSpecimenPositionFromString() throws Exception {
-        spc.setSpecimenPositionFromString("A1", spc.getParentContainer());
-        spc.persist();
-        Assert.assertTrue(spc.getPositionString(false, false).equals("A1"));
-        RowColPos pos = spc.getPosition();
+        parentSpc.setSpecimenPositionFromString("A1",
+            parentSpc.getParentContainer());
+        parentSpc.persist();
+        Assert.assertTrue(parentSpc.getPositionString(false, false)
+            .equals("A1"));
+        RowColPos pos = parentSpc.getPosition();
         Assert.assertTrue((pos.col == 0) && (pos.row == 0));
 
-        spc.setSpecimenPositionFromString("C2", spc.getParentContainer());
-        spc.persist();
-        Assert.assertTrue(spc.getPositionString(false, false).equals("C2"));
-        pos = spc.getPosition();
+        parentSpc.setSpecimenPositionFromString("C2",
+            parentSpc.getParentContainer());
+        parentSpc.persist();
+        Assert.assertTrue(parentSpc.getPositionString(false, false)
+            .equals("C2"));
+        pos = parentSpc.getPosition();
         Assert.assertTrue((pos.col == 1) && (pos.row == 2));
 
         try {
-            spc.setSpecimenPositionFromString("79", spc.getParentContainer());
+            parentSpc.setSpecimenPositionFromString("79",
+                parentSpc.getParentContainer());
             Assert.fail("invalid position");
         } catch (Exception bce) {
             Assert.assertTrue(true);
@@ -315,12 +333,14 @@ public class TestSpecimen extends TestDatabase {
 
     @Test
     public void testGetPositionString() throws Exception {
-        spc.setSpecimenPositionFromString("A1", spc.getParentContainer());
-        Assert.assertTrue(spc.getPositionString(false, false).equals("A1"));
-        String parentLabel = spc.getParentContainer().getLabel();
-        Assert.assertTrue(spc.getPositionString(true, false).equals(
+        parentSpc.setSpecimenPositionFromString("A1",
+            parentSpc.getParentContainer());
+        Assert.assertTrue(parentSpc.getPositionString(false, false)
+            .equals("A1"));
+        String parentLabel = parentSpc.getParentContainer().getLabel();
+        Assert.assertTrue(parentSpc.getPositionString(true, false).equals(
             parentLabel + "A1"));
-        Assert.assertTrue(spc.getPositionString().equals(
+        Assert.assertTrue(parentSpc.getPositionString().equals(
             parentLabel + "A1 ("
                 + topContainer.getContainerType().getNameShort() + ")"));
     }
@@ -330,50 +350,51 @@ public class TestSpecimen extends TestDatabase {
         RowColPos position = new RowColPos();
         position.row = 1;
         position.col = 3;
-        spc.setPosition(position);
-        RowColPos newPosition = spc.getPosition();
+        parentSpc.setPosition(position);
+        RowColPos newPosition = parentSpc.getPosition();
         Assert.assertEquals(position.row, newPosition.row);
         Assert.assertEquals(position.col, newPosition.col);
 
         // ensure position remains after persist
-        spc.persist();
-        spc.reload();
-        newPosition = spc.getPosition();
+        parentSpc.persist();
+        parentSpc.reload();
+        newPosition = parentSpc.getPosition();
         Assert.assertEquals(position.row, newPosition.row);
         Assert.assertEquals(position.col, newPosition.col);
 
         // test setting position to null
-        spc.setPosition(null);
-        spc.persist();
-        spc.reload();
-        Assert.assertEquals(null, spc.getPosition());
-        Assert.assertEquals(null, spc.getParentContainer());
+        parentSpc.setPosition(null);
+        parentSpc.persist();
+        parentSpc.reload();
+        Assert.assertEquals(null, parentSpc.getPosition());
+        Assert.assertEquals(null, parentSpc.getParentContainer());
     }
 
     @Test
     public void testGetSetParent() throws Exception {
-        Assert.assertTrue(spc.hasParent());
-        ContainerWrapper oldParent = spc.getParentContainer();
+        Assert.assertTrue(parentSpc.hasParent());
+        ContainerWrapper oldParent = parentSpc.getParentContainer();
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
             "newCtType", "ctNew", 1, 4, 5, true);
-        type.addToSpecimenTypeCollection(Arrays.asList(spc.getSpecimenType()));
+        type.addToSpecimenTypeCollection(Arrays.asList(parentSpc
+            .getSpecimenType()));
         type.persist();
         ContainerWrapper parent = ContainerHelper.addContainer(
             "newcontainerParent", "ccNew", null, site, type);
 
-        spc.setParent(parent);
-        spc.persist();
+        parentSpc.setParent(parent);
+        parentSpc.persist();
         // check to make sure gone from old parent
         oldParent.reload();
         Assert.assertTrue(oldParent.getSpecimens().size() == 0);
         // check to make sure added to new parent
         parent.reload();
-        Assert.assertTrue(spc.getParentContainer() != null);
+        Assert.assertTrue(parentSpc.getParentContainer() != null);
         Collection<SpecimenWrapper> sampleWrappers = parent.getSpecimens()
             .values();
         boolean found = false;
         for (SpecimenWrapper sampleWrapper : sampleWrappers) {
-            if (sampleWrapper.getId().equals(spc.getId()))
+            if (sampleWrapper.getId().equals(parentSpc.getId()))
                 found = true;
         }
         Assert.assertTrue(found);
@@ -386,13 +407,14 @@ public class TestSpecimen extends TestDatabase {
     @Test
     public void testGetSetSpecimenType() throws BiobankCheckException,
         Exception {
-        SpecimenTypeWrapper stw = spc.getSpecimenType();
+        SpecimenTypeWrapper stw = parentSpc.getSpecimenType();
         SpecimenTypeWrapper newType = SpecimenTypeHelper
             .addSpecimenType("newStw");
         stw.persist();
         Assert.assertTrue(stw.getId() != newType.getId());
-        spc.setSpecimenType(newType);
-        Assert.assertTrue(newType.getId() == spc.getSpecimenType().getId());
+        parentSpc.setSpecimenType(newType);
+        Assert.assertTrue(newType.getId() == parentSpc.getSpecimenType()
+            .getId());
 
         SpecimenWrapper sample1 = new SpecimenWrapper(appService);
         sample1.setSpecimenType(null);
@@ -401,8 +423,8 @@ public class TestSpecimen extends TestDatabase {
 
     @Test
     public void testGetSetQuantityFromType() throws Exception {
-        Double quantity = spc.getQuantity();
-        spc.setQuantityFromType();
+        Double quantity = parentSpc.getQuantity();
+        parentSpc.setQuantityFromType();
         // no sample storages defined yet, should be null
         Assert.assertTrue(quantity == null);
 
@@ -412,78 +434,81 @@ public class TestSpecimen extends TestDatabase {
         AliquotedSpecimenWrapper ss1 = new AliquotedSpecimenWrapper(appService);
         ss1.setSpecimenType(SpecimenTypeHelper.addSpecimenType("ss1"));
         ss1.setVolume(1.0);
-        ss1.setStudy(spc.getCollectionEvent().getPatient().getStudy());
+        ss1.setStudy(parentSpc.getCollectionEvent().getPatient().getStudy());
         ss1.setActivityStatus(activeStatus);
         ss1.persist();
         AliquotedSpecimenWrapper ss2 = new AliquotedSpecimenWrapper(appService);
         ss2.setSpecimenType(SpecimenTypeHelper.addSpecimenType("ss2"));
         ss2.setVolume(2.0);
-        ss2.setStudy(spc.getCollectionEvent().getPatient().getStudy());
+        ss2.setStudy(parentSpc.getCollectionEvent().getPatient().getStudy());
         ss2.setActivityStatus(activeStatus);
         ss2.persist();
         AliquotedSpecimenWrapper ss3 = new AliquotedSpecimenWrapper(appService);
-        ss3.setSpecimenType(spc.getSpecimenType());
+        ss3.setSpecimenType(parentSpc.getSpecimenType());
         ss3.setVolume(3.0);
-        ss3.setStudy(spc.getCollectionEvent().getPatient().getStudy());
+        ss3.setStudy(parentSpc.getCollectionEvent().getPatient().getStudy());
         ss3.setActivityStatus(activeStatus);
         ss3.persist();
-        spc.getCollectionEvent().getPatient().getStudy()
+        parentSpc.getCollectionEvent().getPatient().getStudy()
             .addToAliquotedSpecimenCollection(Arrays.asList(ss1, ss2, ss3));
         // should be 3
-        spc.setQuantityFromType();
-        Assert.assertTrue(spc.getQuantity().equals(3.0));
+        parentSpc.setQuantityFromType();
+        Assert.assertTrue(parentSpc.getQuantity().equals(3.0));
     }
 
     @Test
     public void testGetFormattedLinkDate() throws Exception {
         Date date = Utils.getRandomDate();
-        spc.setCreatedAt(date);
+        parentSpc.setCreatedAt(date);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        Assert.assertTrue(sdf.format(date).equals(spc.getFormattedCreatedAt()));
+        Assert.assertTrue(sdf.format(date).equals(
+            parentSpc.getFormattedCreatedAt()));
     }
 
     @Test
     public void testCompareTo() throws BiobankCheckException, Exception {
-        spc.setInventoryId("defgh");
-        spc.persist();
-        SpecimenWrapper sample2 = SpecimenHelper.newSpecimen(
-            spc.getSpecimenType(), ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            spc.getParentContainer(), spc.getCollectionEvent(), 2, 3, site);
+        parentSpc.setInventoryId("defgh");
+        parentSpc.persist();
+        SpecimenWrapper sample2 = SpecimenHelper.newSpecimen(parentSpc,
+            childSpc.getSpecimenType(),
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
+            childSpc.getParentContainer(), 2, 3);
         sample2.setInventoryId("awert");
         sample2.persist();
-        Assert.assertTrue(spc.compareTo(sample2) > 0);
+        Assert.assertTrue(parentSpc.compareTo(sample2) > 0);
 
         sample2.setInventoryId("qwerty");
         sample2.persist();
-        Assert.assertTrue(spc.compareTo(sample2) < 0);
+        Assert.assertTrue(parentSpc.compareTo(sample2) < 0);
     }
 
     @Test
     public void testGetSpecimen() throws Exception {
-        ContainerWrapper container = spc.getParentContainer();
+        ContainerWrapper container = parentSpc.getParentContainer();
         ContainerTypeWrapper containerType = container.getContainerType();
-        CollectionEventWrapper pv = spc.getCollectionEvent();
         SpecimenTypeWrapper sampleType = containerType
             .getSpecimenTypeCollection(false).get(0);
         Assert.assertNotNull(sampleType);
-        spc.setInventoryId(Utils.getRandomString(5));
-        spc.persist();
+        parentSpc.setInventoryId(Utils.getRandomString(5));
+        parentSpc.persist();
 
-        SpecimenHelper.addSpecimen(sampleType, container, pv, 3, 3,
-            container.getSite());
+        SpecimenHelper.newSpecimen(parentSpc, childSpc.getSpecimenType(),
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
+            childSpc.getParentContainer(), 3, 3);
 
         SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(appService,
-            spc.getInventoryId(), null);
+            parentSpc.getInventoryId(), null);
         Assert.assertNotNull(foundSpecimen);
-        Assert.assertEquals(foundSpecimen, spc);
+        Assert.assertEquals(foundSpecimen, parentSpc);
     }
 
     @Test
     public void testGetSpecimensNonActive() throws Exception {
-        ContainerWrapper container = spc.getParentContainer();
+        ContainerWrapper container = parentSpc.getParentContainer();
         ContainerTypeWrapper containerType = container.getContainerType();
-        CollectionEventWrapper pv = spc.getCollectionEvent();
         SpecimenTypeWrapper sampleType = containerType
             .getSpecimenTypeCollection(false).get(0);
         Assert.assertNotNull(sampleType);
@@ -502,14 +527,19 @@ public class TestSpecimen extends TestDatabase {
         List<SpecimenWrapper> activeSpecimens = new ArrayList<SpecimenWrapper>();
         List<SpecimenWrapper> nonActiveSpecimens = new ArrayList<SpecimenWrapper>();
 
-        activeSpecimens.add(spc);
+        activeSpecimens.add(parentSpc);
         for (int i = 1, n = container.getColCapacity(); i < n; ++i) {
-            activeSpecimens.add(SpecimenHelper.addSpecimen(sampleType,
-                container, pv, 0, i, site));
+            activeSpecimens.add(SpecimenHelper.newSpecimen(parentSpc,
+                childSpc.getSpecimenType(),
+                ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+                parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
+                childSpc.getParentContainer(), 0, i));
 
-            SpecimenWrapper a = SpecimenHelper.newSpecimen(sampleType,
-                ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, pv, 1,
-                i, site);
+            SpecimenWrapper a = SpecimenHelper.newSpecimen(parentSpc,
+                childSpc.getSpecimenType(),
+                ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+                parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
+                childSpc.getParentContainer(), 1, i);
             a.setActivityStatus(activityStatusNonActive);
             a.persist();
             nonActiveSpecimens.add(a);
@@ -524,45 +554,54 @@ public class TestSpecimen extends TestDatabase {
 
     @Test
     public void testGetSpecimensInSiteWithPositionLabel() throws Exception {
-        ContainerWrapper container = spc.getParentContainer();
+        ContainerWrapper container = parentSpc.getParentContainer();
         ContainerTypeWrapper containerType = container.getContainerType();
-        CollectionEventWrapper pv = spc.getCollectionEvent();
         SpecimenTypeWrapper sampleType = containerType
             .getSpecimenTypeCollection(false).get(0);
         Assert.assertNotNull(sampleType);
-        spc.setInventoryId(Utils.getRandomString(5));
-        spc.persist();
+        parentSpc.setInventoryId(Utils.getRandomString(5));
+        parentSpc.persist();
 
         OriginInfoWrapper oi = new OriginInfoWrapper(appService);
         oi.setCenter(container.getSite());
         oi.persist();
-        SpecimenHelper.addSpecimen(sampleType, container, pv, 0, 1, site);
-        SpecimenHelper.addSpecimen(sampleType, container, pv, 1, 0, site);
-        spc = SpecimenHelper.newSpecimen(sampleType,
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, pv, 0, 2,
-            site);
-        spc.setInventoryId(Utils.getRandomString(5));
-        spc.persist();
+        SpecimenHelper.newSpecimen(parentSpc, childSpc.getSpecimenType(),
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
+            childSpc.getParentContainer(), 0, 1);
+
+        SpecimenHelper.newSpecimen(parentSpc, childSpc.getSpecimenType(),
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
+            childSpc.getParentContainer(), 1, 0);
+
+        parentSpc = SpecimenHelper.newSpecimen(parentSpc,
+            childSpc.getSpecimenType(),
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
+            childSpc.getParentContainer(), 0, 2);
+        parentSpc.setInventoryId(Utils.getRandomString(5));
+        parentSpc.persist();
 
         List<SpecimenWrapper> specimens = SpecimenWrapper
             .getSpecimensInSiteWithPositionLabel(appService, site,
-                spc.getPositionString(true, false));
+                parentSpc.getPositionString(true, false));
         Assert.assertEquals(1, specimens.size());
-        Assert.assertEquals(specimens.get(0), spc);
+        Assert.assertEquals(specimens.get(0), parentSpc);
     }
 
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
-        spc.persist();
-        String old = spc.getInventoryId();
-        spc.setInventoryId("toto");
-        spc.reset();
-        Assert.assertEquals(old, spc.getInventoryId());
+        parentSpc.persist();
+        String old = parentSpc.getInventoryId();
+        parentSpc.setInventoryId("toto");
+        parentSpc.reset();
+        Assert.assertEquals(old, parentSpc.getInventoryId());
     }
 
     @Test
     public void testResetNew() throws Exception {
-        SpecimenWrapper newSpec = SpecimenHelper.newSpecimen(spc
+        SpecimenWrapper newSpec = SpecimenHelper.newSpecimen(parentSpc
             .getSpecimenType());
         newSpec.setInventoryId("toto");
         newSpec.reset();
@@ -571,11 +610,11 @@ public class TestSpecimen extends TestDatabase {
 
     @Test
     public void testCheckPosition() throws BiobankCheckException, Exception {
-        spc.persist();
-        ContainerWrapper container = spc.getParentContainer();
+        parentSpc.persist();
+        ContainerWrapper container = parentSpc.getParentContainer();
 
         SpecimenWrapper specimen2 = new SpecimenWrapper(appService);
-        specimen2.setPosition(spc.getPosition());
+        specimen2.setPosition(parentSpc.getPosition());
 
         Assert.assertFalse(specimen2.isPositionFree(container));
 
@@ -585,28 +624,32 @@ public class TestSpecimen extends TestDatabase {
 
     @Test
     public void testDebugRandomMethods() throws Exception {
-        ContainerWrapper container = spc.getParentContainer();
+        ContainerWrapper container = parentSpc.getParentContainer();
         ContainerTypeWrapper containerType = container.getContainerType();
-        CollectionEventWrapper cevent = spc.getCollectionEvent();
         SpecimenTypeWrapper spcType = containerType.getSpecimenTypeCollection(
             false).get(0);
         Assert.assertNotNull(spcType);
 
         ProcessingEventWrapper pevent = ProcessingEventHelper
-            .addProcessingEvent(spc.getCurrentCenter(), spc
+            .addProcessingEvent(parentSpc.getCurrentCenter(), parentSpc
                 .getCollectionEvent().getPatient(), Utils.getRandomDate());
 
         // add aliquoted specimen
-        SpecimenWrapper specimen = SpecimenHelper.newSpecimen(spcType,
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, cevent, 2,
-            3, site);
+        SpecimenWrapper specimen = SpecimenHelper.newSpecimen(parentSpc,
+            childSpc.getSpecimenType(),
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
+            childSpc.getParentContainer(), 2, 3);
         specimen.setInventoryId(Utils.getRandomString(5));
         specimen.persist();
 
         pevent.addToSpecimenCollection(Arrays.asList(specimen));
         pevent.persist();
 
-        SpecimenHelper.addSpecimen(spcType, null, cevent, null, null, site);
+        SpecimenHelper.newSpecimen(parentSpc, childSpc.getSpecimenType(),
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
+            childSpc.getParentContainer(), 2, 4);
 
         try {
             Assert.assertTrue(DebugUtil.getRandomLinkedAliquotedSpecimens(
@@ -632,19 +675,19 @@ public class TestSpecimen extends TestDatabase {
             .getShippingMethods(appService).get(0);
         DispatchWrapper d = DispatchHelper.addDispatch(site, destSite, method);
 
-        spc = SpecimenHelper.newSpecimen(name);
+        parentSpc = SpecimenHelper.newSpecimen(name);
         OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
         originInfo.setCenter(destSite);
         originInfo.persist();
         CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(site, patient, 1, originInfo, spc);
-        spc = cevent.getAllSpecimenCollection(false).get(0);
+            .addCollectionEvent(site, patient, 1, originInfo, parentSpc);
+        parentSpc = cevent.getAllSpecimenCollection(false).get(0);
 
-        d.addSpecimens(Arrays.asList(spc), DispatchSpecimenState.NONE);
+        d.addSpecimens(Arrays.asList(parentSpc), DispatchSpecimenState.NONE);
         d.persist();
-        spc.reload();
+        parentSpc.reload();
 
-        List<DispatchWrapper> specimenDispatches = spc.getDispatches();
+        List<DispatchWrapper> specimenDispatches = parentSpc.getDispatches();
         Assert.assertEquals(1, specimenDispatches.size());
         Assert.assertTrue(specimenDispatches.contains(d));
 
@@ -657,22 +700,23 @@ public class TestSpecimen extends TestDatabase {
 
         // dest site receive specimen
         d.setState(DispatchState.RECEIVED);
-        d.receiveSpecimens(Arrays.asList(spc));
+        d.receiveSpecimens(Arrays.asList(parentSpc));
         d.persist();
         Assert.assertTrue(d.isInReceivedState());
 
         // make sure spc now belongs to destSite
         destSite.reload();
-        Assert.assertTrue(destSite.getSpecimenCollection(false).contains(spc));
+        Assert.assertTrue(destSite.getSpecimenCollection(false).contains(
+            parentSpc));
 
         // dispatch specimen to second site
         SiteWrapper destSite2 = SiteHelper.addSite(name + "_2");
 
         DispatchWrapper d2 = DispatchHelper.addDispatch(destSite, destSite2,
             method);
-        d2.addSpecimens(Arrays.asList(spc), DispatchSpecimenState.NONE);
+        d2.addSpecimens(Arrays.asList(parentSpc), DispatchSpecimenState.NONE);
 
-        spc.reload();
+        parentSpc.reload();
         // assign a position to this specimen
         ContainerTypeWrapper topType = ContainerTypeHelper.addContainerType(
             destSite, "ct11", "ct11", 1, 5, 6, true);
@@ -684,23 +728,24 @@ public class TestSpecimen extends TestDatabase {
         topType.persist();
         ContainerWrapper cont = ContainerHelper.addContainer("22", "22",
             topCont, destSite, childType, 4, 5);
-        childType.addToSpecimenTypeCollection(Arrays.asList(spc
+        childType.addToSpecimenTypeCollection(Arrays.asList(parentSpc
             .getSpecimenType()));
         childType.persist();
         cont.reload();
-        cont.addSpecimen(2, 3, spc);
-        spc.persist();
+        cont.addSpecimen(2, 3, parentSpc);
+        parentSpc.persist();
 
         // add to new dispatch
-        d2.addSpecimens(Arrays.asList(spc), DispatchSpecimenState.NONE);
+        d2.addSpecimens(Arrays.asList(parentSpc), DispatchSpecimenState.NONE);
         d2.persist();
 
         // make sure spc still belongs to destSite
         destSite2.reload();
-        Assert.assertTrue(destSite.getSpecimenCollection(false).contains(spc));
+        Assert.assertTrue(destSite.getSpecimenCollection(false).contains(
+            parentSpc));
 
-        spc.reload();
-        specimenDispatches = spc.getDispatches();
+        parentSpc.reload();
+        specimenDispatches = parentSpc.getDispatches();
         Assert.assertEquals(2, specimenDispatches.size());
         Assert.assertTrue(specimenDispatches.contains(d));
         Assert.assertTrue(specimenDispatches.contains(d2));

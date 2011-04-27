@@ -13,9 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -29,7 +27,6 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
@@ -165,17 +162,6 @@ public class TestProcessingEvent extends TestDatabase {
 
     @Test
     public void testDelete() throws Exception {
-        List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSpecimenTypes(appService, true);
-
-        String name = "testDelete" + r.nextInt();
-        CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEventWithRandomPatient(clinic, name, 1);
-
-        SpecimenWrapper spc = SpecimenHelper.addSpecimen(allSampleTypes.get(0),
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING, Utils.getRandomDate(),
-            cevent, clinic);
-
         ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, Utils.getRandomDate());
         pevent.delete();
@@ -199,7 +185,6 @@ public class TestProcessingEvent extends TestDatabase {
         }
 
         // delete aliquot and pevent
-        spc.delete();
         childSpc.delete();
         pevent.reload();
         pevent.delete();

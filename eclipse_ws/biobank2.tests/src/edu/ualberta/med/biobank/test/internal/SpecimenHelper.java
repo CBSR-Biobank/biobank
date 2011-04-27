@@ -50,8 +50,7 @@ public class SpecimenHelper extends DbHelper {
     public static SpecimenWrapper newSpecimen(SpecimenWrapper parentSpc,
         SpecimenTypeWrapper specimenType, String activityStatus,
         CollectionEventWrapper cevent, ProcessingEventWrapper pevent,
-        ContainerWrapper container, Integer row, Integer col,
-        CenterWrapper<?> center) throws Exception {
+        ContainerWrapper container, Integer row, Integer col) throws Exception {
         SpecimenWrapper specimen = newSpecimen(specimenType, activityStatus,
             Utils.getRandomDate());
         if (container != null) {
@@ -62,6 +61,8 @@ public class SpecimenHelper extends DbHelper {
         if ((row != null) && (col != null)) {
             specimen.setPosition(new RowColPos(row, col));
         }
+
+        CenterWrapper<?> center = container.getSite();
         OriginInfoWrapper oi = new OriginInfoWrapper(appService);
         oi.setCenter(center);
         oi.persist();
@@ -117,7 +118,7 @@ public class SpecimenHelper extends DbHelper {
         Integer col) throws Exception {
         SpecimenWrapper spc = newSpecimen(parentSpc, specimenType,
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, cevent, pevent,
-            container, row, col, container.getSite());
+            container, row, col);
         spc.persist();
         return spc;
     }
@@ -179,6 +180,7 @@ public class SpecimenHelper extends DbHelper {
             SpecimenWrapper childSpc = SpecimenHelper.addSpecimen(spc,
                 allSampleTypes.get(0), ce, pe, container, posOffset / colCap,
                 posOffset % colCap);
+            childSpc.setParent(container);
             spcs.add(childSpc);
         }
 
@@ -196,14 +198,15 @@ public class SpecimenHelper extends DbHelper {
 
         StudyWrapper study = StudyHelper.addStudy("Study-" + r.nextInt());
         SiteWrapper site = SiteHelper.addSite("testsite" + r.nextInt());
+        ClinicWrapper clinic = ClinicHelper.addClinic("testclinic"
+            + r.nextInt());
         PatientWrapper patient = PatientHelper.addPatient(
             "testp" + r.nextInt(), study);
         OriginInfoWrapper oi = OriginInfoHelper.addOriginInfo(site);
 
-        newSpec.setSpecimenType(st);
         newSpec.setOriginInfo(oi);
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
-            site, patient, 2, oi, newSpec);
+            clinic, patient, 2, oi, newSpec);
         return ce.getOriginalSpecimenCollection(false).get(0);
     }
 }
