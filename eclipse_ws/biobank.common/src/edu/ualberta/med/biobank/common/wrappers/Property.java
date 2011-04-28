@@ -132,6 +132,11 @@ public class Property<T, W> {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return name + "(" + getType() + ")";
+    }
+
     public interface Accessor<T, W> {
         public T get(W model);
 
