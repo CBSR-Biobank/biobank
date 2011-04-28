@@ -65,8 +65,6 @@ public class SiteHelper extends CenterHelper {
         deleteContainers(site.getContainerCollection(false));
         deleteFromList(site.getContainerTypeCollection(false));
         site.reload();
-        deleteFromList(site.getProcessingEventCollection(false));
-        site.reload();
 
         // dispatches should have been deleted before sites are deleted
         //
@@ -74,6 +72,11 @@ public class SiteHelper extends CenterHelper {
         Assert.isTrue(site.getSrcDispatchCollection(false).size() == 0);
         Assert.isTrue(site.getDstDispatchCollection(false).size() == 0);
         deleteCenterDependencies(site);
+
+        site.reload();
+        deleteFromList(site.getProcessingEventCollection(false));
+
+        site.reload();
         site.delete();
     }
 
