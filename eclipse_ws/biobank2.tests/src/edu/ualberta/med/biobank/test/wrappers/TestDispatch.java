@@ -11,7 +11,6 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -20,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -35,6 +35,7 @@ import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
+import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -302,16 +303,21 @@ public class TestDispatch extends TestDatabase {
         int numSampletypes = sampleTypes.size();
         int colCapacity = container.getColCapacity();
 
+        SpecimenWrapper parentSpc = SpecimenHelper.addParentSpecimen();
+
         OriginInfoWrapper oi = new OriginInfoWrapper(appService);
         oi.setCenter(container.getSite());
         oi.persist();
 
+        ProcessingEventWrapper pevent = ProcessingEventHelper
+            .addProcessingEvent(container.getSite(), parentSpc
+                .getCollectionEvent().getPatient(), Utils.getRandomDate());
+
         List<SpecimenWrapper> spcs = new ArrayList<SpecimenWrapper>();
         for (int i = 0; i < colCapacity; ++i) {
-            spcs.add(SpecimenHelper.addSpecimen(
-                sampleTypes.get(r.nextInt(numSampletypes)),
-                ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, cevent,
-                row, i, oi));
+            spcs.add(SpecimenHelper.addSpecimen(parentSpc,
+                sampleTypes.get(r.nextInt(numSampletypes)), cevent, pevent,
+                container, row, i));
         }
         container.reload();
         cevent.reload();

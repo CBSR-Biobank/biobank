@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 
-public class SiteHelper extends DbHelper {
+public class SiteHelper extends CenterHelper {
 
     public static List<SiteWrapper> createdSites = new ArrayList<SiteWrapper>();
 
@@ -73,11 +73,7 @@ public class SiteHelper extends DbHelper {
         // see TestDatabase.tearDown().
         Assert.isTrue(site.getSrcDispatchCollection(false).size() == 0);
         Assert.isTrue(site.getDstDispatchCollection(false).size() == 0);
-
-        site.reload();
-
-        deleteFromList(site.getSpecimenCollection(false));
-        deleteFromList(site.getOriginInfoCollection(false));
+        deleteCenterDependencies(site);
         site.delete();
     }
 
