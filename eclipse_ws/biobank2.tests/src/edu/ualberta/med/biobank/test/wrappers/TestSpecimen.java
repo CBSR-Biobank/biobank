@@ -63,7 +63,7 @@ public class TestSpecimen extends TestDatabase {
         super.setUp();
 
         parentSpc = SpecimenHelper.addParentSpecimen();
-        site = (SiteWrapper) parentSpc.getOriginInfo().getCenter();
+        site = SiteHelper.addSite("testsite" + r.nextInt());
         ContainerTypeWrapper typeChild = ContainerTypeHelper.addContainerType(
             site, "ctTypeChild" + r.nextInt(), "ctChild", 1, 4, 5, false);
         typeChild.addToSpecimenTypeCollection(Arrays.asList(parentSpc

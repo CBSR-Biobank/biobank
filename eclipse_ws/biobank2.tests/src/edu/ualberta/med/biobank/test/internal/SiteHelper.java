@@ -7,6 +7,7 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 
 public class SiteHelper extends DbHelper {
@@ -76,7 +77,11 @@ public class SiteHelper extends DbHelper {
 
         site.reload();
 
-        deleteFromList(site.getSpecimenCollection(false));
+        for (SpecimenWrapper spc : site.getSpecimenCollection(false)) {
+            if (spc.getOriginInfo().getCenter().equals(site)) {
+                spc.delete();
+            }
+        }
         deleteFromList(site.getOriginInfoCollection(false));
         site.delete();
     }

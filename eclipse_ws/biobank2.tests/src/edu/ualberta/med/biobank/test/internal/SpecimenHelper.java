@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -158,10 +157,11 @@ public class SpecimenHelper extends DbHelper {
             throw new Exception("cannot fit number of specimens: " + spcCount);
         }
 
-        List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSpecimenTypes(appService, true);
+        List<SpecimenTypeWrapper> spcTypes = container.getContainerType()
+            .getSpecimenTypeCollection();
 
-        SpecimenWrapper spc = SpecimenHelper.newSpecimen(allSampleTypes.get(0),
+        SpecimenWrapper spc = SpecimenHelper.newSpecimen(
+            DbHelper.chooseRandomlyInList(spcTypes),
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, Utils.getRandomDate());
 
         OriginInfoWrapper oi = new OriginInfoWrapper(appService);
@@ -178,8 +178,8 @@ public class SpecimenHelper extends DbHelper {
 
         for (int i = 0; i < spcCount; ++i, posOffset++) {
             SpecimenWrapper childSpc = SpecimenHelper.addSpecimen(spc,
-                allSampleTypes.get(0), ce, pe, container, posOffset / colCap,
-                posOffset % colCap);
+                DbHelper.chooseRandomlyInList(spcTypes), ce, pe, container,
+                posOffset / colCap, posOffset % colCap);
             childSpc.setParent(container);
             spcs.add(childSpc);
         }
@@ -197,12 +197,11 @@ public class SpecimenHelper extends DbHelper {
             .getActiveActivityStatus(appService));
 
         StudyWrapper study = StudyHelper.addStudy("Study-" + r.nextInt());
-        SiteWrapper site = SiteHelper.addSite("testsite" + r.nextInt());
         ClinicWrapper clinic = ClinicHelper.addClinic("testclinic"
             + r.nextInt());
         PatientWrapper patient = PatientHelper.addPatient(
             "testp" + r.nextInt(), study);
-        OriginInfoWrapper oi = OriginInfoHelper.addOriginInfo(site);
+        OriginInfoWrapper oi = OriginInfoHelper.addOriginInfo(clinic);
 
         newSpec.setOriginInfo(oi);
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
