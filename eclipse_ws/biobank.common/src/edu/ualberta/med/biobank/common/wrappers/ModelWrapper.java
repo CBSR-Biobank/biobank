@@ -184,6 +184,17 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         for (Property<?, ? super E> property : properties) {
             String propertyName = property.getName();
+            PropertyChangeListener[] listeners = propertyChangeSupport
+                .getPropertyChangeListeners(propertyName);
+
+            // if no one is listening to this property then do not send a change
+            // as it may be expensive to determine the old and new values (ex:
+            // lazily loading an association, such as, a Center's
+            // specimenCollection).
+            if (listeners.length == 0) {
+                continue;
+            }
+
             Object oldValue = property.get(oldWrappedObject);
             Object newValue = property.get(newWrappedObject);
 
