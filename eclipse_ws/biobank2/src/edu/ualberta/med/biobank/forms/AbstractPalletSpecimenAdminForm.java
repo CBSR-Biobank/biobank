@@ -317,7 +317,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         });
         GridData gd = (GridData) plateToScanText.getLayoutData();
         gd.horizontalAlignment = SWT.FILL;
-        gd.horizontalSpan = 2;
+        int parentNumColumns = ((GridLayout) fieldsComposite.getLayout()).numColumns;
+        if (parentNumColumns > 2)
+            gd.horizontalSpan = parentNumColumns - 1;
         plateToScanText.setLayoutData(gd);
     }
 
