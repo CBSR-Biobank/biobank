@@ -15,9 +15,12 @@ import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -229,11 +232,22 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return super.getSecuritySpecificCenters();
     }
 
-    public List<CollectionEventWrapper> getCollectionEventFromSpecimens() {
-        Set<CollectionEventWrapper> cEvents = new HashSet<CollectionEventWrapper>();
-        for (SpecimenWrapper spec : getSpecimenCollection(false)) {
-            cEvents.add(spec.getCollectionEvent());
-        }
-        return new ArrayList<CollectionEventWrapper>(cEvents);
+    private static String CEVENT_FROM_SPECIMEN_AND_PATIENT_QRY = "select distinct(cEvent) from "
+        + CollectionEvent.class.getName()
+        + " as cEvent join cEvent."
+        + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
+        + " as specs where cEvent."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+        + "=? and specs."
+        + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
+            ProcessingEventPeer.ID) + "=?";
+
+    public List<CollectionEventWrapper> getCollectionEventFromSpecimensAndPatient(
+        PatientWrapper patient) throws ApplicationException {
+        HQLCriteria c = new HQLCriteria(CEVENT_FROM_SPECIMEN_AND_PATIENT_QRY,
+            Arrays.asList(new Object[] { patient.getId(), getId() }));
+        List<CollectionEvent> res = appService.query(c);
+        return wrapModelCollection(appService, res,
+            CollectionEventWrapper.class);
     }
 }
