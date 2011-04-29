@@ -26,7 +26,6 @@ import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -44,7 +43,6 @@ import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
-import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -945,7 +943,7 @@ public class TestContainer extends TestDatabase {
         SpecimenTypeWrapper sampleType;
 
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
-            site, patient, 1, OriginInfoHelper.addOriginInfo(site));
+            site, patient, 1);
         ContainerWrapper childL3 = containerMap.get("ChildL3");
         for (int row = 0, maxRow = childL3.getRowCapacity(), n = selectedSampleTypes
             .size(); row < maxRow; ++row) {
@@ -1423,11 +1421,10 @@ public class TestContainer extends TestDatabase {
         childL4.getContainerType().addToSpecimenTypeCollection(
             Arrays.asList(spcType));
         childL4.getContainerType().persist();
-        OriginInfoWrapper oi = OriginInfoHelper.addOriginInfo(site);
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
             site,
             PatientHelper.addPatient(Utils.getRandomString(5),
-                StudyHelper.addStudy("tests")), 1, oi);
+                StudyHelper.addStudy("tests")), 1);
 
         SpecimenWrapper parentSpc = SpecimenHelper.addSpecimen(spcType,
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, Utils.getRandomDate(),

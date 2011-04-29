@@ -33,7 +33,6 @@ import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
-import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceSpecimenHelper;
@@ -310,7 +309,7 @@ public class TestStudy extends TestDatabase {
 
         CollectionEventWrapper cevent = CollectionEventHelper
             .addCollectionEvent(site, PatientHelper.addPatient("testp", study),
-                1, OriginInfoHelper.addOriginInfo(site));
+                1);
         cevent.setEventAttrValue("Patient Type 2", Utils.getRandomString(5));
         cevent.persist();
 
@@ -462,7 +461,7 @@ public class TestStudy extends TestDatabase {
 
         CollectionEventWrapper visit = CollectionEventHelper
             .addCollectionEvent(site, PatientHelper.addPatient("testp", study),
-                1, OriginInfoHelper.addOriginInfo(site));
+                1);
         try {
             visit.setEventAttrValue("Patient Type 2", Utils.getRandomString(5));
             visit.persist();
