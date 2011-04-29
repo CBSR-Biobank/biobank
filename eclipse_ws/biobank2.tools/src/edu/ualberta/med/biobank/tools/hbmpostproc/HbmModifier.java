@@ -122,7 +122,6 @@ public class HbmModifier {
                 }
 
                 documentChanged |= !line.equals(alteredLine);
-
                 writer.write(alteredLine);
                 writer.newLine();
                 line = reader.readLine();

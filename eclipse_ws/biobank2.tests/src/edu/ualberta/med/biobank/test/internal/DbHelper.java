@@ -55,14 +55,16 @@ public class DbHelper {
         }
     }
 
-    public static void deleteDispatchs(Collection<DispatchWrapper> shipments)
+    public static void deleteDispatches(Collection<DispatchWrapper> dispaches)
         throws Exception {
         Assert.assertNotNull("appService is null", appService);
-        if ((shipments == null) || (shipments.size() == 0))
+        if ((dispaches == null) || dispaches.isEmpty())
             return;
 
-        for (DispatchWrapper shipment : shipments) {
-            shipment.delete();
+        for (DispatchWrapper dispatch : dispaches) {
+            dispatch.reload();
+            deleteFromList(dispatch.getDispatchSpecimenCollection(false));
+            dispatch.delete();
         }
     }
 

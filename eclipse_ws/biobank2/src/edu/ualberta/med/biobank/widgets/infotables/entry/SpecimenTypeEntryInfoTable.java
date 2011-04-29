@@ -123,7 +123,7 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
                 SpecimenTypeWrapper specType = getSelection();
                 if (specType != null) {
                     try {
-                        if (!specType.isNew() && specType.isUsedBySamples()) {
+                        if (!specType.isNew() && specType.isUsedBySpecimens()) {
                             BiobankPlugin
                                 .openError(
                                     "Specimen Type Delete Error",

@@ -95,12 +95,12 @@ public class ShipmentViewForm extends BiobankViewForm {
             "Shipping Method");
         if (shipment.getShipmentInfo().getShippingMethod().needDate()) {
             departedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Departed");
+                "Packed");
         }
         boxNumberLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Box number");
         dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Date received");
+            "Received");
 
         setShipmentValues();
     }

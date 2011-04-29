@@ -166,10 +166,10 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 }
             });
 
-        departedLabel = widgetCreator.createLabel(client, "Date Sent");
+        departedLabel = widgetCreator.createLabel(client, "Packed");
         departedLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        departedValidator = new NotNullValidator("Date Sent should be set");
+        departedValidator = new NotNullValidator("Date Packed should be set");
 
         dateSentWidget = createDateTimeWidget(client, departedLabel,
             shipmentInfo.getPackedAt(), shipmentInfo,
@@ -182,10 +182,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             "Box Number", null, shipmentInfo,
             ShipmentInfoPeer.BOX_NUMBER.getName(), null);
 
-        dateReceivedWidget = createDateTimeWidget(client, "Date Received",
+        dateReceivedWidget = createDateTimeWidget(client, "Received",
             shipmentInfo.getReceivedAt(), shipmentInfo,
             ShipmentInfoPeer.RECEIVED_AT.getName(), new NotNullValidator(
                 "Date Received should be set"));
+
     }
 
     protected void activateWaybillWidget(boolean waybillNeeded) {
