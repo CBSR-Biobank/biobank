@@ -149,6 +149,9 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             multipleValidationMade, "Validation needed: hit enter"); //$NON-NLS-1$
     }
 
+    /**
+     * Multiple. initialize pallet
+     */
     private void initPalletValues() {
         try {
             currentMultipleContainer.initObjectWith(new ContainerWrapper(

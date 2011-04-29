@@ -52,7 +52,7 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.GenericLinkEntryForm"; //$NON-NLS-1$
 
-    private static final String INVENTORY_ID_BINDING = "inventoryId-binding";
+    private static final String INVENTORY_ID_BINDING = "inventoryId-binding"; //$NON-NLS-1$
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(GenericLinkEntryForm.class.getName());
@@ -103,7 +103,7 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected String getFormTitle() {
-        return Messages.getString("GenericLinkEntryForm.form.title");
+        return Messages.getString("GenericLinkEntryForm.form.title"); //$NON-NLS-1$
     }
 
     @Override
@@ -390,7 +390,9 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
         @SuppressWarnings("unchecked")
         Map<RowColPos, PalletCell> cells = (Map<RowColPos, PalletCell>) palletWidget
             .getCells();
-        StringBuffer sb = new StringBuffer("ALIQUOTED SPECIMENS:\n"); //$NON-NLS-1$
+        StringBuffer sb = new StringBuffer(
+            Messages
+                .getString("GenericLinkEntryForm.activitylog.specimens.start")); //$NON-NLS-1$
         int nber = 0;
         ActivityStatusWrapper activeStatus = ActivityStatusWrapper
             .getActiveActivityStatus(appService);
@@ -418,7 +420,7 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
                 // LINKED\: {0} - Type: {1} - Patient\: {2} - Visit\: {3} -
                 // Center: {4} \n
                 sb.append(Messages.getString(
-                    "ScanLink.activitylog.specimen.linked", //$NON-NLS-1$
+                    "GenericLinkEntryForm.activitylog.specimen.linked", //$NON-NLS-1$
                     cell.getValue(), cell.getType().getName(), sourceSpecimen
                         .getSpecimenType().getNameShort(), sourceSpecimen
                         .getInventoryId(), sourceSpecimen.getCollectionEvent()
@@ -433,8 +435,9 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
         // display logs only if persist succeeds.
         appendLog(sb.toString());
 
-        // SCAN-LINK\: {0} specimens linked to patient {1} on center {2}
-        appendLog(Messages.getString("ScanLink.activitylog.save.summary", nber, //$NON-NLS-1$
+        // LINKING\: {0} specimens linked to patient {1} on center {2}
+        appendLog(Messages.getString(
+            "GenericLinkEntryForm.activitylog.save.summary", nber, //$NON-NLS-1$
             linkFormPatientManagement.getCurrentPatient().getPnumber(),
             currentSelectedCenter.getNameShort()));
     }
