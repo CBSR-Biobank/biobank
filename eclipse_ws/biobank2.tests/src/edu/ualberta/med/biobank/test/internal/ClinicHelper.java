@@ -6,7 +6,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 
-public class ClinicHelper extends DbHelper {
+public class ClinicHelper extends CenterHelper {
 
     private static List<ClinicWrapper> createdClinics = new ArrayList<ClinicWrapper>();
 
@@ -72,8 +72,10 @@ public class ClinicHelper extends DbHelper {
     }
 
     public static void deleteCreatedClinics() throws Exception {
+        for (ClinicWrapper clinic : createdClinics) {
+            deleteCenterDependencies(clinic);
+        }
         deleteClinics(createdClinics);
         createdClinics.clear();
     }
-
 }

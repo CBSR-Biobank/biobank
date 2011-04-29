@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -18,11 +18,12 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
@@ -30,7 +31,9 @@ import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
+import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestProcessingEvent extends TestDatabase {
@@ -46,10 +49,6 @@ public class TestProcessingEvent extends TestDatabase {
     private ClinicWrapper clinic;
 
     private PatientWrapper patient;
-
-    // the methods to skip in the getters and setters test
-    private static final List<String> GETTER_SKIP_METHODS = Arrays
-        .asList(new String[] { "getPvAttrValue", "getPvAttrTypeName" });
 
     @Override
     @Before
@@ -105,110 +104,90 @@ public class TestProcessingEvent extends TestDatabase {
         containerMap.put("ChildL1", childL1);
     }
 
-    private void addPvAttrs() throws Exception {
-        // add PvAtt to study
-        Collection<String> types = EventAttrTypeWrapper
-            .getAllEventAttrTypesMap(appService).keySet();
-        Assert
-            .assertTrue("PvAttrTypes not initialized", types.contains("text"));
-        // FIXME
-        // study.setStudyPvAttr("PMBC Count", "number");
-        // study.setStudyPvAttr("Worksheet", "text");
-        // study.setStudyPvAttr("Date", "date_time");
-        // study.setStudyPvAttr("Consent", "select_multiple", new String[] {
-        // "c1",
-        // "c2", "c3" });
-        // study.setStudyPvAttr("Visit", "select_single", new String[] { "v1",
-        // "v2", "v3", "v4" });
-        // study.persist();
-        // study.reload();
-    }
-
     @Test
     public void testGettersAndSetters() throws Exception {
-        // FIXME
-        // ProcessingEventWrapper pevent = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, Utils.getRandomDate(),
-        // Utils.getRandomDate());
-        // testGettersAndSetters(pevent, GETTER_SKIP_METHODS);
+        ProcessingEventWrapper pevent = ProcessingEventHelper
+            .addProcessingEvent(site, patient, Utils.getRandomDate());
+        testGettersAndSetters(pevent);
     }
 
     @Test
     public void testCompareTo() throws Exception {
         // visit2's date processed is 1 day after visit1's
-        // FIXME
-        // Date date = Utils.getRandomDate();
-        // ProcessingEventWrapper visit1 = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, date, date);
-        //
-        // Calendar cal = Calendar.getInstance();
-        // cal.setTime(date);
-        // cal.add(Calendar.DATE, 1);
-        //
-        // ProcessingEventWrapper visit2 = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, cal.getTime(), date);
-        //
-        // Assert.assertEquals(-1, visit1.compareTo(visit2));
-        //
-        // // visit2's date processed is 1 day before visit1's
-        // cal.add(Calendar.DATE, -2);
-        // visit2.setDateProcessed(cal.getTime());
-        // visit2.persist();
-        // visit2.reload();
-        // Assert.assertEquals(1, visit1.compareTo(visit2));
-        //
-        // // check against itself
-        // Assert.assertEquals(0, visit1.compareTo(visit1));
+        Date date = Utils.getRandomDate();
+        ProcessingEventWrapper pevent1 = ProcessingEventHelper
+            .addProcessingEvent(site, patient, date);
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.DATE, 1);
+
+        ProcessingEventWrapper pevent2 = ProcessingEventHelper
+            .addProcessingEvent(site, patient, cal.getTime());
+
+        Assert.assertEquals(-1, pevent1.compareTo(pevent2));
+
+        // visit2's date processed is 1 day before visit1's
+        cal.add(Calendar.DATE, -2);
+        pevent2.setCreatedAt(cal.getTime());
+        pevent2.persist();
+        pevent2.reload();
+        Assert.assertEquals(1, pevent1.compareTo(pevent2));
+
+        // check against itself
+        Assert.assertEquals(0, pevent1.compareTo(pevent1));
     }
 
     @Test
     public void testReset() throws Exception {
-        // FIXME
-        // ProcessingEventWrapper pevent = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, Utils.getRandomDate(),
-        // Utils.getRandomDate());
-        // pevent.reset();
+        Date dateProcessed = Utils.getRandomDate();
+        ProcessingEventWrapper pevent = ProcessingEventHelper
+            .addProcessingEvent(site, patient, dateProcessed);
+        Calendar cal = Calendar.getInstance();
+        pevent.setCreatedAt(cal.getTime());
+        pevent.reset();
+        Assert.assertEquals(dateProcessed, pevent.getCreatedAt());
     }
 
     @Test
     public void testReload() throws Exception {
-        // FIXME
-        // ProcessingEventWrapper pevent = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, Utils.getRandomDate(),
-        // Utils.getRandomDate());
-        // pevent.reload();
+        Date dateProcessed = Utils.getRandomDate();
+        ProcessingEventWrapper pevent = ProcessingEventHelper
+            .addProcessingEvent(site, patient, dateProcessed);
+        Calendar cal = Calendar.getInstance();
+        pevent.setCreatedAt(cal.getTime());
+        pevent.reload();
+        Assert.assertEquals(dateProcessed, pevent.getCreatedAt());
     }
 
     @Test
     public void testDelete() throws Exception {
-        // FIXME
-        // ProcessingEventWrapper pevent = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, Utils.getRandomDate(),
-        // Utils.getRandomDate());
-        // pevent.delete();
-        //
-        // // make sure pevent cannot be deleted if it has samples
-        // pevent = ProcessingEventHelper.addProcessingEvent(site, patient,
-        // Utils.getRandomDate(), Utils.getRandomDate());
-        // addContainerTypes();
-        // addContainers();
-        // List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-        // .getAllSpecimenTypes(appService, true);
-        // SpecimenWrapper aliquot = SpecimenHelper.addAliquot(
-        // allSampleTypes.get(0), containerMap.get("ChildL1"), pevent, 0, 0);
-        // pevent.reload();
-        //
-        // try {
-        // pevent.delete();
-        // Assert.fail("should not be allowed to delete Processing Event");
-        // } catch (Exception e) {
-        // Assert.assertTrue(true);
-        // }
-        //
-        // // delete aliquot and pevent
-        // aliquot.delete();
-        // pevent.reload();
-        // pevent.delete();
+        ProcessingEventWrapper pevent = ProcessingEventHelper
+            .addProcessingEvent(site, patient, Utils.getRandomDate());
+        pevent.delete();
+
+        // make sure pevent cannot be deleted if it has samples
+        pevent = ProcessingEventHelper.addProcessingEvent(site, patient,
+            Utils.getRandomDate());
+        addContainerTypes();
+        addContainers();
+
+        SpecimenWrapper childSpc = SpecimenHelper.addSpecimens(patient, clinic,
+            containerMap.get("ChildL1"), 0, 0, 1).get(0);
+        pevent = childSpc.getProcessingEvent();
+
+        try {
+            pevent.delete();
+            Assert
+                .fail("should not be allowed to delete Processing Event since it is associated with specimens");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        // delete aliquot and pevent
+        childSpc.delete();
+        pevent.reload();
+        pevent.delete();
     }
 
     @Test
@@ -326,293 +305,6 @@ public class TestProcessingEvent extends TestDatabase {
         // pevent.reload();
         // visitSamples = pevent.getSpecimenCollection(false);
         // Assert.assertEquals(0, visitSamples.size());
-    }
-
-    @Test
-    public void testGetSetPvAttrLabels() throws Exception {
-        addPvAttrs();
-        // FIXME
-        // List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
-        // Assert.assertEquals(5, labels.size());
-        //
-        // ProcessingEventWrapper pevent = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
-        // Utils.getRandomDate());
-        // pevent.reload();
-        //
-        // Assert.assertEquals(0, pevent.getPvAttrLabels().length);
-        //
-        // pevent.setPvAttrValue("PMBC Count", "-0.543");
-        // pevent.setPvAttrValue("Worksheet", "abcdefghi");
-        // pevent.setPvAttrValue("Date", "1999-12-31 23:59");
-        // pevent.setPvAttrValue("Consent", "c1;c2;c3");
-        // pevent.setPvAttrValue("Visit", "v1");
-        // pevent.persist();
-        //
-        // labels = Arrays.asList(pevent.getPvAttrLabels());
-        // Assert.assertEquals(5, labels.size());
-        // Assert.assertTrue(labels.containsAll(Arrays.asList("PMBC Count",
-        // "Worksheet", "Date", "Consent", "Visit")));
-        //
-        // // set an invalid label
-        // try {
-        // pevent.setPvAttrValue("xyz", "abcdef");
-        // Assert.fail("should not be allowed to assign invalid value");
-        // } catch (Exception e) {
-        // Assert.assertTrue(true);
-        // }
-    }
-
-    @Test
-    public void testEmptyGetPvAttr() throws Exception {
-        // FIXME
-        // ProcessingEventWrapper pevent = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
-        // Utils.getRandomDate());
-        // pevent.reload();
-        // List<String> pvAttr = Arrays.asList(pevent.getPvAttrLabels());
-        // Assert.assertEquals(0, pvAttr.size());
-    }
-
-    @Test
-    public void testGetPvAttr() throws Exception {
-        addPvAttrs();
-        // FIXME
-        // ProcessingEventWrapper pevent = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
-        // Utils.getRandomDate());
-        // pevent.reload();
-        //
-        // // no values have been set yet, they should return null
-        // Assert.assertEquals(null, pevent.getPvAttrValue("PMBC Count"));
-        // Assert.assertEquals(null, pevent.getPvAttrValue("Worksheet"));
-        // Assert.assertEquals(null, pevent.getPvAttrValue("Date"));
-        // Assert.assertEquals(null, pevent.getPvAttrValue("Consent"));
-        // Assert.assertEquals(null, pevent.getPvAttrValue("Visit"));
-        //
-        // // select an invalid PvAttr label
-        // try {
-        // pevent.getPvAttrValue("abcdef");
-        // Assert.fail("should not be query an invalid label");
-        // } catch (Exception e) {
-        // Assert.assertTrue(true);
-        // }
-        //
-        // // assign PvAttrs correctly
-        // String worksheetValue = Utils.getRandomString(10, 20);
-        // pevent.setPvAttrValue("PMBC Count", "-0.543");
-        // pevent.setPvAttrValue("Worksheet", worksheetValue);
-        // pevent.setPvAttrValue("Date", "1999-12-31 23:59");
-        // pevent.setPvAttrValue("Consent", "c1;c2;c3");
-        // pevent.setPvAttrValue("Visit", "v1");
-        // pevent.persist();
-        //
-        // pevent.reload();
-        // List<String> pvAttr = Arrays.asList(pevent.getPvAttrLabels());
-        // Assert.assertEquals(5, pvAttr.size());
-        // Assert.assertEquals("-0.543", pevent.getPvAttrValue("PMBC Count"));
-        // Assert.assertEquals(worksheetValue,
-        // pevent.getPvAttrValue("Worksheet"));
-        // Assert.assertEquals("1999-12-31 23:59",
-        // pevent.getPvAttrValue("Date"));
-        // Assert.assertEquals("c1;c2;c3", pevent.getPvAttrValue("Consent"));
-        // Assert.assertEquals("v1", pevent.getPvAttrValue("Visit"));
-        //
-        // // select an invalid value for a number PvAttr
-        // try {
-        // pevent.setPvAttrValue("PMBC Count", "abcdef");
-        // Assert.fail("should not be allowed to assign invalid value");
-        // } catch (Exception e) {
-        // Assert.assertTrue(true);
-        // }
-        //
-        // // select an invalid value for a date_time PvAttr
-        // try {
-        // pevent.setPvAttrValue("PMBC Count", "1999-12-31 2300:59");
-        // Assert.fail("should not be allowed to assign invalid value");
-        // } catch (Exception e) {
-        // Assert.assertTrue(true);
-        // }
-        //
-        // // select an invalid value for a select_multiple PvAttr
-        // try {
-        // pevent.setPvAttrValue("Consent", "c2;c99");
-        // Assert.fail("should not be allowed to assign invalid value");
-        // } catch (Exception e) {
-        // Assert.assertTrue(true);
-        // }
-        //
-        // // select an invalid value for a select_single PvAttr
-        // try {
-        // pevent.setPvAttrValue("Visit", "abcdef");
-        // Assert.fail("should not be allowed to assign invalid value");
-        // } catch (Exception e) {
-        // Assert.assertTrue(true);
-        // }
-    }
-
-    @Test
-    public void testGetPvAttrTypeName() throws Exception {
-        addPvAttrs();
-        // FIXME
-        // List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
-        // Assert.assertEquals(5, labels.size());
-        //
-        // ProcessingEventWrapper pevent = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
-        // Utils.getRandomDate());
-        // pevent.reload();
-        //
-        // // get types before they are assigned on Processing Event
-        // Assert.assertEquals("number",
-        // pevent.getPvAttrTypeName("PMBC Count"));
-        // Assert.assertEquals("text", pevent.getPvAttrTypeName("Worksheet"));
-        // Assert.assertEquals("date_time", pevent.getPvAttrTypeName("Date"));
-        // Assert.assertEquals("select_multiple",
-        // pevent.getPvAttrTypeName("Consent"));
-        // Assert.assertEquals("select_single",
-        // pevent.getPvAttrTypeName("Visit"));
-        //
-        // // select an invalid label
-        // try {
-        // pevent.getPvAttrTypeName("xyz");
-        // Assert.fail("should not be allowed get type for invalid label");
-        // } catch (Exception e) {
-        // Assert.assertTrue(true);
-        // }
-        //
-        // pevent.setPvAttrValue("PMBC Count", "-0.543");
-        // pevent.setPvAttrValue("Worksheet", "abcdefghi");
-        // pevent.setPvAttrValue("Date", "1999-12-31 23:59");
-        // pevent.setPvAttrValue("Consent", "c1;c2;c3");
-        // pevent.setPvAttrValue("Visit", "v1");
-        // pevent.persist();
-        //
-        // // set value to null
-        // pevent.setPvAttrValue("PMBC Count", null);
-        // pevent.persist();
-        //
-        // // get types after they are assigned on Processing Event
-        // Assert.assertEquals("number",
-        // pevent.getPvAttrTypeName("PMBC Count"));
-        // Assert.assertEquals("text", pevent.getPvAttrTypeName("Worksheet"));
-        // Assert.assertEquals("date_time", pevent.getPvAttrTypeName("Date"));
-        // Assert.assertEquals("select_multiple",
-        // pevent.getPvAttrTypeName("Consent"));
-        // Assert.assertEquals("select_single",
-        // pevent.getPvAttrTypeName("Visit"));
-    }
-
-    @Test
-    public void testPvAttrPermissible() throws Exception {
-        addPvAttrs();
-        // FIXME
-        // List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
-        // Assert.assertEquals(5, labels.size());
-        //
-        // ProcessingEventWrapper pevent = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
-        // Utils.getRandomDate());
-        // pevent.reload();
-        //
-        // pevent.setPvAttrValue("PMBC Count", "-0.543");
-        // pevent.setPvAttrValue("Worksheet", "abcdefghi");
-        // pevent.setPvAttrValue("Date", "1999-12-31 23:59");
-        // pevent.setPvAttrValue("Consent", "c1;c2;c3");
-        // pevent.setPvAttrValue("Visit", "v1");
-        // pevent.persist();
-        // pevent.reload();
-        //
-        // Assert.assertEquals(null, pevent.getPvAttrPermissible("PMBC Count"));
-        // Assert.assertEquals(null, pevent.getPvAttrPermissible("Worksheet"));
-        // Assert.assertEquals(null, pevent.getPvAttrPermissible("Date"));
-        //
-        // List<String> permissibles = Arrays.asList(pevent
-        // .getPvAttrPermissible("Consent"));
-        // Assert.assertEquals(3, permissibles.size());
-        // Assert.assertTrue(permissibles.containsAll(Arrays.asList("c1", "c2",
-        // "c3")));
-        //
-        // permissibles = Arrays.asList(pevent.getPvAttrPermissible("Visit"));
-        // Assert.assertEquals(4, permissibles.size());
-        // Assert.assertTrue(permissibles.containsAll(Arrays.asList("v1", "v2",
-        // "v3", "v4")));
-        //
-        // // select an invalid label
-        // try {
-        // pevent.getPvAttrPermissible("xyz");
-        // Assert
-        // .fail("should not be allowed get permissible for invalid label");
-        // } catch (Exception e) {
-        // Assert.assertTrue(true);
-        // }
-    }
-
-    @Test
-    public void testGetSetPvAttrActivityStatus() throws Exception {
-        addPvAttrs();
-        // FIXME
-        // List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
-        // Assert.assertEquals(5, labels.size());
-        //
-        // ProcessingEventWrapper pevent = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
-        // Utils.getRandomDate());
-        // pevent.reload();
-        //
-        // // lock an attribute
-        // study.setStudyPvAttrActivityStatus("Worksheet", ActivityStatusWrapper
-        // .getActivityStatus(appService,
-        // ActivityStatusWrapper.CLOSED_STATUS_STRING));
-        // study.persist();
-        // pevent.reload();
-        // try {
-        // pevent.setPvAttrValue("Worksheet", "xyz");
-        // Assert.fail("should not be allowed set value for locked label");
-        // } catch (Exception e) {
-        // Assert.assertTrue(true);
-        // }
-        //
-        // // unlock the attribute
-        // study.setStudyPvAttrActivityStatus("Worksheet",
-        // ActivityStatusWrapper.getActiveActivityStatus(appService));
-        // study.persist();
-        // pevent.reload();
-        // pevent.setPvAttrValue("Worksheet", "xyz");
-        // pevent.persist();
-    }
-
-    @Test
-    public void testDuplicatePvAttr() throws Exception {
-        addPvAttrs();
-        // FIXME
-        // List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
-        // Assert.assertEquals(5, labels.size());
-        //
-        // ProcessingEventWrapper pevent = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
-        // Utils.getRandomDate());
-        // pevent.reload();
-        //
-        // pevent.setPvAttrValue("Worksheet", "abcdefghi");
-        // pevent.persist();
-        //
-        // // change the worksheet value
-        // pevent.setPvAttrValue("Worksheet", "jklmnopqr");
-        // pevent.persist();
-        // pevent.reload();
-        //
-        // // make sure only one value in database
-        // HQLCriteria c = new HQLCriteria(
-        // "select pvattr from "
-        // + ProcessingEvent.class.getName()
-        // + " as pv "
-        // + "join pv.pvAttrCollection as pvattr "
-        // +
-        // "join pvattr.studyPvAttr as spvattr where pv.id = ? and spvattr.label= ?",
-        // Arrays.asList(new Object[] { pevent.getId(), "Worksheet" }));
-        // List<PvAttr> results = appService.query(c);
-        // Assert.assertEquals(1, results.size());
     }
 
     @Test

@@ -177,10 +177,24 @@ public class TestDatabase {
                 w.persist();
                 w.reload();
                 Object getResult = getterInfo.getMethod.invoke(w);
+                String msg = new StringBuffer(w.getClass().getName())
+                    .append(".").append(getterInfo.getMethod.getName())
+                    .append("()").toString();
 
-                Assert.assertEquals(w.getClass().getName() + "."
-                    + getterInfo.getMethod.getName() + "()", parameter,
-                    getResult);
+                if (returnType.equals(java.lang.Double.class)) {
+                    // FIXME: temporary fix for caCORE not supporting DECIMAL
+                    // MySQL type
+                    //
+                    // our wish is to convert all Doubles in the model to
+                    // DECIMALs
+                    Assert
+                        .assertTrue(
+                            msg,
+                            Math.abs((Double) parameter - (Double) getResult) < 0.0001);
+
+                } else {
+                    Assert.assertEquals(msg, parameter, getResult);
+                }
             }
 
             // maxlength for varchar test

@@ -71,7 +71,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
-        if (isUsedBySamples()) {
+        if (isUsedBySpecimens()) {
             throw new BiobankDeleteException("Unable to delete specimen type "
                 + getName() + ". Specimens of this type exists in storage."
                 + " Remove all instances before deleting this type.");
@@ -138,13 +138,13 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return getName();
     }
 
-    public static final String IS_USED_BY_SAMPLES_QRY = "select count(s) from "
+    public static final String IS_USED_BY_SPECIMENS_QRY = "select count(s) from "
         + Specimen.class.getName() + " as s where s."
         + SpecimenPeer.SPECIMEN_TYPE.getName() + "=?)";
 
-    public boolean isUsedBySamples() throws ApplicationException,
+    public boolean isUsedBySpecimens() throws ApplicationException,
         BiobankQueryResultSizeException {
-        HQLCriteria c = new HQLCriteria(IS_USED_BY_SAMPLES_QRY,
+        HQLCriteria c = new HQLCriteria(IS_USED_BY_SPECIMENS_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
         return getCountResult(appService, c) > 0;
     }

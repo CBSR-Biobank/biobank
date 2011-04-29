@@ -368,8 +368,14 @@ public class LinkFormPatientManagement {
     public void setCollectionEventListFromPEvent() {
         if (viewerCollectionEvents != null) {
             if (currentPEventSelected != null) {
-                List<CollectionEventWrapper> collection = currentPEventSelected
-                    .getCollectionEventFromSpecimens();
+                List<CollectionEventWrapper> collection = null;
+                try {
+                    collection = currentPEventSelected
+                        .getCollectionEventFromSpecimensAndPatient(currentPatient);
+                } catch (ApplicationException e) {
+                    BiobankPlugin.openAsyncError(
+                        "Problem retrieving collection events", e);
+                }
                 viewerCollectionEvents.setInput(collection);
                 if (collection != null && collection.size() == 1) {
                     viewerCollectionEvents
