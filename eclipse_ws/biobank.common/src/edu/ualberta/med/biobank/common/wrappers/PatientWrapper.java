@@ -213,7 +213,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         return getPnumber();
     }
 
-    private static final String LAST_7_DAYS_PROCESSING_EVENTS_FOR_CENTER_QRY = "select pEvent from "
+    private static final String LAST_7_DAYS_PROCESSING_EVENTS_FOR_CENTER_QRY = "select distinct(pEvent) from "
         + Patient.class.getName()
         + " as patient join patient."
         + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
