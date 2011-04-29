@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
@@ -160,6 +161,11 @@ public class RequestWrapper extends RequestBaseWrapper {
 
     public void setState(RequestState state) {
         setState(state.getId());
+    }
+
+    public String getFormattedCreated() {
+        return DateFormatter.formatAsDate(DateFormatter.convertDate(
+            DateFormatter.GMT, DateFormatter.LOCAL, getCreated()));
     }
 
 }

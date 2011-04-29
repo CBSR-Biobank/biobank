@@ -110,7 +110,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     public String getFormattedCreatedAt() {
-        return DateFormatter.formatAsDateTime(getCreatedAt());
+        return DateFormatter.formatAsDateTime(DateFormatter.convertDate(
+            DateFormatter.GMT, DateFormatter.LOCAL, getCreatedAt()));
     }
 
     public ContainerWrapper getParentContainer() {

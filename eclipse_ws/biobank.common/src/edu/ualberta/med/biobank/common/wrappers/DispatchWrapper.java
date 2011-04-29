@@ -62,8 +62,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public String getFormattedPackedAt() {
         if (getShipmentInfo() != null)
-            return DateFormatter.formatAsDateTime(getShipmentInfo()
-                .getPackedAt());
+            return DateFormatter.formatAsDateTime(DateFormatter.convertDate(
+                DateFormatter.GMT, DateFormatter.LOCAL, getShipmentInfo()
+                    .getPackedAt()));
         return null;
     }
 

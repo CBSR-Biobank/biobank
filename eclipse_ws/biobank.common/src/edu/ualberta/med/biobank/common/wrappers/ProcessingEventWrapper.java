@@ -131,7 +131,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     public String getFormattedCreatedAt() {
-        return DateFormatter.formatAsDateTime(getCreatedAt());
+        return DateFormatter.formatAsDateTime(DateFormatter.convertDate(
+            DateFormatter.GMT, DateFormatter.LOCAL, getCreatedAt()));
     }
 
     @Override

@@ -151,7 +151,9 @@ public class ProcessingView extends AbstractAdministrationView {
                     msg += " for worksheet " + treeText.getText();
                 } else {
                     msg += " for date "
-                        + DateFormatter.formatAsDate(dateWidget.getDate());
+                        + DateFormatter.formatAsDate(DateFormatter.convertDate(
+                            DateFormatter.LOCAL, DateFormatter.GMT,
+                            dateWidget.getDate()));
                 }
                 BiobankPlugin.openMessage("Processing Event not found", msg);
             } else {

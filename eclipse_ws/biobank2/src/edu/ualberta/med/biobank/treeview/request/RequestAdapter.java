@@ -11,7 +11,6 @@ import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -41,7 +40,7 @@ public class RequestAdapter extends AdapterBase {
         StudyWrapper study = shipment.getStudy();
         String label = shipment.getId() + " - ";
         label += study.getNameShort() + " - ";
-        label += DateFormatter.formatAsDate(shipment.getCreated());
+        label += shipment.getFormattedCreated();
         return label;
 
     }

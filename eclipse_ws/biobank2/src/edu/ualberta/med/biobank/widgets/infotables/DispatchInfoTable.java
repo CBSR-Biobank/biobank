@@ -28,9 +28,12 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         @Override
         public String toString() {
             return StringUtils.join(
-                new String[] { DateFormatter.formatAsDate(dispatchTime),
-                    DateFormatter.formatAsDate(dateReceived), waybill, dstatus,
-                    astatus }, "\t");
+                new String[] {
+                    DateFormatter.formatAsDate(DateFormatter.convertDate(
+                        DateFormatter.LOCAL, DateFormatter.GMT, dispatchTime)),
+                    DateFormatter.formatAsDate(DateFormatter.convertDate(
+                        DateFormatter.LOCAL, DateFormatter.GMT, dateReceived)),
+                    waybill, dstatus, astatus }, "\t");
         }
     }
 
@@ -64,9 +67,13 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                 }
                 switch (columnIndex) {
                 case 0:
-                    return DateFormatter.formatAsDate(info.dispatchTime);
+                    return DateFormatter.formatAsDate(DateFormatter
+                        .convertDate(DateFormatter.LOCAL, DateFormatter.GMT,
+                            info.dispatchTime));
                 case 1:
-                    return DateFormatter.formatAsDate(info.dateReceived);
+                    return DateFormatter.formatAsDate(DateFormatter
+                        .convertDate(DateFormatter.LOCAL, DateFormatter.GMT,
+                            info.dateReceived));
                 case 2:
                     return info.waybill;
                 case 3:
