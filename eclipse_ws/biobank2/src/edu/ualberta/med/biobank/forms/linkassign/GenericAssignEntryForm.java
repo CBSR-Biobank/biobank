@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -43,6 +44,7 @@ import edu.ualberta.med.biobank.common.scanprocess.data.AssignProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -80,6 +82,8 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     private static final String PRODUCT_BARCODE_BINDING = "productBarcode-binding";
 
     private static final String LABEL_BINDING = "label-binding";
+
+    private static final String PALLET_TYPES_BINDING = "palletType-binding";
 
     // parents of either the specimen in single mode or the pallet/box in
     // multiple mode. First container, is the direct parent, second is the
@@ -131,9 +135,8 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected boolean palletPositionTextModified;
     private List<ContainerTypeWrapper> palletContainerTypes;
     private BiobankText palletproductBarcodeText;
-
+    private boolean saveEvenIfMissing;
     private boolean isFakeScanLinkedOnly;
-
     private Button fakeScanLinkedOnlyButton;
 
     @Override
@@ -196,7 +199,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected int getLeftSectionWidth() {
-        return 410;
+        return 450;
     }
 
     @Override
@@ -256,11 +259,12 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         if (inventoryId.isEmpty()) {
             return;
         }
-        if (inventoryId.length() == 4) {
-            // compatibility with old cabinet specimens imported
-            // 4 letters specimens are now C+4letters
-            inventoryId = "C" + inventoryId; //$NON-NLS-1$
-        }
+        // FIXME only for old Cabinet... SHould we still search for that?
+        // if (inventoryId.length() == 4) {
+        // // compatibility with old cabinet specimens imported
+        // // 4 letters specimens are now C+4letters
+        //            inventoryId = "C" + inventoryId; //$NON-NLS-1$
+        // }
         // resultShownValue.setValue(false);
         reset();
         singleSpecimen.setInventoryId(inventoryId);
@@ -298,9 +302,9 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             displayOldCabinetFields(true);
             oldSinglePositionCheckText.setText(oldSinglePositionCheckText
                 .getText());
+            oldSinglePositionCheckText.setFocus();
         }
         oldSinglePositionText.setText(positionString);
-        page.layout(true, true);
         appendLog(Messages
             .getString(
                 "Cabinet.activitylog.specimenInfo", singleSpecimen.getInventoryId(), //$NON-NLS-1$
@@ -397,7 +401,6 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         newSinglePositionText
             .addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         displayOldCabinetFields(false);
-
     }
 
     /**
@@ -831,12 +834,12 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     private void createPalletTypesViewer(Composite parent)
         throws ApplicationException {
         palletContainerTypes = getPalletContainerTypes();
-        palletTypesViewer = createComboViewer(
+        palletTypesViewer = widgetCreator.createComboViewer(
             parent,
             Messages.getString("ScanAssign.palletType.label"), //$NON-NLS-1$
             null, null,
-            Messages.getString("ScanAssign.palletType.validationMsg"),
-            new ComboSelectionUpdate() {
+            Messages.getString("ScanAssign.palletType.validationMsg"), true,
+            PALLET_TYPES_BINDING, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     if (!multipleModificationMode) {
@@ -902,9 +905,60 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         setFinished(false);
     }
 
-    private void saveMultipleSpecimens() {
-        // TODO Auto-generated method stub
+    private void saveMultipleSpecimens() throws Exception {
+        if (saveEvenIfMissing) {
+            if (containerToRemove != null) {
+                containerToRemove.delete();
+            }
+            currentMultipleContainer.persist();
+            displayPalletPositionInfo();
+            int totalNb = 0;
+            StringBuffer sb = new StringBuffer("SPECIMENS ASSIGNED:\n"); //$NON-NLS-1$
+            try {
+                Map<RowColPos, PalletCell> cells = getCells();
+                for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
+                    RowColPos rcp = entry.getKey();
+                    PalletCell cell = entry.getValue();
+                    if (cell != null
+                        && (cell.getStatus() == UICellStatus.NEW || cell
+                            .getStatus() == UICellStatus.MOVED)) {
+                        SpecimenWrapper specimen = cell.getSpecimen();
+                        if (specimen != null) {
+                            specimen.setPosition(rcp);
+                            specimen.setParent(currentMultipleContainer);
+                            specimen.persist();
+                            String posStr = specimen.getPositionString(true,
+                                false);
+                            if (posStr == null) {
+                                posStr = "none"; //$NON-NLS-1$
+                            }
+                            computeActivityLogMessage(sb, cell, specimen,
+                                posStr);
+                            totalNb++;
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                setScanHasBeenLauched(false, true);
+                throw ex;
+            }
+            appendLog(sb.toString());
+            appendLog(Messages.getString(
+                "ScanAssign.activitylog.save.summary", totalNb, //$NON-NLS-1$
+                currentMultipleContainer.getLabel(), currentMultipleContainer
+                    .getSite().getNameShort()));
+            setFinished(false);
+        }
+    }
 
+    private void computeActivityLogMessage(StringBuffer sb, PalletCell cell,
+        SpecimenWrapper specimen, String posStr) {
+        CollectionEventWrapper visit = specimen.getCollectionEvent();
+        sb.append(Messages.getString(
+            "ScanAssign.activitylog.specimen.assigned", //$NON-NLS-1$
+            posStr, currentMultipleContainer.getSite().getNameShort(), cell
+                .getValue(), specimen.getSpecimenType().getName(), visit
+                .getPatient().getPnumber(), visit.getVisitNumber()));
     }
 
     private void saveSingleSpecimen() throws Exception {
@@ -1003,6 +1057,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         widgetCreator.setBinding(NEW_SINGLE_POSITION_BINDING, isSingleMode);
         widgetCreator.setBinding(PRODUCT_BARCODE_BINDING, !isSingleMode);
         widgetCreator.setBinding(LABEL_BINDING, !isSingleMode);
+        widgetCreator.setBinding(PALLET_TYPES_BINDING, !isSingleMode);
         super.setBindings(isSingleMode);
     }
 
@@ -1423,7 +1478,16 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected void doBeforeSave() throws Exception {
-        // saveEvenIfMissing = saveEvenIfSpecimensMissing();
+        saveEvenIfMissing = true;
+        if (currentScanState == UICellStatus.MISSING) {
+            boolean save = BiobankPlugin.openConfirm(
+                Messages.getString("ScanAssign.dialog.reallySave.title"), //$NON-NLS-1$
+                Messages.getString("ScanAssign.dialog.saveWithMissing.msg")); //$NON-NLS-1$
+            if (!save) {
+                setDirty(true);
+                saveEvenIfMissing = false;
+            }
+        }
     }
 
     @Override
@@ -1440,4 +1504,19 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             "Select linked and assigned specimens", SWT.RADIO); //$NON-NLS-1$
     }
 
+    private void displayPalletPositionInfo() {
+        String productBarcode = currentMultipleContainer.getProductBarcode();
+        String containerType = currentMultipleContainer.getContainerType()
+            .getName();
+        String palletLabel = currentMultipleContainer.getLabel();
+        String siteName = currentMultipleContainer.getSite().getNameShort();
+        if (palletFoundWithProductBarcodeLabel == null)
+            appendLog(Messages.getString("ScanAssign.activitylog.pallet.added", //$NON-NLS-1$
+                productBarcode, containerType, palletLabel, siteName));
+        else if (!palletLabel.equals(palletFoundWithProductBarcodeLabel))
+            appendLog(Messages.getString(
+                "ScanAssign.activitylog.pallet.moved", //$NON-NLS-1$
+                productBarcode, containerType,
+                palletFoundWithProductBarcodeLabel, palletLabel, siteName));
+    }
 }

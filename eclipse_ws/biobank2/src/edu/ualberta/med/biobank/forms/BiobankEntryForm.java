@@ -315,13 +315,13 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         firstControl = c;
     }
 
-    protected void addBooleanBinding(WritableValue writableValue,
+    public void addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, final String errorMsg) {
         addBooleanBinding(writableValue, observableValue, errorMsg,
             IStatus.ERROR);
     }
 
-    protected void addBooleanBinding(WritableValue writableValue,
+    public void addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, String errorMsg, int statusType) {
         widgetCreator.addBooleanBinding(writableValue, observableValue,
             errorMsg, statusType);

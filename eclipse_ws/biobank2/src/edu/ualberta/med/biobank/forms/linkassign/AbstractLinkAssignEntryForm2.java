@@ -12,9 +12,10 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 
-public abstract class AbstractLinkAssignEntryForm extends
-    AbstractPalletSpecimenAdminForm {
+public abstract class AbstractLinkAssignEntryForm2 extends
+    AbstractSpecimenAdminForm {
 
     // composite containing common fields to single and multiple
     private Composite commonFieldsComposite;
@@ -31,8 +32,8 @@ public abstract class AbstractLinkAssignEntryForm extends
     private Composite multipleFieldsComposite;
     private ScrolledComposite visualisationScroll;
     private Composite visualisationComposite;
-    private Button fakeScanRandom;
-    protected boolean isFakeScanRandom;
+
+    protected CancelConfirmWidget cancelConfirmWidget;
 
     @Override
     protected void init() throws Exception {
@@ -105,7 +106,7 @@ public abstract class AbstractLinkAssignEntryForm extends
 
         createSingleMultipleSection(leftComposite);
 
-        createCancelConfirmWidget(leftComposite);
+        cancelConfirmWidget = new CancelConfirmWidget(leftComposite, this, true);
     }
 
     protected int getLeftSectionWidth() {
@@ -194,30 +195,14 @@ public abstract class AbstractLinkAssignEntryForm extends
         page.layout(true, true);
     }
 
+    protected abstract void setBindings(boolean isSingleMode);
+
     protected abstract void createSingleFields(Composite parent);
 
     protected abstract void createMultipleFields(Composite parent)
         throws Exception;
 
     protected abstract void createContainersVisualisation(Composite parent);
-
-    @Override
-    /**
-     * when creating the scan button in debug mode, add options to create random values 
-     */
-    protected void createFakeOptions(Composite fieldsComposite) {
-        GridData gd;
-        Composite comp = toolkit.createComposite(fieldsComposite);
-        comp.setLayout(new GridLayout());
-        gd = new GridData();
-        gd.horizontalSpan = 3;
-        comp.setLayoutData(gd);
-        fakeScanRandom = toolkit.createButton(comp, "Get random scan values", //$NON-NLS-1$
-            SWT.RADIO);
-        fakeScanRandom.setSelection(true);
-        toolkit.createButton(comp,
-            "Get random and already linked specimens", SWT.RADIO); //$NON-NLS-1$
-    }
 
     /**
      * Containers visualisation
@@ -255,10 +240,10 @@ public abstract class AbstractLinkAssignEntryForm extends
         }
     }
 
-    @Override
-    protected void disableFields() {
-        enableFields(false);
-    }
+    // @Override
+    // protected void disableFields() {
+    // enableFields(false);
+    // }
 
     private void enableFields(boolean enable) {
         commonFieldsComposite.setEnabled(enable);
@@ -278,30 +263,30 @@ public abstract class AbstractLinkAssignEntryForm extends
 
     public void reset(boolean resetAll) {
         cancelConfirmWidget.reset();
-        removeRescanMode();
-        setScanHasBeenLauched(isSingleMode());
-        if (resetAll) {
-            resetPlateToScan();
-        }
+        // removeRescanMode();
+        // setScanHasBeenLauched(isSingleMode());
+        // if (resetAll) {
+        // resetPlateToScan();
+        // }
         setFocus();
     }
 
-    @Override
-    /**
-     * Multiple linking: do this before multiple scan is made
-     */
-    protected void beforeScanThreadStart() {
-        isFakeScanRandom = fakeScanRandom != null
-            && fakeScanRandom.getSelection();
-    }
+    // @Override
+    // /**
+    // * Multiple linking: do this before multiple scan is made
+    // */
+    // protected void beforeScanThreadStart() {
+    // isFakeScanRandom = fakeScanRandom != null
+    // && fakeScanRandom.getSelection();
+    // }
 
-    @Override
-    /**
-     * Multiple linking: do this before scan of one tube is really made
-     */
-    protected void beforeScanTubeAlone() {
-        isFakeScanRandom = fakeScanRandom != null
-            && fakeScanRandom.getSelection();
-    }
+    // @Override
+    // /**
+    // * Multiple linking: do this before scan of one tube is really made
+    // */
+    // protected void beforeScanTubeAlone() {
+    // isFakeScanRandom = fakeScanRandom != null
+    // && fakeScanRandom.getSelection();
+    // }
 
 }
