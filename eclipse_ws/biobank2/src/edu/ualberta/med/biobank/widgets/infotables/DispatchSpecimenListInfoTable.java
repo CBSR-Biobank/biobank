@@ -67,7 +67,7 @@ public abstract class DispatchSpecimenListInfoTable extends
                                         + " specimens from this shipment ?"))
                                 return;
                             try {
-                                shipment.removeSpecimens(dsaList);
+                                shipment.removeDispatchSpecimens(dsaList);
                                 reloadCollection();
                                 notifyListeners();
                             } catch (Exception e) {

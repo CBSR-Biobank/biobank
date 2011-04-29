@@ -399,7 +399,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchWrapper> getDispatchs() {
+    public List<DispatchWrapper> getDispatches() {
         List<DispatchWrapper> dispatchs = (List<DispatchWrapper>) cache
             .get(DISPATCHS_CACHE_KEY);
         if (dispatchs == null) {
@@ -418,12 +418,23 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     @Override
     protected Log getLogMessage(String action, String center, String details) {
         Log log = new Log();
-        CollectionEventWrapper cevent = getCollectionEvent();
         log.setAction(action);
-        if (center == null)
-            center = getCurrentCenter().getNameShort();
+        if (center == null) {
+            CenterWrapper<?> c = getCurrentCenter();
+            if (c != null) {
+                center = c.getNameShort();
+            }
+        }
         log.setCenter(center);
-        log.setPatientNumber(cevent.getPatient().getPnumber());
+
+        CollectionEventWrapper cevent = getCollectionEvent();
+        if (cevent != null) {
+            PatientWrapper patient = cevent.getPatient();
+            if (patient != null) {
+                log.setPatientNumber(patient.getPnumber());
+            }
+        }
+
         log.setInventoryId(getInventoryId());
         log.setLocationLabel(getPositionString(true, true));
         log.setDetails(details);

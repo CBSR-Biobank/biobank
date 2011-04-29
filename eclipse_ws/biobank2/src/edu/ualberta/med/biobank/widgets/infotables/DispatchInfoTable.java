@@ -45,7 +45,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     public DispatchInfoTable(Composite parent, SpecimenWrapper a) {
         super(parent, null, HEADINGS, 15);
         this.a = a;
-        setCollection(a.getDispatchs());
+        setCollection(a.getDispatches());
     }
 
     @Override
@@ -137,7 +137,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     }
 
     public void reloadCollection() {
-        reloadCollection(a.getDispatchs());
+        reloadCollection(a.getDispatches());
     }
 
 }

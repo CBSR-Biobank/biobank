@@ -37,6 +37,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private List<DispatchSpecimenWrapper> deletedDispatchedSpecimens = new ArrayList<DispatchSpecimenWrapper>();
 
+    private List<DispatchSpecimenWrapper> receivedDispatchedSpecimens = new ArrayList<DispatchSpecimenWrapper>();
+
     private boolean hasNewSpecimens = false;
 
     public DispatchWrapper(WritableApplicationService appService) {
@@ -98,10 +100,15 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     @Override
     protected void persistDependencies(Dispatch origObject) throws Exception {
-        for (DispatchSpecimenWrapper dsa : deletedDispatchedSpecimens) {
-            if (!dsa.isNew()) {
-                dsa.delete();
+        for (DispatchSpecimenWrapper dds : deletedDispatchedSpecimens) {
+            if (!dds.isNew()) {
+                dds.delete();
             }
+        }
+
+        // FIXME: temporary fix - this should be converted to a batch update
+        for (DispatchSpecimenWrapper rds : receivedDispatchedSpecimens) {
+            rds.getSpecimen().persist();
         }
     }
 
@@ -221,7 +228,26 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         resetMap();
     }
 
-    public void removeSpecimens(List<DispatchSpecimenWrapper> dsaList) {
+    public void removeSpecimens(List<SpecimenWrapper> spcs) {
+        if (spcs == null) {
+            throw new NullPointerException();
+        }
+
+        if (spcs.isEmpty())
+            return;
+
+        List<DispatchSpecimenWrapper> removeDispatchSpecimens = new ArrayList<DispatchSpecimenWrapper>();
+
+        for (DispatchSpecimenWrapper dsa : getDispatchSpecimenCollection(false)) {
+            if (spcs.contains(dsa.getSpecimen())) {
+                removeDispatchSpecimens.add(dsa);
+                deletedDispatchedSpecimens.add(dsa);
+            }
+        }
+        removeFromDispatchSpecimenCollection(removeDispatchSpecimens);
+    }
+
+    public void removeDispatchSpecimens(List<DispatchSpecimenWrapper> dsaList) {
         if (dsaList == null) {
             throw new NullPointerException();
         }
@@ -243,10 +269,11 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public void receiveSpecimens(List<SpecimenWrapper> specimensToReceive) {
         List<DispatchSpecimenWrapper> nonProcessedSpecimens = getDispatchSpecimenCollectionWithState(DispatchSpecimenState.NONE);
-        for (DispatchSpecimenWrapper da : nonProcessedSpecimens) {
-            if (specimensToReceive.contains(da.getSpecimen())) {
-                da.setDispatchSpecimenState(DispatchSpecimenState.RECEIVED);
-                da.getSpecimen().setCurrentCenter(getReceiverCenter());
+        for (DispatchSpecimenWrapper ds : nonProcessedSpecimens) {
+            if (specimensToReceive.contains(ds.getSpecimen())) {
+                ds.setDispatchSpecimenState(DispatchSpecimenState.RECEIVED);
+                ds.getSpecimen().setCurrentCenter(getReceiverCenter());
+                receivedDispatchedSpecimens.add(ds);
             }
         }
         resetMap();
@@ -378,6 +405,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         super.resetInternalFields();
         resetMap();
         deletedDispatchedSpecimens.clear();
+        receivedDispatchedSpecimens.clear();
         hasNewSpecimens = false;
     }
 
@@ -394,7 +422,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
         if (site != null) {
             log.setCenter(site);
-        } else {
+        } else if (state != null) {
             if (state.equals(DispatchState.CREATION)
                 || state.equals(DispatchState.IN_TRANSIT)) {
                 log.setCenter(getSenderCenter().getNameShort());
@@ -411,9 +439,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         detailsList.add(new StringBuilder("state: ").append(
             getStateDescription()).toString());
 
-        if (state.equals(DispatchState.CREATION)
-            || state.equals(DispatchState.IN_TRANSIT)
-            || state.equals(DispatchState.LOST)) {
+        if ((state != null)
+            && ((state.equals(DispatchState.CREATION)
+                || state.equals(DispatchState.IN_TRANSIT) || state
+                .equals(DispatchState.LOST)))) {
             String packedAt = getFormattedPackedAt();
             if ((packedAt != null) && (packedAt.length() > 0)) {
                 detailsList.add(new StringBuilder("packed at: ").append(

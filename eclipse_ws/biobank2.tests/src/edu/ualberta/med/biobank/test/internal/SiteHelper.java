@@ -3,11 +3,13 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.util.Assert;
+
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 
-public class SiteHelper extends DbHelper {
+public class SiteHelper extends CenterHelper {
 
     public static List<SiteWrapper> createdSites = new ArrayList<SiteWrapper>();
 
@@ -63,14 +65,18 @@ public class SiteHelper extends DbHelper {
         deleteContainers(site.getContainerCollection(false));
         deleteFromList(site.getContainerTypeCollection(false));
         site.reload();
-        deleteFromList(site.getProcessingEventCollection(false));
-        site.reload();
-        deleteDispatchs(site.getSrcDispatchCollection(false));
-        deleteDispatchs(site.getDstDispatchCollection(false));
-        site.reload();
 
-        deleteFromList(site.getSpecimenCollection(false));
-        deleteFromList(site.getOriginInfoCollection(false));
+        // dispatches should have been deleted before sites are deleted
+        //
+        // see TestDatabase.tearDown().
+        Assert.isTrue(site.getSrcDispatchCollection(false).size() == 0);
+        Assert.isTrue(site.getDstDispatchCollection(false).size() == 0);
+        deleteCenterDependencies(site);
+
+        site.reload();
+        deleteFromList(site.getProcessingEventCollection(false));
+
+        site.reload();
         site.delete();
     }
 
