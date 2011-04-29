@@ -109,6 +109,12 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         return new Point(width, height);
     }
 
+    // @Override
+    // public void initLegend(List<UICellStatus> status) {
+    // super.initLegend(status);
+    // hasLegend = status != null && status.size() > 0;
+    // }
+
     protected void drawRectangle(PaintEvent e,
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
         int indexRow, int indexCol, Color defaultBackgroundColor) {

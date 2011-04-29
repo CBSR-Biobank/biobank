@@ -82,7 +82,6 @@ public abstract class AbstractLinkAssignEntryForm extends
     private void createLeftSection(Composite parent) throws Exception {
         Composite leftComposite = toolkit.createComposite(parent);
         GridLayout gl = new GridLayout(1, false);
-        gl.marginWidth = 0;
         leftComposite.setLayout(gl);
         toolkit.paintBordersFor(leftComposite);
         GridData gd = new GridData();
@@ -109,7 +108,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     }
 
     protected int getLeftSectionWidth() {
-        return 600;
+        return 520;
     }
 
     protected abstract void createCommonFields(Composite commonFieldsComposite);

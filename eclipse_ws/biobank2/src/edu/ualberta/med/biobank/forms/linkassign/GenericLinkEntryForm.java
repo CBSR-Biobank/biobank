@@ -321,11 +321,10 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected void setBindings(boolean isSingleMode) {
         super.setBindings(isSingleMode);
+        widgetCreator.setBinding(INVENTORY_ID_BINDING, isSingleMode);
         if (isSingleMode) {
-            widgetCreator.addBinding(INVENTORY_ID_BINDING);
             singleTypesWidget.addBindings();
         } else {
-            widgetCreator.removeBinding(INVENTORY_ID_BINDING);
             singleTypesWidget.removeBindings();
         }
     }

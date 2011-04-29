@@ -82,6 +82,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     // global state of the pallet process
     protected UICellStatus currentScanState;
+    private Label plateToScanLabel;
 
     @Override
     protected void init() throws Exception {
@@ -306,12 +307,14 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void createPlateToScanField(Composite fieldsComposite) {
+        plateToScanLabel = widgetCreator.createLabel(fieldsComposite,
+            Messages.getString("linkAssign.plateToScan.label")); //$NON-NLS-1$);
         plateToScanText = (BiobankText) widgetCreator
-            .createBoundWidgetWithLabel(
+            .createBoundWidget(
                 fieldsComposite,
                 BiobankText.class,
                 SWT.NONE,
-                Messages.getString("linkAssign.plateToScan.label"), //$NON-NLS-1$
+                plateToScanLabel,
                 new String[0],
                 plateToScanValue,
                 new ScannerBarcodeValidator(Messages
@@ -330,6 +333,12 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         if (parentNumColumns > 2)
             gd.horizontalSpan = parentNumColumns - 1;
         plateToScanText.setLayoutData(gd);
+    }
+
+    protected void showPlateToScanField(boolean show) {
+        widgetCreator.showWidget(plateToScanLabel, show);
+        widgetCreator.showWidget(plateToScanText, show);
+        widgetCreator.setBinding(PLATE_VALIDATOR, show);
     }
 
     protected void createFakeOptions(
