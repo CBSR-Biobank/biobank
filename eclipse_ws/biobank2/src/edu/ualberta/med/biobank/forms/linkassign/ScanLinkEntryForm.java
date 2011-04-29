@@ -378,7 +378,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         fieldsComposite.setLayout(layout);
         toolkit.paintBordersFor(fieldsComposite);
         gd = new GridData();
-        gd.widthHint = 600;
+        gd.widthHint = 500;
         gd.verticalAlignment = SWT.TOP;
         fieldsComposite.setLayoutData(gd);
 

@@ -20,6 +20,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -325,6 +326,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         });
         GridData gd = (GridData) plateToScanText.getLayoutData();
         gd.horizontalAlignment = SWT.FILL;
+        int parentNumColumns = ((GridLayout) fieldsComposite.getLayout()).numColumns;
+        if (parentNumColumns > 2)
+            gd.horizontalSpan = parentNumColumns - 1;
         plateToScanText.setLayoutData(gd);
     }
 
