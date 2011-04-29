@@ -10,6 +10,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -100,7 +101,8 @@ public class PatientViewForm extends BiobankViewForm {
 
     private void setValues() throws ApplicationException, BiobankException {
         setTextValue(studyLabel, patient.getStudy().getName());
-        setTextValue(createdAtLabel, patient.getFormattedCreatedAt());
+        setTextValue(createdAtLabel,
+            DateFormatter.formatAsDateTime(patient.getCreatedAt()));
         setTextValue(visitCountLabel, patient.getCollectionEventCount(true)
             .toString());
         setTextValue(sourceSpecimenCountLabel,

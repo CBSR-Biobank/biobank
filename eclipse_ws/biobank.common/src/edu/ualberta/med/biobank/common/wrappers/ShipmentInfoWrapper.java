@@ -31,13 +31,11 @@ public class ShipmentInfoWrapper extends ShipmentInfoBaseWrapper {
     }
 
     public String getFormattedDateReceived() {
-        return DateFormatter.formatAsDateTime(DateFormatter.convertDate(
-            DateFormatter.GMT, DateFormatter.LOCAL, getReceivedAt()));
+        return DateFormatter.formatAsDateTime(getReceivedAt());
     }
 
     public String getFormattedDatePacked() {
-        return DateFormatter.formatAsDateTime(DateFormatter.convertDate(
-            DateFormatter.GMT, DateFormatter.LOCAL, getPackedAt()));
+        return DateFormatter.formatAsDateTime(getPackedAt());
     }
 
     @Override

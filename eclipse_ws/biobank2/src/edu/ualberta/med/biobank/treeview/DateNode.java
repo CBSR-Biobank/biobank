@@ -18,10 +18,8 @@ public class DateNode extends AdapterBase {
     private Date date;
 
     public DateNode(AdapterBase parent, String text, Date date) {
-        super(parent, (int) date.getTime() + text.hashCode(), text
-            + ": "
-            + DateFormatter.formatAsDate(DateFormatter.convertDate(
-                DateFormatter.LOCAL, DateFormatter.GMT, date)), true, false);
+        super(parent, (int) date.getTime() + text.hashCode(), text + ": "
+            + DateFormatter.formatAsDate(date), true, false);
         this.setDate(date);
     }
 

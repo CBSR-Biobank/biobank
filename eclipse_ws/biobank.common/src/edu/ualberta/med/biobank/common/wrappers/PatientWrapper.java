@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
@@ -375,11 +374,6 @@ public class PatientWrapper extends PatientBaseWrapper {
             return getCountResult(appService, criteria);
         }
         return (long) getCollectionEventCollection(false).size();
-    }
-
-    public String getFormattedCreatedAt() {
-        return DateFormatter.formatAsDateTime(DateFormatter.convertDate(
-            DateFormatter.GMT, DateFormatter.LOCAL, getCreatedAt()));
     }
 
 }

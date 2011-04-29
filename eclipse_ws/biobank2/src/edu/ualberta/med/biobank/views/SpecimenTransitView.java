@@ -188,9 +188,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                     msg += " for waybill " + treeText.getText();
                 } else {
                     msg += " for date "
-                        + DateFormatter.formatAsDate(DateFormatter.convertDate(
-                            DateFormatter.LOCAL, DateFormatter.GMT,
-                            dateWidget.getDate()));
+                        + DateFormatter.formatAsDate(dateWidget.getDate());
                 }
                 BiobankPlugin.openMessage("Dispatch not found", msg);
             } else {
