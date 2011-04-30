@@ -286,12 +286,6 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return aliquotedSpecimens;
     }
 
-    @Deprecated
-    public static List<CollectionEventWrapper> getTodayCollectionEvents(
-        WritableApplicationService appService) {
-        return null;
-    }
-
     /**
      * source specimen that are in a process event
      */

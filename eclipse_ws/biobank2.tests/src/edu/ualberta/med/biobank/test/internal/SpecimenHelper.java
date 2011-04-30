@@ -164,12 +164,8 @@ public class SpecimenHelper extends DbHelper {
             DbHelper.chooseRandomlyInList(spcTypes),
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, Utils.getRandomDate());
 
-        OriginInfoWrapper oi = new OriginInfoWrapper(appService);
-        oi.setCenter(clinic);
-        oi.persist();
-
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
-            clinic, patient, 1, oi, spc);
+            clinic, patient, 1, spc);
 
         ProcessingEventWrapper pe = ProcessingEventHelper.addProcessingEvent(
             container.getSite(), patient, Utils.getRandomDate());
@@ -201,11 +197,8 @@ public class SpecimenHelper extends DbHelper {
             + r.nextInt());
         PatientWrapper patient = PatientHelper.addPatient(
             "testp" + r.nextInt(), study);
-        OriginInfoWrapper oi = OriginInfoHelper.addOriginInfo(clinic);
-
-        newSpec.setOriginInfo(oi);
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
-            clinic, patient, 2, oi, newSpec);
+            clinic, patient, 2, newSpec);
         return ce.getOriginalSpecimenCollection(false).get(0);
     }
 }

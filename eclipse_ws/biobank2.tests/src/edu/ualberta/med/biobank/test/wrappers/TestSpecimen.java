@@ -24,7 +24,6 @@ import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -691,11 +690,8 @@ public class TestSpecimen extends TestDatabase {
         DispatchWrapper d = DispatchHelper.addDispatch(site, destSite, method);
 
         parentSpc = SpecimenHelper.newSpecimen(name);
-        OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
-        originInfo.setCenter(destSite);
-        originInfo.persist();
         CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(site, patient, 1, originInfo, parentSpc);
+            .addCollectionEvent(site, patient, 1, parentSpc);
         parentSpc = cevent.getAllSpecimenCollection(false).get(0);
 
         d.addSpecimens(Arrays.asList(parentSpc), DispatchSpecimenState.NONE);
