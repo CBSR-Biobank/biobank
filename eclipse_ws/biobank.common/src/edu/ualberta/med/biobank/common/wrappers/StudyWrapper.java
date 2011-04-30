@@ -484,6 +484,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         return getCollectionEventWrapper().size();
     }
 
+    // WARNING: this runs very slow and generates a lot of network traffic
     public List<CollectionEventWrapper> getCollectionEventWrapper() {
         List<CollectionEventWrapper> cEvents = new ArrayList<CollectionEventWrapper>();
         for (PatientWrapper p : getPatientCollection(false)) {

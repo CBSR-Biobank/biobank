@@ -15,7 +15,6 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -340,11 +339,7 @@ public class TestClinic extends TestDatabase {
         SpecimenWrapper sv = SpecimenHelper.newSpecimen(SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, false).get(0));
 
-        OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
-        originInfo.setCenter(clinic);
-        originInfo.persist();
-        CollectionEventHelper.addCollectionEvent(clinic, patient, 1,
-            originInfo, sv);
+        CollectionEventHelper.addCollectionEvent(clinic, patient, 1, sv);
 
         clinic.reload();
         try {
@@ -426,13 +421,9 @@ public class TestClinic extends TestDatabase {
             List<PatientWrapper> patientsForClinic = patientMap.get(clinic
                 .getId());
             patientsForClinic.add(patient);
-            OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
-            originInfo.setCenter(clinic);
-            originInfo.persist();
             SpecimenWrapper sv = SpecimenHelper.newSpecimen(SpecimenTypeWrapper
                 .getAllSpecimenTypes(appService, false).get(0));
-            CollectionEventHelper.addCollectionEvent(clinic, patient, i,
-                originInfo, sv);
+            CollectionEventHelper.addCollectionEvent(clinic, patient, i, sv);
             Assert.assertEquals(Long.valueOf(patientsForClinic.size()),
                 clinic.getPatientCount());
         }
@@ -497,13 +488,9 @@ public class TestClinic extends TestDatabase {
             List<PatientWrapper> patientsForClinicForStudy = studyMap.get(study
                 .getId());
             patientsForClinicForStudy.add(patient);
-            OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
-            originInfo.setCenter(clinic);
-            originInfo.persist();
             SpecimenWrapper sv = SpecimenHelper.newSpecimen(SpecimenTypeWrapper
                 .getAllSpecimenTypes(appService, false).get(0));
-            CollectionEventHelper.addCollectionEvent(clinic, patient, i,
-                originInfo, sv);
+            CollectionEventHelper.addCollectionEvent(clinic, patient, i, sv);
             Assert.assertEquals(patientsForClinicForStudy.size(),
                 clinic.getPatientCountForStudy(study));
         }
@@ -584,15 +571,12 @@ public class TestClinic extends TestDatabase {
 
             PatientWrapper patient = PatientHelper.addPatient(name + "_" + i,
                 study);
-            OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
-            originInfo.setCenter(clinic);
-            originInfo.persist();
             for (int eventNb = 0; eventNb < r.nextInt(10) + 3; eventNb++) {
                 SpecimenWrapper originSpecimen = SpecimenHelper
                     .newSpecimen(SpecimenTypeWrapper.getAllSpecimenTypes(
                         appService, false).get(0));
                 CollectionEventWrapper cEvent = CollectionEventHelper
-                    .addCollectionEvent(clinic, patient, eventNb, originInfo,
+                    .addCollectionEvent(clinic, patient, eventNb,
                         originSpecimen);
                 cEventForClinicForStudy.add(cEvent);
             }

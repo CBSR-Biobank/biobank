@@ -23,7 +23,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -129,13 +128,9 @@ public class TestActivityStatus extends TestDatabase {
         SpecimenWrapper originSpecimen = SpecimenHelper
             .newSpecimen(SpecimenTypeHelper.addSpecimenType(name));
 
-        OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
-        originInfo.setCenter(site);
-        originInfo.persist();
-
         // Collection Event
         CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(site, patient, 1, originInfo, originSpecimen);
+            .addCollectionEvent(site, patient, 1, originSpecimen);
         originSpecimen = cevent.getOriginalSpecimenCollection(false).get(0);
 
         // ProcessingEvent
