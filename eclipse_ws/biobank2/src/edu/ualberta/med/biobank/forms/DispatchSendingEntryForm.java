@@ -9,7 +9,6 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -140,7 +139,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             try {
                 destSiteComboViewer = createComboViewer(client, "Receiver",
                     CenterWrapper.getOtherCenters(appService, SessionManager
-                        .getUser().getCurrentWorkingCenter()), null,
+                        .getUser().getCurrentWorkingCenter()),
+                    dispatch.getReceiverCenter(),
                     "Dispatch must have a receiver",
                     new ComboSelectionUpdate() {
                         @Override
@@ -150,9 +150,6 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                             setDirty(true);
                         }
                     });
-                if (dispatch.getReceiverCenter() != null)
-                    destSiteComboViewer.setSelection(new StructuredSelection(
-                        dispatch.getReceiverCenter()));
             } catch (ApplicationException e) {
                 BiobankPlugin.openAsyncError("Error",
                     "Unable to retrieve Centers");
