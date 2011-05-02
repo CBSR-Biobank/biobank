@@ -93,15 +93,13 @@ public class DateTimeWidget extends BiobankWidget {
     public Date getDate() {
         // dirty hax to covert times by timezone
         if (dateEntry.getSelection() != null) {
-            return DateFormatter.convertDate(timeZone, DateFormatter.GMT,
-                dateEntry.getSelection());
+            return dateEntry.getSelection();
         }
         return null;
     }
 
     public void setDate(Date date) {
-        dateEntry.setSelection(DateFormatter.convertDate(DateFormatter.GMT,
-            timeZone, date));
+        dateEntry.setSelection(date);
         fireModifyListeners();
     }
 
