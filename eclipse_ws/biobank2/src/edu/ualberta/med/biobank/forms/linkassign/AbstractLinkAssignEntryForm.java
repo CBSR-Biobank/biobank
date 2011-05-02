@@ -72,12 +72,15 @@ public abstract class AbstractLinkAssignEntryForm extends
 
         createVisualisationSection(mainComposite);
 
-        radioSingle.setSelection(isSingleMode());
-        radioMultiple.setSelection(!isSingleMode());
-        showSingleComposite(isSingleMode());
+        boolean singleSelection = initializeWithSingle();
+        radioSingle.setSelection(singleSelection);
+        radioMultiple.setSelection(!singleSelection);
+        showSingleComposite(singleSelection);
 
         toolkit.adapt(mainComposite);
     }
+
+    protected abstract boolean initializeWithSingle();
 
     private void createLeftSection(Composite parent) throws Exception {
         Composite leftComposite = toolkit.createComposite(parent);
@@ -278,7 +281,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     public void reset(boolean resetAll) {
         cancelConfirmWidget.reset();
         removeRescanMode();
-        setScanHasBeenLauched(isSingleMode());
+        setScanHasBeenLaunched(isSingleMode());
         if (resetAll) {
             resetPlateToScan();
         }

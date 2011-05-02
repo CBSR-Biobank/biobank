@@ -14,8 +14,11 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
@@ -81,6 +84,10 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
     // source/type hierarchy selected (use rows order)
     private List<SpecimenHierarchy> preSelections;
 
+    protected static String lastSingleInventoryId;
+
+    protected static boolean goToAssign = false;
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -133,7 +140,8 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     public String getNextOpenedFormID() {
-        // FIXME if checkbox to open assign form, should be assign form instead
+        if (goToAssign)
+            return GenericAssignEntryForm.ID;
         return ID;
     }
 
@@ -315,7 +323,15 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         widgetCreator.createLabel(fieldsComposite,
             Messages.getString("GenericLinkEntryForm.checkbox.assign")); //$NON-NLS-1$
-        toolkit.createButton(fieldsComposite, "", SWT.CHECK); //$NON-NLS-1$
+        final Button goToAssignButton = toolkit.createButton(fieldsComposite,
+            "", SWT.CHECK); //$NON-NLS-1$
+        goToAssignButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                goToAssign = goToAssignButton.getSelection();
+            }
+        });
+        goToAssignButton.setSelection(goToAssign);
     }
 
     @Override
@@ -467,6 +483,7 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
             linkFormPatientManagement.getCurrentPatient().getPnumber(),
             singleSpecimen.getCollectionEvent().getVisitNumber(),
             singleSpecimen.getCurrentCenter().getNameShort()));
+        lastSingleInventoryId = singleSpecimen.getInventoryId();
     }
 
     @Override
@@ -655,5 +672,10 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
         cell.setSourceSpecimen(selection.getParentSpecimen());
         cell.setSpecimenType(selection.getAliquotedSpecimenType());
         cell.setStatus(UICellStatus.TYPE);
+    }
+
+    @Override
+    protected boolean initializeWithSingle() {
+        return isSingleMode();
     }
 }

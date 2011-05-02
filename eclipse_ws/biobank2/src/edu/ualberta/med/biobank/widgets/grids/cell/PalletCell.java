@@ -17,8 +17,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PalletCell extends AbstractUICell {
 
-    private UICellStatus status;
-
     private String information;
 
     private String title = "";
@@ -127,14 +125,6 @@ public class PalletCell extends AbstractUICell {
             i++;
         }
         return palletScanned;
-    }
-
-    public UICellStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(UICellStatus status) {
-        this.status = status;
     }
 
     /**

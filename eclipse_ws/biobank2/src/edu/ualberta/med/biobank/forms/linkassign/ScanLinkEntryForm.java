@@ -364,7 +364,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
     private void createFieldsComposite() throws Exception {
         Composite leftSideComposite = toolkit.createComposite(page);
-        GridLayout layout = new GridLayout(2, false);
+        GridLayout layout = new GridLayout(1, false);
         layout.horizontalSpacing = 10;
         leftSideComposite.setLayout(layout);
         GridData gd = new GridData();
@@ -672,7 +672,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         linkFormPatientManagement.reset(resetAll);
         cancelConfirmWidget.reset();
         removeRescanMode();
-        setScanHasBeenLauched(false);
+        setScanHasBeenLaunched(false);
         if (resetAll) {
             resetPlateToScan();
             spw.setCells(null);
@@ -713,4 +713,5 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         linkFormPatientManagement.onClose();
         return super.onClose();
     }
+
 }

@@ -561,13 +561,13 @@ public class WidgetCreator {
         return widget;
     }
 
-    public void addBooleanBinding(WritableValue writableValue,
+    public Binding addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, final String errorMsg) {
-        addBooleanBinding(writableValue, observableValue, errorMsg,
+        return addBooleanBinding(writableValue, observableValue, errorMsg,
             IStatus.ERROR);
     }
 
-    public void addBooleanBinding(WritableValue writableValue,
+    public Binding addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, final String errorMsg,
         final int statusType) {
         Assert.isNotNull(dbc);
@@ -589,7 +589,7 @@ public class WidgetCreator {
 
             });
         }
-        dbc.bindValue(writableValue, observableValue, uvs, uvs);
+        return dbc.bindValue(writableValue, observableValue, uvs, uvs);
     }
 
     public void addGlobalBindValue(IObservableValue statusObservable) {

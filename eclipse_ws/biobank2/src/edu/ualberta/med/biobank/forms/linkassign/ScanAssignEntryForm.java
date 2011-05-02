@@ -670,7 +670,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                     }
                 }
             } catch (Exception ex) {
-                setScanHasBeenLauched(false, true);
+                setScanHasBeenLaunched(false, true);
                 throw ex;
             }
             appendLog(sb.toString());
@@ -748,14 +748,14 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             if (palletTypesViewer != null) {
                 palletTypesViewer.getCombo().deselectAll();
             }
-            setScanHasBeenLauched(false);
+            setScanHasBeenLaunched(false);
             removeRescanMode();
             freezerWidget.setSelection(null);
             hotelWidget.setSelection(null);
             palletWidget.setCells(null);
         }
         movedAndMissingSpecimensFromPallet.clear();
-        setScanHasBeenLauched(false);
+        setScanHasBeenLaunched(false);
         initPalletValues();
 
         palletproductBarcodeText.setText(productBarcode);

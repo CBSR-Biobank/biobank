@@ -12,16 +12,13 @@ import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileSettin
 
 public class ScanPalletWidget extends ContainerDisplayWidget {
 
-    private ScanPalletDisplay defaultDisplay;
-
     public ScanPalletWidget(Composite parent) {
         this(parent, null);
     }
 
     public ScanPalletWidget(Composite parent, List<UICellStatus> cellStatus) {
         super(parent, cellStatus);
-        defaultDisplay = new ScanPalletDisplay(this);
-        setContainerDisplay(defaultDisplay);
+        setContainerDisplay(new ScanPalletDisplay(this));
     }
 
     public boolean isEverythingTyped() {
@@ -44,8 +41,15 @@ public class ScanPalletWidget extends ContainerDisplayWidget {
         this.redraw();
     }
 
-    public void setDefaultDisplay() {
-        setContainerDisplay(defaultDisplay);
+    @Override
+    public void initDisplayFromType(boolean createDefaultContainer,
+        Integer cellSize) {
+        ScanPalletDisplay display = (ScanPalletDisplay) getContainerDisplay();
+        if (containerType == null)
+            display.setDefaultStorageSize();
+        else
+            display.setContainerType(containerType);
+        display.setCellWidth(cellSize);
+        display.setCellHeight(cellSize);
     }
-
 }

@@ -87,6 +87,8 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     private static final String PALLET_TYPES_BINDING = "palletType-binding"; //$NON-NLS-1$
 
+    protected static boolean useScanner = true;
+
     // parents of either the specimen in single mode or the pallet/box in
     // multiple mode. First container, is the direct parent, second is the
     // parent parent, etc...
@@ -118,7 +120,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     private Composite multipleVisualisation;
     protected boolean palletproductBarcodeTextModified;
     private NonEmptyStringValidator productBarcodeValidator;
-    protected boolean multipleModificationMode;
+    protected boolean isModifyingMultipleFields;
     // private IObservableValue multipleValidationMade = new WritableValue(
     // Boolean.TRUE, Boolean.class);
     private Control nextFocusWidget;
@@ -147,6 +149,8 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     private Label palletproductBarcodeLabel;
 
+    private String singleLinkingInventoryId;
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -156,6 +160,11 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         // addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
         // multipleValidationMade,
         //            Messages.getString("GenericAssignEntryForm.valisation.msg")); //$NON-NLS-1$
+
+        if (GenericLinkEntryForm.goToAssign) {
+            singleLinkingInventoryId = GenericLinkEntryForm.lastSingleInventoryId;
+            GenericLinkEntryForm.lastSingleInventoryId = null;
+        }
     }
 
     /**
@@ -273,6 +282,10 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                 displayPositions(false);
             }
         });
+        if (singleLinkingInventoryId != null) {
+            // get previous inventory id entered in previous single linking
+            inventoryIdText.setText(singleLinkingInventoryId);
+        }
         createPositionFields(fieldsComposite);
     }
 
@@ -482,30 +495,35 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             while (removeSize < 5) { // we are assuming that the bin
                                      // position won't be bigger than 3 !
                 int cutIndex = fullLabel.length() - removeSize;
-                String binLabel = fullLabel.substring(0, cutIndex);
-                labelsTested.add(binLabel);
-                for (ContainerWrapper cont : ContainerWrapper
-                    .getContainersInSite(appService, currentSite, binLabel)) {
-                    boolean canContainSpecimens = cont.getContainerType()
-                        .getSpecimenTypeCollection() != null
-                        && cont.getContainerType().getSpecimenTypeCollection()
-                            .size() > 0;
-                    if (containerPosition || canContainSpecimens) {
-                        RowColPos rcp = null;
-                        try {
-                            rcp = ContainerLabelingSchemeWrapper
-                                .getRowColFromPositionString(appService,
-                                    fullLabel.substring(cutIndex), cont
-                                        .getContainerType()
-                                        .getChildLabelingSchemeId(), cont
-                                        .getContainerType().getRowCapacity(),
-                                    cont.getContainerType().getColCapacity());
-                        } catch (Exception ex) {
-                            // the test failed
-                            continue;
+                if (cutIndex > 0) {
+                    String binLabel = fullLabel.substring(0, cutIndex);
+                    labelsTested.add(binLabel);
+                    for (ContainerWrapper cont : ContainerWrapper
+                        .getContainersInSite(appService, currentSite, binLabel)) {
+                        boolean canContainSpecimens = cont.getContainerType()
+                            .getSpecimenTypeCollection() != null
+                            && cont.getContainerType()
+                                .getSpecimenTypeCollection().size() > 0;
+                        if (containerPosition || canContainSpecimens) {
+                            RowColPos rcp = null;
+                            try {
+                                rcp = ContainerLabelingSchemeWrapper
+                                    .getRowColFromPositionString(appService,
+                                        fullLabel.substring(cutIndex), cont
+                                            .getContainerType()
+                                            .getChildLabelingSchemeId(), cont
+                                            .getContainerType()
+                                            .getRowCapacity(), cont
+                                            .getContainerType()
+                                            .getColCapacity());
+                            } catch (Exception ex) {
+                                // the test failed
+                                continue;
+                            }
+                            if (rcp != null) // the full position string is
+                                             // valid:
+                                foundContainers.add(cont);
                         }
-                        if (rcp != null) // the full position string is valid:
-                            foundContainers.add(cont);
                     }
                 }
                 removeSize++;
@@ -664,29 +682,35 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
      * single assign. Display containers
      */
     private void displayPositions(boolean show) {
-        widgetCreator.showWidget(secondSingleParentWidget, show);
-        widgetCreator.showWidget(secondSingleParentLabel, show);
-        widgetCreator.showWidget(thirdSingleParentLabel, show);
-        widgetCreator.showWidget(thirdSingleParentWidget, show);
-        if (show) {
-            if (parentContainers != null && parentContainers.size() >= 3) {
-                ContainerWrapper thirdParent = parentContainers.get(2);
-                ContainerWrapper secondParent = parentContainers.get(1);
-                ContainerWrapper firstParent = parentContainers.get(0);
-                thirdSingleParentWidget.setContainerType(thirdParent
-                    .getContainerType());
-                thirdSingleParentWidget.setSelection(secondParent
-                    .getPositionAsRowCol());
-                thirdSingleParentLabel.setText(thirdParent.getLabel());
-                secondSingleParentWidget.setContainer(secondParent);
-                secondSingleParentWidget.setSelection(firstParent
-                    .getPositionAsRowCol());
-                secondSingleParentLabel.setText(secondParent.getLabel());
+        if (singleMode) {
+            if (secondSingleParentWidget != null) {
+                widgetCreator.showWidget(secondSingleParentWidget, show);
+                widgetCreator.showWidget(secondSingleParentLabel, show);
             }
+            if (thirdSingleParentWidget != null) {
+                widgetCreator.showWidget(thirdSingleParentLabel, show);
+                widgetCreator.showWidget(thirdSingleParentWidget, show);
+            }
+            if (show) {
+                if (parentContainers != null && parentContainers.size() >= 3) {
+                    ContainerWrapper thirdParent = parentContainers.get(2);
+                    ContainerWrapper secondParent = parentContainers.get(1);
+                    ContainerWrapper firstParent = parentContainers.get(0);
+                    thirdSingleParentWidget.setContainerType(thirdParent
+                        .getContainerType());
+                    thirdSingleParentWidget.setSelection(secondParent
+                        .getPositionAsRowCol());
+                    thirdSingleParentLabel.setText(thirdParent.getLabel());
+                    secondSingleParentWidget.setContainer(secondParent);
+                    secondSingleParentWidget.setSelection(firstParent
+                        .getPositionAsRowCol());
+                    secondSingleParentLabel.setText(secondParent.getLabel());
+                }
+            }
+            showVisualisation(show);
+            page.layout(true, true);
+            book.reflow(true);
         }
-        showVisualisation(show);
-        page.layout(true, true);
-        book.reflow(true);
     }
 
     private void createSingleVisualisation(Composite parent) {
@@ -812,8 +836,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                 setUseScanner(userScannerButton.getSelection());
             }
         });
-        // TODO remember previous selection
-        userScannerButton.setSelection(true);
+        userScannerButton.setSelection(useScanner);
 
         palletproductBarcodeLabel = widgetCreator
             .createLabel(
@@ -846,7 +869,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         palletproductBarcodeText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                if (!multipleModificationMode) {
+                if (!isModifyingMultipleFields) {
                     palletproductBarcodeTextModified = true;
                     // multipleValidationMade.setValue(false);
                 }
@@ -877,8 +900,9 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         palletPositionText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                if (!multipleModificationMode) {
+                if (!isModifyingMultipleFields) {
                     palletPositionTextModified = true;
+                    currentMultipleContainer.setContainerType(null);
                     // multipleValidationMade.setValue(false);
                 }
             }
@@ -891,19 +915,30 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         createScanButton(parent);
     }
 
-    protected void setUseScanner(boolean useScanner) {
-        showPlateToScanField(useScanner);
-        widgetCreator.showWidget(scanButton, useScanner);
-        widgetCreator.showWidget(palletproductBarcodeLabel, useScanner);
-        widgetCreator.showWidget(palletproductBarcodeText, useScanner);
-        widgetCreator.setBinding(PRODUCT_BARCODE_BINDING, useScanner);
+    @Override
+    protected void setUseScanner(boolean use) {
+        useScanner = use;
+        showPlateToScanField(use);
+        widgetCreator.showWidget(scanButton, use);
+        widgetCreator.showWidget(palletproductBarcodeLabel, use);
+        widgetCreator.showWidget(palletproductBarcodeText, use);
+        widgetCreator.setBinding(PRODUCT_BARCODE_BINDING, use);
         if (fakeScanComposite != null)
-            widgetCreator.showWidget(fakeScanComposite, useScanner);
-        if (!useScanner) {
-            setScanHasBeenLauched(true);
+            widgetCreator.showWidget(fakeScanComposite, use);
+        showScanTubeAloneSwitch(use);
+        if (use) {
+            if (isScanTubeAloneMode())
+                // want to deactivate it at first in scan mode
+                toggleScanTubeAloneMode();
+        } else {
+            setScanHasBeenLaunched(true);
             setScanValid(true);
+            if (!isScanTubeAloneMode())
+                // want to activate tube alone mode if do not use the scanner
+                toggleScanTubeAloneMode();
         }
         reset(false);
+        super.setUseScanner(use);
         page.layout(true, true);
     }
 
@@ -952,7 +987,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                 true, PALLET_TYPES_BINDING, new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
-                        if (!multipleModificationMode) {
+                        if (!isModifyingMultipleFields) {
                             ContainerTypeWrapper oldContainerType = currentMultipleContainer
                                 .getContainerType();
                             currentMultipleContainer
@@ -1065,7 +1100,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                     }
                 }
             } catch (Exception ex) {
-                setScanHasBeenLauched(false, true);
+                setScanHasBeenLaunched(false, true);
                 throw ex;
             }
             appendLog(sb.toString());
@@ -1152,7 +1187,8 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             hotelWidget.setSelection(null);
             palletWidget.setCells(null);
         }
-        setScanHasBeenLauched(!userScannerButton.getSelection());
+        setScanHasBeenLaunched(isSingleMode()
+            || !userScannerButton.getSelection());
         initPalletValues();
 
         palletproductBarcodeText.setText(productBarcode);
@@ -1168,7 +1204,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected void setBindings(boolean isSingleMode) {
-        setCanLaunchScan(true);
+        setCanLaunchScan(isSingleMode);
         widgetCreator.setBinding(INVENTORY_ID_BINDING, isSingleMode);
         widgetCreator.setBinding(NEW_SINGLE_POSITION_BINDING, isSingleMode);
         widgetCreator.setBinding(PRODUCT_BARCODE_BINDING, !isSingleMode);
@@ -1180,7 +1216,6 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected void showSingleComposite(boolean single) {
         widgetCreator.showWidget(multipleVisualisation, !single);
-        reset(false);
         widgetCreator.showWidget(singleVisualisation, single);
         super.showSingleComposite(single);
     }
@@ -1190,7 +1225,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
      */
     protected void validateMultipleValues() {
         nextFocusWidget = null;
-        multipleModificationMode = true;
+        isModifyingMultipleFields = true;
         try {
             if (!userScannerButton.getSelection()
                 || productBarcodeValidator.validate(
@@ -1229,7 +1264,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                 }
             });
         }
-        multipleModificationMode = false;
+        isModifyingMultipleFields = false;
         // multipleValidationMade.setValue(true);
     }
 
@@ -1611,13 +1646,9 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
 
             palletLabel.setText(currentMultipleContainer.getLabel());
 
-            palletWidget.setContainerType(currentMultipleContainer
-                .getContainerType());
-            if (palletContainerTypes.contains(currentMultipleContainer
-                .getContainerType()))
-                palletWidget.setDefaultDisplay();
-            palletWidget.setDisplaySize(ScanPalletDisplay.PALLET_WIDTH,
-                ScanPalletDisplay.PALLET_HEIGHT);
+            palletWidget.setContainerType(
+                currentMultipleContainer.getContainerType(),
+                ScanPalletDisplay.SAMPLE_WIDTH);
 
             showOnlyPallet(false);
         }
@@ -1686,4 +1717,13 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             "Select linked and assigned specimens", SWT.RADIO); //$NON-NLS-1$
     }
 
+    @Override
+    protected boolean initializeWithSingle() {
+        // if come from the single mode entry of linking asking to go to assign,
+        // then select single
+        if (singleLinkingInventoryId != null
+            && singleLinkingInventoryId.length() > 0)
+            return true;
+        return isSingleMode();
+    }
 }

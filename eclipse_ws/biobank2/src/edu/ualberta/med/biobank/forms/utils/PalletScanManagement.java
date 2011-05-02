@@ -26,6 +26,7 @@ public class PalletScanManagement {
 
     protected Map<RowColPos, PalletCell> cells;
     private int successfulScansCount = 0;
+    private boolean useScanner = true;
 
     private boolean scanTubeAloneMode = false;
 
@@ -173,7 +174,8 @@ public class PalletScanManagement {
         }
     }
 
-    protected boolean canScanTubeAlone(PalletCell cell) {
+    protected boolean canScanTubeAlone(
+        @SuppressWarnings("unused") PalletCell cell) {
         return true;
     }
 
@@ -245,8 +247,20 @@ public class PalletScanManagement {
     }
 
     public void reset() {
-        cells = null;
         successfulScansCount = 0;
+        initCells();
+    }
+
+    public void setUseScanner(boolean useScanner) {
+        this.useScanner = useScanner;
+        initCells();
+    }
+
+    private void initCells() {
+        if (useScanner)
+            cells = null;
+        else
+            cells = new HashMap<RowColPos, PalletCell>();
     }
 
     public int getSuccessfulScansCount() {
@@ -255,7 +269,6 @@ public class PalletScanManagement {
 
     public void toggleScanTubeAloneMode() {
         scanTubeAloneMode = !scanTubeAloneMode;
-        ;
     }
 
     public boolean isScanTubeAloneMode() {
