@@ -679,6 +679,7 @@ public class TestContainerType extends TestDatabase {
             Assert.assertTrue(true);
         }
 
+        // remove specimens and try and remove specimen type again
         for (SpecimenWrapper spc : spcs) {
             spc.delete();
         }
