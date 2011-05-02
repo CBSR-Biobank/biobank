@@ -173,6 +173,11 @@ public class CollectionView extends AbstractAdministrationView {
     @Override
     protected void internalSearch() {
         String text = treeText.getText();
+
+        if (text.trim().isEmpty()) {
+            return;
+        }
+
         try {
             List<? extends ModelWrapper<?>> searchedObject = search(text);
             if (searchedObject == null || searchedObject.size() == 0) {

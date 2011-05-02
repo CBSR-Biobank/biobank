@@ -290,10 +290,18 @@ public class BaseWrapperBuilder extends BaseBuilder {
         result.append("   public void set")
             .append(CamelCase.toCamelCase(member.getName(), true)).append("(")
             .append(member.getType()).append(" ").append(member.getName())
-            .append(") {\n").append("      setProperty(").append(mc.getName())
+            .append(") {\n");
+
+        String value = member.getName();
+        if (member.getType().equals("String")) {
+            value = "trimmed";
+            result.append("      String ").append(value).append(" = ")
+                .append(member.getName()).append(".trim();\n");
+        }
+
+        result.append("      setProperty(").append(mc.getName())
             .append("Peer.").append(CamelCase.toTitleCase(member.getName()))
-            .append(", ").append(member.getName()).append(");\n")
-            .append("   }\n\n");
+            .append(", ").append(value).append(");\n").append("   }\n\n");
 
         return result.toString();
     }
