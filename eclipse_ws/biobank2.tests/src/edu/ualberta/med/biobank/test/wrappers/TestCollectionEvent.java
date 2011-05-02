@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
@@ -31,6 +32,7 @@ import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestCollectionEvent extends TestDatabase {
 
@@ -453,18 +455,18 @@ public class TestCollectionEvent extends TestDatabase {
         List<String> labels = Arrays.asList(study.getStudyEventAttrLabels());
         Assert.assertEquals(5, labels.size());
 
-        CollectionEventWrapper pevent = CollectionEventHelper
+        CollectionEventWrapper cevent = CollectionEventHelper
             .addCollectionEvent(clinic, patient, 1);
-        pevent.reload();
+        cevent.reload();
 
         // lock an attribute
         study.setStudyEventAttrActivityStatus("Worksheet",
             ActivityStatusWrapper.getActivityStatus(appService,
                 ActivityStatusWrapper.CLOSED_STATUS_STRING));
         study.persist();
-        pevent.reload();
+        cevent.reload();
         try {
-            pevent.setEventAttrValue("Worksheet", "xyz");
+            cevent.setEventAttrValue("Worksheet", "xyz");
             Assert.fail("should not be allowed set value for locked label");
         } catch (Exception e) {
             Assert.assertTrue(true);
@@ -474,42 +476,42 @@ public class TestCollectionEvent extends TestDatabase {
         study.setStudyEventAttrActivityStatus("Worksheet",
             ActivityStatusWrapper.getActiveActivityStatus(appService));
         study.persist();
-        pevent.reload();
-        pevent.setEventAttrValue("Worksheet", "xyz");
-        pevent.persist();
+        cevent.reload();
+        cevent.setEventAttrValue("Worksheet", "xyz");
+        cevent.persist();
     }
 
     @Test
     public void testDuplicateEventAttr() throws Exception {
+        String name = "testGetSetEventAttrActivityStatus" + r.nextInt();
+        ClinicWrapper clinic = ClinicHelper.addClinic(name + "CLINIC1");
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
         addEventAttrs(study);
-        // FIXME
-        // List<String> labels = Arrays.asList(study.getStudyEventAttrLabels());
-        // Assert.assertEquals(5, labels.size());
-        //
-        // CollectionEventWrapper pevent = CollectionEventHelper
-        // .addCollectionEvent(site, patient, TestCommon.getUniqueDate(r),
-        // Utils.getRandomDate());
-        // pevent.reload();
-        //
-        // pevent.setEventAttrValue("Worksheet", "abcdefghi");
-        // pevent.persist();
-        //
-        // // change the worksheet value
-        // pevent.setEventAttrValue("Worksheet", "jklmnopqr");
-        // pevent.persist();
-        // pevent.reload();
-        //
-        // // make sure only one value in database
-        // HQLCriteria c = new HQLCriteria(
-        // "select pvattr from "
-        // + CollectionEvent.class.getName()
-        // + " as pv "
-        // + "join pv.pvAttrCollection as pvattr "
-        // +
-        // "join pvattr.studyEventAttr as spvattr where pv.id = ? and spvattr.label= ?",
-        // Arrays.asList(new Object[] { pevent.getId(), "Worksheet" }));
-        // List<EventAttr> results = appService.query(c);
-        // Assert.assertEquals(1, results.size());
+        List<String> labels = Arrays.asList(study.getStudyEventAttrLabels());
+        Assert.assertEquals(5, labels.size());
+
+        CollectionEventWrapper cevent = CollectionEventHelper
+            .addCollectionEvent(clinic, patient, 1);
+        cevent.reload();
+
+        cevent.setEventAttrValue("Worksheet", "abcdefghi");
+        cevent.persist();
+
+        // change the worksheet value
+        cevent.setEventAttrValue("Worksheet", "jklmnopqr");
+        cevent.persist();
+        cevent.reload();
+
+        // make sure only one value in database
+        HQLCriteria c = new HQLCriteria(
+            "select eattr from "
+                + CollectionEvent.class.getName()
+                + " as ce "
+                + "join ce.eventAttrCollection as eattr "
+                + "join eattr.studyEventAttr as seattr where ce.id = ? and seattr.label= ?",
+            Arrays.asList(new Object[] { cevent.getId(), "Worksheet" }));
+        List<EventAttr> results = appService.query(c);
+        Assert.assertEquals(1, results.size());
     }
 
     private void addEventAttrs(StudyWrapper study) throws Exception {
