@@ -224,16 +224,14 @@ public class TestDispatch extends TestDatabase {
             receiverSite, method, name, Utils.getRandomDate());
 
         dispatch.reset();
-        // FIXME
-        // Assert.assertEquals(null, dispatch.getWaybill());
+        Assert.assertEquals(null, dispatch.getComment());
 
         // test reset for an object already in database
         dispatch = DispatchHelper.addDispatch(senderSite, receiverSite, method,
             name, Utils.getRandomDate());
-        // FIXME
-        // dispatch.setWaybill("QQQQ");
-        // dispatch.reset();
-        // Assert.assertEquals(name, dispatch.getWaybill());
+        dispatch.setComment("test comment");
+        dispatch.reset();
+        Assert.assertEquals(null, dispatch.getComment());
     }
 
     @Test
