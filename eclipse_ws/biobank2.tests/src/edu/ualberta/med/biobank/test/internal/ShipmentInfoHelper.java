@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.Date;
 
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -42,18 +41,24 @@ public class ShipmentInfoHelper extends DbHelper {
     }
 
     public static ShipmentInfoWrapper addShipment(CenterWrapper<?> center,
-        ShippingMethodWrapper method, String waybill, SpecimenWrapper... spcs)
-        throws Exception {
-        ShipmentInfoWrapper shipment = newShipment(center, method, waybill,
-            Utils.getRandomDate(), spcs);
-        shipment.persist();
-        return shipment;
+        ShippingMethodWrapper method, String waybill, Date dateReceived,
+        SpecimenWrapper... spcs) throws Exception {
+        ShipmentInfoWrapper shipInfo = newShipment(center, method, waybill,
+            dateReceived, spcs);
+        shipInfo.persist();
+        return shipInfo;
     }
 
     public static ShipmentInfoWrapper addShipment(CenterWrapper<?> center,
-        ClinicWrapper clinic, ShippingMethodWrapper method,
-        SpecimenWrapper... spcs) throws Exception {
-        return addShipment(center, method, TestCommon.getNewWaybill(r), spcs);
+        ShippingMethodWrapper method, String waybill, SpecimenWrapper... spcs)
+        throws Exception {
+        return addShipment(center, method, waybill, Utils.getRandomDate(), spcs);
+    }
+
+    public static ShipmentInfoWrapper addShipment(CenterWrapper<?> center,
+        ShippingMethodWrapper method, SpecimenWrapper... spcs) throws Exception {
+        return addShipment(center, method, TestCommon.getNewWaybill(r),
+            Utils.getRandomDate(), spcs);
     }
 
 }
