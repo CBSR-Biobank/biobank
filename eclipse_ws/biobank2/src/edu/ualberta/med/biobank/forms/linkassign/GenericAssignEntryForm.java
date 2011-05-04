@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
@@ -40,6 +39,7 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.ContainerLabelSearchException;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.scanprocess.data.AssignProcessData;
@@ -47,10 +47,8 @@ import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
@@ -110,8 +108,6 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     private StringLengthValidator newSinglePositionValidator;
     private BiobankText newSinglePositionText;
     protected boolean positionTextModified;
-    private static IObservableValue canLaunchCheck = new WritableValue(
-        Boolean.TRUE, Boolean.class);
     private Label thirdSingleParentLabel;
     private Label secondSingleParentLabel;
     private ContainerDisplayWidget thirdSingleParentWidget;
@@ -268,7 +264,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             public void focusLost(FocusEvent e) {
                 if (inventoryIdModified)
                     try {
-                        retrieveSpecimenData();
+                        retrieveSingleSpecimenData();
                     } catch (Exception ex) {
                         BiobankPlugin.openError("Move - specimen error", ex); //$NON-NLS-1$
                         focusControlInError(inventoryIdText);
@@ -280,8 +276,6 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             @Override
             public void modifyText(ModifyEvent e) {
                 inventoryIdModified = true;
-                positionTextModified = true;
-                // resultShownValue.setValue(Boolean.FALSE);
                 displayPositions(false);
             }
         });
@@ -299,18 +293,18 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
      * Single assign. Search the specimen, if find it, display related
      * information
      */
-    protected void retrieveSpecimenData() throws Exception {
+    protected void retrieveSingleSpecimenData() throws Exception {
         String inventoryId = inventoryIdText.getText();
         if (inventoryId.isEmpty()) {
             return;
         }
         // FIXME only for old Cabinet... SHould we still search for that?
+        // if search for 'AAAA' exist in a freezer, but we also have 'CAAAA'...
         // if (inventoryId.length() == 4) {
         // // compatibility with old cabinet specimens imported
         // // 4 letters specimens are now C+4letters
         //            inventoryId = "C" + inventoryId; //$NON-NLS-1$
         // }
-        // resultShownValue.setValue(false);
         reset();
         singleSpecimen.setInventoryId(inventoryId);
         inventoryIdText.setText(inventoryId);
@@ -322,26 +316,16 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(appService,
             singleSpecimen.getInventoryId(), SessionManager.getUser());
         if (foundSpecimen == null) {
-            canLaunchCheck.setValue(false);
             throw new Exception(Messages.getString(
                 "GenericAssignEntryForm.single.inventoryId.error", //$NON-NLS-1$
                 singleSpecimen.getInventoryId()));
         }
         singleSpecimen.initObjectWith(foundSpecimen);
-        // List<SpecimenTypeWrapper> possibleTypes = getCabinetSpecimenTypes();
-        // if (!possibleTypes.contains(specimen.getSpecimenType())) {
-        // canLaunchCheck.setValue(false);
-        // throw new Exception(
-        //                "This specimen is of type " + specimen.getSpecimenType().getNameShort() //$NON-NLS-1$
-        // + ": this is not a cabinet type");
-        // }
         if (singleSpecimen.isUsedInDispatch()) {
-            canLaunchCheck.setValue(false);
             throw new Exception(
                 Messages
                     .getString("GenericAssignEntryForm.single.specimen.transit.error")); //$NON-NLS-1$
         }
-        canLaunchCheck.setValue(true);
         String positionString = singleSpecimen.getPositionString(true, false);
         if (positionString == null) {
             displayOldSingleFields(false);
@@ -479,74 +463,25 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     /**
-     * single assign: search possible parents from the position text
+     * Search possible parents from the position text. Is used both by single
+     * and multiple assign.
+     * 
+     * @param positionText the position to use for initialisation
+     * @param isContainerPosition if true, the position is a full container
+     *            position, if false, it is a full specimen position
      */
     protected void initContainersFromPosition(BiobankText positionText,
-        boolean containerPosition) {
-        resetParentContainers();
+        boolean isContainerPosition) {
+        parentContainers = null;
         try {
             parentContainers = null;
-            SiteWrapper currentSite = SessionManager.getUser()
-                .getCurrentWorkingSite();
-            String fullLabel = positionText.getText();
-            List<ContainerWrapper> foundContainers = new ArrayList<ContainerWrapper>();
-            int removeSize = 2; // FIXME we are assuming that the specimen
-                                // position will be only of size 2 !
-            List<String> labelsTested = new ArrayList<String>();
-            while (removeSize < 5) { // we are assuming that the bin
-                                     // position won't be bigger than 3 !
-                int cutIndex = fullLabel.length() - removeSize;
-                if (cutIndex > 0) {
-                    String binLabel = fullLabel.substring(0, cutIndex);
-                    labelsTested.add(binLabel);
-                    for (ContainerWrapper cont : ContainerWrapper
-                        .getContainersInSite(appService, currentSite, binLabel)) {
-                        boolean canContainSpecimens = cont.getContainerType()
-                            .getSpecimenTypeCollection() != null
-                            && cont.getContainerType()
-                                .getSpecimenTypeCollection().size() > 0;
-                        if (containerPosition || canContainSpecimens) {
-                            RowColPos rcp = null;
-                            try {
-                                rcp = ContainerLabelingSchemeWrapper
-                                    .getRowColFromPositionString(appService,
-                                        fullLabel.substring(cutIndex), cont
-                                            .getContainerType()
-                                            .getChildLabelingSchemeId(), cont
-                                            .getContainerType()
-                                            .getRowCapacity(), cont
-                                            .getContainerType()
-                                            .getColCapacity());
-                            } catch (Exception ex) {
-                                // the test failed
-                                continue;
-                            }
-                            if (rcp != null) // the full position string is
-                                             // valid:
-                                foundContainers.add(cont);
-                        }
-                    }
-                }
-                removeSize++;
-            }
+            List<ContainerWrapper> foundContainers = ContainerWrapper
+                .getPossibleContainersFromPosition(appService,
+                    SessionManager.getUser(), positionText.getText(),
+                    isContainerPosition);
             if (foundContainers.size() == 1) {
-                initContainersParents(foundContainers.get(0));
-            } else if (foundContainers.size() == 0) {
-                String errorMsg = Messages
-                    .getString(
-                        "GenericAssignEntryForm.single.checkParent.error.notfound.msg", //$NON-NLS-1$
-                        getNotFoundLabelMessage(fullLabel, labelsTested));
-                BiobankPlugin
-                    .openError(
-                        Messages
-                            .getString("GenericAssignEntryForm.single.checkParent.error.notfound.title"), //$NON-NLS-1$
-                        errorMsg);
-                appendLog(Messages
-                    .getString(
-                        "GenericAssignEntryForm.single.activitylog.checkParent.error", errorMsg)); //$NON-NLS-1$
-                focusControlInError(positionText);
-                return;
-            } else {
+                initParentContainers(foundContainers.get(0));
+            } else if (foundContainers.size() > 1) {
                 SelectParentContainerDialog dlg = new SelectParentContainerDialog(
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                         .getShell(), foundContainers);
@@ -566,58 +501,51 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                                     sb.toString()));
                     focusControlInError(positionText);
                 } else
-                    initContainersParents(dlg.getSelectedContainer());
+                    initParentContainers(dlg.getSelectedContainer());
             }
+        } catch (BiobankException be) {
+            BiobankPlugin
+                .openError(
+                    Messages
+                        .getString("GenericAssignEntryForm.container.init.position.error.title"), //$NON-NLS-1$
+                    be);
+            appendLog(Messages.getString(
+                "GenericAssignEntryForm.single.activitylog.checkParent.error", //$NON-NLS-1$
+                be.getMessage()));
+            focusControlInError(positionText);
         } catch (Exception ex) {
             BiobankPlugin
                 .openError(
                     Messages
-                        .getString("GenericAssignEntryForm.container.init.position.error.title"), ex); //$NON-NLS-1$
+                        .getString("GenericAssignEntryForm.container.init.position.error.title"), //$NON-NLS-1$
+                    ex);
             focusControlInError(positionText);
         }
     }
 
     /**
-     * single assign: initialise parents of the single specimen
+     * Initialise parents
      */
-    private void initContainersParents(ContainerWrapper bottomContainer) {
-        // only one cabinet container has been found
+    private void initParentContainers(ContainerWrapper bottomContainer) {
         parentContainers = new ArrayList<ContainerWrapper>();
         ContainerWrapper parent = bottomContainer;
         while (parent != null) {
             parentContainers.add(parent);
             parent = parent.getParentContainer();
         }
-        // TODO which generic message ?
-        // appendLog(Messages.getString(
-        //            "Cabinet.activitylog.containers.init", //$NON-NLS-1$
-        // thirdParent.getFullInfoLabel(), secondParent.getFullInfoLabel(),
-        // firstParent.getFullInfoLabel()));
-    }
-
-    private void resetParentContainers() {
-        parentContainers = null;
-        // if (thirdParentWidget != null)
-        // thirdParentWidget.setSelection(null);
-        // if (secondParentWidget != null)
-        // secondParentWidget.setSelection(null);
-    }
-
-    /**
-     * assign single: append container names for message display
-     */
-    private String getNotFoundLabelMessage(String fullLabel,
-        List<String> labelsTested) {
-        StringBuffer res = new StringBuffer();
-        for (int i = 0; i < labelsTested.size(); i++) {
-            if (i != 0) {
-                res.append(", "); //$NON-NLS-1$
-            }
-            String binLabel = labelsTested.get(i);
-            res.append(binLabel).append("(") //$NON-NLS-1$
-                .append(fullLabel.replace(binLabel, "")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+        StringBuffer parentMsg = new StringBuffer();
+        for (int i = parentContainers.size() - 1; i >= 0; i--) {
+            parent = parentContainers.get(i);
+            String label = parent.getPositionString();
+            if (label == null)
+                label = parent.getLabel();
+            parentMsg.append(label);
+            if (i != 0)
+                parentMsg.append("|");
         }
-        return res.toString();
+        appendLog(Messages.getString(
+            "GenericAssignEntryForm.activitylog.containers.init", //$NON-NLS-1$
+            parentMsg.toString()));
     }
 
     /**
@@ -925,7 +853,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             inventoryIdText.setText(singleLinkingInventoryId);
             setFirstControl(newSinglePositionText);
             try {
-                retrieveSpecimenData();
+                retrieveSingleSpecimenData();
             } catch (Exception ex) {
                 BiobankPlugin.openError("Move - specimen error", ex); //$NON-NLS-1$
                 focusControlInError(inventoryIdText);
@@ -1163,7 +1091,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     public void reset() throws Exception {
         super.reset();
         singleLinkingInventoryId = null;
-        resetParentContainers();
+        parentContainers = null;
         // resultShownValue.setValue(Boolean.FALSE);
         // the 2 following lines are needed. The validator won't update if don't
         // do that (why ?)

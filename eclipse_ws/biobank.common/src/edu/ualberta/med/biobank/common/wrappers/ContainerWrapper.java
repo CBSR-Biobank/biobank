@@ -11,6 +11,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 
+import edu.ualberta.med.biobank.common.Messages;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -23,6 +24,7 @@ import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.util.TypeReference;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerBaseWrapper;
@@ -33,6 +35,7 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -736,8 +739,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public void moveSpecimens(ContainerWrapper destination) throws Exception {
         Map<RowColPos, SpecimenWrapper> aliquots = getSpecimens();
         for (Entry<RowColPos, SpecimenWrapper> e : aliquots.entrySet()) {
-            destination
-                .addSpecimen(e.getKey().row, e.getKey().col, e.getValue());
+            destination.addSpecimen(e.getKey().row, e.getKey().col,
+                e.getValue());
         }
         destination.persist();
     }
@@ -1168,4 +1171,77 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return objectWithPositionManagement.getTop();
     }
 
+    /**
+     * Search possible parents from the position text.
+     * 
+     * @param positionText the position to use for initialisation
+     * @param isContainerPosition if true, the position is a full container
+     *            position, if false, it is a full specimen position
+     * @throws BiobankException
+     */
+    public static List<ContainerWrapper> getPossibleContainersFromPosition(
+        BiobankApplicationService appService, User user, String positionText,
+        boolean isContainerPosition) throws ApplicationException,
+        BiobankException {
+        String fullLabel = positionText;
+        List<ContainerWrapper> foundContainers = new ArrayList<ContainerWrapper>();
+        int removeSize = 2;
+        List<String> parentLabelsTested = new ArrayList<String>();
+        while (removeSize < 5) { // we are assuming that an object position
+                                 // in its parent won't be bigger than 3 !
+            int cutIndex = fullLabel.length() - removeSize;
+            if (cutIndex > 0) {
+                String parentLabel = fullLabel.substring(0, cutIndex);
+                parentLabelsTested.add(parentLabel);
+                for (ContainerWrapper cont : ContainerWrapper
+                    .getContainersInSite(appService,
+                        user.getCurrentWorkingSite(), parentLabel)) {
+                    // need to know if can contain specimen if this is a
+                    // specimen position
+                    boolean canContainSpecimens = cont.getContainerType()
+                        .getSpecimenTypeCollection() != null
+                        && cont.getContainerType().getSpecimenTypeCollection()
+                            .size() > 0;
+                    if (isContainerPosition || canContainSpecimens) {
+                        RowColPos rcp = null;
+                        try {
+                            // check if the string position is possible in
+                            // this container
+                            ContainerTypeWrapper type = cont.getContainerType();
+                            rcp = ContainerLabelingSchemeWrapper
+                                .getRowColFromPositionString(appService,
+                                    fullLabel.substring(cutIndex),
+                                    type.getChildLabelingSchemeId(),
+                                    type.getRowCapacity(),
+                                    type.getColCapacity());
+                        } catch (Exception ex) {
+                            // the test failed
+                            continue;
+                        }
+                        if (rcp != null) // the full position string is
+                                         // valid:
+                            foundContainers.add(cont);
+                    }
+                }
+            }
+            removeSize++;
+        }
+        if (foundContainers.size() == 0) {
+            StringBuffer res = new StringBuffer();
+            for (int i = 0; i < parentLabelsTested.size(); i++) {
+                if (i != 0) {
+                    res.append(", "); //$NON-NLS-1$
+                }
+                String binLabel = parentLabelsTested.get(i);
+                res.append(binLabel).append("(") //$NON-NLS-1$
+                    .append(fullLabel.replace(binLabel, "")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            String errorMsg = Messages
+                .getString(
+                    "ContainerWrapper.getPossibleContainersFromPosition.error.notfound.msg", //$NON-NLS-1$
+                    res.toString());
+            throw new BiobankException(errorMsg);
+        }
+        return foundContainers;
+    }
 }
