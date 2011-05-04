@@ -302,12 +302,12 @@
        <command
              categoryId="org.eclipse.ui.category.window"
              id="edu.ualberta.med.biobank.commands.processing.assign"
-             name="Generic Assign">
+             name="Specimen Assign">
        </command>
        <command
              categoryId="org.eclipse.ui.category.window"
              id="edu.ualberta.med.biobank.commands.processing.link"
-             name="Generic Link">
+             name="Specimen Link">
        </command>
    </extension>
    <extension
@@ -871,7 +871,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.GenericAssignHandler"
+            class="edu.ualberta.med.biobank.handlers.SpecimenAssignHandler"
             commandId="edu.ualberta.med.biobank.commands.processing.assign">
          <activeWhen>
             <and>
@@ -890,7 +890,7 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.GenericLinkHandler"
+            class="edu.ualberta.med.biobank.handlers.SpecimenLinkHandler"
             commandId="edu.ualberta.med.biobank.commands.processing.link">
          <activeWhen>
             <and>
@@ -1102,7 +1102,7 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.processing.link"
                   icon="icons/scanLink.png"
-                  label="Generic Link"
+                  label="Specimen Link"
                   style="push">
             </command>
             <command
@@ -1114,7 +1114,7 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.processing.assign"
                   icon="icons/scanAssign.png"
-                  label="Generic Assign"
+                  label="Specimen Assign"
                   style="push">
             </command>
             <command
@@ -1385,7 +1385,7 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.processing.link"
                   icon="icons/scanLink.png"
-                  label="Generic Link"
+                  label="Specimen Link"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -1409,7 +1409,7 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.processing.assign"
                   icon="icons/scanAssign.png"
-                  label="Generic Assign"
+                  label="Specimen Assign"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -2138,16 +2138,16 @@
       name="Processing Event View">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.linkassign.GenericLinkEntryForm"
+      class="edu.ualberta.med.biobank.forms.linkassign.SpecimenLinkEntryForm"
       default="false"
-      id="edu.ualberta.med.biobank.forms.GenericLinkEntryForm"
-      name="Generic Link">
+      id="edu.ualberta.med.biobank.forms.SpecimenLinkEntryForm"
+      name="Specimen Link">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.linkassign.GenericAssignEntryForm"
+      class="edu.ualberta.med.biobank.forms.linkassign.SpecimenAssignEntryForm"
       default="false"
-      id="edu.ualberta.med.biobank.forms.GenericAssignEntryForm"
-      name="Generic Assign">
+      id="edu.ualberta.med.biobank.forms.SpecimenAssignEntryForm"
+      name="Specimen Assign">
 </editor>
    </extension>
    <extension

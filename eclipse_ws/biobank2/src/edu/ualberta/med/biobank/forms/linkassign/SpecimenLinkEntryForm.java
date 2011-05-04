@@ -14,11 +14,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
@@ -51,14 +48,14 @@ import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 // FIXME the custom selection is not done in this version. 
-public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
+public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.GenericLinkEntryForm"; //$NON-NLS-1$
+    public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenLinkEntryForm"; //$NON-NLS-1$
 
     private static final String INVENTORY_ID_BINDING = "inventoryId-binding"; //$NON-NLS-1$
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(GenericLinkEntryForm.class.getName());
+        .getLogger(SpecimenLinkEntryForm.class.getName());
 
     private static boolean singleMode = false;
 
@@ -84,14 +81,10 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
     // source/type hierarchy selected (use rows order)
     private List<SpecimenHierarchy> preSelections;
 
-    protected static String lastSingleInventoryId;
-
-    protected static boolean goToAssign = false;
-
     @Override
     protected void init() throws Exception {
         super.init();
-        setPartName(Messages.getString("GenericLinkEntryForm.tab.title")); //$NON-NLS-1$
+        setPartName(Messages.getString("SpecimenLink.tab.title")); //$NON-NLS-1$
         linkFormPatientManagement = new LinkFormPatientManagement(
             widgetCreator, this);
         setCanLaunchScan(true);
@@ -110,7 +103,7 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected String getFormTitle() {
-        return Messages.getString("GenericLinkEntryForm.form.title"); //$NON-NLS-1$
+        return Messages.getString("SpecimenLink.form.title"); //$NON-NLS-1$
     }
 
     @Override
@@ -125,7 +118,7 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected String getActivityTitle() {
-        return Messages.getString("GenericLinkEntryForm.activity.title"); //$NON-NLS-1$
+        return Messages.getString("SpecimenLink.activity.title"); //$NON-NLS-1$
     }
 
     @Override
@@ -135,13 +128,11 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected String getOkMessage() {
-        return Messages.getString("GenericLinkEntryForm.description.ok"); //$NON-NLS-1$
+        return Messages.getString("SpecimenLink.description.ok"); //$NON-NLS-1$
     }
 
     @Override
     public String getNextOpenedFormID() {
-        if (goToAssign)
-            return GenericAssignEntryForm.ID;
         return ID;
     }
 
@@ -201,9 +192,9 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         toolkit.createLabel(typesSelectionPerRowComposite, ""); //$NON-NLS-1$
         toolkit.createLabel(typesSelectionPerRowComposite,
-            Messages.getString("GenericLinkEntryForm.source.column.title")); //$NON-NLS-1$
+            Messages.getString("SpecimenLink.source.column.title")); //$NON-NLS-1$
         toolkit.createLabel(typesSelectionPerRowComposite,
-            Messages.getString("GenericLinkEntryForm.result.column.title")); //$NON-NLS-1$
+            Messages.getString("SpecimenLink.result.column.title")); //$NON-NLS-1$
         toolkit.createLabel(typesSelectionPerRowComposite, ""); //$NON-NLS-1$
 
         specimenTypesWidgets = new ArrayList<AliquotedSpecimenSelectionWidget>();
@@ -307,12 +298,12 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
             fieldsComposite,
             BiobankText.class,
             SWT.NONE,
-            Messages.getString("GenericLinkEntryForm.inventoryId.label"), //$NON-NLS-1$
+            Messages.getString("SpecimenLink.inventoryId.label"), //$NON-NLS-1$
             new String[0],
             singleSpecimen,
             SpecimenPeer.INVENTORY_ID.getName(),
             new NonEmptyStringValidator(Messages
-                .getString("GenericLinkEntryForm.inventoryId.validator.msg")), //$NON-NLS-1$
+                .getString("SpecimenLink.inventoryId.validator.msg")), //$NON-NLS-1$
             INVENTORY_ID_BINDING);
         inventoryIdText.addKeyListener(textFieldKeyListener);
 
@@ -320,18 +311,6 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
         singleTypesWidget = new AliquotedSpecimenSelectionWidget(
             fieldsComposite, null, widgetCreator, false);
         singleTypesWidget.addBindings();
-
-        widgetCreator.createLabel(fieldsComposite,
-            Messages.getString("GenericLinkEntryForm.checkbox.assign")); //$NON-NLS-1$
-        final Button goToAssignButton = toolkit.createButton(fieldsComposite,
-            "", SWT.CHECK); //$NON-NLS-1$
-        goToAssignButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                goToAssign = goToAssignButton.getSelection();
-            }
-        });
-        goToAssignButton.setSelection(goToAssign);
     }
 
     @Override
@@ -407,7 +386,7 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
             .getCells();
         StringBuffer sb = new StringBuffer(
             Messages
-                .getString("GenericLinkEntryForm.activitylog.specimens.start")); //$NON-NLS-1$
+                .getString("SpecimenLink.activitylog.specimens.start")); //$NON-NLS-1$
         int nber = 0;
         ActivityStatusWrapper activeStatus = ActivityStatusWrapper
             .getActiveActivityStatus(appService);
@@ -435,7 +414,7 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
                 // LINKED\: {0} - Type: {1} - Patient\: {2} - Visit\: {3} -
                 // Center: {4} \n
                 sb.append(Messages.getString(
-                    "GenericLinkEntryForm.activitylog.specimen.linked", //$NON-NLS-1$
+                    "SpecimenLink.activitylog.specimen.linked", //$NON-NLS-1$
                     cell.getValue(), cell.getType().getName(), sourceSpecimen
                         .getSpecimenType().getNameShort(), sourceSpecimen
                         .getInventoryId(), sourceSpecimen.getCollectionEvent()
@@ -452,7 +431,7 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         // LINKING\: {0} specimens linked to patient {1} on center {2}
         appendLog(Messages.getString(
-            "GenericLinkEntryForm.activitylog.save.summary", nber, //$NON-NLS-1$
+            "SpecimenLink.activitylog.save.summary", nber, //$NON-NLS-1$
             linkFormPatientManagement.getCurrentPatient().getPnumber(),
             currentSelectedCenter.getNameShort()));
     }
@@ -471,19 +450,18 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
         String posStr = singleSpecimen.getPositionString(true, false);
         if (posStr == null) {
             posStr = Messages
-                .getString("GenericLinkEntryForm.position.label.none"); //$NON-NLS-1$
+                .getString("SpecimenLink.position.label.none"); //$NON-NLS-1$
         }
         // LINKED\: specimen {0} of type\: {1} to source\: {2} ({3}) -
         // Patient\: {4} - Visit\: {5} - Center\: {6} \n
         appendLog(Messages.getString(
-            "GenericLinkEntryForm.activitylog.specimen.linked", singleSpecimen //$NON-NLS-1$
+            "SpecimenLink.activitylog.specimen.linked", singleSpecimen //$NON-NLS-1$
                 .getInventoryId(), singleSpecimen.getSpecimenType().getName(),
             singleSpecimen.getParentSpecimen().getInventoryId(), singleSpecimen
                 .getParentSpecimen().getSpecimenType().getNameShort(),
             linkFormPatientManagement.getCurrentPatient().getPnumber(),
             singleSpecimen.getCollectionEvent().getVisitNumber(),
             singleSpecimen.getCurrentCenter().getNameShort()));
-        lastSingleInventoryId = singleSpecimen.getInventoryId();
     }
 
     @Override

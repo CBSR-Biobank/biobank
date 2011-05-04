@@ -137,10 +137,10 @@ public abstract class AbstractLinkAssignEntryForm extends
 
         // radio button to choose single or multiple
         radioSingle = toolkit.createButton(singleMultipleComposite,
-            Messages.getString("GenericLinkEntryForm.choice.radio.single"), //$NON-NLS-1$
+            Messages.getString("AbstractLinkAssignEntryForm.choice.radio.single"), //$NON-NLS-1$
             SWT.RADIO);
         radioMultiple = toolkit.createButton(singleMultipleComposite,
-            Messages.getString("GenericLinkEntryForm.choice.radio.multiple"), //$NON-NLS-1$
+            Messages.getString("AbstractLinkAssignEntryForm.choice.radio.multiple"), //$NON-NLS-1$
             SWT.RADIO);
 
         singleFieldsComposite = toolkit.createComposite(leftComposite);

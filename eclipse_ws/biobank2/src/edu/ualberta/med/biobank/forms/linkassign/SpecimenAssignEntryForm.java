@@ -66,12 +66,12 @@ import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
+public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.GenericAssignEntryForm"; //$NON-NLS-1$
+    public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenAssignEntryForm"; //$NON-NLS-1$
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(GenericAssignEntryForm.class.getName());
+        .getLogger(SpecimenAssignEntryForm.class.getName());
 
     private static boolean singleMode = false;
 
@@ -91,10 +91,6 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     // multiple mode. First container, is the direct parent, second is the
     // parent parent, etc...
     private List<ContainerWrapper> parentContainers;
-
-    private String singleLinkingInventoryId;
-
-    private boolean comesFromSingleLinking = false;
 
     // for single specimen assign
     private BiobankText inventoryIdText;
@@ -153,15 +149,6 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         setCanLaunchScan(true);
         currentMultipleContainer = new ContainerWrapper(appService);
         initPalletValues();
-        // addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
-        // multipleValidationMade,
-        //            Messages.getString("GenericAssignEntryForm.valisation.msg")); //$NON-NLS-1$
-
-        if (GenericLinkEntryForm.goToAssign) {
-            singleLinkingInventoryId = GenericLinkEntryForm.lastSingleInventoryId;
-            GenericLinkEntryForm.lastSingleInventoryId = null;
-        }
-        comesFromSingleLinking = singleLinkingInventoryId != null;
     }
 
     /**
@@ -183,7 +170,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected String getActivityTitle() {
-        return Messages.getString("GenericAssignEntryForm.activity.title"); //$NON-NLS-1$
+        return Messages.getString("SpecimenAssign.activity.title"); //$NON-NLS-1$
     }
 
     @Override
@@ -193,7 +180,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected String getFormTitle() {
-        return Messages.getString("GenericAssignEntryForm.form.title"); //$NON-NLS-1$
+        return Messages.getString("SpecimenAssign.form.title"); //$NON-NLS-1$
     }
 
     @Override
@@ -208,13 +195,11 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected String getOkMessage() {
-        return Messages.getString("GenericAssignEntryFormAssign.okmessage"); //$NON-NLS-1$
+        return Messages.getString("SpecimenAssign.okmessage"); //$NON-NLS-1$
     }
 
     @Override
     public String getNextOpenedFormID() {
-        if (comesFromSingleLinking)
-            return GenericLinkEntryForm.ID;
         return ID;
     }
 
@@ -222,7 +207,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected void createCommonFields(Composite commonFieldsComposite) {
         BiobankText siteLabel = createReadOnlyLabelledField(
             commonFieldsComposite, SWT.NONE,
-            Messages.getString("GenericAssignEntryForm.site.label")); //$NON-NLS-1$
+            Messages.getString("SpecimenAssign.site.label")); //$NON-NLS-1$
         siteLabel.setText(SessionManager.getUser().getCurrentWorkingCenter()
             .getNameShort());
     }
@@ -250,13 +235,11 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             fieldsComposite,
             BiobankText.class,
             SWT.NONE,
-            Messages
-                .getString("GenericAssignEntryForm.single.inventoryId.label"), new String[0], //$NON-NLS-1$
+            Messages.getString("SpecimenAssign.single.inventoryId.label"), new String[0], //$NON-NLS-1$
             singleSpecimen,
             "inventoryId", //$NON-NLS-1$
-            new NonEmptyStringValidator(
-                Messages
-                    .getString("GenericAssignEntryForm.single.inventoryId.validator.msg")), //$NON-NLS-1$
+            new NonEmptyStringValidator(Messages
+                .getString("SpecimenAssign.single.inventoryId.validator.msg")), //$NON-NLS-1$
             INVENTORY_ID_BINDING);
         inventoryIdText.addKeyListener(textFieldKeyListener);
         inventoryIdText.addFocusListener(new FocusAdapter() {
@@ -311,26 +294,25 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         oldSinglePositionCheckText.setText("?"); //$NON-NLS-1$
 
         appendLog(Messages.getString(
-            "GenericAssignEntryForm.single.activitylog.gettingInfoId", //$NON-NLS-1$
+            "SpecimenAssign.single.activitylog.gettingInfoId", //$NON-NLS-1$
             singleSpecimen.getInventoryId()));
         SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(appService,
             singleSpecimen.getInventoryId(), SessionManager.getUser());
         if (foundSpecimen == null) {
             throw new Exception(Messages.getString(
-                "GenericAssignEntryForm.single.inventoryId.error", //$NON-NLS-1$
+                "SpecimenAssign.single.inventoryId.error", //$NON-NLS-1$
                 singleSpecimen.getInventoryId()));
         }
         singleSpecimen.initObjectWith(foundSpecimen);
         if (singleSpecimen.isUsedInDispatch()) {
             throw new Exception(
                 Messages
-                    .getString("GenericAssignEntryForm.single.specimen.transit.error")); //$NON-NLS-1$
+                    .getString("SpecimenAssign.single.specimen.transit.error")); //$NON-NLS-1$
         }
         String positionString = singleSpecimen.getPositionString(true, false);
         if (positionString == null) {
             displayOldSingleFields(false);
-            positionString = Messages
-                .getString("GenericAssignEntryForm.position.none"); //$NON-NLS-1$
+            positionString = Messages.getString("SpecimenAssign.position.none"); //$NON-NLS-1$
             newSinglePositionText.setFocus();
         } else {
             displayOldSingleFields(true);
@@ -340,7 +322,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         }
         oldSinglePositionText.setText(positionString);
         appendLog(Messages.getString(
-            "GenericAssignEntryForm.single.activitylog.specimenInfo", //$NON-NLS-1$
+            "SpecimenAssign.single.activitylog.specimenInfo", //$NON-NLS-1$
             singleSpecimen.getInventoryId(), positionString));
     }
 
@@ -351,8 +333,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     private void createPositionFields(Composite fieldsComposite) {
         // for move mode: display old position retrieved from database
         oldSinglePositionLabel = widgetCreator.createLabel(fieldsComposite,
-            Messages
-                .getString("GenericAssignEntryForm.single.old.position.label")); //$NON-NLS-1$
+            Messages.getString("SpecimenAssign.single.old.position.label")); //$NON-NLS-1$
         oldSinglePositionText = (BiobankText) widgetCreator.createBoundWidget(
             fieldsComposite, BiobankText.class, SWT.NONE,
             oldSinglePositionLabel, new String[0], null, null);
@@ -362,14 +343,12 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         // for move mode: field to enter old position. Check needed to be sure
         // nothing is wrong with the specimen
-        oldSinglePositionCheckLabel = widgetCreator
-            .createLabel(
-                fieldsComposite,
-                Messages
-                    .getString("GenericAssignEntryForm.single.old.position.check.label")); //$NON-NLS-1$
+        oldSinglePositionCheckLabel = widgetCreator.createLabel(
+            fieldsComposite, Messages
+                .getString("SpecimenAssign.single.old.position.check.label")); //$NON-NLS-1$
         oldSinglePositionCheckValidator = new AbstractValidator(
             Messages
-                .getString("GenericAssignEntryForm.single.old.position.check.validation.msg")) { //$NON-NLS-1$
+                .getString("SpecimenAssign.single.old.position.check.validation.msg")) { //$NON-NLS-1$
             @Override
             public IStatus validate(Object value) {
                 if (value != null && !(value instanceof String)) {
@@ -397,11 +376,9 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         // for all modes: position to be assigned to the specimen
         newSinglePositionLabel = widgetCreator.createLabel(fieldsComposite,
-            Messages.getString("GenericAssignEntryForm.single.position.label")); //$NON-NLS-1$
-        newSinglePositionValidator = new StringLengthValidator(
-            4,
-            Messages
-                .getString("GenericAssignEntryForm.single.position.validationMsg")); //$NON-NLS-1$
+            Messages.getString("SpecimenAssign.single.position.label")); //$NON-NLS-1$
+        newSinglePositionValidator = new StringLengthValidator(4,
+            Messages.getString("SpecimenAssign.single.position.validationMsg")); //$NON-NLS-1$
         displayOldSingleFields(false);
         newSinglePositionText = (BiobankText) widgetCreator.createBoundWidget(
             fieldsComposite, BiobankText.class, SWT.NONE,
@@ -451,11 +428,11 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         widgetCreator.showWidget(oldSinglePositionCheckText, displayOld);
         if (displayOld) {
             newSinglePositionLabel.setText(Messages
-                .getString("GenericAssignEntryForm.single.new.position.label") //$NON-NLS-1$
+                .getString("SpecimenAssign.single.new.position.label") //$NON-NLS-1$
                 + ":"); //$NON-NLS-1$
         } else {
             newSinglePositionLabel.setText(Messages
-                .getString("GenericAssignEntryForm.single.position.label") //$NON-NLS-1$
+                .getString("SpecimenAssign.single.position.label") //$NON-NLS-1$
                 + ":"); //$NON-NLS-1$
             oldSinglePositionCheckText.setText(oldSinglePositionText.getText());
         }
@@ -494,10 +471,10 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                     BiobankPlugin
                         .openError(
                             Messages
-                                .getString("GenericAssignEntryForm.single.checkParent.error.toomany.title"), //$NON-NLS-1$
+                                .getString("SpecimenAssign.single.checkParent.error.toomany.title"), //$NON-NLS-1$
                             Messages
                                 .getString(
-                                    "GenericAssignEntryForm.single.checkParent.error.toomany.msg", //$NON-NLS-1$
+                                    "SpecimenAssign.single.checkParent.error.toomany.msg", //$NON-NLS-1$
                                     sb.toString()));
                     focusControlInError(positionText);
                 } else
@@ -507,17 +484,17 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             BiobankPlugin
                 .openError(
                     Messages
-                        .getString("GenericAssignEntryForm.container.init.position.error.title"), //$NON-NLS-1$
+                        .getString("SpecimenAssign.container.init.position.error.title"), //$NON-NLS-1$
                     be);
             appendLog(Messages.getString(
-                "GenericAssignEntryForm.single.activitylog.checkParent.error", //$NON-NLS-1$
+                "SpecimenAssign.single.activitylog.checkParent.error", //$NON-NLS-1$
                 be.getMessage()));
             focusControlInError(positionText);
         } catch (Exception ex) {
             BiobankPlugin
                 .openError(
                     Messages
-                        .getString("GenericAssignEntryForm.container.init.position.error.title"), //$NON-NLS-1$
+                        .getString("SpecimenAssign.container.init.position.error.title"), //$NON-NLS-1$
                     ex);
             focusControlInError(positionText);
         }
@@ -541,10 +518,10 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                 label = parent.getLabel();
             parentMsg.append(label);
             if (i != 0)
-                parentMsg.append("|");
+                parentMsg.append("|"); //$NON-NLS-1$
         }
         appendLog(Messages.getString(
-            "GenericAssignEntryForm.activitylog.containers.init", //$NON-NLS-1$
+            "SpecimenAssign.activitylog.containers.init", //$NON-NLS-1$
             parentMsg.toString()));
     }
 
@@ -566,7 +543,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                     }
                     appendLog(Messages
                         .getString(
-                            "GenericAssignEntryForm.single.activitylog.checkingPosition", positionString)); //$NON-NLS-1$
+                            "SpecimenAssign.single.activitylog.checkingPosition", positionString)); //$NON-NLS-1$
                     singleSpecimen.setSpecimenPositionFromString(
                         positionString, parentContainers.get(0));
                     if (singleSpecimen.isPositionFree(parentContainers.get(0))) {
@@ -577,14 +554,14 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                     } else {
                         BiobankPlugin.openError(
                             Messages
-                                .getString("GenericAssignEntryForm.single.position.error.msg"), //$NON-NLS-1$
+                                .getString("SpecimenAssign.single.position.error.msg"), //$NON-NLS-1$
                             Messages
                                 .getString(
-                                    "GenericAssignEntryForm.single.checkStatus.error", positionString, //$NON-NLS-1$
+                                    "SpecimenAssign.single.checkStatus.error", positionString, //$NON-NLS-1$
                                     parentContainers.get(0).getLabel()));
                         appendLog(Messages
                             .getString(
-                                "GenericAssignEntryForm.single.activitylog.checkPosition.error", //$NON-NLS-1$
+                                "SpecimenAssign.single.activitylog.checkPosition.error", //$NON-NLS-1$
                                 positionString, parentContainers.get(0)
                                     .getLabel()));
                         focusControlInError(newSinglePositionText);
@@ -751,12 +728,13 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         productBarcodeValidator = new NonEmptyStringValidator(
             Messages
-                .getString("GenericAssignEntryForm.multiple.productBarcode.validationMsg"));//$NON-NLS-1$
+                .getString("SpecimenAssign.multiple.productBarcode.validationMsg"));//$NON-NLS-1$
         palletLabelValidator = new NonEmptyStringValidator(
             Messages
-                .getString("GenericAssignEntryForm.multiple.palletLabel.validationMsg"));//$NON-NLS-1$
+                .getString("SpecimenAssign.multiple.palletLabel.validationMsg"));//$NON-NLS-1$
 
-        widgetCreator.createLabel(multipleOptionsFields, "Use scanner");
+        widgetCreator.createLabel(multipleOptionsFields,
+            Messages.getString("SpecimenAssign.useScanner.check.label")); //$NON-NLS-1$
         useScannerButton = toolkit.createButton(multipleOptionsFields,
             "", SWT.CHECK); //$NON-NLS-1$
         useScannerButton.addSelectionListener(new SelectionAdapter() {
@@ -766,11 +744,9 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             }
         });
 
-        palletproductBarcodeLabel = widgetCreator
-            .createLabel(
-                multipleOptionsFields,
-                Messages
-                    .getString("GenericAssignEntryForm.multiple.productBarcode.label")); //$NON-NLS-1$)
+        palletproductBarcodeLabel = widgetCreator.createLabel(
+            multipleOptionsFields,
+            Messages.getString("SpecimenAssign.multiple.productBarcode.label")); //$NON-NLS-1$)
         palletproductBarcodeText = (BiobankText) createBoundWidget(
             multipleOptionsFields, BiobankText.class, SWT.NONE,
             palletproductBarcodeLabel, null, currentMultipleContainer,
@@ -808,8 +784,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             multipleOptionsFields,
             BiobankText.class,
             SWT.NONE,
-            Messages
-                .getString("GenericAssignEntryForm.multiple.palletLabel.label"), null, //$NON-NLS-1$
+            Messages.getString("SpecimenAssign.multiple.palletLabel.label"), null, //$NON-NLS-1$
             currentMultipleContainer, ContainerPeer.LABEL.getName(),
             palletLabelValidator, LABEL_BINDING);
         palletPositionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
@@ -847,18 +822,6 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected void defaultInitialisation() {
         useScannerButton.setSelection(useScanner);
         setUseScanner(useScanner);
-
-        if (singleLinkingInventoryId != null) {
-            // get previous inventory id entered in previous single linking
-            inventoryIdText.setText(singleLinkingInventoryId);
-            setFirstControl(newSinglePositionText);
-            try {
-                retrieveSingleSpecimenData();
-            } catch (Exception ex) {
-                BiobankPlugin.openError("Move - specimen error", ex); //$NON-NLS-1$
-                focusControlInError(inventoryIdText);
-            }
-        }
     }
 
     @Override
@@ -921,33 +884,28 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     private void createPalletTypesViewer(Composite parent)
         throws ApplicationException {
         initPalletContainerTypes();
-        palletTypesViewer = widgetCreator
-            .createComboViewer(
-                parent,
-                Messages
-                    .getString("GenericAssignEntryForm.multiple.palletType.label"), //$NON-NLS-1$
-                null,
-                null,
-                Messages
-                    .getString("GenericAssignEntryForm.multiple.palletType.validationMsg"), //$NON-NLS-1$
-                true, PALLET_TYPES_BINDING, new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        if (!isModifyingMultipleFields) {
-                            ContainerTypeWrapper oldContainerType = currentMultipleContainer
-                                .getContainerType();
-                            currentMultipleContainer
-                                .setContainerType((ContainerTypeWrapper) selectedObject);
-                            if (oldContainerType != null) {
-                                validateMultipleValues();
-                            }
-                            palletTypesViewer.getCombo().setFocus();
-
-                            if (!useScannerButton.getSelection())
-                                displayPalletPositions();
+        palletTypesViewer = widgetCreator.createComboViewer(parent, Messages
+            .getString("SpecimenAssign.multiple.palletType.label"), //$NON-NLS-1$
+            null, null, Messages
+                .getString("SpecimenAssign.multiple.palletType.validationMsg"), //$NON-NLS-1$
+            true, PALLET_TYPES_BINDING, new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    if (!isModifyingMultipleFields) {
+                        ContainerTypeWrapper oldContainerType = currentMultipleContainer
+                            .getContainerType();
+                        currentMultipleContainer
+                            .setContainerType((ContainerTypeWrapper) selectedObject);
+                        if (oldContainerType != null) {
+                            validateMultipleValues();
                         }
+                        palletTypesViewer.getCombo().setFocus();
+
+                        if (!useScannerButton.getSelection())
+                            displayPalletPositions();
                     }
-                }); //$NON-NLS-1$
+                }
+            }); //$NON-NLS-1$
     }
 
     /**
@@ -960,9 +918,9 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             BiobankPlugin
                 .openAsyncError(
                     Messages
-                        .getString("GenericAssignEntryForm.multiple.dialog.noPalletFoundError.title"), //$NON-NLS-1$
+                        .getString("SpecimenAssign.multiple.dialog.noPalletFoundError.title"), //$NON-NLS-1$
                     Messages
-                        .getString("GenericAssignEntryForm.multiple.dialog.noPalletFoundError.msg" //$NON-NLS-1$
+                        .getString("SpecimenAssign.multiple.dialog.noPalletFoundError.msg" //$NON-NLS-1$
                         ));
         }
     }
@@ -1009,17 +967,17 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             String siteName = currentMultipleContainer.getSite().getNameShort();
             if (palletFoundWithProductBarcodeLabel == null)
                 appendLog(Messages.getString(
-                    "GenericAssignEntryForm.multiple.activitylog.pallet.added", //$NON-NLS-1$
+                    "SpecimenAssign.multiple.activitylog.pallet.added", //$NON-NLS-1$
                     productBarcode, containerType, palletLabel, siteName));
             else if (!palletLabel.equals(palletFoundWithProductBarcodeLabel))
                 appendLog(Messages.getString(
-                    "GenericAssignEntryForm.multiple.activitylog.pallet.moved", //$NON-NLS-1$
+                    "SpecimenAssign.multiple.activitylog.pallet.moved", //$NON-NLS-1$
                     productBarcode, containerType,
                     palletFoundWithProductBarcodeLabel, palletLabel, siteName));
             int totalNb = 0;
             StringBuffer sb = new StringBuffer(
                 Messages
-                    .getString("GenericAssignEntryForm.multiple.activilylog.save.start")); //$NON-NLS-1$
+                    .getString("SpecimenAssign.multiple.activilylog.save.start")); //$NON-NLS-1$
             try {
                 Map<RowColPos, PalletCell> cells = getCells();
                 for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
@@ -1037,7 +995,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                                 false);
                             if (posStr == null) {
                                 posStr = Messages
-                                    .getString("GenericAssignEntryForm.position.none"); //$NON-NLS-1$
+                                    .getString("SpecimenAssign.position.none"); //$NON-NLS-1$
                             }
                             computeActivityLogMessage(sb, cell, specimen,
                                 posStr);
@@ -1050,11 +1008,10 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                 throw ex;
             }
             appendLog(sb.toString());
-            appendLog(Messages
-                .getString(
-                    "GenericAssignEntryForm.multiple.activitylog.save.summary", totalNb, //$NON-NLS-1$
-                    currentMultipleContainer.getLabel(),
-                    currentMultipleContainer.getSite().getNameShort()));
+            appendLog(Messages.getString(
+                "SpecimenAssign.multiple.activitylog.save.summary", totalNb, //$NON-NLS-1$
+                currentMultipleContainer.getLabel(), currentMultipleContainer
+                    .getSite().getNameShort()));
             setFinished(false);
         }
     }
@@ -1063,7 +1020,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         SpecimenWrapper specimen, String posStr) {
         CollectionEventWrapper visit = specimen.getCollectionEvent();
         sb.append(Messages.getString(
-            "GenericAssignEntryForm.multiple.activitylog.specimen.assigned", //$NON-NLS-1$
+            "SpecimenAssign.multiple.activitylog.specimen.assigned", //$NON-NLS-1$
             posStr, currentMultipleContainer.getSite().getNameShort(), cell
                 .getValue(), specimen.getSpecimenType().getName(), visit
                 .getPatient().getPnumber(), visit.getVisitNumber()));
@@ -1090,7 +1047,6 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        singleLinkingInventoryId = null;
         parentContainers = null;
         // resultShownValue.setValue(Boolean.FALSE);
         // the 2 following lines are needed. The validator won't update if don't
@@ -1200,9 +1156,9 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             BiobankPlugin
                 .openError(
                     Messages
-                        .getString("GenericAssignEntryForm.multiple.validation.error.title"), ex); //$NON-NLS-1$
+                        .getString("SpecimenAssign.multiple.validation.error.title"), ex); //$NON-NLS-1$
             appendLog(Messages.getString(
-                "GenericAssignEntryForm.multiple.activitylog.error", //$NON-NLS-1$
+                "SpecimenAssign.multiple.activitylog.error", //$NON-NLS-1$
                 ex.getMessage()));
             if (ex instanceof ContainerLabelSearchException) {
                 nextFocusWidget = palletPositionText;
@@ -1258,7 +1214,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                 palletFoundWithProductBarcode.getContainerType()));
             appendLog(Messages
                 .getString(
-                    "GenericAssignEntryForm.multiple.activitylog.pallet.productBarcode.exists", //$NON-NLS-1$
+                    "SpecimenAssign.multiple.activitylog.pallet.productBarcode.exists", //$NON-NLS-1$
                     currentMultipleContainer.getProductBarcode(),
                     palletFoundWithProductBarcode.getLabel(),
                     currentMultipleContainer.getSite().getNameShort(),
@@ -1288,7 +1244,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             // database.
             appendLog(Messages
                 .getString(
-                    "GenericAssignEntryForm.multiple.activitylog.pallet.checkLabelForProductBarcode", //$NON-NLS-1$
+                    "SpecimenAssign.multiple.activitylog.pallet.checkLabelForProductBarcode", //$NON-NLS-1$
                     currentMultipleContainer.getLabel(),
                     currentMultipleContainer.getProductBarcode(),
                     currentMultipleContainer.getSite().getNameShort()));
@@ -1307,21 +1263,19 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                 if (canContinue) {
                     // Move the pallet.
                     type = currentMultipleContainer.getContainerType();
-                    appendLog(Messages
-                        .getString(
-                            "GenericAssignEntryForm.multiple.activitylog.pallet.moveInfo", //$NON-NLS-1$
-                            currentMultipleContainer.getProductBarcode(),
-                            palletFoundWithProductBarcodeLabel,
-                            currentMultipleContainer.getLabel()));
+                    appendLog(Messages.getString(
+                        "SpecimenAssign.multiple.activitylog.pallet.moveInfo", //$NON-NLS-1$
+                        currentMultipleContainer.getProductBarcode(),
+                        palletFoundWithProductBarcodeLabel,
+                        currentMultipleContainer.getLabel()));
                 } else {
                     return false;
                 }
             }
             if (type != null) {
-                appendLog(Messages
-                    .getString(
-                        "GenericAssignEntryForm.multiple.activitylog.pallet.typeUsed", //$NON-NLS-1$
-                        type.getName()));
+                appendLog(Messages.getString(
+                    "SpecimenAssign.multiple.activitylog.pallet.typeUsed", //$NON-NLS-1$
+                    type.getName()));
             }
         }
         if (needToCheckPosition) {
@@ -1334,15 +1288,12 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple assign
      */
     private boolean openDialogPalletMoved() {
-        return MessageDialog
-            .openConfirm(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getShell(),
-                "Pallet product barcode", //$NON-NLS-1$
-                Messages
-                    .getString(
-                        "GenericAssignEntryForm.multiple.dialog.checkPallet.otherPosition", //$NON-NLS-1$
-                        palletFoundWithProductBarcodeLabel,
-                        currentMultipleContainer.getLabel()));
+        return MessageDialog.openConfirm(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), "Pallet product barcode", //$NON-NLS-1$
+            Messages.getString(
+                "SpecimenAssign.multiple.dialog.checkPallet.otherPosition", //$NON-NLS-1$
+                palletFoundWithProductBarcodeLabel,
+                currentMultipleContainer.getLabel()));
     }
 
     /**
@@ -1389,7 +1340,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                 if (!ok) {
                     appendLog(Messages
                         .getString(
-                            "GenericAssignEntryForm.multiple.activitylog.pallet.positionUsedMsg", barcode, //$NON-NLS-1$
+                            "SpecimenAssign.multiple.activitylog.pallet.positionUsedMsg", barcode, //$NON-NLS-1$
                             currentMultipleContainer.getLabel(),
                             currentMultipleContainer.getSite().getNameShort()));
                     return false;
@@ -1399,7 +1350,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                 // Position exists but no product barcode set before
                 appendLog(Messages
                     .getString(
-                        "GenericAssignEntryForm.multiple.activitylog.pallet.positionUsedWithNoProductBarcode", //$NON-NLS-1$
+                        "SpecimenAssign.multiple.activitylog.pallet.positionUsedWithNoProductBarcode", //$NON-NLS-1$
                         palletLabel, containerAtPosition.getContainerType()
                             .getName(), currentMultipleContainer
                             .getProductBarcode()));
@@ -1407,7 +1358,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                 // Position initialised but not physically used
                 appendLog(Messages
                     .getString(
-                        "GenericAssignEntryForm.multiple.activitylog.pallet.positionInitialized", //$NON-NLS-1$
+                        "SpecimenAssign.multiple.activitylog.pallet.positionInitialized", //$NON-NLS-1$
                         palletLabel, containerAtPosition.getContainerType()
                             .getName()));
             }
@@ -1436,11 +1387,10 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             BiobankPlugin
                 .openError(
                     Messages
-                        .getString("GenericAssignEntryForm.container.position.toomany.error.title"), //$NON-NLS-1$
-                    Messages
-                        .getString(
-                            "GenericAssignEntryForm.container.position.toomany.error.msg", //$NON-NLS-1$
-                            palletLabel));
+                        .getString("SpecimenAssign.container.position.toomany.error.title"), //$NON-NLS-1$
+                    Messages.getString(
+                        "SpecimenAssign.container.position.toomany.error.msg", //$NON-NLS-1$
+                        palletLabel));
             nextFocusWidget = palletPositionText;
             return false;
         }
@@ -1475,9 +1425,9 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                         PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                             .getShell(),
                         Messages
-                            .getString("GenericAssignEntryForm.multiple.dialog.positionUsed.noBarcode.title"), //$NON-NLS-1$
+                            .getString("SpecimenAssign.multiple.dialog.positionUsed.noBarcode.title"), //$NON-NLS-1$
                         Messages
-                            .getString("GenericAssignEntryForm.multiple.dialog.positionUsed.noBarcode.question")); //$NON-NLS-1$
+                            .getString("SpecimenAssign.multiple.dialog.positionUsed.noBarcode.question")); //$NON-NLS-1$
             }
             return useNewProductBarcode;
         } else {
@@ -1485,10 +1435,10 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             BiobankPlugin
                 .openError(
                     Messages
-                        .getString("GenericAssignEntryForm.multiple.dialog.positionUsed.error.title"), //$NON-NLS-1$
+                        .getString("SpecimenAssign.multiple.dialog.positionUsed.error.title"), //$NON-NLS-1$
                     Messages
                         .getString(
-                            "GenericAssignEntryForm.multiple.dialog.positionUsed.error.msg", //$NON-NLS-1$
+                            "SpecimenAssign.multiple.dialog.positionUsed.error.msg", //$NON-NLS-1$
                             barcode, currentMultipleContainer.getSite()
                                 .getNameShort())); //$NON-NLS-1$
             nextFocusWidget = palletPositionText;
@@ -1642,9 +1592,9 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                 boolean save = BiobankPlugin
                     .openConfirm(
                         Messages
-                            .getString("GenericAssignEntryForm.multiple.dialog.reallySave.title"), //$NON-NLS-1$
+                            .getString("SpecimenAssign.multiple.dialog.reallySave.title"), //$NON-NLS-1$
                         Messages
-                            .getString("GenericAssignEntryForm.multiple.dialog.saveWithMissing.msg")); //$NON-NLS-1$
+                            .getString("SpecimenAssign.multiple.dialog.saveWithMissing.msg")); //$NON-NLS-1$
                 if (!save) {
                     setDirty(true);
                     saveEvenIfMissing = false;
@@ -1672,11 +1622,6 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected boolean initializeWithSingle() {
-        // if come from the single mode entry of linking asking to go to assign,
-        // then select single
-        if (singleLinkingInventoryId != null
-            && singleLinkingInventoryId.length() > 0)
-            return true;
         return isSingleMode();
     }
 
