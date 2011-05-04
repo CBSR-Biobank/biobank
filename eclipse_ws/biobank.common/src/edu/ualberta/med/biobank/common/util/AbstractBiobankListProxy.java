@@ -29,7 +29,6 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
     protected List<Object> nextListChunk;
     protected int pageSize;
     protected int offset;
-    protected int nextOffset;
     protected int realSize;
     protected transient ApplicationService appService;
 
@@ -40,7 +39,6 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
 
     public AbstractBiobankListProxy(ApplicationService appService) {
         this.offset = 0;
-        this.nextOffset = 1000;
         this.loadedOffset = -2000;
         this.pageSize = appService.getMaxRecordsCount();
         this.appService = appService;
@@ -96,29 +94,31 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
     }
 
     private void updateListChunk(int index) {
+        // if already loaded, check for preload
         if (index - offset >= pageSize || index < offset) {
+            // if outside the current chunk, check for index inside next chunk
             if (index < loadedOffset + pageSize && index >= loadedOffset) {
                 // swap
-                if (semaphore.availablePermits() == 0) {
+                try {
                     if (listener != null)
                         listener.showBusy();
-                    try {
-                        semaphore.acquire();
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                    semaphore.acquire();
+                    if (nextListChunk != null) {
+                        List<Object> temp = listChunk;
+                        listChunk = nextListChunk;
+                        nextListChunk = temp;
+                        int tempOffset = loadedOffset;
+                        loadedOffset = offset;
+                        offset = tempOffset;
                     }
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } finally {
                     if (listener != null)
                         listener.done();
                     semaphore.release();
                 }
-                if (nextListChunk != null) {
-                    List<Object> temp = listChunk;
-                    listChunk = nextListChunk;
-                    nextListChunk = temp;
-                    int tempOffset = loadedOffset;
-                    loadedOffset = offset;
-                    offset = tempOffset;
-                }
+
             } else {
                 // user loading out of order, do a query on demand
                 try {
@@ -140,27 +140,32 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
             return;
         }
 
+        int nextOffset;
         if ((i - offset) > (pageSize / 2)) {
             nextOffset = offset + pageSize;
         } else
             nextOffset = offset - pageSize;
         if (loadedOffset != nextOffset && nextOffset >= 0) {
             loadedOffset = nextOffset;
+
+            final int nextOffsetCopy = nextOffset;
             Thread t = new Thread() {
                 @Override
                 public void run() {
                     try {
-                        nextListChunk = getChunk(nextOffset);
+                        nextListChunk = getChunk(nextOffsetCopy);
                         if (nextListChunk.size() != 1000 && realSize == -1)
-                            realSize = nextOffset + nextListChunk.size();
+                            realSize = nextOffsetCopy + nextListChunk.size();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
+                    } finally {
+                        semaphore.release();
                     }
-                    semaphore.release();
                 }
             };
             t.start();
-        }
+        } else
+            semaphore.release();
     }
 
     @Override
@@ -289,5 +294,15 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
         }
 
         return this;
+    }
+
+    private static class Chunk {
+        public final int start;
+        public final List<Object> list;
+
+        public Chunk(int start, List<Object> list) {
+            this.start = start;
+            this.list = list;
+        }
     }
 }
