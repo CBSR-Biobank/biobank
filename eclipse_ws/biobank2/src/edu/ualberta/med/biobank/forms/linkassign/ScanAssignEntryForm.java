@@ -991,8 +991,8 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     @Override
-    protected void disableFields() {
-        fieldsComposite.setEnabled(false);
+    protected void enableFields(boolean enable) {
+        fieldsComposite.setEnabled(enable);
     }
 
     @Override

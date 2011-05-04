@@ -94,6 +94,10 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     // parent parent, etc...
     private List<ContainerWrapper> parentContainers;
 
+    private String singleLinkingInventoryId;
+
+    private boolean comesFromSingleLinking = false;
+
     // for single specimen assign
     private BiobankText inventoryIdText;
     protected boolean inventoryIdModified;
@@ -142,14 +146,10 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     private boolean saveEvenIfMissing;
     private boolean isFakeScanLinkedOnly;
     private Button fakeScanLinkedOnlyButton;
-
+    private Composite multipleOptionsFields;
     private Composite fakeScanComposite;
-
-    private Button userScannerButton;
-
+    private Button useScannerButton;
     private Label palletproductBarcodeLabel;
-
-    private String singleLinkingInventoryId;
 
     @Override
     protected void init() throws Exception {
@@ -165,6 +165,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             singleLinkingInventoryId = GenericLinkEntryForm.lastSingleInventoryId;
             GenericLinkEntryForm.lastSingleInventoryId = null;
         }
+        comesFromSingleLinking = singleLinkingInventoryId != null;
     }
 
     /**
@@ -216,6 +217,8 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     public String getNextOpenedFormID() {
+        if (comesFromSingleLinking)
+            return GenericLinkEntryForm.ID;
         return ID;
     }
 
@@ -282,10 +285,6 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                 displayPositions(false);
             }
         });
-        if (singleLinkingInventoryId != null) {
-            // get previous inventory id entered in previous single linking
-            inventoryIdText.setText(singleLinkingInventoryId);
-        }
         createPositionFields(fieldsComposite);
     }
 
@@ -348,6 +347,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             displayOldSingleFields(false);
             positionString = Messages
                 .getString("GenericAssignEntryForm.position.none"); //$NON-NLS-1$
+            newSinglePositionText.setFocus();
         } else {
             displayOldSingleFields(true);
             oldSinglePositionCheckText.setText(oldSinglePositionCheckText
@@ -384,7 +384,8 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                 Messages
                     .getString("GenericAssignEntryForm.single.old.position.check.label")); //$NON-NLS-1$
         oldSinglePositionCheckValidator = new AbstractValidator(
-            "GenericAssignEntryForm.single.old.position.check.validation.msg") { //$NON-NLS-1$
+            Messages
+                .getString("GenericAssignEntryForm.single.old.position.check.validation.msg")) { //$NON-NLS-1$
             @Override
             public IStatus validate(Object value) {
                 if (value != null && !(value instanceof String)) {
@@ -809,16 +810,16 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected void createMultipleFields(Composite parent)
         throws ApplicationException {
-        Composite fieldsComposite = toolkit.createComposite(parent);
+        multipleOptionsFields = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
-        fieldsComposite.setLayout(layout);
-        toolkit.paintBordersFor(fieldsComposite);
+        multipleOptionsFields.setLayout(layout);
+        toolkit.paintBordersFor(multipleOptionsFields);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
-        fieldsComposite.setLayoutData(gd);
+        multipleOptionsFields.setLayoutData(gd);
 
         productBarcodeValidator = new NonEmptyStringValidator(
             Messages
@@ -827,24 +828,23 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             Messages
                 .getString("GenericAssignEntryForm.multiple.palletLabel.validationMsg"));//$NON-NLS-1$
 
-        widgetCreator.createLabel(fieldsComposite, "Use scanner");
-        userScannerButton = toolkit
-            .createButton(fieldsComposite, "", SWT.CHECK); //$NON-NLS-1$
-        userScannerButton.addSelectionListener(new SelectionAdapter() {
+        widgetCreator.createLabel(multipleOptionsFields, "Use scanner");
+        useScannerButton = toolkit.createButton(multipleOptionsFields,
+            "", SWT.CHECK); //$NON-NLS-1$
+        useScannerButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                setUseScanner(userScannerButton.getSelection());
+                setUseScanner(useScannerButton.getSelection());
             }
         });
-        userScannerButton.setSelection(useScanner);
 
         palletproductBarcodeLabel = widgetCreator
             .createLabel(
-                fieldsComposite,
+                multipleOptionsFields,
                 Messages
                     .getString("GenericAssignEntryForm.multiple.productBarcode.label")); //$NON-NLS-1$)
         palletproductBarcodeText = (BiobankText) createBoundWidget(
-            fieldsComposite, BiobankText.class, SWT.NONE,
+            multipleOptionsFields, BiobankText.class, SWT.NONE,
             palletproductBarcodeLabel, null, currentMultipleContainer,
             ContainerPeer.PRODUCT_BARCODE.getName(), productBarcodeValidator,
             PRODUCT_BARCODE_BINDING);
@@ -877,7 +877,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         });
 
         palletPositionText = (BiobankText) createBoundWidgetWithLabel(
-            fieldsComposite,
+            multipleOptionsFields,
             BiobankText.class,
             SWT.NONE,
             Messages
@@ -908,17 +908,35 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             }
         });
 
-        createPalletTypesViewer(fieldsComposite);
+        createPalletTypesViewer(multipleOptionsFields);
 
-        createPlateToScanField(fieldsComposite);
+        createPlateToScanField(multipleOptionsFields);
 
         createScanButton(parent);
     }
 
     @Override
+    protected void defaultInitialisation() {
+        useScannerButton.setSelection(useScanner);
+        setUseScanner(useScanner);
+
+        if (singleLinkingInventoryId != null) {
+            // get previous inventory id entered in previous single linking
+            inventoryIdText.setText(singleLinkingInventoryId);
+            setFirstControl(newSinglePositionText);
+            try {
+                retrieveSpecimenData();
+            } catch (Exception ex) {
+                BiobankPlugin.openError("Move - specimen error", ex); //$NON-NLS-1$
+                focusControlInError(inventoryIdText);
+            }
+        }
+    }
+
+    @Override
     protected void setUseScanner(boolean use) {
         useScanner = use;
-        showPlateToScanField(use);
+        showPlateToScanField(use && !singleMode);
         widgetCreator.showWidget(scanButton, use);
         widgetCreator.showWidget(palletproductBarcodeLabel, use);
         widgetCreator.showWidget(palletproductBarcodeText, use);
@@ -997,7 +1015,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
                             }
                             palletTypesViewer.getCombo().setFocus();
 
-                            if (!userScannerButton.getSelection())
+                            if (!useScannerButton.getSelection())
                                 displayPalletPositions();
                         }
                     }
@@ -1022,9 +1040,9 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    protected void disableFields() {
-        super.disableFields();
-        // FIXME ?
+    protected void enableFields(boolean enable) {
+        super.enableFields(enable);
+        multipleOptionsFields.setEnabled(enable);
     }
 
     @Override
@@ -1144,6 +1162,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
+        singleLinkingInventoryId = null;
         resetParentContainers();
         // resultShownValue.setValue(Boolean.FALSE);
         // the 2 following lines are needed. The validator won't update if don't
@@ -1164,6 +1183,12 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         singleSpecimen.reset(); // reset internal values
         setDirty(false);
+        if (singleMode)
+            inventoryIdText.setFocus();
+        else if (useScanner)
+            palletproductBarcodeText.setFocus();
+        else
+            palletPositionText.setFocus();
         setFocus();
     }
 
@@ -1188,7 +1213,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             palletWidget.setCells(null);
         }
         setScanHasBeenLaunched(isSingleMode()
-            || !userScannerButton.getSelection());
+            || !useScannerButton.getSelection());
         initPalletValues();
 
         palletproductBarcodeText.setText(productBarcode);
@@ -1227,7 +1252,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         nextFocusWidget = null;
         isModifyingMultipleFields = true;
         try {
-            if (!userScannerButton.getSelection()
+            if (!useScannerButton.getSelection()
                 || productBarcodeValidator.validate(
                     currentMultipleContainer.getProductBarcode()).equals(
                     Status.OK_STATUS)) {
@@ -1405,7 +1430,7 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
         containerToRemove = null;
         initContainersFromPosition(palletPositionText, true);
         List<ContainerTypeWrapper> containersTypes = null;
-        if (userScannerButton.getSelection())
+        if (useScannerButton.getSelection())
             containersTypes = palletContainerTypes;
         else if (parentContainers != null) {
             containersTypes = parentContainers.get(0).getContainerType()
@@ -1725,5 +1750,14 @@ public class GenericAssignEntryForm extends AbstractLinkAssignEntryForm {
             && singleLinkingInventoryId.length() > 0)
             return true;
         return isSingleMode();
+    }
+
+    @Override
+    protected Composite getFocusedComposite(boolean single) {
+        if (single)
+            return inventoryIdText;
+        if (useScanner)
+            return palletproductBarcodeText;
+        return palletPositionText;
     }
 }

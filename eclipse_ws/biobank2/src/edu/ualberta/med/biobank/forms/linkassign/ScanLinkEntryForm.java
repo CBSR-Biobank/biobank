@@ -656,7 +656,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     private void setTypeToCell(PalletCell cell, SpecimenHierarchy selection) {
         cell.setSourceSpecimen(selection.getParentSpecimen());
         cell.setSpecimenType(selection.getAliquotedSpecimenType());
-        cell.setStatus(UICellStatus.TYPE);
+        if (cell.getStatus() != UICellStatus.ERROR)
+            cell.setStatus(UICellStatus.TYPE);
     }
 
     @Override
@@ -694,8 +695,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     @Override
-    protected void disableFields() {
-        fieldsComposite.setEnabled(false);
+    protected void enableFields(boolean enable) {
+        fieldsComposite.setEnabled(enable);
     }
 
     @Override

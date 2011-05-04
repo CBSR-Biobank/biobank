@@ -671,11 +671,19 @@ public class GenericLinkEntryForm extends AbstractLinkAssignEntryForm {
     private void setHierarchyToCell(PalletCell cell, SpecimenHierarchy selection) {
         cell.setSourceSpecimen(selection.getParentSpecimen());
         cell.setSpecimenType(selection.getAliquotedSpecimenType());
-        cell.setStatus(UICellStatus.TYPE);
+        if (cell.getStatus() != UICellStatus.ERROR)
+            cell.setStatus(UICellStatus.TYPE);
     }
 
     @Override
     protected boolean initializeWithSingle() {
         return isSingleMode();
     }
+
+    @Override
+    protected void enableFields(boolean enable) {
+        super.enableFields(enable);
+        multipleOptionsFields.setEnabled(enable);
+    }
+
 }

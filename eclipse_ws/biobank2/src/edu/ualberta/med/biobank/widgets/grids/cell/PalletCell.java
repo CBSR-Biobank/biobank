@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
+import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -268,6 +269,18 @@ public class PalletCell extends AbstractUICell {
     public void setStatus(CellStatus status) {
         if (status != null)
             setStatus(UICellStatus.valueOf(status.name()));
+    }
+
+    public Cell transformIntoServerCell() {
+        Cell serverCell = new Cell(getRow(), getCol(), getValue(),
+            getStatus() == null ? null : CellStatus.valueOf(getStatus().name()));
+        serverCell.setExpectedSpecimenId(getExpectedSpecimen() == null ? null
+            : getExpectedSpecimen().getId());
+        serverCell.setInformation(getInformation());
+        serverCell.setSpecimenId(getSpecimen() == null ? null : getSpecimen()
+            .getId());
+        serverCell.setTitle(getTitle());
+        return serverCell;
     }
 
 }

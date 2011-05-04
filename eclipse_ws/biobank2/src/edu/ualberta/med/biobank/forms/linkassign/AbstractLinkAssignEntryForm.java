@@ -72,12 +72,17 @@ public abstract class AbstractLinkAssignEntryForm extends
 
         createVisualisationSection(mainComposite);
 
+        toolkit.adapt(mainComposite);
+
+        defaultInitialisation();
+
         boolean singleSelection = initializeWithSingle();
         radioSingle.setSelection(singleSelection);
         radioMultiple.setSelection(!singleSelection);
         showSingleComposite(singleSelection);
+    }
 
-        toolkit.adapt(mainComposite);
+    protected void defaultInitialisation() {
     }
 
     protected abstract boolean initializeWithSingle();
@@ -192,8 +197,16 @@ public abstract class AbstractLinkAssignEntryForm extends
         widgetCreator.showWidget(multipleFieldsComposite, !single);
         setBindings(single);
         showVisualisation(!single);
+        Composite focusComposite = getFocusedComposite(single);
+        if (focusComposite != null)
+            focusComposite.setFocus();
 
         page.layout(true, true);
+    }
+
+    protected Composite getFocusedComposite(
+        @SuppressWarnings("unused") boolean single) {
+        return null;
     }
 
     protected abstract void createSingleFields(Composite parent);
@@ -258,11 +271,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     }
 
     @Override
-    protected void disableFields() {
-        enableFields(false);
-    }
-
-    private void enableFields(boolean enable) {
+    protected void enableFields(boolean enable) {
         commonFieldsComposite.setEnabled(enable);
         radioSingle.setEnabled(enable);
         radioMultiple.setEnabled(enable);
@@ -271,10 +280,8 @@ public abstract class AbstractLinkAssignEntryForm extends
     @Override
     public void reset() throws Exception {
         super.reset();
-        enableFields(true);
-        singleSpecimen.reset(); // reset internal values
+        singleSpecimen.initObjectWith(new SpecimenWrapper(appService));
         setDirty(false);
-        setFocus();
         reset(true);
     }
 
