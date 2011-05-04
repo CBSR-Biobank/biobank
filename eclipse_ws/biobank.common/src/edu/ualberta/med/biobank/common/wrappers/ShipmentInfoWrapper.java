@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -76,14 +75,16 @@ public class ShipmentInfoWrapper extends ShipmentInfoBaseWrapper {
             && dateReveived.compareTo(endDate) <= 0;
     }
 
+    private static final String ALL_SHIP_INFOS_BY_METHOD = "from "
+        + ShipmentInfo.class.getName() + " ship where ship."
+        + ShipmentInfoPeer.SHIPPING_METHOD.getName() + "=?";
+
     public static List<ShipmentInfoWrapper> getAllShipmentInfosByMethod(
         WritableApplicationService appService, ShippingMethodWrapper method)
         throws ApplicationException {
-        List<ShipmentInfoWrapper> ships = new ArrayList<ShipmentInfoWrapper>();
-        HQLCriteria c = new HQLCriteria("from " + ShipmentInfo.class.getName()
-            + " ship where ship." + ShipmentInfoPeer.SHIPPING_METHOD.getName()
-            + "=?", Arrays.asList(method.getWrappedObject()));
-        ships = appService.query(c);
+        HQLCriteria c = new HQLCriteria(ALL_SHIP_INFOS_BY_METHOD,
+            Arrays.asList(method.getWrappedObject()));
+        List<ShipmentInfoWrapper> ships = appService.query(c);
         return ships;
     }
 }

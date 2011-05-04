@@ -196,7 +196,6 @@ public class TestProcessingEvent extends TestDatabase {
 
     @Test
     public void testDeleteNoMoreSpecimens() throws Exception {
-        // FIXME: issue 1174
         String name = "testDeleteNoMoreSpecimens" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite("site" + name);
 
@@ -206,6 +205,7 @@ public class TestProcessingEvent extends TestDatabase {
             .addProcessingEvent(site, parentSpc.getCollectionEvent()
                 .getPatient(), Utils.getRandomDate());
         pevent.addToSpecimenCollection(Arrays.asList(parentSpc));
+        parentSpc.setProcessingEvent(pevent);
         pevent.persist();
 
         try {
@@ -217,6 +217,8 @@ public class TestProcessingEvent extends TestDatabase {
         }
 
         pevent.removeFromSpecimenCollection(Arrays.asList(parentSpc));
+        parentSpc.delete();
+        pevent.reload();
         pevent.persist();
 
         // should be allowed to delete processing event
