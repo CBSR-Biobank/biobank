@@ -41,7 +41,7 @@ public class DateTimeObservableValue extends AbstractObservableValue {
 
     @Override
     protected void doSetValue(final Object value) {
-        if (value instanceof Date) {
+        if (value == null || value instanceof Date) {
             Date date = (Date) value;
             dateToDateTime(date);
         }

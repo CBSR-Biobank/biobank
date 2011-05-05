@@ -1,14 +1,11 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -27,8 +24,8 @@ import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.CollectionView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class PatientEntryForm extends BiobankEntryForm {
 
@@ -53,8 +50,6 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private NotNullValidator createdAtValidator;
 
-    private DateTimeWidget createdAtWidget;
-
     private NonEmptyStringValidator pnumberNonEmptyValidator = new NonEmptyStringValidator(
         Messages.getString("PatientEntryForm.patientNumber.validation.msg"));
 
@@ -64,23 +59,8 @@ public class PatientEntryForm extends BiobankEntryForm {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        if (adapter.getModelObject().isNew()) {
-            patient = (PatientWrapper) adapter.getModelObject();
+        patient = (PatientWrapper) getModelObject();
 
-            Calendar c = Calendar.getInstance();
-            c.setTime(new Date());
-            c.set(Calendar.SECOND, 0);
-            patient.setCreatedAt(c.getTime());
-
-        } else {
-            try {
-                patient = (PatientWrapper) adapter.getModelObjectClone();
-            } catch (Exception e1) {
-                logger.error("Error getting patient clone", e1);
-            }
-        }
-
-        retrievePatient();
         SessionManager.logEdit(patient);
         String tabName;
         if (patient.isNew()) {
@@ -145,9 +125,9 @@ public class PatientEntryForm extends BiobankEntryForm {
             GridData.VERTICAL_ALIGN_BEGINNING));
         createdAtValidator = new NotNullValidator("Created At should be set");
 
-        createdAtWidget = createDateTimeWidget(client, createdAtLabel,
-            patient.getCreatedAt(), patient, "createdAt", createdAtValidator,
-            SWT.DATE | SWT.TIME, CREATED_AT_BINDING);
+        createDateTimeWidget(client, createdAtLabel, patient.getCreatedAt(),
+            patient, "createdAt", createdAtValidator, SWT.DATE | SWT.TIME,
+            CREATED_AT_BINDING);
     }
 
     @Override
@@ -176,27 +156,10 @@ public class PatientEntryForm extends BiobankEntryForm {
         return PatientViewForm.ID;
     }
 
-    private void retrievePatient() {
-        try {
-            patient.reload();
-        } catch (Exception e) {
-            logger
-                .error(
-                    Messages.getString("PatientEntryForm.retrieve.error.msg",
-                        patient.getPnumber()), e);
-        }
-    }
-
     @Override
-    public void reset() throws Exception {
-        super.reset();
-        StudyWrapper study = patient.getStudy();
-        if (study != null) {
-            studiesViewer.setSelection(new StructuredSelection(study));
-        }
-        createdAtWidget.setDate(new Date());
-        studiesViewer.setSelection(null);
+    protected void onReset() throws Exception {
         patient.reset();
-        pnumberNonEmptyValidator.validate(null);
+
+        GuiUtil.reset(studiesViewer, patient.getStudy());
     }
 }

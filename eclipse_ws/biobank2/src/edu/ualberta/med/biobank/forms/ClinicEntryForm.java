@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -26,6 +25,7 @@ import edu.ualberta.med.biobank.widgets.infotables.entry.ContactEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicEntryForm extends AddressEntryFormCommon {
@@ -63,12 +63,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
         clinicAdapter = (ClinicAdapter) adapter;
-        if (clinicAdapter.getWrapper().isNew())
-            clinic = clinicAdapter.getWrapper();
-        else
-            clinic = (ClinicWrapper) clinicAdapter.getWrapper()
-                .getDatabaseClone();
-        clinic.reload();
+        clinic = (ClinicWrapper) getModelObject();
 
         String tabName;
         if (clinic.isNew()) {
@@ -188,16 +183,16 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    public void reset() {
-        super.reset();
-        ActivityStatusWrapper currentActivityStatus = clinic
-            .getActivityStatus();
-        if (currentActivityStatus != null) {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                currentActivityStatus));
-        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
-            activityStatusComboViewer.getCombo().deselectAll();
+    protected void onReset() throws Exception {
+        clinic.reset();
+
+        if (clinic.isNew()) {
+            clinic.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         }
+
+        GuiUtil.reset(activityStatusComboViewer, clinic.getActivityStatus());
+
         contactEntryWidget.reload();
     }
 }

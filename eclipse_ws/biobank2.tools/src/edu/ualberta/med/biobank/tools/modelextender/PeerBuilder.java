@@ -22,7 +22,6 @@ import edu.ualberta.med.biobank.tools.modelumlparser.ModelClass;
 import edu.ualberta.med.biobank.tools.utils.CamelCase;
 
 public class PeerBuilder extends BaseBuilder {
-
     public PeerBuilder(String outputdir, String packagename,
         Map<String, ModelClass> modelClasses) {
         super(outputdir, packagename, modelClasses);
@@ -59,62 +58,55 @@ public class PeerBuilder extends BaseBuilder {
 
         // Member property fields
         for (String attr : mc.getAttrMap().keySet()) {
-            result.append("   public static final Property<")
-                .append(mc.getAttrMap().get(attr).getType()).append(", ")
-                .append(mc.getName()).append("> ")
-                .append(CamelCase.toTitleCase(attr))
-                .append(" = Property.create(\"").append(attr)
-                .append("\", new TypeReference<")
-                .append(mc.getAttrMap().get(attr).getType())
-                .append(">() {});\n\n");
+
+            String propertyClass = mc.getAttrMap().get(attr).getType();
+            String modelClass = mc.getName();
+            String propertyName = attr;
+
+            String propertyFieldString = PropertyFieldBuilder.getField(
+                propertyClass, modelClass, propertyName);
+
+            result.append(propertyFieldString).append("\n\n");
         }
 
         // Association property fields
         for (String assocName : mc.getAssocMap().keySet()) {
             ClassAssociation assoc = mc.getAssocMap().get(assocName);
+
+            String propertyClass = assoc.getToClass().getName();
+            String modelClass = mc.getName();
+            String propertyName = assocName;
+
             if ((assoc.getAssociationType() == ClassAssociationType.ZERO_OR_ONE_TO_MANY)
                 || (assoc.getAssociationType() == ClassAssociationType.ONE_TO_MANY)) {
-                result.append("   public static final Property<Collection<")
-                    .append(assoc.getToClass().getName()).append(">, ")
-                    .append(mc.getName()).append("> ")
-                    .append(CamelCase.toTitleCase(assocName))
-                    .append(" = Property.create(\"").append(assocName)
-                    .append("\", new TypeReference<Collection<")
-                    .append(assoc.getToClass().getName())
-                    .append(">>() {});\n\n");
-            } else {
-                result.append("   public static final Property<")
-                    .append(assoc.getToClass().getName()).append(", ")
-                    .append(mc.getName()).append("> ")
-                    .append(CamelCase.toTitleCase(assocName))
-                    .append(" = Property.create(\"").append(assocName)
-                    .append("\", new TypeReference<")
-                    .append(assoc.getToClass().getName())
-                    .append(">() {});\n\n");
+                propertyClass = "Collection<" + propertyClass + ">";
             }
+
+            String propertyFieldString = PropertyFieldBuilder.getField(
+                propertyClass, modelClass, propertyName);
+
+            result.append(propertyFieldString).append("\n\n");
         }
 
         // property change names
         if (mc.getAttrMap().size() + mc.getAssocMap().size() > 0) {
-            result
-                .append("   public static final List<String> PROP_NAMES;\n")
+            result.append("   public static final List<Property<?, ? super ")
+                .append(mc.getName()).append(">> PROPERTIES;\n")
                 .append("   static {\n")
-                .append("      List<String> aList = new ArrayList<String>();\n");
-            if (ec != null) {
-                result.append("      aList.addAll(").append(ec.getName())
-                    .append("Peer.PROP_NAMES").append(");\n");
-            }
+                .append("      List<Property<?, ? super ").append(mc.getName())
+                .append(">> aList = new ArrayList<Property<?, ? super ")
+                .append(mc.getName()).append(">>();\n");
 
             for (String attr : mc.getAttrMap().keySet()) {
-                result.append("      aList.add(\"").append(attr)
-                    .append("\");\n");
+                result.append("      aList.add(")
+                    .append(CamelCase.toTitleCase(attr)).append(");\n");
             }
             for (String assocName : mc.getAssocMap().keySet()) {
-                result.append("      aList.add(\"").append(assocName)
-                    .append("\");\n");
+                result.append("      aList.add(")
+                    .append(CamelCase.toTitleCase(assocName)).append(");\n");
             }
             result.append(
-                "      PROP_NAMES = Collections.unmodifiableList(aList);\n")
+                "      PROPERTIES = Collections.unmodifiableList(aList);\n")
                 .append("   };\n");
         }
 
