@@ -23,28 +23,32 @@ import org.springframework.util.Assert;
 public abstract class AbstractBiobankListProxy<E> implements List<E>,
     Serializable {
 
+    private static enum Shown {
+        BUSY, DONE
+    };
+
+    private Shown lastShown = Shown.DONE;
+
     private static final long serialVersionUID = 1L;
+    private static final int REAL_SIZE_UNKNOWN = -1;
 
-    protected List<Object> listChunk;
-    protected List<Object> nextListChunk;
-    protected int pageSize;
-    protected int offset;
-    protected int nextOffset;
-    protected int realSize;
+    protected final int pageSize;
+    private final Semaphore loadingNextPage = new Semaphore(1);
+
     protected transient ApplicationService appService;
-
-    protected int loadedOffset;
-
+    private Page<Object> page;
+    private Page<Object> nextPage;
+    private int realSize;
     private IBusyListener listener;
-    private Semaphore semaphore = new Semaphore(1);
 
     public AbstractBiobankListProxy(ApplicationService appService) {
-        this.offset = 0;
-        this.nextOffset = 1000;
-        this.loadedOffset = -2000;
-        this.pageSize = appService.getMaxRecordsCount();
+        page = new Page<Object>();
+        nextPage = new Page<Object>();
+
+        pageSize = appService.getMaxRecordsCount();
         this.appService = appService;
-        this.realSize = -1;
+
+        this.realSize = REAL_SIZE_UNKNOWN;
     }
 
     protected abstract List<Object> getChunk(Integer firstRow)
@@ -52,126 +56,166 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
 
     @Override
     public boolean add(Object e) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void add(int index, Object element) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void clear() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean contains(Object o) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public E get(int index) {
         init();
         Assert.isTrue(index >= 0);
         updateListChunk(index);
-        if (listChunk.size() > 0 && listChunk.size() > index - offset)
-            return getRowObject((E) listChunk.get(index - offset));
-        else
+
+        Object element = page.get(index);
+        if (element != null) {
+            @SuppressWarnings("unchecked")
+            E tmp = (E) element;
+            return getRowObject(tmp);
+        } else
             return null;
     }
 
+    private void swapPages() {
+        Page<Object> tmp = nextPage;
+        nextPage = page;
+        page = tmp;
+    }
+
+    private void updateRealSize(Page<?> page) {
+        if (page.list.size() < pageSize && realSize == REAL_SIZE_UNKNOWN) {
+            realSize = page.offset + page.list.size();
+        }
+    }
+
+    /**
+     * Loads a chunk into the given page, starting from the given offset.
+     * 
+     * @param offset
+     * @param page
+     */
+    private void loadChunk(int offset, Page<Object> page)
+        throws ApplicationException {
+        page.list = getChunk(offset);
+        page.offset = offset;
+
+        updateRealSize(page);
+    }
+
+    private void showBusy() {
+        if (lastShown != Shown.BUSY && listener != null) {
+            listener.showBusy();
+            lastShown = Shown.BUSY;
+        }
+    }
+
+    private void showDone() {
+        if (lastShown != Shown.DONE && listener != null) {
+            listener.done();
+            lastShown = Shown.DONE;
+        }
+    }
+
     private void updateListChunk(int index) {
-        if (index - offset >= pageSize || index < offset) {
-            if (index < loadedOffset + pageSize && index >= loadedOffset) {
-                // swap
-                if (semaphore.availablePermits() == 0) {
-                    if (listener != null)
-                        listener.showBusy();
-                    try {
-                        semaphore.acquire();
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    if (listener != null)
-                        listener.done();
-                    semaphore.release();
-                }
-                if (nextListChunk != null) {
-                    List<Object> temp = listChunk;
-                    listChunk = nextListChunk;
-                    nextListChunk = temp;
-                    int tempOffset = loadedOffset;
-                    loadedOffset = offset;
-                    offset = tempOffset;
-                }
-            } else {
-                // user loading out of order, do a query on demand
-                try {
-                    offset = (index / pageSize) * pageSize;
-                    listChunk = getChunk(offset);
-                    // add cancel support
-                    if (listChunk.size() != 1000 && realSize == -1)
-                        realSize = offset + listChunk.size();
-                } catch (ApplicationException e) {
-                    throw new RuntimeException(e);
-                }
+        if (!page.hasElement(index)) {
+            boolean acquired = loadingNextPage.tryAcquire();
+            if (!acquired || !nextPage.hasElement(index)) {
+                showBusy();
             }
+
+            try {
+                if (!acquired)
+                    loadingNextPage.acquire();
+                if (!nextPage.hasElement(index)) {
+                    int offset = (index / pageSize) * pageSize;
+                    loadChunk(offset, page);
+                } else {
+                    swapPages();
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                showDone();
+                loadingNextPage.release();
+            }
+
         } else
             preLoadList(index);
     }
 
     private void preLoadList(final int i) {
-        if (!semaphore.tryAcquire()) {
+        if (!loadingNextPage.tryAcquire()) {
             return;
         }
 
-        if ((i - offset) > (pageSize / 2)) {
-            nextOffset = offset + pageSize;
+        int nextOffset;
+        if ((i - page.offset) > (pageSize / 2)) {
+            nextOffset = page.offset + pageSize;
         } else
-            nextOffset = offset - pageSize;
-        if (loadedOffset != nextOffset && nextOffset >= 0) {
-            loadedOffset = nextOffset;
+            nextOffset = page.offset - pageSize;
+
+        boolean alreadyLoaded = nextPage.offset != null
+            && nextPage.offset.equals(nextOffset);
+        boolean afterStart = nextOffset >= 0;
+        boolean beforeEnd = (realSize == REAL_SIZE_UNKNOWN || nextOffset < realSize);
+
+        if (!alreadyLoaded && afterStart && beforeEnd) {
+            final int finalNextOffset = nextOffset;
             Thread t = new Thread() {
                 @Override
                 public void run() {
                     try {
-                        nextListChunk = getChunk(nextOffset);
-                        if (nextListChunk.size() != 1000 && realSize == -1)
-                            realSize = nextOffset + nextListChunk.size();
-                    } catch (Exception e) {
+                        loadChunk(finalNextOffset, nextPage);
+                    } catch (ApplicationException e) {
                         throw new RuntimeException(e);
+                    } finally {
+                        loadingNextPage.release();
                     }
-                    semaphore.release();
                 }
             };
             t.start();
+        } else {
+            loadingNextPage.release();
         }
     }
 
     @Override
     public int indexOf(Object o) {
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isEmpty() {
         init();
-        return listChunk.isEmpty();
+        return page.list.isEmpty();
     }
 
     @Override
@@ -181,42 +225,42 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
 
     @Override
     public int lastIndexOf(Object o) {
-        return -1;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public ListIterator<E> listIterator() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public ListIterator<E> listIterator(int index) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean remove(Object o) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public E remove(int index) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public E set(int index, Object element) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -235,14 +279,20 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
         assert (fromIndex >= 0 && toIndex >= 0);
         assert (fromIndex <= toIndex);
         updateListChunk(fromIndex);
-        List<E> subList = new ArrayList<E>();
-        for (Object o : listChunk.subList(fromIndex - offset,
-            Math.min(listChunk.size(), toIndex - offset))) {
+        List<E> subList = new ArrayList<E>(toIndex - fromIndex);
+
+        // for (int i = fromIndex; i < toIndex; i++) {
+        // subList.add(get(i));
+        // }
+
+        for (Object o : page.list.subList(fromIndex - page.offset,
+            Math.min(page.list.size(), toIndex - page.offset))) {
             subList.add(getRowObject((E) o));
         }
-        if (offset + pageSize < toIndex && listChunk.size() == pageSize) {
-            subList.addAll(subList(offset + pageSize, toIndex));
+        if (page.offset + pageSize < toIndex && page.list.size() == pageSize) {
+            subList.addAll(subList(page.offset + pageSize, toIndex));
         }
+
         return subList;
     }
 
@@ -252,42 +302,67 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
 
     @Override
     public java.lang.Object[] toArray() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     public void setAppService(ApplicationService as) {
         this.appService = as;
     }
 
-    /**
-     * Used in BiobankProxyHelperImpl
-     */
-    public List<Object> getListChunk() {
-        init();
-        return listChunk;
-    }
-
-    /**
-     * Used in BiobankProxyHelperImpl
-     */
-    public void setListChunk(List<Object> listChunk) {
-        this.listChunk = listChunk;
-    }
-
+    // TODO: rename to "setBusyListener"?
     public void addBusyListener(IBusyListener l) {
         this.listener = l;
     }
 
     public AbstractBiobankListProxy<?> init() {
-        if (listChunk == null) {
-            updateListChunk(-1);
+        if (!page.isInitialized()) {
+            updateListChunk(0);
         }
 
         return this;
+    }
+
+    private class Page<V> implements Serializable, NotAProxy {
+
+        private static final long serialVersionUID = 7230323011529770077L;
+        public Integer offset;
+        public List<V> list;
+
+        /**
+         * 
+         * @param index
+         * @return true if this page could hold the given index, otherwise
+         *         false.
+         */
+        public boolean hasElement(int index) {
+            return isInitialized() && index - offset < pageSize
+                && index >= offset;
+        }
+
+        /**
+         * 
+         * @param index
+         * @return the element at the given index, otherwise null.
+         */
+        public V get(int index) {
+            V result = null;
+
+            if (offset != null && list != null) {
+                if (list.size() > 0 && list.size() > index - offset) {
+                    result = list.get(index - offset);
+                }
+            }
+
+            return result;
+        }
+
+        public boolean isInitialized() {
+            return offset != null && list != null;
+        }
     }
 }

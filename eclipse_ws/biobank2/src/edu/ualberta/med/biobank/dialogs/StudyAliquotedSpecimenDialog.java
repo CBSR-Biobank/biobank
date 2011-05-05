@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
@@ -25,7 +26,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
-public class StudyAliquotedSpecimenDialog extends BiobankDialog {
+public class StudyAliquotedSpecimenDialog extends PagedDialog {
 
     private AliquotedSpecimenWrapper origAliquotedSpecimen;
 
@@ -37,10 +38,17 @@ public class StudyAliquotedSpecimenDialog extends BiobankDialog {
 
     private Collection<SpecimenTypeWrapper> availableSpecimenTypes;
 
+    private BiobankText quantity;
+
+    private BiobankText volume;
+
+    private ComboViewer activityStatus;
+
     public StudyAliquotedSpecimenDialog(Shell parent,
         AliquotedSpecimenWrapper origAliquotedSpecimen,
-        Collection<SpecimenTypeWrapper> specimenTypes) {
-        super(parent);
+        NewListener newListener, Collection<SpecimenTypeWrapper> specimenTypes) {
+        super(parent, newListener,
+            origAliquotedSpecimen.getSpecimenType() == null);
         Assert.isNotNull(origAliquotedSpecimen);
         Assert.isNotNull(specimenTypes);
         this.availableSpecimenTypes = specimenTypes;
@@ -121,7 +129,7 @@ public class StudyAliquotedSpecimenDialog extends BiobankDialog {
             }
         });
 
-        getWidgetCreator().createComboViewer(
+        activityStatus = getWidgetCreator().createComboViewer(
             contents,
             Messages.getString("label.activity"),
             ActivityStatusWrapper.getAllActivityStatuses(SessionManager
@@ -140,14 +148,15 @@ public class StudyAliquotedSpecimenDialog extends BiobankDialog {
                 }
             });
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+        volume = (BiobankText) createBoundWidgetWithLabel(contents,
+            BiobankText.class, SWT.BORDER,
             Messages.getString("AliquotedSpecimen.field.volume.label"),
             new String[0], newAliquotedSpecimen,
             AliquotedSpecimenPeer.VOLUME.getName(), new DoubleNumberValidator(
                 Messages.getString("AliquotedSpecimen.field.validation.msg"),
                 false));
 
-        createBoundWidgetWithLabel(
+        quantity = (BiobankText) createBoundWidgetWithLabel(
             contents,
             BiobankText.class,
             SWT.BORDER,
@@ -169,13 +178,37 @@ public class StudyAliquotedSpecimenDialog extends BiobankDialog {
 
     @Override
     protected void okPressed() {
-        origAliquotedSpecimen.setSpecimenType(newAliquotedSpecimen
-            .getSpecimenType());
-        origAliquotedSpecimen.setVolume(newAliquotedSpecimen.getVolume());
-        origAliquotedSpecimen.setQuantity(newAliquotedSpecimen.getQuantity());
-        origAliquotedSpecimen.setActivityStatus(newAliquotedSpecimen
-            .getActivityStatus());
+        copy(origAliquotedSpecimen);
         super.okPressed();
     }
 
+    @Override
+    protected void copy(ModelWrapper<?> newModelObject) {
+        ((AliquotedSpecimenWrapper) newModelObject)
+            .setSpecimenType(newAliquotedSpecimen.getSpecimenType());
+        ((AliquotedSpecimenWrapper) newModelObject)
+            .setVolume(newAliquotedSpecimen.getVolume());
+        ((AliquotedSpecimenWrapper) newModelObject)
+            .setQuantity(newAliquotedSpecimen.getQuantity());
+        ((AliquotedSpecimenWrapper) newModelObject)
+            .setActivityStatus(newAliquotedSpecimen.getActivityStatus());
+    }
+
+    @Override
+    protected ModelWrapper<?> getNew() {
+        return new AliquotedSpecimenWrapper(null);
+    }
+
+    @Override
+    protected void resetFields() {
+        try {
+            newAliquotedSpecimen.reset();
+        } catch (Exception e) {
+            BiobankPlugin.openAsyncError("Error", e);
+        }
+        specimenTypeComboViewer.getCombo().deselectAll();
+        quantity.setText("");
+        volume.setText("");
+        activityStatus.getCombo().deselectAll();
+    }
 }

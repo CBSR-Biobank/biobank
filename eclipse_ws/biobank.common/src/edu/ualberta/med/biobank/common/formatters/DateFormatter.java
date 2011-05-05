@@ -4,8 +4,13 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class DateFormatter {
+
+    public static final TimeZone LOCAL = TimeZone.getDefault();
+
+    public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
 
     public static final String DATE_FORMAT = "yyyy-MM-dd";
 
@@ -28,6 +33,28 @@ public class DateFormatter {
 
     public static String formatAsDateTime(Date date) {
         return format(dateTimeFormatter, date);
+    }
+
+    public static Date convertDate(TimeZone oldTimeZone, TimeZone newTimeZone,
+        Date date) {
+        if (date == null)
+            return null;
+
+        // TODO: too slow?
+        SimpleDateFormat sdf1 = new SimpleDateFormat(DATE_TIME_FORMAT);
+        sdf1.setTimeZone(oldTimeZone);
+
+        SimpleDateFormat sdf2 = new SimpleDateFormat(DATE_TIME_FORMAT);
+        sdf2.setTimeZone(newTimeZone);
+        String oldDate = sdf2.format(date);
+
+        try {
+            return sdf1.parse(oldDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
     public static String formatAsDateTime(Timestamp timestamp) {
@@ -74,4 +101,5 @@ public class DateFormatter {
             return null;
         }
     }
+
 }

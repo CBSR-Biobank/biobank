@@ -1,10 +1,9 @@
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -36,8 +35,13 @@ public class DateTimeWidget extends BiobankWidget {
         }
     };
 
-    public DateTimeWidget(Composite parent, int style, Date date) {
+    private TimeZone timeZone;
+
+    public DateTimeWidget(Composite parent, int style, Date date,
+        TimeZone timeZone) {
         super(parent, style);
+
+        this.timeZone = timeZone;
 
         GridLayout layout = new GridLayout(1, false);
         layout.horizontalSpacing = 0;
@@ -78,15 +82,18 @@ public class DateTimeWidget extends BiobankWidget {
         }
     }
 
+    public DateTimeWidget(Composite parent, int style, Date date) {
+        this(parent, style, date, DateFormatter.LOCAL);
+    }
+
     public String getText() {
         return getDate().toString();
     }
 
     public Date getDate() {
-        Calendar cal = new GregorianCalendar();
+        // dirty hax to covert times by timezone
         if (dateEntry.getSelection() != null) {
-            cal.setTime(dateEntry.getSelection());
-            return cal.getTime();
+            return dateEntry.getSelection();
         }
         return null;
     }
@@ -134,5 +141,9 @@ public class DateTimeWidget extends BiobankWidget {
     public void setBackground(Color color) {
         super.setBackground(color);
         dateEntry.setBackground(color);
+    }
+
+    public TimeZone getTimeZone() {
+        return timeZone;
     }
 }
