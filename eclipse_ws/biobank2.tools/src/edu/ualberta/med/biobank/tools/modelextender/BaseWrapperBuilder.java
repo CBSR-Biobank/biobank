@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.tools.modelumlparser.Attribute;
 import edu.ualberta.med.biobank.tools.modelumlparser.ClassAssociation;
 import edu.ualberta.med.biobank.tools.modelumlparser.ClassAssociationType;
@@ -118,12 +119,15 @@ public class BaseWrapperBuilder extends BaseBuilder {
             .append(
                 "import gov.nih.nci.system.applicationservice.WritableApplicationService;\n")
             .append("import ").append(mc.getPkg()).append(".")
-            .append(mc.getName()).append(";\n");
+            .append(mc.getName()).append(";\n").append("import ")
+            .append(Property.class.getName()).append(";\n");
 
         if (mc.getExtendsClass() == null)
             contents.append("import ").append(wrapperPackageName)
                 .append(".ModelWrapper;\n");
-        else
+
+        if (modelBaseClasses.containsKey(mc.getName())
+            || mc.getExtendsClass() != null)
             // need this for the getPropertyChangeNames method
             contents.append("import ").append(ArrayList.class.getName())
                 .append(";\n");
@@ -194,6 +198,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
             .append(" wrappedObject) {\n")
             .append("        super(appService, wrappedObject);\n")
             .append("    }\n\n");
+
         return result.toString();
     }
 
@@ -209,22 +214,62 @@ public class BaseWrapperBuilder extends BaseBuilder {
                 .append(".class;\n").append("    }\n\n");
         }
 
-        result.append("    @Override\n").append(
-            "   protected List<String> getPropertyChangeNames() {\n");
-        if (mc.getExtendsClass() == null)
-            result.append("        return ").append(mc.getName())
-                .append("Peer.PROP_NAMES;\n");
-        else
+        String wrappedObjectType = mc.getName();
+        if (modelBaseClasses.containsKey(mc.getName())) {
+            wrappedObjectType = "E";
+        }
+
+        boolean hasBooleanAttributes = false;
+        StringBuilder getNewObject = new StringBuilder();
+
+        getNewObject.append("    @Override\n").append("   protected ")
+            .append(wrappedObjectType)
+            .append(" getNewObject() throws Exception {\n").append("        ")
+            .append(wrappedObjectType)
+            .append(" newObject = super.getNewObject();\n");
+
+        // by default, set Boolean attributes to false when a new object is
+        // constructed.
+        for (Attribute attr : mc.getAttrMap().values()) {
+            if (attr.getType().equals("Boolean")) {
+                getNewObject.append("        newObject.set")
+                    .append(CamelCase.toCamelCase(attr.getName(), true))
+                    .append("(false);\n");
+                hasBooleanAttributes = true;
+            }
+        }
+
+        getNewObject.append("        return newObject;\n").append("    }\n\n");
+
+        if (hasBooleanAttributes) {
+            result.append(getNewObject);
+        }
+
+        result.append("    @Override\n")
+            .append("   protected List<Property<?, ? super ")
+            .append(wrappedObjectType).append(">> getProperties() {\n");
+
+        if (modelBaseClasses.containsKey(mc.getName()))
             result
-                .append(
-                    "        List<String> superNames = super.getPropertyChangeNames();\n")
-                .append("        List<String> all = new ArrayList<String>();\n")
+                .append("        return new ArrayList<Property<?, ? super E>>(")
+                .append(mc.getName()).append("Peer.PROPERTIES);\n");
+        else if (mc.getExtendsClass() == null)
+            result.append("        return ").append(mc.getName())
+                .append("Peer.PROPERTIES;\n");
+        else
+            result.append("        List<Property<?, ? super ")
+                .append(mc.getName())
+                .append(">> superNames = super.getProperties();\n")
+                .append("        List<Property<?, ? super ")
+                .append(mc.getName())
+                .append(">> all = new ArrayList<Property<?, ? super ")
+                .append(mc.getName()).append(">>();\n")
                 .append("        all.addAll(superNames);\n")
                 .append("        all.addAll(").append(mc.getName())
-                .append("Peer.PROP_NAMES);\n").append("        return all;\n");
+                .append("Peer.PROPERTIES);\n").append("        return all;\n");
         result.append("    }\n\n");
-        return result.toString();
 
+        return result.toString();
     }
 
     private String createPropertyGetter(ModelClass mc, Attribute member) {
@@ -245,10 +290,18 @@ public class BaseWrapperBuilder extends BaseBuilder {
         result.append("   public void set")
             .append(CamelCase.toCamelCase(member.getName(), true)).append("(")
             .append(member.getType()).append(" ").append(member.getName())
-            .append(") {\n").append("      setProperty(").append(mc.getName())
+            .append(") {\n");
+
+        String value = member.getName();
+        if (member.getType().equals("String")) {
+            value = "trimmed";
+            result.append("      String ").append(value).append(" = ")
+                .append(member.getName()).append(".trim();\n");
+        }
+
+        result.append("      setProperty(").append(mc.getName())
             .append("Peer.").append(CamelCase.toTitleCase(member.getName()))
-            .append(", ").append(member.getName()).append(");\n")
-            .append("   }\n\n");
+            .append(", ").append(value).append(");\n").append("   }\n\n");
 
         return result.toString();
     }

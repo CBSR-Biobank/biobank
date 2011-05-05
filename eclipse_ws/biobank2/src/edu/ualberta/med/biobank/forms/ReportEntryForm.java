@@ -721,4 +721,9 @@ public class ReportEntryForm extends BiobankEntryForm {
 
         return comments;
     }
+
+    @Override
+    protected void onReset() throws Exception {
+        report.reset();
+    }
 }

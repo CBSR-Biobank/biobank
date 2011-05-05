@@ -50,6 +50,13 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         super(appService, dispatch);
     }
 
+    @Override
+    public Dispatch getNewObject() throws Exception {
+        Dispatch newObject = super.getNewObject();
+        newObject.setState(DispatchState.CREATION.getId());
+        return newObject;
+    }
+
     public String getStateDescription() {
         DispatchState state = DispatchState
             .getState(getProperty(DispatchPeer.STATE));
@@ -205,12 +212,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                     appService);
                 dsa.setSpecimen(specimen);
                 dsa.setDispatch(this);
-                dsa.setDispatchSpecimenState(DispatchSpecimenState.NONE);
-                dispatchSpecimenMap.put(DispatchSpecimenState.NONE,
-                    new ArrayList<DispatchSpecimenWrapper>());
+                dsa.setDispatchSpecimenState(state);
                 newDispatchSpecimens.add(dsa);
                 hasNewSpecimens = true;
-                dispatchSpecimenMap.get(DispatchSpecimenState.NONE).add(dsa);
             }
         }
         addToDispatchSpecimenCollection(newDispatchSpecimens);

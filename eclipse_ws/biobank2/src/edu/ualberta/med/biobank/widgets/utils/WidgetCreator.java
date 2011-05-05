@@ -441,6 +441,9 @@ public class WidgetCreator {
                 bindings.put(bindingKey, binding);
             }
         }
+        if (selection != null) {
+            comboViewer.setSelection(new StructuredSelection(selection));
+        }
         if (csu != null) {
             comboViewer
                 .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -455,9 +458,6 @@ public class WidgetCreator {
                         }
                     }
                 });
-        }
-        if (selection != null) {
-            comboViewer.setSelection(new StructuredSelection(selection));
         }
         if (modifyListener != null) {
             combo.addModifyListener(modifyListener);

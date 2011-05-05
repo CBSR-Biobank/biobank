@@ -7,7 +7,6 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -37,6 +36,7 @@ import edu.ualberta.med.biobank.widgets.infotables.entry.SourceSpecimenEntryInfo
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class StudyEntryForm extends BiobankEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.StudyEntryForm"; //$NON-NLS-1$
@@ -88,10 +88,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         studyAdapter = (StudyAdapter) adapter;
-        if (studyAdapter.getWrapper().isNew())
-            study = studyAdapter.getWrapper();
-        else
-            study = (StudyWrapper) studyAdapter.getWrapper().getDatabaseClone();
+        study = (StudyWrapper) getModelObject();
 
         String tabName;
         if (study.isNew()) {
@@ -347,15 +344,15 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void reset() throws Exception {
+    protected void onReset() throws Exception {
         study.reset();
-        ActivityStatusWrapper currentActivityStatus = study.getActivityStatus();
-        if (currentActivityStatus != null) {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                currentActivityStatus));
-        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
-            activityStatusComboViewer.getCombo().deselectAll();
+
+        if (study.isNew()) {
+            study.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         }
+
+        GuiUtil.reset(activityStatusComboViewer, study.getActivityStatus());
 
         contactEntryTable.reload();
         aliquotedSpecimenEntryTable.reload();

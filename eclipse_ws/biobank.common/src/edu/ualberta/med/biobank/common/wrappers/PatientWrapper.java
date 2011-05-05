@@ -42,6 +42,18 @@ public class PatientWrapper extends PatientBaseWrapper {
     }
 
     @Override
+    protected Patient getNewObject() throws Exception {
+        Patient newObject = super.getNewObject();
+
+        Calendar createdAt = Calendar.getInstance();
+        createdAt.setTime(new Date());
+        createdAt.set(Calendar.SECOND, 0);
+
+        newObject.setCreatedAt(createdAt.getTime());
+        return newObject;
+    }
+
+    @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
         checkNoDuplicates(Patient.class, PatientPeer.PNUMBER.getName(),

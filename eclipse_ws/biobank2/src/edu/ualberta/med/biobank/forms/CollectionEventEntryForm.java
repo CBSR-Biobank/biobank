@@ -7,7 +7,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -47,6 +46,7 @@ import edu.ualberta.med.biobank.widgets.infotables.entry.CEventSpecimenEntryInfo
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionEventEntryForm extends BiobankEntryForm {
@@ -95,41 +95,23 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         ceventAdapter = (CollectionEventAdapter) adapter;
-        if (ceventAdapter.getWrapper().isNew()) {
-            cevent = ceventAdapter.getWrapper();
-            cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
-                appService, cevent));
-        } else
-            cevent = (CollectionEventWrapper) ceventAdapter.getWrapper()
-                .getDatabaseClone();
+        cevent = (CollectionEventWrapper) getModelObject();
         patient = cevent.getPatient();
-        retrieve();
+
         SessionManager.logEdit(cevent);
         String tabName;
         if (cevent.isNew()) {
             tabName = Messages.getString("CollectionEventEntryForm.title.new");
             cevent.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
+			cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
+                appService, cevent));
         } else {
             tabName = Messages.getString("CollectionEventEntryForm.title.edit",
                 cevent.getVisitNumber());
         }
 
         setPartName(tabName);
-    }
-
-    private void retrieve() {
-        try {
-            if (!cevent.isNew()) {
-                cevent.reload();
-            }
-            patient.reload();
-        } catch (Exception e) {
-            logger.error(
-                "Error while retrieving patient visit "
-                    + cevent.getVisitNumber() + " (Patient "
-                    + cevent.getPatient() + ")", e);
-        }
     }
 
     @Override
@@ -376,16 +358,21 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void reset() throws Exception {
-        PatientWrapper patient = cevent.getPatient();
-        patient.reload();
-        cevent.reload();
-        super.reset();
-        cevent.setPatient(patient);
-        if (cevent.getActivityStatus() != null) {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                cevent.getActivityStatus()));
+    protected void onReset() throws Exception {
+        cevent.reset();
+
+        if (cevent.isNew()) {
+            cevent.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
+			cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
+                appService, cevent));
         }
+
+        patient.reset();
+        cevent.setPatient(patient);
+
+        GuiUtil.reset(activityStatusComboViewer, cevent.getActivityStatus());
+
         specimensTable.reload(cevent.getOriginalSpecimenCollection(true));
         resetPvCustomInfo();
     }

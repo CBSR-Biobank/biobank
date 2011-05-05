@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -32,6 +33,7 @@ import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.Event;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingEventEntryForm extends BiobankEntryForm {
@@ -62,12 +64,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         pEventAdapter = (ProcessingEventAdapter) adapter;
-        if (pEventAdapter.getWrapper().isNew())
-            pEvent = pEventAdapter.getWrapper();
-        else
-            pEvent = (ProcessingEventWrapper) pEventAdapter.getWrapper()
-                .getDatabaseClone();
-        retrieve();
+        pEvent = (ProcessingEventWrapper) getModelObject();
+
         String tabName;
         if (pEvent.isNew()) {
             tabName = Messages.getString("ProcessingEventEntryForm.title.new"); //$NON-NLS-1$
@@ -84,18 +82,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     pEvent.getFormattedCreatedAt());
         }
         setPartName(tabName);
-    }
-
-    private void retrieve() {
-        try {
-            if (!pEvent.isNew()) {
-                pEvent.reload();
-            }
-        } catch (Exception e) {
-            logger.error("Error while retrieving processing event " //$NON-NLS-1$
-                + pEvent.getFormattedCreatedAt() + " (Worksheet " //$NON-NLS-1$
-                + pEvent.getWorksheet() + ")", e); //$NON-NLS-1$
-        }
     }
 
     @Override
@@ -266,12 +252,18 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
-        if (pEvent.getActivityStatus() != null) {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                pEvent.getActivityStatus()));
+    protected void onReset() throws Exception {
+        CenterWrapper<?> center = pEvent.getCenter();
+        pEvent.reset();
+        pEvent.setCenter(center);
+
+        if (pEvent.isNew()) {
+            pEvent.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         }
+
+        GuiUtil.reset(activityStatusComboViewer, pEvent.getActivityStatus());
+
         specimenEntryWidget.setSpecimens(pEvent.getSpecimenCollection(true));
     }
 }

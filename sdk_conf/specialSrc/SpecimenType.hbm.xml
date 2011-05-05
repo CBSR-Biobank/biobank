@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="edu.ualberta.med.biobank.model" auto-import="false" default-cascade="none">
+	<class name="SpecimenType" table="SPECIMEN_TYPE" lazy="true" polymorphism="explicit" abstract="false" >
+		<cache usage="read-write" />
+		<id name="id" type="integer" column="ID">
+			<generator class="increment"/>			
+		</id>
+		<!-- Attributes mapping for the SpecimenType class -->
+		<property name="name" type="string" column="NAME"/>
+		<property name="nameShort" type="string" column="NAME_SHORT"/>
+		<!-- Associations mapping for the SpecimenType class -->
+		<set name="containerTypeCollection" table="CONTAINER_TYPE_SPECIMEN_TYPE" lazy="true" inverse="true">
+			<cache usage="read-write" />
+			<key column="SPECIMEN_TYPE_ID" />
+			<many-to-many class="edu.ualberta.med.biobank.model.ContainerType" column="CONTAINER_TYPE_ID" />
+		</set>
+		<set name="parentSpecimenTypeCollection" table="SPECIMEN_TYPE_SPECIMEN_TYPE" lazy="true" inverse="true">
+			<cache usage="read-write" />
+			<key column="CHILD_SPECIMEN_TYPE_ID" />
+			<many-to-many class="edu.ualberta.med.biobank.model.SpecimenType" column="PARENT_SPECIMEN_TYPE_ID" />
+		</set>
+		<set name="childSpecimenTypeCollection" table="SPECIMEN_TYPE_SPECIMEN_TYPE" lazy="true" inverse="false">
+			<cache usage="read-write" />
+			<key column="PARENT_SPECIMEN_TYPE_ID" />
+			<many-to-many class="edu.ualberta.med.biobank.model.SpecimenType" column="CHILD_SPECIMEN_TYPE_ID" />
+		</set>
+	</class>
+</hibernate-mapping>

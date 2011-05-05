@@ -10,7 +10,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -28,6 +27,7 @@ import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
@@ -40,6 +40,7 @@ import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeEntryForm extends BiobankEntryForm {
@@ -99,7 +100,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
-        containerType = containerTypeAdapter.getContainerType();
+        containerType = (ContainerTypeWrapper) getModelObject();
+
         String tabName;
         if (containerType.isNew()) {
             tabName = Messages.getString("ContainerTypeEntryForm.new.title"); //$NON-NLS-1$
@@ -141,7 +143,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 availSubContainerTypes.add(type);
             }
         }
-        setDirty(true);
 
         BiobankText name = (BiobankText) createBoundWidgetWithLabel(
             client,
@@ -475,16 +476,24 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
-        if (containerType.getTopLevel() == null) {
-            containerType.setTopLevel(false);
+    protected void onReset() throws Exception {
+        SiteWrapper site = containerType.getSite();
+        containerType.reset();
+        containerType.setSite(site);
+
+        if (containerType.isNew()) {
+            containerType.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         }
+
         setChildContainerTypeSelection();
         setSpecimenTypesSelection();
         showContainersOrSpecimens();
-        setLabelingScheme();
-        setActivityStatus();
+
+        GuiUtil.reset(labelingSchemeComboViewer,
+            containerType.getChildLabelingSchemeName());
+        GuiUtil.reset(activityStatusComboViewer,
+            containerType.getActivityStatus());
     }
 
     private void showContainersOrSpecimens() {
@@ -493,25 +502,5 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         showSpecimens(hasSpecimens);
         hasSpecimensRadio.setSelection(hasSpecimens);
         hasContainersRadio.setSelection(!hasSpecimens);
-    }
-
-    private void setLabelingScheme() {
-        String currentScheme = containerType.getChildLabelingSchemeName();
-        if (currentScheme == null) {
-            labelingSchemeComboViewer.getCombo().deselectAll();
-        } else {
-            labelingSchemeComboViewer.setSelection(new StructuredSelection(
-                currentScheme));
-        }
-    }
-
-    private void setActivityStatus() {
-        ActivityStatusWrapper activity = containerType.getActivityStatus();
-        if (activity == null) {
-            activityStatusComboViewer.getCombo().deselectAll();
-        } else {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                activity));
-        }
     }
 }

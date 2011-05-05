@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -24,6 +23,7 @@ import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteEntryForm extends AddressEntryFormCommon {
@@ -59,10 +59,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
-        if (siteAdapter.getWrapper().isNew())
-            site = siteAdapter.getWrapper();
-        else
-            site = (SiteWrapper) siteAdapter.getWrapper().getDatabaseClone();
+        site = (SiteWrapper) getModelObject();
 
         String tabName;
         if (site.isNew()) {
@@ -172,15 +169,16 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    public void reset() throws Exception {
-        ActivityStatusWrapper currentActivityStatus = site.getActivityStatus();
-        if (currentActivityStatus != null) {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                currentActivityStatus));
-        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
-            activityStatusComboViewer.getCombo().deselectAll();
+    protected void onReset() throws Exception {
+        site.reset();
+
+        if (site.isNew()) {
+            site.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         }
+
+        GuiUtil.reset(activityStatusComboViewer, site.getActivityStatus());
+
         studiesTable.reload();
-        super.reset();
     }
 }
