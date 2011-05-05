@@ -9,7 +9,6 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -27,9 +26,9 @@ import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
@@ -38,6 +37,7 @@ import edu.ualberta.med.biobank.widgets.DispatchSpecimensTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
@@ -50,9 +50,25 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     private ComboViewer destSiteComboViewer;
 
+    private ComboViewer shippingMethodViewer;
+
     protected DispatchSpecimenListInfoTable specimensNonProcessedTable;
 
     private DispatchSpecimensTreeTable specimensTreeTable;
+
+    private ShipmentInfoWrapper shipmentInfo = null;
+
+    @Override
+    protected void init() throws Exception {
+        super.init();
+
+        if (dispatch.isNew()) {
+            dispatch.setSenderCenter(SessionManager.getUser()
+                .getCurrentWorkingCenter());
+        } else {
+            shipmentInfo = dispatch.getShipmentInfo();
+        }
+    }
 
     @Override
     public void createPartControl(Composite parent) {
@@ -63,7 +79,6 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         if (dispatch.isNew()) {
             setDirty(true);
         }
-
     }
 
     @Override
@@ -79,12 +94,6 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        if (dispatch.isNew()) {
-            dispatch.setSenderCenter(SessionManager.getUser()
-                .getCurrentWorkingCenter());
-            dispatch.setState(DispatchState.CREATION);
-        }
-
         setFirstControl(client);
 
         createReceiverCombo(client);
@@ -92,10 +101,10 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         if (!dispatch.isNew() && !dispatch.isInCreationState()) {
             ShippingMethodWrapper selectedShippingMethod = dispatch
                 .getShipmentInfo().getShippingMethod();
-            widgetCreator.createComboViewer(client, "Shipping Method",
-                ShippingMethodWrapper.getShippingMethods(SessionManager
-                    .getAppService()), selectedShippingMethod, null,
-                new ComboSelectionUpdate() {
+            shippingMethodViewer = widgetCreator.createComboViewer(client,
+                "Shipping Method", ShippingMethodWrapper
+                    .getShippingMethods(SessionManager.getAppService()),
+                selectedShippingMethod, null, new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
                         dispatch.getShipmentInfo().setShippingMethod(
@@ -104,7 +113,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 });
 
             createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-                "Waybill", null, dispatch.getShipmentInfo(),
+                "Waybill", null, shipmentInfo,
                 ShipmentInfoPeer.WAYBILL.getName(), null);
         }
 
@@ -118,7 +127,6 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 DispatchPeer.COMMENT.getName()), null);
 
         createSpecimensSelectionSection();
-
     }
 
     private void createReceiverCombo(Composite client) {
@@ -131,7 +139,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             try {
                 destSiteComboViewer = createComboViewer(client, "Receiver",
                     CenterWrapper.getOtherCenters(appService, SessionManager
-                        .getUser().getCurrentWorkingCenter()), null,
+                        .getUser().getCurrentWorkingCenter()),
+                    dispatch.getReceiverCenter(),
                     "Dispatch must have a receiver",
                     new ComboSelectionUpdate() {
                         @Override
@@ -141,9 +150,6 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                             setDirty(true);
                         }
                     });
-                if (dispatch.getReceiverCenter() != null)
-                    destSiteComboViewer.setSelection(new StructuredSelection(
-                        dispatch.getReceiverCenter()));
             } catch (ApplicationException e) {
                 BiobankPlugin.openAsyncError("Error",
                     "Unable to retrieve Centers");
@@ -258,21 +264,20 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     }
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
-        dispatch.setSenderCenter(SessionManager.getUser()
-            .getCurrentWorkingCenter());
-        if (destSiteComboViewer != null) {
-            CenterWrapper<?> destSite = dispatch.getReceiverCenter();
-            if (destSite != null) {
-                destSiteComboViewer.setSelection(new StructuredSelection(
-                    destSite));
-            } else if (destSiteComboViewer.getCombo().getItemCount() == 1)
-                destSiteComboViewer.setSelection(new StructuredSelection(
-                    destSiteComboViewer.getElementAt(0)));
-            else
-                destSiteComboViewer.getCombo().deselectAll();
+    protected void onReset() throws Exception {
+        CenterWrapper<?> sender = dispatch.getSenderCenter();
+        super.onReset();
+        dispatch.setSenderCenter(sender);
+
+        if (shipmentInfo != null) {
+            shipmentInfo.reset();
+            dispatch.setShipmentInfo(shipmentInfo);
+
+            GuiUtil.reset(shippingMethodViewer,
+                shipmentInfo.getShippingMethod());
         }
+
+        GuiUtil.reset(destSiteComboViewer, dispatch.getReceiverCenter());
     }
 
     @Override

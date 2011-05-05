@@ -43,12 +43,20 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
     private Set<SpecimenTypeWrapper> deletedSpecimenTypes = new HashSet<SpecimenTypeWrapper>();
 
-    public static final List<String> PROP_NAMES;
+    public static final Property<Integer, ContainerType> ROW_CAPACITY = ContainerTypePeer.CAPACITY
+        .wrap(CapacityPeer.ROW_CAPACITY);
+    public static final Property<Integer, ContainerType> COL_CAPACITY = ContainerTypePeer.CAPACITY
+        .wrap(CapacityPeer.COL_CAPACITY);
+
+    public static final List<Property<?, ? super ContainerType>> PROPERTIES;
     static {
-        List<String> aList = new ArrayList<String>();
-        aList.addAll(ContainerTypePeer.PROP_NAMES);
-        aList.addAll(CapacityPeer.PROP_NAMES);
-        PROP_NAMES = Collections.unmodifiableList(aList);
+        List<Property<?, ? super ContainerType>> aList = new ArrayList<Property<?, ? super ContainerType>>();
+        aList.addAll(ContainerTypePeer.PROPERTIES);
+        aList.add(ROW_CAPACITY);
+        aList.add(COL_CAPACITY);
+        aList.add(ContainerTypePeer.CHILD_LABELING_SCHEME.wrap(
+            "childLabelingSchemeName", ContainerLabelingSchemePeer.NAME));
+        PROPERTIES = Collections.unmodifiableList(aList);
     };
 
     public ContainerTypeWrapper(WritableApplicationService appService,
@@ -61,10 +69,8 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     }
 
     @Override
-    protected List<String> getPropertyChangeNames() {
-        List<String> all = new ArrayList<String>(super.getPropertyChangeNames());
-        all.addAll(CapacityPeer.PROP_NAMES);
-        return all;
+    protected List<Property<?, ? super ContainerType>> getProperties() {
+        return PROPERTIES;
     }
 
     @Override

@@ -723,8 +723,8 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
+    protected void onReset() throws Exception {
+        super.onReset();
         reset(false);
         fieldsComposite.setEnabled(true);
         showOnlyPallet(true);
