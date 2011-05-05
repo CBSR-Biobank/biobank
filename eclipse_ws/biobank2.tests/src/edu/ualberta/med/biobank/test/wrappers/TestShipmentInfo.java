@@ -80,9 +80,9 @@ public class TestShipmentInfo extends TestDatabase {
             // FIXME: finish this test
         }
 
-        ShipmentInfoWrapper shipInfo = ShipmentInfoHelper.addShipment(site,
-            ShippingMethodWrapper.getShippingMethods(appService).get(0),
-            TestCommon.getNewWaybill(r), dateNow, spc);
+        // ShipmentInfoWrapper shipInfo = ShipmentInfoHelper.addShipment(site,
+        // ShippingMethodWrapper.getShippingMethods(appService).get(0),
+        // TestCommon.getNewWaybill(r), dateNow, spc);
 
     }
 

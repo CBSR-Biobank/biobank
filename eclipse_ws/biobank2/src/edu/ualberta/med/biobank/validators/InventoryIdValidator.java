@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.validators;
 
+import java.util.List;
+
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -14,9 +16,12 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 public class InventoryIdValidator extends AbstractValidator {
 
     private boolean duplicate;
+    private List<SpecimenWrapper> excludeList;
 
-    public InventoryIdValidator(String message) {
+    public InventoryIdValidator(List<SpecimenWrapper> excludeList,
+        String message) {
         super(message);
+        this.excludeList = excludeList;
     }
 
     @Override
@@ -42,6 +47,9 @@ public class InventoryIdValidator extends AbstractValidator {
             public void run() {
                 try {
                     spc.checkInventoryIdUnique();
+                    if (excludeList.contains(spc)) {
+                        duplicate = true;
+                    }
                 } catch (DuplicateEntryException e) {
                     duplicate = true;
                 } catch (Exception e) {
