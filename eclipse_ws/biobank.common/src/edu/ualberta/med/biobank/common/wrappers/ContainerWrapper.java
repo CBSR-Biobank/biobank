@@ -858,13 +858,13 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return filteredWrappers;
     }
 
-    private static final String CONTAINERS_HOLDING_CONTAINER_TYPES_BASE_QRY = "from "
+    private static final String CONTAINERS_HOLDING_CONTAINER_TYPES_PART1_QRY = "from "
         + Container.class.getName()
         + " where "
         + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
         + "=? and "
-        + ContainerPeer.LABEL.getName()
-        + "=? and "
+        + ContainerPeer.LABEL.getName() + "=? ";
+    private static final String CONTAINERS_HOLDING_CONTAINER_TYPES_PART2_QRY = "and "
         + ContainerPeer.CONTAINER_TYPE.getName()
         + " in (select parent from "
         + ContainerType.class.getName()
@@ -882,6 +882,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     /**
      * get containers with label label in site which can have children of types
      * container type
+     * 
+     * don't check the type is types list is null or empty
      */
     public static List<ContainerWrapper> getContainersHoldingContainerTypes(
         WritableApplicationService appService, String label, SiteWrapper site,
@@ -890,14 +892,19 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             throw new NullPointerException();
         }
         List<Integer> typeIds = new ArrayList<Integer>();
-        for (ContainerTypeWrapper type : types) {
-            typeIds.add(type.getId());
+        if (types != null)
+            for (ContainerTypeWrapper type : types) {
+                typeIds.add(type.getId());
+            }
+        StringBuffer qry = new StringBuffer(
+            CONTAINERS_HOLDING_CONTAINER_TYPES_PART1_QRY);
+        if (typeIds.size() > 0) {
+            qry.append(CONTAINERS_HOLDING_CONTAINER_TYPES_PART2_QRY)
+                .append(StringUtils.join(typeIds, ',')).append(")))")
+                .toString();
         }
-        String qry = new StringBuilder(
-            CONTAINERS_HOLDING_CONTAINER_TYPES_BASE_QRY)
-            .append(StringUtils.join(typeIds, ',')).append(")))").toString();
-        HQLCriteria criteria = new HQLCriteria(qry, Arrays.asList(new Object[] {
-            site.getId(), label }));
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            Arrays.asList(new Object[] { site.getId(), label }));
         List<Container> containers = appService.query(criteria);
         return wrapModelCollection(appService, containers,
             ContainerWrapper.class);
@@ -1177,16 +1184,21 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @param positionText the position to use for initialisation
      * @param isContainerPosition if true, the position is a full container
      *            position, if false, it is a full specimen position
+     * @param contType if is a container position, will check the type can be
+     *            used
      * @throws BiobankException
      */
     public static List<ContainerWrapper> getPossibleContainersFromPosition(
         BiobankApplicationService appService, User user, String positionText,
-        boolean isContainerPosition) throws ApplicationException,
-        BiobankException {
+        boolean isContainerPosition, ContainerTypeWrapper contType)
+        throws ApplicationException, BiobankException {
         String fullLabel = positionText;
         List<ContainerWrapper> foundContainers = new ArrayList<ContainerWrapper>();
         int removeSize = 2;
         List<String> parentLabelsTested = new ArrayList<String>();
+        List<ContainerTypeWrapper> typesList = new ArrayList<ContainerTypeWrapper>();
+        if (contType != null)
+            typesList.add(contType);
         while (removeSize < 5) { // we are assuming that an object position
                                  // in its parent won't be bigger than 3 !
             int cutIndex = fullLabel.length() - removeSize;
@@ -1194,8 +1206,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 String parentLabel = fullLabel.substring(0, cutIndex);
                 parentLabelsTested.add(parentLabel);
                 for (ContainerWrapper cont : ContainerWrapper
-                    .getContainersInSite(appService,
-                        user.getCurrentWorkingSite(), parentLabel)) {
+                    .getContainersHoldingContainerTypes(appService,
+                        parentLabel, user.getCurrentWorkingSite(), typesList)) {
                     // need to know if can contain specimen if this is a
                     // specimen position
                     boolean canContainSpecimens = cont.getContainerType()
@@ -1236,10 +1248,18 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 res.append(binLabel).append("(") //$NON-NLS-1$
                     .append(fullLabel.replace(binLabel, "")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
             }
-            String errorMsg = Messages
-                .getString(
-                    "ContainerWrapper.getPossibleContainersFromPosition.error.notfound.msg", //$NON-NLS-1$
-                    res.toString());
+            String errorMsg;
+            if (contType == null)
+                errorMsg = Messages
+                    .getString(
+                        "ContainerWrapper.getPossibleContainersFromPosition.error.notfound.msg", //$NON-NLS-1$
+                        res.toString());
+            else
+                errorMsg = Messages
+                    .getString(
+                        "ContainerWrapper.getPossibleContainersFromPosition.error.notfoundWithType.msg",//$NON-NLS-1$
+                        res.toString(), contType.getNameShort());
+
             throw new BiobankException(errorMsg);
         }
         return foundContainers;

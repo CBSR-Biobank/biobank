@@ -136,11 +136,11 @@ public abstract class AbstractLinkAssignEntryForm extends
         toolkit.paintBordersFor(singleMultipleComposite);
 
         // radio button to choose single or multiple
-        radioSingle = toolkit.createButton(singleMultipleComposite,
-            Messages.getString("AbstractLinkAssignEntryForm.choice.radio.single"), //$NON-NLS-1$
+        radioSingle = toolkit.createButton(singleMultipleComposite, Messages
+            .getString("AbstractLinkAssignEntryForm.choice.radio.single"), //$NON-NLS-1$
             SWT.RADIO);
-        radioMultiple = toolkit.createButton(singleMultipleComposite,
-            Messages.getString("AbstractLinkAssignEntryForm.choice.radio.multiple"), //$NON-NLS-1$
+        radioMultiple = toolkit.createButton(singleMultipleComposite, Messages
+            .getString("AbstractLinkAssignEntryForm.choice.radio.multiple"), //$NON-NLS-1$
             SWT.RADIO);
 
         singleFieldsComposite = toolkit.createComposite(leftComposite);
@@ -292,7 +292,6 @@ public abstract class AbstractLinkAssignEntryForm extends
         if (resetAll) {
             resetPlateToScan();
         }
-        setFocus();
     }
 
     @Override
