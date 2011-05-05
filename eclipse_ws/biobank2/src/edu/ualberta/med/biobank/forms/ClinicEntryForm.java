@@ -188,7 +188,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    public void reset() throws Exception {
+    public void reset() {
         super.reset();
         ActivityStatusWrapper currentActivityStatus = clinic
             .getActivityStatus();

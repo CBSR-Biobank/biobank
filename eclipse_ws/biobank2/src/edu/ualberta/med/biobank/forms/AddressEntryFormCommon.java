@@ -47,5 +47,4 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
         Composite client = createSectionWithClient("Address");
         createBoundWidgetsFromMap(ADDRESS_FIELDS, wrapperObject, client);
     }
-
 }
