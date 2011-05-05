@@ -134,12 +134,14 @@ public class SpecimenHelper extends DbHelper {
      * @rowStart the starting row where to place the specimens at.
      * @colStart the starting column where to place the specimens at.
      * @count the number of specimens to create.
+     * @spcTypes the specimen types to use (chosen randomly)
      * @return A list of the specimens that were created.
      * @throws Exception
      */
     public static List<SpecimenWrapper> addSpecimens(PatientWrapper patient,
         ClinicWrapper clinic, ContainerWrapper container, int rowStart,
-        int colStart, int spcCount) throws Exception {
+        int colStart, int spcCount, List<SpecimenTypeWrapper> spcTypes)
+        throws Exception {
         int rowCap = container.getRowCapacity();
         int colCap = container.getColCapacity();
 
@@ -157,19 +159,12 @@ public class SpecimenHelper extends DbHelper {
             throw new Exception("cannot fit number of specimens: " + spcCount);
         }
 
-        List<SpecimenTypeWrapper> spcTypes = container.getContainerType()
-            .getSpecimenTypeCollection();
-
         SpecimenWrapper spc = SpecimenHelper.newSpecimen(
             DbHelper.chooseRandomlyInList(spcTypes),
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, Utils.getRandomDate());
 
-        OriginInfoWrapper oi = new OriginInfoWrapper(appService);
-        oi.setCenter(clinic);
-        oi.persist();
-
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
-            clinic, patient, 1, oi, spc);
+            clinic, patient, 1, spc);
 
         ProcessingEventWrapper pe = ProcessingEventHelper.addProcessingEvent(
             container.getSite(), patient, Utils.getRandomDate());
@@ -187,6 +182,28 @@ public class SpecimenHelper extends DbHelper {
         return spcs;
     }
 
+    /**
+     * Creates aliquoted specimens and adds them to a newly created processing
+     * event. A source specimen is also created along with a collection event.
+     * If specified, the aliquoted specimens are liked to the container starting
+     * at the position specified.
+     * 
+     * @param patient The patient the samples are from.
+     * @param clinic The clinic the collection event is from.
+     * @param container The container where to link the specimens to.
+     * @rowStart the starting row where to place the specimens at.
+     * @colStart the starting column where to place the specimens at.
+     * @count the number of specimens to create.
+     * @return A list of the specimens that were created.
+     * @throws Exception
+     */
+    public static List<SpecimenWrapper> addSpecimens(PatientWrapper patient,
+        ClinicWrapper clinic, ContainerWrapper container, int rowStart,
+        int colStart, int spcCount) throws Exception {
+        return addSpecimens(patient, clinic, container, rowStart, colStart,
+            spcCount, container.getContainerType().getSpecimenTypeCollection());
+    }
+
     public static SpecimenWrapper addParentSpecimen() throws Exception {
         SpecimenTypeWrapper st = SpecimenTypeHelper.addSpecimenType("testst"
             + r.nextInt());
@@ -201,11 +218,8 @@ public class SpecimenHelper extends DbHelper {
             + r.nextInt());
         PatientWrapper patient = PatientHelper.addPatient(
             "testp" + r.nextInt(), study);
-        OriginInfoWrapper oi = OriginInfoHelper.addOriginInfo(clinic);
-
-        newSpec.setOriginInfo(oi);
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
-            clinic, patient, 2, oi, newSpec);
+            clinic, patient, 2, newSpec);
         return ce.getOriginalSpecimenCollection(false).get(0);
     }
 }

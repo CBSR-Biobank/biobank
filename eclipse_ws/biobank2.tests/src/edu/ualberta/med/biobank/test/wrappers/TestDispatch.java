@@ -224,16 +224,14 @@ public class TestDispatch extends TestDatabase {
             receiverSite, method, name, Utils.getRandomDate());
 
         dispatch.reset();
-        // FIXME
-        // Assert.assertEquals(null, dispatch.getWaybill());
+        Assert.assertEquals(null, dispatch.getComment());
 
         // test reset for an object already in database
         dispatch = DispatchHelper.addDispatch(senderSite, receiverSite, method,
             name, Utils.getRandomDate());
-        // FIXME
-        // dispatch.setWaybill("QQQQ");
-        // dispatch.reset();
-        // Assert.assertEquals(name, dispatch.getWaybill());
+        dispatch.setComment("test comment");
+        dispatch.reset();
+        Assert.assertEquals(null, dispatch.getComment());
     }
 
     @Test
@@ -362,13 +360,8 @@ public class TestDispatch extends TestDatabase {
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
         study.reload();
-
-        OriginInfoWrapper oi = new OriginInfoWrapper(appService);
-        oi.setCenter(container.getSite());
-        oi.persist();
-
         CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(clinic, patient, 1, oi);
+            .addCollectionEvent(clinic, patient, 1);
 
         List<SpecimenWrapper> spcSet1 = addSpecimensToContainerRow(cevent,
             container, 0, sampleTypes);

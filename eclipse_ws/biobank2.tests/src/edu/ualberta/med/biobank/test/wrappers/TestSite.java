@@ -33,7 +33,6 @@ import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
-import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -747,8 +746,7 @@ public class TestSite extends TestDatabase {
         List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
         for (PatientWrapper p : Arrays.asList(patient1, patient2, patient3)) {
             CollectionEventWrapper cevent = CollectionEventHelper
-                .addCollectionEvent(site, p, 1, OriginInfoHelper
-                    .addOriginInfo(site), SpecimenHelper
+                .addCollectionEvent(site, p, 1, SpecimenHelper
                     .newSpecimen(SpecimenTypeHelper.addSpecimenType(Utils
                         .getRandomNumericString(10))), SpecimenHelper
                     .newSpecimen(SpecimenTypeHelper.addSpecimenType(Utils

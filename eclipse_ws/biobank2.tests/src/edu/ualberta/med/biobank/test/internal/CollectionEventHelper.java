@@ -17,8 +17,7 @@ public class CollectionEventHelper extends DbHelper {
 
     public static CollectionEventWrapper newCollectionEvent(
         CenterWrapper<?> center, PatientWrapper patient, int visitNumber,
-        OriginInfoWrapper oi, SpecimenWrapper... originSpecimens)
-        throws Exception {
+        SpecimenWrapper... originSpecimens) throws Exception {
         CollectionEventWrapper cevent = new CollectionEventWrapper(appService);
         cevent.setPatient(patient);
         cevent.setVisitNumber(visitNumber);
@@ -27,6 +26,11 @@ public class CollectionEventHelper extends DbHelper {
         if ((originSpecimens != null) && (originSpecimens.length != 0)) {
             cevent.addToOriginalSpecimenCollection(Arrays
                 .asList(originSpecimens));
+
+            OriginInfoWrapper oi = new OriginInfoWrapper(appService);
+            oi.setCenter(center);
+            oi.persist();
+
             for (SpecimenWrapper spc : originSpecimens) {
                 spc.setOriginInfo(oi);
                 spc.setCollectionEvent(cevent);
@@ -39,10 +43,9 @@ public class CollectionEventHelper extends DbHelper {
 
     public static CollectionEventWrapper addCollectionEvent(
         CenterWrapper<?> center, PatientWrapper patient, int visitNumber,
-        OriginInfoWrapper oi, SpecimenWrapper... originSpecimens)
-        throws Exception {
+        SpecimenWrapper... originSpecimens) throws Exception {
         CollectionEventWrapper ce = newCollectionEvent(center, patient,
-            visitNumber, oi, originSpecimens);
+            visitNumber, originSpecimens);
         ce.persist();
         return ce;
     }
@@ -58,33 +61,24 @@ public class CollectionEventHelper extends DbHelper {
             .newSpecimen(SpecimenTypeWrapper.getAllSpecimenTypes(appService,
                 false).get(0));
 
-        OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
-        originInfo.setCenter(center);
-        originInfo.persist();
-        return addCollectionEvent(center, patient, visitNumber, originInfo,
-            originSpecimen);
+        return addCollectionEvent(center, patient, visitNumber, originSpecimen);
     }
 
     public static List<CollectionEventWrapper> addCollectionEvents(
         CenterWrapper<?> center, StudyWrapper study, String name)
         throws Exception {
         List<CollectionEventWrapper> cevents = new ArrayList<CollectionEventWrapper>();
-        SpecimenTypeWrapper spcType = SpecimenTypeWrapper.getAllSpecimenTypes(
-            appService, false).get(0);
+        List<SpecimenTypeWrapper> spcTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, false);
         int num = r.nextInt(15) + 1;
 
         for (int i = 0; i < num; i++) {
-            PatientWrapper patient = PatientHelper.addPatient(name + "_p" + i,
-                study);
-            SpecimenWrapper originSpecimen = SpecimenHelper
-                .newSpecimen(spcType);
+            PatientWrapper patient = PatientHelper.addPatient(
+                name + "_p" + r.nextInt(), study);
+            SpecimenWrapper spc = SpecimenHelper.newSpecimen(DbHelper
+                .chooseRandomlyInList(spcTypes));
 
-            OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
-            originInfo.setCenter(center);
-            originInfo.persist();
-
-            cevents.add(addCollectionEvent(center, patient, 1, originInfo,
-                originSpecimen));
+            cevents.add(addCollectionEvent(center, patient, 1, spc));
         }
         return cevents;
     }

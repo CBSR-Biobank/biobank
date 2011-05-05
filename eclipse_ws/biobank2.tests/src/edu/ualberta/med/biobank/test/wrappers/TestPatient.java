@@ -30,7 +30,6 @@ import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
-import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -573,12 +572,10 @@ public class TestPatient extends TestDatabase {
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
 
         CollectionEventWrapper visit1 = CollectionEventHelper
-            .addCollectionEvent(site, patient, 1,
-                OriginInfoHelper.addOriginInfo(site));
+            .addCollectionEvent(site, patient, 1);
 
         CollectionEventWrapper visit2 = CollectionEventHelper
-            .addCollectionEvent(site, patient2, 1,
-                OriginInfoHelper.addOriginInfo(site));
+            .addCollectionEvent(site, patient2, 1);
 
         Assert.assertEquals(patient, visit1.getPatient());
         Assert.assertEquals(patient2, visit2.getPatient());
