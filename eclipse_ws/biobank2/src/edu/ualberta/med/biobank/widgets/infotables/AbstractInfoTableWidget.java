@@ -1,21 +1,13 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -29,12 +21,12 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.widgets.BiobankClipboard;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
@@ -121,7 +113,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
         autoSizeColumns = columnWidths == null ? true : false;
 
-        addClipboardCopySupport();
+        BiobankClipboard.addClipboardCopySupport(tableViewer, menu,
+            (BiobankLabelProvider) getLabelProvider(), headings.length);
 
     }
 
@@ -161,50 +154,6 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
     public List<T> getCollection() {
         return collection;
-    }
-
-    private void addClipboardCopySupport() {
-        Assert.isNotNull(menu);
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Copy");
-        item.addSelectionListener(new SelectionAdapter() {
-            @SuppressWarnings("unchecked")
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                BiobankLabelProvider lp = (BiobankLabelProvider) getLabelProvider();
-                int numCols = getTableViewer().getTable().getColumnCount();
-                List<Object> selectedRows = new ArrayList<Object>();
-                IStructuredSelection sel = (IStructuredSelection) tableViewer
-                    .getSelection();
-                for (Iterator<Object> iterator = sel.iterator(); iterator
-                    .hasNext();) {
-                    Object item = iterator.next();
-                    List<String> row = new ArrayList<String>();
-                    for (int i = 0; i < numCols; i++) {
-                        String text = lp.getColumnText(item, i);
-                        if (text != null) {
-                            row.add(text);
-                        } else {
-                            row.add("");
-                        }
-                    }
-                    selectedRows.add(StringUtils.join(row, ","));
-                }
-                if (selectedRows.size() > 0) {
-                    StringBuilder sb = new StringBuilder();
-                    for (Object row : selectedRows) {
-                        if (sb.length() != 0) {
-                            sb.append(System.getProperty("line.separator"));
-                        }
-                        sb.append(row.toString());
-                    }
-                    TextTransfer textTransfer = TextTransfer.getInstance();
-                    Clipboard cb = new Clipboard(Display.getDefault());
-                    cb.setContents(new Object[] { sb.toString() },
-                        new Transfer[] { textTransfer });
-                }
-            }
-        });
     }
 
     @Override
