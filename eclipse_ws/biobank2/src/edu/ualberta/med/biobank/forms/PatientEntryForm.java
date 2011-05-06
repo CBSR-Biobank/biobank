@@ -145,7 +145,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                CollectionView.reloadCurrent();
+                SessionManager.updateAllSimilarNodes(adapter, true);
                 CollectionView.showPatient(patient);
             }
         });
