@@ -15,8 +15,10 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
 import edu.ualberta.med.biobank.dialogs.StudyAliquotedSpecimenDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
@@ -77,24 +79,36 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     }
 
     private void addOrEditAliquotedSpecimen(boolean add,
-        AliquotedSpecimenWrapper aliquotedSpecimen) {
-        List<SpecimenTypeWrapper> availableSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
-        availableSpecimenTypes.addAll(allSpecimenTypes);
-        for (AliquotedSpecimenWrapper ssw : selectedAliquotedSpecimen) {
-            if (add || !ssw.equals(aliquotedSpecimen)) {
-                availableSpecimenTypes.remove(ssw.getSpecimenType());
-            }
+        final AliquotedSpecimenWrapper aliquotedSpecimen) {
+        List<SpecimenTypeWrapper> dialogSpecimenTypes = allSpecimenTypes;
+        if (!add) {
+            dialogSpecimenTypes.add(aliquotedSpecimen.getSpecimenType());
+        }
+        NewListener newListener = null;
+        if (add) {
+            // only add to the collection when adding and not editing
+            newListener = new NewListener() {
+                @Override
+                public void newAdded(ModelWrapper<?> spec) {
+                    ((AliquotedSpecimenWrapper) spec).setStudy(study);
+                    allSpecimenTypes
+                        .remove(aliquotedSpecimen.getSpecimenType());
+                    selectedAliquotedSpecimen
+                        .add((AliquotedSpecimenWrapper) spec);
+                    addedOrModifiedAliquotedSpecimen
+                        .add((AliquotedSpecimenWrapper) spec);
+                    reloadCollection(selectedAliquotedSpecimen);
+                    notifyListeners();
+                }
+            };
         }
         StudyAliquotedSpecimenDialog dlg = new StudyAliquotedSpecimenDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            aliquotedSpecimen, availableSpecimenTypes);
-        if (dlg.open() == Dialog.OK) {
-            if (add) {
-                // only add to the collection when adding and not editing
-                selectedAliquotedSpecimen.add(aliquotedSpecimen);
-            }
+            aliquotedSpecimen, newListener, allSpecimenTypes);
+
+        int res = dlg.open();
+        if (!add && res == Dialog.OK) {
             reloadCollection(selectedAliquotedSpecimen);
-            addedOrModifiedAliquotedSpecimen.add(aliquotedSpecimen);
             notifyListeners();
         }
     }
@@ -180,6 +194,8 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     @Override
     public BiobankTableSorter getComparator() {
         return new BiobankTableSorter() {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public int compare(Object e1, Object e2) {
                 try {

@@ -24,7 +24,6 @@ import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.util.TypeReference;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
@@ -565,11 +564,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return positions.size();
     }
 
-    public static final Property<Map<RowColPos, ContainerWrapper>, Container> ID = Property
-        .create("children",
-            new TypeReference<Map<RowColPos, ContainerWrapper>>() {
-            });
-
     private static final String GET_CHILD_CONTAINERS_QRY = "from "
         + Container.class.getName() + " as c join fetch c."
         + ContainerPeer.CHILD_POSITION_COLLECTION.getName()
@@ -736,8 +730,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public void moveSpecimens(ContainerWrapper destination) throws Exception {
         Map<RowColPos, SpecimenWrapper> aliquots = getSpecimens();
         for (Entry<RowColPos, SpecimenWrapper> e : aliquots.entrySet()) {
-            destination
-                .addSpecimen(e.getKey().row, e.getKey().col, e.getValue());
+            destination.addSpecimen(e.getKey().row, e.getKey().col,
+                e.getValue());
         }
         destination.persist();
     }

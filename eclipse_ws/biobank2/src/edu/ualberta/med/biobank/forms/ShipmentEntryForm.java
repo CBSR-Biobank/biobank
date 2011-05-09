@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,7 +8,6 @@ import java.util.Set;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -18,6 +16,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
@@ -40,6 +39,7 @@ import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.Event;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentEntryForm extends BiobankEntryForm {
@@ -55,7 +55,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private ShipmentAdapter shipmentAdapter;
 
-    private OriginInfoWrapper shipment;
+    private ShipmentInfoWrapper shipmentInfo;
+
+    private OriginInfoWrapper originInfo;
 
     private ComboViewer senderComboViewer;
 
@@ -90,22 +92,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         shipmentAdapter = (ShipmentAdapter) adapter;
-        if (!shipmentAdapter.getWrapper().isNew())
-            shipment = (OriginInfoWrapper) shipmentAdapter.getWrapper()
-                .getDatabaseClone();
-        else
-            shipment = shipmentAdapter.getWrapper();
-        try {
-            shipment.reload();
-        } catch (Exception e) {
-            logger.error("Error while retrieving shipment", e);
-        }
+        originInfo = (OriginInfoWrapper) getModelObject();
+        shipmentInfo = originInfo.getShipmentInfo();
+
         String tabName;
-        if (shipment.isNew()) {
+        if (originInfo.isNew()) {
             tabName = "New Shipment";
         } else {
             tabName = "Shipment "
-                + shipment.getShipmentInfo().getFormattedDateReceived();
+                + originInfo.getShipmentInfo().getFormattedDateReceived();
         }
         setPartName(tabName);
     }
@@ -127,19 +122,13 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        ShipmentInfoWrapper shipInfo = shipment.getShipmentInfo();
-        if (shipInfo == null) {
-            shipInfo = new ShipmentInfoWrapper(appService);
-            shipment.setShipmentInfo(shipInfo);
-        }
-
         senderComboViewer = createComboViewer(client, "Sender",
             ClinicWrapper.getAllClinics(appService),
-            (ClinicWrapper) shipment.getCenter(),
+            (ClinicWrapper) originInfo.getCenter(),
             "A sender should be selected", new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    shipment.setCenter((CenterWrapper<?>) selectedObject);
+                    originInfo.setCenter((CenterWrapper<?>) selectedObject);
                     activateWaybillWidget(((ClinicWrapper) selectedObject)
                         .getSendsShipments());
                 }
@@ -152,23 +141,24 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         waybillValidator = new NonEmptyStringValidator(
             "A waybill should be set");
         waybillWidget = (BiobankText) createBoundWidget(client,
-            BiobankText.class, SWT.NONE, waybillLabel, new String[0], shipment,
-            "shipmentInfo.waybill", waybillValidator, WAYBILL_BINDING);
+            BiobankText.class, SWT.NONE, waybillLabel, new String[0],
+            shipmentInfo, ShipmentInfoPeer.WAYBILL.getName(), waybillValidator,
+            WAYBILL_BINDING);
 
-        ClinicWrapper clinic = (ClinicWrapper) shipment.getCenter();
+        ClinicWrapper clinic = (ClinicWrapper) originInfo.getCenter();
         if (clinic != null) {
             activateWaybillWidget(clinic.getSendsShipments());
         }
 
         shippingMethodComboViewer = createComboViewer(client,
             "Shipping Method",
-            ShippingMethodWrapper.getShippingMethods(appService), shipment
+            ShippingMethodWrapper.getShippingMethods(appService), originInfo
                 .getShipmentInfo().getShippingMethod(), null,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     ShippingMethodWrapper method = (ShippingMethodWrapper) selectedObject;
-                    ShipmentInfoWrapper shipInfo = shipment.getShipmentInfo();
+                    ShipmentInfoWrapper shipInfo = originInfo.getShipmentInfo();
                     shipInfo.setShippingMethod(method);
                     if (dateSentWidget != null && method != null) {
                         activateDepartedWidget(method.needDate());
@@ -176,31 +166,27 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 }
             });
 
-        ShippingMethodWrapper shipMethod = shipInfo.getShippingMethod();
-        if (shipInfo.getPackedAt() == null) {
-            shipInfo.setPackedAt(new Date());
-        }
-
         departedLabel = widgetCreator.createLabel(client, "Packed");
         departedLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         departedValidator = new NotNullValidator("Date Packed should be set");
 
         dateSentWidget = createDateTimeWidget(client, departedLabel,
-            shipInfo.getPackedAt(), shipInfo, "packedAt", departedValidator,
-            SWT.DATE | SWT.TIME, DATE_SHIPPED_BINDING);
-        activateDepartedWidget(shipMethod != null && shipMethod.needDate());
+            shipmentInfo.getPackedAt(), shipmentInfo,
+            ShipmentInfoPeer.PACKED_AT.getName(), departedValidator, SWT.DATE
+                | SWT.TIME, DATE_SHIPPED_BINDING);
+        activateDepartedWidget(shipmentInfo.getShippingMethod() != null
+            && shipmentInfo.getShippingMethod().needDate());
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Box Number", null, shipInfo, "boxNumber", null);
-
-        if (shipInfo.getReceivedAt() == null) {
-            shipInfo.setReceivedAt(new Date());
-        }
+            "Box Number", null, shipmentInfo,
+            ShipmentInfoPeer.BOX_NUMBER.getName(), null);
 
         dateReceivedWidget = createDateTimeWidget(client, "Received",
-            shipInfo.getReceivedAt(), shipInfo, "receivedAt",
-            new NotNullValidator("Date Received should be set"));
+            shipmentInfo.getReceivedAt(), shipmentInfo,
+            ShipmentInfoPeer.RECEIVED_AT.getName(), new NotNullValidator(
+                "Date Received should be set"));
+
     }
 
     protected void activateWaybillWidget(boolean waybillNeeded) {
@@ -243,7 +229,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
         toolkit.paintBordersFor(client);
 
-        List<SpecimenWrapper> specimens = shipment.getSpecimenCollection(true);
+        List<SpecimenWrapper> specimens = originInfo
+            .getSpecimenCollection(true);
 
         specimenEntryWidget = new SpecimenEntryWidget(client, SWT.NONE,
             toolkit, appService, true);
@@ -278,18 +265,18 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                     else if (specimen.getOriginInfo() != null
                         && specimen.getOriginInfo().getShipmentInfo() != null
                         && !specimen.getOriginInfo().getShipmentInfo()
-                            .equals(shipment.getShipmentInfo()))
+                            .equals(originInfo.getShipmentInfo()))
                         throw new VetoException(
                             "Specimen is currently part of another shipment: "
                                 + specimen.getOriginInfo().getShipmentInfo()
                                 + ". You must remove this specimen from that shipment before it can be added to this one.");
                     break;
                 case POST_ADD:
-                    shipment.addToSpecimenCollection(Arrays.asList(specimen));
-                    specimen.setOriginInfo(shipment);
+                    originInfo.addToSpecimenCollection(Arrays.asList(specimen));
+                    specimen.setOriginInfo(originInfo);
                     break;
                 case PRE_DELETE:
-                    if (!shipment.isNew()) {
+                    if (!originInfo.isNew()) {
                         try {
                             List<CenterWrapper<?>> centers = CenterWrapper
                                 .getCenters(specimen.getAppService());
@@ -309,7 +296,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                     }
                     break;
                 case POST_DELETE:
-                    shipment.removeFromSpecimenCollection(Arrays
+                    originInfo.removeFromSpecimenCollection(Arrays
                         .asList(specimen));
                     break;
                 }
@@ -333,17 +320,17 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        return (shipment.isNew()) ? MSG_NEW_SHIPMENT_OK : MSG_SHIPMENT_OK;
+        return (originInfo.isNew()) ? MSG_NEW_SHIPMENT_OK : MSG_SHIPMENT_OK;
     }
 
     @Override
     protected void saveForm() throws Exception {
-        if (shipment.getShipmentInfo().getWaybill() != null
-            && shipment.getShipmentInfo().getWaybill().isEmpty()) {
-            shipment.getShipmentInfo().setWaybill(null);
+        if (originInfo.getShipmentInfo().getWaybill() != null
+            && originInfo.getShipmentInfo().getWaybill().isEmpty()) {
+            originInfo.getShipmentInfo().setWaybill(null);
         }
 
-        shipment.persist();
+        originInfo.persist();
 
         for (SpecimenWrapper s : specimensToPersist) {
             OriginInfoWrapper origin = s.getOriginInfo();
@@ -357,30 +344,27 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             @Override
             public void run() {
                 SpecimenTransitView.reloadCurrent();
-                if (!shipment.getShipmentInfo().isReceivedToday())
-                    SpecimenTransitView.showShipment(shipment);
+                if (!originInfo.getShipmentInfo().isReceivedToday())
+                    SpecimenTransitView.showShipment(originInfo);
             }
         });
     }
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
-        if (shipment.isNew() && senderComboViewer.getCombo().getItemCount() > 1) {
-            senderComboViewer.getCombo().deselectAll();
-        }
-        dateSentWidget.setDate(new Date());
-        dateReceivedWidget.setDate(new Date());
+    protected void onReset() throws Exception {
+        originInfo.reset();
 
-        specimenEntryWidget.setSpecimens(shipment.getSpecimenCollection(false));
-        ShippingMethodWrapper shipMethod = null;
-        if (shipment.getShipmentInfo() != null)
-            shipMethod = shipment.getShipmentInfo().getShippingMethod();
-        if (shipMethod != null) {
-            shippingMethodComboViewer.setSelection(new StructuredSelection(
-                shipMethod));
-        } else if (shippingMethodComboViewer.getCombo().getItemCount() > 1) {
-            shippingMethodComboViewer.getCombo().deselectAll();
-        }
+        // do not change origin if form reset
+        specimensToPersist.clear();
+
+        shipmentInfo.reset();
+        originInfo.setShipmentInfo(shipmentInfo);
+
+        specimenEntryWidget.setSpecimens(originInfo
+            .getSpecimenCollection(false));
+
+        GuiUtil.reset(senderComboViewer, originInfo.getCenter());
+        GuiUtil.reset(shippingMethodComboViewer,
+            shipmentInfo.getShippingMethod());
     }
 }

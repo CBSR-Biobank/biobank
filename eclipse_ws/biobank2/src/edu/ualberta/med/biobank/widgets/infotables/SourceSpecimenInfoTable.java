@@ -76,7 +76,7 @@ public class SourceSpecimenInfoTable extends
         TableRowData info = new TableRowData();
         info.studySourceVessel = studySourceVessel;
         Assert.isNotNull(studySourceVessel.getSpecimenType(),
-            "study source vessel has null for source vessel");
+            "study specimen type is null");
         info.name = studySourceVessel.getSpecimenType().getName();
         info.needTimeDrawn = (studySourceVessel.getNeedTimeDrawn() != null) ? (studySourceVessel
             .getNeedTimeDrawn() ? "Yes" : "No") : "No";

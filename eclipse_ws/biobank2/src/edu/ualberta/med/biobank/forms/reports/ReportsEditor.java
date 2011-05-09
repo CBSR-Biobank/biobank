@@ -310,7 +310,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
     }
 
     private void exportCSV(List<String> columnInfo, List<Object[]> params,
-        String path, IProgressMonitor monitor) throws Exception {
+        String path) {
         // csv
         PrintWriter bw = null;
         try {
@@ -333,9 +333,6 @@ public abstract class ReportsEditor extends BiobankFormBase {
         bw.println();
         BiobankLabelProvider stringConverter = reportTable.getLabelProvider();
         for (Object row : reportData) {
-            if (monitor.isCanceled()) {
-                throw new Exception("Exporting canceled.");
-            }
             Object[] castOb = (Object[]) row;
             bw.write("\"" + stringConverter.getColumnText(castOb, 0) + "\"");
             for (int j = 1; j < columnInfo.size(); j++) {
@@ -399,7 +396,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
             }
             IRunnableContext context = new ProgressMonitorDialog(Display
                 .getDefault().getActiveShell());
-            context.run(true, true, new IRunnableWithProgress() {
+            context.run(true, false, new IRunnableWithProgress() {
                 @Override
                 public void run(final IProgressMonitor monitor) {
                     monitor.beginTask("Preparing Report...",
@@ -407,14 +404,11 @@ public abstract class ReportsEditor extends BiobankFormBase {
                     final List<Map<String, String>> listData = new ArrayList<Map<String, String>>();
                     try {
                         if (exportCSV) {
-                            exportCSV(columnInfo, printParams, path, monitor);
+                            exportCSV(columnInfo, printParams, path);
                             SessionManager.log("exportCSV", report.getName(),
                                 "report");
                         } else {
                             for (Object object : reportData) {
-                                if (monitor.isCanceled()) {
-                                    throw new Exception("Exporting canceled.");
-                                }
                                 Map<String, String> map = new HashMap<String, String>();
                                 for (int j = 0; j < columnInfo.size(); j++) {
                                     map.put(columnInfo.get(j), (reportTable

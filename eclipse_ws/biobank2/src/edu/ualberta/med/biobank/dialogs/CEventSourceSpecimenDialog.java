@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -25,9 +24,11 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.InventoryIdValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
@@ -36,11 +37,9 @@ import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class CEventSourceSpecimenDialog extends BiobankDialog {
+public class CEventSourceSpecimenDialog extends PagedDialog {
 
     private SpecimenWrapper editedSpecimen;
-
-    private SpecimenWrapper internalSpecimen;
 
     private ComboViewer specimenTypeComboViewer;
 
@@ -49,8 +48,6 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
     private List<SpecimenTypeWrapper> allSpecimenTypes;
 
     private List<ActivityStatusWrapper> allActivityStatus;
-
-    private boolean addMode;
 
     private String currentTitle;
 
@@ -64,17 +61,17 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
     private DoubleNumberValidator quantityTextValidator;
     private ComboViewer activityStatusComboViewer;
 
-    private NewSpecimenListener newSpecimenListener;
-
     private ActivityStatusWrapper activeActivityStatus;
 
     private Date defaultTimeDrawn;
 
+    private SpecimenWrapper internalSpecimen;
+
     public CEventSourceSpecimenDialog(Shell parent, SpecimenWrapper specimen,
         List<SourceSpecimenWrapper> studySourceSpecimen,
-        List<SpecimenTypeWrapper> allSpecimenTypes,
-        NewSpecimenListener listener, Date defaultTimeDrawn) {
-        super(parent);
+        List<SpecimenTypeWrapper> allSpecimenTypes, NewListener listener,
+        Date defaultTimeDrawn) {
+        super(parent, listener, specimen == null);
         this.defaultTimeDrawn = defaultTimeDrawn;
         try {
             activeActivityStatus = ActivityStatusWrapper
@@ -83,10 +80,8 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
             // ok if don't find default
         }
         Assert.isNotNull(studySourceSpecimen);
-        newSpecimenListener = listener;
         internalSpecimen = new SpecimenWrapper(SessionManager.getAppService());
         if (specimen == null) {
-            addMode = true;
             internalSpecimen.setActivityStatus(activeActivityStatus);
             internalSpecimen.setCreatedAt(defaultTimeDrawn);
         } else {
@@ -97,7 +92,6 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
             internalSpecimen.setComment(specimen.getComment());
             internalSpecimen.setActivityStatus(specimen.getActivityStatus());
             editedSpecimen = specimen;
-            addMode = false;
         }
         mapStudySourceSpecimen = new HashMap<String, SourceSpecimenWrapper>();
         for (SourceSpecimenWrapper ssw : studySourceSpecimen) {
@@ -309,105 +303,54 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
         }
     }
 
-    @Override
-    protected void createButtonsForButtonBar(Composite parent) {
-        if (addMode) {
-            createButton(parent, IDialogConstants.CANCEL_ID,
-                IDialogConstants.CANCEL_LABEL, false);
-            createButton(parent, IDialogConstants.FINISH_ID,
-                IDialogConstants.FINISH_LABEL, false);
-            createButton(parent, IDialogConstants.NEXT_ID,
-                IDialogConstants.NEXT_LABEL, true);
-        } else {
-            super.createButtonsForButtonBar(parent);
-        }
-    }
-
-    @Override
-    protected void setOkButtonEnabled(boolean enabled) {
-        if (addMode) {
-            Button nextButton = getButton(IDialogConstants.NEXT_ID);
-            Button finishButton = getButton(IDialogConstants.FINISH_ID);
-            if (nextButton != null && !nextButton.isDisposed()
-                && finishButton != null && !finishButton.isDisposed()) {
-                nextButton.setEnabled(enabled);
-                finishButton.setEnabled(enabled);
-            } else {
-                okButtonEnabled = enabled;
-            }
-        } else {
-            super.setOkButtonEnabled(enabled);
-        }
-    }
-
     /**
      * Used only when editing
      */
     @Override
     protected void okPressed() {
-        editedSpecimen.setInventoryId(internalSpecimen.getInventoryId());
-        editedSpecimen.setSpecimenType(internalSpecimen.getSpecimenType());
-        editedSpecimen.setQuantity(internalSpecimen.getQuantity());
-        editedSpecimen.setCreatedAt(internalSpecimen.getCreatedAt());
-        editedSpecimen.setComment(internalSpecimen.getComment());
-        editedSpecimen.setActivityStatus(internalSpecimen.getActivityStatus());
+        copy(editedSpecimen);
         super.okPressed();
     }
 
     @Override
-    protected void buttonPressed(int buttonId) {
-        if (addMode) {
-            if (IDialogConstants.CANCEL_ID == buttonId)
-                super.buttonPressed(buttonId);
-            else if (IDialogConstants.FINISH_ID == buttonId) {
-                Button nextButton = getButton(IDialogConstants.NEXT_ID);
-                if (nextButton.isEnabled()) {
-                    addNewSpecimen();
-                }
-                setReturnCode(OK);
-                close();
-            } else if (IDialogConstants.NEXT_ID == buttonId) {
-                addNewSpecimen();
-            }
-        } else {
-            super.buttonPressed(buttonId);
-        }
+    protected ModelWrapper<Specimen> getNew() {
+        return new SpecimenWrapper(SessionManager.getAppService());
+
     }
 
-    private void addNewSpecimen() {
+    @Override
+    protected void resetFields() {
+        // then reset fields
         try {
-            SpecimenWrapper newSpecimen = new SpecimenWrapper(
-                SessionManager.getAppService());
-            newSpecimen.initObjectWith(internalSpecimen);
-            if (newSpecimenListener != null)
-                newSpecimenListener.newSpecimenAdded(newSpecimen);
-
-            // then reset fields
             internalSpecimen.reset();
-            inventoryIdWidget.setText(""); //$NON-NLS-1$
-            inventoryIdWidget.setFocus();
-            quantityText.setText(""); //$NON-NLS-1$
-            timeDrawnWidget.setDate(null);
-            quantityText.setText(""); //$NON-NLS-1$
-            specimenTypeComboViewer.getCombo().deselectAll();
-            activityStatusComboViewer.getCombo().deselectAll();
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                activeActivityStatus));
-            updateWidgetVisibilityAndValues();
         } catch (Exception e) {
-            BiobankPlugin
-                .openAsyncError(
-                    Messages
-                        .getString("CEventSourceSpecimenDialog.specimen.dialog.error.msg"), //$NON-NLS-1$
-                    e);
+            BiobankPlugin.openAsyncError("Error", e);
         }
+        inventoryIdWidget.setText(""); //$NON-NLS-1$
+        inventoryIdWidget.setFocus();
+        quantityText.setText(""); //$NON-NLS-1$
+        timeDrawnWidget.setDate(null);
+        quantityText.setText(""); //$NON-NLS-1$
+        specimenTypeComboViewer.getCombo().deselectAll();
+        activityStatusComboViewer.getCombo().deselectAll();
+        activityStatusComboViewer.setSelection(new StructuredSelection(
+            activeActivityStatus));
+        updateWidgetVisibilityAndValues();
     }
 
-    public void setNewSpecimenListener(NewSpecimenListener newListener) {
-        this.newSpecimenListener = newListener;
-    }
-
-    public static abstract class NewSpecimenListener {
-        public abstract void newSpecimenAdded(SpecimenWrapper spec);
+    @Override
+    protected void copy(ModelWrapper<?> newModelObject) {
+        ((SpecimenWrapper) newModelObject).setInventoryId(internalSpecimen
+            .getInventoryId());
+        ((SpecimenWrapper) newModelObject).setSpecimenType(internalSpecimen
+            .getSpecimenType());
+        ((SpecimenWrapper) newModelObject).setQuantity(internalSpecimen
+            .getQuantity());
+        ((SpecimenWrapper) newModelObject).setCreatedAt(internalSpecimen
+            .getCreatedAt());
+        ((SpecimenWrapper) newModelObject).setComment(internalSpecimen
+            .getComment());
+        ((SpecimenWrapper) newModelObject).setActivityStatus(internalSpecimen
+            .getActivityStatus());
     }
 }

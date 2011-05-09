@@ -86,22 +86,32 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return wrappedObject;
     }
 
-    public void setWrappedObject(E wrappedObject) {
-        this.wrappedObject = wrappedObject;
+    public void setWrappedObject(E newWrappedObject) {
+        E oldWrappedObject = wrappedObject;
+        wrappedObject = newWrappedObject;
+
         cache.clear();
         propertyCache.clear();
+
+        firePropertyChanges(oldWrappedObject, newWrappedObject);
     }
 
     public void addPropertyChangeListener(String propertyName,
         PropertyChangeListener listener) {
-        List<String> propertiesList = getPropertyChangeNames();
+        List<Property<?, ? super E>> propertiesList = getProperties();
         if ((propertiesList == null) || (propertiesList.size() == 0)) {
             throw new RuntimeException("wrapper has not defined any properties");
         }
-        if (!propertiesList.contains(propertyName)) {
-            throw new RuntimeException("invalid property: " + propertyName);
+
+        for (Property<?, ? super E> property : propertiesList) {
+            if (property.getName().equals(propertyName)) {
+                propertyChangeSupport.addPropertyChangeListener(propertyName,
+                    listener);
+                return;
+            }
         }
-        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+
+        throw new RuntimeException("invalid property: " + propertyName);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
@@ -138,7 +148,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         propertyCache.clear();
         resetInternalFields();
 
-        E oldValue = wrappedObject;
+        E oldWrappedObject = wrappedObject;
 
         if (!isNew()) {
             wrappedObject = getObjectFromDatabase();
@@ -147,29 +157,49 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             }
         }
 
-        firePropertyChanges(oldValue, wrappedObject);
+        firePropertyChanges(oldWrappedObject, wrappedObject);
     }
 
     /**
      * return the list of the different properties we want to notify when we
      * call firePropertyChanges
      */
-    protected abstract List<String> getPropertyChangeNames();
+    protected abstract List<Property<?, ? super E>> getProperties();
 
     /**
      * When retrieve the values from the database, need to fire the
      * modifications for the different objects contained in the wrapped object
      */
-    private void firePropertyChanges(Object oldWrappedObject,
-        Object newWrappedObject) throws Exception {
-        List<String> memberNames = getPropertyChangeNames();
-        if (memberNames == null) {
-            throw new Exception("memberNames cannot be null");
+    private void firePropertyChanges(E oldWrappedObject, E newWrappedObject) {
+        List<Property<?, ? super E>> properties = getProperties();
+
+        if (properties == null) {
+            // TODO: is this necessary? Just early-out if null?
+            throw new RuntimeException("getProperties() cannot return null");
         }
-        for (String member : memberNames) {
-            // TODO: should send old and new PROPERTY values.
-            propertyChangeSupport.firePropertyChange(member, oldWrappedObject,
-                newWrappedObject);
+
+        if (oldWrappedObject == newWrappedObject) {
+            return;
+        }
+
+        for (Property<?, ? super E> property : properties) {
+            String propertyName = property.getName();
+            PropertyChangeListener[] listeners = propertyChangeSupport
+                .getPropertyChangeListeners(propertyName);
+
+            // if no one is listening to this property then do not send a change
+            // as it may be expensive to determine the old and new values (ex:
+            // lazily loading an association, such as, a Center's
+            // specimenCollection).
+            if (listeners.length == 0) {
+                continue;
+            }
+
+            Object oldValue = property.get(oldWrappedObject);
+            Object newValue = property.get(newWrappedObject);
+
+            propertyChangeSupport.firePropertyChange(propertyName, oldValue,
+                newValue);
         }
     }
 
@@ -261,7 +291,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     protected void checkFieldLimits() throws BiobankCheckException,
         CheckFieldLimitsException {
         String fieldValue = "";
-        for (String field : getPropertyChangeNames()) {
+        for (Property<?, ? super E> property : getProperties()) {
+            // TODO: use accessor instead!
+            String field = property.getName();
+
             Integer maxLen = VarCharLengths
                 .getMaxSize(getWrappedClass(), field);
             if (maxLen == null)
@@ -354,9 +387,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * @throws Exception
      */
     private void resetToNewObject() throws Exception {
-        E oldValue = wrappedObject;
+        E oldWrappedObject = wrappedObject;
         wrappedObject = getNewObject();
-        firePropertyChanges(oldValue, wrappedObject);
+        firePropertyChanges(oldWrappedObject, wrappedObject);
     }
 
     protected E getNewObject() throws Exception {

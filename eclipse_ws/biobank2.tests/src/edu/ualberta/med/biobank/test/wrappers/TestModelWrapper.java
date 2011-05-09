@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -24,7 +25,7 @@ public class TestModelWrapper extends TestDatabase {
         }
 
         @Override
-        protected List<String> getPropertyChangeNames() {
+        protected List<Property<?, ? super Object>> getProperties() {
             return null;
         }
 
@@ -47,7 +48,7 @@ public class TestModelWrapper extends TestDatabase {
         }
 
         @Override
-        protected List<String> getPropertyChangeNames() {
+        protected List<Property<?, ? super Site>> getProperties() {
             return null;
         }
 
