@@ -25,6 +25,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -585,6 +586,19 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected boolean canScanTubeAlone(PalletCell cell) {
         return cell == null || cell.getStatus() == UICellStatus.EMPTY;
+    }
+
+    protected void focusControl(final Control control) {
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                control.setFocus();
+            }
+        });
+    }
+
+    protected void focusPlateToScan() {
+        focusControl(plateToScanText);
     }
 
 }

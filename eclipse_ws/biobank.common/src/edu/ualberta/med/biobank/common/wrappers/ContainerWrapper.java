@@ -1258,4 +1258,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         }
         return foundContainers;
     }
+
+    public boolean isPallet96() {
+        return getContainerType().isPallet96();
+    }
 }
