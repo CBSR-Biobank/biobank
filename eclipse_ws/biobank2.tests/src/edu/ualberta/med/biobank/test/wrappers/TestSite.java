@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -36,7 +35,6 @@ import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
-import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -577,13 +575,15 @@ public class TestSite extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
 
-        List<SourceVesselWrapper> svs = new ArrayList<SourceVesselWrapper>();
-        for (PatientWrapper patient : new PatientWrapper[] { patient1, patient2 }) {
-            svs.add(SourceVesselHelper.newSourceVessel(patient,
-                Utils.getRandomDate(), 0.1));
-            svs.add(SourceVesselHelper.newSourceVessel(patient,
-                Utils.getRandomDate(), 0.1));
-        }
+        // FIXME
+        // List<SourceVesselWrapper> svs = new ArrayList<SourceVesselWrapper>();
+        // for (PatientWrapper patient : new PatientWrapper[] { patient1,
+        // patient2 }) {
+        // svs.add(SourceVesselHelper.newSourceVessel(patient,
+        // Utils.getRandomDate(), 0.1));
+        // svs.add(SourceVesselHelper.newSourceVessel(patient,
+        // Utils.getRandomDate(), 0.1));
+        // }
 
         // FIXME
         // CollectionEventHelper.addCollectionEvent(site, method, svs.get(0),
