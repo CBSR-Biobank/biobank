@@ -1094,12 +1094,6 @@
                   visible="true">
             </separator>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.scanLink"
-                  icon="icons/scanLink.png"
-                  label="Scan Link"
-                  style="push">
-            </command>
-            <command
                   commandId="edu.ualberta.med.biobank.commands.processing.link"
                   icon="icons/scanLink.png"
                   label="Specimen Link"
@@ -1109,18 +1103,6 @@
                   commandId="edu.ualberta.med.biobank.commands.patients.scanAssign"
                   icon="icons/scanAssign.png"
                   label="Scan Assign"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.processing.assign"
-                  icon="icons/scanAssign.png"
-                  label="Specimen Assign"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.cabinetLinkAssign"
-                  icon="icons/cabinetLinkAssign.png"
-                  label="Cabinet Link/Assign"
                   style="push">
             </command>
             <separator
@@ -1371,18 +1353,6 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.scanLink"
-                  icon="icons/scanLink.png"
-                  label="Scan Link"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.processingPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
                   commandId="edu.ualberta.med.biobank.commands.processing.link"
                   icon="icons/scanLink.png"
                   label="Specimen Link"
@@ -1395,33 +1365,9 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.scanAssign"
-                  icon="icons/scanAssign.png"
-                  label="Scan Assign"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.processingPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
                   commandId="edu.ualberta.med.biobank.commands.processing.assign"
                   icon="icons/scanAssign.png"
                   label="Specimen Assign"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.processingPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.cabinetLinkAssign"
-                  icon="icons/cabinetLinkAssign.png"
-                  label="Cabinet Link/Assign"
                   style="push">
                <visibleWhen
                      checkEnabled="false">

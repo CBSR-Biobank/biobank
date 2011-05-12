@@ -9,15 +9,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
@@ -36,15 +43,14 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.CEventComboCallback;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.PatientTextCallback;
+import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
-import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
-import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 // FIXME the custom selection is not done in this version. 
@@ -53,11 +59,12 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenLinkEntryForm"; //$NON-NLS-1$
 
     private static final String INVENTORY_ID_BINDING = "inventoryId-binding"; //$NON-NLS-1$
+    private static final String NEW_SINGLE_POSITION_BINDING = "newSinglePosition-binding"; //$NON-NLS-1$
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(SpecimenLinkEntryForm.class.getName());
 
-    private static boolean singleMode = false;
+    private static Mode mode = Mode.MULTIPLE;
 
     // TODO do not need a composite class anymore if only one link form is left
     private LinkFormPatientManagement linkFormPatientManagement;
@@ -65,9 +72,12 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     // single linking
     // source specimen / type relation when only one specimen
     private AliquotedSpecimenSelectionWidget singleTypesWidget;
+    private Label newSinglePositionLabel;
+    private BiobankText newSinglePositionText;
+    private StringLengthValidator newSinglePositionValidator;
+    private boolean positionTextModified;
 
     // Multiple linking
-    private ScanPalletWidget palletWidget;
     // list of source specimen / type widget for multiple linking
     private List<AliquotedSpecimenSelectionWidget> specimenTypesWidgets;
     private Composite multipleOptionsFields;
@@ -108,12 +118,12 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected boolean isSingleMode() {
-        return singleMode;
+        return mode.isSingleMode();
     }
 
     @Override
-    protected void setSingleMode(boolean single) {
-        singleMode = single;
+    protected void setMode(Mode m) {
+        mode = m;
     }
 
     @Override
@@ -134,6 +144,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     public String getNextOpenedFormID() {
         return ID;
+    }
+
+    @Override
+    protected boolean showSinglePosition() {
+        return true;
     }
 
     @Override
@@ -247,37 +262,15 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    protected void createContainersVisualisation(Composite parent) {
-        Composite comp = toolkit.createComposite(parent);
-        GridLayout layout = new GridLayout(2, false);
-        comp.setLayout(layout);
-        GridData gd = new GridData();
-        gd.horizontalAlignment = SWT.CENTER;
-        gd.grabExcessHorizontalSpace = true;
-        comp.setLayoutData(gd);
+    protected void defaultInitialisation() {
+        setNeedSinglePosition(mode == Mode.SINGLE_POSITION);
+    }
 
-        palletWidget = new ScanPalletWidget(comp,
-            UICellStatus.DEFAULT_PALLET_SCAN_LINK_STATUS_LIST);
-        toolkit.adapt(palletWidget);
-        palletWidget.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true,
-            false));
-
-        palletWidget.getMultiSelectionManager().addMultiSelectionListener(
-            new MultiSelectionListener() {
-                @Override
-                public void selectionChanged(MultiSelectionEvent mse) {
-                    // customSelectionWidget.setNumber(mse.selections);
-                }
-            });
-        palletWidget.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseDoubleClick(MouseEvent e) {
-                scanTubeAlone(e);
-            }
-        });
-        // palletWidget.loadProfile(profilesCombo.getCombo().getText());
-
-        createScanTubeAloneButton(comp);
+    @Override
+    protected void setNeedSinglePosition(boolean position) {
+        widgetCreator.setBinding(NEW_SINGLE_POSITION_BINDING, position);
+        widgetCreator.showWidget(newSinglePositionLabel, position);
+        widgetCreator.showWidget(newSinglePositionText, position);
     }
 
     @Override
@@ -294,7 +287,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         fieldsComposite.setLayoutData(gd);
 
         // inventoryID
-        BiobankText inventoryIdText = (BiobankText) createBoundWidgetWithLabel(
+        final BiobankText inventoryIdText = (BiobankText) createBoundWidgetWithLabel(
             fieldsComposite,
             BiobankText.class,
             SWT.NONE,
@@ -311,6 +304,46 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         singleTypesWidget = new AliquotedSpecimenSelectionWidget(
             fieldsComposite, null, widgetCreator, false);
         singleTypesWidget.addBindings();
+
+        newSinglePositionLabel = widgetCreator.createLabel(fieldsComposite,
+            Messages.getString("SpecimenAssign.single.position.label")); //$NON-NLS-1$
+        newSinglePositionValidator = new StringLengthValidator(4,
+            Messages.getString("SpecimenAssign.single.position.validationMsg")); //$NON-NLS-1$
+        newSinglePositionText = (BiobankText) widgetCreator.createBoundWidget(
+            fieldsComposite, BiobankText.class, SWT.NONE,
+            newSinglePositionLabel, new String[0], new WritableValue("", //$NON-NLS-1$
+                String.class), newSinglePositionValidator,
+            NEW_SINGLE_POSITION_BINDING);
+        newSinglePositionText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (positionTextModified
+                    && newSinglePositionValidator
+                        .validate(newSinglePositionText.getText()) == Status.OK_STATUS) {
+                    BusyIndicator.showWhile(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell().getDisplay(),
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                initContainersFromPosition(
+                                    newSinglePositionText, false, null);
+                                checkPositionAndSpecimen(inventoryIdText,
+                                    newSinglePositionText);
+                            }
+                        });
+                }
+                positionTextModified = false;
+            }
+        });
+        newSinglePositionText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                positionTextModified = true;
+                displayPositions(false);
+            }
+        });
+        newSinglePositionText
+            .addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
     }
 
     @Override
@@ -348,14 +381,14 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected boolean fieldsValid() {
-        return (singleMode ? true : isPlateValid())
+        return (mode.isSingleMode() ? true : isPlateValid())
             && linkFormPatientManagement.fieldsValid();
     }
 
     @Override
     protected void doBeforeSave() throws Exception {
         // can't access the combos in another thread, so do it now
-        if (singleMode) {
+        if (mode.isSingleMode()) {
             SpecimenHierarchy selection = singleTypesWidget.getSelection();
             singleSpecimen.setParentSpecimen(selection.getParentSpecimen());
             singleSpecimen
@@ -372,7 +405,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         originInfo
             .setCenter(SessionManager.getUser().getCurrentWorkingCenter());
         originInfo.persist();
-        if (singleMode)
+        if (mode.isSingleMode())
             saveSingleSpecimen(originInfo);
         else
             saveMultipleSpecimens(originInfo);
@@ -385,8 +418,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         Map<RowColPos, PalletCell> cells = (Map<RowColPos, PalletCell>) palletWidget
             .getCells();
         StringBuffer sb = new StringBuffer(
-            Messages
-                .getString("SpecimenLink.activitylog.specimens.start")); //$NON-NLS-1$
+            Messages.getString("SpecimenLink.activitylog.specimens.start")); //$NON-NLS-1$
         int nber = 0;
         ActivityStatusWrapper activeStatus = ActivityStatusWrapper
             .getActiveActivityStatus(appService);
@@ -438,6 +470,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     private void saveSingleSpecimen(OriginInfoWrapper originInfo)
         throws Exception {
+        // FIXME mettre aussi la position
+
         singleSpecimen.setCreatedAt(new Date());
         singleSpecimen.setQuantityFromType();
         singleSpecimen.setActivityStatus(ActivityStatusWrapper
@@ -449,8 +483,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         singleSpecimen.persist();
         String posStr = singleSpecimen.getPositionString(true, false);
         if (posStr == null) {
-            posStr = Messages
-                .getString("SpecimenLink.position.label.none"); //$NON-NLS-1$
+            posStr = Messages.getString("SpecimenLink.position.label.none"); //$NON-NLS-1$
         }
         // LINKED\: specimen {0} of type\: {1} to source\: {2} ({3}) -
         // Patient\: {4} - Visit\: {5} - Center\: {6} \n
@@ -654,8 +687,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    protected boolean initializeWithSingle() {
-        return isSingleMode();
+    protected Mode initialisationMode() {
+        return mode;
     }
 
     @Override
