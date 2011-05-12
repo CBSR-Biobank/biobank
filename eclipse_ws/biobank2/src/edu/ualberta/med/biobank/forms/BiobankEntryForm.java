@@ -217,6 +217,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                         });
                         monitor.setCanceled(true);
                         BiobankPlugin.openAsyncError("Save error", bse);
+                        throw new RuntimeException(bse);
                     } catch (Exception e) {
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
@@ -250,7 +251,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
      */
     @SuppressWarnings("unused")
     protected void doAfterSave() throws Exception {
-        setDirty(false);
     }
 
     @Override

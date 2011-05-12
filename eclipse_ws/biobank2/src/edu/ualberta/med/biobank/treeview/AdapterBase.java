@@ -434,9 +434,6 @@ public abstract class AdapterBase {
                 final AdapterBase node = createChildNode(-i);
                 addChild(node);
                 newNodes.add(node);
-                if (updateNode) {
-                    SessionManager.updateAdapterTreeNode(node);
-                }
             }
 
             childUpdateThread = new Thread() {

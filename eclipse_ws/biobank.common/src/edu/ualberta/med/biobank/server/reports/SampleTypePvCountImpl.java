@@ -20,7 +20,7 @@ public class SampleTypePvCountImpl extends AbstractReport {
         + SENT_SAMPLES_FREEZER_NAME
         + "'"
         + ")) and ce.patient.study.nameShort like ?"
-        + " GROUP BY ce.patient.pnumber, s.specimenType "
+        + " GROUP BY ce, s.specimenType "
         + " ORDER BY ce.patient.pnumber, min(s.parentSpecimen.processingEvent.createdAt)";
 
     public SampleTypePvCountImpl(BiobankReport report) {
