@@ -296,6 +296,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
         if (member.getType().equals("String")) {
             value = "trimmed";
             result.append("      String ").append(value).append(" = ")
+                .append(member.getName()).append(" == null ? null : ")
                 .append(member.getName()).append(".trim();\n");
         }
 
