@@ -59,17 +59,17 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         deletedSourceSpecimens.removeAll(specimenCollection);
     }
 
-    @Override
-    public void removeFromOriginalSpecimenCollection(
+    public void removeFromSpecimenCollections(
         List<SpecimenWrapper> specimenCollection) {
         deletedSourceSpecimens.addAll(specimenCollection);
+        super.removeFromAllSpecimenCollection(specimenCollection);
         super.removeFromOriginalSpecimenCollection(specimenCollection);
     }
 
-    @Override
-    public void removeFromOriginalSpecimenCollectionWithCheck(
+    public void removeFromSpecimenCollectionsWithCheck(
         List<SpecimenWrapper> specimenCollection) throws BiobankCheckException {
         deletedSourceSpecimens.addAll(specimenCollection);
+        super.removeFromAllSpecimenCollectionWithCheck(specimenCollection);
         super.removeFromOriginalSpecimenCollectionWithCheck(specimenCollection);
     }
 
