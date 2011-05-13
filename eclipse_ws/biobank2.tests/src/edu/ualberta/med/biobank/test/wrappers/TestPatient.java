@@ -80,7 +80,7 @@ public class TestPatient extends TestDatabase {
             .getAllSpecimenTypes(appService, true);
 
         childType = ContainerTypeHelper.newContainerType(site,
-            "Child L1 Container Type", "CCTL1", 3, 4, 5, false);
+            "Child L1 Container Type", "CCTL1", 3, 8, 12, false);
         childType.addToSpecimenTypeCollection(allSampleTypes);
         childType.persist();
         containerTypeMap.put("ChildCtL1", childType);
@@ -447,67 +447,80 @@ public class TestPatient extends TestDatabase {
     @Test
     public void testPatientMerge() throws Exception {
         String name = "testMerge" + r.nextInt();
-        PatientWrapper patient1 = PatientHelper.addPatient(name + "_1", study);
-        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study);
 
         addContainerTypes();
         addContainers();
         addClinic();
-
-        SpecimenWrapper[] parentSpcs = new SpecimenWrapper[] {
-            SpecimenHelper.addParentSpecimen(clinic, study, patient1),
-            SpecimenHelper.addParentSpecimen(clinic, study, patient2) };
-
-        CollectionEventWrapper cevent2 = parentSpcs[1].getCollectionEvent();
-        cevent2.setVisitNumber(2);
-        cevent2.persist();
-
-        ContainerWrapper childL1 = containerMap.get("ChildL1");
-        List<SpecimenTypeWrapper> contSampleTypes = childL1.getContainerType()
-            .getSpecimenTypeCollection();
-        int colCapacity = childL1.getColCapacity();
         int storedSpecimenCount = 0;
 
-        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
-        for (SpecimenWrapper parentSpc : parentSpcs) {
-            PatientWrapper patient = parentSpc.getCollectionEvent()
-                .getPatient();
-            List<ProcessingEventWrapper> patientPevents = ProcessingEventHelper
-                .addProcessingEvents(site, patient, Utils.getRandomDate(),
-                    parentSpc, contSampleTypes, 5, 2);
+        // try this two times, the first time the collection events have the
+        // same visit number, the second time they don't
+        for (int i = 0; i < 2; ++i) {
+            PatientWrapper patient1 = PatientHelper.addPatient(
+                name + "_1_" + i, study);
+            PatientWrapper patient2 = PatientHelper.addPatient(
+                name + "_2_" + i, study);
 
-            // store the first specimen from each pevent in a childL1
-            for (ProcessingEventWrapper pevent : patientPevents) {
-                pevent.reload();
-                childL1.addSpecimen(storedSpecimenCount / colCapacity,
-                    storedSpecimenCount % colCapacity, pevent
-                        .getSpecimenCollection(false).get(0));
-                storedSpecimenCount++;
+            SpecimenWrapper[] parentSpcs = new SpecimenWrapper[] {
+                SpecimenHelper.addParentSpecimen(clinic, study, patient1, 1),
+                SpecimenHelper.addParentSpecimen(clinic, study, patient2, 1) };
+
+            if (i == 0) {
+                CollectionEventWrapper cevent2 = parentSpcs[1]
+                    .getCollectionEvent();
+                cevent2.setVisitNumber(2);
+                cevent2.persist();
             }
 
-            pevents.addAll(patientPevents);
+            ContainerWrapper childL1 = containerMap.get("ChildL1");
+            List<SpecimenTypeWrapper> contSampleTypes = childL1
+                .getContainerType().getSpecimenTypeCollection();
+            int colCapacity = childL1.getColCapacity();
 
-        }
+            List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+            for (SpecimenWrapper parentSpc : parentSpcs) {
+                PatientWrapper patient = parentSpc.getCollectionEvent()
+                    .getPatient();
+                List<ProcessingEventWrapper> patientPevents = ProcessingEventHelper
+                    .addProcessingEvents(site, patient, Utils.getRandomDate(),
+                        parentSpc, contSampleTypes, 5, 2);
 
-        patient1.reload();
-        patient2.reload();
+                // store the first specimen from each pevent in a childL1
+                for (ProcessingEventWrapper pevent : patientPevents) {
+                    pevent.reload();
+                    childL1.addSpecimen(storedSpecimenCount / colCapacity,
+                        storedSpecimenCount % colCapacity, pevent
+                            .getSpecimenCollection(false).get(0));
+                    storedSpecimenCount++;
+                }
 
-        patient1.merge(patient2);
+                pevents.addAll(patientPevents);
 
-        patient1.reload();
-        patient2.reload();
+            }
 
-        for (ProcessingEventWrapper pevent : pevents) {
-            pevent.reload();
-            Assert.assertEquals(patient1, pevent.getSpecimenCollection(false)
-                .get(0).getCollectionEvent().getPatient());
-        }
+            patient1.reload();
+            patient2.reload();
 
-        for (SpecimenWrapper parentSpc : parentSpcs) {
-            Assert.assertEquals(patient1, parentSpc.getCollectionEvent()
-                .getPatient());
-            Assert.assertEquals(patient1, parentSpc
-                .getOriginalCollectionEvent().getPatient());
+            patient1.merge(patient2);
+
+            patient1.reload();
+            patient2.reload();
+
+            for (ProcessingEventWrapper pevent : pevents) {
+                pevent.reload();
+                Assert.assertEquals(patient1,
+                    pevent.getSpecimenCollection(false).get(0)
+                        .getCollectionEvent().getPatient());
+            }
+
+            for (SpecimenWrapper parentSpc : parentSpcs) {
+                CollectionEventWrapper cevent = parentSpc.getCollectionEvent();
+                cevent.reload();
+                Assert.assertEquals(patient1, cevent.getPatient());
+                cevent = parentSpc.getOriginalCollectionEvent();
+                cevent.reload();
+                Assert.assertEquals(patient1, cevent.getPatient());
+            }
         }
     }
 
