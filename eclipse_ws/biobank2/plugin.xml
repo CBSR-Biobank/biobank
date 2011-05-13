@@ -150,11 +150,6 @@
             name="Open Administration View">
       </command>
       <command
-            categoryId="org.eclipse.ui.category.window"
-            id="edu.ualberta.med.biobank.commands.patients.scanLink"
-            name="Scan Link">
-      </command>
-       <command
              categoryId="org.eclipse.ui.category.edit"
              id="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
              name="Add shipment">
@@ -284,16 +279,6 @@
              id="biobank2.command.category.server"
              name="Server">
        </category>
-       <command
-             categoryId="org.eclipse.ui.category.window"
-             id="edu.ualberta.med.biobank.commands.patients.scanAssign"
-             name="Scan Assign">
-       </command>
-       <command
-             categoryId="org.eclipse.ui.category.window"
-             id="edu.ualberta.med.biobank.commands.patients.cabinetLinkAssign"
-             name="Cabinet Link Assign">
-       </command>
        <command
              categoryId="org.eclipse.ui.category.edit"
              id="edu.ualberta.med.biobank.commands.ProcessingEventAdd"
@@ -528,25 +513,6 @@
                 </or>
                   </not>
             	</and>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.ScanLinkHandler"
-            commandId="edu.ualberta.med.biobank.commands.patients.scanLink">
-         <activeWhen>
-            <and>
-              <reference
-                    definitionId="biobank2.processingPerspectiveSelected">
-              </reference>
-              <reference
-                    definitionId="biobank2.loggedIn">
-              </reference>
-            </and>
-         </activeWhen>
-         <enabledWhen>
-            <reference
-                  definitionId="biobank2.processingPerspectiveSelected">
-            </reference>
          </enabledWhen>
       </handler>
       <handler
@@ -814,44 +780,6 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.ScanAssignHandler"
-            commandId="edu.ualberta.med.biobank.commands.patients.scanAssign">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="biobank2.processingPerspectiveSelected">
-               </reference>
-               <reference
-                     definitionId="biobank2.loggedIn">
-               </reference>
-            </and>
-         </activeWhen>
-         <enabledWhen>
-            <reference
-                  definitionId="biobank2.processingPerspectiveSelected">
-            </reference>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.CabinetLinkAssignHandler"
-            commandId="edu.ualberta.med.biobank.commands.patients.cabinetLinkAssign">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="biobank2.processingPerspectiveSelected">
-               </reference>
-               <reference
-                     definitionId="biobank2.loggedIn">
-               </reference>
-            </and>
-         </activeWhen>
-         <enabledWhen>
-              <reference
-                    definitionId="biobank2.processingPerspectiveSelected">
-              </reference>
-         </enabledWhen>
-      </handler>
-      <handler
             class="edu.ualberta.med.biobank.handlers.ProcessingEventAddHandler"
             commandId="edu.ualberta.med.biobank.commands.ProcessingEventAdd">
          <activeWhen>
@@ -1097,12 +1025,6 @@
                   commandId="edu.ualberta.med.biobank.commands.processing.link"
                   icon="icons/scanLink.png"
                   label="Specimen Link"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.scanAssign"
-                  icon="icons/scanAssign.png"
-                  label="Scan Assign"
                   style="push">
             </command>
             <separator
@@ -1765,27 +1687,6 @@
             name="Container View">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.linkassign.ScanLinkEntryForm"
-            default="false"
-            icon="icons/scanLink.png"
-            id="edu.ualberta.med.biobank.forms.ScanLinkEntryForm"
-            name="Scan Link Entry">
-      </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.linkassign.ScanAssignEntryForm"
-            default="false"
-            icon="icons/scanAssign.png"
-            id="edu.ualberta.med.biobank.forms.ScanAssignEntryForm"
-            name="Scan Assign Entry">
-      </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.linkassign.CabinetLinkAssignEntryForm"
-            default="false"
-            icon="icons/cabinetLinkAssign.png"
-            id="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm"
-            name="Cabinet Link/Assign Entry ">
-      </editor>
-      <editor
             class="edu.ualberta.med.biobank.forms.SpecimenViewForm"
             default="false"
             icon="icons/specimen.png"
@@ -2163,22 +2064,16 @@
             sequence="M3+E">
       </key>
       <key
-            commandId="edu.ualberta.med.biobank.commands.patients.scanLink"
+            commandId="edu.ualberta.med.biobank.commands.processing.link"
             contextId="edu.ualberta.med.biobank.perspective.processing"
             schemeId="biobank2.scheme"
             sequence="M2+M3+L">
       </key>
       <key
-            commandId="edu.ualberta.med.biobank.commands.patients.scanAssign"
+            commandId="edu.ualberta.med.biobank.commands.processing.assign"
             contextId="edu.ualberta.med.biobank.perspective.processing"
             schemeId="biobank2.scheme"
             sequence="M2+M3+A">
-      </key>
-      <key
-            commandId="edu.ualberta.med.biobank.commands.patients.cabinetLinkAssign"
-            contextId="edu.ualberta.med.biobank.perspective.processing"
-            schemeId="biobank2.scheme"
-            sequence="M2+M3+C">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.reset"
@@ -2537,23 +2432,6 @@
                   value="1">
             </count>
          </with>
-      </definition>
-      <definition
-            id="biobank2.scanlinking">
-         <with
-               variable="activeEditorId">
-            <or>
-               <equals
-                     value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
-               </equals>
-               <equals
-                     value="edu.ualberta.med.biobank.forms.ScanAssignEntryForm">
-               </equals>
-               <equals
-                     value="edu.ualberta.med.biobank.forms.ScanLinkEntryForm">
-               </equals>
-            </or>
-                     </with>
       </definition>
       <definition
             id="biobank2.editorDirty">

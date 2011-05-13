@@ -231,9 +231,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             public void modifyText(ModifyEvent e) {
                 inventoryIdModified = true;
                 displayPositions(false);
+                canSaveSingleSpecimen.setValue(false);
             }
         });
-        createPositionFields(fieldsComposite);
+        createSinglePositionFields(fieldsComposite);
     }
 
     /**
@@ -289,13 +290,14 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         appendLog(Messages.getString(
             "SpecimenAssign.single.activitylog.specimenInfo", //$NON-NLS-1$
             singleSpecimen.getInventoryId(), positionString));
+        canSaveSingleSpecimen.setValue(true);
     }
 
     /**
      * Single assign: Some fields will be displayed only if the specimen has
      * already a position
      */
-    private void createPositionFields(Composite fieldsComposite) {
+    private void createSinglePositionFields(Composite fieldsComposite) {
         // for move mode: display old position retrieved from database
         oldSinglePositionLabel = widgetCreator.createLabel(fieldsComposite,
             Messages.getString("SpecimenAssign.single.old.position.label")); //$NON-NLS-1$
@@ -376,6 +378,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             public void modifyText(ModifyEvent e) {
                 positionTextModified = true;
                 displayPositions(false);
+                canSaveSingleSpecimen.setValue(false);
             }
         });
         newSinglePositionText

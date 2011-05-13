@@ -1,9 +1,5 @@
 package edu.ualberta.med.biobank.logs;
 
-import edu.ualberta.med.biobank.forms.linkassign.CabinetLinkAssignEntryForm;
-import edu.ualberta.med.biobank.forms.linkassign.ScanAssignEntryForm;
-import edu.ualberta.med.biobank.forms.linkassign.ScanLinkEntryForm;
-
 /**
  * Activity log information. Used for Activity logs of ScanLink, ScanAssign and
  * CabinetLinkAssign.

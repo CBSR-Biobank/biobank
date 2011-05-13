@@ -72,6 +72,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     // single linking
     // source specimen / type relation when only one specimen
     private AliquotedSpecimenSelectionWidget singleTypesWidget;
+    protected boolean inventoryIdModified;
     private Label newSinglePositionLabel;
     private BiobankText newSinglePositionText;
     private StringLengthValidator newSinglePositionValidator;
@@ -286,23 +287,53 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         fieldsComposite.setLayoutData(gd);
 
+        final NonEmptyStringValidator idValidator = new NonEmptyStringValidator(
+            Messages.getString("SpecimenLink.inventoryId.validator.msg"));
         // inventoryID
         final BiobankText inventoryIdText = (BiobankText) createBoundWidgetWithLabel(
-            fieldsComposite,
-            BiobankText.class,
+            fieldsComposite, BiobankText.class,
             SWT.NONE,
             Messages.getString("SpecimenLink.inventoryId.label"), //$NON-NLS-1$
-            new String[0],
-            singleSpecimen,
-            SpecimenPeer.INVENTORY_ID.getName(),
-            new NonEmptyStringValidator(Messages
-                .getString("SpecimenLink.inventoryId.validator.msg")), //$NON-NLS-1$
+            new String[0], singleSpecimen, SpecimenPeer.INVENTORY_ID.getName(),
+            idValidator, //$NON-NLS-1$
             INVENTORY_ID_BINDING);
         inventoryIdText.addKeyListener(textFieldKeyListener);
+        inventoryIdText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (inventoryIdModified
+                    && idValidator.validate(inventoryIdText.getText()) == Status.OK_STATUS) {
+                    BusyIndicator.showWhile(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell().getDisplay(),
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                checkInventoryId(inventoryIdText);
+                            }
+                        });
+                }
+                inventoryIdModified = false;
+            }
+        });
+        inventoryIdText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                inventoryIdModified = true;
+                newSinglePositionText.setText("");
+                canSaveSingleSpecimen.setValue(false);
+            }
+        });
 
         // widget to select the source and the type
         singleTypesWidget = new AliquotedSpecimenSelectionWidget(
             fieldsComposite, null, widgetCreator, false);
+        singleTypesWidget
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    newSinglePositionText.setText("");
+                }
+            });
         singleTypesWidget.addBindings();
 
         newSinglePositionLabel = widgetCreator.createLabel(fieldsComposite,
@@ -340,10 +371,34 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             public void modifyText(ModifyEvent e) {
                 positionTextModified = true;
                 displayPositions(false);
+                canSaveSingleSpecimen.setValue(false);
             }
         });
         newSinglePositionText
             .addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+    }
+
+    private void checkInventoryId(BiobankText inventoryIdText) {
+        boolean ok = true;
+        try {
+            SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(appService,
+                inventoryIdText.getText(), null);
+            if (specimen != null) {
+                BiobankPlugin.openAsyncError("InventoryId error",
+                    "InventoryId " + inventoryIdText.getText()
+                        + " already exists.");
+                ok = false;
+            }
+        } catch (Exception e) {
+            BiobankPlugin.openAsyncError("Error checking inventoryId", e);
+            ok = false;
+        }
+        singleTypesWidget.setEnabled(ok);
+        newSinglePositionText.setEnabled(ok);
+        canSaveSingleSpecimen.setValue(ok);
+        if (!ok)
+            focusControl(inventoryIdText);
+
     }
 
     @Override
@@ -470,8 +525,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     private void saveSingleSpecimen(OriginInfoWrapper originInfo)
         throws Exception {
-        // FIXME mettre aussi la position
-
         singleSpecimen.setCreatedAt(new Date());
         singleSpecimen.setQuantityFromType();
         singleSpecimen.setActivityStatus(ActivityStatusWrapper
@@ -502,6 +555,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         super.reset();
         linkFormPatientManagement.reset(true);
         singleTypesWidget.deselectAll();
+        showOnlyPallet(true);
+        form.layout(true, true);
     }
 
     @Override

@@ -3,6 +3,9 @@ package edu.ualberta.med.biobank.forms.linkassign;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.databinding.Binding;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -68,6 +71,9 @@ public abstract class AbstractLinkAssignEntryForm extends
     private ContainerDisplayWidget thirdSingleParentWidget;
     private Label secondSingleParentLabel;
     private ContainerDisplayWidget secondSingleParentWidget;
+    protected IObservableValue canSaveSingleSpecimen = new WritableValue(
+        Boolean.TRUE, Boolean.class);
+    private Binding canSaveSingleBinding;
 
     // Multiple
     private Composite multipleFieldsComposite;
@@ -87,6 +93,10 @@ public abstract class AbstractLinkAssignEntryForm extends
     protected void init() throws Exception {
         super.init();
         singleSpecimen = new SpecimenWrapper(appService);
+        canSaveSingleBinding = widgetCreator.addBooleanBinding(
+            new WritableValue(Boolean.FALSE, Boolean.class),
+            canSaveSingleSpecimen,
+            "Cannot save specimen because of previous errors");
     }
 
     protected abstract String getFormTitle();
@@ -131,7 +141,8 @@ public abstract class AbstractLinkAssignEntryForm extends
         radioMultiple.setSelection(mode == Mode.MULTIPLE);
         showModeComposite(mode);
         widgetCreator.showWidget(radioSinglePosition, showSinglePosition());
-        page.layout(true, true);
+        showOnlyPallet(true);
+        form.layout(true, true);
     }
 
     protected boolean showSinglePosition() {
@@ -306,11 +317,6 @@ public abstract class AbstractLinkAssignEntryForm extends
     protected abstract void createMultipleFields(Composite parent)
         throws Exception;
 
-    protected void createContainersVisualisation(Composite parent) {
-        createMultipleVisualisation(parent);
-        createSingleVisualisation(parent);
-    }
-
     protected void createMultipleVisualisation(Composite parent) {
         multipleVisualisation = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(3, false);
@@ -469,7 +475,8 @@ public abstract class AbstractLinkAssignEntryForm extends
         visualisationComposite.setLayoutData(gd);
         visualisationScroll.setContent(visualisationComposite);
 
-        createContainersVisualisation(visualisationComposite);
+        createMultipleVisualisation(visualisationComposite);
+        createSingleVisualisation(visualisationComposite);
     }
 
     protected void showVisualisation(boolean show) {
@@ -667,6 +674,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                     if (singleSpecimen.isPositionFree(parentContainers.get(0))) {
                         singleSpecimen.setParent(parentContainers.get(0));
                         displayPositions(true);
+                        canSaveSingleSpecimen.setValue(true);
                         cancelConfirmWidget.setFocus();
                     } else {
                         BiobankPlugin.openError(
@@ -709,6 +717,15 @@ public abstract class AbstractLinkAssignEntryForm extends
         widgetCreator.showWidget(hotelLabel, !onlyPallet);
         widgetCreator.showWidget(hotelWidget, !onlyPallet);
         page.layout(true, true);
+    }
+
+    @Override
+    protected void setBindings(boolean isSingleMode) {
+        super.setBindings(isSingleMode);
+        if (isSingleMode)
+            widgetCreator.addBinding(canSaveSingleBinding);
+        else
+            widgetCreator.removeBinding(canSaveSingleBinding);
     }
 
     /**
