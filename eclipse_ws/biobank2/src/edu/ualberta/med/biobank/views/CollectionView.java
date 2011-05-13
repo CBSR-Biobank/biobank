@@ -203,8 +203,6 @@ public class CollectionView extends AbstractAdministrationView {
 
     @Override
     public void reload() {
-        rootNode.removeAll();
-        createNodes();
         for (AdapterBase adapter : rootNode.getChildren())
             adapter.rebuild();
         super.reload();

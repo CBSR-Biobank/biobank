@@ -66,8 +66,8 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
         }
         CEventSourceSpecimenDialog dlg = new CEventSourceSpecimenDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            specimen, studySourceTypes, allSpecimenTypes, newListener,
-            defaultTimeDrawn);
+            specimen, studySourceTypes, allSpecimenTypes, currentSpecimens,
+            newListener, defaultTimeDrawn);
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
             reloadCollection(currentSpecimens);

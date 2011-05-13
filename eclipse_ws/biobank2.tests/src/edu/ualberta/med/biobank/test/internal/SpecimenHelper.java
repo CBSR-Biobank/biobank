@@ -204,7 +204,8 @@ public class SpecimenHelper extends DbHelper {
             spcCount, container.getContainerType().getSpecimenTypeCollection());
     }
 
-    public static SpecimenWrapper addParentSpecimen() throws Exception {
+    public static SpecimenWrapper addParentSpecimen(ClinicWrapper clinic,
+        StudyWrapper study, PatientWrapper patient) throws Exception {
         SpecimenTypeWrapper st = SpecimenTypeHelper.addSpecimenType("testst"
             + r.nextInt());
         st.persist();
@@ -213,13 +214,17 @@ public class SpecimenHelper extends DbHelper {
         newSpec.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
 
-        StudyWrapper study = StudyHelper.addStudy("Study-" + r.nextInt());
-        ClinicWrapper clinic = ClinicHelper.addClinic("testclinic"
-            + r.nextInt());
-        PatientWrapper patient = PatientHelper.addPatient(
-            "testp" + r.nextInt(), study);
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
             clinic, patient, 2, newSpec);
         return ce.getOriginalSpecimenCollection(false).get(0);
+    }
+
+    public static SpecimenWrapper addParentSpecimen() throws Exception {
+        ClinicWrapper clinic = ClinicHelper.addClinic("testclinic"
+            + r.nextInt());
+        StudyWrapper study = StudyHelper.addStudy("Study-" + r.nextInt());
+        PatientWrapper patient = PatientHelper.addPatient(
+            "testp" + r.nextInt(), study);
+        return addParentSpecimen(clinic, study, patient);
     }
 }

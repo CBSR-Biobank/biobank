@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,8 +20,10 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -30,8 +33,11 @@ import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
+import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
+import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestPatient extends TestDatabase {
@@ -58,7 +64,7 @@ public class TestPatient extends TestDatabase {
         containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
     }
 
-    private void addClinic(PatientWrapper patient) throws Exception {
+    private void addClinic() throws Exception {
         clinic = ClinicHelper.addClinic("Clinic - Patient Test "
             + Utils.getRandomString(10));
         ContactWrapper contact = ContactHelper.addContact(clinic,
@@ -152,90 +158,85 @@ public class TestPatient extends TestDatabase {
 
     @Test
     public void testDelete() throws Exception {
-        PatientWrapper patient = PatientHelper.addPatient(
-            Utils.getRandomNumericString(20), study);
+        String name = "testDelete" + r.nextInt();
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
         patient.delete();
         study.reload();
 
-        // create new patient with patient pevents, should not be allowed to
+        // create new patient with processing events, should not be allowed to
         // delete
-        patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
-            study);
+        patient = PatientHelper.addPatient(name, study);
         addContainerTypes();
         addContainers();
-        addClinic(patient);
+        addClinic();
         patient.persist();
-        // FIXME
-        // SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(patient,
-        // Utils.getRandomDate(), 0.1);
-        // CollectionEventWrapper cevent = CollectionEventHelper
-        // .newCollectionEvent(site,
-        // ShippingMethodWrapper.getShippingMethods(appService).get(0));
-        // cevent.addToSourceVesselCollection(Arrays.asList(sv));
-        // sv.setCollectionEvent(cevent);
-        // cevent.persist();
-        // patient.reload();
-        //
-        // cevent = patient.getCollectionEventCollection().get(0);
-        // Assert.assertNotNull(cevent);
-        //
-        // int count = r.nextInt(15) + 1;
-        // List<ProcessingEventWrapper> pevent = new
-        // ArrayList<ProcessingEventWrapper>();
-        // for (int i = 0; i < count; i++) {
-        // ProcessingEventWrapper pe = ProcessingEventHelper
-        // .newProcessingEvent(site, patient, Utils.getRandomDate(),
-        // Utils.getRandomDate());
-        // pe.setPatient(patient);
-        // pe.persist();
-        // pe.reload();
-        // pevent.add(pe);
-        // }
-        // patient.addToProcessingEventCollection(pevent);
-        // patient.persist();
-        // patient.reload();
-        //
-        // pevent = patient.getProcessingEventCollection(false);
-        // List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-        // .getAllSpecimenTypes(appService, true);
-        // SpecimenWrapper aliquot = SpecimenHelper.addAliquot(
-        // allSampleTypes.get(0), containerMap.get("ChildL1"), pevent.get(0),
-        // 0, 0);
-        // patient.reload();
-        //
-        // try {
-        // patient.delete();
-        // Assert.fail("should not be allowed to delete patient with samples");
-        // } catch (Exception e) {
-        // Assert.assertTrue(true);
-        // }
-        //
-        // // delete aliquot and patient
-        // aliquot.delete();
-        //
-        // try {
-        // patient.delete();
-        // Assert
-        // .fail("should not be allowed to delete patient with processing events");
-        // } catch (Exception e) {
-        // Assert.assertTrue(true);
-        // }
-        // for (ProcessingEventWrapper pe : patient
-        // .getProcessingEventCollection(false)) {
-        // pe.delete();
-        // }
-        //
-        // try {
-        // patient.delete();
-        // Assert
-        // .fail("should not be allowed to delete patient linked to source vessels");
-        // } catch (Exception e) {
-        // Assert.assertTrue(true);
-        // }
-        //
-        // DbHelper.deleteFromList(cevent.getSourceVesselCollection(false));
-        // cevent.delete();
-        // patient.delete();
+
+        SpecimenWrapper parentSpc = SpecimenHelper.addParentSpecimen(clinic,
+            study, patient);
+        patient.reload();
+        CollectionEventWrapper cevent = patient.getCollectionEventCollection(
+            false).get(0);
+        Assert.assertNotNull(cevent);
+
+        List<SpecimenTypeWrapper> contSampleTypes = containerMap.get("ChildL1")
+            .getContainerType().getSpecimenTypeCollection();
+
+        int count = containerMap.get("ChildL1").getColCapacity();
+        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+        for (int i = 0; i < count; i++) {
+            ProcessingEventWrapper pe = ProcessingEventHelper
+                .addProcessingEvent(site, patient, Utils.getRandomDate());
+            SpecimenHelper.addSpecimen(parentSpc,
+                DbHelper.chooseRandomlyInList(contSampleTypes), cevent, pe,
+                containerMap.get("ChildL1"), 0, i);
+            pevents.add(pe);
+        }
+        patient.persist();
+        patient.reload();
+
+        pevents = patient.getProcessingEventCollection(false);
+        SpecimenWrapper spc = SpecimenHelper.addSpecimen(parentSpc,
+            DbHelper.chooseRandomlyInList(contSampleTypes), cevent,
+            pevents.get(0), containerMap.get("ChildL1"), 1, 0);
+        patient.reload();
+
+        try {
+            patient.delete();
+            Assert.fail("should not be allowed to delete patient with samples");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        // delete specimen and patient
+        spc.delete();
+
+        try {
+            patient.delete();
+            Assert
+                .fail("should not be allowed to delete patient with processing events");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        for (ProcessingEventWrapper pe : patient
+            .getProcessingEventCollection(false)) {
+            DbHelper.deleteFromList(pe.getSpecimenCollection(false));
+            pe.reload();
+            pe.delete();
+        }
+
+        try {
+            patient.delete();
+            Assert
+                .fail("should not be allowed to delete patient linked to collection event");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        DbHelper.deleteCollectionEvents(patient
+            .getCollectionEventCollection(false));
+
+        patient.delete();
     }
 
     @Test

@@ -67,12 +67,16 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
     private SpecimenWrapper internalSpecimen;
 
+    private List<SpecimenWrapper> excludeList;
+
     public CEventSourceSpecimenDialog(Shell parent, SpecimenWrapper specimen,
         List<SourceSpecimenWrapper> studySourceSpecimen,
-        List<SpecimenTypeWrapper> allSpecimenTypes, NewListener listener,
+        List<SpecimenTypeWrapper> allSpecimenTypes,
+        List<SpecimenWrapper> excludeList, NewListener listener,
         Date defaultTimeDrawn) {
         super(parent, listener, specimen == null);
         this.defaultTimeDrawn = defaultTimeDrawn;
+        this.excludeList = excludeList;
         try {
             activeActivityStatus = ActivityStatusWrapper
                 .getActiveActivityStatus(SessionManager.getAppService());
@@ -155,6 +159,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             internalSpecimen,
             SpecimenPeer.INVENTORY_ID.getName(),
             new InventoryIdValidator(
+                excludeList,
                 Messages
                     .getString("CEventSourceSpecimenDialog.field.inventoryID.validator.msg"))); //$NON-NLS-1$
         GridData gd = (GridData) inventoryIdWidget.getLayoutData();

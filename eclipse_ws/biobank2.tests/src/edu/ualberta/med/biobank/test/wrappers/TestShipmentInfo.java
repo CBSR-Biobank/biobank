@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.wrappers;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -78,12 +79,15 @@ public class TestShipmentInfo extends TestDatabase {
         for (ShippingMethodWrapper method : ShippingMethodWrapper
             .getShippingMethods(appService)) {
             // FIXME: finish this test
+            ShipmentInfoWrapper shipInfo = ShipmentInfoHelper.addShipment(site,
+                method, TestCommon.getNewWaybill(r), new Date(), spc);
+
+            List<ShipmentInfoWrapper> actualShipInfos = ShipmentInfoWrapper
+                .getAllShipmentInfosByMethod(appService, method);
+
+            Assert.assertEquals(1, actualShipInfos.size());
+
         }
-
-        ShipmentInfoWrapper shipInfo = ShipmentInfoHelper.addShipment(site,
-            ShippingMethodWrapper.getShippingMethods(appService).get(0),
-            TestCommon.getNewWaybill(r), dateNow, spc);
-
     }
 
     @Test

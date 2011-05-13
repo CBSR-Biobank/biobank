@@ -255,7 +255,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         SDKQueryResult result = ((BiobankApplicationService) appService)
             .executeQuery(query);
         wrappedObject = ((E) result.getObjectResult());
-        reload();
         Log logMessage = null;
         try {
             logMessage = getLogMessage(eventType.name().toLowerCase(), null, "");
