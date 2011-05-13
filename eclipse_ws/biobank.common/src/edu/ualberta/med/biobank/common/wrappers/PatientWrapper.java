@@ -173,7 +173,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
         + "=?";
 
-    public long getSourceSpecimensCount(boolean fast)
+    public long getSourceSpecimenCount(boolean fast)
         throws ApplicationException, BiobankException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(SOURCE_SPECIMEN_COUNT_QRY,
@@ -196,7 +196,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         + SpecimenPeer.PARENT_SPECIMEN.getName()
         + " is not null";
 
-    public long getAliquotedSpecimensCount(boolean fast)
+    public long getAliquotedSpecimenCount(boolean fast)
         throws ApplicationException, BiobankException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(

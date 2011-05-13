@@ -65,6 +65,22 @@ public class CollectionEventHelper extends DbHelper {
     }
 
     public static List<CollectionEventWrapper> addCollectionEvents(
+        CenterWrapper<?> center, PatientWrapper patient, String name)
+        throws Exception {
+        List<CollectionEventWrapper> cevents = new ArrayList<CollectionEventWrapper>();
+        List<SpecimenTypeWrapper> spcTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, false);
+        int num = r.nextInt(15) + 1;
+
+        for (int i = 0; i < num; i++) {
+            SpecimenWrapper spc = SpecimenHelper.newSpecimen(DbHelper
+                .chooseRandomlyInList(spcTypes));
+            cevents.add(addCollectionEvent(center, patient, i + 1, spc));
+        }
+        return cevents;
+    }
+
+    public static List<CollectionEventWrapper> addCollectionEvents(
         CenterWrapper<?> center, StudyWrapper study, String name)
         throws Exception {
         List<CollectionEventWrapper> cevents = new ArrayList<CollectionEventWrapper>();

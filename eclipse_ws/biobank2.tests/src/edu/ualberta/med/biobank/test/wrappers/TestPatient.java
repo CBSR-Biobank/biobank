@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.test.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -317,248 +316,199 @@ public class TestPatient extends TestDatabase {
         String name = "testAddProcessingEvents" + r.nextInt();
         PatientWrapper patient = PatientHelper.addPatient(name, study);
         patient.reload();
+        addClinic();
+        SpecimenWrapper parentSpc = SpecimenHelper.addParentSpecimen(clinic,
+            study, patient);
 
-        // FIXME
-        // ProcessingEventWrapper pevent = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, Utils.getRandomDate(),
-        // Utils.getRandomDate());
-        // patient.addToProcessingEventCollection(Arrays.asList(pevent));
-        // patient.persist();
-        // patient.reload();
-        // Assert.assertEquals(1, patient.getProcessingEventCollection(false)
-        // .size());
-        //
-        // pevent = ProcessingEventHelper.addProcessingEvent(site, patient,
-        // Utils.getRandomDate(), Utils.getRandomDate());
-        // patient.addToProcessingEventCollection(Arrays.asList(pevent));
-        // patient.persist();
-        // patient.reload();
-        // Assert.assertEquals(2, patient.getProcessingEventCollection(false)
-        // .size());
+        List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, true);
+
+        List<ProcessingEventWrapper> peventSet1 = ProcessingEventHelper
+            .addProcessingEvents(site, patient, Utils.getRandomDate(),
+                parentSpc, allSampleTypes, r.nextInt(15) + 5, 1);
+        patient.reload();
+        Assert.assertEquals(peventSet1.size(), patient
+            .getProcessingEventCollection(false).size());
+
+        List<ProcessingEventWrapper> peventSet2 = ProcessingEventHelper
+            .addProcessingEvents(site, patient, Utils.getRandomDate(),
+                parentSpc, allSampleTypes, r.nextInt(10) + 5, 1);
+        patient.reload();
+        Assert.assertEquals(peventSet1.size() + peventSet2.size(), patient
+            .getProcessingEventCollection(false).size());
     }
 
     @Test
     public void testGetPatientCollectionEventCollection() throws Exception {
-        PatientWrapper patient = PatientHelper.addPatient(
-            Utils.getRandomNumericString(20), study);
-        // FIXME
-        // List<CollectionEventWrapper> cevents = new
-        // ArrayList<CollectionEventWrapper>();
-        // for (int i = 0, n = r.nextInt(10); i < n; ++i) {
-        // CollectionEventWrapper ce = CollectionEventHelper
-        // .addCollectionEvent(site, ShippingMethodWrapper
-        // .getShippingMethods(appService).get(0), SourceVesselHelper
-        // .newSourceVessel(patient, Utils.getRandomDate(), 0.1));
-        // cevents.add(ce);
-        // }
-        // patient.reload();
-        //
-        // List<CollectionEventWrapper> savedCollectionEvents = patient
-        // .getCollectionEventCollection();
-        // Assert.assertEquals(cevents.size(), savedCollectionEvents.size());
-        // for (CollectionEventWrapper cevent : savedCollectionEvents) {
-        // Assert.assertTrue(cevents.contains(cevent));
-        // }
+        String name = "testGetPatientCollectionEventCollection" + r.nextInt();
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        addClinic();
+        List<CollectionEventWrapper> cevents = CollectionEventHelper
+            .addCollectionEvents(clinic, patient, name);
+
+        patient.reload();
+        List<CollectionEventWrapper> savedCollectionEvents = patient
+            .getCollectionEventCollection(false, false);
+        Assert.assertEquals(cevents.size(), savedCollectionEvents.size());
+        Assert.assertTrue(savedCollectionEvents.containsAll(cevents));
     }
 
     @Test
-    public void testGetVisits() throws Exception {
-        String name = "testGetVisits" + r.nextInt();
+    public void testGetSpecimenCount() throws Exception {
+        String name = "testGetPatientCollectionEventCollection" + r.nextInt();
         PatientWrapper patient1 = PatientHelper.addPatient(name + "_1", study);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study);
 
-        Date dateProcessed1 = Utils.getRandomDate();
-        Date dateDrawn1 = Utils.getRandomDate();
-        Date dateDrawn1_1 = Utils.getRandomDate();
-        Date dateProcessed2 = Utils.getRandomDate();
-        Date dateDrawn2 = Utils.getRandomDate();
-        Date dateProcessed3 = Utils.getRandomDate();
-        Date dateDrawn3 = Utils.getRandomDate();
-
-        // FIXME
-        // ProcessingEventWrapper visit1 = ProcessingEventHelper
-        // .addProcessingEvent(site, patient1, dateProcessed1, dateDrawn1);
-        // ProcessingEventWrapper visit1_1 = ProcessingEventHelper
-        // .addProcessingEvent(site, patient1, dateProcessed1, dateDrawn1_1);
-        // ProcessingEventWrapper visit2 = ProcessingEventHelper
-        // .addProcessingEvent(site, patient1, dateProcessed2, dateDrawn2);
-        // ProcessingEventWrapper visit3 = ProcessingEventHelper
-        // .addProcessingEvent(site, patient2, dateProcessed3, dateDrawn3);
-        //
-        // patient1.reload();
-        // patient2.reload();
-        //
-        // List<ProcessingEventWrapper> visitsFound = patient1.getVisits(
-        // dateProcessed1, dateDrawn1);
-        // Assert.assertTrue(visitsFound.size() == 1);
-        // Assert.assertTrue(visitsFound.contains(visit1));
-        //
-        // visitsFound = patient1.getVisits(dateProcessed1, dateDrawn1_1);
-        // Assert.assertTrue(visitsFound.size() == 1);
-        // Assert.assertTrue(visitsFound.contains(visit1_1));
-        //
-        // visitsFound = patient1.getVisits(dateProcessed2, dateDrawn2);
-        // Assert.assertTrue(visitsFound.size() == 1);
-        // Assert.assertEquals(visit2, visitsFound.get(0));
-        //
-        // visitsFound = patient1.getVisits(dateProcessed3, dateDrawn3);
-        // Assert.assertEquals(0, visitsFound.size());
-        //
-        // visitsFound = patient2.getVisits(dateProcessed3, dateDrawn3);
-        // Assert.assertTrue(visitsFound.size() == 1);
-        // Assert.assertEquals(visit3, visitsFound.get(0));
-    }
-
-    @Test
-    public void testGetSampleCount() throws Exception {
-        String patientName = Utils.getRandomNumericString(20);
-        PatientWrapper patient1 = PatientHelper.addPatient(patientName, study);
-        PatientWrapper patient2 = PatientHelper.addPatient(patientName + "_2",
-            study);
-
         addContainerTypes();
         addContainers();
-        patient1.persist();
-        // FIXME
-        // CollectionEventWrapper cevent = CollectionEventHelper
-        // .addCollectionEvent(
-        // site,
-        // ShippingMethodWrapper.getShippingMethods(appService).get(0),
-        // SourceVesselHelper.newSourceVessel(patient1,
-        // Utils.getRandomDate(), 0.1));
-        // cevent.persist();
-        // patient1.reload();
-        // patient2.reload();
-        //
-        // cevent = patient1.getCollectionEventCollection().get(0);
-        // Assert.assertNotNull(cevent);
-        //
-        // ContainerWrapper childL1 = containerMap.get("ChildL1");
-        // int maxCols = childL1.getColCapacity();
-        // int count = 5;
-        // for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
-        // List<ProcessingEventWrapper> pevents = new
-        // ArrayList<ProcessingEventWrapper>();
-        // for (int i = 0; i < count; i++) {
-        // pevents.add(ProcessingEventHelper.newProcessingEvent(site,
-        // patient, Utils.getRandomDate(), Utils.getRandomDate()));
-        // }
-        // patient.addToProcessingEventCollection(pevents);
-        // patient.persist();
-        // patient.reload();
-        // }
-        //
-        // List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-        // .getAllSpecimenTypes(appService, true);
-        //
-        // int sampleTypeCount = allSampleTypes.size();
-        // List<SpecimenWrapper> samples = new ArrayList<SpecimenWrapper>();
-        // Map<PatientWrapper, Integer> patientSampleCount = new
-        // HashMap<PatientWrapper, Integer>();
-        // for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
-        // patientSampleCount.put(patient, 0);
-        // }
-        //
-        // // 2 samples per pevent
-        // int sampleCount = 0;
-        // for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
-        // for (ProcessingEventWrapper pevent : patient
-        // .getProcessingEventCollection(false)) {
-        // for (int i = 0; i < 2; ++i) {
-        // samples.add(SpecimenHelper.addAliquot(
-        // allSampleTypes.get(r.nextInt(sampleTypeCount)),
-        // childL1, pevent, sampleCount / maxCols, sampleCount
-        // % maxCols));
-        // patient.reload();
-        // patientSampleCount.put(patient,
-        // patientSampleCount.get(patient) + 1);
-        // ++sampleCount;
-        // Assert.assertEquals(patientSampleCount.get(patient)
-        // .intValue(), patient.getSpecimensCount(true));
-        // Assert.assertEquals(patientSampleCount.get(patient)
-        // .intValue(), patient.getSpecimensCount(false));
-        // }
-        // }
-        // }
-        //
-        // Assert
-        // .assertEquals(1, patient1.getSourceVesselCollection(false).size());
-        //
-        // // now delete samples
-        // for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
-        // for (ProcessingEventWrapper pevent : patient
-        // .getProcessingEventCollection(false)) {
-        // samples = pevent.getSpecimenCollection(false);
-        // while (samples.size() > 0) {
-        // SpecimenWrapper aliquot = samples.get(0);
-        // aliquot.delete();
-        // pevent.reload();
-        // patient.reload();
-        // samples = pevent.getSpecimenCollection(false);
-        // patientSampleCount.put(patient,
-        // patientSampleCount.get(patient) - 1);
-        // Assert.assertEquals(patientSampleCount.get(patient1)
-        // .intValue(), patient1.getSpecimensCount(true));
-        // Assert.assertEquals(patientSampleCount.get(patient1)
-        // .intValue(), patient1.getSpecimensCount(false));
-        // Assert.assertEquals(patientSampleCount.get(patient2)
-        // .intValue(), patient2.getSpecimensCount(true));
-        // Assert.assertEquals(patientSampleCount.get(patient2)
-        // .intValue(), patient2.getSpecimensCount(false));
-        // }
-        // }
-        // }
+        addClinic();
+
+        SpecimenWrapper[] parentSpcs = new SpecimenWrapper[] {
+            SpecimenHelper.addParentSpecimen(clinic, study, patient1),
+            SpecimenHelper.addParentSpecimen(clinic, study, patient2) };
+
+        for (SpecimenWrapper parentSpc : parentSpcs) {
+            Assert.assertNotNull(parentSpc.getCollectionEvent());
+        }
+
+        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+        int count = 5;
+        for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
+            for (int i = 0; i < count; i++) {
+                pevents.add(ProcessingEventHelper.addProcessingEvent(site,
+                    patient, Utils.getRandomDate()));
+            }
+        }
+
+        ContainerWrapper childL1 = containerMap.get("ChildL1");
+        int maxCols = childL1.getColCapacity();
+        List<SpecimenTypeWrapper> spcTypes = childL1.getContainerType()
+            .getSpecimenTypeCollection();
+
+        List<SpecimenWrapper> samples = new ArrayList<SpecimenWrapper>();
+        Map<PatientWrapper, Integer> patientSampleCount = new HashMap<PatientWrapper, Integer>();
+        for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
+            patientSampleCount.put(patient, 0);
+        }
+
+        // 2 specimens per pevent
+        int sampleCount = 0;
+        for (SpecimenWrapper parentSpc : parentSpcs) {
+            CollectionEventWrapper cevent = parentSpc.getCollectionEvent();
+            PatientWrapper patient = cevent.getPatient();
+            for (ProcessingEventWrapper pevent : patient
+                .getProcessingEventCollection(false)) {
+                for (int i = 0; i < 2; ++i) {
+                    samples.add(SpecimenHelper.addSpecimen(parentSpc,
+                        DbHelper.chooseRandomlyInList(spcTypes), cevent,
+                        pevent, childL1, sampleCount / maxCols, sampleCount
+                            % maxCols));
+                    patient.reload();
+                    patientSampleCount.put(patient,
+                        patientSampleCount.get(patient) + 1);
+                    ++sampleCount;
+                    Assert.assertEquals(patientSampleCount.get(patient)
+                        .longValue(), patient.getAliquotedSpecimenCount(true));
+                    Assert.assertEquals(patientSampleCount.get(patient)
+                        .intValue(), patient.getAliquotedSpecimenCount(false));
+                }
+            }
+            patient.reload();
+            Assert.assertEquals(1, patient.getSourceSpecimenCount(true));
+            Assert.assertEquals(1, patient.getSourceSpecimenCount(false));
+        }
+
+        // now delete specimens
+        for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
+            for (ProcessingEventWrapper pevent : patient
+                .getProcessingEventCollection(false)) {
+                samples = pevent.getSpecimenCollection(false);
+                while (samples.size() > 0) {
+                    SpecimenWrapper aliquot = samples.get(0);
+                    aliquot.delete();
+                    pevent.reload();
+                    patient.reload();
+                    samples = pevent.getSpecimenCollection(false);
+                    patientSampleCount.put(patient,
+                        patientSampleCount.get(patient) - 1);
+                    Assert.assertEquals(patientSampleCount.get(patient1)
+                        .intValue(), patient1.getAliquotedSpecimenCount(true));
+                    Assert.assertEquals(patientSampleCount.get(patient1)
+                        .intValue(), patient1.getAliquotedSpecimenCount(false));
+                    Assert.assertEquals(patientSampleCount.get(patient2)
+                        .intValue(), patient2.getAliquotedSpecimenCount(true));
+                    Assert.assertEquals(patientSampleCount.get(patient2)
+                        .intValue(), patient2.getAliquotedSpecimenCount(false));
+                }
+            }
+        }
     }
 
     @Test
     public void testPatientMerge() throws Exception {
         String name = "testMerge" + r.nextInt();
-        PatientWrapper patient = PatientHelper.addPatient(name + "_1", study);
+        PatientWrapper patient1 = PatientHelper.addPatient(name + "_1", study);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study);
 
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
-        ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.addToContactCollection(Arrays.asList(contact));
-        study.persist();
+        addContainerTypes();
+        addContainers();
+        addClinic();
 
-        // FIXME
-        // CollectionEventWrapper cevent = CollectionEventHelper
-        // .addCollectionEvent(
-        // site,
-        // ShippingMethodWrapper.getShippingMethods(appService).get(0),
-        // SourceVesselHelper.newSourceVessel(patient,
-        // Utils.getRandomDate(), 0.1));
-        // CollectionEventWrapper shipment2 = CollectionEventHelper
-        // .addCollectionEvent(
-        // site,
-        // ShippingMethodWrapper.getShippingMethods(appService).get(0),
-        // SourceVesselHelper.newSourceVessel(patient2,
-        // Utils.getRandomDate(), 0.1));
-        //
-        // ProcessingEventWrapper visit1 = ProcessingEventHelper
-        // .addProcessingEvent(site, patient, Utils.getRandomDate(),
-        // Utils.getRandomDate());
-        //
-        // ProcessingEventWrapper visit2 = ProcessingEventHelper
-        // .addProcessingEvent(site, patient2, Utils.getRandomDate(),
-        // Utils.getRandomDate());
-        //
-        // Assert.assertEquals(patient, visit1.getPatient());
-        // Assert.assertEquals(patient2, visit2.getPatient());
-        //
-        // patient.merge(patient2);
-        //
-        // patient.reload();
-        // patient2.reload();
-        // visit1.reload();
-        // visit2.reload();
-        // cevent.reload();
-        // shipment2.reload();
-        //
-        // Assert.assertEquals(patient, visit1.getPatient());
-        // Assert.assertEquals(patient, visit2.getPatient());
-        //
-        // Assert.assertTrue(cevent.getPatientCollection().contains(patient));
+        SpecimenWrapper[] parentSpcs = new SpecimenWrapper[] {
+            SpecimenHelper.addParentSpecimen(clinic, study, patient1),
+            SpecimenHelper.addParentSpecimen(clinic, study, patient2) };
+
+        CollectionEventWrapper cevent2 = parentSpcs[1].getCollectionEvent();
+        cevent2.setVisitNumber(2);
+        cevent2.persist();
+
+        ContainerWrapper childL1 = containerMap.get("ChildL1");
+        List<SpecimenTypeWrapper> contSampleTypes = childL1.getContainerType()
+            .getSpecimenTypeCollection();
+        int colCapacity = childL1.getColCapacity();
+        int storedSpecimenCount = 0;
+
+        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+        for (SpecimenWrapper parentSpc : parentSpcs) {
+            PatientWrapper patient = parentSpc.getCollectionEvent()
+                .getPatient();
+            List<ProcessingEventWrapper> patientPevents = ProcessingEventHelper
+                .addProcessingEvents(site, patient, Utils.getRandomDate(),
+                    parentSpc, contSampleTypes, 5, 2);
+
+            // store the first specimen from each pevent in a childL1
+            for (ProcessingEventWrapper pevent : patientPevents) {
+                pevent.reload();
+                childL1.addSpecimen(storedSpecimenCount / colCapacity,
+                    storedSpecimenCount % colCapacity, pevent
+                        .getSpecimenCollection(false).get(0));
+                storedSpecimenCount++;
+            }
+
+            pevents.addAll(patientPevents);
+
+        }
+
+        patient1.reload();
+        patient2.reload();
+
+        patient1.merge(patient2);
+
+        patient1.reload();
+        patient2.reload();
+
+        for (ProcessingEventWrapper pevent : pevents) {
+            pevent.reload();
+            Assert.assertEquals(patient1, pevent.getSpecimenCollection(false)
+                .get(0).getCollectionEvent().getPatient());
+        }
+
+        for (SpecimenWrapper parentSpc : parentSpcs) {
+            Assert.assertEquals(patient1, parentSpc.getCollectionEvent()
+                .getPatient());
+            Assert.assertEquals(patient1, parentSpc
+                .getOriginalCollectionEvent().getPatient());
+        }
     }
 
     @Test

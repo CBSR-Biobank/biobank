@@ -246,7 +246,7 @@ public class SpecimenHelper extends DbHelper {
             .getActiveActivityStatus(appService));
 
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
-            clinic, patient, 2, newSpec);
+            clinic, patient, 1, newSpec);
         return ce.getOriginalSpecimenCollection(false).get(0);
     }
 
