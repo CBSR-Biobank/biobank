@@ -48,20 +48,14 @@ public class SpecimenHelper extends DbHelper {
 
     public static SpecimenWrapper newSpecimen(SpecimenWrapper parentSpc,
         SpecimenTypeWrapper specimenType, String activityStatus,
-        CollectionEventWrapper cevent, ProcessingEventWrapper pevent,
-        ContainerWrapper container, Integer row, Integer col) throws Exception {
+        CollectionEventWrapper cevent, ProcessingEventWrapper pevent)
+        throws Exception {
         SpecimenWrapper specimen = newSpecimen(specimenType, activityStatus,
             Utils.getRandomDate());
-        if (container != null) {
-            specimen.setParent(container);
-        }
         specimen.setProcessingEvent(pevent);
         specimen.setCollectionEvent(parentSpc.getCollectionEvent());
-        if ((row != null) && (col != null)) {
-            specimen.setPosition(new RowColPos(row, col));
-        }
 
-        CenterWrapper<?> center = container.getSite();
+        CenterWrapper<?> center = pevent.getCenter();
         OriginInfoWrapper oi = new OriginInfoWrapper(appService);
         oi.setCenter(center);
         oi.persist();
@@ -71,12 +65,49 @@ public class SpecimenHelper extends DbHelper {
         return specimen;
     }
 
+    public static SpecimenWrapper newSpecimen(SpecimenWrapper parentSpc,
+        SpecimenTypeWrapper specimenType, String activityStatus,
+        CollectionEventWrapper cevent, ProcessingEventWrapper pevent,
+        ContainerWrapper container, Integer row, Integer col) throws Exception {
+
+        SpecimenWrapper specimen = newSpecimen(parentSpc, specimenType,
+            activityStatus, cevent, pevent);
+
+        if (container != null) {
+            specimen.setParent(container);
+        }
+        if ((row != null) && (col != null)) {
+            specimen.setPosition(new RowColPos(row, col));
+        }
+
+        return specimen;
+    }
+
     public static SpecimenWrapper addSpecimen(SpecimenTypeWrapper specimenType,
         String activityStatus, Date createdAt) throws Exception {
         SpecimenWrapper specimen = newSpecimen(specimenType, activityStatus,
             createdAt);
         specimen.persist();
         return specimen;
+    }
+
+    public static SpecimenWrapper addSpecimen(SpecimenWrapper parentSpc,
+        SpecimenTypeWrapper specimenType, String activityStatus,
+        CollectionEventWrapper cevent, ProcessingEventWrapper pevent)
+        throws Exception {
+        SpecimenWrapper spc = newSpecimen(parentSpc, specimenType,
+            activityStatus, cevent, pevent);
+        spc.persist();
+        return spc;
+    }
+
+    public static SpecimenWrapper addSpecimen(SpecimenWrapper parentSpc,
+        SpecimenTypeWrapper specimenType, CollectionEventWrapper cevent,
+        ProcessingEventWrapper pevent) throws Exception {
+        SpecimenWrapper spc = newSpecimen(parentSpc, specimenType,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, cevent, pevent);
+        spc.persist();
+        return spc;
     }
 
     public static SpecimenWrapper addSpecimen(SpecimenTypeWrapper specimenType,

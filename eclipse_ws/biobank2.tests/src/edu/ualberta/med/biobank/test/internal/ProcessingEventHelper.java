@@ -1,11 +1,16 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 
 public class ProcessingEventHelper extends DbHelper {
@@ -44,6 +49,24 @@ public class ProcessingEventHelper extends DbHelper {
             dateProcessed);
         pevent.persist();
         return pevent;
+    }
+
+    public static List<ProcessingEventWrapper> addProcessingEvents(
+        CenterWrapper<?> center, PatientWrapper patient, Date dateProcessed,
+        SpecimenWrapper parentSpc, List<SpecimenTypeWrapper> sampleTypes,
+        int maxProcEvent, int spcPerProcEvent) throws Exception {
+        CollectionEventWrapper cevent = parentSpc.getCollectionEvent();
+        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+        for (int i = 0; i < maxProcEvent; ++i) {
+            for (int j = 0; j < spcPerProcEvent; ++j) {
+                ProcessingEventWrapper pe = ProcessingEventHelper
+                    .addProcessingEvent(center, patient, Utils.getRandomDate());
+                SpecimenHelper.addSpecimen(parentSpc,
+                    DbHelper.chooseRandomlyInList(sampleTypes), cevent, pe);
+                pevents.add(pe);
+            }
+        }
+        return pevents;
     }
 
 }

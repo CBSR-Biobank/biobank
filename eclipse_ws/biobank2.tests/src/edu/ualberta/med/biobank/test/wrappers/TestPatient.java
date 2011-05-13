@@ -265,46 +265,51 @@ public class TestPatient extends TestDatabase {
 
     @Test
     public void testGetProcessingEventCollection() throws Exception {
-        // FIXME
-        // PatientWrapper patient = PatientHelper.addPatient(
-        // Utils.getRandomNumericString(20), study);
-        // List<ProcessingEventWrapper> list = patient
-        // .getProcessingEventCollection(false);
-        // Assert.assertTrue(list.isEmpty());
-        //
-        // List<ProcessingEventWrapper> visitsAdded = ProcessingEventHelper
-        // .addProcessingEvents(site, patient, 3, false);
-        //
-        // patient.reload();
-        // List<ProcessingEventWrapper> pevents = patient
-        // .getProcessingEventCollection(false);
-        // Assert.assertTrue(pevents.containsAll(visitsAdded));
-        //
-        // // delete some random pevents, ensure at least one left
-        // int numToDelete = r.nextInt(visitsAdded.size() - 1);
-        // for (int i = 0; i < numToDelete; ++i) {
-        // ProcessingEventWrapper v = visitsAdded.get(r.nextInt(visitsAdded
-        // .size()));
-        // visitsAdded.remove(v);
-        // v.delete();
-        // }
-        //
-        // // make sure patient now only has the pevents that were not deleted
-        // patient.reload();
-        // pevents = patient.getProcessingEventCollection(false);
-        // Assert.assertTrue(pevents.containsAll(visitsAdded));
-        //
-        // // now remove all patient pevents
-        // while (visitsAdded.size() > 0) {
-        // ProcessingEventWrapper v = visitsAdded.get(0);
-        // v.delete();
-        // visitsAdded.remove(0);
-        // }
-        //
-        // // make sure patient does not have any patient pevents
-        // patient.reload();
-        // pevents = patient.getProcessingEventCollection(false);
-        // Assert.assertEquals(0, pevents.size());
+        String name = "testGetProcessingEventCollection" + r.nextInt();
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        List<ProcessingEventWrapper> list = patient
+            .getProcessingEventCollection(false);
+        Assert.assertTrue(list.isEmpty());
+
+        List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, true);
+
+        addClinic();
+        SpecimenWrapper parentSpc = SpecimenHelper.addParentSpecimen(clinic,
+            study, patient);
+
+        List<ProcessingEventWrapper> origPevents = ProcessingEventHelper
+            .addProcessingEvents(site, patient, Utils.getRandomDate(),
+                parentSpc, allSampleTypes, r.nextInt(15) + 5, 1);
+
+        patient.reload();
+        List<ProcessingEventWrapper> pevents = patient
+            .getProcessingEventCollection(false);
+        Assert.assertTrue(pevents.containsAll(origPevents));
+
+        // delete random pevents, ensure at least one left
+        int numToDelete = r.nextInt(pevents.size() - 1);
+        List<ProcessingEventWrapper> deletePevents = new ArrayList<ProcessingEventWrapper>();
+        for (int i = 0; i < numToDelete; ++i) {
+            ProcessingEventWrapper pevent = DbHelper
+                .chooseRandomlyInList(origPevents);
+            deletePevents.add(pevent);
+            origPevents.remove(pevent);
+        }
+        DbHelper.deleteProcessingEvents(deletePevents);
+
+        // make sure patient now only has the pevents that were not deleted
+        patient.reload();
+        pevents = patient.getProcessingEventCollection(false);
+        Assert.assertTrue(pevents.containsAll(pevents));
+
+        // now remove all patient pevents
+        DbHelper.deleteProcessingEvents(origPevents);
+
+        // make sure patient does not have any patient pevents
+        patient.reload();
+        Assert.assertEquals(0, patient.getProcessingEventCollection(false)
+            .size());
     }
 
     @Test
