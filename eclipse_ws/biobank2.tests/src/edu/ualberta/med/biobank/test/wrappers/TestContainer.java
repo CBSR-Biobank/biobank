@@ -1580,85 +1580,6 @@ public class TestContainer extends TestDatabase {
     }
 
     /**
-     * see ContainerAdapter.setNewPositionFromLabel
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testMoveOtherContainer() throws Exception {
-        addContainerHierarchy(containerMap.get("Top"));
-        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA01
-
-        ContainerWrapper top2 = ContainerHelper.addContainer("02",
-            TestCommon.getNewBarcode(r), null, site,
-            containerTypeMap.get("TopCT"));
-
-        String newLabel = "02AF";
-        List<ContainerWrapper> newParentContainers = child
-            .getPossibleParents(newLabel);
-        Assert.assertEquals(1, newParentContainers.size());
-        ContainerWrapper newParent = newParentContainers.get(0);
-        Assert.assertEquals(top2, newParent);
-
-        newParent.addChild(newLabel.substring(newLabel.length() - 2), child);
-        child.persist();
-        child.reload();
-        Assert.assertEquals(top2, child.getParentContainer());
-        Assert.assertEquals(newLabel, child.getLabel());
-    }
-
-    /**
-     * see ContainerAdapter.setNewPositionFromLabel
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testMoveSameContainer() throws Exception {
-        ContainerWrapper top = addContainerHierarchy(containerMap.get("Top"));
-        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA
-
-        ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r), null,
-            site, containerTypeMap.get("TopCT"));
-
-        String newLabel = "01AF";
-        List<ContainerWrapper> newParentContainers = child
-            .getPossibleParents(newLabel);
-        Assert.assertEquals(1, newParentContainers.size());
-        ContainerWrapper newParent = newParentContainers.get(0);
-        Assert.assertEquals(top, newParent);
-
-        newParent.addChild(newLabel.substring(newLabel.length() - 2), child);
-        child.persist();
-        child.reload();
-        Assert.assertEquals(top, child.getParentContainer());
-        Assert.assertEquals(newLabel, child.getLabel());
-    }
-
-    @Test
-    public void testMoveSameContainer2() throws Exception {
-        ContainerWrapper top = addContainerHierarchy(containerMap.get("Top"));
-        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA
-
-        ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r), null,
-            site, containerTypeMap.get("TopCT"));
-
-        top.addChild(2, 3, child);
-        child.persist();
-
-        // Use model object to be sure the DB is up-to-date
-        Container container = new Container();
-        container.setId(child.getId());
-        List<Container> containersDB = appService.search(Container.class,
-            container);
-        Assert.assertEquals(1, containersDB.size());
-        container = containersDB.get(0);
-        ContainerPosition pos = container.getPosition();
-        Assert.assertEquals(top.getId(), pos.getParentContainer().getId());
-        Assert.assertEquals(2, pos.getRow().intValue());
-        Assert.assertEquals(3, pos.getCol().intValue());
-    }
-
-    /**
      * Check the sub children are renamed too
      * 
      * @throws Exception
@@ -1898,6 +1819,85 @@ public class TestContainer extends TestDatabase {
         top.reload();
 
         Assert.assertTrue(top.isContainerFull());
+    }
+
+    /**
+     * see ContainerAdapter.setNewPositionFromLabel
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testMoveSameContainer() throws Exception {
+        ContainerWrapper top = addContainerHierarchy(containerMap.get("Top"));
+        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA
+
+        ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r), null,
+            site, containerTypeMap.get("TopCT"));
+
+        String newLabel = "01AF";
+        List<ContainerWrapper> newParentContainers = child
+            .getPossibleParents(newLabel);
+        Assert.assertEquals(1, newParentContainers.size());
+        ContainerWrapper newParent = newParentContainers.get(0);
+        Assert.assertEquals(top, newParent);
+
+        newParent.addChild(newLabel.substring(newLabel.length() - 2), child);
+        child.persist();
+        child.reload();
+        Assert.assertEquals(top, child.getParentContainer());
+        Assert.assertEquals(newLabel, child.getLabel());
+    }
+
+    @Test
+    public void testMoveSameContainer2() throws Exception {
+        ContainerWrapper top = addContainerHierarchy(containerMap.get("Top"));
+        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA
+
+        ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r), null,
+            site, containerTypeMap.get("TopCT"));
+
+        top.addChild(2, 3, child);
+        child.persist();
+
+        // Use model object to be sure the DB is up-to-date
+        Container container = new Container();
+        container.setId(child.getId());
+        List<Container> containersDB = appService.search(Container.class,
+            container);
+        Assert.assertEquals(1, containersDB.size());
+        container = containersDB.get(0);
+        ContainerPosition pos = container.getPosition();
+        Assert.assertEquals(top.getId(), pos.getParentContainer().getId());
+        Assert.assertEquals(2, pos.getRow().intValue());
+        Assert.assertEquals(3, pos.getCol().intValue());
+    }
+
+    /**
+     * see ContainerAdapter.setNewPositionFromLabel
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testMoveOtherContainer() throws Exception {
+        addContainerHierarchy(containerMap.get("Top"));
+        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA01
+
+        ContainerWrapper top2 = ContainerHelper.addContainer("02",
+            TestCommon.getNewBarcode(r), null, site,
+            containerTypeMap.get("TopCT"));
+
+        String newLabel = "02AF";
+        List<ContainerWrapper> newParentContainers = child
+            .getPossibleParents(newLabel);
+        Assert.assertEquals(1, newParentContainers.size());
+        ContainerWrapper newParent = newParentContainers.get(0);
+        Assert.assertEquals(top2, newParent);
+
+        newParent.addChild(newLabel.substring(newLabel.length() - 2), child);
+        child.persist();
+        child.reload();
+        Assert.assertEquals(top2, child.getParentContainer());
+        Assert.assertEquals(newLabel, child.getLabel());
     }
 
 }

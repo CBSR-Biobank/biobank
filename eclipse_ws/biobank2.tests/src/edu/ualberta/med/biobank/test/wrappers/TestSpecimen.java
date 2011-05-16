@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -81,10 +80,8 @@ public class TestSpecimen extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(null, "2nd",
             topContainer, site, typeChild, 3, 3);
 
-        childSpc = SpecimenHelper.addSpecimens(
-            parentSpc.getCollectionEvent().getPatient(),
-            (ClinicWrapper) parentSpc.getOriginInfo().getCenter(), container,
-            0, 0, 1).get(0);
+        childSpc = SpecimenHelper.addSpecimens(parentSpc, container, 0, 0, 1)
+            .get(0);
     }
 
     @Test
@@ -547,13 +544,13 @@ public class TestSpecimen extends TestDatabase {
 
         activeSpecimens.add(childSpc);
         for (int i = 1, n = container.getColCapacity(); i < n; ++i) {
-            activeSpecimens.add(SpecimenHelper.newSpecimen(childSpc,
+            activeSpecimens.add(SpecimenHelper.newSpecimen(parentSpc,
                 childSpc.getSpecimenType(),
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING,
                 childSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
                 childSpc.getParentContainer(), 0, i));
 
-            SpecimenWrapper a = SpecimenHelper.newSpecimen(childSpc,
+            SpecimenWrapper a = SpecimenHelper.newSpecimen(parentSpc,
                 childSpc.getSpecimenType(),
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING,
                 childSpc.getCollectionEvent(), childSpc.getProcessingEvent(),

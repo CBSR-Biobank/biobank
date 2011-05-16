@@ -60,15 +60,6 @@ public class PatientWrapper extends PatientBaseWrapper {
             getPnumber(), "A patient with PNumber");
     }
 
-    /**
-     * Search patient visits with the given date processed.
-     */
-    @Deprecated
-    public List<CollectionEventWrapper> getVisits(Date dateProcessed,
-        Date dateDrawn) {
-        return null;
-    }
-
     private static final String PATIENT_QRY = "from " + Patient.class.getName()
         + " where " + PatientPeer.PNUMBER.getName() + "=?";
 
