@@ -144,10 +144,10 @@ public class StudyWrapper extends StudyBaseWrapper {
 
         studyEventAttrMap = new HashMap<String, StudyEventAttrWrapper>();
 
-        List<StudyEventAttrWrapper> EventAttrList = StudyEventAttrWrapper
-            .getStudyEventAttrCollection(this);
+        List<StudyEventAttrWrapper> eventAttrList = getStudyEventAttrCollection(false);
+        // StudyEventAttrWrapper.getStudyEventAttrCollection(this);
 
-        for (StudyEventAttrWrapper studyEventAttr : EventAttrList) {
+        for (StudyEventAttrWrapper studyEventAttr : eventAttrList) {
             studyEventAttrMap.put(studyEventAttr.getLabel(), studyEventAttr);
         }
         return studyEventAttrMap;
