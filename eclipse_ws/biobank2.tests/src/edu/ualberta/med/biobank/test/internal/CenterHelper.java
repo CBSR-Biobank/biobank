@@ -9,6 +9,16 @@ public class CenterHelper extends DbHelper {
         throws Exception {
         center.reload();
 
+        // first delete aliquoted specimens
+        for (SpecimenWrapper spc : center.getSpecimenCollection(false)) {
+            if (spc.getOriginInfo().getCenter().equals(center)
+                && (spc.getParentSpecimen() != null)) {
+                spc.delete();
+            }
+        }
+
+        // now delete source specimens
+        center.reload();
         for (SpecimenWrapper spc : center.getSpecimenCollection(false)) {
             if (spc.getOriginInfo().getCenter().equals(center)) {
                 spc.delete();

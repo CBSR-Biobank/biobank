@@ -53,7 +53,7 @@ public class ProcessingEventHelper extends DbHelper {
 
     public static List<ProcessingEventWrapper> addProcessingEvents(
         CenterWrapper<?> center, PatientWrapper patient, Date dateProcessed,
-        SpecimenWrapper parentSpc, List<SpecimenTypeWrapper> sampleTypes,
+        SpecimenWrapper parentSpc, List<SpecimenTypeWrapper> spcTypes,
         int maxProcEvent, int spcPerProcEvent) throws Exception {
         CollectionEventWrapper cevent = parentSpc.getCollectionEvent();
         List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
@@ -62,7 +62,7 @@ public class ProcessingEventHelper extends DbHelper {
                 ProcessingEventWrapper pe = ProcessingEventHelper
                     .addProcessingEvent(center, patient, Utils.getRandomDate());
                 SpecimenHelper.addSpecimen(parentSpc,
-                    DbHelper.chooseRandomlyInList(sampleTypes), cevent, pe);
+                    DbHelper.chooseRandomlyInList(spcTypes), cevent, pe);
                 pevents.add(pe);
             }
         }

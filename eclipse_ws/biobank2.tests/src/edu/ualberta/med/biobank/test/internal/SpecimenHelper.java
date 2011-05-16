@@ -54,6 +54,7 @@ public class SpecimenHelper extends DbHelper {
             Utils.getRandomDate());
         specimen.setProcessingEvent(pevent);
         specimen.setCollectionEvent(parentSpc.getCollectionEvent());
+        specimen.setParentSpecimen(parentSpc);
 
         CenterWrapper<?> center = pevent.getCenter();
         OriginInfoWrapper oi = new OriginInfoWrapper(appService);

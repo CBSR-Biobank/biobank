@@ -101,6 +101,7 @@ public class DbHelper {
     public static void deleteCollectionEvents(
         List<CollectionEventWrapper> cevents) throws Exception {
         for (CollectionEventWrapper ce : cevents) {
+            ce.reload();
             deleteFromList(ce.getAllSpecimenCollection(false));
             ce.reload();
             ce.delete();
