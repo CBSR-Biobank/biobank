@@ -71,15 +71,14 @@ public class DbHelper {
     }
 
     public static void deleteCollectionEvents(
-        Collection<CollectionEventWrapper> cevents) throws Exception {
-        Assert.assertNotNull("appService is null", appService);
-        if ((cevents == null) || (cevents.size() == 0))
-            return;
-
-        for (CollectionEventWrapper cevent : cevents) {
-            if (!cevent.isNew()) {
-                cevent.delete();
-            }
+        List<CollectionEventWrapper> cevents) throws Exception {
+        for (CollectionEventWrapper ce : cevents) {
+            if (ce.isNew())
+                continue;
+            ce.reload();
+            deleteFromList(ce.getAllSpecimenCollection(false));
+            ce.reload();
+            ce.delete();
         }
     }
 
@@ -95,16 +94,6 @@ public class DbHelper {
             deleteCollectionEvents(patient.getCollectionEventCollection(false));
             patient.reload();
             patient.delete();
-        }
-    }
-
-    public static void deleteCollectionEvents(
-        List<CollectionEventWrapper> cevents) throws Exception {
-        for (CollectionEventWrapper ce : cevents) {
-            ce.reload();
-            deleteFromList(ce.getAllSpecimenCollection(false));
-            ce.reload();
-            ce.delete();
         }
     }
 

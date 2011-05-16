@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.test.wrappers;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import junit.framework.Assert;
 
@@ -71,29 +70,8 @@ public class TestShipmentInfo extends TestDatabase {
     }
 
     @Test
-    public void testShipmentMethods() throws Exception {
-        String name = "testShipmentMethods" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SpecimenWrapper spc = SpecimenHelper.addParentSpecimen();
-
-        for (ShippingMethodWrapper method : ShippingMethodWrapper
-            .getShippingMethods(appService)) {
-            // FIXME: finish this test
-            ShipmentInfoWrapper shipInfo = ShipmentInfoHelper.addShipment(site,
-                method, TestCommon.getNewWaybill(r), new Date(), spc);
-
-            List<ShipmentInfoWrapper> actualShipInfos = ShipmentInfoWrapper
-                .getAllShipmentInfosByMethod(appService, method);
-
-            Assert.assertEquals(1, actualShipInfos.size());
-
-        }
-    }
-
-    @Test
     public void testTemp() throws Exception {
         String name = "testPersistFailWaybillNull" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(name + "_study");
         ClinicWrapper clinic = ClinicHelper.addClinicWithShipments(name
             + "_clinic");
