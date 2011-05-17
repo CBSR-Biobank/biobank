@@ -70,7 +70,7 @@ public class TestShipmentInfo extends TestDatabase {
     }
 
     @Test
-    public void testTemp() throws Exception {
+    public void testShipmentNullWaybill() throws Exception {
         String name = "testPersistFailWaybillNull" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name + "_study");
         ClinicWrapper clinic = ClinicHelper.addClinicWithShipments(name
