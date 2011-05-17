@@ -15,8 +15,6 @@ public class CenterHelper extends DbHelper {
         for (SpecimenWrapper spc : center.getSpecimenCollection(false)) {
             if (spc.getOriginInfo().getCenter().equals(center)
                 && (spc.getParentSpecimen() != null)) {
-                OriginInfoWrapper oi = spc.getOriginInfo();
-                oi.delete();
                 spc.delete();
             }
         }
@@ -30,7 +28,6 @@ public class CenterHelper extends DbHelper {
                 if (shipInfo != null) {
                     shipInfo.delete();
                 }
-                oi.delete();
                 spc.delete();
             }
         }
