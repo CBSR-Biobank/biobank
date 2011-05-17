@@ -43,7 +43,7 @@ public class TestCollectionEvent extends TestDatabase {
     public void setUp() throws Exception {
         super.setUp();
         study = StudyHelper.addStudy("Study - Processing Event Test "
-            + Utils.getRandomString(10));
+            + Utils.getRandomString(8, 15));
     }
 
     @Test

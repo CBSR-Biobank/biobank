@@ -1879,25 +1879,27 @@ public class TestContainer extends TestDatabase {
      */
     @Test
     public void testMoveOtherContainer() throws Exception {
-        addContainerHierarchy(containerMap.get("Top"));
-        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA01
-
-        ContainerWrapper top2 = ContainerHelper.addContainer("02",
-            TestCommon.getNewBarcode(r), null, site,
-            containerTypeMap.get("TopCT"));
-
-        String newLabel = "02AF";
-        List<ContainerWrapper> newParentContainers = child
-            .getPossibleParents(newLabel);
-        Assert.assertEquals(1, newParentContainers.size());
-        ContainerWrapper newParent = newParentContainers.get(0);
-        Assert.assertEquals(top2, newParent);
-
-        newParent.addChild(newLabel.substring(newLabel.length() - 2), child);
-        child.persist();
-        child.reload();
-        Assert.assertEquals(top2, child.getParentContainer());
-        Assert.assertEquals(newLabel, child.getLabel());
+        Assert.fail("need fixes to container wrapper for this test to work");
+        // FIXME: Commenting out for now
+        // addContainerHierarchy(containerMap.get("Top"));
+        // ContainerWrapper child = containerMap.get("ChildL1"); // 01AA01
+        //
+        // ContainerWrapper top2 = ContainerHelper.addContainer("02",
+        // TestCommon.getNewBarcode(r), null, site,
+        // containerTypeMap.get("TopCT"));
+        //
+        // String newLabel = "02AF";
+        // List<ContainerWrapper> newParentContainers = child
+        // .getPossibleParents(newLabel);
+        // Assert.assertEquals(1, newParentContainers.size());
+        // ContainerWrapper newParent = newParentContainers.get(0);
+        // Assert.assertEquals(top2, newParent);
+        //
+        // newParent.addChild(newLabel.substring(newLabel.length() - 2), child);
+        // child.persist();
+        // child.reload();
+        // Assert.assertEquals(top2, child.getParentContainer());
+        // Assert.assertEquals(newLabel, child.getLabel());
     }
 
 }
