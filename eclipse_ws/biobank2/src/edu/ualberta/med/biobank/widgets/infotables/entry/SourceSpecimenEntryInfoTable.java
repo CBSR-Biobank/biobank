@@ -208,6 +208,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         deletedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
     }
 
+    @SuppressWarnings("serial")
     @Override
     protected BiobankTableSorter getComparator() {
         return new BiobankTableSorter() {

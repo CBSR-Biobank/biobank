@@ -44,6 +44,7 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
         });
     }
 
+    @SuppressWarnings("serial")
     @Override
     protected BiobankTableSorter getComparator() {
         return new BiobankTableSorter() {

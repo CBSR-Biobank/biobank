@@ -173,6 +173,7 @@ public class PalletScanManagement {
         }
     }
 
+    @SuppressWarnings("unused")
     protected boolean canScanTubeAlone(PalletCell cell) {
         return true;
     }

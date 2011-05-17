@@ -36,13 +36,12 @@ import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 public class RequestSpecimensTreeTable extends BiobankWidget {
 
     private TreeViewer tv;
-    private RequestWrapper shipment;
+
     protected List<DispatchTableGroup> groups;
 
+    @SuppressWarnings("unused")
     public RequestSpecimensTreeTable(Composite parent, RequestWrapper shipment) {
         super(parent, SWT.NONE);
-
-        this.shipment = shipment;
 
         setLayout(new FillLayout());
         GridData gd = new GridData();

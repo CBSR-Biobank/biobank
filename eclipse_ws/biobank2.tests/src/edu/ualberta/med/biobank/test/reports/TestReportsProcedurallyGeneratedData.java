@@ -18,12 +18,10 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
 import edu.ualberta.med.biobank.test.AllTests;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
-import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
@@ -34,11 +32,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import org.junit.AfterClass;
@@ -78,11 +72,11 @@ public final class TestReportsProcedurallyGeneratedData implements
     private static final int[] NUM_CONTACTS_PER_STUDY = { 2, 2, 3 };
     private static final int PATIENTS_PER_STUDY = 11; // 17
     private static final int SHIPMENTS_PER_SITE = 23; // 43
-    private static final int[] NUM_STUDIES_PER_SHIPMENT = { 2, 3, 4 };
-    private static final int[] NUM_PATIENTS_PER_SHIPMENT = { 1, 2, 3 };
-    private static final int NUM_SHIPMENTS_WITHOUT_PVS = 3;
+    // private static final int[] NUM_STUDIES_PER_SHIPMENT = { 2, 3, 4 };
+    // private static final int[] NUM_PATIENTS_PER_SHIPMENT = { 1, 2, 3 };
+    // private static final int NUM_SHIPMENTS_WITHOUT_PVS = 3;
     // leave every xth Container position empty
-    private static final int SKIP_ALIQUOT = 7; // 10
+    // private static final int SKIP_ALIQUOT = 7; // 10
 
     private final WritableApplicationService appService;
     private final Random random = new Random(1); // consistent randomness (;
@@ -445,16 +439,18 @@ public final class TestReportsProcedurallyGeneratedData implements
         throws Exception {
         List<AliquotedSpecimenWrapper> sampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
 
-        for (StudyWrapper study : studies) {
-            // leave the first SampleType unassociated with any Study via
-            // SampleStorage since at least one report checks for these
-            for (int sampleTypeIndex = 1, numSampleTypes = sampleTypes.size(); sampleTypeIndex < numSampleTypes; sampleTypeIndex++) {
-                SpecimenTypeWrapper type = sampleTypes.get(sampleTypeIndex);
-                AliquotedSpecimenWrapper sampleStorage = SampleStorageHelper
-                    .addSampleStorage(study, type);
-                sampleStorages.add(sampleStorage);
-            }
-        }
+        // FIXME: commented out code
+        // for (StudyWrapper study : studies) {
+        // leave the first SampleType unassociated with any Study via
+        // SampleStorage since at least one report checks for these
+        // for (int sampleTypeIndex = 1, numSampleTypes = sampleTypes.size();
+        // sampleTypeIndex < numSampleTypes; sampleTypeIndex++) {
+        // SpecimenTypeWrapper type = sampleTypes.get(sampleTypeIndex);
+        // AliquotedSpecimenWrapper sampleStorage = SampleStorageHelper
+        // .addSampleStorage(study, type);
+        // sampleStorages.add(sampleStorage);
+        // }
+        // }
         return sampleStorages;
     }
 
@@ -478,98 +474,105 @@ public final class TestReportsProcedurallyGeneratedData implements
     private static List<CollectionEventWrapper> generateShipments(
         SiteWrapper site, final int shipmentLimit, List<ClinicWrapper> clinics)
         throws ApplicationException, Exception {
-        List<CollectionEventWrapper> shipments = new ArrayList<CollectionEventWrapper>();
+        // FIXME
+        // List<CollectionEventWrapper> shipments = new
+        // ArrayList<CollectionEventWrapper>();
+        //
+        // Calendar calendar = Calendar.getInstance();
+        // calendar.setTime(new Date(0));
+        //
+        // // keep track of the next study and patient index as we travel
+        // through
+        // // the same collections multiple times (e.g. we don't want to add the
+        // // same first 2 of 5 patients in a study every time, and never the
+        // last
+        // // 2)
+        // Map<Integer, Integer> nextStudyIndex = new HashMap<Integer,
+        // Integer>();
+        // Map<List<Integer>, Integer> nextPatientIndex = new
+        // HashMap<List<Integer>, Integer>();
+        //
+        // int clinicIndex = 0;
+        // int shipmentsAdded = 0;
+        // int studiesPerShipmentCounter = 0;
+        // int patientsPerShipmentCounter = 0;
+        //
+        // while (shipmentsAdded < shipmentLimit) {
+        // ClinicWrapper clinic = clinics.get(clinicIndex);
+        // List<StudyWrapper> studies = clinic.getStudyCollection();
+        //
+        // Integer tmp = nextStudyIndex.get(clinicIndex);
+        // int studyIndex = tmp != null ? tmp : 0;
+        //
+        // // cycle through number of studies per shipment
+        // int studiesAdded = 0;
+        // int studyLimit = NUM_STUDIES_PER_SHIPMENT[studiesPerShipmentCounter++
+        // % NUM_STUDIES_PER_SHIPMENT.length];
+        // studyLimit = Math.min(studyLimit, studies.size());
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date(0));
+        // while ((shipmentsAdded < shipmentLimit)
+        // && (studiesAdded < studyLimit)) {
+        // StudyWrapper study = studies.get(studyIndex);
+        // List<PatientWrapper> patients = study
+        // .getPatientCollection(false);
+        //
+        // tmp = nextPatientIndex.get(Arrays.asList(clinicIndex,
+        // studyIndex));
+        // int patientIndex = tmp != null ? tmp : 0;
+        //
+        // // cycle through number of patients per shipment
+        // int patientsAdded = 0;
+        // int patientLimit =
+        // NUM_PATIENTS_PER_SHIPMENT[patientsPerShipmentCounter++
+        // % NUM_PATIENTS_PER_SHIPMENT.length];
+        // patientLimit = Math.min(patientLimit, patients.size());
+        //
+        // if (patientLimit > 0) {
+        // CollectionEventWrapper shipment = CollectionEventHelper
+        // .addCollectionEvent(site, patients.get(patientIndex), 1);
 
-        // keep track of the next study and patient index as we travel through
-        // the same collections multiple times (e.g. we don't want to add the
-        // same first 2 of 5 patients in a study every time, and never the last
-        // 2)
-        Map<Integer, Integer> nextStudyIndex = new HashMap<Integer, Integer>();
-        Map<List<Integer>, Integer> nextPatientIndex = new HashMap<List<Integer>, Integer>();
+        // // TODO: more appropriate Date-s?
+        // shipment.set(calendar.getTime());
+        // calendar.add(Calendar.DAY_OF_YEAR, 1);
+        // shipment.setDateReceived(calendar.getTime());
+        //
+        // patientsAdded++;
+        // patientIndex = (patientIndex + 1) % patients.size();
+        //
+        // while (patientsAdded++ < patientLimit) {
+        // PatientWrapper patient = patients.get(patientIndex);
+        // shipment.addToSourceVesselCollection(Arrays
+        // .asList(SourceVesselHelper.newSourceVessel(patient,
+        // Utils.getRandomDate(), 0.1)));
+        //
+        // // advance to the next legal Patient index
+        // patientIndex = (patientIndex + 1) % patients.size();
+        // }
 
-        int clinicIndex = 0;
-        int shipmentsAdded = 0;
-        int studiesPerShipmentCounter = 0;
-        int patientsPerShipmentCounter = 0;
+        // nextPatientIndex.put(
+        // Arrays.asList(clinicIndex, studyIndex), patientIndex);
+        //
+        // shipmentsAdded++;
+        // studiesAdded++;
+        //
+        // shipments.add(shipment);
+        //
+        // shipment.persist();
+        // shipment.reload();
+        // }
+        //
+        // // advance to the next legal Study index
+        // studyIndex = (studyIndex + 1) % studies.size();
+        // }
+        //
+        // nextStudyIndex.put(clinicIndex, studyIndex);
+        //
+        // // advance to the next legal Clinic index
+        // clinicIndex = (clinicIndex + 1) % clinics.size();
+        // }
 
-        while (shipmentsAdded < shipmentLimit) {
-            ClinicWrapper clinic = clinics.get(clinicIndex);
-            List<StudyWrapper> studies = clinic.getStudyCollection();
-
-            Integer tmp = nextStudyIndex.get(clinicIndex);
-            int studyIndex = tmp != null ? tmp : 0;
-
-            // cycle through number of studies per shipment
-            int studiesAdded = 0;
-            int studyLimit = NUM_STUDIES_PER_SHIPMENT[studiesPerShipmentCounter++
-                % NUM_STUDIES_PER_SHIPMENT.length];
-            studyLimit = Math.min(studyLimit, studies.size());
-
-            while ((shipmentsAdded < shipmentLimit)
-                && (studiesAdded < studyLimit)) {
-                StudyWrapper study = studies.get(studyIndex);
-                List<PatientWrapper> patients = study
-                    .getPatientCollection(false);
-
-                tmp = nextPatientIndex.get(Arrays.asList(clinicIndex,
-                    studyIndex));
-                int patientIndex = tmp != null ? tmp : 0;
-
-                // cycle through number of patients per shipment
-                int patientsAdded = 0;
-                int patientLimit = NUM_PATIENTS_PER_SHIPMENT[patientsPerShipmentCounter++
-                    % NUM_PATIENTS_PER_SHIPMENT.length];
-                patientLimit = Math.min(patientLimit, patients.size());
-
-                if (patientLimit > 0) {
-                    CollectionEventWrapper shipment = CollectionEventHelper
-                        .addCollectionEvent(site, patients.get(patientIndex), 1);
-
-                    // FIXME
-                    // // TODO: more appropriate Date-s?
-                    // shipment.set(calendar.getTime());
-                    // calendar.add(Calendar.DAY_OF_YEAR, 1);
-                    // shipment.setDateReceived(calendar.getTime());
-                    //
-                    // patientsAdded++;
-                    // patientIndex = (patientIndex + 1) % patients.size();
-                    //
-                    // while (patientsAdded++ < patientLimit) {
-                    // PatientWrapper patient = patients.get(patientIndex);
-                    // shipment.addToSourceVesselCollection(Arrays
-                    // .asList(SourceVesselHelper.newSourceVessel(patient,
-                    // Utils.getRandomDate(), 0.1)));
-                    //
-                    // // advance to the next legal Patient index
-                    // patientIndex = (patientIndex + 1) % patients.size();
-                    // }
-
-                    nextPatientIndex.put(
-                        Arrays.asList(clinicIndex, studyIndex), patientIndex);
-
-                    shipmentsAdded++;
-                    studiesAdded++;
-
-                    shipments.add(shipment);
-
-                    shipment.persist();
-                    shipment.reload();
-                }
-
-                // advance to the next legal Study index
-                studyIndex = (studyIndex + 1) % studies.size();
-            }
-
-            nextStudyIndex.put(clinicIndex, studyIndex);
-
-            // advance to the next legal Clinic index
-            clinicIndex = (clinicIndex + 1) % clinics.size();
-        }
-
-        return shipments;
+        // return shipments;
+        return null;
     }
 
     private static List<ProcessingEventWrapper> generatePatientVisits(
@@ -577,28 +580,29 @@ public final class TestReportsProcedurallyGeneratedData implements
         throws Exception {
         List<ProcessingEventWrapper> patientVisits = new ArrayList<ProcessingEventWrapper>();
 
-        Calendar calendar = Calendar.getInstance();
+        // FIXME
+        // Calendar calendar = Calendar.getInstance();
 
-        for (int shipmentIndex = 0, numShipments = shipments.size()
-            - NUM_SHIPMENTS_WITHOUT_PVS; shipmentIndex < numShipments; shipmentIndex++) {
-            CollectionEventWrapper shipment = shipments.get(shipmentIndex);
-            // FIXME
-            // List<PatientWrapper> patients = shipment.getPatientCollection();
-            // for (PatientWrapper patient : patients) {
-            // calendar.setTime(shipment.getDeparted());
-            // calendar.add(Calendar.DAY_OF_YEAR, -1);
-            //
-            // TODO: more appropriate Date-s?
-            // Date drawn = calendar.getTime();
-            // calendar.add(Calendar.DAY_OF_YEAR, 2);
-            // Date processed = calendar.getTime();
+        // for (int shipmentIndex = 0, numShipments = shipments.size()
+        // - NUM_SHIPMENTS_WITHOUT_PVS; shipmentIndex < numShipments;
+        // shipmentIndex++) {
+        // CollectionEventWrapper shipment = shipments.get(shipmentIndex);
+        // List<PatientWrapper> patients = shipment.getPatientCollection();
+        // for (PatientWrapper patient : patients) {
+        // calendar.setTime(shipment.getDeparted());
+        // calendar.add(Calendar.DAY_OF_YEAR, -1);
+        //
+        // TODO: more appropriate Date-s?
+        // Date drawn = calendar.getTime();
+        // calendar.add(Calendar.DAY_OF_YEAR, 2);
+        // Date processed = calendar.getTime();
 
-            // ProcessingEventWrapper patientVisit = ProcessingEventHelper
-            // .addProcessingEvent(shipment.getSourceCenter(), patient,
-            // drawn, processed);
-            // patientVisits.add(patientVisit);
-            // }
-        }
+        // ProcessingEventWrapper patientVisit = ProcessingEventHelper
+        // .addProcessingEvent(shipment.getSourceCenter(), patient,
+        // drawn, processed);
+        // patientVisits.add(patientVisit);
+        // }
+        // }
 
         // reload all patients since Shipment-s have been added involving them
         // as have PatientVisit-s
@@ -615,86 +619,88 @@ public final class TestReportsProcedurallyGeneratedData implements
         List<SpecimenTypeWrapper> allSampleTypes) throws Exception {
         List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>();
 
+        // FIXME
         // ignore the last PatientVisit
         Assert.assertTrue(patientVisits.size() > 1);
         patientVisits = patientVisits.subList(0, patientVisits.size() - 1);
 
-        Calendar calendar = Calendar.getInstance();
+        // Calendar calendar = Calendar.getInstance();
+        //
+        // int aliquotsAdded = 0;
+        // for (ContainerWrapper container : containers) {
+        // List<SpecimenTypeWrapper> sampleTypes = container
+        // .getContainerType().getSpecimenTypeCollection(false);
+        // if ((sampleTypes != null) && (sampleTypes.size() > 0)) {
+        // for (int row = 0, numRows = container.getRowCapacity(); row <
+        // numRows; row++) {
+        // for (int col = 0, numCols = container.getColCapacity(); col <
+        // numCols; col++) {
+        // // cycle through sample types
+        // SpecimenTypeWrapper sampleType = sampleTypes
+        // .get(aliquotsAdded % sampleTypes.size());
+        //
+        // // cycle through patient visits
+        // ProcessingEventWrapper patientVisit = patientVisits
+        // .get(aliquotsAdded % patientVisits.size());
 
-        int aliquotsAdded = 0;
-        for (ContainerWrapper container : containers) {
-            List<SpecimenTypeWrapper> sampleTypes = container
-                .getContainerType().getSpecimenTypeCollection(false);
-            if ((sampleTypes != null) && (sampleTypes.size() > 0)) {
-                for (int row = 0, numRows = container.getRowCapacity(); row < numRows; row++) {
-                    for (int col = 0, numCols = container.getColCapacity(); col < numCols; col++) {
-                        // cycle through sample types
-                        SpecimenTypeWrapper sampleType = sampleTypes
-                            .get(aliquotsAdded % sampleTypes.size());
-
-                        // cycle through patient visits
-                        ProcessingEventWrapper patientVisit = patientVisits
-                            .get(aliquotsAdded % patientVisits.size());
-
-                        // FIXME
-                        // SpecimenWrapper aliquot = SpecimenHelper
-                        // .newAliquot(sampleType);
-                        //
-                        // // leave some positions without an Aliquot (but still
-                        // // add the Aliquot since having some Aliquot-s
-                        // without
-                        // // parent containers is also useful)
-                        // if (aliquotsAdded % SKIP_ALIQUOT != 0) {
-                        // aliquot.setParent(container);
-                        // aliquot.setPosition(new RowColPos(row, col));
-                        // }
-                        //
-                        // aliquot.setProcessingEvent(patientVisit);
-                        // aliquot.setInventoryId(getInstance().getRandString());
-                        //
-                        // // base the link date on the date the patient visit
-                        // // is processed
-                        // calendar.setTime(patientVisit.getDateProcessed());
-                        // calendar.add(Calendar.MINUTE, 10);
-                        //
-                        // aliquot.setLinkDate(calendar.getTime());
-                        // aliquot.persist();
-                        // aliquot.reload();
-                        //
-                        // aliquots.add(aliquot);
-                        //
-                        // aliquotsAdded++;
-                    }
-                }
-            }
-
-            container.reload();
-        }
+        // SpecimenWrapper aliquot = SpecimenHelper
+        // .newAliquot(sampleType);
+        //
+        // // leave some positions without an Aliquot (but still
+        // // add the Aliquot since having some Aliquot-s
+        // without
+        // // parent containers is also useful)
+        // if (aliquotsAdded % SKIP_ALIQUOT != 0) {
+        // aliquot.setParent(container);
+        // aliquot.setPosition(new RowColPos(row, col));
+        // }
+        //
+        // aliquot.setProcessingEvent(patientVisit);
+        // aliquot.setInventoryId(getInstance().getRandString());
+        //
+        // // base the link date on the date the patient visit
+        // // is processed
+        // calendar.setTime(patientVisit.getDateProcessed());
+        // calendar.add(Calendar.MINUTE, 10);
+        //
+        // aliquot.setLinkDate(calendar.getTime());
+        // aliquot.persist();
+        // aliquot.reload();
+        //
+        // aliquots.add(aliquot);
+        //
+        // aliquotsAdded++;
+        // }
+        // }
+        // }
+        //
+        // container.reload();
+        // }
 
         // add an Aliquot of each SampleType that is not in a Container
-        for (SpecimenTypeWrapper sampleType : allSampleTypes) {
-            // cycle through patient visits
-            // ProcessingEventWrapper patientVisit = patientVisits
-            // .get(aliquotsAdded % patientVisits.size());
+        // for (SpecimenTypeWrapper sampleType : allSampleTypes) {
+        // cycle through patient visits
+        // ProcessingEventWrapper patientVisit = patientVisits
+        // .get(aliquotsAdded % patientVisits.size());
 
-            // FIXME
-            // SpecimenWrapper aliquot = SpecimenHelper.newAliquot(sampleType);
-            //
-            // aliquot.setProcessingEvent(patientVisit);
-            // aliquot.setInventoryId(getInstance().getRandString());
-            //
-            // // base the link date on the date the patient visit
-            // // is processed
-            // calendar.setTime(patientVisit.getDateProcessed());
-            // calendar.add(Calendar.MINUTE, 10);
-            //
-            // aliquot.setLinkDate(calendar.getTime());
-            // aliquot.persist();
-            // aliquot.reload();
-            // aliquots.add(aliquot);
+        // FIXME
+        // SpecimenWrapper aliquot = SpecimenHelper.newAliquot(sampleType);
+        //
+        // aliquot.setProcessingEvent(patientVisit);
+        // aliquot.setInventoryId(getInstance().getRandString());
+        //
+        // // base the link date on the date the patient visit
+        // // is processed
+        // calendar.setTime(patientVisit.getDateProcessed());
+        // calendar.add(Calendar.MINUTE, 10);
+        //
+        // aliquot.setLinkDate(calendar.getTime());
+        // aliquot.persist();
+        // aliquot.reload();
+        // aliquots.add(aliquot);
 
-            aliquotsAdded++;
-        }
+        // aliquotsAdded++;
+        // }
 
         return aliquots;
     }

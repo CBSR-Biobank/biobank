@@ -185,6 +185,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
         }
     }
 
+    @SuppressWarnings("serial")
     @Override
     protected BiobankTableSorter getComparator() {
         return new BiobankTableSorter() {

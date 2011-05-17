@@ -185,6 +185,7 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
         }
     }
 
+    @SuppressWarnings("serial")
     @Override
     protected BiobankTableSorter getComparator() {
         return new BiobankTableSorter() {
