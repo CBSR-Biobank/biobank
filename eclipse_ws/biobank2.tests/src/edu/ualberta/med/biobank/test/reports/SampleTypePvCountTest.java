@@ -25,9 +25,11 @@ public class SampleTypePvCountTest extends AbstractReportTest {
     private static final Mapper<SpecimenWrapper, List<Object>, Long> GROUP_BY_PV_AND_SAMPLE_TYPE = new Mapper<SpecimenWrapper, List<Object>, Long>() {
         public List<Object> getKey(SpecimenWrapper aliquot) {
             ProcessingEventWrapper pevent = aliquot.getProcessingEvent();
+            SpecimenWrapper parentSpc = aliquot.getParentSpecimen();
             return Arrays.asList(new Object[] { pevent.getId(),
-                pevent.getPatient().getPnumber(), pevent.getDateProcessed(),
-                pevent.getDateDrawn(), aliquot.getSpecimenType().getName() });
+                parentSpc.getCollectionEvent().getPatient().getPnumber(),
+                pevent.getCreatedAt(), parentSpc.getCreatedAt(),
+                aliquot.getSpecimenType().getName() });
         }
 
         public Long getValue(SpecimenWrapper aliquot, Long count) {
@@ -111,7 +113,6 @@ public class SampleTypePvCountTest extends AbstractReportTest {
             public boolean evaluate(SpecimenWrapper aliquot) {
                 return aliquot.getCollectionEvent().getPatient().getStudy()
                     .getNameShort().equals(studyNameShort);
-                return true;
             }
         };
     }

@@ -674,8 +674,8 @@ public final class TestReportsProcedurallyGeneratedData implements
         // add an Aliquot of each SampleType that is not in a Container
         for (SpecimenTypeWrapper sampleType : allSampleTypes) {
             // cycle through patient visits
-            ProcessingEventWrapper patientVisit = patientVisits
-                .get(aliquotsAdded % patientVisits.size());
+            // ProcessingEventWrapper patientVisit = patientVisits
+            // .get(aliquotsAdded % patientVisits.size());
 
             // FIXME
             // SpecimenWrapper aliquot = SpecimenHelper.newAliquot(sampleType);
