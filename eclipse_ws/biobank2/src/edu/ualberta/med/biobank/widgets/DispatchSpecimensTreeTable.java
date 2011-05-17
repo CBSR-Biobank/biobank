@@ -127,8 +127,14 @@ public class DispatchSpecimensTreeTable extends BiobankWidget {
                             .getLabelInternal();
                     return "";
                 } else if (element instanceof TreeItemAdapter) {
-                    return ((TreeItemAdapter) element)
-                        .getColumnText(columnIndex);
+                    if (columnIndex < 3)
+                        return ((TreeItemAdapter) element)
+                            .getColumnText(columnIndex);
+                    if (columnIndex == 4)
+                        return ((DispatchSpecimenWrapper) ((TreeItemAdapter) element)
+                            .getSpecimen()).getComment();
+                    else
+                        return "";
                 }
                 return "";
             }

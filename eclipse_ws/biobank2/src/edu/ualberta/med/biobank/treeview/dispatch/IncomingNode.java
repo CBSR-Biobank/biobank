@@ -16,6 +16,7 @@ public class IncomingNode extends AdapterBase {
     private ReceivingInTransitDispatchGroup receivedTransitNode;
     private ReceivingNoErrorsDispatchGroup receivingNode;
     private ReceivingWithErrorsDispatchGroup receivingWithErrorsNode;
+    private ReceivingRequestGroup requestNode;
 
     public IncomingNode(AdapterBase parent, int id, CenterWrapper<?> center) {
         super(parent, id, "Incoming", true, false);
@@ -32,6 +33,10 @@ public class IncomingNode extends AdapterBase {
             center);
         receivingWithErrorsNode.setParent(this);
         addChild(receivingWithErrorsNode);
+
+        requestNode = new ReceivingRequestGroup(this, 3, center);
+        requestNode.setParent(this);
+        addChild(requestNode);
 
     }
 

@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 
 public class TreeItemAdapter implements Node {
@@ -41,8 +40,6 @@ public class TreeItemAdapter implements Node {
                 .getPnumber();
         case 3:
             return raw.getSpecimen().getActivityStatus().getName();
-        case 4:
-            return ((DispatchSpecimenWrapper) raw).getComment();
         }
         return "";
     }

@@ -12,6 +12,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
@@ -128,7 +129,7 @@ public class RequestEntryForm extends BiobankFormBase {
     protected void openScanDialog() {
         RequestReceiveScanDialog dialog = new RequestReceiveScanDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            request, request.getRequester());
+            request, SessionManager.getUser().getCurrentWorkingCenter());
         dialog.open();
         if (dialog.hasReceivedSpecimens()) {
             // setDirty(true);

@@ -8,14 +8,18 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.peer.ContainerPathPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerPath;
-import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
+import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -25,6 +29,19 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
     public RequestTableGroup(RequestSpecimenState ds, RequestWrapper dispatch) {
         super(ds, dispatch);
     }
+
+    public static final String TREE_QUERY2 = "select ra, cp."
+        + ContainerPathPeer.PATH.getName() + " from "
+        + RequestSpecimen.class.getName() + " ra inner join fetch ra."
+        + RequestSpecimenPeer.SPECIMEN.getName() + " a inner join fetch a."
+        + SpecimenPeer.SPECIMEN_TYPE.getName() + " st inner join fetch a."
+        + SpecimenPeer.SPECIMEN_POSITION.getName() + " sp inner join fetch sp."
+        + SpecimenPositionPeer.CONTAINER.getName() + " c inner join fetch c."
+        + ContainerPeer.CONTAINER_PATH.getName() + " cp where ra."
+        + RequestSpecimenPeer.REQUEST.getName() + "=? and ra."
+        + RequestSpecimenPeer.STATE.getName() + "=?";
+
+    public static final String TREE_QUERY = "select count(*) from specimen where id > ? and ? is not null";
 
     public static List<RequestTableGroup> getGroupsForShipment(
         RequestWrapper ship) {
@@ -39,18 +56,12 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
     }
 
     @Override
-    public void createAdapterTree(Integer state, RequestWrapper request) {
+    public void createAdapterTree(Integer state, RequestWrapper request)
+        throws Exception {
         List<Object[]> results = new ArrayList<Object[]>();
         // test hql
-        HQLCriteria query = new HQLCriteria(
-            "select ra, cp.container, cp.path from "
-                + Request.class.getName()
-                + " ra inner join fetch ra.specimen inner join fetch ra.specimen.specimenType, "
-                + ContainerPath.class.getName()
-                + " cp where ra.request ="
-                + request.getId()
-                + " and ra.specimen.specimenPosition.container=cp.container and ra.state=?",
-            Arrays.asList(new Object[] { state }));
+        HQLCriteria query = new HQLCriteria(TREE_QUERY,
+            Arrays.asList(new Object[] { request, state }));
         try {
             results = SessionManager.getAppService().query(query);
         } catch (Exception e) {
@@ -60,13 +71,12 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
 
         HashSet<Integer> containers = new HashSet<Integer>();
         HashMap<Integer, RequestContainerAdapter> adapters = new HashMap<Integer, RequestContainerAdapter>();
-        List<Object> tops = new ArrayList<Object>();
+        this.tops = new ArrayList<Node>();
 
         // get all the containers to display
         for (Object o : results) {
-            String path = (String) ((Object[]) o)[2];
+            String path = (String) ((Object[]) o)[1];
             RequestSpecimen ra = (RequestSpecimen) ((Object[]) o)[0];
-            Container container = (Container) ((Object[]) o)[1];
             String[] cIds = p.split(path);
             int i = 0;
             for (; i < cIds.length; i++) {
@@ -75,8 +85,12 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
                 RequestContainerAdapter adapter = null;
                 if (!adapters.containsKey(id)) {
                     // add adapter
+                    Container c = new Container();
+                    c.setId(id);
                     ContainerWrapper cw = new ContainerWrapper(
-                        SessionManager.getAppService(), container);
+                        SessionManager.getAppService(),
+                        (Container) SessionManager.getAppService()
+                            .search(Container.class, c).get(0));
                     adapter = new RequestContainerAdapter(null, cw);
                     if (i == 0)
                         tops.add(adapter);
@@ -94,6 +108,5 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
             numSpecimens++;
         }
 
-        // this.tops = tops;
     }
 }

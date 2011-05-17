@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
-import edu.ualberta.med.biobank.forms.utils.DispatchTableGroup;
 import edu.ualberta.med.biobank.forms.utils.RequestTableGroup;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
@@ -37,7 +36,7 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
 
     private TreeViewer tv;
     private RequestWrapper shipment;
-    protected List<DispatchTableGroup> groups;
+    protected List<RequestTableGroup> groups;
 
     public RequestSpecimensTreeTable(Composite parent, RequestWrapper shipment) {
         super(parent, SWT.NONE);
@@ -80,8 +79,8 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
-                // groups = RequestTableGroup
-                // .getGroupsForShipment(RequestSpecimensTreeTable.this.shipment);
+                groups = RequestTableGroup
+                    .getGroupsForShipment(RequestSpecimensTreeTable.this.shipment);
             }
 
             @Override
@@ -101,7 +100,8 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
 
             @Override
             public boolean hasChildren(Object element) {
-                return ((Node) element).getChildren().size() != 0;
+                return ((Node) element).getChildren() == null ? false
+                    : ((Node) element).getChildren().size() > 0;
             }
         };
         tv.setContentProvider(contentProvider);
@@ -119,8 +119,14 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
                             .getLabelInternal();
                     return "";
                 } else if (element instanceof TreeItemAdapter) {
-                    return ((TreeItemAdapter) element)
-                        .getColumnText(columnIndex);
+                    if (columnIndex < 3)
+                        return ((TreeItemAdapter) element)
+                            .getColumnText(columnIndex);
+                    if (columnIndex == 4)
+                        return ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
+                            .getSpecimen()).getClaimedBy();
+                    else
+                        return "";
                 }
                 return "";
             }
