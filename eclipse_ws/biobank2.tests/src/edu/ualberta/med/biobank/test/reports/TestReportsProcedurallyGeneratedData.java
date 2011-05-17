@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
 import edu.ualberta.med.biobank.test.AllTests;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
@@ -25,6 +26,7 @@ import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -151,12 +153,11 @@ public final class TestReportsProcedurallyGeneratedData implements
 
     private static List<SpecimenTypeWrapper> generateSampleTypes(
         final int numSampleTypes) throws Exception {
-        List<SpecimenTypeWrapper> sampleTypes = new ArrayList<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> spcTypes = new ArrayList<SpecimenTypeWrapper>();
 
         for (int i = 0; i < numSampleTypes; i++) {
-            // FIXME
-            // sampleTypes.add(SpecimenTypeHelper.addSampleType(getInstance()
-            // .getRandString()));
+            spcTypes.add(SpecimenTypeHelper.addSpecimenType(getInstance()
+                .getRandString()));
         }
 
         try {
@@ -164,9 +165,8 @@ public final class TestReportsProcedurallyGeneratedData implements
             // "AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME" as some reports query
             // for this specific sample type; however, this sample type may
             // already exist
-            // FIXME
-            // SpecimenTypeHelper
-            // .addSampleType(AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME);
+            SpecimenTypeHelper
+                .addSpecimenType(AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME);
         } catch (Exception e) {
         }
 
@@ -174,13 +174,13 @@ public final class TestReportsProcedurallyGeneratedData implements
             .getAllSpecimenTypes(getInstance().getAppService(), true)) {
             if (sampleType.getNameShort().equals(
                 AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME)) {
-                sampleTypes.add(sampleType);
+                spcTypes.add(sampleType);
             }
         }
 
         // ensure there is one sample type named
         // "AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME"
-        Assert.assertTrue(PredicateUtil.filter(sampleTypes,
+        Assert.assertTrue(PredicateUtil.filter(spcTypes,
             new Predicate<SpecimenTypeWrapper>() {
                 public boolean evaluate(SpecimenTypeWrapper sampleType) {
                     return sampleType.getNameShort().equals(
@@ -189,7 +189,7 @@ public final class TestReportsProcedurallyGeneratedData implements
 
             }).size() == 1);
 
-        return sampleTypes;
+        return spcTypes;
     }
 
     private static List<ClinicWrapper> generateClinics(final int numClinics)
@@ -293,9 +293,8 @@ public final class TestReportsProcedurallyGeneratedData implements
                 containerType = addContainerType(site, getInstance()
                     .getRandString(), isTopLevel);
 
-                // FIXME
-                // containerType.addToSampleTypeCollection(sampleTypes.subList(i,
-                // i + 1));
+                containerType.addToSpecimenTypeCollection(sampleTypes.subList(
+                    i, i + 1));
 
                 childContainerTypes.add(containerType);
             }
@@ -303,8 +302,7 @@ public final class TestReportsProcedurallyGeneratedData implements
             // also generate a ContainerType that can hold every SampleType
             containerType = addContainerType(site, getInstance()
                 .getRandString(), isTopLevel);
-            // FIXME
-            // containerType.addToSampleTypeCollection(sampleTypes);
+            containerType.addToSpecimenTypeCollection(sampleTypes);
             childContainerTypes.add(containerType);
         } else {
             // middle- or top-level
@@ -512,61 +510,57 @@ public final class TestReportsProcedurallyGeneratedData implements
 
             while ((shipmentsAdded < shipmentLimit)
                 && (studiesAdded < studyLimit)) {
-                // FIXME
-                // StudyWrapper study = studies.get(studyIndex);
-                // List<PatientWrapper> patients = study.getPatientCollection();
-                //
-                // tmp = nextPatientIndex.get(Arrays.asList(clinicIndex,
-                // studyIndex));
-                // int patientIndex = tmp != null ? tmp : 0;
-                //
-                // // cycle through number of patients per shipment
-                // int patientsAdded = 0;
-                // int patientLimit =
-                // NUM_PATIENTS_PER_SHIPMENT[patientsPerShipmentCounter++
-                // % NUM_PATIENTS_PER_SHIPMENT.length];
-                // patientLimit = Math.min(patientLimit, patients.size());
-                //
-                // if (patientLimit > 0) {
-                // CollectionEventWrapper shipment = CollectionEventHelper
-                // .addCollectionEvent(site, ShippingMethodWrapper
-                // .getShippingMethods(getInstance().getAppService())
-                // .get(0), SourceVesselHelper.newSourceVessel(
-                // patients.get(patientIndex), Utils.getRandomDate(),
-                // 0.1));
-                //
-                // // TODO: more appropriate Date-s?
-                // shipment.setDeparted(calendar.getTime());
-                // calendar.add(Calendar.DAY_OF_YEAR, 1);
-                // shipment.setDateReceived(calendar.getTime());
-                //
-                // patientsAdded++;
-                // patientIndex = (patientIndex + 1) % patients.size();
-                //
-                // while (patientsAdded++ < patientLimit) {
-                // PatientWrapper patient = patients.get(patientIndex);
-                // shipment.addToSourceVesselCollection(Arrays
-                // .asList(SourceVesselHelper.newSourceVessel(patient,
-                // Utils.getRandomDate(), 0.1)));
-                //
-                // // advance to the next legal Patient index
-                // patientIndex = (patientIndex + 1) % patients.size();
-                // }
-                //
-                // nextPatientIndex.put(
-                // Arrays.asList(clinicIndex, studyIndex), patientIndex);
-                //
-                // shipmentsAdded++;
-                // studiesAdded++;
-                //
-                // shipments.add(shipment);
-                //
-                // shipment.persist();
-                // shipment.reload();
-                // }
-                //
-                // // advance to the next legal Study index
-                // studyIndex = (studyIndex + 1) % studies.size();
+                StudyWrapper study = studies.get(studyIndex);
+                List<PatientWrapper> patients = study
+                    .getPatientCollection(false);
+
+                tmp = nextPatientIndex.get(Arrays.asList(clinicIndex,
+                    studyIndex));
+                int patientIndex = tmp != null ? tmp : 0;
+
+                // cycle through number of patients per shipment
+                int patientsAdded = 0;
+                int patientLimit = NUM_PATIENTS_PER_SHIPMENT[patientsPerShipmentCounter++
+                    % NUM_PATIENTS_PER_SHIPMENT.length];
+                patientLimit = Math.min(patientLimit, patients.size());
+
+                if (patientLimit > 0) {
+                    CollectionEventWrapper shipment = CollectionEventHelper
+                        .addCollectionEvent(site, patients.get(patientIndex), 1);
+
+                    // FIXME
+                    // // TODO: more appropriate Date-s?
+                    // shipment.set(calendar.getTime());
+                    // calendar.add(Calendar.DAY_OF_YEAR, 1);
+                    // shipment.setDateReceived(calendar.getTime());
+                    //
+                    // patientsAdded++;
+                    // patientIndex = (patientIndex + 1) % patients.size();
+                    //
+                    // while (patientsAdded++ < patientLimit) {
+                    // PatientWrapper patient = patients.get(patientIndex);
+                    // shipment.addToSourceVesselCollection(Arrays
+                    // .asList(SourceVesselHelper.newSourceVessel(patient,
+                    // Utils.getRandomDate(), 0.1)));
+                    //
+                    // // advance to the next legal Patient index
+                    // patientIndex = (patientIndex + 1) % patients.size();
+                    // }
+
+                    nextPatientIndex.put(
+                        Arrays.asList(clinicIndex, studyIndex), patientIndex);
+
+                    shipmentsAdded++;
+                    studiesAdded++;
+
+                    shipments.add(shipment);
+
+                    shipment.persist();
+                    shipment.reload();
+                }
+
+                // advance to the next legal Study index
+                studyIndex = (studyIndex + 1) % studies.size();
             }
 
             nextStudyIndex.put(clinicIndex, studyIndex);
