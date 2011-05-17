@@ -241,7 +241,6 @@ public class AssignProcess extends ServerProcess {
                 Boolean posHasMissing = movedAndMissingSpecimensFromPallet
                     .get(movedFromPosition);
                 if (Boolean.TRUE.equals(posHasMissing)) {
-                    // FIXME
                     // missing position has already been processed: remove
                     // the MISSING flag
                     // missingSpecimen.setStatus(UICellStatus.EMPTY);
