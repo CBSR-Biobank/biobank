@@ -23,27 +23,22 @@ import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
-import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
-import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestSpecimen extends TestDatabase {
 
@@ -646,7 +641,7 @@ public class TestSpecimen extends TestDatabase {
                 .getCollectionEvent().getPatient(), Utils.getRandomDate());
 
         // add aliquoted specimen
-        SpecimenWrapper specimen = SpecimenHelper.newSpecimen(childSpc,
+        SpecimenWrapper specimen = SpecimenHelper.newSpecimen(parentSpc,
             childSpc.getSpecimenType(),
             ActivityStatusWrapper.ACTIVE_STATUS_STRING,
             childSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
@@ -676,26 +671,22 @@ public class TestSpecimen extends TestDatabase {
 
     }
 
+    /*
+     * childSpc created in setUp()
+     */
     @Test
     public void testGetDispatches() throws Exception {
         String name = "testGetDispatches" + r.nextInt();
         SiteWrapper destSite = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
         DispatchWrapper d = DispatchHelper.addDispatch(site, destSite, method);
 
-        parentSpc = SpecimenHelper.newSpecimen(name);
-        CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(site, patient, 1, parentSpc);
-        parentSpc = cevent.getAllSpecimenCollection(false).get(0);
-
-        d.addSpecimens(Arrays.asList(parentSpc), DispatchSpecimenState.NONE);
+        d.addSpecimens(Arrays.asList(childSpc), DispatchSpecimenState.NONE);
         d.persist();
-        parentSpc.reload();
+        childSpc.reload();
 
-        List<DispatchWrapper> specimenDispatches = parentSpc.getDispatches();
+        List<DispatchWrapper> specimenDispatches = childSpc.getDispatches();
         Assert.assertEquals(1, specimenDispatches.size());
         Assert.assertTrue(specimenDispatches.contains(d));
 
@@ -708,21 +699,21 @@ public class TestSpecimen extends TestDatabase {
 
         // dest site receive specimen
         d.setState(DispatchState.RECEIVED);
-        d.receiveSpecimens(Arrays.asList(parentSpc));
+        d.receiveSpecimens(Arrays.asList(childSpc));
         d.persist();
         Assert.assertTrue(d.isInReceivedState());
 
         // make sure spc now belongs to destSite
         destSite.reload();
         Assert.assertTrue(destSite.getSpecimenCollection(false).contains(
-            parentSpc));
+            childSpc));
 
         // dispatch specimen to second site
         SiteWrapper destSite2 = SiteHelper.addSite(name + "_2");
 
         DispatchWrapper d2 = DispatchHelper.addDispatch(destSite, destSite2,
             method);
-        d2.addSpecimens(Arrays.asList(parentSpc), DispatchSpecimenState.NONE);
+        d2.addSpecimens(Arrays.asList(childSpc), DispatchSpecimenState.NONE);
 
         parentSpc.reload();
         // assign a position to this specimen
@@ -736,24 +727,24 @@ public class TestSpecimen extends TestDatabase {
         topType.persist();
         ContainerWrapper cont = ContainerHelper.addContainer("22", "22",
             topCont, destSite, childType, 4, 5);
-        childType.addToSpecimenTypeCollection(Arrays.asList(parentSpc
+        childType.addToSpecimenTypeCollection(Arrays.asList(childSpc
             .getSpecimenType()));
         childType.persist();
         cont.reload();
-        cont.addSpecimen(2, 3, parentSpc);
+        cont.addSpecimen(2, 3, childSpc);
         parentSpc.persist();
 
         // add to new dispatch
-        d2.addSpecimens(Arrays.asList(parentSpc), DispatchSpecimenState.NONE);
+        d2.addSpecimens(Arrays.asList(childSpc), DispatchSpecimenState.NONE);
         d2.persist();
 
         // make sure spc still belongs to destSite
         destSite2.reload();
         Assert.assertTrue(destSite.getSpecimenCollection(false).contains(
-            parentSpc));
+            childSpc));
 
-        parentSpc.reload();
-        specimenDispatches = parentSpc.getDispatches();
+        childSpc.reload();
+        specimenDispatches = childSpc.getDispatches();
         Assert.assertEquals(2, specimenDispatches.size());
         Assert.assertTrue(specimenDispatches.contains(d));
         Assert.assertTrue(specimenDispatches.contains(d2));

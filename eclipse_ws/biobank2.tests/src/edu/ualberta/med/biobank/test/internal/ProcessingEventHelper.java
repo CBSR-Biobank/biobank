@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
 public class ProcessingEventHelper extends DbHelper {
 
@@ -26,7 +27,7 @@ public class ProcessingEventHelper extends DbHelper {
         CenterWrapper<?> center, PatientWrapper patient, Date createdAt)
         throws Exception {
         ProcessingEventWrapper pevent = new ProcessingEventWrapper(appService);
-        pevent.setWorksheet(Utils.getRandomString(20));
+        pevent.setWorksheet(TestCommon.getUniqueWorksheet(r));
         pevent.setCenter(center);
         pevent.setCreatedAt(createdAt);
         pevent.setActivityStatus(ActivityStatusWrapper

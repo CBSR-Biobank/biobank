@@ -70,8 +70,8 @@ public class TestSite extends TestDatabase {
         int spcPerProcEvent, PatientWrapper... patients) throws Exception {
         List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
         for (PatientWrapper patient : patients) {
-            addProcessingEvents(site, patient, spcTypes, visitNumber,
-                maxProcEvent, spcPerProcEvent);
+            pevents.addAll(addProcessingEvents(site, patient, spcTypes,
+                visitNumber, maxProcEvent, spcPerProcEvent));
         }
         return pevents;
     }

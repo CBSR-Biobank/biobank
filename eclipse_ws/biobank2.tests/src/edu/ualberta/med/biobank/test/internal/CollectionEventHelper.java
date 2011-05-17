@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -32,6 +33,11 @@ public class CollectionEventHelper extends DbHelper {
             oi.persist();
 
             for (SpecimenWrapper spc : originSpecimens) {
+                OriginInfoWrapper origOi = spc.getOriginInfo();
+                if (origOi != null) {
+                    throw new BiobankCheckException(
+                        "specimen already has a collection event");
+                }
                 spc.setOriginInfo(oi);
                 spc.setCollectionEvent(cevent);
                 spc.setOriginalCollectionEvent(cevent);
