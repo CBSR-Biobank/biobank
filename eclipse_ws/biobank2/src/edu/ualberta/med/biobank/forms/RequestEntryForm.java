@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -77,9 +79,18 @@ public class RequestEntryForm extends BiobankFormBase {
         createSpecimensSelectionActions(c, false);
 
         specimensTree = new RequestSpecimensTreeTable(c, request);
+        specimensTree.addTreeSelectionListener(new ISelectionChangedListener() {
+
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                button
+                    .setEnabled(specimensTree.getSelectionElements().size() > 0);
+            }
+
+        });
 
         button = new Button(c, SWT.PUSH);
-        button.setVisible(false);
+        button.setVisible(true);
         button.setText("Dispatch Specimens");
 
     }
@@ -106,11 +117,6 @@ public class RequestEntryForm extends BiobankFormBase {
                 newSpecimenText.setFocus();
                 newSpecimenText.setText("");
                 specimensTree.refresh();
-                try {
-                    button.setEnabled(request.isAllProcessed());
-                } catch (Exception ex) {
-                    BiobankPlugin.openAsyncError("Query error", ex);
-                }
             }
         });
         toolkit.createLabel(addComposite, "or open scan dialog:");
@@ -135,11 +141,6 @@ public class RequestEntryForm extends BiobankFormBase {
             // setDirty(true);
         }
         specimensTree.refresh();
-        try {
-            button.setEnabled(request.isAllProcessed());
-        } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Query error", e);
-        }
     }
 
     @Override

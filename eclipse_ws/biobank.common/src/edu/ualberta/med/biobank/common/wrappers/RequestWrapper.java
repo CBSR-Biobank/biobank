@@ -6,14 +6,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
-import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.base.RequestBaseWrapper;
 import edu.ualberta.med.biobank.model.Request;
-import edu.ualberta.med.biobank.model.RequestSpecimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -141,21 +138,6 @@ public class RequestWrapper extends RequestBaseWrapper {
             wrappers.add(new RequestWrapper(appService, s));
         }
         return wrappers;
-    }
-
-    private static final String IS_ALL_PROCESSED_QRY = "select count(*) from "
-        + RequestSpecimen.class.getName() + " as ra where ra."
-        + RequestSpecimenPeer.STATE.getName() + "=?" + " and ra."
-        + Property.concatNames(RequestSpecimenPeer.REQUEST, RequestPeer.ID)
-        + "=?";
-
-    public boolean isAllProcessed() throws BiobankQueryResultSizeException,
-        ApplicationException {
-        // using the collection was too slow
-        HQLCriteria c = new HQLCriteria(IS_ALL_PROCESSED_QRY,
-            Arrays.asList(new Object[] {
-                RequestSpecimenState.NONPROCESSED_STATE.getId(), getId() }));
-        return 0 == getCountResult(appService, c);
     }
 
     public void setState(RequestState state) {

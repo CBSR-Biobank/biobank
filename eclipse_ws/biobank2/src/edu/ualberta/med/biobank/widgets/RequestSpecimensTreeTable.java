@@ -1,11 +1,15 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -213,8 +217,8 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
                 a.setClaimedBy(SessionManager.getUser().getFirstName());
                 a.persist();
             } else {
-                List<Node> children = ((RequestContainerAdapter) node)
-                    .getChildren();
+                List<RequestSpecimenWrapper> children = ((RequestContainerAdapter) node)
+                    .getSpecimenChildren();
                 for (Object child : children)
                     claim(child);
             }
@@ -240,6 +244,24 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
                 refresh();
             }
         });
+    }
+
+    public void addTreeSelectionListener(ISelectionChangedListener listener) {
+        tv.addSelectionChangedListener(listener);
+    }
+
+    public List<RequestSpecimenWrapper> getSelectionElements() {
+        StructuredSelection sel = (StructuredSelection) tv.getSelection();
+        HashSet<RequestContainerAdapter> containers = new HashSet<RequestContainerAdapter>();
+        HashSet<RequestSpecimenWrapper> specs = new HashSet<RequestSpecimenWrapper>();
+        for (Object o : sel.toList()) {
+            if (o instanceof RequestContainerAdapter && !containers.contains(o)) {
+                containers.add((RequestContainerAdapter) o);
+                specs.addAll(((RequestContainerAdapter) o)
+                    .getSpecimenChildren());
+            }
+        }
+        return new ArrayList<RequestSpecimenWrapper>(specs);
     }
 
     public void refresh() {

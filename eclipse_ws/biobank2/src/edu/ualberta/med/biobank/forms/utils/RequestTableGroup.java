@@ -30,18 +30,16 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
         super(ds, dispatch);
     }
 
-    public static final String TREE_QUERY2 = "select ra, cp."
-        + ContainerPathPeer.PATH.getName() + " from "
+    public static final String TREE_QUERY = "select ra, cp."
+        + ContainerPathPeer.PATH.getName() + ", c.id, a.id, st.id, sp.id from "
         + RequestSpecimen.class.getName() + " ra inner join fetch ra."
         + RequestSpecimenPeer.SPECIMEN.getName() + " a inner join fetch a."
         + SpecimenPeer.SPECIMEN_TYPE.getName() + " st inner join fetch a."
         + SpecimenPeer.SPECIMEN_POSITION.getName() + " sp inner join fetch sp."
         + SpecimenPositionPeer.CONTAINER.getName() + " c inner join fetch c."
         + ContainerPeer.CONTAINER_PATH.getName() + " cp where ra."
-        + RequestSpecimenPeer.REQUEST.getName() + "=? and ra."
+        + RequestSpecimenPeer.REQUEST.getName() + ".id=? and ra."
         + RequestSpecimenPeer.STATE.getName() + "=?";
-
-    public static final String TREE_QUERY = "select count(*) from specimen where id > ? and ? is not null";
 
     public static List<RequestTableGroup> getGroupsForShipment(
         RequestWrapper ship) {
@@ -61,7 +59,7 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
         List<Object[]> results = new ArrayList<Object[]>();
         // test hql
         HQLCriteria query = new HQLCriteria(TREE_QUERY,
-            Arrays.asList(new Object[] { request, state }));
+            Arrays.asList(new Object[] { request.getId(), state }));
         try {
             results = SessionManager.getAppService().query(query);
         } catch (Exception e) {

@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 
 public class RequestContainerAdapter implements Node {
 
@@ -52,5 +54,18 @@ public class RequestContainerAdapter implements Node {
 
     public void addChild(Node c) {
         children.add(c);
+    }
+
+    public List<RequestSpecimenWrapper> getSpecimenChildren() {
+        List<RequestSpecimenWrapper> specs = new ArrayList<RequestSpecimenWrapper>();
+        for (Object child : getChildren()) {
+            if (child instanceof RequestContainerAdapter)
+                specs.addAll(((RequestContainerAdapter) child)
+                    .getSpecimenChildren());
+            else
+                specs.add((RequestSpecimenWrapper) ((TreeItemAdapter) child)
+                    .getSpecimen());
+        }
+        return specs;
     }
 }
