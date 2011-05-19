@@ -192,7 +192,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     public void addSpecimens(List<SpecimenWrapper> newSpecimens,
-        DispatchSpecimenState state) {
+        DispatchSpecimenState state) throws BiobankCheckException {
         if (newSpecimens == null)
             return;
 
@@ -207,15 +207,19 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
         // new specimens added
         for (SpecimenWrapper specimen : newSpecimens) {
-            if (!currentSpecimenList.contains(specimen)) {
-                DispatchSpecimenWrapper dsa = new DispatchSpecimenWrapper(
-                    appService);
-                dsa.setSpecimen(specimen);
-                dsa.setDispatch(this);
-                dsa.setDispatchSpecimenState(state);
-                newDispatchSpecimens.add(dsa);
-                hasNewSpecimens = true;
-            }
+            if (specimen.getCurrentCenter().equals(getSenderCenter())) {
+                if (!currentSpecimenList.contains(specimen)) {
+                    DispatchSpecimenWrapper dsa = new DispatchSpecimenWrapper(
+                        appService);
+                    dsa.setSpecimen(specimen);
+                    dsa.setDispatch(this);
+                    dsa.setDispatchSpecimenState(state);
+                    newDispatchSpecimens.add(dsa);
+                    hasNewSpecimens = true;
+                }
+            } else
+                throw new BiobankCheckException(
+                    "Specimen does not belong to this sender.");
         }
         addToDispatchSpecimenCollection(newDispatchSpecimens);
         // make sure previously deleted ones, that have been re-added, are

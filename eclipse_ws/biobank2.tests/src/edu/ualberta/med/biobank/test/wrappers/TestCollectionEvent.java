@@ -43,7 +43,7 @@ public class TestCollectionEvent extends TestDatabase {
     public void setUp() throws Exception {
         super.setUp();
         study = StudyHelper.addStudy("Study - Processing Event Test "
-            + Utils.getRandomString(10));
+            + Utils.getRandomString(8, 15));
     }
 
     @Test
@@ -225,11 +225,11 @@ public class TestCollectionEvent extends TestDatabase {
     public void testGetSetEventAttrLabels() throws Exception {
         String name = "testGetSetEventAttrLabels" + r.nextInt();
         ClinicWrapper clinic = ClinicHelper.addClinic(name + "CLINIC1");
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
         addEventAttrs(study);
         List<String> labels = Arrays.asList(study.getStudyEventAttrLabels());
         Assert.assertEquals(5, labels.size());
 
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
         CollectionEventWrapper cevent = CollectionEventHelper
             .addCollectionEvent(clinic, patient, 1);
 
@@ -515,7 +515,7 @@ public class TestCollectionEvent extends TestDatabase {
     }
 
     private void addEventAttrs(StudyWrapper study) throws Exception {
-        // add PvAtt to study
+        // add Event Attr to study
         Collection<String> types = EventAttrTypeWrapper
             .getAllEventAttrTypesMap(appService).keySet();
         Assert.assertTrue("EventAttrTypes not initialized",
@@ -528,7 +528,6 @@ public class TestCollectionEvent extends TestDatabase {
         study.setStudyEventAttr("Visit", EventAttrTypeEnum.SELECT_SINGLE,
             new String[] { "v1", "v2", "v3", "v4" });
         study.persist();
-        study.reload();
     }
 
 }

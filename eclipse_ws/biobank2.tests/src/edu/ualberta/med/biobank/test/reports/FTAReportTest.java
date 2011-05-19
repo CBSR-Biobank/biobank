@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -29,27 +30,22 @@ public class FTAReportTest extends AbstractReportTest {
         }
     };
     private static final Mapper<ProcessingEventWrapper, String, ProcessingEventWrapper> GROUP_PATIENT_VISITS_BY_PNUMBER = new Mapper<ProcessingEventWrapper, String, ProcessingEventWrapper>() {
-        public String getKey(ProcessingEventWrapper patientVisit) {
-            // FIXME
-            // return patientVisit.getPatient().getPnumber();
-            return null;
+        public String getKey(ProcessingEventWrapper pevent) {
+            return pevent.getSpecimenCollection(false).get(0)
+                .getCollectionEvent().getPatient().getPnumber();
         }
 
-        public ProcessingEventWrapper getValue(
-            ProcessingEventWrapper patientVisit, ProcessingEventWrapper oldValue) {
+        public ProcessingEventWrapper getValue(ProcessingEventWrapper pevent,
+            ProcessingEventWrapper oldValue) {
             // keep the earliest patient visit (according to date processed)
-            // FIXME
-            // return (oldValue == null)
-            // || patientVisit.getDateProcessed().before(
-            // oldValue.getDateProcessed()) ? patientVisit : oldValue;
-            return null;
+            return (oldValue == null)
+                || pevent.getCreatedAt().before(oldValue.getCreatedAt()) ? pevent
+                : oldValue;
         }
     };
     private static final Mapper<SpecimenWrapper, String, SpecimenWrapper> GROUP_ALIQUOTS_BY_PNUMBER = new Mapper<SpecimenWrapper, String, SpecimenWrapper>() {
         public String getKey(SpecimenWrapper aliquot) {
-            // FIXME
-            // return aliquot.getProcessingEvent().getPatient().getPnumber();
-            return null;
+            return aliquot.getCollectionEvent().getPatient().getPnumber();
         }
 
         public SpecimenWrapper getValue(SpecimenWrapper aliquot,
@@ -70,9 +66,7 @@ public class FTAReportTest extends AbstractReportTest {
     @Deprecated
     private static final Mapper<SpecimenWrapper, String, SpecimenWrapper> GROUP_ALIQUOTS_BY_PNUMBER_OLD = new Mapper<SpecimenWrapper, String, SpecimenWrapper>() {
         public String getKey(SpecimenWrapper aliquot) {
-            // FIXME
-            // return aliquot.getProcessingEvent().getPatient().getPnumber();
-            return null;
+            return aliquot.getCollectionEvent().getPatient().getPnumber();
         }
 
         public SpecimenWrapper getValue(SpecimenWrapper aliquot,
@@ -83,21 +77,18 @@ public class FTAReportTest extends AbstractReportTest {
             if (oldValue == null) {
                 return aliquot;
             } else {
-                // FIXME
-                // if (aliquot.getProcessingEvent().getDateProcessed()
-                // .equals(oldValue.getProcessingEvent().getDateProcessed())) {
-                // if (aliquot.getId() > oldValue.getId()) {
-                // return oldValue;
-                // } else {
-                // return aliquot;
-                // }
-                // } else if (aliquot.getProcessingEvent().getDateProcessed()
-                // .after(oldValue.getProcessingEvent().getDateProcessed())) {
-                // return oldValue;
-                // } else {
-                // return aliquot;
-                // }
-                return null;
+                if (aliquot.getProcessingEvent().getCreatedAt()
+                    .equals(oldValue.getProcessingEvent().getCreatedAt())) {
+                    if (aliquot.getId() > oldValue.getId()) {
+                        return oldValue;
+                    } else {
+                        return aliquot;
+                    }
+                } else if (aliquot.getProcessingEvent().getCreatedAt()
+                    .after(oldValue.getProcessingEvent().getCreatedAt())) {
+                    return oldValue;
+                }
+                return aliquot;
             }
         }
     };
@@ -119,23 +110,22 @@ public class FTAReportTest extends AbstractReportTest {
     @Test
     public void testMiddleDates() throws Exception {
         Calendar calendar = Calendar.getInstance();
-        List<ProcessingEventWrapper> patientVisits;
+        List<ProcessingEventWrapper> pevents;
 
         for (StudyWrapper study : getStudies()) {
-            // FIXME
-            // for (PatientWrapper patient : study.getPatientCollection()) {
-            // patientVisits = patient.getProcessingEventCollection(false);
-            // if ((patientVisits != null) && (patientVisits.size() > 0)) {
-            // // check before, on, and after each patient's first patient
-            // // visit
-            // calendar.setTime(patientVisits.get(0).getDateProcessed());
-            // checkResults(study.getNameShort(), calendar.getTime());
-            // calendar.add(Calendar.MINUTE, -1);
-            // checkResults(study.getNameShort(), calendar.getTime());
-            // calendar.add(Calendar.MINUTE, 2);
-            // checkResults(study.getNameShort(), calendar.getTime());
-            // }
-            // }
+            for (PatientWrapper patient : study.getPatientCollection(false)) {
+                pevents = patient.getProcessingEventCollection(false);
+                if ((pevents != null) && !pevents.isEmpty()) {
+                    // check before, on, and after each patient's first patient
+                    // visit
+                    calendar.setTime(pevents.get(0).getCreatedAt());
+                    checkResults(study.getNameShort(), calendar.getTime());
+                    calendar.add(Calendar.MINUTE, -1);
+                    checkResults(study.getNameShort(), calendar.getTime());
+                    calendar.add(Calendar.MINUTE, 2);
+                    checkResults(study.getNameShort(), calendar.getTime());
+                }
+            }
         }
     }
 
@@ -145,19 +135,15 @@ public class FTAReportTest extends AbstractReportTest {
         final Date firstPvDateProcessed = (Date) getReport().getParams().get(1);
 
         Predicate<ProcessingEventWrapper> patientInStudy = new Predicate<ProcessingEventWrapper>() {
-            public boolean evaluate(ProcessingEventWrapper patientVisit) {
-                // FIXME
-                // return patientVisit.getPatient().getStudy().getNameShort()
-                // .equals(studyNameShort);
-                return true;
+            public boolean evaluate(ProcessingEventWrapper pevent) {
+                return pevent.getCenter().getNameShort().equals(studyNameShort);
             }
         };
 
         Predicate<SpecimenWrapper> pvProcessedAfter = new Predicate<SpecimenWrapper>() {
             public boolean evaluate(SpecimenWrapper aliquot) {
-                // return aliquot.getProcessingEvent().getDateProcessed()
-                // .after(firstPvDateProcessed);
-                return true;
+                return aliquot.getProcessingEvent().getCreatedAt()
+                    .after(firstPvDateProcessed);
             }
         };
 
@@ -184,11 +170,10 @@ public class FTAReportTest extends AbstractReportTest {
         for (SpecimenWrapper aliquot : filteredAndGroupedAliquots) {
             for (ProcessingEventWrapper patientVisit : groupedPatientVisits
                 .values()) {
-                // FIXME
-                // if (patientVisit.getId().equals(
-                // aliquot.getProcessingEvent().getId())) {
-                // expectedResults.add(aliquot.getId());
-                // }
+                if (patientVisit.getId().equals(
+                    aliquot.getProcessingEvent().getId())) {
+                    expectedResults.add(aliquot.getId());
+                }
             }
         }
 

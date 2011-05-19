@@ -141,6 +141,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         reloadCollection(selectedContacts, null);
     }
 
+    @SuppressWarnings("serial")
     @Override
     protected BiobankTableSorter getComparator() {
         return new BiobankTableSorter() {

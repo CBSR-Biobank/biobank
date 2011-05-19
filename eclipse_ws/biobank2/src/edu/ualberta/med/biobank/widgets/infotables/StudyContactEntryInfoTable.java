@@ -113,6 +113,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         return row.contact;
     }
 
+    @SuppressWarnings("serial")
     @Override
     protected BiobankTableSorter getComparator() {
         return new BiobankTableSorter() {

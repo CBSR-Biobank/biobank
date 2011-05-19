@@ -176,7 +176,8 @@ public class TestProcessingEvent extends TestDatabase {
         addContainerTypes();
         addContainers();
 
-        SpecimenWrapper childSpc = SpecimenHelper.addSpecimens(patient, clinic,
+        SpecimenWrapper parentSpc = SpecimenHelper.addParentSpecimen();
+        SpecimenWrapper childSpc = SpecimenHelper.addSpecimens(parentSpc,
             containerMap.get("ChildL1"), 0, 0, 1).get(0);
         pevent = childSpc.getProcessingEvent();
 

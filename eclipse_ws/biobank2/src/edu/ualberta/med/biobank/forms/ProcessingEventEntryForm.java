@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
@@ -40,15 +39,14 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ProcessingEventEntryForm"; //$NON-NLS-1$
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(ProcessingEventEntryForm.class.getName());
-
     private static final String MSG_NEW_PEVENT_OK = Messages
         .getString("ProcessingEventEntryForm.creation.msg"); //$NON-NLS-1$
+
     private static final String MSG_PEVENT_OK = Messages
         .getString("ProcessingEventEntryForm.edition.msg"); //$NON-NLS-1$
 
     private ProcessingEventAdapter pEventAdapter;
+
     private ProcessingEventWrapper pEvent;
 
     private ComboViewer activityStatusComboViewer;

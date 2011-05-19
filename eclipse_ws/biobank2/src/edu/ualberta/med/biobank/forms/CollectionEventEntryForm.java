@@ -31,7 +31,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
@@ -50,9 +49,6 @@ import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionEventEntryForm extends BiobankEntryForm {
-
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(CollectionEventEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventEntryForm";
 
@@ -104,7 +100,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             tabName = Messages.getString("CollectionEventEntryForm.title.new");
             cevent.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
-			cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
+            cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
                 appService, cevent));
         } else {
             tabName = Messages.getString("CollectionEventEntryForm.title.edit",
@@ -364,7 +360,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         if (cevent.isNew()) {
             cevent.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
-			cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
+            cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
                 appService, cevent));
         }
 

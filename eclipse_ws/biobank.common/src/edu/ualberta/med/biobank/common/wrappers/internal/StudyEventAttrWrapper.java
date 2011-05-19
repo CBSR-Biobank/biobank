@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
@@ -58,16 +56,6 @@ public class StudyEventAttrWrapper extends StudyEventAttrBaseWrapper {
 
     public static List<StudyEventAttrWrapper> getStudyEventAttrCollection(
         StudyWrapper study) {
-        List<StudyEventAttrWrapper> result = new ArrayList<StudyEventAttrWrapper>();
-        Collection<StudyEventAttr> StudyEventAttrCollection = study
-            .getWrappedObject().getStudyEventAttrCollection();
-        if (StudyEventAttrCollection != null) {
-            for (StudyEventAttr StudyEventAttr : StudyEventAttrCollection) {
-                result.add(new StudyEventAttrWrapper(study.getAppService(),
-                    StudyEventAttr));
-            }
-        }
-        return result;
-
+        return study.getStudyEventAttrCollection(false);
     }
 }
