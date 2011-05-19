@@ -68,6 +68,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     private static final String NEW_SINGLE_POSITION_BINDING = "newSinglePosition-binding"; //$NON-NLS-1$
 
+    private static final String OLD_SINGLE_POSITION_BINDING = "oldSinglePosition-binding"; //$NON-NLS-1$
+
     private static final String PRODUCT_BARCODE_BINDING = "productBarcode-binding"; //$NON-NLS-1$
 
     private static final String LABEL_BINDING = "label-binding"; //$NON-NLS-1$
@@ -77,6 +79,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected static boolean useScanner = true;
 
     // for single specimen assign
+    private Button cabinetCheckButton;
     private BiobankText inventoryIdText;
     protected boolean inventoryIdModified;
     private Label oldSinglePositionLabel;
@@ -201,6 +204,27 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         fieldsComposite.setLayoutData(gd);
 
+        // check box to say it is a cabinet specimen or not
+        widgetCreator.createLabel(fieldsComposite,
+            Messages.getString("SpecimenAssign.single.cabinet.check.label"));
+        cabinetCheckButton = toolkit.createButton(fieldsComposite,
+            "", SWT.CHECK); //$NON-NLS-1$
+        cabinetCheckButton.setToolTipText(Messages
+            .getString("SpecimenAssign.single.cabinet.check.tooltip")); //$NON-NLS-1$
+        cabinetCheckButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (cabinetCheckButton.getSelection()) {
+                    if (inventoryIdText.getText().length() == 4) {
+                        // compatibility with old cabinet specimens imported
+                        // 4 letters specimens are now C+4letters
+                        inventoryIdText
+                            .setText("C" + inventoryIdText.getText()); //$NON-NLS-1$
+                    }
+                }
+            }
+        });
+
         // inventoryID
         inventoryIdText = (BiobankText) createBoundWidgetWithLabel(
             fieldsComposite,
@@ -247,13 +271,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         if (inventoryId.isEmpty()) {
             return;
         }
-        // FIXME only for old Cabinet... SHould we still search for that?
-        // if search for 'AAAA' exist in a freezer, but we also have 'CAAAA'...
-        // if (inventoryId.length() == 4) {
-        // // compatibility with old cabinet specimens imported
-        // // 4 letters specimens are now C+4letters
-        //            inventoryId = "C" + inventoryId; //$NON-NLS-1$
-        // }
+        if (cabinetCheckButton.getSelection() && inventoryId.length() == 4) {
+            // compatibility with old cabinet specimens imported
+            // 4 letters specimens are now C+4letters
+            inventoryId = "C" + inventoryId; //$NON-NLS-1$
+        }
         reset();
         singleSpecimen.setInventoryId(inventoryId);
         inventoryIdText.setText(inventoryId);
@@ -337,7 +359,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         oldSinglePositionCheckText = (BiobankText) widgetCreator
             .createBoundWidget(fieldsComposite, BiobankText.class, SWT.NONE,
                 oldSinglePositionCheckLabel, new String[0], new WritableValue(
-                    "", String.class), oldSinglePositionCheckValidator); //$NON-NLS-1$
+                    "", String.class), oldSinglePositionCheckValidator, //$NON-NLS-1$
+                OLD_SINGLE_POSITION_BINDING);
         oldSinglePositionCheckText
             .addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
@@ -973,6 +996,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected void setBindings(boolean isSingleMode) {
         setCanLaunchScan(isSingleMode);
         widgetCreator.setBinding(INVENTORY_ID_BINDING, isSingleMode);
+        widgetCreator.setBinding(OLD_SINGLE_POSITION_BINDING, isSingleMode);
+        oldSinglePositionCheckText.setText("?"); //$NON-NLS-1$
         widgetCreator.setBinding(NEW_SINGLE_POSITION_BINDING, isSingleMode);
         widgetCreator.setBinding(PRODUCT_BARCODE_BINDING, !isSingleMode);
         widgetCreator.setBinding(LABEL_BINDING, !isSingleMode);
