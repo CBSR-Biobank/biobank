@@ -415,8 +415,7 @@ public class LinkFormPatientManagement {
      * container authorized
      */
     public List<SpecimenTypeWrapper> getStudyAliquotedTypes(
-        List<SpecimenTypeWrapper> authorizedSpecimenTypesInContainer,
-        String containerLabel) {
+        List<SpecimenTypeWrapper> authorizedSpecimenTypesInContainer) {
         if (currentPatient == null)
             return Collections.emptyList();
 
@@ -446,21 +445,10 @@ public class LinkFormPatientManagement {
             String studyNameShort = "unknown";
             if (getCurrentPatient() != null)
                 studyNameShort = study.getNameShort();
-            if (containerLabel == null)
-                BiobankPlugin.openAsyncError(Messages
-                    .getString("ScanLink.aliquotedSpecimenTypes.error.title"), //$NON-NLS-1$
-                    Messages.getString(
-                        "ScanLink.aliquotedSpecimenTypes.error.msg", //$NON-NLS-1$
-                        studyNameShort));
-            else
-                BiobankPlugin
-                    .openAsyncError(
-                        Messages
-                            .getString("ScanLink.aliquotedSpecimenTypes.error.title"), //$NON-NLS-1$
-                        Messages
-                            .getString(
-                                "ScanLink.aliquotedSpecimenTypes.error.msg.known.container", //$NON-NLS-1$
-                                studyNameShort, containerLabel));
+            BiobankPlugin.openAsyncError(Messages
+                .getString("ScanLink.aliquotedSpecimenTypes.error.title"), //$NON-NLS-1$
+                Messages.getString("ScanLink.aliquotedSpecimenTypes.error.msg", //$NON-NLS-1$
+                    studyNameShort));
         }
         return studiesAliquotedTypes;
     }

@@ -412,26 +412,54 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
     }
 
+    private void setTypeCombos() {
+        setTypeCombos(null);
+    }
+
     /**
      * Get types only defined in the patient's study. Then set these types to
      * the types combos
+     * 
+     * @param typesRows used only in multiple to indicate the count of each row
+     *            after scan has been done.
      */
-    private void setTypeCombos() {
-        List<SpecimenTypeWrapper> studiesAliquotedTypes = linkFormPatientManagement
-            .getStudyAliquotedTypes(null, null);
+    private void setTypeCombos(Map<Integer, Integer> typesRows) {
+        List<SpecimenTypeWrapper> studiesAliquotedTypes = null;
+        List<SpecimenTypeWrapper> authorizedTypesInContainers = null;
+        if (typesRows != null)
+            authorizedTypesInContainers = palletSpecimenTypes;
+        studiesAliquotedTypes = linkFormPatientManagement
+            .getStudyAliquotedTypes(authorizedTypesInContainers);
         List<SpecimenWrapper> availableSourceSpecimens = linkFormPatientManagement
             .getParentSpecimenForPEventAndCEvent();
-        if (isFirstSuccessfulScan())
-            // for multiple
-            for (int row = 0; row < specimenTypesWidgets.size(); row++) {
+        if (authorizedTypesInContainers != null) {
+            // FIXME wiating for issue #1011 to be done
+            // availableSourceSpecimen should be parents of the authorized Types
+            // !
+            // List<SpecimenWrapper> filteredSpecs = new
+            // ArrayList<SpecimenWrapper>();
+            // for (SpecimenWrapper spec : availableSourceSpecimens)
+            // if (!Collections.disjoint(authorizedTypesInContainers, spec
+            // .getSpecimenType().getChildSpecimenTypeCollection(false)))
+            // filteredSpecs.add(spec);
+            // availableSourceSpecimens = filteredSpecs;
+        }
+        // for multiple
+        for (int row = 0; row < specimenTypesWidgets.size(); row++) {
+            if (typesRows != null)
+                setCountOnSpecimenWidget(typesRows, row);
+            if (isFirstSuccessfulScan()) {
                 AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets
                     .get(row);
                 widget.setSourceSpecimens(availableSourceSpecimens);
                 widget.setResultTypes(studiesAliquotedTypes);
             }
-        // for single
-        singleTypesWidget.setSourceSpecimens(availableSourceSpecimens);
-        singleTypesWidget.setResultTypes(studiesAliquotedTypes);
+        }
+        if (typesRows == null) {
+            // for single
+            singleTypesWidget.setSourceSpecimens(availableSourceSpecimens);
+            singleTypesWidget.setResultTypes(studiesAliquotedTypes);
+        }
     }
 
     @Override
@@ -647,7 +675,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                         @Override
                         public void run() {
                             if (rowToProcess == null)
-                                setCombosLists(typesRows);
+                                setTypeCombos(typesRows);
                             else {
                                 setCountOnSpecimenWidget(typesRows,
                                     rowToProcess);
@@ -690,37 +718,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     /**
-     * Multiple linking: get types only defined in the patient's study. Then set
-     * these types to the hierarchy combos
-     */
-    private void setCombosLists(Map<Integer, Integer> typesRows) {
-        List<SpecimenTypeWrapper> studiesAliquotedTypes = null;
-        if (isFirstSuccessfulScan()) {
-            studiesAliquotedTypes = linkFormPatientManagement
-                .getStudyAliquotedTypes(palletSpecimenTypes, null);
-        }
-        List<SpecimenWrapper> availableSourceSpecimens = linkFormPatientManagement
-            .getParentSpecimenForPEventAndCEvent();
-        // set the list of aliquoted types to all widgets, in case the list is
-        // activated using the handheld scanner
-        for (int row = 0; row < specimenTypesWidgets.size(); row++) {
-            AliquotedSpecimenSelectionWidget widget = setCountOnSpecimenWidget(
-                typesRows, row);
-            if (isFirstSuccessfulScan()) {
-                widget.setSourceSpecimens(availableSourceSpecimens);
-                widget.setResultTypes(studiesAliquotedTypes);
-            }
-        }
-    }
-
-    /**
      * Multiple linking: apply a count on a specific row of 'hierarchy' widgets.
      * 
      * @param typesRows contains a row:count map
      * @param row row of the widget we want to update.
      */
-    private AliquotedSpecimenSelectionWidget setCountOnSpecimenWidget(
-        Map<Integer, Integer> typesRows, int row) {
+    private void setCountOnSpecimenWidget(Map<Integer, Integer> typesRows,
+        int row) {
         AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets.get(row);
         Integer number = typesRows.get(row);
         if (number == null) {
@@ -728,7 +732,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             widget.deselectAll();
         }
         widget.setNumber(number);
-        return widget;
     }
 
     /**
