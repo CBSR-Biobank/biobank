@@ -40,6 +40,7 @@ import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -599,6 +600,13 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected void focusPlateToScan() {
         focusControl(plateToScanText);
+    }
+
+    protected void initCellsWithContainer(
+        ContainerWrapper currentMultipleContainer) {
+        if (currentMultipleContainer != null)
+            palletScanManagement
+                .initCellsWithContainer(currentMultipleContainer);
     }
 
 }

@@ -15,12 +15,16 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PalletScanManagement {
 
@@ -273,5 +277,24 @@ public class PalletScanManagement {
 
     public boolean isScanTubeAloneMode() {
         return scanTubeAloneMode;
+    }
+
+    public void initCellsWithContainer(ContainerWrapper container) {
+        if (!useScanner) {
+            cells.clear();
+            try {
+                for (Entry<RowColPos, SpecimenWrapper> entry : container
+                    .getSpecimens(true).entrySet()) {
+                    RowColPos rcp = entry.getKey();
+                    PalletCell cell = new PalletCell(new ScanCell(rcp.row,
+                        rcp.col, entry.getValue().getInventoryId()));
+                    cell.setSpecimen(entry.getValue());
+                    cell.setStatus(UICellStatus.FILLED);
+                    cells.put(rcp, cell);
+                }
+            } catch (ApplicationException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

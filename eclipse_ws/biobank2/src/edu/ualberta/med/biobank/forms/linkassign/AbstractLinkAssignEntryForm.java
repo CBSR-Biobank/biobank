@@ -429,7 +429,7 @@ public abstract class AbstractLinkAssignEntryForm extends
         secondSingleParentWidget.setContainerType(secondSingleParentType, true);
         toolkit.adapt(secondSingleParentWidget);
 
-        displayPositions(false);
+        displaySinglePositions(false);
     }
 
     @Override
@@ -532,7 +532,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     /**
      * single assign. Display containers
      */
-    protected void displayPositions(boolean show) {
+    protected void displaySinglePositions(boolean show) {
         if (isSingleMode()) {
             if (secondSingleParentWidget != null) {
                 widgetCreator.showWidget(secondSingleParentWidget, show);
@@ -663,7 +663,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                     String positionString = positionField.getText();
                     if (parentContainers == null
                         || parentContainers.size() == 0) {
-                        displayPositions(false);
+                        displaySinglePositions(false);
                         return;
                     }
                     appendLog(Messages
@@ -673,7 +673,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                         positionString, parentContainers.get(0));
                     if (singleSpecimen.isPositionFree(parentContainers.get(0))) {
                         singleSpecimen.setParent(parentContainers.get(0));
-                        displayPositions(true);
+                        displaySinglePositions(true);
                         canSaveSingleSpecimen.setValue(true);
                         cancelConfirmWidget.setFocus();
                     } else {

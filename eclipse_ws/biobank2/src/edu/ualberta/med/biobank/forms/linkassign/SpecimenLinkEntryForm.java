@@ -370,7 +370,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             @Override
             public void modifyText(ModifyEvent e) {
                 positionTextModified = true;
-                displayPositions(false);
+                displaySinglePositions(false);
                 canSaveSingleSpecimen.setValue(false);
             }
         });

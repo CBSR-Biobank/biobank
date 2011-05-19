@@ -1027,6 +1027,12 @@
                   label="Specimen Link"
                   style="push">
             </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.processing.assign"
+                  icon="icons/scanAssign.png"
+                  label="Specimen Assign"
+                  style="push">
+            </command>
             <separator
                   name="biobank2.separator4"
                   visible="true">

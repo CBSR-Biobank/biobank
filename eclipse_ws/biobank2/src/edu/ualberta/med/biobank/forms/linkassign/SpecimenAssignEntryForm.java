@@ -220,6 +220,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         // 4 letters specimens are now C+4letters
                         inventoryIdText
                             .setText("C" + inventoryIdText.getText()); //$NON-NLS-1$
+                        focusControl(inventoryIdText);
                     }
                 }
             }
@@ -254,7 +255,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             @Override
             public void modifyText(ModifyEvent e) {
                 inventoryIdModified = true;
-                displayPositions(false);
+                displaySinglePositions(false);
                 canSaveSingleSpecimen.setValue(false);
             }
         });
@@ -400,7 +401,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             @Override
             public void modifyText(ModifyEvent e) {
                 positionTextModified = true;
-                displayPositions(false);
+                displaySinglePositions(false);
                 canSaveSingleSpecimen.setValue(false);
             }
         });
@@ -522,12 +523,18 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     && palletLabelValidator.validate(
                         currentMultipleContainer.getLabel()).equals(
                         Status.OK_STATUS)) {
-                    checkingMultipleContainerPosition = true;
-                    boolean ok = checkMultipleContainerPosition();
-                    setCanLaunchScan(ok);
-                    if (!ok)
-                        focusControl(palletPositionText);
-                    checkingMultipleContainerPosition = false;
+                    BusyIndicator.showWhile(Display.getDefault(),
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                boolean ok = checkMultipleContainerPosition();
+                                setCanLaunchScan(ok);
+                                initCellsWithContainer(currentMultipleContainer);
+                                if (!ok)
+                                    focusControl(palletPositionText);
+                                palletPositionTextModified = false;
+                            }
+                        });
                 }
                 palletPositionTextModified = false;
             }
@@ -1003,6 +1010,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         widgetCreator.setBinding(LABEL_BINDING, !isSingleMode);
         widgetCreator.setBinding(PALLET_TYPES_BINDING, !isSingleMode);
         super.setBindings(isSingleMode);
+        setScanHasBeenLaunched(isSingleMode || !useScanner);
     }
 
     @Override
@@ -1099,6 +1107,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             palletWidget.setContainerType(
                 currentMultipleContainer.getContainerType(),
                 ScanPalletDisplay.SAMPLE_WIDTH);
+            palletWidget.setCells(getCells());
 
             showOnlyPallet(false);
         }

@@ -22,6 +22,8 @@ import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -32,6 +34,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -366,25 +369,60 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return rcp;
     }
 
-    @SuppressWarnings("unchecked")
+    private static String SPECIMENS_FAST_QRY = "select pos."
+        + SpecimenPositionPeer.ROW.getName()
+        + ", pos."
+        + SpecimenPositionPeer.COL.getName()
+        + ", specimen from "
+        + Specimen.class.getName()
+        + " as specimen join specimen."
+        + SpecimenPeer.SPECIMEN_POSITION.getName()
+        + " as pos where pos."
+        + Property
+            .concatNames(SpecimenPositionPeer.CONTAINER, ContainerPeer.ID)
+        + " = ?";
+
     public Map<RowColPos, SpecimenWrapper> getSpecimens() {
+        try {
+            return getSpecimens(false);
+        } catch (ApplicationException e) {
+            // Application Exception is thrown when fast = true
+            throw new RuntimeException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<RowColPos, SpecimenWrapper> getSpecimens(boolean fast)
+        throws ApplicationException {
         Map<RowColPos, SpecimenWrapper> specimens = (Map<RowColPos, SpecimenWrapper>) cache
             .get(SPECIMENS_CACHE_KEY);
         if (specimens == null) {
-            List<SpecimenPositionWrapper> positions = getWrapperCollection(
-                ContainerPeer.SPECIMEN_POSITION_COLLECTION,
-                SpecimenPositionWrapper.class, false);
-
             specimens = new TreeMap<RowColPos, SpecimenWrapper>();
-            for (SpecimenPositionWrapper position : positions) {
-                try {
-                    position.reload();
-                } catch (Exception ex) {
-                    // do nothing
+            if (fast) {
+                List<Object[]> res = appService.query(new HQLCriteria(
+                    SPECIMENS_FAST_QRY, Arrays.asList(getId())));
+                for (Object[] r : res) {
+                    RowColPos rcp = new RowColPos((Integer) r[0],
+                        (Integer) r[1]);
+                    SpecimenWrapper spec = new SpecimenWrapper(appService,
+                        (Specimen) r[2]);
+                    specimens.put(rcp, spec);
                 }
-                SpecimenWrapper spc = position.getSpecimen();
-                specimens.put(
-                    new RowColPos(position.getRow(), position.getCol()), spc);
+            } else {
+                List<SpecimenPositionWrapper> positions = getWrapperCollection(
+                    ContainerPeer.SPECIMEN_POSITION_COLLECTION,
+                    SpecimenPositionWrapper.class, false);
+                for (SpecimenPositionWrapper position : positions) {
+                    try {
+                        position.reload();
+                    } catch (Exception ex) {
+                        // do nothing
+                    }
+                    SpecimenWrapper spc = position.getSpecimen();
+                    specimens.put(
+                        new RowColPos(position.getRow(), position.getCol()),
+                        spc);
+                }
             }
             cache.put(SPECIMENS_CACHE_KEY, specimens);
         }
@@ -1080,4 +1118,5 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public boolean isPallet96() {
         return getContainerType().isPallet96();
     }
+
 }
