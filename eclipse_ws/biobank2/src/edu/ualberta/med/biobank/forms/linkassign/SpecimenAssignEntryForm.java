@@ -112,8 +112,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private Composite fakeScanComposite;
     private Button useScannerButton;
     private Label palletproductBarcodeLabel;
-    // pallet found with given product barcode
-    private ContainerWrapper oldPalletFoundWithProductBarcode;
     private boolean isNewMultipleContainer;
     private boolean checkingMultipleContainerPosition;
 
@@ -1118,7 +1116,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      */
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
-        if (oldPalletFoundWithProductBarcode != null) {
+        if (currentMultipleContainer.hasSpecimens()) {
             Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
             for (RowColPos pos : currentMultipleContainer.getSpecimens()
                 .keySet()) {
