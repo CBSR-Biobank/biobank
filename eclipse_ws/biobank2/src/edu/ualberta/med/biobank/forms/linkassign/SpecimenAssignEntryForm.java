@@ -204,7 +204,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         // check box to say it is a cabinet specimen or not
         widgetCreator.createLabel(fieldsComposite,
-            Messages.getString("SpecimenAssign.single.cabinet.check.label"));
+            Messages.getString("SpecimenAssign.single.cabinet.check.label")); //$NON-NLS-1$
         cabinetCheckButton = toolkit.createButton(fieldsComposite,
             "", SWT.CHECK); //$NON-NLS-1$
         cabinetCheckButton.setToolTipText(Messages
@@ -497,7 +497,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     palletTypesViewer.setInput(null);
                     currentMultipleContainer.setContainerType(null);
                     palletPositionText.setEnabled(true);
-                    palletPositionText.setText("");
+                    palletPositionText.setText(""); //$NON-NLS-1$
                 }
             }
         });
@@ -570,7 +570,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 // free position for the container
                 parent.addChild(
                     currentMultipleContainer.getLabel().replaceAll(
-                        parent.getLabel(), ""), currentMultipleContainer);
+                        parent.getLabel(), ""), currentMultipleContainer); //$NON-NLS-1$
                 possibleTypes = get96Types(parent.getContainerType()
                     .getChildContainerTypeCollection());
                 if (possibleTypes.size() == 1) {
@@ -639,7 +639,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             palletTypesViewer.getCombo().setEnabled(enableCombo);
             palletTypesViewer.setInput(possibleTypes);
             if (possibleTypes.size() == 0) {
-                BiobankPlugin.openAsyncError("96", "no 96 pallet types");
+                BiobankPlugin
+                    .openAsyncError(
+                        Messages
+                            .getString("SpecimenAssignEntryForm.pallet.96.error.title"), Messages.getString("SpecimenAssignEntryForm.pallet.96.error.msg")); //$NON-NLS-1$ //$NON-NLS-2$
                 typeSelection = null;
                 return false;
             }
@@ -688,9 +691,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     BiobankPlugin
                         .openAsyncError(
                             Messages
-                                .getString("SpecimenAssign.multiple.validation.error.title"),
+                                .getString("SpecimenAssign.multiple.validation.error.title"), //$NON-NLS-1$
                             Messages
-                                .getString("SpecimenAssign.barcode.notPallet.error.msg"));
+                                .getString("SpecimenAssign.barcode.notPallet.error.msg")); //$NON-NLS-1$
                     return false;
                 }
                 if (!palletPositionText.getText().isEmpty()
@@ -701,10 +704,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     BiobankPlugin
                         .openAsyncError(
                             Messages
-                                .getString("SpecimenAssign.multiple.validation.error.title"),
+                                .getString("SpecimenAssign.multiple.validation.error.title"), //$NON-NLS-1$
                             Messages
                                 .getString(
-                                    "SpecimenAssign.barcode.exists.different.position.error.msg",
+                                    "SpecimenAssign.barcode.exists.different.position.error.msg", //$NON-NLS-1$
                                     palletFoundWithProductBarcode
                                         .getProductBarcode(),
                                     palletFoundWithProductBarcode
@@ -773,7 +776,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 // want to deactivate it at first in scan mode
                 toggleScanTubeAloneMode();
         } else {
-            palletproductBarcodeText.setText("");
+            palletproductBarcodeText.setText(""); //$NON-NLS-1$
             currentMultipleContainer.setContainerType(null);
             setScanHasBeenLaunched(true);
             setScanValid(true);
@@ -905,9 +908,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             }
             appendLog(sb.toString());
             appendLog(Messages.getString(
-                "SpecimenAssign.multiple.activitylog.save.summary", totalNb, //$NON-NLS-1$
-                currentMultipleContainer.getLabel(), currentMultipleContainer
-                    .getSite().getNameShort()));
+                "SpecimenAssign.multiple.activitylog.save.summary", //$NON-NLS-1$ 
+                totalNb, currentMultipleContainer.getLabel(),
+                currentMultipleContainer.getSite().getNameShort()));
             setFinished(false);
         }
     }
