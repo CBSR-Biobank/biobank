@@ -76,6 +76,13 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return null;
     }
 
+    public String getFormattedReceivedAt() {
+        if (getShipmentInfo() != null)
+            return DateFormatter.formatAsDateTime(getShipmentInfo()
+                .getReceivedAt());
+        return null;
+    }
+
     public boolean hasErrors() {
         return !getDispatchSpecimenCollectionWithState(
             DispatchSpecimenState.MISSING, DispatchSpecimenState.EXTRA)
@@ -549,4 +556,5 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     public boolean hasNewSpecimens() {
         return hasNewSpecimens;
     }
+
 }

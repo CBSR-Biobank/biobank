@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -13,7 +14,6 @@ import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
-import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
@@ -24,10 +24,21 @@ import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class RequestTableGroup extends TableGroup<RequestWrapper> {
+public class RequestTableGroup implements Node {
 
-    public RequestTableGroup(RequestSpecimenState ds, RequestWrapper dispatch) {
-        super(ds, dispatch);
+    protected Integer numSpecimens = 0;
+    private static final String allLabel = "All";
+    protected List<Node> tops;
+    protected static final Pattern p = Pattern.compile("/");
+    protected Object parent = null;
+
+    public RequestTableGroup(RequestWrapper request) {
+        try {
+            createAdapterTree(request);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public static final String TREE_QUERY = "select ra, cp."
@@ -38,28 +49,20 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
         + SpecimenPeer.SPECIMEN_POSITION.getName() + " sp inner join fetch sp."
         + SpecimenPositionPeer.CONTAINER.getName() + " c inner join fetch c."
         + ContainerPeer.CONTAINER_PATH.getName() + " cp where ra."
-        + RequestSpecimenPeer.REQUEST.getName() + ".id=? and ra."
-        + RequestSpecimenPeer.STATE.getName() + "=?";
+        + RequestSpecimenPeer.REQUEST.getName() + ".id=? order by ra."
+        + RequestSpecimenPeer.STATE.getName();
 
-    public static List<RequestTableGroup> getGroupsForShipment(
-        RequestWrapper ship) {
-        List<RequestTableGroup> groups = new ArrayList<RequestTableGroup>();
-        groups.add(new RequestTableGroup(
-            RequestSpecimenState.NONPROCESSED_STATE, ship));
-        groups.add(new RequestTableGroup(RequestSpecimenState.PROCESSED_STATE,
-            ship));
-        groups.add(new RequestTableGroup(
-            RequestSpecimenState.UNAVAILABLE_STATE, ship));
+    public static List<Node> getGroupsForShipment(RequestWrapper ship) {
+        List<Node> groups = new ArrayList<Node>();
+        groups.add(new RequestTableGroup(ship));
         return groups;
     }
 
-    @Override
-    public void createAdapterTree(Integer state, RequestWrapper request)
-        throws Exception {
+    public void createAdapterTree(RequestWrapper request) throws Exception {
         List<Object[]> results = new ArrayList<Object[]>();
         // test hql
         HQLCriteria query = new HQLCriteria(TREE_QUERY,
-            Arrays.asList(new Object[] { request.getId(), state }));
+            Arrays.asList(new Object[] { request.getId() }));
         try {
             results = SessionManager.getAppService().query(query);
         } catch (Exception e) {
@@ -105,6 +108,24 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
                         ra)));
             numSpecimens++;
         }
+    }
 
+    @Override
+    public String toString() {
+        return getTitle();
+    }
+
+    public String getTitle() {
+        return allLabel + " (" + numSpecimens + ")";
+    }
+
+    @Override
+    public List<Node> getChildren() {
+        return tops;
+    }
+
+    @Override
+    public Object getParent() {
+        return parent;
     }
 }

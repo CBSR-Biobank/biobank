@@ -409,7 +409,8 @@ public abstract class CenterWrapper<E extends Center> extends
         + " ra where ra."
         + Property.concatNames(RequestSpecimenPeer.SPECIMEN,
             SpecimenPeer.CURRENT_CENTER) + " = ? and ra.state = "
-        + RequestSpecimenState.NONPROCESSED_STATE.getId();
+        + RequestSpecimenState.NONPROCESSED_STATE.getId() + " or ra.state = "
+        + RequestSpecimenState.PROCESSED_STATE.getId();
 
     public static Collection<? extends ModelWrapper<?>> getRequestCollection(
         WritableApplicationService appService, CenterWrapper<?> center)

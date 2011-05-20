@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -22,6 +20,7 @@ import edu.ualberta.med.biobank.dialogs.dispatch.RequestReceiveScanDialog;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.RequestSpecimensTreeTable;
+import edu.ualberta.med.biobank.widgets.infotables.RequestDispatchInfoTable;
 
 public class RequestEntryForm extends BiobankFormBase {
 
@@ -29,6 +28,7 @@ public class RequestEntryForm extends BiobankFormBase {
     private RequestWrapper request;
     private RequestSpecimensTreeTable specimensTree;
     private Button button;
+    private RequestDispatchInfoTable dispatchTable;
 
     @Override
     protected void createFormContent() throws Exception {
@@ -60,7 +60,7 @@ public class RequestEntryForm extends BiobankFormBase {
 
         BiobankText studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Study");
-        setTextValue(studyLabel, request.getStudy());
+        setTextValue(studyLabel, request.getStudy().getNameShort());
 
         BiobankText researchGroupLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Research Group");
@@ -79,19 +79,14 @@ public class RequestEntryForm extends BiobankFormBase {
         createSpecimensSelectionActions(c, false);
 
         specimensTree = new RequestSpecimensTreeTable(c, request);
-        specimensTree.addTreeSelectionListener(new ISelectionChangedListener() {
 
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                button
-                    .setEnabled(specimensTree.getSelectionElements().size() > 0);
-            }
-
-        });
-
-        button = new Button(c, SWT.PUSH);
-        button.setVisible(true);
-        button.setText("Dispatch Specimens");
+        Section s2 = createSection("Dispatches");
+        Composite c2 = toolkit.createComposite(s2);
+        s2.setClient(c2);
+        c2.setLayout(new GridLayout());
+        c2.setLayoutData(new GridData());
+        dispatchTable = new RequestDispatchInfoTable(c2,
+            request.getDispatchCollection(false));
 
     }
 
