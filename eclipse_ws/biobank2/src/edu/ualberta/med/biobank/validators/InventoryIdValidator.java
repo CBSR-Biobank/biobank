@@ -15,8 +15,14 @@ public class InventoryIdValidator extends AbstractValidator {
 
     private boolean duplicate;
 
-    public InventoryIdValidator(String message) {
+    /**
+     * Edited specimen. Null if new specimen.
+     */
+    private SpecimenWrapper editedSpecimen;
+
+    public InventoryIdValidator(String message, SpecimenWrapper editedSpecimen) {
         super(message);
+        this.editedSpecimen = editedSpecimen;
     }
 
     @Override
@@ -34,6 +40,10 @@ public class InventoryIdValidator extends AbstractValidator {
         final SpecimenWrapper spc = new SpecimenWrapper(
             SessionManager.getAppService());
         spc.setInventoryId((String) value);
+        if (editedSpecimen != null)
+            // need to do that to know the object in database is not the same we
+            // are editing
+            spc.getWrappedObject().setId(editedSpecimen.getId());
 
         duplicate = false;
 

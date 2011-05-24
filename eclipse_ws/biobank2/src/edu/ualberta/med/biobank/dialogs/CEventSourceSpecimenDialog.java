@@ -162,7 +162,8 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
             SpecimenPeer.INVENTORY_ID.getName(),
             new InventoryIdValidator(
                 Messages
-                    .getString("CEventSourceSpecimenDialog.field.inventoryID.validator.msg"))); //$NON-NLS-1$
+                    .getString("CEventSourceSpecimenDialog.field.inventoryID.validator.msg"), //$NON-NLS-1$
+                editedSpecimen));
         GridData gd = (GridData) inventoryIdWidget.getLayoutData();
         gd.horizontalSpan = 2;
 
