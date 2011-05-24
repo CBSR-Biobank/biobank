@@ -161,7 +161,8 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             new InventoryIdValidator(
                 excludeList,
                 Messages
-                    .getString("CEventSourceSpecimenDialog.field.inventoryID.validator.msg"))); //$NON-NLS-1$
+                    .getString("CEventSourceSpecimenDialog.field.inventoryID.validator.msg"), //$NON-NLS-1$
+                editedSpecimen));
         GridData gd = (GridData) inventoryIdWidget.getLayoutData();
         gd.horizontalSpan = 2;
 

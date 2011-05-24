@@ -206,15 +206,16 @@ public class SpecimenEntryWidget extends BiobankWidget {
 
                     try {
                         vetoListenerSupport.notifyListeners(preDelete);
+                        if (preDelete.doit) {
+                            specimens.remove(specimen);
+                            Collections.sort(specimens);
+                            specTable.setCollection(specimens);
 
-                        specimens.remove(specimen);
-                        Collections.sort(specimens);
-                        specTable.setCollection(specimens);
+                            notifyListeners();
+                            hasSpecimens.setValue(specimens.size() > 0);
 
-                        notifyListeners();
-                        hasSpecimens.setValue(specimens.size() > 0);
-
-                        vetoListenerSupport.notifyListeners(postDelete);
+                            vetoListenerSupport.notifyListeners(postDelete);
+                        }
                     } catch (VetoException e) {
                         BiobankPlugin.openAsyncError("Error", e.getMessage());
                     }
