@@ -473,6 +473,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     @Override
     protected void resetInternalFields() {
         objectWithPositionManagement.resetInternalFields();
+        if (isNew())
+            setTopSpecimenInternal(this);
     }
 
     @Override
