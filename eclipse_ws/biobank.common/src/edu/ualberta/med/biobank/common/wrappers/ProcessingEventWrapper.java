@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -60,10 +61,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     @Override
     protected void persistDependencies(ProcessingEvent origObject)
         throws Exception {
-        deleteSpecimens();
-    }
-
-    private void deleteSpecimens() throws Exception {
         for (SpecimenWrapper ss : removedSpecimens) {
             if (!ss.isNew()) {
                 ss.setProcessingEvent(null);
@@ -86,14 +83,26 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankDeleteException,
-        ApplicationException {
-        // FIXME
-        // if (getChildSpecimenCount(false) > 0) {
-        // throw new BiobankCheckException(
-        // "Unable to delete processing event " + getCreatedAt()
-        // + " since it has child specimens stored in database.");
-        // }
+    protected void deleteChecks() throws ApplicationException, BiobankException {
+        if (getDerivedSpecimenCount(false) > 0) {
+            throw new BiobankDeleteException(
+                "Unable to delete processing event '"
+                    + getWorksheet()
+                    + "' ("
+                    + getFormattedCreatedAt()
+                    + ") since some of its specimens have already been derived "
+                    + "into others specimens.");
+        }
+    }
+
+    @Override
+    protected void deleteDependencies() throws Exception {
+        for (SpecimenWrapper ss : getSpecimenCollection(false)) {
+            if (!ss.isNew()) {
+                ss.setProcessingEvent(null);
+                ss.persist();
+            }
+        }
     }
 
     private static final String SPECIMEN_COUNT_QRY = "select count(specimen) from "
@@ -110,6 +119,33 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
             return getCountResult(appService, criteria);
         }
         return getSpecimenCollection(false).size();
+    }
+
+    private static final String DERIVED_SPECIMEN_COUNT_QRY = "select count(specimen) from "
+        + Specimen.class.getName()
+        + " as specimen where specimen."
+        + Property.concatNames(SpecimenPeer.PARENT_SPECIMEN,
+            SpecimenPeer.PROCESSING_EVENT, ProcessingEventPeer.ID) + "=?";
+
+    public long getDerivedSpecimenCount(boolean fast) throws BiobankException,
+        ApplicationException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(DERIVED_SPECIMEN_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, criteria);
+        }
+        return getDerivedSpecimenCollection(false).size();
+    }
+
+    public List<SpecimenWrapper> getDerivedSpecimenCollection(boolean sort) {
+        List<SpecimenWrapper> derivedSpecimens = new ArrayList<SpecimenWrapper>();
+        for (SpecimenWrapper spec : getSpecimenCollection(false)) {
+            derivedSpecimens.addAll(spec.getChildSpecimenCollection(false));
+        }
+        if (sort) {
+            Collections.sort(derivedSpecimens);
+        }
+        return derivedSpecimens;
     }
 
     @Override
