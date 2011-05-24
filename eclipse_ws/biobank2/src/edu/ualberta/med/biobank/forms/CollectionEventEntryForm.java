@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -194,7 +195,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
         widgetCreator.createLabel(client,
             Messages.getString("CollectionEventEntryForm.timeDrawn.label"));
-        timeDrawnWidget = new DateTimeWidget(client, SWT.DATE | SWT.TIME, null);
+        timeDrawnWidget = new DateTimeWidget(client, SWT.DATE | SWT.TIME,
+            new Date());
         toolkit.adapt(timeDrawnWidget);
 
         createPvDataSection(client);
