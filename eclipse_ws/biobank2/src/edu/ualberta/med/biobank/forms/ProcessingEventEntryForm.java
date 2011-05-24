@@ -12,6 +12,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
@@ -221,12 +222,29 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                     .getStudy()))
                         throw new VetoException(
                             "All specimens must be part of the same study.");
+                    else if (specimen.getProcessingEvent() != null) {
+                        throw new VetoException(
+                            "This specimen is already in processing event '"
+                                + specimen.getProcessingEvent().getWorksheet()
+                                + "' ("
+                                + specimen.getProcessingEvent()
+                                    .getFormattedCreatedAt()
+                                + "). Remove it from the other processing event first.");
+                    }
                     break;
                 case POST_ADD:
                     specimen.setProcessingEvent(pEvent);
                     pEvent.addToSpecimenCollection(Arrays.asList(specimen));
                     break;
                 case PRE_DELETE:
+                    if (specimen.getChildSpecimenCollection(false).size() > 0) {
+                        boolean ok = BiobankPlugin
+                            .openConfirm(
+                                "Parent specimen",
+                                "This specimen is the parent of aliquoted specimen. "
+                                    + "Are you sure you want to remove it from this processing event ?");
+                        event.doit = ok;
+                    }
                     break;
                 case POST_DELETE:
                     pEvent
@@ -268,6 +286,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
+        pEvent.reset();
         if (pEvent.getActivityStatus() != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
                 pEvent.getActivityStatus()));
