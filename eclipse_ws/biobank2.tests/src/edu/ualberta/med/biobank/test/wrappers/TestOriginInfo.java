@@ -33,7 +33,7 @@ public class TestOriginInfo extends TestDatabase {
             .addShippingMethod(name);
 
         CollectionEventHelper.addCollectionEvent(clinic, patient, 1, spc);
-        ShipmentInfoWrapper shipInfo = ShipmentInfoHelper.addShipment(clinic,
+        ShipmentInfoWrapper shipInfo = ShipmentInfoHelper.addShipmentInfo(clinic,
             method, Utils.getRandomString(20), Utils.getRandomDate(), spc);
 
         Assert.assertEquals(method, shipInfo.getShippingMethod());

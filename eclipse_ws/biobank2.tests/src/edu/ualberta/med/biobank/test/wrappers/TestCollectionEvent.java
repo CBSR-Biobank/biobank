@@ -100,6 +100,43 @@ public class TestCollectionEvent extends TestDatabase {
     }
 
     @Test
+    public void testAddSourceSpecimens() throws Exception {
+        String name = "testAddSourceSpecimens" + r.nextInt();
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
+        StudyWrapper study = StudyHelper.addStudy("study" + name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.addToContactCollection(Arrays.asList(contact));
+        study.persist();
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study);
+        SpecimenTypeWrapper type = SpecimenTypeWrapper.getAllSpecimenTypes(
+            appService, false).get(0);
+        SpecimenWrapper[] newSpecs = new SpecimenWrapper[r.nextInt(10) + 3];
+        for (int i = 0; i < newSpecs.length; i++) {
+            newSpecs[i] = SpecimenHelper.newSpecimen(type);
+        }
+        CollectionEventWrapper cevent = CollectionEventHelper
+            .addCollectionEvent(clinic, patient1, 1, newSpecs);
+
+        // new sources specimens should also be in the all specimen list.
+        Assert
+            .assertEquals(newSpecs.length, cevent.getAllSpecimensCount(false));
+        Assert.assertEquals(newSpecs.length, cevent
+            .getOriginalSpecimenCollection(false).size());
+
+        // adding a new source specimen
+        OriginInfoWrapper oi = new OriginInfoWrapper(appService);
+        oi.setCenter(clinic);
+        oi.persist();
+        SpecimenWrapper newSrcSpc = SpecimenHelper.newSpecimen(type);
+        newSrcSpc.setOriginInfo(oi);
+        newSrcSpc.setCollectionEvent(cevent);
+        newSrcSpc.setOriginalCollectionEvent(cevent);
+        cevent.addToOriginalSpecimenCollection(Arrays.asList(newSrcSpc));
+        cevent.persist();
+
+    }
+
+    @Test
     public void testRemoveSpecimens() throws Exception {
         // FIXME: issue 1180
         String name = "testRemoveSpecimens" + r.nextInt();

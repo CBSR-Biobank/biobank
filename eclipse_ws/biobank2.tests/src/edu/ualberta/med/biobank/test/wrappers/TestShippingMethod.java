@@ -198,7 +198,7 @@ public class TestShippingMethod extends TestDatabase {
         CollectionEventWrapper cevent1 = CollectionEventHelper
             .addCollectionEvent(site, patient1, 1, parentSpc);
         parentSpc = cevent1.getOriginalSpecimenCollection(false).get(0);
-        ShipmentInfoWrapper shipInfo = ShipmentInfoHelper.addShipment(site,
+        ShipmentInfoWrapper shipInfo = ShipmentInfoHelper.addShipmentInfo(site,
             method, TestCommon.getNewWaybill(r), Utils.getRandomDate(),
             parentSpc);
 
@@ -287,7 +287,7 @@ public class TestShippingMethod extends TestDatabase {
             .addCollectionEvent(clinic1, patient1, 1, parentSpc1);
         parentSpc1 = cevent1.getOriginalSpecimenCollection(false).get(0);
         String waybill = "waybill_" + name;
-        ShipmentInfoWrapper shipInfo1 = ShipmentInfoHelper.addShipment(clinic1,
+        ShipmentInfoWrapper shipInfo1 = ShipmentInfoHelper.addShipmentInfo(clinic1,
             methods[0], waybill, Utils.getRandomDate(), parentSpc1);
 
         Assert.assertTrue(methods[0].isUsed());
@@ -298,7 +298,7 @@ public class TestShippingMethod extends TestDatabase {
         CollectionEventWrapper cevent2 = CollectionEventHelper
             .addCollectionEvent(clinic2, patient1, 2, parentSpc2);
         parentSpc1 = cevent2.getOriginalSpecimenCollection(false).get(0);
-        ShipmentInfoWrapper shipInfo2 = ShipmentInfoHelper.addShipment(clinic2,
+        ShipmentInfoWrapper shipInfo2 = ShipmentInfoHelper.addShipmentInfo(clinic2,
             methods[1], waybill, Utils.getRandomDate(), parentSpc2);
 
         methods[0].reload();

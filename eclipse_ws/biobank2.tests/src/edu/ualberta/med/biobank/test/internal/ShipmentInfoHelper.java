@@ -45,7 +45,7 @@ public class ShipmentInfoHelper extends DbHelper {
             Utils.getRandomDate());
     }
 
-    public static ShipmentInfoWrapper addShipment(CenterWrapper<?> center,
+    public static ShipmentInfoWrapper addShipmentInfo(CenterWrapper<?> center,
         ShippingMethodWrapper method, String waybill, Date dateReceived,
         SpecimenWrapper... spcs) throws Exception {
         ShipmentInfoWrapper shipInfo = newShipmentInfo(center, method, waybill,
@@ -55,15 +55,15 @@ public class ShipmentInfoHelper extends DbHelper {
         return shipInfo;
     }
 
-    public static ShipmentInfoWrapper addShipment(CenterWrapper<?> center,
+    public static ShipmentInfoWrapper addShipmentInfo(CenterWrapper<?> center,
         ShippingMethodWrapper method, String waybill, SpecimenWrapper... spcs)
         throws Exception {
-        return addShipment(center, method, waybill, Utils.getRandomDate(), spcs);
+        return addShipmentInfo(center, method, waybill, Utils.getRandomDate(), spcs);
     }
 
-    public static ShipmentInfoWrapper addShipment(CenterWrapper<?> center,
+    public static ShipmentInfoWrapper addShipmentInfo(CenterWrapper<?> center,
         ShippingMethodWrapper method, SpecimenWrapper... spcs) throws Exception {
-        return addShipment(center, method, TestCommon.getNewWaybill(r),
+        return addShipmentInfo(center, method, TestCommon.getNewWaybill(r),
             Utils.getRandomDate(), spcs);
     }
 
