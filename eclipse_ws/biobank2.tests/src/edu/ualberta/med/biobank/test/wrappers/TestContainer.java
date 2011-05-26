@@ -617,7 +617,7 @@ public class TestContainer extends TestDatabase {
     private String getLabel(Integer labelingScheme, int maxRows, int maxCol,
         int row, int col) {
         String label = null;
-        int len = ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+        int len = ContainerLabelingSchemeWrapper.CBSR_2_CHAR_LABELLING_PATTERN
             .length();
 
         switch (labelingScheme) {
@@ -630,9 +630,9 @@ public class TestContainer extends TestDatabase {
         case 2: {
             int index = maxRows * col + row;
             label = String.format("%c%c",
-                ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                ContainerLabelingSchemeWrapper.CBSR_2_CHAR_LABELLING_PATTERN
                     .charAt(index / len),
-                ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                ContainerLabelingSchemeWrapper.CBSR_2_CHAR_LABELLING_PATTERN
                     .charAt(index % len));
             break;
         }
