@@ -307,6 +307,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
+        // FIXME need to use batchquery for OriginInfo + Collection Event
+
         // create the origin info to be used
         if (specimensTable.getAddedSpecimens().size() > 0) {
             OriginInfoWrapper originInfo = new OriginInfoWrapper(

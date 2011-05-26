@@ -123,6 +123,11 @@ public class TestCollectionEvent extends TestDatabase {
         Assert.assertEquals(newSpecs.length, cevent
             .getOriginalSpecimenCollection(false).size());
 
+        // need to make sure is using a fresh object, as if we just retrieved
+        // the object from the database. We used to have a problem
+        // (org.hibernate.NonUniqueObjectException) when adding new specimen
+        // because of cascade on both specimen relations. see issue #1186
+        cevent.reload();
         // adding a new source specimen
         OriginInfoWrapper oi = new OriginInfoWrapper(appService);
         oi.setCenter(clinic);
@@ -134,6 +139,11 @@ public class TestCollectionEvent extends TestDatabase {
         cevent.addToOriginalSpecimenCollection(Arrays.asList(newSrcSpc));
         cevent.persist();
 
+        cevent.reload();
+        Assert.assertEquals(newSpecs.length + 1,
+            cevent.getAllSpecimensCount(false));
+        Assert.assertEquals(newSpecs.length + 1, cevent
+            .getOriginalSpecimenCollection(false).size());
     }
 
     @Test
