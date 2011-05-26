@@ -42,7 +42,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
     TestOriginInfo.class, TestPatient.class, TestProcessingEvent.class,
     TestSpecimenType.class, TestShipmentInfo.class, TestShippingMethod.class,
     TestSite.class, TestSourceSpecimen.class, TestSpecimen.class,
-    TestSpecimenType.class, TestStudy.class, })
+    TestSpecimenType.class, TestStudy.class })
 public class AllTests {
     public static WritableApplicationService appService = null;
 
