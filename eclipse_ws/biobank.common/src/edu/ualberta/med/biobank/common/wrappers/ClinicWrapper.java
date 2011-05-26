@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ClinicBaseWrapper;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
@@ -44,10 +45,10 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
-        checkNoDuplicates(Clinic.class, ClinicPeer.NAME.getName(), getName(),
-            "A clinic with name");
-        checkNoDuplicates(Clinic.class, ClinicPeer.NAME_SHORT.getName(),
-            getNameShort(), "A clinic with name short");
+        checkNoDuplicates(Center.class, CenterPeer.NAME.getName(), getName(),
+            "A center with name");
+        checkNoDuplicates(Center.class, CenterPeer.NAME_SHORT.getName(),
+            getNameShort(), "A center with short name");
     }
 
     @Override
