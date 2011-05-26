@@ -1,5 +1,11 @@
 package edu.ualberta.med.biobank.dialogs;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -10,6 +16,7 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
 public class SpecimenTypeDialog extends BiobankDialog {
 
@@ -25,12 +32,26 @@ public class SpecimenTypeDialog extends BiobankDialog {
 
     private String currentTitle;
 
+    private MultiSelectWidget multiSelectChildren;
+
+    private Map<Integer, SpecimenTypeWrapper> allOthersTypesObjects;
+    private LinkedHashMap<Integer, String> allOthersTypesStrings;
+
     public SpecimenTypeDialog(Shell parent, SpecimenTypeWrapper specimenType,
-        String message) {
+        String message, List<SpecimenTypeWrapper> allTypes) {
         super(parent);
         Assert.isNotNull(specimenType);
         this.specimenType = specimenType;
         this.message = message;
+        allOthersTypesStrings = new LinkedHashMap<Integer, String>();
+        allOthersTypesObjects = new HashMap<Integer, SpecimenTypeWrapper>();
+        for (SpecimenTypeWrapper type : allTypes) {
+            if (!type.equals(specimenType)) {
+                Integer id = type.getId();
+                allOthersTypesStrings.put(id, type.getName());
+                allOthersTypesObjects.put(id, type);
+            }
+        }
         currentTitle = ((specimenType.getName() == null) ? "Add " : "Edit ")
             + TITLE;
     }
@@ -63,10 +84,30 @@ public class SpecimenTypeDialog extends BiobankDialog {
         createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
             "Short Name", null, specimenType, "nameShort",
             new NonEmptyStringValidator(MSG_NO_ST_SNAME));
+
+        multiSelectChildren = new MultiSelectWidget(content, SWT.NONE,
+            "Available types", "Child types", 300);
+        GridData gd = new GridData();
+        gd.horizontalAlignment = SWT.FILL;
+        gd.widthHint = 700;
+        gd.horizontalSpan = 2;
+        multiSelectChildren.setLayoutData(gd);
+
+        List<Integer> selectedTypes = new ArrayList<Integer>();
+        for (SpecimenTypeWrapper child : specimenType
+            .getChildSpecimenTypeCollection(false)) {
+            selectedTypes.add(child.getId());
+        }
+        multiSelectChildren.setSelections(allOthersTypesStrings, selectedTypes);
     }
 
     @Override
     protected void okPressed() {
+        List<SpecimenTypeWrapper> addedTypes = new ArrayList<SpecimenTypeWrapper>();
+        for (Integer addedId : multiSelectChildren.getAddedToSelection()) {
+            addedTypes.add(allOthersTypesObjects.get(addedId));
+        }
+        specimenType.addToChildSpecimenTypeCollection(addedTypes);
         super.okPressed();
     }
 }

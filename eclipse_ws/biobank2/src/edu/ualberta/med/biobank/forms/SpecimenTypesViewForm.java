@@ -11,7 +11,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenTypeEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.trees.infos.SpecimenTypeEntryInfoTree;
 
 public class SpecimenTypesViewForm extends BiobankFormBase {
 
@@ -19,7 +19,9 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
 
     public static final String OK_MESSAGE = "Add or edit a specimen type";
 
-    private SpecimenTypeEntryInfoTable specimenWidget;
+    private SpecimenTypeEntryInfoTree specimenWidget;
+
+    private List<SpecimenTypeWrapper> globalSampleTypes;
 
     @Override
     public void init() throws Exception {
@@ -30,17 +32,18 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
     protected void createFormContent() throws Exception {
         form.setText("Specimen Types");
         page.setLayout(new GridLayout(1, false));
-        createGlobalSampleTypeSection();
-    }
 
-    private void createGlobalSampleTypeSection() throws Exception {
-        Section section = createSection("Specimen Types");
-        List<SpecimenTypeWrapper> globalSampleTypes = SpecimenTypeWrapper
-            .getAllSpecimenTypes(appService, true);
+        globalSampleTypes = SpecimenTypeWrapper.getAllSpecimenTypes(appService,
+            true);
         if (globalSampleTypes == null) {
             globalSampleTypes = new ArrayList<SpecimenTypeWrapper>();
         }
-        specimenWidget = new SpecimenTypeEntryInfoTable(section,
+        createGlobalSampleTypeSection();
+    }
+
+    private void createGlobalSampleTypeSection() {
+        Section section = createSection("Specimen Types");
+        specimenWidget = new SpecimenTypeEntryInfoTree(section,
             globalSampleTypes, "Add a new global specimen type",
             "Edit the global specimen type");
         specimenWidget.adaptToToolkit(toolkit, true);

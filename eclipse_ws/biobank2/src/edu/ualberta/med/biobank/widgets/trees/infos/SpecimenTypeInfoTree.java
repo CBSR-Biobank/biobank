@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets.infotables;
+package edu.ualberta.med.biobank.widgets.trees.infos;
 
 import java.util.List;
 
@@ -6,14 +6,17 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 
-public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> {
+public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
 
     private static final String[] HEADINGS = new String[] { "Name",
         "Short Name" };
 
-    public SpecimenTypeInfoTable(Composite parent,
+    public SpecimenTypeInfoTree(Composite parent,
         List<SpecimenTypeWrapper> specimenCollection) {
         super(parent, specimenCollection, HEADINGS, 20);
     }
@@ -23,7 +26,11 @@ public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> 
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                SpecimenTypeWrapper item = (SpecimenTypeWrapper) ((BiobankCollectionModel) element).o;
+                SpecimenTypeWrapper item = null;
+                if (element instanceof SpecimenTypeWrapper)
+                    item = (SpecimenTypeWrapper) element;
+                else
+                    item = (SpecimenTypeWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
                         return "loading...";
@@ -44,10 +51,9 @@ public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> 
 
     @Override
     protected String getCollectionModelObjectToString(Object o) {
-        // if (o == null)
-        // return null;
-        // return ((SourceVesselWrapper) o).getSourceVesselType().getName();
-        return null;
+        if (o == null)
+            return null;
+        return ((SpecimenTypeWrapper) o).toString();
     }
 
     @Override
@@ -64,4 +70,18 @@ public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> 
     protected BiobankTableSorter getComparator() {
         return null;
     }
+
+    @Override
+    protected List<Node> getNodeChildren(Node node) {
+        if (node != null && node instanceof BiobankCollectionModel) {
+            BiobankCollectionModel model = (BiobankCollectionModel) node;
+            Object obj = model.o;
+            if (obj != null)
+                return createNodes(node,
+                    ((SpecimenTypeWrapper) obj)
+                        .getChildSpecimenTypeCollection(false));
+        }
+        return super.getNodeChildren(node);
+    }
+
 }

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets.infotables.entry;
+package edu.ualberta.med.biobank.widgets.trees.infos;
 
 import java.util.List;
 
@@ -16,23 +16,22 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.dialogs.SpecimenTypeDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
-import edu.ualberta.med.biobank.widgets.infotables.SpecimenTypeInfoTable;
+import edu.ualberta.med.biobank.widgets.trees.infos.listener.IInfoTreeAddItemListener;
+import edu.ualberta.med.biobank.widgets.trees.infos.listener.IInfoTreeDeleteItemListener;
+import edu.ualberta.med.biobank.widgets.trees.infos.listener.IInfoTreeEditItemListener;
+import edu.ualberta.med.biobank.widgets.trees.infos.listener.InfoTreeEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Displays the current specimen type collection and allows the user to add
  * additional specimen type to the collection.
  */
-public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
+public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(SpecimenTypeEntryInfoTable.class.getName());
+        .getLogger(SpecimenTypeEntryInfoTree.class.getName());
 
-    List<SpecimenTypeWrapper> selectedSpecimenTypes;
+    private List<SpecimenTypeWrapper> selectedSpecimenTypes;
 
     private String addMessage;
 
@@ -45,7 +44,7 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
      * @param SampleTypeCollection the specimen type already selected and to be
      *            displayed in the table viewer (can be null).
      */
-    public SpecimenTypeEntryInfoTable(Composite parent,
+    public SpecimenTypeEntryInfoTree(Composite parent,
         List<SpecimenTypeWrapper> globalSpecimenTypes, String addMessage,
         String editMessage) {
         super(parent, null);
@@ -74,7 +73,7 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
         SpecimenTypeWrapper specimenType, String message) {
         SpecimenTypeDialog dlg = new SpecimenTypeDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            specimenType, message);
+            specimenType, message, selectedSpecimenTypes);
         if (dlg.open() == Dialog.OK) {
             if (addEditOk(specimenType)) {
                 if (add) {
@@ -101,25 +100,25 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
     }
 
     private void addEditSupport() {
-        addAddItemListener(new IInfoTableAddItemListener() {
+        addAddItemListener(new IInfoTreeAddItemListener() {
             @Override
-            public void addItem(InfoTableEvent event) {
+            public void addItem(InfoTreeEvent event) {
                 addSpecimenType();
             }
         });
 
-        addEditItemListener(new IInfoTableEditItemListener() {
+        addEditItemListener(new IInfoTreeEditItemListener() {
             @Override
-            public void editItem(InfoTableEvent event) {
+            public void editItem(InfoTreeEvent event) {
                 SpecimenTypeWrapper type = getSelection();
                 if (type != null)
                     addOrEditSpecimenType(false, type, editMessage);
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        addDeleteItemListener(new IInfoTreeDeleteItemListener() {
             @Override
-            public void deleteItem(InfoTableEvent event) {
+            public void deleteItem(InfoTreeEvent event) {
                 SpecimenTypeWrapper specType = getSelection();
                 if (specType != null) {
                     try {

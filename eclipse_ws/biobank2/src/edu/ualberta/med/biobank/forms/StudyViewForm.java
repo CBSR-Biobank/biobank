@@ -18,8 +18,8 @@ import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.SourceSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
+import edu.ualberta.med.biobank.widgets.trees.infos.SourceSpecimenInfoTree;
 
 public class StudyViewForm extends BiobankViewForm {
 
@@ -40,7 +40,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private StudyContactInfoTable contactsTable;
     private AliquotedSpecimenInfoTable aliquotedSpecimenTable;
-    private SourceSpecimenInfoTable sourceSpecimenTable;
+    private SourceSpecimenInfoTree sourceSpecimenTree;
 
     private static class StudyPvCustomInfo extends PvAttrCustom {
         public BiobankText wiget;
@@ -159,11 +159,11 @@ public class StudyViewForm extends BiobankViewForm {
         Section section = createSection(Messages
             .getString("StudyViewForm.source.specimen.title")); //$NON-NLS-1$
 
-        sourceSpecimenTable = new SourceSpecimenInfoTable(section,
+        sourceSpecimenTree = new SourceSpecimenInfoTree(section,
             study.getSourceSpecimenCollection(true));
-        section.setClient(sourceSpecimenTable);
-        sourceSpecimenTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(sourceSpecimenTable);
+        section.setClient(sourceSpecimenTree);
+        sourceSpecimenTree.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(sourceSpecimenTree);
     }
 
     private void createPvCustomInfoSection() throws Exception {
@@ -233,7 +233,7 @@ public class StudyViewForm extends BiobankViewForm {
         setPvDataSectionValues();
         aliquotedSpecimenTable.setCollection(study
             .getAliquotedSpecimenCollection(true));
-        sourceSpecimenTable.setCollection(study
+        sourceSpecimenTree.setCollection(study
             .getSourceSpecimenCollection(true));
         contactsTable.setCollection(study.getContactCollection(true));
     }
