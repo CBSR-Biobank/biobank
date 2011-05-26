@@ -95,6 +95,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         if (patient.isNew()) {
             if (studies.size() == 1) {
                 selectedStudy = studies.get(0);
+                patient.setStudy(selectedStudy);
             }
         } else {
             selectedStudy = patient.getStudy();
