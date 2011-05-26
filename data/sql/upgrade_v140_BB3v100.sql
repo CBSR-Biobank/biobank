@@ -6,6 +6,13 @@
 
 
 /*****************************************************
+ * Source specimen
+ ****************************************************/
+
+ALTER TABLE source_specimen
+    DROP COLUMN need_time_drawn;
+
+/*****************************************************
  * Container labeling scheme
  ****************************************************/
 INSERT INTO `CONTAINER_LABELING_SCHEME` (ID, NAME, MIN_CHARS, MAX_CHARS, MAX_ROWS, MAX_COLS, MAX_CAPACITY, VERSION) VALUES
