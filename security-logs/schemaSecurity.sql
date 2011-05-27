@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.1.49, for debian-linux-gnu (x86_64)
 --
--- Host: localhost    Database: biobank2
+-- Host: localhost    Database: biobank
 -- ------------------------------------------------------
 -- Server version	5.1.49-1ubuntu8.1
 
@@ -46,7 +46,7 @@ CREATE TABLE `csm_application` (
 LOCK TABLES `csm_application` WRITE;
 /*!40000 ALTER TABLE `csm_application` DISABLE KEYS */;
 INSERT INTO `csm_application` VALUES (1,'csmupt','CSM UPT Super Admin Application',0,0,'2009-07-22',NULL,NULL,NULL,NULL,NULL);
-INSERT INTO `csm_application` VALUES (2,'biobank2','biobank2',0,0,'2009-07-22','jdbc:mysql://localhost:3306/biobank2','dummy','4UlzrQJztJY=','org.hibernate.dialect.MySQLDialect','com.mysql.jdbc.Driver');
+INSERT INTO `csm_application` VALUES (2,'biobank','biobank',0,0,'2009-07-22','jdbc:mysql://localhost:3306/biobank','dummy','4UlzrQJztJY=','org.hibernate.dialect.MySQLDialect','com.mysql.jdbc.Driver');
 /*!40000 ALTER TABLE `csm_application` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -301,7 +301,7 @@ CREATE TABLE `csm_protection_element` (
 LOCK TABLES `csm_protection_element` WRITE;
 /*!40000 ALTER TABLE `csm_protection_element` DISABLE KEYS */;
 INSERT INTO `csm_protection_element` VALUES (1,'csmupt','CSM UPT Super Admin Application Protection Element','csmupt',NULL,NULL,NULL,1,'2009-07-22');
-INSERT INTO `csm_protection_element` VALUES (2,'biobank2','biobank2','biobank2',NULL,NULL,NULL,1,'2009-07-22');
+INSERT INTO `csm_protection_element` VALUES (2,'biobank','biobank','biobank',NULL,NULL,NULL,1,'2009-07-22');
 INSERT INTO `csm_protection_element` VALUES (3,'edu.ualberta.med.biobank.model.ActivityStatus','edu.ualberta.med.biobank.model.ActivityStatus','edu.ualberta.med.biobank.model.ActivityStatus','','','',2,'2010-03-04');
 INSERT INTO `csm_protection_element` VALUES (4,'edu.ualberta.med.biobank.model.Address','edu.ualberta.med.biobank.model.Address','edu.ualberta.med.biobank.model.Address',NULL,NULL,NULL,2,'2009-07-22');
 INSERT INTO `csm_protection_element` VALUES (5,'edu.ualberta.med.biobank.model.Capacity','edu.ualberta.med.biobank.model.Capacity','edu.ualberta.med.biobank.model.Capacity',NULL,NULL,NULL,2,'2009-07-22');
