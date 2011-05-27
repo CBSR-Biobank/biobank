@@ -4,6 +4,37 @@
  *
  *----------------------------------------------------------------------------*/
 
+ALTER TABLE dispatch
+      MODIFY COLUMN RECEIVER_CENTER_ID INT(11) NOT NULL,
+      MODIFY COLUMN SENDER_CENTER_ID INT(11) NOT NULL;
+
+ALTER TABLE dispatch_specimen
+      MODIFY COLUMN SPECIMEN_ID INT(11) NOT NULL,
+      MODIFY COLUMN DISPATCH_ID INT(11) NOT NULL;
+
+ALTER TABLE request_specimen
+      MODIFY COLUMN SPECIMEN_ID INT(11) NOT NULL,
+      MODIFY COLUMN AREQUEST_ID INT(11) NOT NULL;
+
+ALTER TABLE request
+      ADD COLUMN REQUESTER_ID INT(11) NOT NULL COMMENT '',
+      ADD INDEX FK6C1A7E6F80AB67E (REQUESTER_ID),
+      ADD CONSTRAINT FK6C1A7E6F80AB67E FOREIGN KEY FK6C1A7E6F80AB67E (REQUESTER_ID) REFERENCES center (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+/*****************************************************
+ * Origin info
+ ****************************************************/
+
+ALTER TABLE origin_info
+      ADD COLUMN RECEIVER_SITE_ID INT(11) NULL DEFAULT NULL COMMENT '',
+      ADD INDEX FKE92E7A275598FA35 (RECEIVER_SITE_ID),
+      ADD CONSTRAINT FKE92E7A275598FA35 FOREIGN KEY FKE92E7A275598FA35 (RECEIVER_SITE_ID) REFERENCES center (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+update origin_info oi, shipment_info si, specimen spc
+       set oi.receiver_site_id=spc.current_center_id
+       where oi.id=spc.origin_info_id
+       and si.id=oi.shipment_info_id;
+
 
 /*****************************************************
  * Source specimen
@@ -21,6 +52,9 @@ INSERT INTO `CONTAINER_LABELING_SCHEME` (ID, NAME, MIN_CHARS, MAX_CHARS, MAX_ROW
 /*****************************************************
  * Specimen Hierarchy
  ****************************************************/
+
+ALTER TABLE specimen_type_specimen_type
+      ADD PRIMARY KEY (PARENT_SPECIMEN_TYPE_ID, CHILD_SPECIMEN_TYPE_ID);
 
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
 	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),

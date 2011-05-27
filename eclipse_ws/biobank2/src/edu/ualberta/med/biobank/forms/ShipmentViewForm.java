@@ -23,9 +23,11 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private ShipmentAdapter shipmentAdapter;
 
-    private OriginInfoWrapper shipment;
+    private OriginInfoWrapper originInfo;
 
     private BiobankText senderLabel;
+
+    private BiobankText receiverLabel;
 
     private BiobankText waybillLabel;
 
@@ -46,17 +48,17 @@ public class ShipmentViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         shipmentAdapter = (ShipmentAdapter) adapter;
-        shipment = shipmentAdapter.getWrapper();
+        originInfo = shipmentAdapter.getWrapper();
 
         setPartName();
     }
 
     private void retrieveShipment() {
         try {
-            shipment.reload();
+            originInfo.reload();
         } catch (Exception ex) {
             logger.error("Error while retrieving shipment "
-                + shipment.getShipmentInfo().getWaybill(), ex);
+                + originInfo.getShipmentInfo().getWaybill(), ex);
         }
     }
 
@@ -77,7 +79,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
         specimenWidget = new SpecimenEntryWidget(client, SWT.NONE, toolkit,
             appService, false);
-        specimenWidget.setSpecimens(shipment.getSpecimenCollection());
+        specimenWidget.setSpecimens(originInfo.getSpecimenCollection());
         specimenWidget.addDoubleClickListener(collectionDoubleClickListener);
     }
 
@@ -90,10 +92,12 @@ public class ShipmentViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         senderLabel = createReadOnlyLabelledField(client, SWT.NONE, "Sender");
+        receiverLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Receiver");
         waybillLabel = createReadOnlyLabelledField(client, SWT.NONE, "Waybill");
         shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Shipping Method");
-        if (shipment.getShipmentInfo().getShippingMethod().needDate()) {
+        if (originInfo.getShipmentInfo().getShippingMethod().needDate()) {
             departedLabel = createReadOnlyLabelledField(client, SWT.NONE,
                 "Packed");
         }
@@ -106,11 +110,12 @@ public class ShipmentViewForm extends BiobankViewForm {
     }
 
     private void setShipmentValues() {
-        ShipmentInfoWrapper shipInfo = shipment.getShipmentInfo();
+        ShipmentInfoWrapper shipInfo = originInfo.getShipmentInfo();
         ShippingMethodWrapper shipMethod = shipInfo.getShippingMethod();
 
-        setTextValue(senderLabel, shipment.getCenter().getName());
-        setTextValue(waybillLabel, shipment.getShipmentInfo().getWaybill());
+        setTextValue(senderLabel, originInfo.getCenter().getName());
+        setTextValue(receiverLabel, originInfo.getReceiverSite().getName());
+        setTextValue(waybillLabel, originInfo.getShipmentInfo().getWaybill());
         if (departedLabel != null) {
             setTextValue(departedLabel, shipInfo.getFormattedDatePacked());
         }
@@ -128,19 +133,19 @@ public class ShipmentViewForm extends BiobankViewForm {
         setFormText();
         setShipmentValues();
 
-        specimenWidget.setSpecimens(shipment.getSpecimenCollection());
+        specimenWidget.setSpecimens(originInfo.getSpecimenCollection());
     }
 
     private void setPartName() {
         setPartName("Shipment "
-            + shipment.getShipmentInfo().getFormattedDateReceived());
+            + originInfo.getShipmentInfo().getFormattedDateReceived());
     }
 
     private void setFormText() {
         if (!form.isDisposed()) {
             form.setText("Shipment received on "
-                + shipment.getShipmentInfo().getFormattedDateReceived()
-                + " from " + shipment.getCenter().getNameShort());
+                + originInfo.getShipmentInfo().getFormattedDateReceived()
+                + " from " + originInfo.getCenter().getNameShort());
         }
     }
 
