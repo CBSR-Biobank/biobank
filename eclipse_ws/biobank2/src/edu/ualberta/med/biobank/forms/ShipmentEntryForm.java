@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.SpecimenOriginSelectDialog;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
@@ -54,6 +55,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private OriginInfoWrapper originInfo;
 
     private ComboViewer senderComboViewer;
+
+    private ComboViewer receiverComboViewer;
 
     private ComboViewer shippingMethodComboViewer;
 
@@ -105,7 +108,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         createSpecimensSection();
     }
 
-    private void createMainSection() throws ApplicationException {
+    private void createMainSection() throws Exception, ApplicationException {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -116,7 +119,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         senderComboViewer = createComboViewer(client, "Sender",
             ClinicWrapper.getAllClinics(appService),
             (ClinicWrapper) originInfo.getCenter(),
-            "A sender should be selected", new ComboSelectionUpdate() {
+            "A sender center should be selected", new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     originInfo.setCenter((CenterWrapper<?>) selectedObject);
@@ -125,6 +128,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 }
             });
         setFirstControl(senderComboViewer.getControl());
+
+        receiverComboViewer = createComboViewer(client, "Receiver",
+            SiteWrapper.getSites(appService), originInfo.getReceiverSite(),
+            "A receiving site should be selected", new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    originInfo.setReceiverSite((SiteWrapper) selectedObject);
+                }
+            });
 
         waybillLabel = widgetCreator.createLabel(client, "Waybill");
         waybillLabel.setLayoutData(new GridData(
@@ -354,6 +366,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             .getSpecimenCollection(false));
 
         GuiUtil.reset(senderComboViewer, originInfo.getCenter());
+        GuiUtil.reset(receiverComboViewer, originInfo.getReceiverSite());
         GuiUtil.reset(shippingMethodComboViewer,
             shipmentInfo.getShippingMethod());
     }
