@@ -292,7 +292,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
     }
 
     @SuppressWarnings("unused")
-    public Object getCollectionModelObject(T item) throws Exception {
+    public Object getCollectionModelObject(Object item) throws Exception {
         return item;
     }
 
@@ -519,18 +519,19 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
     }
 
     @Override
-    protected List<Node> getNodeChildren(Node node) {
+    protected List<Node> getNodeChildren(Node node) throws Exception {
         if (node == root) {
             return node.getChildren();
         }
         return Collections.emptyList();
     }
 
-    protected List<Node> createNodes(Node parent, List<?> objects) {
+    protected List<Node> createNodes(Node parent, List<?> objects)
+        throws Exception {
         List<Node> nodes = new ArrayList<Node>();
         for (int i = 0, n = objects.size(); i < n; ++i) {
             BiobankCollectionModel model = new BiobankCollectionModel(parent, i);
-            model.o = objects.get(i);
+            model.o = getCollectionModelObject(objects.get(i));
             nodes.add(model);
         }
         return nodes;

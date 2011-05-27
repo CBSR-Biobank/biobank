@@ -72,7 +72,7 @@ public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
     }
 
     @Override
-    protected List<Node> getNodeChildren(Node node) {
+    protected List<Node> getNodeChildren(Node node) throws Exception {
         if (node != null && node instanceof BiobankCollectionModel) {
             BiobankCollectionModel model = (BiobankCollectionModel) node;
             Object obj = model.o;

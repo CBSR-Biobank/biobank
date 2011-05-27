@@ -139,7 +139,11 @@ public abstract class AbstractInfoTreeWidget<T> extends BiobankWidget {
             @Override
             public Object[] getChildren(Object parentElement) {
                 if (parentElement instanceof Node)
-                    return getNodeChildren((Node) parentElement).toArray();
+                    try {
+                        return getNodeChildren((Node) parentElement).toArray();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 return new Object[0];
             }
         });
@@ -171,7 +175,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BiobankWidget {
 
     }
 
-    protected abstract List<Node> getNodeChildren(Node node);
+    protected abstract List<Node> getNodeChildren(Node node) throws Exception;
 
     protected abstract List<Node> getRootChildren();
 
