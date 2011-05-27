@@ -32,9 +32,9 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
 import edu.ualberta.med.biobank.widgets.infotables.entry.AliquotedSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ClinicAddInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.entry.SourceSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
+import edu.ualberta.med.biobank.widgets.trees.infos.SourceToAliquotedTypeEntryInfoTree;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
@@ -69,7 +69,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private ComboViewer activityStatusComboViewer;
 
-    private SourceSpecimenEntryInfoTable sourceSpecimenEntryTable;
+    private SourceToAliquotedTypeEntryInfoTree sourceSpecimenEntryTree;
 
     private static class StudyPvAttrCustom extends PvAttrCustom {
         public PvInfoWidget widget;
@@ -194,20 +194,20 @@ public class StudyEntryForm extends BiobankEntryForm {
     private void createSourceSpecimensSection() {
         Section section = createSection(Messages
             .getString("StudyEntryForm.source.specimens.title")); //$NON-NLS-1$
-        sourceSpecimenEntryTable = new SourceSpecimenEntryInfoTable(section,
-            study);
-        sourceSpecimenEntryTable.adaptToToolkit(toolkit, true);
-        sourceSpecimenEntryTable.addSelectionChangedListener(listener);
+        sourceSpecimenEntryTree = new SourceToAliquotedTypeEntryInfoTree(
+            section, study);
+        sourceSpecimenEntryTree.adaptToToolkit(toolkit, true);
+        sourceSpecimenEntryTree.addSelectionChangedListener(listener);
 
         addSectionToolbar(
             section,
             Messages.getString("StudyEntryForm.source.specimens.button.add"), new SelectionAdapter() { //$NON-NLS-1$
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    sourceSpecimenEntryTable.addSourceSpecimen();
+                    sourceSpecimenEntryTree.addSourceSpecimen();
                 }
             });
-        section.setClient(sourceSpecimenEntryTable);
+        section.setClient(sourceSpecimenEntryTree);
     }
 
     private void createPvCustomInfoSection() throws Exception {
@@ -285,9 +285,9 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        study.addToSourceSpecimenCollection(sourceSpecimenEntryTable
+        study.addToSourceSpecimenCollection(sourceSpecimenEntryTree
             .getAddedOrModifiedSourceSpecimens());
-        study.removeFromSourceSpecimenCollection(sourceSpecimenEntryTable
+        study.removeFromSourceSpecimenCollection(sourceSpecimenEntryTree
             .getDeletedSourceSpecimens());
 
         // sample storage
@@ -356,7 +356,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         contactEntryTable.reload();
         aliquotedSpecimenEntryTable.reload();
-        sourceSpecimenEntryTable.reload();
+        sourceSpecimenEntryTree.reload();
 
         resetPvCustomInfo();
 

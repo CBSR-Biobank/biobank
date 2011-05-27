@@ -16,14 +16,15 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 
-public class SourceToAliquotedSpecimenInfoTree extends
+public class SourceToAliquotedTypeInfoTree extends
     InfoTreeWidget<SourceSpecimenWrapper> {
 
-    private static final int PAGE_SIZE_ROWS = 5;
+    private static final int PAGE_SIZE_ROWS = 10;
 
     protected static class TreeRowData {
         SourceSpecimenWrapper studySourceVessel;
         AliquotedSpecimenWrapper studyAliquotedSpecimen;
+        SpecimenTypeWrapper type;
         public String name;
         public Double volume;
         public Integer quantity;
@@ -43,7 +44,7 @@ public class SourceToAliquotedSpecimenInfoTree extends
         Messages.getString("AliquotedSpecimen.field.quantity.label"),
         Messages.getString("label.activity") };
 
-    public SourceToAliquotedSpecimenInfoTree(Composite parent,
+    public SourceToAliquotedTypeInfoTree(Composite parent,
         List<SourceSpecimenWrapper> collection) {
         super(parent, collection, HEADINGS, PAGE_SIZE_ROWS);
     }
@@ -85,7 +86,11 @@ public class SourceToAliquotedSpecimenInfoTree extends
             info.studySourceVessel = studySourceVessel;
             Assert.isNotNull(studySourceVessel.getSpecimenType(),
                 "study specimen type is null");
-            info.name = studySourceVessel.getSpecimenType().getName();
+            String needOriginalVolume = (studySourceVessel
+                .getNeedOriginalVolume() != null) ? (studySourceVessel
+                .getNeedOriginalVolume() ? "Yes" : "No") : "No";
+            info.name = studySourceVessel.getSpecimenType().getName()
+                + " (need volume=" + needOriginalVolume + ")";
         } else if (item instanceof AliquotedSpecimenWrapper) {
             AliquotedSpecimenWrapper aliquotedSpecimen = (AliquotedSpecimenWrapper) item;
             info.studyAliquotedSpecimen = aliquotedSpecimen;
@@ -135,7 +140,8 @@ public class SourceToAliquotedSpecimenInfoTree extends
             if (row != null)
                 if (row.studySourceVessel != null)
                     return createNodes(node,
-                        row.studySourceVessel.getPossibleDerivedTypes());
+                        row.studySourceVessel
+                            .getAliquotedSpecimenCollection(false));
         }
         return super.getNodeChildren(node);
     }

@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
-import edu.ualberta.med.biobank.widgets.trees.infos.SourceToAliquotedSpecimenInfoTree;
+import edu.ualberta.med.biobank.widgets.trees.infos.SourceToAliquotedTypeInfoTree;
 
 public class StudyViewForm extends BiobankViewForm {
 
@@ -40,7 +40,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private StudyContactInfoTable contactsTable;
     private AliquotedSpecimenInfoTable aliquotedSpecimenTable;
-    private SourceToAliquotedSpecimenInfoTree sourceSpecimenTree;
+    private SourceToAliquotedTypeInfoTree sourceSpecimenTree;
 
     private static class StudyPvCustomInfo extends PvAttrCustom {
         public BiobankText wiget;
@@ -94,7 +94,7 @@ public class StudyViewForm extends BiobankViewForm {
             Messages.getString("StudyViewForm.field.label.total.patientVisits")); //$NON-NLS-1$
 
         createClinicSection();
-        createSourceSpecimenSection();
+        createSourceToAliquotedSpecimenSection();
         createAliquotedSpecimenSection();
         createPvCustomInfoSection();
         setStudySectionValues();
@@ -155,11 +155,11 @@ public class StudyViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(aliquotedSpecimenTable);
     }
 
-    private void createSourceSpecimenSection() {
+    private void createSourceToAliquotedSpecimenSection() {
         Section section = createSection(Messages
-            .getString("StudyViewForm.source.specimen.title")); //$NON-NLS-1$
+            .getString("StudyViewForm.source.toaliquoted.types.title")); //$NON-NLS-1$
 
-        sourceSpecimenTree = new SourceToAliquotedSpecimenInfoTree(section,
+        sourceSpecimenTree = new SourceToAliquotedTypeInfoTree(section,
             study.getSourceSpecimenCollection(true));
         section.setClient(sourceSpecimenTree);
         sourceSpecimenTree.adaptToToolkit(toolkit, true);

@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.widgets.trees.infos;
 
 import java.util.List;
 
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -203,10 +204,15 @@ public abstract class AbstractInfoTreeWidget<T> extends BiobankWidget {
                         col.getColumn().pack();
                     }
                 });
+                col.setEditingSupport(getEditingSupport(index));
                 index++;
             }
             treeViewer.setColumnProperties(headings);
         }
+    }
+
+    protected EditingSupport getEditingSupport(int index) {
+        return null;
     }
 
     protected abstract boolean isEditMode();

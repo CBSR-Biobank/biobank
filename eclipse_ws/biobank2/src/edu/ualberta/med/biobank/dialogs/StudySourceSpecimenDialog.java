@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.dialogs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -15,10 +16,13 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.widgets.infotables.TypeAndAliquotedSpecimenData;
+import edu.ualberta.med.biobank.widgets.infotables.TypeAndAliquotedSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class StudySourceSpecimenDialog extends PagedDialog {
@@ -36,6 +40,10 @@ public class StudySourceSpecimenDialog extends PagedDialog {
     private Button volume;
 
     private SourceSpecimenWrapper internalSourceSpecimen;
+
+    private TypeAndAliquotedSpecimenInfoTable aliquotedViewer;
+
+    private List<TypeAndAliquotedSpecimenData> tableInput = new ArrayList<TypeAndAliquotedSpecimenData>();
 
     public StudySourceSpecimenDialog(Shell parent,
         SourceSpecimenWrapper origSourceSpecimen, NewListener newListener,
@@ -99,6 +107,9 @@ public class StudySourceSpecimenDialog extends PagedDialog {
                 public void doSelection(Object selectedObject) {
                     internalSourceSpecimen
                         .setSpecimenType((SpecimenTypeWrapper) selectedObject);
+                    updateTableModel(internalSourceSpecimen.getSpecimenType(),
+                        true);
+                    aliquotedViewer.reloadCollection(tableInput);
                 }
             });
 
@@ -108,6 +119,41 @@ public class StudySourceSpecimenDialog extends PagedDialog {
             new String[0], internalSourceSpecimen,
             SourceSpecimenPeer.NEED_ORIGINAL_VOLUME.getName(), null);
 
+        updateTableModel(origSourceSpecimen);
+        aliquotedViewer = new TypeAndAliquotedSpecimenInfoTable(contents,
+            tableInput);
+        GridData gd = new GridData();
+        gd.horizontalAlignment = SWT.FILL;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalSpan = 2;
+        aliquotedViewer.setLayoutData(gd);
+    }
+
+    private void updateTableModel(SourceSpecimenWrapper sourceSpecimen) {
+        List<SpecimenTypeWrapper> types = new ArrayList<SpecimenTypeWrapper>();
+        for (AliquotedSpecimenWrapper asw : sourceSpecimen
+            .getAliquotedSpecimenCollection(false)) {
+            tableInput.add(new TypeAndAliquotedSpecimenData(asw));
+            types.add(asw.getSpecimenType());
+        }
+        updateTableModel(sourceSpecimen.getSpecimenType(), types, false);
+    }
+
+    private void updateTableModel(SpecimenTypeWrapper type, boolean clear) {
+        updateTableModel(type, new ArrayList<SpecimenTypeWrapper>(), clear);
+    }
+
+    private void updateTableModel(SpecimenTypeWrapper type,
+        List<SpecimenTypeWrapper> excludeTypes, boolean clear) {
+        if (clear)
+            tableInput.clear();
+        if (type != null)
+            for (SpecimenTypeWrapper t : type
+                .getChildSpecimenTypeCollection(false)) {
+                if (!excludeTypes.contains(t)) {
+                    tableInput.add(new TypeAndAliquotedSpecimenData(t));
+                }
+            }
     }
 
     @Override
@@ -140,4 +186,5 @@ public class StudySourceSpecimenDialog extends PagedDialog {
             .setNeedOriginalVolume((internalSourceSpecimen)
                 .getNeedOriginalVolume());
     }
+
 }

@@ -294,9 +294,9 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
-        Object type = item.o;
-        Assert.isNotNull(type);
-        return type;
+        Object object = item.o;
+        Assert.isNotNull(object);
+        return object;
     }
 
     public void addClickListener(IDoubleClickListener listener) {

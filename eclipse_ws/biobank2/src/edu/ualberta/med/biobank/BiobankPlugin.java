@@ -148,6 +148,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
     public static final String IMG_PROCESSING = "processing";
     public static final String IMG_SAVE_AS_NEW = "saveAsNew";
     public static final String IMG_PROCESSING_EVENT = "processingEvent";
+    public static final String IMG_CHECK = "check";
+    public static final String IMG_UNCHECK = "uncheck";
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -339,6 +341,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_PROCESSING_EVENT,
             "processingPerspective.png");
         registerImage(registry, IMG_SAVE_AS_NEW, "application_form_add.png");
+        registerImage(registry, IMG_CHECK, "checked.gif");
+        registerImage(registry, IMG_UNCHECK, "unchecked.gif");
     }
 
     private void registerImage(ImageRegistry registry, String key,
