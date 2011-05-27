@@ -31,8 +31,9 @@ ALTER TABLE origin_info
       ADD CONSTRAINT FKE92E7A275598FA35 FOREIGN KEY FKE92E7A275598FA35 (RECEIVER_SITE_ID) REFERENCES center (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 update origin_info oi, shipment_info si, specimen spc
-       set receiver_site_id=(select id from center where name_short='CBSR')
-       where
+       set oi.receiver_site_id=spc.current_center_id
+       where oi.id=spc.origin_info_id
+       and si.id=oi.shipment_info_id;
 
 
 /*****************************************************
