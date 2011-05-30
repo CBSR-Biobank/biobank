@@ -141,12 +141,11 @@ public class PatientEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         patient.persist();
-        // to update patient view:
+        SessionManager.updateAllSimilarNodes(adapter, true);
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                SessionManager.updateAllSimilarNodes(adapter, true);
-                CollectionView.showPatient(patient);
+                CollectionView.getCurrent().getSearchedNode().performExpand();
             }
         });
     }

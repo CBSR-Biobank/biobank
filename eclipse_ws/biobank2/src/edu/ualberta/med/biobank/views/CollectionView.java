@@ -79,7 +79,9 @@ public class CollectionView extends AbstractAdministrationView {
             PatientWrapper patient = new PatientWrapper(
                 SessionManager.getAppService());
             patient.setPnumber(text);
-            PatientAdapter adapter = new PatientAdapter(searchedNode, patient);
+            ((PatientSearchedNode) CollectionView.getCurrent()
+                .getSearchedNode()).addSearchObject(patient);
+            AdapterBase adapter = new PatientAdapter(null, patient);
             adapter.openEntryForm();
         }
     }

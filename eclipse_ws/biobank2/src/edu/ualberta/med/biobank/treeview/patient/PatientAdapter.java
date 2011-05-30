@@ -111,7 +111,6 @@ public class PatientAdapter extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        getWrapper().reload();
         return getWrapper().getCollectionEventCollection(true);
     }
 
