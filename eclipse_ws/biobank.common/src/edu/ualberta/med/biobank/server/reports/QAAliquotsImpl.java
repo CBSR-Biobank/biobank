@@ -5,7 +5,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.model.ContainerPath;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -21,11 +21,11 @@ public class QAAliquotsImpl extends AbstractReport {
         + ("    left join fetch ps.processingEvent pe")
         + " WHERE s.createdAt between ? and ?"
         + "     and s.specimenType.nameShort = ?"
-        + "     and s.specimenPosition.container.id in (SELECT path1.container.id"
-        + ("        FROM " + ContainerPath.class.getName() + " as path1 ")
-        + ("            ," + ContainerPath.class.getName() + " as path2 ")
-        + "         WHERE path1.path like path2.path || '/%' "
-        + ("             and path2.container.id in (" + CONTAINER_LIST + "))")
+        + "     and s.specimenPosition.container.id in (SELECT c1.id"
+        + ("        FROM " + Container.class.getName() + " as c1 ")
+        + ("            ," + Container.class.getName() + " as c2")
+        + "         WHERE c1.path like c2.path || '/%' "
+        + ("             and c2.id in (" + CONTAINER_LIST + "))")
         + " ORDER BY RAND()";
 
     private int numResults;

@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
+import edu.ualberta.med.biobank.common.exception.BiobankRuntimeException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
@@ -156,7 +157,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public void persist() throws Exception {
         objectWithPositionManagement.persist();
         super.persist();
-        persistPath();
     }
 
     @Override
@@ -202,6 +202,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         }
         persistChildren(labelChanged);
         persistSpecimens();
+        setPath();
+        setTopContainer();
     }
 
     public RowColPos getPositionAsRowCol() {
@@ -227,8 +229,75 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return objectWithPositionManagement.getParentContainer();
     }
 
-    public void setParent(ContainerWrapper container) {
+    @Override
+    public String getPath() {
+        if (isNew()) {
+            throw new BiobankRuntimeException(
+                "container is not in database yet: no ID");
+        }
+
+        StringBuffer path = new StringBuffer();
+        ContainerWrapper parent = getParentContainer();
+        if (parent != null) {
+            path.append(parent.getPath()).append("/");
+        }
+        path.append(getId());
+        return path.toString();
+    }
+
+    @Override
+    public void setPath(String dummy) {
+        throw new BiobankRuntimeException("cannot set path on container");
+    }
+
+    private void setPath() throws BiobankCheckException {
+        StringBuffer path = new StringBuffer("");
+        ContainerWrapper parent = getParentContainer();
+        if (parent != null) {
+            boolean top = parent.getContainerType().getTopLevel();
+            String parentPath = parent.getPath();
+            if (!top && (parentPath == null)) {
+                throw new BiobankCheckException(
+                    "parent container does not have a path");
+            }
+            path.append(parentPath);
+        }
+        super.setPath(path.toString());
+    }
+
+    @Override
+    public void setTopContainer(ContainerWrapper c) {
+        throw new BiobankRuntimeException("cannot set path on container");
+    }
+
+    private void setTopContainer() throws BiobankCheckException {
+        ContainerTypeWrapper ctype = getContainerType();
+        if (ctype == null) {
+            throw new RuntimeException("container type needs to be set");
+        }
+
+        ContainerWrapper top = this;
+        if (!getContainerType().getTopLevel()) {
+            while (top != null && top.getParentContainer() != null) {
+                top = top.getParentContainer();
+            }
+
+            if (top == null) {
+                throw new BiobankCheckException("no top container");
+            }
+        }
+        super.setTopContainer(top);
+    }
+
+    public void setParent(ContainerWrapper container)
+        throws BiobankFailedQueryException, BiobankCheckException {
         objectWithPositionManagement.setParent(container);
+
+        setPath();
+        for (ContainerWrapper child : getChildren().values()) {
+            child.setPath();
+        }
+        setTopContainer();
     }
 
     public boolean hasParentContainer() {
@@ -258,18 +327,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 container.persist();
             }
         }
-    }
-
-    private void persistPath() throws Exception {
-        // TODO: why does persisting always just get the current path, ignoring
-        // the one we just set?
-        ContainerPathWrapper containerPath = ContainerPathWrapper
-            .getContainerPath(appService, this);
-        if (containerPath == null) {
-            containerPath = new ContainerPathWrapper(appService);
-            containerPath.setContainer(this);
-        }
-        containerPath.persist();
     }
 
     private static final String LABEL_UNIQUE_FOR_TYPE_BASE_QRY = "select count(c) from "
@@ -322,24 +379,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             return null;
         }
         return type.getColCapacity();
-    }
-
-    public String getPath() {
-        StringBuilder sb = new StringBuilder();
-        ContainerWrapper container = this;
-
-        while (container != null) {
-            if (container.isNew()) {
-                return null;
-            }
-
-            sb.insert(0, container.getId());
-            sb.insert(0, "/");
-            container = container.getParentContainer();
-        }
-        sb.deleteCharAt(0);
-
-        return sb.toString();
     }
 
     /**
@@ -566,13 +605,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return ((positions != null) && (positions.size() > 0));
     }
 
-    public ContainerWrapper getChild(Integer row, Integer col)
-        throws BiobankFailedQueryException {
+    public ContainerWrapper getChild(Integer row, Integer col) throws Exception {
         return getChild(new RowColPos(row, col));
     }
 
-    public ContainerWrapper getChild(RowColPos rcp)
-        throws BiobankFailedQueryException {
+    public ContainerWrapper getChild(RowColPos rcp) throws Exception {
         Map<RowColPos, ContainerWrapper> children = getChildren();
         if (children == null) {
             return null;
@@ -629,7 +666,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     public void addChild(Integer row, Integer col, ContainerWrapper child)
-        throws BiobankException {
+        throws Exception {
         ContainerPositionWrapper tempPosition = new ContainerPositionWrapper(
             appService);
         tempPosition.setRow(row);
@@ -717,15 +754,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         if (hasChildren()) {
             throw new BiobankDeleteException("Unable to delete container "
                 + getLabel() + ". All subcontainers must be removed first.");
-        }
-    }
-
-    @Override
-    protected void deleteDependencies() throws Exception {
-        ContainerPathWrapper path = ContainerPathWrapper.getContainerPath(
-            appService, this);
-        if (path != null) {
-            path.delete();
         }
     }
 
@@ -1042,10 +1070,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         ApplicationException {
         return (this.getChildCount(true) == this.getContainerType()
             .getRowCapacity() * this.getContainerType().getColCapacity());
-    }
-
-    public ContainerWrapper getTop() {
-        return objectWithPositionManagement.getTop();
     }
 
     /**
