@@ -18,6 +18,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankRuntimeException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -51,6 +52,10 @@ import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestContainer extends TestDatabase {
+
+    // the methods to skip in the getters and setters test
+    private static final List<String> GETTER_SKIP_METHODS = Arrays
+        .asList("getPath");
 
     private final String CBSR_ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
@@ -250,7 +255,7 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(
             String.valueOf(r.nextInt()), null, null, site,
             containerTypeMap.get("TopCT"));
-        testGettersAndSetters(container);
+        testGettersAndSetters(container, GETTER_SKIP_METHODS);
     }
 
     @Test
@@ -445,7 +450,22 @@ public class TestContainer extends TestDatabase {
         top = containerMap.get("Top");
         child = ContainerHelper.newContainer(null, "uvwxyz", top, site,
             containerTypeMap.get("ChildCtL1"), 0, 0);
-        Assert.assertNull(child.getPath());
+
+        try {
+            child.getPath();
+            Assert
+                .fail("cannot call get path on container net yet in database");
+        } catch (BiobankRuntimeException e) {
+            Assert.assertTrue(true);
+        }
+
+        try {
+            child.setPath("");
+            Assert.fail("cannot call setPath() on container");
+        } catch (BiobankRuntimeException e) {
+            Assert.assertTrue(true);
+        }
+
         child.persist();
         child.reload();
         String expectedPath = top.getId() + "/" + child.getId();
@@ -1520,6 +1540,9 @@ public class TestContainer extends TestDatabase {
         child.persist();
         child2.persist();
 
+        child.reload();
+        child2.reload();
+
         Assert.assertEquals(3, child.getSpecimens() == null ? 0 : child
             .getSpecimens().size());
         Assert.assertEquals(0, child2.getSpecimens() == null ? 0 : child2
@@ -1669,27 +1692,25 @@ public class TestContainer extends TestDatabase {
      */
     @Test
     public void testMoveOtherContainer() throws Exception {
-        Assert.fail("need fixes to container wrapper for this test to work");
-        // FIXME: Commenting out for now
-        // addContainerHierarchy(containerMap.get("Top"));
-        // ContainerWrapper child = containerMap.get("ChildL1"); // 01AA01
-        //
-        // ContainerWrapper top2 = ContainerHelper.addContainer("02",
-        // TestCommon.getNewBarcode(r), null, site,
-        // containerTypeMap.get("TopCT"));
-        //
-        // String newLabel = "02AF";
-        // List<ContainerWrapper> newParentContainers = child
-        // .getPossibleParents(newLabel);
-        // Assert.assertEquals(1, newParentContainers.size());
-        // ContainerWrapper newParent = newParentContainers.get(0);
-        // Assert.assertEquals(top2, newParent);
-        //
-        // newParent.addChild(newLabel.substring(newLabel.length() - 2), child);
-        // child.persist();
-        // child.reload();
-        // Assert.assertEquals(top2, child.getParentContainer());
-        // Assert.assertEquals(newLabel, child.getLabel());
+        addContainerHierarchy(containerMap.get("Top"));
+        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA01
+
+        ContainerWrapper top2 = ContainerHelper.addContainer("02",
+            TestCommon.getNewBarcode(r), null, site,
+            containerTypeMap.get("TopCT"));
+
+        String newLabel = "02AF";
+        List<ContainerWrapper> altParentContainers = child
+            .getPossibleParents(newLabel);
+        Assert.assertEquals(1, altParentContainers.size());
+        ContainerWrapper altParent = altParentContainers.get(0);
+        Assert.assertEquals(top2, altParent);
+
+        top2.addChild(newLabel.substring(newLabel.length() - 2), child);
+        top2.persist();
+        top2.reload();
+        Assert.assertEquals(top2, child.getParentContainer());
+        Assert.assertEquals(newLabel, child.getLabel());
     }
 
 }

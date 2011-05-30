@@ -10,19 +10,23 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerEmptyLocationsImpl extends AbstractReport {
 
-    private static final String QUERY = "SELECT c.container"
-        + (" FROM " + ContainerPath.class.getName() + " c ")
-        + ("    inner join fetch c.container.containerType")
-        + ("    ," + ContainerPath.class.getName() + " parent ")
-        + (" WHERE parent.id in (" + CONTAINER_LIST + ")")
+    // @formatter:off 
+    private static final String QUERY = "SELECT c"
+        + " FROM " + Container.class.getName() + " c "
+        + "    inner join fetch c.containerType"
+        + "    ," + Container.class.getName() + " parent "
+        + " WHERE parent.id in (" + CONTAINER_LIST + ")"
         + "     and (c.path LIKE parent.path || '/%' OR c.id=parent.id) "
-        + "     and c.container.label LIKE ? || '%' and c.container.containerType.specimenTypeCollection.size > 0"
-        + "     and (c.container.containerType.capacity.rowCapacity * c.container.containerType.capacity.colCapacity) > c.container.specimenPositionCollection.size";
+        + "     and c.label LIKE ? || '%' "
+        + "     and c.containerType.specimenTypeCollection.size > 0"
+        + "     and (c.containerType.capacity.rowCapacity " 
+        + "          * c.containerType.capacity.colCapacity)"
+        + "     > c.container.specimenPositionCollection.size";
+    // @formatter:on 
 
     public ContainerEmptyLocationsImpl(BiobankReport report) {
         super(QUERY, report);
@@ -33,24 +37,20 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
         List<Object> results) {
         List<Object> processedResults = new ArrayList<Object>();
         for (Object c : results) {
-            ContainerWrapper container = new ContainerWrapper(appService,
-                (Container) c);
             try {
+                ContainerWrapper container = new ContainerWrapper(appService,
+                    (Container) c);
                 container.reload();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            int rows = container.getRowCapacity();
-            int cols = container.getColCapacity();
-            Map<RowColPos, SpecimenWrapper> aliquots = container.getSpecimens();
+                int rows = container.getRowCapacity();
+                int cols = container.getColCapacity();
+                Map<RowColPos, SpecimenWrapper> aliquots = container
+                    .getSpecimens();
 
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++) {
-                    RowColPos pos = new RowColPos(i, j);
-                    if (!aliquots.containsKey(pos))
-                        processedResults
-                            .add(new Object[] {
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols; j++) {
+                        RowColPos pos = new RowColPos(i, j);
+                        if (!aliquots.containsKey(pos))
+                            processedResults.add(new Object[] {
                                 container.getLabel()
                                     + ContainerLabelingSchemeWrapper
                                         .getPositionString(pos, container
@@ -59,7 +59,11 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
                                             cols),
                                 container.getContainerType().getNameShort() });
 
+                    }
                 }
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
         return processedResults;
