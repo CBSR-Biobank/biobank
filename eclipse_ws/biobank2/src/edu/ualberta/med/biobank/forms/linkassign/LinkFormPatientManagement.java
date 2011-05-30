@@ -167,7 +167,8 @@ public class LinkFormPatientManagement {
             }
         });
         pEventListCheck = specimenAdminForm.getToolkit().createButton(
-            compositeFields, Messages.getString("LinkForm.last7days.label"), SWT.CHECK); //$NON-NLS-1$
+            compositeFields,
+            Messages.getString("LinkForm.last7days.label"), SWT.CHECK); //$NON-NLS-1$
         pEventListCheck.setSelection(pEventListCheckSelection);
         pEventListCheck.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -245,8 +246,7 @@ public class LinkFormPatientManagement {
                     currentPatient.getPnumber()));
             }
         } catch (ApplicationException e) {
-            BiobankPlugin.openError(
-                "", e); //$NON-NLS-1$
+            BiobankPlugin.openError("", e); //$NON-NLS-1$
         }
         setProcessingEventListFromPatient();
     }
@@ -342,8 +342,10 @@ public class LinkFormPatientManagement {
                             .getLast7DaysProcessingEvents(SessionManager
                                 .getUser().getCurrentWorkingCenter());
                     } catch (ApplicationException e) {
-                        BiobankPlugin.openAsyncError(
-                            Messages.getString("LinkForm.pEvent.retrieve.error.msg"), e); //$NON-NLS-1$
+                        BiobankPlugin
+                            .openAsyncError(
+                                Messages
+                                    .getString("LinkForm.pEvent.retrieve.error.msg"), e); //$NON-NLS-1$
                     }
                 else
                     collection = currentPatient
@@ -373,8 +375,8 @@ public class LinkFormPatientManagement {
                     collection = currentPEventSelected
                         .getCollectionEventFromSpecimensAndPatient(currentPatient);
                 } catch (ApplicationException e) {
-                    BiobankPlugin.openAsyncError(
-                        Messages.getString("LinkForm.cEvent.retrieve.error.msg"), e); //$NON-NLS-1$
+                    BiobankPlugin.openAsyncError(Messages
+                        .getString("LinkForm.cEvent.retrieve.error.msg"), e); //$NON-NLS-1$
                 }
                 viewerCollectionEvents.setInput(collection);
                 if (collection != null && collection.size() == 1) {
@@ -426,7 +428,8 @@ public class LinkFormPatientManagement {
             // same patient)
             study.reload();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError(Messages.getString("LinkForm.study.reload.error.msg"), e); //$NON-NLS-1$
+            BiobankPlugin.openAsyncError(
+                Messages.getString("LinkForm.study.reload.error.msg"), e); //$NON-NLS-1$
         }
         List<SpecimenTypeWrapper> studiesAliquotedTypes;
         // done at first successful scan
@@ -442,7 +445,8 @@ public class LinkFormPatientManagement {
             }
         }
         if (studiesAliquotedTypes.size() == 0) {
-            String studyNameShort = Messages.getString("LinkForm.study.unknown.label"); //$NON-NLS-1$
+            String studyNameShort = Messages
+                .getString("LinkForm.study.unknown.label"); //$NON-NLS-1$
             if (getCurrentPatient() != null)
                 studyNameShort = study.getNameShort();
             BiobankPlugin.openAsyncError(Messages

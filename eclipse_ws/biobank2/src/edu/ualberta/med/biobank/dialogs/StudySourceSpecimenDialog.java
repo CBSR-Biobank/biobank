@@ -4,14 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
@@ -21,8 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
-import edu.ualberta.med.biobank.widgets.infotables.TypeAndAliquotedSpecimenData;
-import edu.ualberta.med.biobank.widgets.infotables.TypeAndAliquotedSpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.AliquotedSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class StudySourceSpecimenDialog extends PagedDialog {
@@ -41,9 +44,12 @@ public class StudySourceSpecimenDialog extends PagedDialog {
 
     private SourceSpecimenWrapper internalSourceSpecimen;
 
-    private TypeAndAliquotedSpecimenInfoTable aliquotedViewer;
+    private AliquotedSpecimenEntryInfoTable aliquotedSpecimenEntryTable;
 
-    private List<TypeAndAliquotedSpecimenData> tableInput = new ArrayList<TypeAndAliquotedSpecimenData>();
+    private List<AliquotedSpecimenWrapper> addedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
+    private List<AliquotedSpecimenWrapper> removedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
+
+    private Section aliquotedSection;
 
     public StudySourceSpecimenDialog(Shell parent,
         SourceSpecimenWrapper origSourceSpecimen, NewListener newListener,
@@ -68,6 +74,10 @@ public class StudySourceSpecimenDialog extends PagedDialog {
             .getSpecimenType());
         internalSourceSpecimen.setNeedOriginalVolume(origSourceSpecimen
             .getNeedOriginalVolume());
+        internalSourceSpecimen.getWrappedObject()
+            .setAliquotedSpecimenCollection(
+                origSourceSpecimen.getWrappedObject()
+                    .getAliquotedSpecimenCollection());
     }
 
     @Override
@@ -105,13 +115,21 @@ public class StudySourceSpecimenDialog extends PagedDialog {
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    internalSourceSpecimen
-                        .setSpecimenType((SpecimenTypeWrapper) selectedObject);
-                    updateTableModel(internalSourceSpecimen.getSpecimenType(),
-                        true);
-                    aliquotedViewer.reloadCollection(tableInput);
+                    SpecimenTypeWrapper stw = (SpecimenTypeWrapper) selectedObject;
+                    internalSourceSpecimen.setSpecimenType(stw);
+                    boolean children = stw
+                        .getChildSpecimenTypeCollection(false).size() > 0;
+                    aliquotedSection.setEnabled(children);
+                    if (children)
+                        setMessage(getTitleAreaMessage(),
+                            getTitleAreaMessageType());
+                    else
+                        setMessage(
+                            "This type cannot be derived (see Specimen types configuration or contact administrator).",
+                            IMessageProvider.WARNING);
                 }
             });
+        typeName.getCombo().setEnabled(origSourceSpecimen.isNew());
 
         volume = (Button) createBoundWidgetWithLabel(contents, Button.class,
             SWT.BORDER,
@@ -119,47 +137,48 @@ public class StudySourceSpecimenDialog extends PagedDialog {
             new String[0], internalSourceSpecimen,
             SourceSpecimenPeer.NEED_ORIGINAL_VOLUME.getName(), null);
 
-        updateTableModel(origSourceSpecimen);
-        aliquotedViewer = new TypeAndAliquotedSpecimenInfoTable(contents,
-            tableInput);
+        aliquotedSection = new Section(contents, Section.TWISTIE
+            | Section.TITLE_BAR | Section.EXPANDED);
+        aliquotedSection.setText("Aliquoted specimen");
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalSpan = 2;
-        aliquotedViewer.setLayoutData(gd);
-    }
+        aliquotedSection.setLayoutData(gd);
 
-    private void updateTableModel(SourceSpecimenWrapper sourceSpecimen) {
-        List<SpecimenTypeWrapper> types = new ArrayList<SpecimenTypeWrapper>();
-        for (AliquotedSpecimenWrapper asw : sourceSpecimen
-            .getAliquotedSpecimenCollection(false)) {
-            tableInput.add(new TypeAndAliquotedSpecimenData(asw));
-            types.add(asw.getSpecimenType());
-        }
-        updateTableModel(sourceSpecimen.getSpecimenType(), types, false);
-    }
+        aliquotedSpecimenEntryTable = new AliquotedSpecimenEntryInfoTable(
+            aliquotedSection, internalSourceSpecimen);
+        aliquotedSection.setClient(aliquotedSpecimenEntryTable);
+        gd = new GridData();
+        gd.horizontalAlignment = SWT.FILL;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalSpan = 2;
 
-    private void updateTableModel(SpecimenTypeWrapper type, boolean clear) {
-        updateTableModel(type, new ArrayList<SpecimenTypeWrapper>(), clear);
-    }
-
-    private void updateTableModel(SpecimenTypeWrapper type,
-        List<SpecimenTypeWrapper> excludeTypes, boolean clear) {
-        if (clear)
-            tableInput.clear();
-        if (type != null)
-            for (SpecimenTypeWrapper t : type
-                .getChildSpecimenTypeCollection(false)) {
-                if (!excludeTypes.contains(t)) {
-                    tableInput.add(new TypeAndAliquotedSpecimenData(t));
-                }
-            }
+        widgetCreator
+            .addSectionToolbar(
+                aliquotedSection,
+                "Add an aliquoted specimen type derived from this type.", new SelectionAdapter() { //$NON-NLS-1$
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        aliquotedSpecimenEntryTable.addAliquotedSpecimen();
+                    }
+                }, null, null);
     }
 
     @Override
     protected void okPressed() {
         copy(origSourceSpecimen);
         super.okPressed();
+    }
+
+    @Override
+    protected void cancelPressed() {
+        try {
+            origSourceSpecimen.reload();
+        } catch (Exception e) {
+            new RuntimeException(e);
+        }
+        super.cancelPressed();
     }
 
     @Override
@@ -180,11 +199,27 @@ public class StudySourceSpecimenDialog extends PagedDialog {
 
     @Override
     protected void copy(ModelWrapper<?> newModelObject) {
-        ((SourceSpecimenWrapper) newModelObject)
-            .setSpecimenType((internalSourceSpecimen).getSpecimenType());
-        ((SourceSpecimenWrapper) newModelObject)
-            .setNeedOriginalVolume((internalSourceSpecimen)
-                .getNeedOriginalVolume());
+        SourceSpecimenWrapper ssw = ((SourceSpecimenWrapper) newModelObject);
+        ssw.setSpecimenType((internalSourceSpecimen).getSpecimenType());
+        ssw.setNeedOriginalVolume((internalSourceSpecimen)
+            .getNeedOriginalVolume());
+        for (AliquotedSpecimenWrapper asw : aliquotedSpecimenEntryTable
+            .getAddedOrModifiedAliquotedSpecimens()) {
+            asw.setSourceSpecimen(ssw);
+            addedAliquotedSpecimen.add(asw);
+        }
+        ssw.addToAliquotedSpecimenCollection(addedAliquotedSpecimen);
+        removedAliquotedSpecimen.addAll(aliquotedSpecimenEntryTable
+            .getDeletedAliquotedSpecimens());
+        ssw.removeFromAliquotedSpecimenCollection(removedAliquotedSpecimen);
+    }
+
+    public List<AliquotedSpecimenWrapper> getAddedAliquotedSpecimen() {
+        return addedAliquotedSpecimen;
+    }
+
+    public List<AliquotedSpecimenWrapper> getRemovedAliquotedSpecimen() {
+        return removedAliquotedSpecimen;
     }
 
 }

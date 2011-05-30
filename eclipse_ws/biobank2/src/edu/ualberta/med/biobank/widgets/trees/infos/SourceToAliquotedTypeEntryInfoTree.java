@@ -40,8 +40,10 @@ public class SourceToAliquotedTypeEntryInfoTree extends
     private List<SourceSpecimenWrapper> selectedSourceSpecimen;
 
     private List<SourceSpecimenWrapper> addedOrModifiedSourceSpecimen;
+    private List<AliquotedSpecimenWrapper> addedOrModifiedAliquotedSpecimen;
 
     private List<SourceSpecimenWrapper> deletedSourceSpecimen;
+    private List<AliquotedSpecimenWrapper> removedAliquotedSpecimen;
 
     private StudyWrapper study;
 
@@ -72,7 +74,9 @@ public class SourceToAliquotedTypeEntryInfoTree extends
         }
         setCollection(selectedSourceSpecimen);
         addedOrModifiedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
+        addedOrModifiedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
         deletedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
+        removedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -104,12 +108,11 @@ public class SourceToAliquotedTypeEntryInfoTree extends
             newListener = new NewListener() {
                 @Override
                 public void newAdded(ModelWrapper<?> spec) {
-                    ((SourceSpecimenWrapper) spec).setStudy(study);
-                    availableSpecimenTypes.remove(sourceSpecimen
-                        .getSpecimenType());
-                    selectedSourceSpecimen.add((SourceSpecimenWrapper) spec);
-                    addedOrModifiedSourceSpecimen
-                        .add((SourceSpecimenWrapper) spec);
+                    SourceSpecimenWrapper ssw = (SourceSpecimenWrapper) spec;
+                    ssw.setStudy(study);
+                    availableSpecimenTypes.remove(ssw.getSpecimenType());
+                    selectedSourceSpecimen.add(ssw);
+                    addedOrModifiedSourceSpecimen.add(ssw);
                     reloadCollection(selectedSourceSpecimen);
                     notifyListeners();
                 }
@@ -120,6 +123,15 @@ public class SourceToAliquotedTypeEntryInfoTree extends
             sourceSpecimen, newListener, dialogSpecimenTypes);
 
         int res = dlg.open();
+        if (res == Dialog.OK) {
+            addedOrModifiedAliquotedSpecimen.removeAll(dlg
+                .getRemovedAliquotedSpecimen());
+            addedOrModifiedAliquotedSpecimen.addAll(dlg
+                .getAddedAliquotedSpecimen());
+            removedAliquotedSpecimen
+                .removeAll(addedOrModifiedAliquotedSpecimen);
+            removedAliquotedSpecimen.addAll(dlg.getRemovedAliquotedSpecimen());
+        }
         if (!add && res == Dialog.OK) {
             reloadCollection(selectedSourceSpecimen);
             notifyListeners();
@@ -188,14 +200,12 @@ public class SourceToAliquotedTypeEntryInfoTree extends
 
     private void initSpecimenTypes() {
         try {
-            availableSpecimenTypes = SpecimenTypeWrapper.getAllSpecimenTypes(
-                SessionManager.getAppService(), false);
-            List<SourceSpecimenWrapper> sourceSpecimen = study
-                .getSourceSpecimenCollection(false);
-            if (sourceSpecimen != null) {
-                for (SourceSpecimenWrapper ssw : sourceSpecimen) {
-                    availableSpecimenTypes.remove(ssw.getSpecimenType());
-                }
+            availableSpecimenTypes = SpecimenTypeWrapper
+                .getAllSourceOnlySpecimenTypes(SessionManager.getAppService(),
+                    false);
+            for (SourceSpecimenWrapper ssw : study
+                .getSourceSpecimenCollection(false)) {
+                availableSpecimenTypes.remove(ssw.getSpecimenType());
             }
         } catch (final RemoteConnectFailureException exp) {
             BiobankPlugin.openRemoteConnectErrorMessage(exp);
@@ -239,20 +249,6 @@ public class SourceToAliquotedTypeEntryInfoTree extends
         };
     }
 
-    // @Override
-    // protected List<Node> getNodeChildren(Node node) throws Exception {
-    // if (node != null && node instanceof BiobankCollectionModel) {
-    // BiobankCollectionModel model = (BiobankCollectionModel) node;
-    // TreeRowData row = (TreeRowData) model.o;
-    // if (row != null)
-    // if (row.studySourceVessel != null)
-    // return createNodes(node, row.studySourceVessel
-    // .getSpecimenType()
-    // .getChildSpecimenTypeCollection(false));
-    // }
-    // return super.getNodeChildren(node);
-    // }
-
     @Override
     public TreeRowData getCollectionModelObject(Object item) throws Exception {
         if (item instanceof SpecimenTypeWrapper) {
@@ -262,5 +258,13 @@ public class SourceToAliquotedTypeEntryInfoTree extends
             return info;
         } else
             return super.getCollectionModelObject(item);
+    }
+
+    public List<AliquotedSpecimenWrapper> getAddedOrModifiedAliquotedSpecimens() {
+        return addedOrModifiedAliquotedSpecimen;
+    }
+
+    public List<AliquotedSpecimenWrapper> getRemovedAliquotedSpecimens() {
+        return removedAliquotedSpecimen;
     }
 }

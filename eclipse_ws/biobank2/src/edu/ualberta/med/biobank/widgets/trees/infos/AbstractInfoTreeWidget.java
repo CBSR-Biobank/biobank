@@ -211,7 +211,8 @@ public abstract class AbstractInfoTreeWidget<T> extends BiobankWidget {
         }
     }
 
-    protected EditingSupport getEditingSupport(int index) {
+    protected EditingSupport getEditingSupport(
+        @SuppressWarnings("unused") int index) {
         return null;
     }
 

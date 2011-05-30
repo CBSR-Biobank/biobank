@@ -260,17 +260,24 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     public void setQuantityFromType() {
-        if (getSpecimenType() == null)
+        if (getSpecimenType() == null || getParentSpecimen() == null)
             return;
+
+        SpecimenWrapper parent = getParentSpecimen();
         CollectionEventWrapper cevent = getCollectionEvent();
         StudyWrapper study = cevent.getPatient().getStudy();
-        Collection<AliquotedSpecimenWrapper> aliquotedSpecimenCollection = study
-            .getAliquotedSpecimenCollection(false);
-        if (aliquotedSpecimenCollection != null) {
-            for (AliquotedSpecimenWrapper ss : aliquotedSpecimenCollection) {
-                if (getSpecimenType().equals(ss.getSpecimenType())) {
-                    setQuantity(ss.getVolume());
-                    return;
+        Collection<SourceSpecimenWrapper> sourceSpecimenCollection = study
+            .getSourceSpecimenCollection(false);
+        if (sourceSpecimenCollection != null) {
+            for (SourceSpecimenWrapper ss : sourceSpecimenCollection) {
+                if (parent.getSpecimenType().equals(ss.getSpecimenType())) {
+                    for (AliquotedSpecimenWrapper as : ss
+                        .getAliquotedSpecimenCollection(false)) {
+                        if (getSpecimenType().equals(as.getSpecimenType())) {
+                            setQuantity(as.getVolume());
+                            return;
+                        }
+                    }
                 }
             }
         }
