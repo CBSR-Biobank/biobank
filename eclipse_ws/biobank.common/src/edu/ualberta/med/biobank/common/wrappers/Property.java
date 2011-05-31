@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,17 +18,27 @@ import edu.ualberta.med.biobank.common.util.TypeReference;
  * @param <T> the type of the Property
  * @param <W> the type that has the Property
  */
-public class Property<T, W> {
+public class Property<T, W> implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final String name;
-    private final TypeReference<T> type;
+    private final String propertyChangeName;
+    private final TypeInfo typeInfo;
     private final Accessor<T, W> accessor;
 
-    // TODO: include the model class as a type parameter and check this
-    // against what it's called on?
-
-    private Property(String name, TypeReference<T> type, Accessor<T, W> accessor) {
+    private Property(String name, TypeReference<T> typeReference,
+        Accessor<T, W> accessor) {
         this.name = name;
-        this.type = type;
+        this.propertyChangeName = name;
+        this.typeInfo = new TypeInfo(typeReference);
+        this.accessor = accessor;
+    }
+
+    private Property(String name, String propertyChangeName, TypeInfo typeInfo,
+        Accessor<T, W> accessor) {
+        this.name = name;
+        this.propertyChangeName = propertyChangeName;
+        this.typeInfo = typeInfo;
         this.accessor = accessor;
     }
 
@@ -34,8 +46,20 @@ public class Property<T, W> {
         return name;
     }
 
-    public Type getType() {
-        return type.getType();
+    public String getPropertyChangeName() {
+        return propertyChangeName;
+    }
+
+    /**
+     * @return the {@code Class} of the elements in the {@code Collection}
+     *         returned by this class, otherwise the {@code Class} itself.
+     */
+    public Class<?> getElementClass() {
+        return typeInfo.elementClass;
+    }
+
+    public boolean isCollection() {
+        return typeInfo.isCollection;
     }
 
     public T get(W model) {
@@ -55,14 +79,17 @@ public class Property<T, W> {
      * of an association as a direct property.
      * 
      * @param <T2>
-     * @param name a new name to use for the property (should correspond to the
+     * @param propertyChangeName a new name to use for the property when firing
+     *            a change event (should correspond to the
      *            <code>ModelWrapper</code>'s method name)
      * @param property
      * @return
      */
-    public <T2> Property<T2, W> wrap(String name,
+    public <T2> Property<T2, W> wrap(String propertyChangeName,
         final Property<T2, ? super T> property) {
         Accessor<T2, W> accessor = new Accessor<T2, W>() {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public T2 get(W model) {
                 T association = Property.this.accessor.get(model);
@@ -78,7 +105,8 @@ public class Property<T, W> {
             }
         };
 
-        return new Property<T2, W>(name, property.type, accessor);
+        return new Property<T2, W>(concatNames(this, property),
+            propertyChangeName, property.typeInfo, accessor);
     }
 
     public Collection<Property<?, W>> wrap(
@@ -134,12 +162,67 @@ public class Property<T, W> {
 
     @Override
     public String toString() {
-        return name + "(" + getType() + ")";
+        return name + "(" + typeInfo.toString + ")";
     }
 
-    public interface Accessor<T, W> {
+    public interface Accessor<T, W> extends Serializable {
         public T get(W model);
 
         public void set(W model, T value);
+    };
+
+    /**
+     * Because {@code TypeReference} is not necessarily {@code Serializable},
+     * this internal class is used to extract all the necessary information,
+     * encapsulate it, and all it to be serialized.
+     * 
+     * @author jferland
+     * 
+     */
+    private static final class TypeInfo implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        private final Class<?> elementClass;
+        private final boolean isCollection;
+        private final String toString;
+
+        public TypeInfo(TypeReference<?> typeReference) {
+            Type type = typeReference.getType();
+            this.elementClass = getElementClass(type);
+            this.isCollection = isCollection(type);
+            this.toString = type.toString();
+        }
+
+        private static Class<?> getElementClass(Type type) {
+            Class<?> klazz = null;
+            if (type instanceof Class<?>) {
+                klazz = (Class<?>) type;
+            } else if (type instanceof ParameterizedType) {
+                ParameterizedType pType = (ParameterizedType) type;
+                Type[] elementTypes = pType.getActualTypeArguments();
+                if (elementTypes.length > 0) {
+                    Type elementType = elementTypes[0];
+                    klazz = getElementClass(elementType);
+                }
+            }
+            return klazz;
+        }
+
+        private static boolean isCollection(Type type) {
+            boolean isCollection = false;
+
+            if (type instanceof ParameterizedType) {
+                ParameterizedType pType = (ParameterizedType) type;
+                Type rawType = pType.getRawType();
+                if (rawType instanceof Class) {
+                    Class<?> rawTypeClass = (Class<?>) rawType;
+                    if (rawTypeClass.isAssignableFrom(Collection.class)) {
+                        isCollection = true;
+                    }
+                }
+            }
+
+            return isCollection;
+        }
     }
 }

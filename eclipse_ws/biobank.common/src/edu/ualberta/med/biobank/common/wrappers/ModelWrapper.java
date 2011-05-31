@@ -37,10 +37,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.cglib.proxy.Enhancer;
 
+import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
@@ -86,12 +86,15 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return wrappedObject;
     }
 
+    public abstract Property<Integer, ? super E> getIdProperty();
+
     public void setWrappedObject(E newWrappedObject) {
         E oldWrappedObject = wrappedObject;
         wrappedObject = newWrappedObject;
 
         cache.clear();
         propertyCache.clear();
+        resetInternalFields();
 
         firePropertyChanges(oldWrappedObject, newWrappedObject);
     }
@@ -104,7 +107,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         for (Property<?, ? super E> property : propertiesList) {
-            if (property.getName().equals(propertyName)) {
+            if (property.getPropertyChangeName().equals(propertyName)) {
                 propertyChangeSupport.addPropertyChangeListener(propertyName,
                     listener);
                 return;
@@ -123,20 +126,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public Integer getId() {
-        Class<?> wrappedClass = wrappedObject.getClass();
-        try {
-            Method methodGetId = wrappedClass.getMethod("getId");
-            return (Integer) methodGetId.invoke(wrappedObject);
-        } catch (Exception e) {
-
-        }
-        return null;
+        return getIdProperty().get(wrappedObject);
     }
 
-    private void setId(Integer id) throws Exception {
-        Class<?> wrappedClass = wrappedObject.getClass();
-        Method methodSetId = wrappedClass.getMethod("setId", Integer.class);
-        methodSetId.invoke(wrappedObject, id);
+    protected void setId(Integer id) {
+        getIdProperty().set(wrappedObject, id);
     }
 
     public WritableApplicationService getAppService() {
@@ -161,6 +155,44 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
+     * Get a {@code TaskList} that will persist (i.e. insert or update) the
+     * wrapped model object. The {@code TaskList}-s might also check certain
+     * conditions on the client or server, as well as persist potential
+     * dependent objects.
+     * 
+     * This method should be overridden as necessary to return a
+     * {@code TaskList} that properly persists the wrapped model object.
+     * 
+     * @return
+     */
+    protected TaskList getPersistTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(new PersistModelWrapperQueryTask<E>(this));
+        tasks.add(new LengthCheck<E>(this));
+
+        return tasks;
+    }
+
+    /**
+     * Get a {@code TaskList} that will delete the wrapped model object. The
+     * {@code TaskList}-s might also check certain conditions on the client or
+     * server, as well as affect potential dependent objects.
+     * 
+     * This method should be overridden as necessary to return a
+     * {@code TaskList} that properly deletes the wrapped model object.
+     * 
+     * @return
+     */
+    protected TaskList getDeleteTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(new DeleteModelWrapperQueryTask<E>(this));
+
+        return tasks;
+    }
+
+    /**
      * return the list of the different properties we want to notify when we
      * call firePropertyChanges
      */
@@ -173,17 +205,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private void firePropertyChanges(E oldWrappedObject, E newWrappedObject) {
         List<Property<?, ? super E>> properties = getProperties();
 
-        if (properties == null) {
-            // TODO: is this necessary? Just early-out if null?
-            throw new RuntimeException("getProperties() cannot return null");
-        }
-
         if (oldWrappedObject == newWrappedObject) {
             return;
         }
 
         for (Property<?, ? super E> property : properties) {
-            String propertyName = property.getName();
+            String propertyName = property.getPropertyChangeName();
             PropertyChangeListener[] listeners = propertyChangeSupport
                 .getPropertyChangeListeners(propertyName);
 
@@ -195,8 +222,22 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 continue;
             }
 
+            // don't fire a property change if the old model's property has not
+            // even been initialized or loaded, as the old value is not
+            // necessarily correct (if we lazily load it now, then it will
+            if (!isInitialized(oldWrappedObject, property)) {
+                continue;
+            }
+
             Object oldValue = property.get(oldWrappedObject);
             Object newValue = property.get(newWrappedObject);
+
+            // if the old and new property value are the same, do not send a
+            // property change event
+            if (oldValue == newValue
+                || (oldValue != null && oldValue.equals(newValue))) {
+                continue;
+            }
 
             propertyChangeSupport.firePropertyChange(propertyName, oldValue,
                 newValue);
@@ -293,7 +334,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         String fieldValue = "";
         for (Property<?, ? super E> property : getProperties()) {
             // TODO: use accessor instead!
-            String field = property.getName();
+            String field = property.getPropertyChangeName();
 
             Integer maxLen = VarCharLengths
                 .getMaxSize(getWrappedClass(), field);
@@ -419,15 +460,19 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         String value, String errorName) throws ApplicationException,
         BiobankException {
         HQLCriteria c;
-        List<Object> params = new ArrayList<Object>();
+        final List<Object> params = new ArrayList<Object>();
         params.add(value);
         String equalsTest = "";
         if (!isNew()) {
             equalsTest = " and id <> ?";
             params.add(getId());
         }
-        c = new HQLCriteria(MessageFormat.format(CHECK_NO_DUPLICATES,
-            objectClass.getName(), propertyName, equalsTest), params);
+
+        final String hqlString = MessageFormat.format(CHECK_NO_DUPLICATES,
+            objectClass.getName(), propertyName, equalsTest);
+
+        c = new HQLCriteria(hqlString, params);
+
         if (getCountResult(appService, c) > 0) {
             throw new DuplicateEntryException(errorName + " \"" + value
                 + "\" already exists.");
@@ -584,7 +629,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         listeners.add(listener);
     }
 
-    private void notifyListeners(WrapperEvent event) {
+    void notifyListeners(WrapperEvent event) {
         // create a new list to avoid concurrent modification
         for (WrapperListener listener : new ArrayList<WrapperListener>(
             listeners)) {
@@ -969,6 +1014,46 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return value;
     }
 
+    /**
+     * Determines whether the given property of the wrapped object has been
+     * initialized.
+     * 
+     * @param property of the wrapped object
+     * @return true if the given {@code Property} has been initialized or if the
+     *         wrapped object is not a proxy (and therefore new), otherwise
+     *         false.
+     */
+    protected boolean isInitialized(Property<?, ? super E> property) {
+        return isNew() || isInitialized(wrappedObject, property);
+    }
+
+    /**
+     * Determines whether the given property of the given model object has been
+     * initialized (loaded).
+     * 
+     * @param model object with the {@code property}
+     * @param property of the wrapped object
+     * @return true if the given {@code Property} has been initialized or if the
+     *         wrapped object is not a proxy (and therefore new), otherwise
+     *         false.
+     */
+    private static <E> boolean isInitialized(E model,
+        Property<?, ? super E> property) {
+        if (model instanceof Advised) {
+            Advised proxy = (Advised) model;
+            try {
+                @SuppressWarnings("unchecked")
+                E tmp = (E) proxy.getTargetSource().getTarget();
+                model = tmp;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        return Hibernate.isPropertyInitialized(model, property.getName());
+    }
+
     private <T, M> void setModelProperty(ModelWrapper<M> modelWrapper,
         Property<? extends T, ? super M> property, T newValue) {
         try {
@@ -1039,12 +1124,33 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return Collections.emptyList();
     }
 
-    public static <T> void persistBatch(Set<? extends ModelWrapper<T>> wrappers)
-        throws Exception {
-        // once the persist method is using batch queries, we should use batch
-        // queries here
-        for (ModelWrapper<T> wrapper : wrappers) {
-            wrapper.persist();
+    private static class LengthCheck<E> implements PreQueryTask {
+        private final ModelWrapper<E> modelWrapper;
+
+        public LengthCheck(ModelWrapper<E> modelWrapper) {
+            this.modelWrapper = modelWrapper;
+        }
+
+        @Override
+        public void beforeExecute() throws BiobankException {
+            E model = modelWrapper.getWrappedObject();
+            Class<E> modelClass = modelWrapper.getWrappedClass();
+
+            for (Property<?, ? super E> property : modelWrapper.getProperties()) {
+                String field = property.getName();
+
+                Integer max = VarCharLengths.getMaxSize(modelClass, field);
+                if (max == null)
+                    continue;
+
+                // TODO: does this work???
+                if (property.getElementClass().equals(String.class)) {
+                    String value = (String) property.get(model);
+                    if ((value != null) && (value.length() > max)) {
+                        throw new CheckFieldLimitsException(field, max, value);
+                    }
+                }
+            }
         }
     }
 }

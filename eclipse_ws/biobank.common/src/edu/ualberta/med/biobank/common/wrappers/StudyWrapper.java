@@ -7,12 +7,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
@@ -23,6 +21,7 @@ import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.Check;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -37,12 +36,6 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     private Map<String, StudyEventAttrWrapper> studyEventAttrMap;
 
-    private Set<AliquotedSpecimenWrapper> deletedAliquotedSpecimens = new HashSet<AliquotedSpecimenWrapper>();
-
-    private Set<SourceSpecimenWrapper> deletedSourceSpecimens = new HashSet<SourceSpecimenWrapper>();
-
-    private Set<StudyEventAttrWrapper> deletedStudyEventAttr = new HashSet<StudyEventAttrWrapper>();
-
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
         super(appService, wrappedObject);
@@ -53,81 +46,46 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankException, ApplicationException {
-        if (hasPatients()) {
-            throw new BiobankDeleteException("Unable to delete study "
-                + getName() + ". All defined patients must be removed first.");
-        }
+    protected TaskList getPersistTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(Check.unique(this, StudyPeer.NAME));
+        tasks.add(Check.unique(this, StudyPeer.NAME_SHORT));
+
+        tasks.add(Check.notNull(this, StudyPeer.NAME));
+        tasks.add(Check.notNull(this, StudyPeer.NAME_SHORT));
+
+        tasks.add(Cascade
+            .deleteOld(this, StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
+        tasks
+            .add(Cascade.deleteOld(this, StudyPeer.SOURCE_SPECIMEN_COLLECTION));
+        tasks.add(Cascade.deleteOld(this,
+            StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
+
+        tasks.add(super.getPersistTasks());
+
+        tasks.add(Cascade.persist(this, StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
+        tasks.add(Cascade.persist(this, StudyPeer.SOURCE_SPECIMEN_COLLECTION));
+        tasks.add(Cascade
+            .persist(this, StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
+
+        return tasks;
     }
 
     @Override
-    public void addToAliquotedSpecimenCollection(
-        List<AliquotedSpecimenWrapper> AliquotedSpecimenCollection) {
-        super.addToAliquotedSpecimenCollection(AliquotedSpecimenCollection);
+    protected TaskList getDeleteTasks() {
+        TaskList tasks = new TaskList();
 
-        // make sure previously deleted ones, that have been re-added, are
-        // no longer deleted
-        deletedAliquotedSpecimens.removeAll(AliquotedSpecimenCollection);
-    }
+        tasks.add(Check.collectionIsEmpty(this, StudyPeer.PATIENT_COLLECTION));
 
-    @Override
-    public void removeFromAliquotedSpecimenCollection(
-        List<AliquotedSpecimenWrapper> AliquotedSpecimensToRemove) {
-        deletedAliquotedSpecimens.addAll(AliquotedSpecimensToRemove);
-        super.removeFromAliquotedSpecimenCollection(AliquotedSpecimensToRemove);
-    }
+        tasks.add(Cascade.delete(this, StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
+        tasks.add(Cascade.delete(this, StudyPeer.SOURCE_SPECIMEN_COLLECTION));
+        tasks
+            .add(Cascade.delete(this, StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
 
-    /*
-     * Removes the StudyEventAttr objects that are not contained in the
-     * collection.
-     */
-    private void deleteStudyEventAttrs() throws Exception {
-        for (StudyEventAttrWrapper st : deletedStudyEventAttr) {
-            if (!st.isNew()) {
-                st.delete();
-            }
-        }
-    }
+        tasks.add(super.getDeleteTasks());
 
-    /**
-     * Removes the sample storage objects that are not contained in the
-     * collection.
-     */
-    private void deleteAliquotedSpecimens() throws Exception {
-        for (AliquotedSpecimenWrapper st : deletedAliquotedSpecimens) {
-            if (!st.isNew()) {
-                st.delete();
-            }
-        }
-    }
-
-    /**
-     * Removes the study source vessel objects that are not contained in the
-     * collection.
-     */
-    private void deleteSourceSpecimens() throws Exception {
-        for (SourceSpecimenWrapper st : deletedSourceSpecimens) {
-            if (!st.isNew()) {
-                st.delete();
-            }
-        }
-    }
-
-    @Override
-    public void addToSourceSpecimenCollection(
-        List<SourceSpecimenWrapper> newSourceSpecimens) {
-        super.addToSourceSpecimenCollection(newSourceSpecimens);
-
-        // make sure previously deleted ones, that have been re-added, are
-        // no longer deleted
-        deletedSourceSpecimens.removeAll(newSourceSpecimens);
-    }
-
-    @Override
-    public void removeFromSourceSpecimenCollection(
-        List<SourceSpecimenWrapper> SourceSpecimensToDelete) {
-        deletedSourceSpecimens.addAll(SourceSpecimensToDelete);
-        super.removeFromSourceSpecimenCollection(SourceSpecimensToDelete);
+        return tasks;
     }
 
     protected Collection<StudyEventAttrWrapper> getStudyEventAttrCollection() {
@@ -151,6 +109,17 @@ public class StudyWrapper extends StudyBaseWrapper {
             studyEventAttrMap.put(studyEventAttr.getLabel(), studyEventAttr);
         }
         return studyEventAttrMap;
+    }
+
+    private void updateStudyEventAttrCollection() {
+        if (studyEventAttrMap != null) {
+            List<StudyEventAttrWrapper> allStudyEventAttrWrappers = new ArrayList<StudyEventAttrWrapper>();
+            for (StudyEventAttrWrapper ss : studyEventAttrMap.values()) {
+                allStudyEventAttrWrappers.add(ss);
+            }
+            setWrapperCollection(StudyPeer.STUDY_EVENT_ATTR_COLLECTION,
+                allStudyEventAttrWrappers);
+        }
     }
 
     public String[] getStudyEventAttrLabels() {
@@ -225,8 +194,8 @@ public class StudyWrapper extends StudyBaseWrapper {
                 + "\" does not exist");
         }
 
-        getStudyEventAttrMap();
-        StudyEventAttrWrapper studyEventAttr = studyEventAttrMap.get(label);
+        StudyEventAttrWrapper studyEventAttr = getStudyEventAttrMap()
+            .get(label);
 
         if (type.isSelectType()) {
             // type has permissible values
@@ -249,11 +218,12 @@ public class StudyWrapper extends StudyBaseWrapper {
             studyEventAttr.setStudy(this);
         }
 
-        deletedStudyEventAttr.remove(studyEventAttr);
         studyEventAttr.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
         studyEventAttr.setPermissible(StringUtils.join(permissibleValues, ';'));
         studyEventAttrMap.put(label, studyEventAttr);
+
+        updateStudyEventAttrCollection();
     }
 
     /**
@@ -302,7 +272,7 @@ public class StudyWrapper extends StudyBaseWrapper {
                 + label + "\" is in use by patient visits");
         }
         studyEventAttrMap.remove(label);
-        deletedStudyEventAttr.add(studyEventAttr);
+        updateStudyEventAttrCollection();
     }
 
     public List<ClinicWrapper> getClinicCollection() {
@@ -334,21 +304,11 @@ public class StudyWrapper extends StudyBaseWrapper {
         return null;
     }
 
-    private static final String HAS_PATIENTS_QRY = "select count(patient) from "
-        + Study.class.getName()
-        + " as study inner join study."
-        + StudyPeer.PATIENT_COLLECTION.getName()
-        + " as patient where study."
-        + StudyPeer.ID.getName() + " = ?";
-
-    public boolean hasPatients() throws ApplicationException,
-        BiobankQueryResultSizeException {
-        HQLCriteria criteria = new HQLCriteria(HAS_PATIENTS_QRY,
-            Arrays.asList(new Object[] { getId() }));
-        return getCountResult(appService, criteria) > 0;
+    public boolean hasPatients() throws ApplicationException, BiobankException {
+        return getPatientCount(true) > 0;
     }
 
-    public static final String PATIENT_COUNT_QRY = "select count(patients) from "
+    public static final String PATIENT_COUNT_HQL = "select count(patients) from "
         + Study.class.getName()
         + " as study inner join study."
         + StudyPeer.PATIENT_COLLECTION.getName()
@@ -362,7 +322,7 @@ public class StudyWrapper extends StudyBaseWrapper {
     public long getPatientCount(boolean fast) throws ApplicationException,
         BiobankException {
         if (fast) {
-            HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
+            HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_HQL,
                 Arrays.asList(new Object[] { getId() }));
             return getCountResult(appService, criteria);
         }
@@ -394,30 +354,6 @@ public class StudyWrapper extends StudyBaseWrapper {
         return 0;
     }
 
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        checkNoDuplicates(Study.class, StudyPeer.NAME.getName(), getName(),
-            "A study with name");
-        checkNoDuplicates(Study.class, StudyPeer.NAME_SHORT.getName(),
-            getNameShort(), "A study with short name");
-    }
-
-    @Override
-    protected void persistDependencies(Study origObject) throws Exception {
-        if (studyEventAttrMap != null) {
-            List<StudyEventAttrWrapper> allStudyEventAttrWrappers = new ArrayList<StudyEventAttrWrapper>();
-            for (StudyEventAttrWrapper ss : studyEventAttrMap.values()) {
-                allStudyEventAttrWrappers.add(ss);
-            }
-            setWrapperCollection(StudyPeer.STUDY_EVENT_ATTR_COLLECTION,
-                allStudyEventAttrWrappers);
-        }
-        deleteAliquotedSpecimens();
-        deleteSourceSpecimens();
-        deleteStudyEventAttrs();
-    }
-
     public static final String IS_LINKED_TO_CLINIC_QRY = "select count(clinics) from "
         + Contact.class.getName()
         + " as contacts join contacts."
@@ -440,9 +376,6 @@ public class StudyWrapper extends StudyBaseWrapper {
     @Override
     public void resetInternalFields() {
         studyEventAttrMap = null;
-        deletedAliquotedSpecimens.clear();
-        deletedSourceSpecimens.clear();
-        deletedStudyEventAttr.clear();
     }
 
     public static final String ALL_STUDIES_QRY = "from "
@@ -499,4 +432,9 @@ public class StudyWrapper extends StudyBaseWrapper {
                 getSecuritySpecificCenters());
     }
 
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        getPersistTasks().execute(appService);
+    }
 }

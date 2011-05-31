@@ -215,7 +215,9 @@ public class BaseWrapperBuilder extends BaseBuilder {
         }
 
         String wrappedObjectType = mc.getName();
+        String idModelClassName = mc.getName();
         if (modelBaseClasses.containsKey(mc.getName())) {
+            idModelClassName = modelBaseClasses.get(mc.getName()).getName();
             wrappedObjectType = "E";
         }
 
@@ -246,7 +248,13 @@ public class BaseWrapperBuilder extends BaseBuilder {
         }
 
         result.append("    @Override\n")
-            .append("   protected List<Property<?, ? super ")
+            .append("    public Property<Integer, ? super ")
+            .append(wrappedObjectType).append("> getIdProperty() {\n")
+            .append("        return ").append(idModelClassName)
+            .append("Peer.ID;\n").append("    }\n\n");
+
+        result.append("    @Override\n")
+            .append("    protected List<Property<?, ? super ")
             .append(wrappedObjectType).append(">> getProperties() {\n");
 
         if (modelBaseClasses.containsKey(mc.getName()))
@@ -287,7 +295,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
     private String createPropertySetter(ModelClass mc, Attribute member) {
         StringBuilder result = new StringBuilder();
 
-        result.append("   public void set")
+        result.append("    public void set")
             .append(CamelCase.toCamelCase(member.getName(), true)).append("(")
             .append(member.getType()).append(" ").append(member.getName())
             .append(") {\n");
@@ -295,13 +303,13 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String value = member.getName();
         if (member.getType().equals("String")) {
             value = "trimmed";
-            result.append("      String ").append(value).append(" = ")
+            result.append("        String ").append(value).append(" = ")
                 .append(member.getName()).append(".trim();\n");
         }
 
-        result.append("      setProperty(").append(mc.getName())
+        result.append("        setProperty(").append(mc.getName())
             .append("Peer.").append(CamelCase.toTitleCase(member.getName()))
-            .append(", ").append(value).append(");\n").append("   }\n\n");
+            .append(", ").append(value).append(");\n").append("    }\n\n");
 
         return result.toString();
     }
@@ -326,13 +334,13 @@ public class BaseWrapperBuilder extends BaseBuilder {
             result.append("   ").append(SUPPRESS_WARNING_UNCHECKED)
                 .append("\n");
         }
-        result.append("   public ").append(assocClassName).append("Wrapper")
+        result.append("    public ").append(assocClassName).append("Wrapper")
             .append(genericString).append(" get")
             .append(CamelCase.toCamelCase(assocName, true)).append("() {\n")
-            .append("      return getWrappedProperty(").append(mc.getName())
+            .append("        return getWrappedProperty(").append(mc.getName())
             .append("Peer.").append(CamelCase.toTitleCase(assocName))
             .append(", ").append(assocClassName).append("Wrapper.class);\n")
-            .append("   }\n\n");
+            .append("    }\n\n");
         return result.toString();
     }
 

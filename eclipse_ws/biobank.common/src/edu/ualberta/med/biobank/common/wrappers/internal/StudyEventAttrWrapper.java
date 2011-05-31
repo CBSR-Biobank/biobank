@@ -44,6 +44,9 @@ public class StudyEventAttrWrapper extends StudyEventAttrBaseWrapper {
 
     public boolean isUsedByCollectionEvents() throws ApplicationException,
         BiobankException {
+        if (isNew()) {
+            return false;
+        }
         HQLCriteria c = new HQLCriteria(IS_USED_BY_COL_EVENTS_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
         return getCountResult(appService, c) > 0;

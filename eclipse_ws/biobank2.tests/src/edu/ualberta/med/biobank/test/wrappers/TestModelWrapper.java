@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -39,6 +40,10 @@ public class TestModelWrapper extends TestDatabase {
             return 0;
         }
 
+        @Override
+        public Property<Integer, ? super Object> getIdProperty() {
+            return null;
+        }
     }
 
     class TestSiteWrapper extends ModelWrapper<Site> {
@@ -62,6 +67,10 @@ public class TestModelWrapper extends TestDatabase {
             return 0;
         }
 
+        @Override
+        public Property<Integer, ? super Site> getIdProperty() {
+            return SitePeer.ID;
+        }
     }
 
     @Test

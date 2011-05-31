@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.BiobankSessionAction;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.Site;
@@ -22,6 +23,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
 import gov.nih.nci.system.dao.Request;
 import gov.nih.nci.system.dao.Response;
+import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.util.ClassCache;
 
 import java.util.List;
@@ -51,6 +53,19 @@ public class BiobankApplicationServiceImpl extends
     public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
         String targetClassName) throws ApplicationException {
         return privateQuery(sqlCriteria, targetClassName);
+    }
+
+    @Override
+    protected Request prepareRequest(SDKQuery query, String classname) {
+        Request request = super.prepareRequest(query, classname);
+
+        // super.prepareRequest replaces the request of SearchHQLQuery, switch
+        // it back to the query if it's a BiobankSessionAction
+        if (query instanceof BiobankSessionAction) {
+            request.setRequest(query);
+        }
+
+        return request;
     }
 
     @Override

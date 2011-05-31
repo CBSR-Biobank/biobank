@@ -11,7 +11,6 @@ import java.lang.reflect.Type;
  * @author crazybob@google.com (Bob Lee)
  */
 public abstract class TypeReference<T> {
-
     private final Type type;
     private volatile Constructor<?> constructor;
 
