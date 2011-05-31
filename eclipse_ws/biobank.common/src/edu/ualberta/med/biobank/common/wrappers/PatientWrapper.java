@@ -60,15 +60,6 @@ public class PatientWrapper extends PatientBaseWrapper {
             getPnumber(), "A patient with PNumber");
     }
 
-    /**
-     * Search patient visits with the given date processed.
-     */
-    @Deprecated
-    public List<CollectionEventWrapper> getVisits(Date dateProcessed,
-        Date dateDrawn) {
-        return null;
-    }
-
     private static final String PATIENT_QRY = "from " + Patient.class.getName()
         + " where " + PatientPeer.PNUMBER.getName() + "=?";
 
@@ -295,13 +286,15 @@ public class PatientWrapper extends PatientBaseWrapper {
                         if (p1event.getVisitNumber().equals(
                             p2event.getVisitNumber())) {
                             // merge collection event
-                            p1event.addToOriginalSpecimenCollection(p2event
-                                .getOriginalSpecimenCollection(false));
-                            p1event.addToAllSpecimenCollection(p2event
-                                .getAllSpecimenCollection(false));
-                            for (SpecimenWrapper spec : p2event
-                                .getAllSpecimenCollection(false))
-                                spec.setCollectionEvent(p1event);
+                            List<SpecimenWrapper> ospecs = p2event
+                                .getOriginalSpecimenCollection(false);
+                            p1event.addToOriginalSpecimenCollection(ospecs);
+                            List<SpecimenWrapper> aspecs = p2event
+                                .getAllSpecimenCollection(false);
+                            p1event.addToAllSpecimenCollection(aspecs);
+                            p2event
+                                .removeFromOriginalSpecimenCollection(ospecs);
+                            p2event.removeFromAllSpecimenCollection(aspecs);
                             toDelete.add(p2event);
                             p1event.persist();
                             merged = true;
