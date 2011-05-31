@@ -277,9 +277,6 @@ public class LinkFormPatientManagement {
         }
         viewerCollectionEvents.setInput(Arrays.asList(cEvent));
         viewerCollectionEvents.setSelection(new StructuredSelection(cEvent));
-        // if (cEventText != null) {
-        // cEventText.setText(cEvent.getVisitNumber().toString());
-        // }
     }
 
     public void enabledPatientText(boolean enabled) {
@@ -388,9 +385,6 @@ public class LinkFormPatientManagement {
             } else {
                 viewerCollectionEvents.setInput(null);
             }
-            // if (cEventText != null) {
-            //                cEventText.setText(""); //$NON-NLS-1$
-            // }
         }
     }
 

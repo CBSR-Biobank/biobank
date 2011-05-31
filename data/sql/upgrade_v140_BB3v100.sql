@@ -599,3 +599,21 @@ insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
 	values ((select id from specimen_type where name='urine cup'),
 	(select id from specimen_type where name='UrineSA900'));
+
+/*****************************************************
+ * Source specimen
+ ****************************************************/
+
+ALTER TABLE aliquoted_specimen
+    ADD COLUMN source_specimen_id INT(11) NOT NULL;
+
+
+update aliquoted_specimen als
+       set als.source_specimen_id=(select ss.id from source_specimen as ss where als.study_id = ss.study_id 
+and ss.specimen_type_id in 
+(select stst.parent_specimen_type_id 
+from specimen_type as child join specimen_type_specimen_type as stst on child.id = stst.child_specimen_type_id 
+where child.id = als.specimen_type_id) limit 1)
+where als.id not in (2,5, 19, 33,35,40,44,47,51,53,64,73,80,96,102,103,104,107,109,110,113,126,129,131,132,134,163,208,210,211,212,213,214,215,218,219,220)
+
+
