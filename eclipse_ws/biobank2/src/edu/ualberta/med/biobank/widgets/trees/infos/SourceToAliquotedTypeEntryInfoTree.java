@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.trees.infos;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -20,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
+import edu.ualberta.med.biobank.dialogs.StudyAliquotedSpecimenDialog;
 import edu.ualberta.med.biobank.dialogs.StudySourceSpecimenDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
@@ -136,6 +138,7 @@ public class SourceToAliquotedTypeEntryInfoTree extends
             reloadCollection(selectedSourceSpecimen);
             notifyListeners();
         }
+        treeViewer.refresh();
     }
 
     private void addEditSupport() {
@@ -158,7 +161,7 @@ public class SourceToAliquotedTypeEntryInfoTree extends
                             addOrEditStudySourceSpecimen(false, sourceSpecimen);
                         } else if (selection instanceof AliquotedSpecimenWrapper) {
                             AliquotedSpecimenWrapper aliquoted = (AliquotedSpecimenWrapper) selection;
-                            // TODO
+                            editAliquotedSpecimen(aliquoted);
                         }
                 }
             });
@@ -191,10 +194,61 @@ public class SourceToAliquotedTypeEntryInfoTree extends
                         }
                     } else if (selection instanceof AliquotedSpecimenWrapper) {
                         AliquotedSpecimenWrapper aliquoted = (AliquotedSpecimenWrapper) selection;
-                        // TODO
+                        if (aliquoted != null) {
+                            if (!MessageDialog
+                                .openConfirm(
+                                    PlatformUI.getWorkbench()
+                                        .getActiveWorkbenchWindow().getShell(),
+                                    Messages
+                                        .getString("AliquotedSpecimenEntryInfoTable.delete.title"),
+                                    Messages
+                                        .getString(
+                                            "AliquotedSpecimenEntryInfoTable.delete.question",
+                                            aliquoted.getSpecimenType()
+                                                .getName()))) {
+                                return;
+                            }
+                            // need to do that to find the exact ss wrapper that
+                            // is inside the study that will be saved later.
+                            for (SourceSpecimenWrapper ssw : study
+                                .getSourceSpecimenCollection(false)) {
+                                if (ssw.equals(aliquoted.getSourceSpecimen())) {
+                                    ssw.removeFromAliquotedSpecimenCollection(Arrays
+                                        .asList(aliquoted));
+                                }
+                            }
+                            addedOrModifiedAliquotedSpecimen.remove(aliquoted);
+                            removedAliquotedSpecimen.add(aliquoted);
+                            treeViewer.refresh();
+                            notifyListeners();
+                        }
                     }
                 }
             });
+        }
+    }
+
+    private void editAliquotedSpecimen(
+        final AliquotedSpecimenWrapper aliquotedSpecimen) {
+        List<SpecimenTypeWrapper> dialogTypes = new ArrayList<SpecimenTypeWrapper>();
+        SourceSpecimenWrapper sourceSpecimen = aliquotedSpecimen
+            .getSourceSpecimen();
+        if (sourceSpecimen.getSpecimenType() != null)
+            dialogTypes.addAll(sourceSpecimen.getSpecimenType()
+                .getChildSpecimenTypeCollection(true));
+        for (AliquotedSpecimenWrapper asw : sourceSpecimen
+            .getAliquotedSpecimenCollection(false)) {
+            dialogTypes.remove(asw.getSpecimenType());
+        }
+        dialogTypes.add(aliquotedSpecimen.getSpecimenType());
+        StudyAliquotedSpecimenDialog dlg = new StudyAliquotedSpecimenDialog(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+            aliquotedSpecimen, null, dialogTypes);
+
+        int res = dlg.open();
+        if (res == Dialog.OK) {
+            treeViewer.refresh();
+            notifyListeners();
         }
     }
 

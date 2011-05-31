@@ -91,12 +91,12 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
         if (sourceSpecimen.getSpecimenType() != null)
             dialogTypes.addAll(sourceSpecimen.getSpecimenType()
                 .getChildSpecimenTypeCollection(true));
-        if (!add) {
-            dialogTypes.add(aliquotedSpecimen.getSpecimenType());
-        }
         for (AliquotedSpecimenWrapper asw : sourceSpecimen
             .getAliquotedSpecimenCollection(false)) {
             dialogTypes.remove(asw.getSpecimenType());
+        }
+        if (!add) {
+            dialogTypes.add(aliquotedSpecimen.getSpecimenType());
         }
         StudyAliquotedSpecimenDialog dlg = new StudyAliquotedSpecimenDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),

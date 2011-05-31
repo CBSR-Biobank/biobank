@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.dialogs;
 import java.util.Collection;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -87,7 +88,18 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.getString("AliquotedSpecimenDialog.msg");
+        if (availableSpecimenTypes.size() > 0)
+            return Messages.getString("AliquotedSpecimenDialog.msg");
+        else
+            return "No more aliquoted specimen type can be derived from the selected source specimen type.";
+    }
+
+    @Override
+    protected int getTitleAreaMessageType() {
+        if (availableSpecimenTypes.size() > 0)
+            return IMessageProvider.NONE;
+        else
+            return IMessageProvider.INFORMATION;
     }
 
     @Override

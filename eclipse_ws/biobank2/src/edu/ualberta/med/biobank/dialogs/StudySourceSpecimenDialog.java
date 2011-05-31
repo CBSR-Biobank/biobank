@@ -42,7 +42,7 @@ public class StudySourceSpecimenDialog extends PagedDialog {
 
     private Button volume;
 
-    private SourceSpecimenWrapper internalSourceSpecimen;
+    // private SourceSpecimenWrapper internalSourceSpecimen;
 
     private AliquotedSpecimenEntryInfoTable aliquotedSpecimenEntryTable;
 
@@ -59,7 +59,7 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         Assert.isNotNull(allSpecimenTypes);
         this.origSourceSpecimen = origSourceSpecimen;
         this.allSpecimenTypes = allSpecimenTypes;
-        internalSourceSpecimen = new SourceSpecimenWrapper(null);
+        // internalSourceSpecimen = new SourceSpecimenWrapper(null);
         if (origSourceSpecimen.getSpecimenType() == null) {
             currentTitle = Messages.getString("SourceSpecimenDialog.add.title");
             message = Messages.getString("SourceSpecimenDialog.add.msg");
@@ -67,17 +67,17 @@ public class StudySourceSpecimenDialog extends PagedDialog {
             currentTitle = Messages
                 .getString("SourceSpecimenDialog.edit.title");
             message = Messages.getString("SourceSpecimenDialog.edit.msg");
-            internalSourceSpecimen = new SourceSpecimenWrapper(null);
+            // internalSourceSpecimen = new SourceSpecimenWrapper(null);
         }
-        internalSourceSpecimen.setStudy(origSourceSpecimen.getStudy());
-        internalSourceSpecimen.setSpecimenType(origSourceSpecimen
-            .getSpecimenType());
-        internalSourceSpecimen.setNeedOriginalVolume(origSourceSpecimen
-            .getNeedOriginalVolume());
-        internalSourceSpecimen.getWrappedObject()
-            .setAliquotedSpecimenCollection(
-                origSourceSpecimen.getWrappedObject()
-                    .getAliquotedSpecimenCollection());
+        // internalSourceSpecimen.setStudy(origSourceSpecimen.getStudy());
+        // internalSourceSpecimen.setSpecimenType(origSourceSpecimen
+        // .getSpecimenType());
+        // internalSourceSpecimen.setNeedOriginalVolume(origSourceSpecimen
+        // .getNeedOriginalVolume());
+        // internalSourceSpecimen.getWrappedObject()
+        // .setAliquotedSpecimenCollection(
+        // origSourceSpecimen.getWrappedObject()
+        // .getAliquotedSpecimenCollection());
     }
 
     @Override
@@ -110,13 +110,13 @@ public class StudySourceSpecimenDialog extends PagedDialog {
 
         typeName = getWidgetCreator().createComboViewer(contents,
             Messages.getString("SourceSpecimen.field.type.label"),
-            allSpecimenTypes, internalSourceSpecimen.getSpecimenType(),
+            allSpecimenTypes, origSourceSpecimen.getSpecimenType(),
             Messages.getString("SourceSpecimen.field.type.validation.msg"),
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     SpecimenTypeWrapper stw = (SpecimenTypeWrapper) selectedObject;
-                    internalSourceSpecimen.setSpecimenType(stw);
+                    origSourceSpecimen.setSpecimenType(stw);
                     boolean children = stw
                         .getChildSpecimenTypeCollection(false).size() > 0;
                     aliquotedSection.setEnabled(children);
@@ -125,7 +125,8 @@ public class StudySourceSpecimenDialog extends PagedDialog {
                             getTitleAreaMessageType());
                     else
                         setMessage(
-                            "This type cannot be derived (see Specimen types configuration or contact administrator).",
+                            "This type cannot be derived (see Specimen types "
+                                + "configuration or contact administrator).",
                             IMessageProvider.WARNING);
                 }
             });
@@ -134,7 +135,7 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         volume = (Button) createBoundWidgetWithLabel(contents, Button.class,
             SWT.BORDER,
             Messages.getString("SourceSpecimen.field.originalVolume.label"),
-            new String[0], internalSourceSpecimen,
+            new String[0], origSourceSpecimen,
             SourceSpecimenPeer.NEED_ORIGINAL_VOLUME.getName(), null);
 
         aliquotedSection = new Section(contents, Section.TWISTIE
@@ -147,7 +148,7 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         aliquotedSection.setLayoutData(gd);
 
         aliquotedSpecimenEntryTable = new AliquotedSpecimenEntryInfoTable(
-            aliquotedSection, internalSourceSpecimen);
+            aliquotedSection, origSourceSpecimen);
         aliquotedSection.setClient(aliquotedSpecimenEntryTable);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
@@ -189,7 +190,7 @@ public class StudySourceSpecimenDialog extends PagedDialog {
     @Override
     protected void resetFields() {
         try {
-            internalSourceSpecimen.reset();
+            origSourceSpecimen.reset();
         } catch (Exception e) {
             BiobankPlugin.openAsyncError("Error", e);
         }
@@ -200,9 +201,9 @@ public class StudySourceSpecimenDialog extends PagedDialog {
     @Override
     protected void copy(ModelWrapper<?> newModelObject) {
         SourceSpecimenWrapper ssw = ((SourceSpecimenWrapper) newModelObject);
-        ssw.setSpecimenType((internalSourceSpecimen).getSpecimenType());
-        ssw.setNeedOriginalVolume((internalSourceSpecimen)
-            .getNeedOriginalVolume());
+        // ssw.setSpecimenType((internalSourceSpecimen).getSpecimenType());
+        // ssw.setNeedOriginalVolume((internalSourceSpecimen)
+        // .getNeedOriginalVolume());
         for (AliquotedSpecimenWrapper asw : aliquotedSpecimenEntryTable
             .getAddedOrModifiedAliquotedSpecimens()) {
             asw.setSourceSpecimen(ssw);
