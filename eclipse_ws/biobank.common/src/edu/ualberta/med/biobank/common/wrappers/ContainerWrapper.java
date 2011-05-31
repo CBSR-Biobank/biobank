@@ -271,20 +271,13 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     private void setTopContainer() throws BiobankCheckException {
-        ContainerTypeWrapper ctype = getContainerType();
-        if (ctype == null) {
-            throw new RuntimeException("container type needs to be set");
+        ContainerWrapper top = this;
+        while (top != null && top.getParentContainer() != null) {
+            top = top.getParentContainer();
         }
 
-        ContainerWrapper top = this;
-        if (!getContainerType().getTopLevel()) {
-            while (top != null && top.getParentContainer() != null) {
-                top = top.getParentContainer();
-            }
-
-            if (top == null) {
-                throw new BiobankCheckException("no top container");
-            }
+        if (top == null) {
+            throw new BiobankCheckException("no top container");
         }
         super.setTopContainer(top);
     }
