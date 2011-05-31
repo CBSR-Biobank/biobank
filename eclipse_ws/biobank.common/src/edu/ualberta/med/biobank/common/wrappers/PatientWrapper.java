@@ -294,6 +294,7 @@ public class PatientWrapper extends PatientBaseWrapper {
                     for (CollectionEventWrapper p1event : getCollectionEventCollection(false))
                         if (p1event.getVisitNumber().equals(
                             p2event.getVisitNumber())) {
+                            // merge collection event
                             p1event.addToOriginalSpecimenCollection(p2event
                                 .getOriginalSpecimenCollection(false));
                             p1event.addToAllSpecimenCollection(p2event
