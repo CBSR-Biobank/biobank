@@ -82,21 +82,21 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
     }
 
     public ContainerWrapper getTop() {
-        ContainerWrapper top;
+        ContainerWrapper container;
         if (objectAtPosition instanceof ContainerWrapper)
-            top = (ContainerWrapper) objectAtPosition;
+            container = (ContainerWrapper) objectAtPosition;
         else
-            top = getParentContainer();
+            container = getParentContainer();
 
-        ContainerPathWrapper path = top.getContainerPath();
-        if (path != null) {
-            return path.getTopContainer();
+        ContainerWrapper top = container.getTopContainer();
+        if (top != null) {
+            return top;
         }
 
-        while (top != null && top.getParentContainer() != null) {
-            top = top.getParentContainer();
+        while (container != null && container.getParentContainer() != null) {
+            container = container.getParentContainer();
         }
-        return top;
+        return container;
     }
 
     /**

@@ -561,13 +561,13 @@ public class WidgetCreator {
         return widget;
     }
 
-    public void addBooleanBinding(WritableValue writableValue,
+    public Binding addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, final String errorMsg) {
-        addBooleanBinding(writableValue, observableValue, errorMsg,
+        return addBooleanBinding(writableValue, observableValue, errorMsg,
             IStatus.ERROR);
     }
 
-    public void addBooleanBinding(WritableValue writableValue,
+    public Binding addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, final String errorMsg,
         final int statusType) {
         Assert.isNotNull(dbc);
@@ -589,7 +589,7 @@ public class WidgetCreator {
 
             });
         }
-        dbc.bindValue(writableValue, observableValue, uvs, uvs);
+        return dbc.bindValue(writableValue, observableValue, uvs, uvs);
     }
 
     public void addGlobalBindValue(IObservableValue statusObservable) {
@@ -646,10 +646,9 @@ public class WidgetCreator {
     }
 
     public void removeBinding(String bindingKey) {
-        Assert.isNotNull(dbc);
         Binding binding = bindings.get(bindingKey);
         Assert.isNotNull(binding);
-        dbc.removeBinding(binding);
+        removeBinding(binding);
     }
 
     public void addBinding(Binding binding) {
@@ -662,8 +661,15 @@ public class WidgetCreator {
         Binding binding = bindings.get(bindingKey);
         Assert.isNotNull(binding);
         if (!dbc.getBindings().contains(binding)) {
-            dbc.addBinding(binding);
+            addBinding(binding);
         }
+    }
+
+    public void setBinding(String bindingKey, boolean set) {
+        if (set)
+            addBinding(bindingKey);
+        else
+            removeBinding(bindingKey);
     }
 
     public void createWidgetsFromMap(Map<String, FieldInfo> fieldsMap,

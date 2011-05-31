@@ -11,6 +11,7 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
@@ -49,10 +50,10 @@ public class SiteWrapper extends SiteBaseWrapper {
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
-        checkNoDuplicates(Site.class, SitePeer.NAME.getName(), getName(),
-            "A site with name");
-        checkNoDuplicates(Site.class, SitePeer.NAME_SHORT.getName(),
-            getNameShort(), "A site with name short");
+        checkNoDuplicates(Center.class, CenterPeer.NAME.getName(), getName(),
+            "A center with name");
+        checkNoDuplicates(Center.class, CenterPeer.NAME_SHORT.getName(),
+            getNameShort(), "A center with short name");
     }
 
     @Override

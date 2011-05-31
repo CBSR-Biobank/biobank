@@ -18,8 +18,8 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
+import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -83,9 +83,11 @@ public class DispatchCreateScanDialog extends
                 });
 
             productBarcodeValidator = new NonEmptyStringValidator(
-                Messages.getString("ScanAssign.productBarcode.validationMsg"));//$NON-NLS-1$
-            Label palletproductBarcodeLabel = widgetCreator.createLabel(parent,
-                Messages.getString("ScanAssign.productBarcode.label"));//$NON-NLS-1$
+                Messages
+                    .getString("DispatchCreateScanDialog.productBarcode.validationMsg"));//$NON-NLS-1$
+            Label palletproductBarcodeLabel = widgetCreator
+                .createLabel(parent, Messages
+                    .getString("DispatchCreateScanDialog.productBarcode.label"));//$NON-NLS-1$
             palletproductBarcodeText = (BiobankText) createBoundWidget(parent,
                 BiobankText.class, SWT.NONE, palletproductBarcodeLabel,
                 new String[0], this,

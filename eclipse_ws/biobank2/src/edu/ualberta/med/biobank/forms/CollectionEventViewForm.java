@@ -153,7 +153,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
             .getString("CollectionEventViewForm.sourcespecimens.title"));
         sourceSpecimenTable = new SpecimenInfoTable(client,
             cevent.getOriginalSpecimenCollection(true),
-            ColumnsShown.CEVENT_FORM, 10);
+            ColumnsShown.SOURCE_SPECIMENS, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
     }
 
@@ -163,7 +163,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
             .getString("CollectionEventViewForm.aliquotedspecimens.title"));
         aliquotedSpecimenTable = new SpecimenInfoTable(client,
             cevent.getAliquotedSpecimenCollection(true),
-            ColumnsShown.CEVENT_FORM, 10);
+            ColumnsShown.ALIQUOTS, 10);
         aliquotedSpecimenTable.adaptToToolkit(toolkit, true);
     }
 

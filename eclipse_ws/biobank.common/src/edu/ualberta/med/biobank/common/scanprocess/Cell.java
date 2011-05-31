@@ -108,4 +108,5 @@ public class Cell implements Serializable {
     public Integer getSpecimenId() {
         return specimenId;
     }
+
 }

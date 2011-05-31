@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.processing;
 
 import java.util.Collection;
 
@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ScanLinkAdapter extends AdapterBase {
 

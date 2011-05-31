@@ -3,19 +3,24 @@ package edu.ualberta.med.biobank.server.reports;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.CapacityPostProcess;
-import edu.ualberta.med.biobank.model.ContainerPath;
+import edu.ualberta.med.biobank.model.Container;
 
 public class ContainerCapacityImpl extends AbstractReport {
 
     private CapacityPostProcess rowPostProcess;
 
-    private static final String QUERY = "select (select c.container.label || '(' || c.container.containerType.nameShort || ')' from "
-        + ContainerPath.class.getName()
-        + " c where c.path=substr(path.path, 1, locate('/', path.path)-1)), "
-        + "sum(path.container.containerType.capacity.rowCapacity * path.container.containerType.capacity.colCapacity), sum(path.container.specimenPositionCollection.size) from "
-        + ContainerPath.class.getName()
-        + " path where path.container.containerType.specimenTypeCollection.size > 0 "
-        + " group by substr(path.path, 1, locate('/', path.path)-1)";
+    // @formatter:off
+    private static final String QUERY = 
+        "select (select c.label || '(' || c.containerType.nameShort || ')' from "
+        + Container.class.getName()
+        + " c where c.id=substr(c2.path, 1, locate('/', c2.path)-1)), "
+        + "sum(c2.containerType.capacity.rowCapacity "
+        + "* c2.containerType.capacity.colCapacity), "
+        + "sum(c2.specimenPositionCollection.size) from "
+        + Container.class.getName()
+        + " c2 where c2.containerType.specimenTypeCollection.size > 0 "
+        + " group by substr(c2.path, 1, locate('/', c2.path)-1)";
+    // @formatter:on
 
     public ContainerCapacityImpl(BiobankReport report) {
         super(QUERY, report);

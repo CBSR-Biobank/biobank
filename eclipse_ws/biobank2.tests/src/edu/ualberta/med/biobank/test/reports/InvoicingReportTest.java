@@ -25,12 +25,10 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 public class InvoicingReportTest extends AbstractReportTest {
     private static final Mapper<SpecimenWrapper, List<String>, Long> GROUP_ALIQUOTS_BY_STUDY_CLINIC_SAMPLE_TYPE = new Mapper<SpecimenWrapper, List<String>, Long>() {
         public List<String> getKey(SpecimenWrapper aliquot) {
-            // FIXME
-            // return Arrays.asList(aliquot.getProcessingEvent().getPatient()
-            // .getStudy().getNameShort(), aliquot.getProcessingEvent()
-            // .getCenter().getNameShort(), aliquot.getSpecimenType()
-            // .getNameShort());
-            return null;
+            return Arrays.asList(aliquot.getCollectionEvent().getPatient()
+                .getStudy().getNameShort(), aliquot.getProcessingEvent()
+                .getCenter().getNameShort(), aliquot.getSpecimenType()
+                .getNameShort());
         }
 
         public Long getValue(SpecimenWrapper aliquot, Long aliquotCount) {
@@ -39,11 +37,9 @@ public class InvoicingReportTest extends AbstractReportTest {
         }
     };
     private static final Mapper<ProcessingEventWrapper, List<String>, Long> GROUP_PVS_BY_STUDY_CLINIC = new Mapper<ProcessingEventWrapper, List<String>, Long>() {
-        public List<String> getKey(ProcessingEventWrapper patientVisit) {
-            // FIXME
-            // return Arrays.asList(patientVisit.getPatient().getStudy()
-            // .getNameShort(), patientVisit.getCenter().getNameShort());
-            return null;
+        public List<String> getKey(ProcessingEventWrapper pevent) {
+            return Arrays.asList(pevent.getCenter().getNameShort(), pevent
+                .getCenter().getNameShort());
         }
 
         public Long getValue(ProcessingEventWrapper patientVisit, Long pvCount) {
@@ -76,8 +72,7 @@ public class InvoicingReportTest extends AbstractReportTest {
         Assert.assertTrue(aliquots.size() > 0);
 
         SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
-        // FIXME
-        // checkResults(aliquot.getLinkDate(), aliquot.getLinkDate());
+        checkResults(aliquot.getCreatedAt(), aliquot.getCreatedAt());
     }
 
     @Test
@@ -88,14 +83,12 @@ public class InvoicingReportTest extends AbstractReportTest {
         SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
 
         Calendar calendar = Calendar.getInstance();
-        // FIXME
-        // calendar.setTime(aliquot.getLinkDate());
+        calendar.setTime(aliquot.getCreatedAt());
         // consider a 2 day range since patient visits are often processed the
         // following day
         calendar.add(Calendar.DAY_OF_YEAR, 2);
 
-        // FIXME
-        // checkResults(aliquot.getLinkDate(), calendar.getTime());
+        checkResults(aliquot.getCreatedAt(), calendar.getTime());
     }
 
     @Override

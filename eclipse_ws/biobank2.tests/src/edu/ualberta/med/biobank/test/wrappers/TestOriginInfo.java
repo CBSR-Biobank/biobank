@@ -3,15 +3,19 @@ package edu.ualberta.med.biobank.test.wrappers;
 import org.junit.Assert;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.test.TestDatabase;
+import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
+import edu.ualberta.med.biobank.test.internal.ShipmentInfoHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
-import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
@@ -20,22 +24,19 @@ public class TestOriginInfo extends TestDatabase {
     @Test
     public void testGetSetShippingMethod() throws Exception {
         String name = "testGetSetShippingMethod" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ShippingMethodWrapper company = ShippingMethodHelper
-            .addShippingMethod(name);
-
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic1" + name);
         StudyWrapper study = StudyHelper.addStudy(name);
         PatientWrapper patient = PatientHelper.addPatient(name, study);
         SpecimenWrapper spc = SpecimenHelper.newSpecimen(name);
 
-        // CollectionEventWrapper cevent = CollectionEventHelper
-        // .addCollectionEvent(site, patient, 1, spc);
+        ShippingMethodWrapper method = ShippingMethodHelper
+            .addShippingMethod(name);
 
-        // cevent.persist();
-        // cevent.reload();
+        CollectionEventHelper.addCollectionEvent(clinic, patient, 1, spc);
+        ShipmentInfoWrapper shipInfo = ShipmentInfoHelper.addShipmentInfo(clinic,
+            method, Utils.getRandomString(20), Utils.getRandomDate(), spc);
 
-        // Assert.assertEquals(company, cevent.getShippingMethod());
-        Assert.fail("test needs implementation");
+        Assert.assertEquals(method, shipInfo.getShippingMethod());
     }
 
 }

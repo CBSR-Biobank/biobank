@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.forms;
+package edu.ualberta.med.biobank.forms.linkassign;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -21,8 +21,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 import edu.ualberta.med.biobank.logs.ActivityLogAppender;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.logs.LogInfo;
@@ -152,10 +152,6 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
             activityLogger.trace(message);
         }
         printed = false;
-    }
-
-    public void appendLogNLS(String key, Object... params) {
-        appendLog(Messages.getString(key, params));
     }
 
     protected void setFinished(boolean finished) {

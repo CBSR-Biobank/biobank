@@ -49,8 +49,6 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
      */
     public static final int LEGEND_WIDTH = 70;
 
-    protected boolean hasLegend = false;
-
     public boolean legendOnSide = false;
 
     @Override
@@ -84,6 +82,13 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
             }
         }
+        if (legendStatus != null) {
+            legendWidth = gridWidth / legendStatus.size();
+            for (int i = 0; i < legendStatus.size(); i++) {
+                UICellStatus status = legendStatus.get(i);
+                drawLegend(e, status.getColor(), i, status.getLegend());
+            }
+        }
     }
 
     @Override
@@ -99,7 +104,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         }
         int width = gridWidth + 10;
         int height = gridHeight + 10;
-        if (hasLegend) {
+        if (legendStatus != null) {
             if (legendOnSide) {
                 width = width + LEGEND_WIDTH + 4;
             } else {
@@ -108,6 +113,12 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         }
         return new Point(width, height);
     }
+
+    // @Override
+    // public void initLegend(List<UICellStatus> status) {
+    // super.initLegend(status);
+    // hasLegend = status != null && status.size() > 0;
+    // }
 
     protected void drawRectangle(PaintEvent e,
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
@@ -288,6 +299,16 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
     public int getCols() {
         return columns;
+    }
+
+    @Override
+    public RowColPos getPositionAtCoordinates(int x, int y) {
+        int col = x / getCellWidth();
+        int row = y / getCellHeight();
+        if (col >= 0 && col < getCols() && row >= 0 && row < getRows()) {
+            return new RowColPos(row, col);
+        }
+        return null;
     }
 
 }

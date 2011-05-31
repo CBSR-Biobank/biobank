@@ -20,6 +20,8 @@ public class TestCommon {
 
     public static List<String> usedWaybills;
 
+    public static List<String> usedWorksheets;
+
     public static ContainerTypeWrapper addSampleTypes(ContainerTypeWrapper ct,
         List<SpecimenTypeWrapper> sampleTypes) throws Exception {
         Assert.assertTrue("not enough sample types for test",
@@ -89,5 +91,18 @@ public class TestCommon {
         } while (usedWaybills.contains(waybill));
         usedWaybills.add(waybill);
         return waybill;
+    }
+
+    public static String getUniqueWorksheet(Random r) {
+        if (usedWorksheets == null) {
+            usedWorksheets = new ArrayList<String>();
+        }
+
+        String worksheet;
+        do {
+            worksheet = Utils.getRandomString(20);
+        } while (usedWorksheets.contains(worksheet));
+        usedWorksheets.add(worksheet);
+        return worksheet;
     }
 }

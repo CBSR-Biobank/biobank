@@ -1,0 +1,70 @@
+#!/bin/bash
+
+#set -o verbose
+
+SCRIPT=`basename $0`
+
+USAGE="
+Usage: $SCRIPT [OPTIONS]
+
+OPTIONS
+  -d DUMP     The original biobank2 database dump file name.
+  -H DBHOST   The hostname of the machine running the MySQL server. Defaults to
+              localhost if not specified.
+  -u DBUSER   The user to use on the MySQL server.
+  -p PWD      The password to use on the MySQL server.
+  -h          Help text.
+"
+
+MYSQL=/usr/bin/mysql
+MYSQLDUMP=/usr/bin/mysqldump
+SED=/bin/sed
+DBHOST="localhost"
+DBNAME=biobank
+
+while getopts "e:d:hH:u:p:o:" OPTION
+do
+  case $OPTION in
+        d) DBDUMP=$OPTARG;;
+        H) DBHOST=$OPTARG;;
+        u) DBUSER=$OPTARG;;
+        p) DBPWD=$OPTARG;;
+        h) echo "$USAGE"; exit;;
+  esac
+done
+
+if [ -z "$DBDUMP" ]; then
+    echo "ERROR: old database dump not specified"
+    echo "$USAGE"
+    exit
+fi
+
+if [ -z "$DBUSER" ]; then
+    echo "ERROR: user not specified"
+    echo "$USAGE"
+    exit
+fi
+
+if [ -z "$DBPWD" ]; then
+    echo "ERROR: password not specified"
+    echo "$USAGE"
+    exit
+fi
+
+DUMPFILE="/tmp/$SCRIPT.$RANDOM.sql"
+
+ant dbcreate
+scripts/dump_csm_schema.sh -ecsm_user -ecsm_user_group -ecsm_group -H$DBHOST -u$DBUSER -p$DBPWD -o$DUMPFILE
+echo "extracting old database..."
+mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop biobank
+mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD create biobank
+gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
+echo "upgrading database..."
+mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v131_v140.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v140_BB3v100.sql
+echo "setting global security..."
+mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < $DUMPFILE
+echo "setting CBSR sites security..."
+mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < security-logs/addCBSRSiteSecurity.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v131_v140_security.sql
+
