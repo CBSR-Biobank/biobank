@@ -41,4 +41,15 @@ public class ScanPalletWidget extends ContainerDisplayWidget {
         this.redraw();
     }
 
+    @Override
+    public void initDisplayFromType(boolean createDefaultContainer,
+        Integer cellSize) {
+        ScanPalletDisplay display = (ScanPalletDisplay) getContainerDisplay();
+        if (containerType == null)
+            display.setDefaultStorageSize();
+        else
+            display.setContainerType(containerType);
+        display.setCellWidth(cellSize);
+        display.setCellHeight(cellSize);
+    }
 }

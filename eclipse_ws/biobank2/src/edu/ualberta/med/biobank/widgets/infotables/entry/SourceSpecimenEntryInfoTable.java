@@ -14,9 +14,11 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
 import edu.ualberta.med.biobank.dialogs.StudySourceSpecimenDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
@@ -89,22 +91,35 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
     }
 
     private void addOrEditStudySourceSpecimen(boolean add,
-        SourceSpecimenWrapper sourceSpecimen) {
+        final SourceSpecimenWrapper sourceSpecimen) {
         List<SpecimenTypeWrapper> dialogSpecimenTypes = availableSpecimenTypes;
         if (!add) {
             dialogSpecimenTypes.add(sourceSpecimen.getSpecimenType());
         }
+        NewListener newListener = null;
+        if (add) {
+            // only add to the collection when adding and not editing
+            newListener = new NewListener() {
+                @Override
+                public void newAdded(ModelWrapper<?> spec) {
+                    ((SourceSpecimenWrapper) spec).setStudy(study);
+                    availableSpecimenTypes.remove(sourceSpecimen
+                        .getSpecimenType());
+                    selectedSourceSpecimen.add((SourceSpecimenWrapper) spec);
+                    addedOrModifiedSourceSpecimen
+                        .add((SourceSpecimenWrapper) spec);
+                    reloadCollection(selectedSourceSpecimen);
+                    notifyListeners();
+                }
+            };
+        }
         StudySourceSpecimenDialog dlg = new StudySourceSpecimenDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            sourceSpecimen, dialogSpecimenTypes);
-        if (dlg.open() == Dialog.OK) {
-            if (add) {
-                // only add to the collection when adding and not editing
-                selectedSourceSpecimen.add(sourceSpecimen);
-            }
-            availableSpecimenTypes.remove(sourceSpecimen.getSpecimenType());
+            sourceSpecimen, newListener, dialogSpecimenTypes);
+
+        int res = dlg.open();
+        if (!add && res == Dialog.OK) {
             reloadCollection(selectedSourceSpecimen);
-            addedOrModifiedSourceSpecimen.add(sourceSpecimen);
             notifyListeners();
         }
     }
@@ -193,6 +208,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         deletedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
     }
 
+    @SuppressWarnings("serial")
     @Override
     protected BiobankTableSorter getComparator() {
         return new BiobankTableSorter() {

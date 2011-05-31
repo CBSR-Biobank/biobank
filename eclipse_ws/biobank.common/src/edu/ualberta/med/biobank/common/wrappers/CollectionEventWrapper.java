@@ -50,27 +50,49 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         super(appService, wrappedObject);
     }
 
-    @Override
-    public void addToOriginalSpecimenCollection(
+    private void removeFromSpecimenCollections(
         List<SpecimenWrapper> specimenCollection) {
-        super.addToOriginalSpecimenCollection(specimenCollection);
-        // make sure previously deleted ones, that have been re-added, are
-        // no longer deleted
-        deletedSourceSpecimens.removeAll(specimenCollection);
+        deletedSourceSpecimens.addAll(specimenCollection);
+        super.removeFromAllSpecimenCollection(specimenCollection);
+        super.removeFromOriginalSpecimenCollection(specimenCollection);
+    }
+
+    private void removeFromSpecimenCollectionsWithCheck(
+        List<SpecimenWrapper> specimenCollection) throws BiobankCheckException {
+        deletedSourceSpecimens.addAll(specimenCollection);
+        super.removeFromAllSpecimenCollectionWithCheck(specimenCollection);
+        super.removeFromOriginalSpecimenCollectionWithCheck(specimenCollection);
+    }
+
+    @Override
+    public void removeFromAllSpecimenCollection(
+        List<SpecimenWrapper> specCollection) {
+        removeFromSpecimenCollections(specCollection);
     }
 
     @Override
     public void removeFromOriginalSpecimenCollection(
-        List<SpecimenWrapper> specimenCollection) {
-        deletedSourceSpecimens.addAll(specimenCollection);
-        super.removeFromOriginalSpecimenCollection(specimenCollection);
+        List<SpecimenWrapper> specCollection) {
+        removeFromSpecimenCollections(specCollection);
+    }
+
+    @Override
+    public void removeFromAllSpecimenCollectionWithCheck(
+        List<SpecimenWrapper> specCollection) throws BiobankCheckException {
+        removeFromSpecimenCollectionsWithCheck(specCollection);
     }
 
     @Override
     public void removeFromOriginalSpecimenCollectionWithCheck(
-        List<SpecimenWrapper> specimenCollection) throws BiobankCheckException {
-        deletedSourceSpecimens.addAll(specimenCollection);
-        super.removeFromOriginalSpecimenCollectionWithCheck(specimenCollection);
+        List<SpecimenWrapper> specCollection) throws BiobankCheckException {
+        removeFromSpecimenCollectionsWithCheck(specCollection);
+    }
+
+    @Override
+    public void addToOriginalSpecimenCollection(List<SpecimenWrapper> specs) {
+        super.addToOriginalSpecimenCollection(specs);
+        super.addToAllSpecimenCollection(specs);
+        deletedSourceSpecimens.removeAll(specs);
     }
 
     private void deleteSpecimens() throws Exception {
@@ -284,12 +306,6 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             getAllSpecimenCollection(true));
         aliquotedSpecimens.removeAll(getOriginalSpecimenCollection(false));
         return aliquotedSpecimens;
-    }
-
-    @Deprecated
-    public static List<CollectionEventWrapper> getTodayCollectionEvents(
-        WritableApplicationService appService) {
-        return null;
     }
 
     /**

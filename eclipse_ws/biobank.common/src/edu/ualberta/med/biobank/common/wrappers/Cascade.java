@@ -8,6 +8,8 @@ import org.hibernate.EntityMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
+
 public class Cascade {
     public static <W1 extends ModelWrapper<M1>, M1, M2> TaskList delete(
         W1 wrapper, Property<M2, M1> property) {
@@ -56,6 +58,9 @@ public class Cascade {
     }
 
     /**
+     * Deletes old values of the given property (that do not exist in the new
+     * set of values).
+     * 
      * IMPORTANT: when old values are deleted using this method, the checks
      * defined in the corresponding wrapper object will NOT be applied. The
      * objects will simply be removed.
@@ -75,7 +80,7 @@ public class Cascade {
         return tasks;
     }
 
-    private static class DeleteRemoved<E> extends BiobankSearchAction<E> {
+    private static class DeleteRemoved<E> extends BiobankWrapperAction<E> {
         private static final long serialVersionUID = 1L;
 
         private final Property<?, ? super E> property;
@@ -87,8 +92,7 @@ public class Cascade {
         }
 
         @Override
-        public Object doAction(Session session)
-            throws BiobankSessionActionException {
+        public Object doAction(Session session) throws BiobankSessionException {
             Collection<Object> newValues = getNewValues();
             Collection<Object> oldValues = getOldValues(session);
 

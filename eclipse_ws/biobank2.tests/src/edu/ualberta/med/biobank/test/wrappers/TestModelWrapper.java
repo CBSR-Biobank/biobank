@@ -84,14 +84,6 @@ public class TestModelWrapper extends TestDatabase {
     }
 
     @Test
-    public void testGetWrappedObject() throws Exception {
-        TestSiteWrapper wrapper = new TestSiteWrapper(appService);
-        wrapper.setWrappedObject(new Site());
-        Site site = wrapper.getWrappedObject();
-        Assert.assertTrue(site instanceof Object);
-    }
-
-    @Test
     public void testPropertyChangeListener() throws Exception {
         TestSiteWrapper wrapper = new TestSiteWrapper(appService);
         PropertyChangeListener listener = new PropertyChangeListener() {
@@ -123,22 +115,6 @@ public class TestModelWrapper extends TestDatabase {
     public void testGetAppService() throws Exception {
         TestSiteWrapper wrapper = new TestSiteWrapper(appService);
         Assert.assertTrue(appService == wrapper.getAppService());
-    }
-
-    @Test
-    public void testFirePropertyChanges() throws Exception {
-        TestSiteWrapper wrapper = new TestSiteWrapper(appService);
-        SiteWrapper site = SiteHelper.addSite("testFirePropertyChanges");
-        Site rawSite = new Site();
-        rawSite.setId(site.getId());
-        wrapper.setWrappedObject(rawSite);
-
-        try {
-            wrapper.reload();
-            Assert.fail("should fail since there are no properties");
-        } catch (Exception e) {
-            Assert.assertTrue(true);
-        }
     }
 
     @Test

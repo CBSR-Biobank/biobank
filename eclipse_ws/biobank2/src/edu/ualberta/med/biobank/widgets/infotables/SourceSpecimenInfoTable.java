@@ -21,14 +21,12 @@ public class SourceSpecimenInfoTable extends
     protected static class TableRowData {
         SourceSpecimenWrapper studySourceVessel;
         public String name;
-        public String needTimeDrawn;
         public String needOriginalVolume;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] {
                 name,
-                (needTimeDrawn != null) ? needTimeDrawn.toString() : "",
                 (needOriginalVolume != null) ? needOriginalVolume.toString()
                     : "" }, "\t");
         }
@@ -60,8 +58,6 @@ public class SourceSpecimenInfoTable extends
                 case 0:
                     return info.name;
                 case 1:
-                    return info.needTimeDrawn;
-                case 2:
                     return info.needOriginalVolume;
                 default:
                     return "";
@@ -76,10 +72,8 @@ public class SourceSpecimenInfoTable extends
         TableRowData info = new TableRowData();
         info.studySourceVessel = studySourceVessel;
         Assert.isNotNull(studySourceVessel.getSpecimenType(),
-            "study source vessel has null for source vessel");
+            "study specimen type is null");
         info.name = studySourceVessel.getSpecimenType().getName();
-        info.needTimeDrawn = (studySourceVessel.getNeedTimeDrawn() != null) ? (studySourceVessel
-            .getNeedTimeDrawn() ? "Yes" : "No") : "No";
         info.needOriginalVolume = (studySourceVessel.getNeedOriginalVolume() != null) ? (studySourceVessel
             .getNeedOriginalVolume() ? "Yes" : "No") : "No";
         return info;

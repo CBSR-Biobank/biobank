@@ -178,7 +178,7 @@ public class SessionManager {
     public static void setSelectedNode(final AdapterBase node) {
         final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null && node != null) {
-            view.setSelectedNodeAsync(node);
+            view.setSelectedNode(node);
         }
     }
 

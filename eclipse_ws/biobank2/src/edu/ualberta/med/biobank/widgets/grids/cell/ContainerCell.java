@@ -10,8 +10,6 @@ public class ContainerCell extends AbstractUICell {
 
     private ContainerWrapper container;
 
-    private UICellStatus status;
-
     public ContainerCell() {
     }
 
@@ -23,14 +21,6 @@ public class ContainerCell extends AbstractUICell {
 
     public ContainerCell(Integer row, Integer col) {
         this(row, col, null);
-    }
-
-    public UICellStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(UICellStatus status) {
-        this.status = status;
     }
 
     @Override

@@ -19,20 +19,19 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 public class AliquotInvoiceByClinicTest extends AbstractReportTest {
     private static final Comparator<SpecimenWrapper> ORDER_BY_CLINIC_ID_PNUMBER = new Comparator<SpecimenWrapper>() {
         public int compare(SpecimenWrapper lhs, SpecimenWrapper rhs) {
-            // FIXME
-            // int cmp = lhs.getProcessingEvent().getCenter().getId()
-            // .compareTo(rhs.getProcessingEvent().getCenter().getId());
-            // if (cmp != 0) {
-            // return cmp;
-            // }
-            //
-            // cmp = compareStrings(lhs.getProcessingEvent().getPatient()
-            // .getPnumber(), rhs.getProcessingEvent().getPatient()
-            // .getPnumber());
-            //
-            // if (cmp != 0) {
-            // return cmp;
-            // }
+            int cmp = lhs.getProcessingEvent().getCenter().getId()
+                .compareTo(rhs.getProcessingEvent().getCenter().getId());
+            if (cmp != 0) {
+                return cmp;
+            }
+
+            cmp = compareStrings(lhs.getCollectionEvent().getPatient()
+                .getPnumber(), rhs.getCollectionEvent().getPatient()
+                .getPnumber());
+
+            if (cmp != 0) {
+                return cmp;
+            }
 
             return compareStrings(lhs.getInventoryId(), rhs.getInventoryId());
         }
@@ -55,8 +54,7 @@ public class AliquotInvoiceByClinicTest extends AbstractReportTest {
         Assert.assertTrue(aliquots.size() > 0);
 
         SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
-        // FIXME
-        // checkResults(aliquot.getLinkDate(), aliquot.getLinkDate());
+        checkResults(aliquot.getCreatedAt(), aliquot.getCreatedAt());
     }
 
     @Test
@@ -65,8 +63,7 @@ public class AliquotInvoiceByClinicTest extends AbstractReportTest {
         Assert.assertTrue(aliquots.size() > 0);
 
         SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
-        // FIXME
-        // checkResults(aliquot.getLinkDate(), aliquot.getLinkDate());
+        checkResults(aliquot.getCreatedAt(), aliquot.getCreatedAt());
     }
 
     @Override
@@ -87,11 +84,10 @@ public class AliquotInvoiceByClinicTest extends AbstractReportTest {
         List<Object> expectedResults = new ArrayList<Object>();
 
         for (SpecimenWrapper aliquot : filteredAliquots) {
-            // FIXME
-            // expectedResults.add(new Object[] { aliquot.getInventoryId(),
-            // aliquot.getProcessingEvent().getCenter().getName(),
-            // aliquot.getProcessingEvent().getPatient().getPnumber(),
-            // aliquot.getLinkDate(), aliquot.getSpecimenType().getName() });
+            expectedResults.add(new Object[] { aliquot.getInventoryId(),
+                aliquot.getProcessingEvent().getCenter().getName(),
+                aliquot.getCollectionEvent().getPatient().getPnumber(),
+                aliquot.getCreatedAt(), aliquot.getSpecimenType().getName() });
         }
 
         return expectedResults;

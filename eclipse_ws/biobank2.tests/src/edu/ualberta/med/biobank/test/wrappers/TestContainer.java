@@ -18,6 +18,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankRuntimeException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -26,7 +27,6 @@ import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -44,7 +44,6 @@ import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
-import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -53,6 +52,10 @@ import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestContainer extends TestDatabase {
+
+    // the methods to skip in the getters and setters test
+    private static final List<String> GETTER_SKIP_METHODS = Arrays
+        .asList("getPath");
 
     private final String CBSR_ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
@@ -252,7 +255,7 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(
             String.valueOf(r.nextInt()), null, null, site,
             containerTypeMap.get("TopCT"));
-        testGettersAndSetters(container);
+        testGettersAndSetters(container, GETTER_SKIP_METHODS);
     }
 
     @Test
@@ -447,7 +450,22 @@ public class TestContainer extends TestDatabase {
         top = containerMap.get("Top");
         child = ContainerHelper.newContainer(null, "uvwxyz", top, site,
             containerTypeMap.get("ChildCtL1"), 0, 0);
-        Assert.assertNull(child.getPath());
+
+        try {
+            child.getPath();
+            Assert
+                .fail("cannot call get path on container net yet in database");
+        } catch (BiobankRuntimeException e) {
+            Assert.assertTrue(true);
+        }
+
+        try {
+            child.setPath("");
+            Assert.fail("cannot call setPath() on container");
+        } catch (BiobankRuntimeException e) {
+            Assert.assertTrue(true);
+        }
+
         child.persist();
         child.reload();
         String expectedPath = top.getId() + "/" + child.getId();
@@ -562,77 +580,6 @@ public class TestContainer extends TestDatabase {
     }
 
     @Test
-    public void testGetContainersWithSameLabelWithType() throws Exception {
-        ContainerWrapper top = containerMap.get("Top");
-        addContainerHierarchy(top);
-
-        ContainerWrapper testContainer = new ContainerWrapper(appService);
-        testContainer.setSite(top.getSite());
-
-        // success cases
-        testContainer.setLabel(containerMap.get("ChildL1").getLabel());
-        List<ContainerWrapper> result = testContainer
-            .getContainersWithSameLabelWithType(Arrays.asList(containerTypeMap
-                .get("ChildCtL1")));
-        Assert.assertEquals(1, result.size());
-        Assert.assertEquals(containerMap.get("ChildL1"), result.get(0));
-
-        testContainer.setLabel(containerMap.get("ChildL2").getLabel());
-        result = testContainer.getContainersWithSameLabelWithType(Arrays
-            .asList(containerTypeMap.get("ChildCtL2")));
-        Assert.assertEquals(1, result.size());
-        Assert.assertEquals(containerMap.get("ChildL2"), result.get(0));
-
-        testContainer.setLabel(containerMap.get("ChildL3").getLabel());
-        result = testContainer.getContainersWithSameLabelWithType(Arrays
-            .asList(containerTypeMap.get("ChildCtL3")));
-        Assert.assertEquals(1, result.size());
-        Assert.assertEquals(containerMap.get("ChildL3"), result.get(0));
-
-        // fail cases
-        testContainer.setLabel(containerMap.get("ChildL2").getLabel());
-        result = testContainer.getContainersWithSameLabelWithType(Arrays
-            .asList(containerTypeMap.get("ChildCtL1")));
-        Assert.assertEquals(0, result.size());
-
-        testContainer.setLabel(containerMap.get("ChildL3").getLabel());
-        result = testContainer.getContainersWithSameLabelWithType(Arrays
-            .asList(containerTypeMap.get("ChildCtL1")));
-        Assert.assertEquals(0, result.size());
-
-    }
-
-    @Test
-    public void testGetContainersHoldingContainerType() throws Exception {
-        ContainerWrapper freezer, hotel, cabinet, drawer;
-
-        addDupLabelledHierarchy();
-
-        freezer = containerMap.get("freezer02");
-        hotel = containerMap.get("H02AA");
-        cabinet = containerMap.get("cabinet");
-        drawer = containerMap.get("D02AA");
-
-        List<ContainerWrapper> list = ContainerWrapper
-            .getContainersHoldingContainerTypes(appService, "02", site,
-                Arrays.asList(hotel.getContainerType()));
-        Assert.assertEquals(1, list.size());
-        Assert.assertTrue(list.contains(freezer));
-
-        list = ContainerWrapper.getContainersHoldingContainerTypes(appService,
-            "02", site, Arrays.asList(drawer.getContainerType()));
-        Assert.assertEquals(1, list.size());
-        Assert.assertTrue(list.contains(cabinet));
-
-        list = ContainerWrapper.getContainersHoldingContainerTypes(appService,
-            "02", site,
-            Arrays.asList(drawer.getContainerType(), hotel.getContainerType()));
-        Assert.assertEquals(2, list.size());
-        Assert.assertTrue(list.contains(cabinet));
-        Assert.assertTrue(list.contains(freezer));
-    }
-
-    @Test
     public void testGetContainersInSite() throws Exception {
         ContainerWrapper freezer, hotel, cabinet, drawer;
 
@@ -690,7 +637,7 @@ public class TestContainer extends TestDatabase {
     private String getLabel(Integer labelingScheme, int maxRows, int maxCol,
         int row, int col) {
         String label = null;
-        int len = ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+        int len = ContainerLabelingSchemeWrapper.CBSR_2_CHAR_LABELLING_PATTERN
             .length();
 
         switch (labelingScheme) {
@@ -703,9 +650,9 @@ public class TestContainer extends TestDatabase {
         case 2: {
             int index = maxRows * col + row;
             label = String.format("%c%c",
-                ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                ContainerLabelingSchemeWrapper.CBSR_2_CHAR_LABELLING_PATTERN
                     .charAt(index / len),
-                ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                ContainerLabelingSchemeWrapper.CBSR_2_CHAR_LABELLING_PATTERN
                     .charAt(index % len));
             break;
         }
@@ -945,7 +892,7 @@ public class TestContainer extends TestDatabase {
         SpecimenTypeWrapper sampleType;
 
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
-            site, patient, 1, OriginInfoHelper.addOriginInfo(site));
+            site, patient, 1);
         ContainerWrapper childL3 = containerMap.get("ChildL3");
         for (int row = 0, maxRow = childL3.getRowCapacity(), n = selectedSampleTypes
             .size(); row < maxRow; ++row) {
@@ -1028,50 +975,6 @@ public class TestContainer extends TestDatabase {
             Assert.fail("should not be allowed to get children beyond limit");
         } catch (Exception e) {
             Assert.assertTrue(true);
-        }
-    }
-
-    @Test
-    public void testGetContainersHoldingSampleType() throws Exception {
-        List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSpecimenTypes(appService, true);
-        List<SpecimenTypeWrapper> selectedSampleTypes = TestCommon
-            .getRandomSampleTypeList(r, allSampleTypes);
-        ContainerTypeWrapper childTypeL3 = TestCommon.addSampleTypes(
-            containerTypeMap.get("ChildCtL3"), selectedSampleTypes);
-        containerTypeMap.put("ChildCtL3", childTypeL3);
-
-        ContainerWrapper top = containerMap.get("Top");
-        addContainerHierarchy(top);
-        ContainerWrapper childL3 = containerMap.get("ChildL3");
-        childL3.reload();
-
-        List<ContainerWrapper> containers;
-
-        for (SpecimenTypeWrapper st : allSampleTypes) {
-            containers = ContainerWrapper.getContainersHoldingSampleType(
-                appService, top.getSite(), "01AA01A1", st);
-
-            if (selectedSampleTypes.contains(st)) {
-                Assert.assertEquals(1, containers.size());
-                Assert.assertTrue(containers.contains(childL3));
-
-                // containers higher in the hierarchy should not container the
-                // sample type
-                containers = ContainerWrapper.getContainersHoldingSampleType(
-                    appService, top.getSite(), "01AA01", st);
-                Assert.assertEquals(0, containers.size());
-
-                containers = ContainerWrapper.getContainersHoldingSampleType(
-                    appService, top.getSite(), "01AA", st);
-                Assert.assertEquals(0, containers.size());
-
-                containers = ContainerWrapper.getContainersHoldingSampleType(
-                    appService, top.getSite(), "01", st);
-                Assert.assertEquals(0, containers.size());
-            } else {
-                Assert.assertEquals(0, containers.size());
-            }
         }
     }
 
@@ -1423,11 +1326,10 @@ public class TestContainer extends TestDatabase {
         childL4.getContainerType().addToSpecimenTypeCollection(
             Arrays.asList(spcType));
         childL4.getContainerType().persist();
-        OriginInfoWrapper oi = OriginInfoHelper.addOriginInfo(site);
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
             site,
             PatientHelper.addPatient(Utils.getRandomString(5),
-                StudyHelper.addStudy("tests")), 1, oi);
+                StudyHelper.addStudy("tests")), 1);
 
         SpecimenWrapper parentSpc = SpecimenHelper.addSpecimen(spcType,
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, Utils.getRandomDate(),
@@ -1469,101 +1371,6 @@ public class TestContainer extends TestDatabase {
     }
 
     @Test
-    public void testSetPositionAndParentFromLabel() throws Exception {
-        addContainerHierarchy(containerMap.get("Top"));
-        ContainerWrapper childL2 = containerMap.get("ChildL2");
-        ContainerTypeWrapper type = childL2.getContainerType()
-            .getChildContainerTypeCollection().get(0);
-        ContainerWrapper newContainer = ContainerHelper.newContainer(null,
-            "testaddNew", null, site, type);
-
-        // expect position 1:5
-        String label = "01AA01B6";
-        newContainer.setPositionAndParentFromLabel(label, Arrays.asList(type));
-
-        Assert.assertEquals(childL2, newContainer.getParentContainer());
-        Assert.assertEquals(new RowColPos(1, 5),
-            newContainer.getPositionAsRowCol());
-        newContainer.persist();
-        Assert.assertEquals(label, newContainer.getLabel());
-
-        // test for invalid parents
-        try {
-            newContainer.setPositionAndParentFromLabel("01AA01", Arrays.asList(
-                type, containerMap.get("ChildL3").getContainerType()));
-        } catch (BiobankCheckException e) {
-            Assert.assertTrue(true);
-        }
-
-        // test for multiple parents
-        ContainerTypeWrapper topType2 = ContainerTypeHelper.newContainerType(
-            site, "Top Container Type 2", "TCT2", 2, CONTAINER_TOP_ROWS - 1,
-            CONTAINER_TOP_COLS + 1, true);
-        topType2.addToChildContainerTypeCollection(Arrays
-            .asList(containerTypeMap.get("ChildCtL1")));
-        topType2.persist();
-        containerTypeMap.put("TopCT", topType2);
-
-        ContainerHelper.addContainer("01", TestCommon.getNewBarcode(r), null,
-            site, topType2);
-        try {
-            newContainer.setPositionAndParentFromLabel("01AB",
-                Arrays.asList(containerMap.get("ChildL1").getContainerType()));
-        } catch (BiobankCheckException e) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
-    public void testSetPositionAndParentFromLabelFailHoldType()
-        throws Exception {
-        addContainerHierarchy(containerMap.get("Top"));
-        ContainerTypeWrapper type2 = containerTypeMap.get("ChildCtL1");
-        ContainerWrapper newContainer = ContainerHelper.newContainer(null,
-            "testaddNew_2", null, site, type2);
-        try {
-            newContainer.setPositionAndParentFromLabel("01AA01B6",
-                Arrays.asList(type2));
-            Assert.fail("No container with label 01AA01 can hold this type");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
-    public void testSetPositionAndParentFromLabelFail() throws Exception {
-        addContainerHierarchy(containerMap.get("Top"));
-        ContainerTypeWrapper existingType = containerTypeMap.get("ChildCtL2");
-        ContainerTypeWrapper newChildType1 = ContainerTypeHelper
-            .addContainerType(site, "newChild1", "NC1", 3, 15, 1, false);
-        newChildType1.addToChildContainerTypeCollection(Arrays
-            .asList(existingType));
-        newChildType1.persist();
-        ContainerTypeWrapper newTopType = ContainerTypeHelper.addContainerType(
-            site, "NewTop", "NT", 2, 3, 5, true);
-        newTopType.addToChildContainerTypeCollection(Arrays
-            .asList(newChildType1));
-        newTopType.persist();
-
-        ContainerWrapper newTopContainer = ContainerHelper.addContainer("01",
-            "new-01", null, site, newTopType);
-        ContainerWrapper child1 = ContainerHelper.newContainer(null,
-            "new-01AA", newTopContainer, site, newChildType1);
-        newTopContainer.addChild(0, 0, child1);
-        newTopContainer.persist();
-
-        ContainerWrapper newContainer = ContainerHelper.newContainer(null,
-            "testsetPosition", null, site, existingType);
-        try {
-            newContainer.setPositionAndParentFromLabel("01AA01",
-                Arrays.asList(existingType));
-            Assert.fail("Two container with label 01AA can hold this type");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
     public void testCheckParentFromSameSite() throws BiobankCheckException,
         Exception {
         String name = "testCheckParentFromSameSite" + r.nextInt();
@@ -1580,85 +1387,6 @@ public class TestContainer extends TestDatabase {
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
-    }
-
-    /**
-     * see ContainerAdapter.setNewPositionFromLabel
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testMoveOtherContainer() throws Exception {
-        addContainerHierarchy(containerMap.get("Top"));
-        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA01
-
-        ContainerWrapper top2 = ContainerHelper.addContainer("02",
-            TestCommon.getNewBarcode(r), null, site,
-            containerTypeMap.get("TopCT"));
-
-        String newLabel = "02AF";
-        List<ContainerWrapper> newParentContainers = child
-            .getPossibleParents(newLabel);
-        Assert.assertEquals(1, newParentContainers.size());
-        ContainerWrapper newParent = newParentContainers.get(0);
-        Assert.assertEquals(top2, newParent);
-
-        newParent.addChild(newLabel.substring(newLabel.length() - 2), child);
-        child.persist();
-        child.reload();
-        Assert.assertEquals(top2, child.getParentContainer());
-        Assert.assertEquals(newLabel, child.getLabel());
-    }
-
-    /**
-     * see ContainerAdapter.setNewPositionFromLabel
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testMoveSameContainer() throws Exception {
-        ContainerWrapper top = addContainerHierarchy(containerMap.get("Top"));
-        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA
-
-        ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r), null,
-            site, containerTypeMap.get("TopCT"));
-
-        String newLabel = "01AF";
-        List<ContainerWrapper> newParentContainers = child
-            .getPossibleParents(newLabel);
-        Assert.assertEquals(1, newParentContainers.size());
-        ContainerWrapper newParent = newParentContainers.get(0);
-        Assert.assertEquals(top, newParent);
-
-        newParent.addChild(newLabel.substring(newLabel.length() - 2), child);
-        child.persist();
-        child.reload();
-        Assert.assertEquals(top, child.getParentContainer());
-        Assert.assertEquals(newLabel, child.getLabel());
-    }
-
-    @Test
-    public void testMoveSameContainer2() throws Exception {
-        ContainerWrapper top = addContainerHierarchy(containerMap.get("Top"));
-        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA
-
-        ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r), null,
-            site, containerTypeMap.get("TopCT"));
-
-        top.addChild(2, 3, child);
-        child.persist();
-
-        // Use model object to be sure the DB is up-to-date
-        Container container = new Container();
-        container.setId(child.getId());
-        List<Container> containersDB = appService.search(Container.class,
-            container);
-        Assert.assertEquals(1, containersDB.size());
-        container = containersDB.get(0);
-        ContainerPosition pos = container.getPosition();
-        Assert.assertEquals(top.getId(), pos.getParentContainer().getId());
-        Assert.assertEquals(2, pos.getRow().intValue());
-        Assert.assertEquals(3, pos.getCol().intValue());
     }
 
     /**
@@ -1812,6 +1540,9 @@ public class TestContainer extends TestDatabase {
         child.persist();
         child2.persist();
 
+        child.reload();
+        child2.reload();
+
         Assert.assertEquals(3, child.getSpecimens() == null ? 0 : child
             .getSpecimens().size());
         Assert.assertEquals(0, child2.getSpecimens() == null ? 0 : child2
@@ -1901,6 +1632,85 @@ public class TestContainer extends TestDatabase {
         top.reload();
 
         Assert.assertTrue(top.isContainerFull());
+    }
+
+    /**
+     * see ContainerAdapter.setNewPositionFromLabel
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testMoveSameContainer() throws Exception {
+        ContainerWrapper top = addContainerHierarchy(containerMap.get("Top"));
+        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA
+
+        ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r), null,
+            site, containerTypeMap.get("TopCT"));
+
+        String newLabel = "01AF";
+        List<ContainerWrapper> newParentContainers = child
+            .getPossibleParents(newLabel);
+        Assert.assertEquals(1, newParentContainers.size());
+        ContainerWrapper newParent = newParentContainers.get(0);
+        Assert.assertEquals(top, newParent);
+
+        newParent.addChild(newLabel.substring(newLabel.length() - 2), child);
+        child.persist();
+        child.reload();
+        Assert.assertEquals(top, child.getParentContainer());
+        Assert.assertEquals(newLabel, child.getLabel());
+    }
+
+    @Test
+    public void testMoveSameContainer2() throws Exception {
+        ContainerWrapper top = addContainerHierarchy(containerMap.get("Top"));
+        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA
+
+        ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r), null,
+            site, containerTypeMap.get("TopCT"));
+
+        top.addChild(2, 3, child);
+        child.persist();
+
+        // Use model object to be sure the DB is up-to-date
+        Container container = new Container();
+        container.setId(child.getId());
+        List<Container> containersDB = appService.search(Container.class,
+            container);
+        Assert.assertEquals(1, containersDB.size());
+        container = containersDB.get(0);
+        ContainerPosition pos = container.getPosition();
+        Assert.assertEquals(top.getId(), pos.getParentContainer().getId());
+        Assert.assertEquals(2, pos.getRow().intValue());
+        Assert.assertEquals(3, pos.getCol().intValue());
+    }
+
+    /**
+     * see ContainerAdapter.setNewPositionFromLabel
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testMoveOtherContainer() throws Exception {
+        addContainerHierarchy(containerMap.get("Top"));
+        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA01
+
+        ContainerWrapper top2 = ContainerHelper.addContainer("02",
+            TestCommon.getNewBarcode(r), null, site,
+            containerTypeMap.get("TopCT"));
+
+        String newLabel = "02AF";
+        List<ContainerWrapper> altParentContainers = child
+            .getPossibleParents(newLabel);
+        Assert.assertEquals(1, altParentContainers.size());
+        ContainerWrapper altParent = altParentContainers.get(0);
+        Assert.assertEquals(top2, altParent);
+
+        top2.addChild(newLabel.substring(newLabel.length() - 2), child);
+        top2.persist();
+        top2.reload();
+        Assert.assertEquals(top2, child.getParentContainer());
+        Assert.assertEquals(newLabel, child.getLabel());
     }
 
 }

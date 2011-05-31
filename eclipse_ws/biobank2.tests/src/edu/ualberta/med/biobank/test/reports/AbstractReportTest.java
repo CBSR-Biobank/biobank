@@ -66,11 +66,9 @@ public abstract class AbstractReportTest {
     };
     public static final Comparator<SpecimenWrapper> ORDER_ALIQUOT_BY_PNUMBER = new Comparator<SpecimenWrapper>() {
         public int compare(SpecimenWrapper lhs, SpecimenWrapper rhs) {
-            // FIXME
-            // return compareStrings(lhs.getProcessingEvent().getPatient()
-            // .getPnumber(), rhs.getProcessingEvent().getPatient()
-            // .getPnumber());
-            return 0;
+            return compareStrings(lhs.getCollectionEvent().getPatient()
+                .getPnumber(), rhs.getCollectionEvent().getPatient()
+                .getPnumber());
         }
     };
 
@@ -85,11 +83,8 @@ public abstract class AbstractReportTest {
         final Integer siteId) {
         return new Predicate<SpecimenWrapper>() {
             public boolean evaluate(SpecimenWrapper aliquot) {
-                // FIXME
-                // return isIn ==
-                // aliquot.getProcessingEvent().getCenter().getId()
-                // .equals(siteId);
-                return true;
+                return isIn == aliquot.getProcessingEvent().getCenter().getId()
+                    .equals(siteId);
             }
         };
     }
@@ -120,15 +115,13 @@ public abstract class AbstractReportTest {
             private Calendar drawn = Calendar.getInstance();
 
             public boolean evaluate(SpecimenWrapper aliquot) {
-                // FIXME
-                // drawn.setTime(aliquot.getProcessingEvent().getDateDrawn());
-                // int drawnDayOfYear = drawn.get(Calendar.DAY_OF_YEAR);
-                // int wantedDayOfYear = wanted.get(Calendar.DAY_OF_YEAR);
-                // int drawnYear = drawn.get(Calendar.YEAR);
-                // int wantedYear = wanted.get(Calendar.YEAR);
-                // return (drawnDayOfYear == wantedDayOfYear)
-                // && (drawnYear == wantedYear);
-                return true;
+                drawn.setTime(aliquot.getParentSpecimen().getCreatedAt());
+                int drawnDayOfYear = drawn.get(Calendar.DAY_OF_YEAR);
+                int wantedDayOfYear = wanted.get(Calendar.DAY_OF_YEAR);
+                int drawnYear = drawn.get(Calendar.YEAR);
+                int wantedYear = wanted.get(Calendar.YEAR);
+                return (drawnDayOfYear == wantedDayOfYear)
+                    && (drawnYear == wantedYear);
             }
         };
     }
@@ -137,11 +130,9 @@ public abstract class AbstractReportTest {
         final Date after, final Date before) {
         return new Predicate<SpecimenWrapper>() {
             public boolean evaluate(SpecimenWrapper aliquot) {
-                // FIXME
-                // Date linked = aliquot.getLinkDate();
-                // return (DateCompare.compare(linked, after) <= 0)
-                // && (DateCompare.compare(linked, before) >= 0);
-                return true;
+                Date linked = aliquot.getCreatedAt();
+                return (DateCompare.compare(linked, after) <= 0)
+                    && (DateCompare.compare(linked, before) >= 0);
             }
         };
     }
@@ -150,12 +141,9 @@ public abstract class AbstractReportTest {
         final Date after, final Date before) {
         return new Predicate<SpecimenWrapper>() {
             public boolean evaluate(SpecimenWrapper aliquot) {
-                // FIXME
-                // Date processed = aliquot.getProcessingEvent()
-                // .getDateProcessed();
-                // return (DateCompare.compare(processed, after) <= 0)
-                // && (DateCompare.compare(processed, before) >= 0);
-                return true;
+                Date processed = aliquot.getProcessingEvent().getCreatedAt();
+                return (DateCompare.compare(processed, after) <= 0)
+                    && (DateCompare.compare(processed, before) >= 0);
             }
         };
     }
@@ -163,12 +151,10 @@ public abstract class AbstractReportTest {
     public static Predicate<ProcessingEventWrapper> patientVisitProcessedBetween(
         final Date after, final Date before) {
         return new Predicate<ProcessingEventWrapper>() {
-            public boolean evaluate(ProcessingEventWrapper patientVisit) {
-                // FIXME
-                // Date processed = patientVisit.getDateProcessed();
-                // return (DateCompare.compare(processed, after) <= 0)
-                // && (DateCompare.compare(processed, before) >= 0);
-                return true;
+            public boolean evaluate(ProcessingEventWrapper pevent) {
+                Date processed = pevent.getCreatedAt();
+                return (DateCompare.compare(processed, after) <= 0)
+                    && (DateCompare.compare(processed, before) >= 0);
             }
         };
     }

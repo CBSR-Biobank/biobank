@@ -8,7 +8,6 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -35,17 +34,11 @@ public class TestHibernateLocking extends TestDatabase {
             StudyWrapper study = StudyHelper.addStudy("teststudy");
             SiteWrapper site = SiteHelper.addSite("testsite");
             PatientWrapper patient = PatientHelper.addPatient("testp", study);
-            OriginInfoWrapper oi = new OriginInfoWrapper(appService);
-            oi.setCenter(site);
-            oi.persist();
             SpecimenTypeWrapper st = SpecimenTypeHelper
                 .addSpecimenType("testst");
             st.persist();
             newSpec.setSpecimenType(st);
-            newSpec.setOriginInfo(oi);
-
-            CollectionEventHelper.addCollectionEvent(site, patient, 1, oi,
-                newSpec);
+            CollectionEventHelper.addCollectionEvent(site, patient, 1, newSpec);
 
             // TEST BEGINS
             SpecimenWrapper ob1 = SpecimenWrapper.getSpecimen(appService,

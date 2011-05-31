@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.validators;
 
+import java.util.List;
+
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -14,9 +16,18 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 public class InventoryIdValidator extends AbstractValidator {
 
     private boolean duplicate;
+    private List<SpecimenWrapper> excludeList;
 
-    public InventoryIdValidator(String message) {
+    /**
+     * Edited specimen. Null if new specimen.
+     */
+    private SpecimenWrapper editedSpecimen;
+
+    public InventoryIdValidator(List<SpecimenWrapper> excludeList,
+        String message, SpecimenWrapper editedSpecimen) {
         super(message);
+        this.excludeList = excludeList;
+        this.editedSpecimen = editedSpecimen;
     }
 
     @Override
@@ -34,6 +45,10 @@ public class InventoryIdValidator extends AbstractValidator {
         final SpecimenWrapper spc = new SpecimenWrapper(
             SessionManager.getAppService());
         spc.setInventoryId((String) value);
+        if (editedSpecimen != null)
+            // need to do that to know the object in database is not the same we
+            // are editing
+            spc.getWrappedObject().setId(editedSpecimen.getId());
 
         duplicate = false;
 
@@ -42,6 +57,9 @@ public class InventoryIdValidator extends AbstractValidator {
             public void run() {
                 try {
                     spc.checkInventoryIdUnique();
+                    if (excludeList.contains(spc)) {
+                        duplicate = true;
+                    }
                 } catch (DuplicateEntryException e) {
                     duplicate = true;
                 } catch (Exception e) {

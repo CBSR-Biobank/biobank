@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.processing;
 
 import java.util.Collection;
 
@@ -7,10 +7,11 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class ScanAssignAdapter extends AdapterBase {
+public class AssignAdapter extends AdapterBase {
 
-    public ScanAssignAdapter(AdapterBase parent, int id, String name,
+    public AssignAdapter(AdapterBase parent, int id, String name,
         boolean hasChildren, boolean loadChildrenInBackground) {
         super(parent, id, name, hasChildren, loadChildrenInBackground);
     }

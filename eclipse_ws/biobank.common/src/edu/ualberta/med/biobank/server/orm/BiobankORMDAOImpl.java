@@ -6,6 +6,7 @@ import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.common.reports.QueryProcess;
 import edu.ualberta.med.biobank.common.wrappers.BiobankSessionAction;
 import edu.ualberta.med.biobank.server.applicationservice.ReportData;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import edu.ualberta.med.biobank.server.reports.ReportRunner;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -55,7 +56,8 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
     }
 
     protected Response query(@SuppressWarnings("unused") Request request,
-        BiobankSessionAction sessionAction) {
+        BiobankSessionAction sessionAction)
+        throws BiobankSessionException {
 
         Response response = new Response();
 

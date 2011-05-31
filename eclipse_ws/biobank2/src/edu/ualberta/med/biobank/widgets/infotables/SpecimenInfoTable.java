@@ -18,8 +18,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
 
     public static enum ColumnsShown {
-        ALL(new String[] { "Inventory ID", "Type", "Patient #", "Visit#",
-            "Current Center", "Position", "Time drawn", "Quantity (ml)",
+        ALL(new String[] { "Inventory ID", "Type", "Patient", "Visit#",
+            "Current Center", "Position", "Time created", "Quantity (ml)",
             "Activity status", "Comment" }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
@@ -49,7 +49,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 }
             }
         },
-        CEVENT_FORM(new String[] { "Inventory ID", "Type", "Time drawn",
+        SOURCE_SPECIMENS(new String[] { "Inventory ID", "Type", "Time drawn",
             "Quantity (ml)", "Activity status", "Study", "Patient #",
             "Current Center" }) {
             @Override
@@ -71,6 +71,29 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                     return row.patient;
                 case 7:
                     return row.center;
+                default:
+                    return "";
+                }
+            }
+        },
+        ALIQUOTS(new String[] { "Inventory ID", "Type", "Time created",
+            "Quantity (ml)", "Activity status", "Study", "Patient #",
+            "Current Center" }) {
+            @Override
+            public String getColumnValue(TableRowData row, int columnIndex) {
+                switch (columnIndex) {
+                case 0:
+                    return row.inventoryId;
+                case 1:
+                    return row.type;
+                case 2:
+                    return row.createdAt;
+                case 3:
+                    return row.center;
+                case 4:
+                    return row.quantity;
+                case 5:
+                    return row.activityStatus;
                 default:
                     return "";
                 }

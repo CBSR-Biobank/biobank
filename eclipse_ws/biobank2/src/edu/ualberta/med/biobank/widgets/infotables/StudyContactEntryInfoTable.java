@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> {
 
-    private static final int PAGE_SIZE_ROWS = 5;
+    private static final int PAGE_SIZE_ROWS = 15;
 
     protected static class TableRowData {
         ContactWrapper contact;
@@ -113,6 +113,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         return row.contact;
     }
 
+    @SuppressWarnings("serial")
     @Override
     protected BiobankTableSorter getComparator() {
         return new BiobankTableSorter() {

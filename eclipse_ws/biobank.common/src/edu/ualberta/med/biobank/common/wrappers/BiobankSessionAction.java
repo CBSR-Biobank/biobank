@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import gov.nih.nci.system.query.SDKQuery;
 
 import org.hibernate.Session;
@@ -12,6 +13,5 @@ import org.hibernate.Session;
  * 
  */
 public interface BiobankSessionAction extends SDKQuery {
-    public Object doAction(Session session)
-        throws BiobankSessionActionException;
+    public Object doAction(Session session) throws BiobankSessionException;
 }

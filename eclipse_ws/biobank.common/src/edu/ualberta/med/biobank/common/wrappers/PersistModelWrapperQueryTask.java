@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 
@@ -58,7 +59,7 @@ public class PersistModelWrapperQueryTask<E> implements QueryTask {
      * 
      * @param <E>
      */
-    private static class PersistAction<E> extends BiobankSearchAction<E> {
+    private static class PersistAction<E> extends BiobankWrapperAction<E> {
         private static final long serialVersionUID = 1L;
 
         public PersistAction(ModelWrapper<E> wrapper) {
@@ -66,8 +67,7 @@ public class PersistModelWrapperQueryTask<E> implements QueryTask {
         }
 
         @Override
-        public Object doAction(Session session)
-            throws BiobankSessionActionException {
+        public Object doAction(Session session) throws BiobankSessionException {
             E model = getModel();
             session.saveOrUpdate(model);
             return model;

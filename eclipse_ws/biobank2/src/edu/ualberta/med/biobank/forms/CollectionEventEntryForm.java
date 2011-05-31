@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -31,7 +32,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
@@ -50,9 +50,6 @@ import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionEventEntryForm extends BiobankEntryForm {
-
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(CollectionEventEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventEntryForm";
 
@@ -104,7 +101,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             tabName = Messages.getString("CollectionEventEntryForm.title.new");
             cevent.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
-			cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
+            cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
                 appService, cevent));
         } else {
             tabName = Messages.getString("CollectionEventEntryForm.title.edit",
@@ -178,7 +175,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
         widgetCreator.createLabel(client,
             Messages.getString("CollectionEventEntryForm.timeDrawn.label"));
-        timeDrawnWidget = new DateTimeWidget(client, SWT.DATE | SWT.TIME, null);
+        timeDrawnWidget = new DateTimeWidget(client, SWT.DATE | SWT.TIME,
+            new Date());
         toolkit.adapt(timeDrawnWidget);
 
         createPvDataSection(client);
@@ -193,7 +191,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             .getString("CollectionEventEntryForm.specimens.title"));
         specimensTable = new CEventSpecimenEntryInfoTable(section,
             cevent.getOriginalSpecimenCollection(true),
-            ColumnsShown.CEVENT_FORM);
+            ColumnsShown.SOURCE_SPECIMENS);
         specimensTable.adaptToToolkit(toolkit, true);
         specimensTable.addSelectionChangedListener(listener);
 
@@ -309,6 +307,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
+        // FIXME need to use batchquery for OriginInfo + Collection Event
+
         // create the origin info to be used
         if (specimensTable.getAddedSpecimens().size() > 0) {
             OriginInfoWrapper originInfo = new OriginInfoWrapper(
@@ -364,7 +364,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         if (cevent.isNew()) {
             cevent.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
-			cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
+            cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
                 appService, cevent));
         }
 

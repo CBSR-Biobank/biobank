@@ -10,8 +10,6 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -24,7 +22,9 @@ import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropertyException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -33,7 +33,6 @@ import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
-import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceSpecimenHelper;
@@ -310,7 +309,7 @@ public class TestStudy extends TestDatabase {
 
         CollectionEventWrapper cevent = CollectionEventHelper
             .addCollectionEvent(site, PatientHelper.addPatient("testp", study),
-                1, OriginInfoHelper.addOriginInfo(site));
+                1);
         cevent.setEventAttrValue("Patient Type 2", Utils.getRandomString(5));
         cevent.persist();
 
@@ -462,7 +461,7 @@ public class TestStudy extends TestDatabase {
 
         CollectionEventWrapper visit = CollectionEventHelper
             .addCollectionEvent(site, PatientHelper.addPatient("testp", study),
-                1, OriginInfoHelper.addOriginInfo(site));
+                1);
         try {
             visit.setEventAttrValue("Patient Type 2", Utils.getRandomString(5));
             visit.persist();
@@ -764,7 +763,7 @@ public class TestStudy extends TestDatabase {
             StudyHelper.addStudy(name);
             Assert
                 .fail("Should not insert the study : same name already in database");
-        } catch (DuplicateEntryException e) {
+        } catch (DuplicatePropertySetException e) {
             Assert.assertTrue(true);
         }
     }
@@ -775,9 +774,7 @@ public class TestStudy extends TestDatabase {
         try {
             s1.persist();
             Assert.fail("Should not insert the study : name empty");
-        } catch (ValueNotSetException e) {
-            Assert.assertTrue(true);
-        } catch (ValidationException e) {
+        } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
     }
@@ -790,9 +787,7 @@ public class TestStudy extends TestDatabase {
         try {
             s1.persist();
             Assert.fail("Should not insert the study : name short empty");
-        } catch (ValueNotSetException e) {
-            Assert.assertTrue(true);
-        } catch (ValidationException e) {
+        } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
     }
@@ -811,7 +806,7 @@ public class TestStudy extends TestDatabase {
             s2.persist();
             Assert
                 .fail("Should not insert the study : same short name already in database");
-        } catch (DuplicateEntryException e) {
+        } catch (DuplicatePropertySetException e) {
             Assert.assertTrue(true);
         }
     }
@@ -863,7 +858,7 @@ public class TestStudy extends TestDatabase {
             study.delete();
             Assert
                 .fail("Should not delete : patients need to be removed first");
-        } catch (BiobankCheckException bce) {
+        } catch (CollectionNotEmptyException e) {
             Assert.assertTrue(true);
         }
     }

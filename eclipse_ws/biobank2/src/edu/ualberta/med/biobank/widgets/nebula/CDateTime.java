@@ -653,19 +653,19 @@ public class CDateTime extends BaseCombo {
             return false;
         }
         if (calendarField >= 0) {
-            if (value > calendar.getActualMaximum(calendarField)) {
+            if (value > getActualMaximum(calendarField)) {
                 if (style == DISCARD) {
                     return false;
                 } else if (style == WRAP) {
                     value = calendar.getActualMinimum(calendarField);
                 } else if (style == BLOCK) {
-                    value = calendar.getActualMaximum(calendarField);
+                    value = getActualMaximum(calendarField);
                 }
             } else if (value < calendar.getActualMinimum(calendarField)) {
                 if (style == DISCARD) {
                     return false;
                 } else if (style == WRAP) {
-                    value = calendar.getActualMaximum(calendarField);
+                    value = getActualMaximum(calendarField);
                 } else if (style == BLOCK) {
                     value = calendar.getActualMinimum(calendarField);
                 }
@@ -679,6 +679,15 @@ public class CDateTime extends BaseCombo {
             fireSelectionChanged(calendarField);
         }
         return true;
+    }
+
+    public Integer getActualMaximum(int cf) {
+        switch (cf) {
+        case Calendar.YEAR:
+            return 9999;
+        default:
+            return calendar.getActualMaximum(cf);
+        }
     }
 
     /**

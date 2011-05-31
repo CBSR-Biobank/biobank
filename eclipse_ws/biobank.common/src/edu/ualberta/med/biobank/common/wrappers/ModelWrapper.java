@@ -4,6 +4,7 @@ import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.exception.BiobankRuntimeException;
 import edu.ualberta.med.biobank.common.exception.CheckFieldLimitsException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.security.Privilege;
@@ -296,7 +297,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         SDKQueryResult result = ((BiobankApplicationService) appService)
             .executeQuery(query);
         wrappedObject = ((E) result.getObjectResult());
-        reload();
         Log logMessage = null;
         try {
             logMessage = getLogMessage(eventType.name().toLowerCase(), null, "");
@@ -353,6 +353,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                             fieldValue);
                     }
                 }
+            } catch (BiobankRuntimeException e) {
             } catch (SecurityException e) {
                 throwBiobankException(field, e);
             } catch (NoSuchMethodException e) {
@@ -362,7 +363,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             } catch (IllegalAccessException e) {
                 throwBiobankException(field, e);
             } catch (InvocationTargetException e) {
-                throwBiobankException(field, e);
+                // do nothing this - this method is meant to not be used by the
+                // user
             }
         }
     }

@@ -15,26 +15,20 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
-import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
-import edu.ualberta.med.biobank.test.internal.StudyHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestContainerType extends TestDatabase {
@@ -641,7 +635,7 @@ public class TestContainerType extends TestDatabase {
     }
 
     @Test
-    public void testRemoveSampleTypes() throws Exception {
+    public void testRemoveSpecimenTypes() throws Exception {
         addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
         ContainerTypeWrapper childTypeL3 = containerTypeMap.get("ChildCtL3");
 
@@ -668,37 +662,29 @@ public class TestContainerType extends TestDatabase {
             TestCommon.getNewBarcode(r), cont2, site,
             containerTypeMap.get("ChildCtL3"), 0, 0);
 
-        StudyWrapper study = StudyHelper.addStudy("studyname" + r.nextInt());
-        PatientWrapper patient = PatientHelper.addPatient(
-            "5684_" + r.nextInt(), study);
-        ClinicWrapper clinic = ClinicHelper.addClinic("clinicname");
-        ContactWrapper contact = ContactHelper.addContact(clinic,
-            "ContactClinic");
-        study.addToContactCollection(Arrays.asList(contact));
-        study.persist();
-        // FIXME
-        // ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
-        // site, patient, Utils.getRandomDate(), Utils.getRandomDate());
-        // SpecimenHelper.addAliquot(selectedSampleTypes.get(0), cont3, pv, 0,
-        // 0);
-        // SpecimenWrapper aliquot = SpecimenHelper.addAliquot(
-        // selectedSampleTypes.get(1), cont3, pv, 0, 1);
-        //
-        // childTypeL3.removeFromSampleTypeCollection(Arrays
-        // .asList(selectedSampleTypes.get(1)));
-        // try {
-        // childTypeL3.persist();
-        // Assert
-        // .fail("Cannot remove a sample type if one container of this type contains this sample type");
-        // } catch (BiobankCheckException bce) {
-        // Assert.assertTrue(true);
-        // }
-        //
-        // childTypeL3.removeFromSampleTypeCollection(Arrays
-        // .asList(selectedSampleTypes.get(1)));
-        //
-        // aliquot.delete();
-        // childTypeL3.persist();
+        SpecimenWrapper parentSpc = SpecimenHelper.addParentSpecimen();
+
+        List<SpecimenWrapper> spcs = SpecimenHelper.addSpecimens(parentSpc,
+            cont3, 0, 0, 2, selectedSampleTypes);
+
+        childTypeL3.removeFromSpecimenTypeCollection(Arrays.asList(spcs.get(1)
+            .getSpecimenType()));
+        try {
+            childTypeL3.persist();
+            Assert
+                .fail("Cannot remove a sample type if one container of this type contains this sample type");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        // remove specimens and try and remove specimen type again
+        for (SpecimenWrapper spc : spcs) {
+            spc.delete();
+        }
+
+        childTypeL3.removeFromSpecimenTypeCollection(Arrays
+            .asList(selectedSampleTypes.get(1)));
+        childTypeL3.persist();
     }
 
     @Test

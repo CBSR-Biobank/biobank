@@ -10,20 +10,15 @@ import gov.nih.nci.system.query.example.SearchExampleQuery;
  * @author jferland
  * 
  */
-public abstract class BiobankSearchAction<E> extends SearchExampleQuery
+public abstract class BiobankWrapperAction<E> extends SearchExampleQuery
     implements BiobankSessionAction {
     private static final long serialVersionUID = 1L;
 
     private final Class<E> modelClass;
 
-    protected BiobankSearchAction(ModelWrapper<E> wrapper) {
+    protected BiobankWrapperAction(ModelWrapper<E> wrapper) {
         super(wrapper.getWrappedObject());
         this.modelClass = wrapper.getWrappedClass();
-    }
-
-    protected BiobankSearchAction(E model, Class<E> modelClass) {
-        super(model);
-        this.modelClass = modelClass;
     }
 
     /**

@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import gov.nih.nci.system.query.hql.SearchHQLQuery;
 
 import java.util.List;
@@ -24,8 +26,7 @@ public abstract class BiobankHQLAction extends SearchHQLQuery implements
     }
 
     @Override
-    public Object doAction(Session session)
-        throws BiobankSessionActionException {
+    public Object doAction(Session session) throws BiobankSessionException {
         Query query = session.createQuery(getHqlString());
 
         int i = 0;
@@ -43,8 +44,8 @@ public abstract class BiobankHQLAction extends SearchHQLQuery implements
      * parameters.
      * 
      * @param results
-     * @throws BiobankSessionActionException
+     * @throws BiobankServerException
      */
     public abstract void doResults(List<?> results)
-        throws BiobankSessionActionException;
+        throws BiobankServerException;
 }

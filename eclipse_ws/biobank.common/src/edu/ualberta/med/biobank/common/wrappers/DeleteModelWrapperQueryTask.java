@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 
@@ -55,7 +56,7 @@ public class DeleteModelWrapperQueryTask<E> implements QueryTask {
      * 
      * @param <E>
      */
-    private static class DeleteAction<E> extends BiobankSearchAction<E> {
+    private static class DeleteAction<E> extends BiobankWrapperAction<E> {
         private static final long serialVersionUID = 1L;
 
         public DeleteAction(ModelWrapper<E> wrapper) {
@@ -63,8 +64,7 @@ public class DeleteModelWrapperQueryTask<E> implements QueryTask {
         }
 
         @Override
-        public Object doAction(Session session)
-            throws BiobankSessionActionException {
+        public Object doAction(Session session) throws BiobankSessionException {
             E model = getModel();
             session.delete(model);
             return model;

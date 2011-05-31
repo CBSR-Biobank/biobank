@@ -36,25 +36,19 @@ public class PVsByStudyTest extends AbstractReportTest {
 
         ProcessingEventWrapper visit = patientVisits
             .get(patientVisits.size() / 2);
-        // FIXME
-        // checkResults(visit.getDateProcessed(), visit.getDateProcessed());
+        checkResults(visit.getCreatedAt(), visit.getCreatedAt());
     }
 
     @Test
     public void testSmallDateRange() throws Exception {
         List<ProcessingEventWrapper> patientVisits = getPatientVisits();
         Assert.assertTrue(patientVisits.size() > 0);
-
         ProcessingEventWrapper visit = patientVisits
             .get(patientVisits.size() / 2);
-
         Calendar calendar = Calendar.getInstance();
-        // FIXME
-        // calendar.setTime(visit.getDateProcessed());
+        calendar.setTime(visit.getCreatedAt());
         calendar.add(Calendar.HOUR_OF_DAY, 24);
-
-        // FIXME
-        // checkResults(visit.getDateProcessed(), calendar.getTime());
+        checkResults(visit.getCreatedAt(), calendar.getTime());
     }
 
     @Override
@@ -102,13 +96,11 @@ public class PVsByStudyTest extends AbstractReportTest {
         final String dateField) {
         final Calendar calendar = Calendar.getInstance();
         return new Mapper<ProcessingEventWrapper, List<Object>, Long>() {
-            public List<Object> getKey(ProcessingEventWrapper patientVisit) {
-                // FIXME
-                // calendar.setTime(patientVisit.getDateProcessed());
+            public List<Object> getKey(ProcessingEventWrapper pevent) {
+                calendar.setTime(pevent.getCreatedAt());
 
                 List<Object> key = new ArrayList<Object>();
-                // FIXME
-                // key.add(patientVisit.getPatient().getStudy().getNameShort());
+                key.add(pevent.getCenter().getNameShort());
                 key.add(new Integer(calendar.get(Calendar.YEAR)));
                 key.add(new Long(getDateFieldValue(calendar, dateField)));
 

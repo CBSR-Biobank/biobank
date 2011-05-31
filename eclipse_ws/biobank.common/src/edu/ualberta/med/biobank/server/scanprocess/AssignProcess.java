@@ -61,11 +61,11 @@ public class AssignProcess extends ServerProcess {
                 CellStatus newStatus = CellStatus.EMPTY;
                 if (cell != null) {
                     newStatus = cell.getStatus();
-                    if (newStatus == null) {
-                        System.out.println(ContainerLabelingSchemeWrapper
-                            .rowColToSbs(new RowColPos(cell.getRow(), cell
-                                .getCol())));
-                    }
+                    // if (newStatus == null) {
+                    // System.out.println(ContainerLabelingSchemeWrapper
+                    // .rowColToSbs(new RowColPos(cell.getRow(), cell
+                    // .getCol())));
+                    // }
                 }
                 currentScanState = currentScanState.mergeWith(newStatus);
             }
@@ -119,11 +119,11 @@ public class AssignProcess extends ServerProcess {
                     expectedSpecimen, foundSpecimen);
             } else {
                 scanCell.setSpecimenId(foundSpecimen.getId());
-                System.out.println("expectedSpecimen="
-                    + expectedSpecimen
-                    + " in "
-                    + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(
-                        scanCell.getRow(), scanCell.getCol())));
+                // System.out.println("expectedSpecimen="
+                // + expectedSpecimen
+                // + " in "
+                // + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(
+                // scanCell.getRow(), scanCell.getCol())));
                 if (expectedSpecimen != null) {
                     // specimen scanned is already registered at this
                     // position (everything is ok !)
@@ -241,7 +241,6 @@ public class AssignProcess extends ServerProcess {
                 Boolean posHasMissing = movedAndMissingSpecimensFromPallet
                     .get(movedFromPosition);
                 if (Boolean.TRUE.equals(posHasMissing)) {
-                    // FIXME
                     // missing position has already been processed: remove
                     // the MISSING flag
                     // missingSpecimen.setStatus(UICellStatus.EMPTY);

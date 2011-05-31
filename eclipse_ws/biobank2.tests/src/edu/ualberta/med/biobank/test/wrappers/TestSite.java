@@ -17,9 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -33,11 +31,9 @@ import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
-import edu.ualberta.med.biobank.test.internal.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
-import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -50,6 +46,34 @@ public class TestSite extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite("testGettersAndSetters"
             + r.nextInt());
         testGettersAndSetters(site);
+    }
+
+    private List<ProcessingEventWrapper> addProcessingEvents(SiteWrapper site,
+        PatientWrapper patient, List<SpecimenTypeWrapper> spcTypes,
+        int visitNumber, int maxProcEvent, int spcPerProcEvent)
+        throws Exception {
+        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+        SpecimenWrapper parentSpc = SpecimenHelper.newSpecimen(DbHelper
+            .chooseRandomlyInList(spcTypes));
+        CollectionEventWrapper cevent = CollectionEventHelper
+            .addCollectionEvent(site, patient, visitNumber, parentSpc);
+
+        parentSpc = cevent.getOriginalSpecimenCollection(false).get(0);
+        pevents.addAll(ProcessingEventHelper.addProcessingEvents(site, patient,
+            Utils.getRandomDate(), parentSpc, spcTypes, maxProcEvent,
+            spcPerProcEvent));
+        return pevents;
+    }
+
+    private List<ProcessingEventWrapper> addProcessingEvents(SiteWrapper site,
+        List<SpecimenTypeWrapper> spcTypes, int visitNumber, int maxProcEvent,
+        int spcPerProcEvent, PatientWrapper... patients) throws Exception {
+        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+        for (PatientWrapper patient : patients) {
+            pevents.addAll(addProcessingEvents(site, patient, spcTypes,
+                visitNumber, maxProcEvent, spcPerProcEvent));
+        }
+        return pevents;
     }
 
     @Test
@@ -563,160 +587,6 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testAddCollectiotnEvents() throws Exception {
-        String name = "testAddCollectionEvents" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-
-        StudyWrapper study = StudyHelper.addStudy(name);
-        study.persist();
-        PatientWrapper patient1 = PatientHelper.addPatient(name, study);
-
-        StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
-        study2.persist();
-        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
-
-        ShippingMethodWrapper method = ShippingMethodWrapper
-            .getShippingMethods(appService).get(0);
-
-        List<SourceVesselWrapper> svs = new ArrayList<SourceVesselWrapper>();
-        for (PatientWrapper patient : new PatientWrapper[] { patient1, patient2 }) {
-            svs.add(SourceVesselHelper.newSourceVessel(patient,
-                Utils.getRandomDate(), 0.1));
-            svs.add(SourceVesselHelper.newSourceVessel(patient,
-                Utils.getRandomDate(), 0.1));
-        }
-
-        // FIXME
-        // CollectionEventHelper.addCollectionEvent(site, method, svs.get(0),
-        // svs.get(1));
-
-        // make sure site has 2 collection events
-        site.reload();
-        // FIXME
-        // Assert.assertEquals(1,
-        // site.getCollectionEventCollection(false).size());
-        //
-        // CollectionEventHelper.addCollectionEvent(site, method, svs.get(2));
-        // CollectionEventHelper.addCollectionEvent(site, method, svs.get(3));
-        //
-        // // make sure site has 2 more collection events
-        // site.reload();
-        // Assert.assertEquals(3,
-        // site.getCollectionEventCollection(false).size());
-    }
-
-    private List<CollectionEventWrapper> createCollectionEvents(SiteWrapper site)
-        throws Exception {
-        String name = site.getName();
-
-        List<CollectionEventWrapper> cEvents = new ArrayList<CollectionEventWrapper>();
-        cEvents.add(CollectionEventHelper.addCollectionEventWithRandomPatient(
-            site, name + "Study1", 1));
-        cEvents.add(CollectionEventHelper.addCollectionEventWithRandomPatient(
-            site, name + "Study2", 2));
-        cEvents.add(CollectionEventHelper.addCollectionEventWithRandomPatient(
-            site, name + "Study3", 3));
-        cEvents.add(CollectionEventHelper.addCollectionEventWithRandomPatient(
-            site, name + "Study4", 4));
-
-        site.reload();
-        return cEvents;
-    }
-
-    @Test
-    public void testGetCollectionEventCollectionSorted() throws Exception {
-        String name = "testGetShipmentCollection" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        List<CollectionEventWrapper> shipments = createCollectionEvents(site);
-
-        // FIXME
-        // List<CollectionEventWrapper> savedShipments = site
-        // .getCollectionEventCollection(true);
-        // Assert.assertTrue(savedShipments.size() > 1);
-        // Assert.assertEquals(shipments.size(), savedShipments.size());
-        // for (int i = 0, n = savedShipments.size() - 1; i < n; i++) {
-        // CollectionEventWrapper s1 = savedShipments.get(i);
-        // CollectionEventWrapper s2 = savedShipments.get(i + 1);
-        // Assert.assertTrue(s1.compareTo(s2) <= 0);
-        // Assert.assertTrue(s2.compareTo(s1) >= 0);
-        // }
-    }
-
-    @Test
-    public void testGetCollectionEventCollection() throws Exception {
-        String name = "testGetProcessingEventCountForClinic" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        List<CollectionEventWrapper> shipments = createCollectionEvents(site);
-
-        // FIXME
-        // List<CollectionEventWrapper> savedShipments = site
-        // .getCollectionEventCollection(false);
-        // Assert.assertTrue(savedShipments.containsAll(shipments));
-    }
-
-    @Test
-    public void testGetCollectionEventCountForSite() throws Exception {
-        String name = "testGetProcessingEventCountForClinic" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-
-        ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
-        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
-            + "CONTACT1");
-
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "CLINIC2");
-        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
-            + "CONTACT2");
-
-        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addToContactCollection(Arrays.asList(contact1, contact2));
-        study1.persist();
-
-        StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
-        study2.addToContactCollection(Arrays.asList(contact2));
-        study2.persist();
-
-        PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
-        PatientWrapper patient2 = PatientHelper
-            .addPatient(name + "_p2", study2);
-        PatientWrapper patient3 = PatientHelper
-            .addPatient(name + "_p3", study1);
-
-        ShippingMethodWrapper method = ShippingMethodWrapper
-            .getShippingMethods(appService).get(0);
-        // FIXME
-        // CollectionEventWrapper cevent1 = CollectionEventHelper
-        // .addCollectionEvent(
-        // site,
-        // method,
-        // SourceVesselHelper.newSourceVessel(patient1,
-        // Utils.getRandomDate(), 0.1),
-        // SourceVesselHelper.newSourceVessel(patient3,
-        // Utils.getRandomDate(), 0.1));
-        // CollectionEventHelper.addCollectionEvent(site, method,
-        // SourceVesselHelper.newSourceVessel(patient2, Utils.getRandomDate(),
-        // 0.1), SourceVesselHelper.newSourceVessel(patient3,
-        // Utils.getRandomDate(), 0.1));
-        //
-        // site.reload();
-        // Assert.assertEquals(2, site.getCollectionEventCount());
-        //
-        // // delete cevent 1
-        // DbHelper.deleteFromList(cevent1.getSourceVesselCollection(false));
-        // cevent1.delete();
-        // site.reload();
-        // Assert.assertEquals(1, site.getCollectionEventCount());
-        //
-        // // add cevent again
-        // cevent1 = CollectionEventHelper.addCollectionEvent(site, method,
-        // SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-        // 0.1), SourceVesselHelper.newSourceVessel(patient3,
-        // Utils.getRandomDate(), 0.1));
-        //
-        // site.reload();
-        // Assert.assertEquals(2, site.getCollectionEventCount());
-    }
-
-    @Test
     public void testGetPatientCountForSite() throws Exception {
         String name = "testGetProcessingEventCountForClinic" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
@@ -747,8 +617,7 @@ public class TestSite extends TestDatabase {
         List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
         for (PatientWrapper p : Arrays.asList(patient1, patient2, patient3)) {
             CollectionEventWrapper cevent = CollectionEventHelper
-                .addCollectionEvent(site, p, 1, OriginInfoHelper
-                    .addOriginInfo(site), SpecimenHelper
+                .addCollectionEvent(site, p, 1, SpecimenHelper
                     .newSpecimen(SpecimenTypeHelper.addSpecimenType(Utils
                         .getRandomNumericString(10))), SpecimenHelper
                     .newSpecimen(SpecimenTypeHelper.addSpecimenType(Utils
@@ -808,39 +677,31 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        ShippingMethodWrapper method = ShippingMethodWrapper
-            .getShippingMethods(appService).get(0);
-        // FIXME
-        // CollectionEventHelper.addCollectionEvent(site, method,
-        // SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-        // 0.1), SourceVesselHelper.newSourceVessel(patient2,
-        // Utils.getRandomDate(), 0.1));
+        List<SpecimenTypeWrapper> spcTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, false);
 
-        // FIXME
-        // cevent1 has processing events for patient1 and patient3
-        // int nber = ProcessingEventHelper.addProcessingEvents(site, patient1)
-        // .size();
-        // int nber2 = ProcessingEventHelper.addProcessingEvents(site, patient3)
-        // .size();
-        //
-        // // cevent 2 has processing events for patient1 and patient2
-        // int nber3 = ProcessingEventHelper.addProcessingEvents(site, patient1)
-        // .size();
-        // int nber4 = ProcessingEventHelper.addProcessingEvents(site, patient2)
-        // .size();
-        //
-        // site.reload();
-        // Assert.assertEquals(nber + nber2 + nber3 + nber4,
-        // site.getProcessingEventCount());
-        //
-        // // delete patient 1 visits
-        // patient1.reload();
-        // for (ProcessingEventWrapper visit : patient1
-        // .getProcessingEventCollection(false)) {
-        // visit.delete();
-        // }
-        // site.reload();
-        // Assert.assertEquals(nber2 + nber4, site.getProcessingEventCount());
+        // pevents1 has processing events for patient1 and patient3
+        List<ProcessingEventWrapper> pevents1 = addProcessingEvents(site,
+            spcTypes, 1, 2, 1, patient1, patient3);
+        site.reload();
+        Assert.assertEquals(pevents1.size(), site.getProcessingEventCount());
+
+        // pevents2 has processing events for patient1 and patient2
+        List<ProcessingEventWrapper> pevents2 = addProcessingEvents(site,
+            spcTypes, 2, 2, 1, patient1, patient2);
+        site.reload();
+        Assert.assertEquals(pevents1.size() + pevents2.size(),
+            site.getProcessingEventCount());
+
+        // delete pevents1
+        DbHelper.deleteProcessingEvents(pevents1);
+        site.reload();
+        Assert.assertEquals(pevents2.size(), site.getProcessingEventCount());
+
+        // delete pevents2
+        DbHelper.deleteProcessingEvents(pevents2);
+        site.reload();
+        Assert.assertEquals(0, site.getProcessingEventCount());
     }
 
     @Test
@@ -871,55 +732,40 @@ public class TestSite extends TestDatabase {
         ctype.addToSpecimenTypeCollection(allSampleTypes);
         ctype.persist();
 
-        ContainerWrapper container = ContainerHelper.addContainer("01", "01",
-            null, site, ctype);
-
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
         PatientWrapper patient2 = PatientHelper
             .addPatient(name + "_p2", study2);
 
-        // FIXME
-        // cevent 1 has processing events for patient1 and patient2
-        // int nber = ProcessingEventHelper.addProcessingEvents(site, patient1,
-        // 10, 24, false).size();
-        // int nber2 = ProcessingEventHelper.addProcessingEvents(site, patient2,
-        // 10, 24, false).size();
+        List<SpecimenTypeWrapper> spcTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, false);
+
+        // pevents1 has processing events for patient1 and patient3
         //
-        // // add 2 samples to each processing event
-        // //
-        // // make sure we do not exceed 96 samples since that is all container
-        // // type can hold
-        // patient1.reload();
-        // patient2.reload();
-        // int sampleTypeCount = allSampleTypes.size();
-        // int sampleCount = 0;
-        // for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
-        // for (ProcessingEventWrapper visit : patient
-        // .getProcessingEventCollection(false)) {
-        // for (int i = 0; i < 2; ++i) {
-        // SpecimenHelper.addAliquot(
-        // allSampleTypes.get(r.nextInt(sampleTypeCount)),
-        // container, visit, sampleCount / 12, sampleCount % 12);
-        // ++sampleCount;
-        // }
-        // }
-        // }
-        //
-        // site.reload();
-        // Assert.assertEquals(2 * (nber + nber2), site.getSpecimenCount()
-        // .longValue());
-        //
-        // // delete patient 1 and all it's visits and samples
-        // for (ProcessingEventWrapper visit : patient1
-        // .getProcessingEventCollection(false)) {
-        // for (SpecimenWrapper aliquot : visit.getSpecimenCollection(false)) {
-        // aliquot.delete();
-        // }
-        // visit.delete();
-        // }
-        // patient1.delete();
-        //
-        // site.reload();
-        // Assert.assertEquals(2 * nber2, site.getSpecimenCount().longValue());
+        // add 2 specimens to each processing event
+        List<ProcessingEventWrapper> peventsPt1 = addProcessingEvents(site,
+            patient1, spcTypes, 1, 2, 4);
+        site.reload();
+        Assert.assertEquals(peventsPt1.size(), site.getProcessingEventCount());
+
+        List<ProcessingEventWrapper> peventsPt2 = addProcessingEvents(site,
+            patient2, spcTypes, 1, 2, 4);
+        site.reload();
+        Assert.assertEquals(peventsPt1.size() + peventsPt2.size(),
+            site.getProcessingEventCount());
+
+        site.reload();
+        Assert.assertEquals(2 * 2 * 4, site.getAliquotedSpecimenCount()
+            .longValue());
+
+        // delete patient 1 processing events and samples
+        DbHelper.deleteProcessingEvents(peventsPt1);
+        site.reload();
+        Assert
+            .assertEquals(2 * 4, site.getAliquotedSpecimenCount().longValue());
+
+        // delete patient 2 processing events and samples
+        DbHelper.deleteProcessingEvents(peventsPt2);
+        site.reload();
+        Assert.assertEquals(0, site.getAliquotedSpecimenCount().longValue());
     }
 }

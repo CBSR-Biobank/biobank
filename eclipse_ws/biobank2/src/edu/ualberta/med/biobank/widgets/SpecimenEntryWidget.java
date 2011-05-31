@@ -112,10 +112,10 @@ public class SpecimenEntryWidget extends BiobankWidget {
 
         if (editable) {
             specTable = new SpecimenEntryInfoTable(this, null,
-                ColumnsShown.CEVENT_FORM);
+                ColumnsShown.SOURCE_SPECIMENS);
         } else {
             specTable = new SpecimenInfoTable(this, null,
-                ColumnsShown.CEVENT_FORM, 20);
+                ColumnsShown.SOURCE_SPECIMENS, 20);
         }
 
         specTable.adaptToToolkit(toolkit, true);
@@ -206,15 +206,16 @@ public class SpecimenEntryWidget extends BiobankWidget {
 
                     try {
                         vetoListenerSupport.notifyListeners(preDelete);
+                        if (preDelete.doit) {
+                            specimens.remove(specimen);
+                            Collections.sort(specimens);
+                            specTable.setCollection(specimens);
 
-                        specimens.remove(specimen);
-                        Collections.sort(specimens);
-                        specTable.setCollection(specimens);
+                            notifyListeners();
+                            hasSpecimens.setValue(specimens.size() > 0);
 
-                        notifyListeners();
-                        hasSpecimens.setValue(specimens.size() > 0);
-
-                        vetoListenerSupport.notifyListeners(postDelete);
+                            vetoListenerSupport.notifyListeners(postDelete);
+                        }
                     } catch (VetoException e) {
                         BiobankPlugin.openAsyncError("Error", e.getMessage());
                     }

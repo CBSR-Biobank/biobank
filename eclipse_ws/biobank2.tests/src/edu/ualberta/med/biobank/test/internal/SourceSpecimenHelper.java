@@ -16,7 +16,6 @@ public class SourceSpecimenHelper extends DbHelper {
         SourceSpecimenWrapper ssv = new SourceSpecimenWrapper(appService);
         ssv.setStudy(study);
         ssv.setSpecimenType(spcType);
-        ssv.setNeedTimeDrawn(needTimeDrawn);
         ssv.setNeedOriginalVolume(needOriginalVolume);
         return ssv;
     }

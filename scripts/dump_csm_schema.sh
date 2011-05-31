@@ -20,7 +20,7 @@ OPTIONS
 "
 
 DBHOST="localhost"
-DBNAME=biobank2
+DBNAME=biobank
 
 function in_array () {
     haystack=( "$@" )

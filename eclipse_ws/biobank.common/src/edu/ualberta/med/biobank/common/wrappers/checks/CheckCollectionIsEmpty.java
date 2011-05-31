@@ -7,18 +7,16 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.wrappers.BiobankSearchAction;
-import edu.ualberta.med.biobank.common.wrappers.BiobankSessionActionException;
+import edu.ualberta.med.biobank.common.wrappers.BiobankCheck;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
 
-public class CheckCollectionIsEmpty<E> extends BiobankSearchAction<E> {
+public class CheckCollectionIsEmpty<E> extends BiobankCheck<E> {
     private static final long serialVersionUID = 1L;
-
+    private static final String EXCEPTION_MESSAGE = "{0} {1} has one or more {2}.";
     private static final String COUNT_HQL = "SELECT m.{0}.size FROM {1} m WHERE m = ?";
-
-    private static final String CANNOT_COUNT = "There was an error while counting the {0} of {1}.";
-    private static final String NOT_EMPTY = "{0} has one or more {1}.";
 
     private final Property<?, E> property;
     private final String modelString;
@@ -31,8 +29,7 @@ public class CheckCollectionIsEmpty<E> extends BiobankSearchAction<E> {
     }
 
     @Override
-    public Object doAction(Session session)
-        throws BiobankSessionActionException {
+    public Object doAction(Session session) throws BiobankSessionException {
 
         String hql = MessageFormat.format(COUNT_HQL, property.getName(),
             getModelClass().getName());
@@ -42,16 +39,14 @@ public class CheckCollectionIsEmpty<E> extends BiobankSearchAction<E> {
         List<?> results = query.list();
         Long count = Check.getCountFromResult(results);
 
-        String elementClassName = property.getElementClass().getSimpleName();
+        if (count == null || count > 0) {
+            String modelClass = Format.modelClass(getModelClass());
+            String propertyName = Format.propertyName(property);
 
-        if (count == null) {
-            String msg = MessageFormat.format(CANNOT_COUNT, elementClassName,
-                modelString);
-            throw new BiobankSessionActionException(msg);
-        } else if (count > 1) {
-            String msg = MessageFormat.format(NOT_EMPTY, modelString,
-                elementClassName);
-            throw new BiobankSessionActionException(msg);
+            String msg = MessageFormat.format(EXCEPTION_MESSAGE, modelClass,
+                modelString, propertyName);
+
+            throw new CollectionNotEmptyException(msg);
         }
 
         return null;

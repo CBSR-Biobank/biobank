@@ -38,8 +38,7 @@ public class PsByStudyTest extends AbstractReportTest {
 
         ProcessingEventWrapper visit = patientVisits
             .get(patientVisits.size() / 2);
-        // FIXME
-        // checkResults(visit.getDateProcessed(), visit.getDateProcessed());
+        checkResults(visit.getCreatedAt(), visit.getCreatedAt());
     }
 
     @Test
@@ -51,12 +50,10 @@ public class PsByStudyTest extends AbstractReportTest {
             .get(patientVisits.size() / 2);
 
         Calendar calendar = Calendar.getInstance();
-        // FIXME
-        // calendar.setTime(visit.getDateProcessed());
+        calendar.setTime(visit.getCreatedAt());
         calendar.add(Calendar.HOUR_OF_DAY, 24);
 
-        // FIXME
-        // checkResults(visit.getDateProcessed(), calendar.getTime());
+        checkResults(visit.getCreatedAt(), calendar.getTime());
     }
 
     @Override
@@ -105,30 +102,28 @@ public class PsByStudyTest extends AbstractReportTest {
         final String dateField) {
         final Calendar calendar = Calendar.getInstance();
         return new Mapper<ProcessingEventWrapper, List<Object>, Set<Integer>>() {
-            public List<Object> getKey(ProcessingEventWrapper visit) {
-                // FIXME
-                // calendar.setTime(visit.getDateProcessed());
+            public List<Object> getKey(ProcessingEventWrapper pevent) {
+                calendar.setTime(pevent.getCreatedAt());
 
                 List<Object> key = new ArrayList<Object>();
-                // FIXME
-                // key.add(visit.getPatient().getStudy().getNameShort());
+                key.add(pevent.getCenter().getNameShort());
                 key.add(new Integer(calendar.get(Calendar.YEAR)));
                 key.add(new Long(getDateFieldValue(calendar, dateField)));
 
                 return key;
             }
 
-            public Set<Integer> getValue(ProcessingEventWrapper visit,
+            public Set<Integer> getValue(ProcessingEventWrapper pevent,
                 Set<Integer> uniquePatientIds) {
                 if (uniquePatientIds == null) {
                     uniquePatientIds = new HashSet<Integer>();
                 }
 
-                // FIXME
-                // Integer patientId = visit.getPatient().getId();
-                // if (!uniquePatientIds.contains(patientId)) {
-                // uniquePatientIds.add(patientId);
-                // }
+                Integer patientId = pevent.getSpecimenCollection(false).get(0)
+                    .getCollectionEvent().getPatient().getId();
+                if (!uniquePatientIds.contains(patientId)) {
+                    uniquePatientIds.add(patientId);
+                }
 
                 return uniquePatientIds;
             }

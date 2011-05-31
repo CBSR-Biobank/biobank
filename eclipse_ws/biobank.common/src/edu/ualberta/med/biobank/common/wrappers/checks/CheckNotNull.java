@@ -4,35 +4,37 @@ import java.text.MessageFormat;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.wrappers.BiobankSearchAction;
-import edu.ualberta.med.biobank.common.wrappers.BiobankSessionActionException;
+import edu.ualberta.med.biobank.common.wrappers.BiobankCheck;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropertyException;
 
-class CheckNotNull<E> extends BiobankSearchAction<E> {
+class CheckNotNull<E> extends BiobankCheck<E> {
     private static final long serialVersionUID = 1L;
-
-    private static final String ERR_STR = "Property {0} of {1} cannot be null.";
+    private static final String EXCEPTION_STRING = "The {0} of {1} {2} must be defined (cannot be null).";
 
     private final Property<?, E> property;
-    private final String description;
 
     protected CheckNotNull(ModelWrapper<E> wrapper, Property<?, E> property) {
         super(wrapper);
-        this.description = wrapper.toString();
         this.property = property;
     }
 
     @Override
-    public Object doAction(Session session)
-        throws BiobankSessionActionException {
-
+    public Object doAction(Session session) throws BiobankSessionException {
         E model = getModel();
-        if (property.get(model) == null) {
-            String name = property.getName();
-            String msg = MessageFormat.format(ERR_STR, name, description);
+        Object value = property.get(model);
 
-            throw new BiobankSessionActionException(msg);
+        if (value == null) {
+            String propertyName = Format.propertyName(property);
+            String modelClass = Format.modelClass(getModelClass());
+            String modelString = getModelString();
+
+            String msg = MessageFormat.format(EXCEPTION_STRING, propertyName,
+                modelClass, modelString);
+
+            throw new NullPropertyException(msg);
         }
 
         return null;

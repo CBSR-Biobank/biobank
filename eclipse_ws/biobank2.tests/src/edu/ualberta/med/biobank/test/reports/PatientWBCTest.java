@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 
 public class PatientWBCTest extends AbstractReportTest {
@@ -42,17 +43,16 @@ public class PatientWBCTest extends AbstractReportTest {
         List<Object> expectedResults = new ArrayList<Object>();
 
         for (SpecimenWrapper aliquot : filteredAliquots) {
-            // FIXME
-            // ProcessingEventWrapper visit = aliquot.getProcessingEvent();
-            // List<Object> objects = new ArrayList<Object>();
-            // objects.add(visit.getPatient().getStudy().getNameShort());
-            // objects.add(visit.getCenter().getNameShort());
-            // objects.add(visit.getPatient().getPnumber());
-            // objects.add(visit.getDateProcessed());
-            // objects.add(aliquot.getSpecimenType().getName());
-            // objects.add(aliquot.getInventoryId());
-            // objects.add(aliquot.getParent().getLabel());
-            // expectedResults.add(objects.toArray());
+            ProcessingEventWrapper pevent = aliquot.getProcessingEvent();
+            List<Object> objects = new ArrayList<Object>();
+            objects.add(pevent.getCenter().getNameShort());
+            objects.add(pevent.getCenter().getNameShort());
+            objects.add(aliquot.getCollectionEvent().getPatient().getPnumber());
+            objects.add(pevent.getCreatedAt());
+            objects.add(aliquot.getSpecimenType().getName());
+            objects.add(aliquot.getInventoryId());
+            objects.add(aliquot.getParentContainer().getLabel());
+            expectedResults.add(objects.toArray());
         }
 
         return expectedResults;

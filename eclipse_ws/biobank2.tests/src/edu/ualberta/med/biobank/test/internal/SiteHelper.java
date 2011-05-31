@@ -76,6 +76,9 @@ public class SiteHelper extends CenterHelper {
         site.reload();
         deleteFromList(site.getProcessingEventCollection(false));
 
+        site.removeFromStudyCollection(site.getStudyCollection(false));
+        site.persist();
+
         site.reload();
         site.delete();
     }

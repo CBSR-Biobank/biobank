@@ -303,7 +303,8 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String value = member.getName();
         if (member.getType().equals("String")) {
             value = "trimmed";
-            result.append("        String ").append(value).append(" = ")
+            result.append("      String ").append(value).append(" = ")
+                .append(member.getName()).append(" == null ? null : ")
                 .append(member.getName()).append(".trim();\n");
         }
 

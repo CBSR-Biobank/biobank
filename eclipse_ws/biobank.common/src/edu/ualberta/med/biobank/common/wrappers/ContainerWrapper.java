@@ -11,18 +11,22 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 
+import edu.ualberta.med.biobank.common.Messages;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
-import edu.ualberta.med.biobank.common.exception.ContainerLabelSearchException;
+import edu.ualberta.med.biobank.common.exception.BiobankRuntimeException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
@@ -31,7 +35,9 @@ import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -151,7 +157,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public void persist() throws Exception {
         objectWithPositionManagement.persist();
         super.persist();
-        persistPath();
     }
 
     @Override
@@ -197,6 +202,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         }
         persistChildren(labelChanged);
         persistSpecimens();
+        setPath();
+        setTopContainer();
     }
 
     public RowColPos getPositionAsRowCol() {
@@ -222,8 +229,75 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return objectWithPositionManagement.getParentContainer();
     }
 
-    public void setParent(ContainerWrapper container) {
+    @Override
+    public String getPath() {
+        if (isNew()) {
+            throw new BiobankRuntimeException(
+                "container is not in database yet: no ID");
+        }
+
+        StringBuffer path = new StringBuffer();
+        ContainerWrapper parent = getParentContainer();
+        if (parent != null) {
+            path.append(parent.getPath()).append("/");
+        }
+        path.append(getId());
+        return path.toString();
+    }
+
+    @Override
+    public void setPath(String dummy) {
+        throw new BiobankRuntimeException("cannot set path on container");
+    }
+
+    private void setPath() throws BiobankCheckException {
+        StringBuffer path = new StringBuffer("");
+        ContainerWrapper parent = getParentContainer();
+        if (parent != null) {
+            boolean top = parent.getContainerType().getTopLevel();
+            String parentPath = parent.getPath();
+            if (!top && (parentPath == null)) {
+                throw new BiobankCheckException(
+                    "parent container does not have a path");
+            }
+            path.append(parentPath);
+        }
+        super.setPath(path.toString());
+    }
+
+    @Override
+    public void setTopContainer(ContainerWrapper c) {
+        throw new BiobankRuntimeException("cannot set path on container");
+    }
+
+    private void setTopContainer() throws BiobankCheckException {
+        ContainerTypeWrapper ctype = getContainerType();
+        if (ctype == null) {
+            throw new RuntimeException("container type needs to be set");
+        }
+
+        ContainerWrapper top = this;
+        if (!getContainerType().getTopLevel()) {
+            while (top != null && top.getParentContainer() != null) {
+                top = top.getParentContainer();
+            }
+
+            if (top == null) {
+                throw new BiobankCheckException("no top container");
+            }
+        }
+        super.setTopContainer(top);
+    }
+
+    public void setParent(ContainerWrapper container)
+        throws BiobankFailedQueryException, BiobankCheckException {
         objectWithPositionManagement.setParent(container);
+
+        setPath();
+        for (ContainerWrapper child : getChildren().values()) {
+            child.setPath();
+        }
+        setTopContainer();
     }
 
     public boolean hasParentContainer() {
@@ -253,18 +327,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 container.persist();
             }
         }
-    }
-
-    private void persistPath() throws Exception {
-        // TODO: why does persisting always just get the current path, ignoring
-        // the one we just set?
-        ContainerPathWrapper containerPath = ContainerPathWrapper
-            .getContainerPath(appService, this);
-        if (containerPath == null) {
-            containerPath = new ContainerPathWrapper(appService);
-            containerPath.setContainer(this);
-        }
-        containerPath.persist();
     }
 
     private static final String LABEL_UNIQUE_FOR_TYPE_BASE_QRY = "select count(c) from "
@@ -319,108 +381,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return type.getColCapacity();
     }
 
-    public String getPath() {
-        StringBuilder sb = new StringBuilder();
-        ContainerWrapper container = this;
-
-        while (container != null) {
-            if (container.isNew()) {
-                return null;
-            }
-
-            sb.insert(0, container.getId());
-            sb.insert(0, "/");
-            container = container.getParentContainer();
-        }
-        sb.deleteCharAt(0);
-
-        return sb.toString();
-    }
-
-    private static final String CONTAINERS_WITH_SAME_LABEL_WITH_TYPE_BASE_QRY = "from "
-        + Container.class.getName()
-        + " where "
-        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
-        + "=? and "
-        + ContainerPeer.LABEL.getName()
-        + "=? and "
-        + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
-            ContainerTypePeer.ID) + " in ( ";
-
-    /**
-     * get the containers with same label than this container and from same site
-     * that this container. The container type should be in the list given
-     * 
-     * @throws ApplicationException
-     */
-    public List<ContainerWrapper> getContainersWithSameLabelWithType(
-        List<ContainerTypeWrapper> types) throws ApplicationException {
-        List<Integer> typeIds = new ArrayList<Integer>();
-        for (ContainerTypeWrapper type : types) {
-            typeIds.add(type.getId());
-        }
-        String qry = new StringBuilder(
-            CONTAINERS_WITH_SAME_LABEL_WITH_TYPE_BASE_QRY)
-            .append(StringUtils.join(typeIds, ',')).append(")").toString();
-        HQLCriteria criteria = new HQLCriteria(qry, Arrays.asList(new Object[] {
-            getSite().getId(), getLabel() }));
-        List<Container> res = appService.query(criteria);
-        List<ContainerWrapper> containers = new ArrayList<ContainerWrapper>();
-        for (Container cont : res) {
-            containers.add(new ContainerWrapper(appService, cont));
-        }
-        return containers;
-    }
-
-    /**
-     * compute the ContainerPosition for this container using its label. If the
-     * parent container cannot hold the container type of this container, then
-     * an exception is thrown.
-     */
-    public void setPositionAndParentFromLabel(String label,
-        List<ContainerTypeWrapper> types) throws Exception {
-        // FIXME used only in ScanAssign, so its ok to use only last 2
-        // characters. But what if it is use in others places
-        String parentContainerLabel = label.substring(0, label.length() - 2);
-        List<ContainerWrapper> possibleParents = ContainerWrapper
-            .getContainersHoldingContainerTypes(appService,
-                parentContainerLabel, getSite(), types);
-        if ((possibleParents.size() == 0) || (possibleParents.size() > 1)) {
-            List<String> typesString = new ArrayList<String>();
-            for (ContainerTypeWrapper type : types) {
-                typesString.add(new StringBuilder("\"").append(type.getName())
-                    .append("\"").toString());
-            }
-
-            if (possibleParents.size() == 0) {
-                throw new ContainerLabelSearchException(
-                    "Can't find container with label \""
-                        + parentContainerLabel
-                        + "\" holding containers of types "
-                        + StringUtils.join(typesString, " or ")
-                        + " and in site "
-                        + (getSite() == null ? "'none'" : getSite()
-                            .getNameShort()));
-            }
-            if (possibleParents.size() > 1) {
-                throw new ContainerLabelSearchException(
-                    possibleParents.size()
-                        + " containers with label "
-                        + parentContainerLabel
-                        + " and holding container types "
-                        + StringUtils.join(typesString, " or ")
-                        + " have been found. This is ambiguous: check containers definitions.");
-            }
-        }
-        // has the parent container. Can now find the position using the
-        // parent labelling scheme
-        ContainerWrapper parent = possibleParents.get(0);
-        setParent(parent);
-        RowColPos position = parent.getPositionFromLabelingScheme(label
-            .substring(label.length() - 2));
-        setPositionAsRowCol(position);
-    }
-
     /**
      * position is 2 letters, or 2 number or 1 letter and 1 number... this
      * position string is used to get the correct row and column index the given
@@ -448,25 +408,60 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return rcp;
     }
 
-    @SuppressWarnings("unchecked")
+    private static String SPECIMENS_FAST_QRY = "select pos."
+        + SpecimenPositionPeer.ROW.getName()
+        + ", pos."
+        + SpecimenPositionPeer.COL.getName()
+        + ", specimen from "
+        + Specimen.class.getName()
+        + " as specimen join specimen."
+        + SpecimenPeer.SPECIMEN_POSITION.getName()
+        + " as pos where pos."
+        + Property
+            .concatNames(SpecimenPositionPeer.CONTAINER, ContainerPeer.ID)
+        + " = ?";
+
     public Map<RowColPos, SpecimenWrapper> getSpecimens() {
+        try {
+            return getSpecimens(false);
+        } catch (ApplicationException e) {
+            // Application Exception is thrown when fast = true
+            throw new RuntimeException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<RowColPos, SpecimenWrapper> getSpecimens(boolean fast)
+        throws ApplicationException {
         Map<RowColPos, SpecimenWrapper> specimens = (Map<RowColPos, SpecimenWrapper>) cache
             .get(SPECIMENS_CACHE_KEY);
         if (specimens == null) {
-            List<SpecimenPositionWrapper> positions = getWrapperCollection(
-                ContainerPeer.SPECIMEN_POSITION_COLLECTION,
-                SpecimenPositionWrapper.class, false);
-
             specimens = new TreeMap<RowColPos, SpecimenWrapper>();
-            for (SpecimenPositionWrapper position : positions) {
-                try {
-                    position.reload();
-                } catch (Exception ex) {
-                    // do nothing
+            if (fast) {
+                List<Object[]> res = appService.query(new HQLCriteria(
+                    SPECIMENS_FAST_QRY, Arrays.asList(getId())));
+                for (Object[] r : res) {
+                    RowColPos rcp = new RowColPos((Integer) r[0],
+                        (Integer) r[1]);
+                    SpecimenWrapper spec = new SpecimenWrapper(appService,
+                        (Specimen) r[2]);
+                    specimens.put(rcp, spec);
                 }
-                SpecimenWrapper spc = position.getSpecimen();
-                specimens.put(
-                    new RowColPos(position.getRow(), position.getCol()), spc);
+            } else {
+                List<SpecimenPositionWrapper> positions = getWrapperCollection(
+                    ContainerPeer.SPECIMEN_POSITION_COLLECTION,
+                    SpecimenPositionWrapper.class, false);
+                for (SpecimenPositionWrapper position : positions) {
+                    try {
+                        position.reload();
+                    } catch (Exception ex) {
+                        // do nothing
+                    }
+                    SpecimenWrapper spc = position.getSpecimen();
+                    specimens.put(
+                        new RowColPos(position.getRow(), position.getCol()),
+                        spc);
+                }
             }
             cache.put(SPECIMENS_CACHE_KEY, specimens);
         }
@@ -610,13 +605,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return ((positions != null) && (positions.size() > 0));
     }
 
-    public ContainerWrapper getChild(Integer row, Integer col)
-        throws BiobankFailedQueryException {
+    public ContainerWrapper getChild(Integer row, Integer col) throws Exception {
         return getChild(new RowColPos(row, col));
     }
 
-    public ContainerWrapper getChild(RowColPos rcp)
-        throws BiobankFailedQueryException {
+    public ContainerWrapper getChild(RowColPos rcp) throws Exception {
         Map<RowColPos, ContainerWrapper> children = getChildren();
         if (children == null) {
             return null;
@@ -673,7 +666,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     public void addChild(Integer row, Integer col, ContainerWrapper child)
-        throws BiobankException {
+        throws Exception {
         ContainerPositionWrapper tempPosition = new ContainerPositionWrapper(
             appService);
         tempPosition.setRow(row);
@@ -764,15 +757,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         }
     }
 
-    @Override
-    protected void deleteDependencies() throws Exception {
-        ContainerPathWrapper path = ContainerPathWrapper.getContainerPath(
-            appService, this);
-        if (path != null) {
-            path.delete();
-        }
-    }
-
     /**
      * Get containers with a given label that can hold this type of container
      * (in this container site)
@@ -780,8 +764,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @throws BiobankException
      */
     public List<ContainerWrapper> getPossibleParents(String childLabel)
-        throws ApplicationException, BiobankException {
-        return getPossibleParents(appService, childLabel, getSite(), this);
+        throws ApplicationException {
+        return getPossibleParents(appService, childLabel, getSite(),
+            getContainerType());
     }
 
     private static final String POSSIBLE_PARENTS_BASE_QRY = "select distinct(c) from "
@@ -800,12 +785,13 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * container, then will check that the parent can contain this type of
      * container
      * 
+     * @param type if the child is a container, this is its type (if available)
      * @throws BiobankException
      */
     public static List<ContainerWrapper> getPossibleParents(
         WritableApplicationService appService, String childLabel,
-        SiteWrapper site, ModelWrapper<?> child) throws ApplicationException,
-        BiobankException {
+        SiteWrapper site, ContainerTypeWrapper type)
+        throws ApplicationException {
         List<Integer> validLengths = ContainerLabelingSchemeWrapper
             .getPossibleLabelLength(appService);
         List<String> validParents = new ArrayList<String>();
@@ -825,10 +811,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             StringBuilder parentQuery = new StringBuilder(
                 POSSIBLE_PARENTS_BASE_QRY).append(
                 StringUtils.join(validParents, ',')).append(")");
-            if (child != null && child instanceof ContainerWrapper) {
-                parentQuery.append(" and ct=?");
-                params.add(((ContainerWrapper) child).getContainerType()
-                    .getWrappedObject());
+            if (type != null) {
+                parentQuery.append(" and ct.id=?");
+                params.add(type.getId());
             }
             HQLCriteria criteria = new HQLCriteria(parentQuery.toString(),
                 params);
@@ -842,84 +827,13 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                         filteredWrappers
                             .add(new ContainerWrapper(appService, c));
                 } catch (Exception e) {
-                    throw new BiobankException(e);
+                    // can't throw an exception: it means that this label is not
+                    // possible in this parent.
+                    // Maybe the next one in the list is ok
                 }
             }
         }
         return filteredWrappers;
-    }
-
-    private static final String CONTAINERS_HOLDING_CONTAINER_TYPES_BASE_QRY = "from "
-        + Container.class.getName()
-        + " where "
-        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
-        + "=? and "
-        + ContainerPeer.LABEL.getName()
-        + "=? and "
-        + ContainerPeer.CONTAINER_TYPE.getName()
-        + " in (select parent from "
-        + ContainerType.class.getName()
-        + " as parent where "
-        + ContainerTypePeer.ID.getName()
-        + " in (select ct."
-        + ContainerTypePeer.ID.getName()
-        + " from "
-        + ContainerType.class.getName()
-        + " as ct"
-        + " left join ct."
-        + ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION.getName()
-        + " as child where child." + ContainerTypePeer.ID.getName() + " in (";
-
-    /**
-     * get containers with label label in site which can have children of types
-     * container type
-     */
-    public static List<ContainerWrapper> getContainersHoldingContainerTypes(
-        WritableApplicationService appService, String label, SiteWrapper site,
-        List<ContainerTypeWrapper> types) throws ApplicationException {
-        if (site == null) {
-            throw new NullPointerException();
-        }
-        List<Integer> typeIds = new ArrayList<Integer>();
-        for (ContainerTypeWrapper type : types) {
-            typeIds.add(type.getId());
-        }
-        String qry = new StringBuilder(
-            CONTAINERS_HOLDING_CONTAINER_TYPES_BASE_QRY)
-            .append(StringUtils.join(typeIds, ',')).append(")))").toString();
-        HQLCriteria criteria = new HQLCriteria(qry, Arrays.asList(new Object[] {
-            site.getId(), label }));
-        List<Container> containers = appService.query(criteria);
-        return wrapModelCollection(appService, containers,
-            ContainerWrapper.class);
-    }
-
-    private static final String CONTAINERS_HOLDING_SPECIMEN_TYPES_QRY = "from "
-        + Container.class.getName() + " where "
-        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and "
-        + ContainerPeer.LABEL.getName() + "=? and "
-        + ContainerPeer.CONTAINER_TYPE.getName() + " in (select parent from "
-        + ContainerType.class.getName() + " as parent where parent."
-        + ContainerTypePeer.ID.getName() + " in (select ct."
-        + ContainerTypePeer.ID.getName() + " from "
-        + ContainerType.class.getName() + " as ct" + " left join ct."
-        + ContainerTypePeer.SPECIMEN_TYPE_COLLECTION.getName()
-        + " as sampleType where sampleType = ?))";
-
-    /**
-     * get the containers with label label and site siteWrapper and holding
-     * given sample type
-     */
-    public static List<ContainerWrapper> getContainersHoldingSampleType(
-        WritableApplicationService appService, SiteWrapper siteWrapper,
-        String label, SpecimenTypeWrapper sampleType)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            CONTAINERS_HOLDING_SPECIMEN_TYPES_QRY, Arrays.asList(new Object[] {
-                siteWrapper.getId(), label, sampleType.getWrappedObject() }));
-        List<Container> containers = appService.query(criteria);
-        return wrapModelCollection(appService, containers,
-            ContainerWrapper.class);
     }
 
     private static final String EMPTY_CONTAINERS_HOLDING_SPECIMEN_TYPE_BASE_QRY = "from "
@@ -1158,8 +1072,75 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             .getRowCapacity() * this.getContainerType().getColCapacity());
     }
 
-    public ContainerWrapper getTop() {
-        return objectWithPositionManagement.getTop();
+    /**
+     * Search possible parents from the position text.
+     * 
+     * @param positionText the position to use for initialisation
+     * @param isContainerPosition if true, the position is a full container
+     *            position, if false, it is a full specimen position
+     * @param contType if is a container position, will check the type can be
+     *            used
+     * @throws BiobankException
+     */
+    public static List<ContainerWrapper> getPossibleContainersFromPosition(
+        BiobankApplicationService appService, User user, String positionText,
+        boolean isContainerPosition, ContainerTypeWrapper contType)
+        throws ApplicationException, BiobankException {
+        List<ContainerWrapper> foundContainers;
+        List<ContainerWrapper> possibles = getPossibleParents(appService,
+            positionText, user.getCurrentWorkingSite(), contType);
+        if (isContainerPosition)
+            foundContainers = possibles;
+        else {
+            foundContainers = new ArrayList<ContainerWrapper>();
+            // need to know if can contain specimen if this is a specimen
+            // position
+            for (ContainerWrapper cont : possibles) {
+                if (cont.getContainerType().getSpecimenTypeCollection() != null
+                    && cont.getContainerType().getSpecimenTypeCollection()
+                        .size() > 0) {
+                    foundContainers.add(cont);
+                }
+            }
+        }
+        if (foundContainers.size() == 0) {
+            List<Integer> validLengths = ContainerLabelingSchemeWrapper
+                .getPossibleLabelLength(appService);
+            StringBuffer res = new StringBuffer();
+
+            // String binLabel = parentLabelsTested.get(i);
+            //                res.append(binLabel).append("(") //$NON-NLS-1$
+            //                    .append(fullLabel.replace(binLabel, "")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+
+            for (int i = 0; i < validLengths.size(); i++) {
+                Integer crop = validLengths.get(i);
+                if (i != 0) {
+                    res.append(", "); //$NON-NLS-1$
+
+                    if (crop < positionText.length())
+                        res.append(positionText.substring(0,
+                            positionText.length() - crop));
+                }
+            }
+            String errorMsg;
+            if (contType == null)
+                errorMsg = Messages
+                    .getString(
+                        "ContainerWrapper.getPossibleContainersFromPosition.error.notfound.msg", //$NON-NLS-1$
+                        positionText);
+            else
+                errorMsg = Messages
+                    .getString(
+                        "ContainerWrapper.getPossibleContainersFromPosition.error.notfoundWithType.msg",//$NON-NLS-1$
+                        positionText, contType.getNameShort());
+
+            throw new BiobankException(errorMsg);
+        }
+        return foundContainers;
+    }
+
+    public boolean isPallet96() {
+        return getContainerType().isPallet96();
     }
 
 }

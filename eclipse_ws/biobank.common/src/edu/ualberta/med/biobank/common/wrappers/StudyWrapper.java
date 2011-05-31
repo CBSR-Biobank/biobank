@@ -102,10 +102,10 @@ public class StudyWrapper extends StudyBaseWrapper {
 
         studyEventAttrMap = new HashMap<String, StudyEventAttrWrapper>();
 
-        List<StudyEventAttrWrapper> EventAttrList = StudyEventAttrWrapper
-            .getStudyEventAttrCollection(this);
+        List<StudyEventAttrWrapper> eventAttrList = getStudyEventAttrCollection(false);
+        // StudyEventAttrWrapper.getStudyEventAttrCollection(this);
 
-        for (StudyEventAttrWrapper studyEventAttr : EventAttrList) {
+        for (StudyEventAttrWrapper studyEventAttr : eventAttrList) {
             studyEventAttrMap.put(studyEventAttr.getLabel(), studyEventAttr);
         }
         return studyEventAttrMap;
@@ -417,6 +417,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         return getCollectionEventWrapper().size();
     }
 
+    // WARNING: this runs very slow and generates a lot of network traffic
     public List<CollectionEventWrapper> getCollectionEventWrapper() {
         List<CollectionEventWrapper> cEvents = new ArrayList<CollectionEventWrapper>();
         for (PatientWrapper p : getPatientCollection(false)) {
@@ -436,5 +437,10 @@ public class StudyWrapper extends StudyBaseWrapper {
     @Override
     public void persist() throws Exception {
         getPersistTasks().execute(appService);
+    }
+
+    @Override
+    public void delete() throws Exception {
+        getDeleteTasks().execute(appService);
     }
 }

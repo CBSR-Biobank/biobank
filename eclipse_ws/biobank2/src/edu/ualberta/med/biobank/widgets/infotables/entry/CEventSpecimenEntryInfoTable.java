@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -13,11 +14,13 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
 import edu.ualberta.med.biobank.dialogs.CEventSourceSpecimenDialog;
-import edu.ualberta.med.biobank.dialogs.CEventSourceSpecimenDialog.NewSpecimenListener;
+import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
@@ -43,27 +46,33 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
         List<SourceSpecimenWrapper> studySourceTypes,
         List<SpecimenTypeWrapper> allSpecimenTypes,
         final CollectionEventWrapper cEvent, final Date defaultTimeDrawn) {
-        NewSpecimenListener newSpecimenListener = null;
+        NewListener newListener = null;
+        List<SpecimenWrapper> excludeList = new ArrayList<SpecimenWrapper>(
+            currentSpecimens);
         if (add) {
-            newSpecimenListener = new NewSpecimenListener() {
+            newListener = new NewListener() {
                 @Override
-                public void newSpecimenAdded(SpecimenWrapper spec) {
-                    spec.setCollectionEvent(cEvent);
-                    spec.setOriginalCollectionEvent(cEvent);
-                    spec.setCurrentCenter(SessionManager.getUser()
-                        .getCurrentWorkingCenter());
-                    currentSpecimens.add(spec);
-                    addedSpecimens.add(spec);
+                public void newAdded(ModelWrapper<?> spec) {
+                    ((SpecimenBaseWrapper) spec).setCollectionEvent(cEvent);
+                    ((SpecimenBaseWrapper) spec)
+                        .setOriginalCollectionEvent(cEvent);
+                    ((SpecimenBaseWrapper) spec)
+                        .setCurrentCenter(SessionManager.getUser()
+                            .getCurrentWorkingCenter());
+                    currentSpecimens.add((SpecimenWrapper) spec);
+                    addedSpecimens.add((SpecimenWrapper) spec);
                     specimensAdded.setValue(true);
                     reloadCollection(currentSpecimens);
                     notifyListeners();
                 }
             };
+        } else {
+            excludeList.remove(specimen);
         }
         CEventSourceSpecimenDialog dlg = new CEventSourceSpecimenDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            specimen, studySourceTypes, allSpecimenTypes, newSpecimenListener,
-            defaultTimeDrawn);
+            specimen, studySourceTypes, allSpecimenTypes, excludeList,
+            newListener, defaultTimeDrawn);
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
             reloadCollection(currentSpecimens);
