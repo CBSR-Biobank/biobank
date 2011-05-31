@@ -663,7 +663,7 @@
   </target>
 
   <target name="build-common-project"
-          depends="sdk-files,modelextender">
+          depends="sdk-files,prepare-webapp-orm,package-codegen-orm,modelextender">
     <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output">
