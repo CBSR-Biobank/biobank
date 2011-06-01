@@ -145,13 +145,13 @@ public class ReportsView extends ViewPart {
         AbstractReportTreeNode clinics, AbstractReportTreeNode patients,
         AbstractReportTreeNode sampleTypes, AbstractReportTreeNode containers,
         ReportTreeNode child) throws Exception {
-        if (child.getLabel().contains("Specimen")) {
-            specimens.addChild(child);
-            child.setParent(specimens);
-        } else if (child.getLabel().contains("Specimen Type")
+        if (child.getLabel().contains("Specimen Type")
             || child.getLabel().contains("Invoicing")) {
             sampleTypes.addChild(child);
             child.setParent(sampleTypes);
+        } else if (child.getLabel().contains("Specimen")) {
+            specimens.addChild(child);
+            child.setParent(specimens);
         } else if (child.getLabel().contains("Patient")) {
             patients.addChild(child);
             child.setParent(patients);
@@ -162,7 +162,8 @@ public class ReportsView extends ViewPart {
             containers.addChild(child);
             child.setParent(containers);
         } else
-            throw new Exception("Unable to place report node.");
+            throw new Exception("Unable to place report node: "
+                + child.getLabel());
     }
 
     @Override
