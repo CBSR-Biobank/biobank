@@ -21,7 +21,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
-    private static final String USED_BY_SPECIMENS_ERRMSG = "Unable to delete specimen type {0}. Specimens of this type exists in storage. Remove all instances before deleting this type.";
+    private static final String HAS_SPECIMENS_MSG = "Unable to delete specimen type {0}. Specimens of this type exists in storage. Remove all instances before deleting this type.";
 
     public SpecimenTypeWrapper(WritableApplicationService appService,
         SpecimenType wrappedObject) {
@@ -100,7 +100,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return getName();
     }
 
-    public static final String IS_USED_BY_SPECIMENS_HQL = "select count(s) from "
+    public static final String HAS_SPECIMENS_HQL = "select count(s) from "
         + Specimen.class.getName()
         + " as s where s."
         + SpecimenPeer.SPECIMEN_TYPE.getName() + "=?)";
@@ -109,7 +109,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         BiobankQueryResultSizeException {
         if (isNew())
             return false;
-        HQLCriteria c = new HQLCriteria(IS_USED_BY_SPECIMENS_HQL,
+        HQLCriteria c = new HQLCriteria(HAS_SPECIMENS_HQL,
             Arrays.asList(new Object[] { wrappedObject }));
         return getCountResult(appService, c) > 0;
     }
@@ -141,8 +141,8 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
     private BiobankSessionAction checkIsUsedBySpecimens() {
         List<?> expected = Arrays.asList(new Long(0));
-        String msg = MessageFormat.format(USED_BY_SPECIMENS_ERRMSG, getName());
-        return new CheckHQLResult(expected, msg, IS_USED_BY_SPECIMENS_HQL,
+        String msg = MessageFormat.format(HAS_SPECIMENS_MSG, getName());
+        return new CheckHQLResult(expected, msg, HAS_SPECIMENS_HQL,
             wrappedObject);
     }
 

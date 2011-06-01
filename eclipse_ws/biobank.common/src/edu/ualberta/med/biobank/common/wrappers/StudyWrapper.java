@@ -76,7 +76,7 @@ public class StudyWrapper extends StudyBaseWrapper {
     protected TaskList getDeleteTasks() {
         TaskList tasks = new TaskList();
 
-        tasks.add(Check.collectionIsEmpty(this, StudyPeer.PATIENT_COLLECTION));
+        tasks.add(Check.empty(this, StudyPeer.PATIENT_COLLECTION));
 
         tasks.add(Cascade.delete(this, StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
         tasks.add(Cascade.delete(this, StudyPeer.SOURCE_SPECIMEN_COLLECTION));

@@ -21,11 +21,11 @@ public class CheckUnique<E> extends BiobankWrapperAction<E> {
     private static final String EXCEPTION_STRING = "There already exists a {0} ({1}) with property value(s) ({2}) for ({3}), respectively. These field(s) must be unique.";
 
     private final Property<? extends Serializable, ? super E> idProperty;
-    private final Collection<Property<?, E>> properties;
+    private final Collection<Property<?, ? super E>> properties;
     private final String modelString;
 
     protected CheckUnique(ModelWrapper<E> wrapper,
-        Collection<Property<?, E>> properties) {
+        Collection<Property<?, ? super E>> properties) {
         super(wrapper);
         this.idProperty = wrapper.getIdProperty();
         this.properties = properties;
@@ -49,7 +49,7 @@ public class CheckUnique<E> extends BiobankWrapperAction<E> {
                 id)));
         }
 
-        for (Property<?, E> property : properties) {
+        for (Property<?, ? super E> property : properties) {
             String name = property.getName();
             Object value = property.get(model);
             criteria.add(Restrictions.eq(name, value));

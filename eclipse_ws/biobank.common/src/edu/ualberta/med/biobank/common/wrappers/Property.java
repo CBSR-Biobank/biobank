@@ -70,6 +70,22 @@ public class Property<T, W> implements Serializable {
         accessor.set(model, value);
     }
 
+    /**
+     * An alias for the {@code wrap()} method. Behaves exactly the same, but
+     * with a shorter method name for use such as
+     * {@code
+     *      Property cThroughA = A.to(B.to(C))
+     *      C c = cThroughA.get(a);
+     * }
+     * 
+     * @param <T2>
+     * @param property
+     * @return
+     */
+    public <T2> Property<T2, W> to(final Property<T2, ? super T> property) {
+        return wrap(property.name, property);
+    }
+
     public <T2> Property<T2, W> wrap(final Property<T2, ? super T> property) {
         return wrap(property.name, property);
     }

@@ -14,10 +14,11 @@ class CheckNotNull<E> extends BiobankWrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_STRING = "The {0} of {1} {2} must be defined (cannot be null).";
 
-    private final Property<?, E> property;
+    private final Property<?, ? super E> property;
     private final String modelString;
 
-    protected CheckNotNull(ModelWrapper<E> wrapper, Property<?, E> property) {
+    protected CheckNotNull(ModelWrapper<E> wrapper,
+        Property<?, ? super E> property) {
         super(wrapper);
         this.property = property;
         this.modelString = wrapper.toString();

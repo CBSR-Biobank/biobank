@@ -18,14 +18,21 @@ public class CheckCollectionIsEmpty<E> extends BiobankWrapperAction<E> {
     private static final String EXCEPTION_MESSAGE = "{0} {1} has one or more {2}.";
     private static final String COUNT_HQL = "SELECT m.{0}.size FROM {1} m WHERE m = ?";
 
-    private final Property<?, E> property;
+    private final Property<?, ? super E> property;
     private final String modelString;
+    private final String msg;
 
     public CheckCollectionIsEmpty(ModelWrapper<E> wrapper,
-        Property<? extends Collection<?>, E> property) {
+        Property<? extends Collection<?>, ? super E> property) {
+        this(wrapper, property, null);
+    }
+
+    public CheckCollectionIsEmpty(ModelWrapper<E> wrapper,
+        Property<? extends Collection<?>, ? super E> property, String msg) {
         super(wrapper);
         this.property = property;
         this.modelString = wrapper.toString();
+        this.msg = msg;
     }
 
     @Override
@@ -40,11 +47,15 @@ public class CheckCollectionIsEmpty<E> extends BiobankWrapperAction<E> {
         Long count = Check.getCountFromResult(results);
 
         if (count == null || count > 0) {
-            String modelClass = Format.modelClass(getModelClass());
-            String propertyName = Format.propertyName(property);
+            String msg = this.msg;
 
-            String msg = MessageFormat.format(EXCEPTION_MESSAGE, modelClass,
-                modelString, propertyName);
+            if (msg == null) {
+                String modelClass = Format.modelClass(getModelClass());
+                String propertyName = Format.propertyName(property);
+
+                msg = MessageFormat.format(EXCEPTION_MESSAGE, modelClass,
+                    modelString, propertyName);
+            }
 
             throw new CollectionNotEmptyException(msg);
         }

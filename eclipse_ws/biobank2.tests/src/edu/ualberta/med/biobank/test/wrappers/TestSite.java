@@ -8,7 +8,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -22,6 +21,8 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -396,7 +397,7 @@ public class TestSite extends TestDatabase {
             site2.persist();
             Assert
                 .fail("Should not insert the site : same name already in database");
-        } catch (DuplicateEntryException e) {
+        } catch (DuplicatePropertySetException e) {
             Assert.assertTrue(true);
         }
 
@@ -440,10 +441,11 @@ public class TestSite extends TestDatabase {
             site.getId());
         Assert.assertNotNull(siteInDB);
 
+        Integer id = site.getId();
+
         site.delete();
 
-        siteInDB = ModelUtils.getObjectWithId(appService, Site.class,
-            site.getId());
+        siteInDB = ModelUtils.getObjectWithId(appService, Site.class, id);
         // object is not anymore in database
         Assert.assertNull(siteInDB);
     }
@@ -462,7 +464,7 @@ public class TestSite extends TestDatabase {
             site.delete();
             Assert
                 .fail("Should not delete the site : a container type is still there");
-        } catch (BiobankCheckException bce) {
+        } catch (CollectionNotEmptyException bce) {
             Assert.assertEquals(oldTotal + 1, SiteWrapper.getSites(appService)
                 .size());
         }
@@ -486,7 +488,7 @@ public class TestSite extends TestDatabase {
             site.delete();
             Assert
                 .fail("Should not delete the site : a container and a container type is still there");
-        } catch (BiobankCheckException bce) {
+        } catch (CollectionNotEmptyException bce) {
             Assert.assertEquals(oldTotal + 1, SiteWrapper.getSites(appService)
                 .size());
         }

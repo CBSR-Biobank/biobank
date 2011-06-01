@@ -24,4 +24,14 @@ public class SourceSpecimenWrapper extends SourceSpecimenBaseWrapper {
         return 0;
     }
 
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        getPersistTasks().execute(appService);
+    }
+
+    @Override
+    public void delete() throws Exception {
+        getDeleteTasks().execute(appService);
+    }
 }

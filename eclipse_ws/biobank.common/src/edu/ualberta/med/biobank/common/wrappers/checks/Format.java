@@ -13,11 +13,11 @@ class Format {
     }
 
     public static <E> String propertyValues(E model,
-        Collection<Property<?, E>> properties) {
+        Collection<Property<?, ? super E>> properties) {
         StringBuilder sb = new StringBuilder();
         int n = properties.size();
         int i = 0;
-        for (Property<?, E> property : properties) {
+        for (Property<?, ? super E> property : properties) {
             sb.append(property.get(model).toString());
             if (i < n) {
                 sb.append(DELIMITER);
@@ -27,11 +27,12 @@ class Format {
         return sb.toString();
     }
 
-    public static <E> String propertyNames(Collection<Property<?, E>> properties) {
+    public static <E> String propertyNames(
+        Collection<Property<?, ? super E>> properties) {
         StringBuilder sb = new StringBuilder();
         int n = properties.size();
         int i = 0;
-        for (Property<?, E> property : properties) {
+        for (Property<?, ? super E> property : properties) {
             sb.append(propertyName(property));
             if (i < n) {
                 sb.append(DELIMITER);
