@@ -616,4 +616,3 @@ from specimen_type as child join specimen_type_specimen_type as stst on child.id
 where child.id = als.specimen_type_id) limit 1)
 where als.id not in (2,5, 19, 33,35,40,44,47,51,53,64,73,80,96,102,103,104,107,109,110,113,126,129,131,132,134,163,208,210,211,212,213,214,215,218,219,220)
 
-
