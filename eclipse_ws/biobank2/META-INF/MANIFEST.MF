@@ -4,18 +4,12 @@ Created-By: 14.3-b01 (Sun Microsystems Inc.)
 Bundle-Name: Biobank2 Plug-in
 Bundle-ClassPath: .,
  lib/gluegen.jar,
- lib/jasperreports-3.7.0.jar,
- lib/commons-beanutils-1.8.0.jar,
- lib/commons-digester-1.7.jar,
- lib/iText-2.1.0.jar,
- lib/DynamicJasper-3.0.14.jar,
- lib/jdt-compiler-3.1.1.jar,
  lib/SuperCSV-1.52.jar,
  lib/spiffy-all-0.05.jar,
  lib/mailapi.jar,
  lib/smtp.jar,
- lib/jasperreports-4.0.2.jar,
- lib/jdom.jar
+ lib/jdom.jar,
+ lib/DynamicJasper-3.0.14.jar
 Bundle-Activator: edu.ualberta.med.biobank.BiobankPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ManifestVersion: 2
@@ -38,7 +32,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.equinox.p2.engine;bundle-version="2.0.0",
  org.eclipse.equinox.p2.operations;bundle-version="2.0.0",
  org.eclipse.equinox.p2.ui.sdk.scheduler;bundle-version="1.0.0",
- barcodeGenerator;bundle-version="0.0.1"
+ barcodeGenerator;bundle-version="0.0.1",
+ biobank.gui.common;bundle-version="1.0.0"
 Bundle-Version: 1.4.0.rc6
 Bundle-Vendor: AICML
 Bundle-Localization: plugin
