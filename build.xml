@@ -19,6 +19,8 @@
   <property name="cacore.sdk.filename" value="caCORE_SDK_411.tar.gz" />
   <property name="eclipse.workspace.dir" location="eclipse_ws" />
   <property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
+  <property name="eclipse.proj.dir.gui.common"
+            location="eclipse_ws/biobank.gui.common" />
   <property name="eclipse.proj.dir.common"
             location="eclipse_ws/biobank.common" />
   <property name="eclipse.proj.dir.tools"
@@ -39,8 +41,10 @@
   <property name="database.password" value="ozzy498" />
   <property name="req.jars.dir" value="jars" />
   <property name="lib-sources.dir" value="lib-sources" />
+  <property name="biobank.gui.common.jar.files"
+            value="commons-beanutils-1.8.0.jar,commons-digester-1.7.jar,commons-javaflow-20060411.jar,iText-2.1.7.jar,jasperreports-4.0.2.jar,jdt-compiler-3.1.1.jar" />
   <property name="biobank.jar.files"
-            value="gluegen.jar,jdom.jar,commons-beanutils-1.8.0.jar, commons-digester-1.7.jar, iText-2.1.0.jar, jasperreports-3.7.0.jar,DynamicJasper-3.0.14.jar,jdt-compiler-3.1.1.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
+            value="DynamicJasper-3.0.14.jar,gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
   <property name="biobank.common.jar.files"
             value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar" />
   <property name="biobank.tools.jar.files"
@@ -249,6 +253,11 @@
                       files="${biobank.common.jar.files}" />
     </dependset>
     <dependset>
+      <srcfilelist dir="${req.jars.dir}" files="${biobank.gui.common.jar.files}" />
+      <targetfilelist dir="${eclipse.proj.dir.gui.common}/lib"
+                      files="${biobank.gui.commmon.jar.files}" />
+    </dependset>
+    <dependset>
       <srcfilelist dir="${req.jars.dir}" files="${biobank.jar.files}" />
       <targetfilelist dir="${eclipse.proj.dir}/lib"
                       files="${biobank.jar.files}" />
@@ -294,6 +303,12 @@
     <copy todir="${eclipse.proj.dir.common}/conf" overwrite="true">
       <filelist dir="${cacore.sdk.dir}/output/biobank/package/remote-client/conf"
                 files="application-config-client.xml,application-config-client-info.xml" />
+    </copy>
+    <copy todir="${eclipse.proj.dir.gui.common}/lib" overwrite="true">
+      <filelist dir="${req.jars.dir}" files="${biobank.gui.common.jar.files}" />
+    </copy>
+    <copy todir="${eclipse.proj.dir.gui.common}/lib" overwrite="true">
+      <filelist dir="${cacore.sdk.dir}/system/lib" files="commons-collections-3.2.jar,commons-logging-1.1.jar" />
     </copy>
     <copy todir="${eclipse.proj.dir}/lib" overwrite="true">
       <filelist dir="${req.jars.dir}" files="${biobank.jar.files}" />
