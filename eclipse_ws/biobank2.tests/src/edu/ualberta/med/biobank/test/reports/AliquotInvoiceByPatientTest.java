@@ -19,14 +19,13 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 public class AliquotInvoiceByPatientTest extends AbstractReportTest {
     private static final Comparator<SpecimenWrapper> ORDER_BY_ALIQUOT_PNUMBER = new Comparator<SpecimenWrapper>() {
         public int compare(SpecimenWrapper lhs, SpecimenWrapper rhs) {
-            // FIXME
-            // int cmp = compareStrings(lhs.getProcessingEvent().getPatient()
-            // .getPnumber(), rhs.getProcessingEvent().getPatient()
-            // .getPnumber());
-            //
-            // if (cmp != 0) {
-            // return cmp;
-            // }
+            int cmp = compareStrings(lhs.getCollectionEvent().getPatient()
+                .getPnumber(), rhs.getCollectionEvent().getPatient()
+                .getPnumber());
+
+            if (cmp != 0) {
+                return cmp;
+            }
 
             return compareStrings(lhs.getInventoryId(), rhs.getInventoryId());
         }
@@ -48,8 +47,7 @@ public class AliquotInvoiceByPatientTest extends AbstractReportTest {
         Assert.assertTrue(aliquots.size() > 0);
 
         SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
-        // FIXME
-        // checkResults(aliquot.getLinkDate(), aliquot.getLinkDate());
+        checkResults(aliquot.getCreatedAt(), aliquot.getCreatedAt());
     }
 
     @Test
@@ -58,8 +56,7 @@ public class AliquotInvoiceByPatientTest extends AbstractReportTest {
         Assert.assertTrue(aliquots.size() > 0);
 
         SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
-        // FIXME
-        // checkResults(aliquot.getLinkDate(), aliquot.getLinkDate());
+        checkResults(aliquot.getCreatedAt(), aliquot.getCreatedAt());
     }
 
     @Override
@@ -80,11 +77,10 @@ public class AliquotInvoiceByPatientTest extends AbstractReportTest {
         List<Object> expectedResults = new ArrayList<Object>();
 
         for (SpecimenWrapper aliquot : filteredAliquots) {
-            // FIXME
-            // expectedResults.add(new Object[] { aliquot.getInventoryId(),
-            // aliquot.getProcessingEvent().getPatient().getPnumber(),
-            // aliquot.getProcessingEvent().getCenter().getName(),
-            // aliquot.getLinkDate(), aliquot.getSpecimenType().getName() });
+            expectedResults.add(new Object[] { aliquot.getInventoryId(),
+                aliquot.getCollectionEvent().getPatient().getPnumber(),
+                aliquot.getProcessingEvent().getCenter().getName(),
+                aliquot.getCreatedAt(), aliquot.getSpecimenType().getName() });
         }
 
         return expectedResults;

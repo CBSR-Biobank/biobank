@@ -78,11 +78,8 @@ public class AliquotRequestTest extends AbstractReportTest {
 
             Predicate<SpecimenWrapper> aliquotPnumber = new Predicate<SpecimenWrapper>() {
                 public boolean evaluate(SpecimenWrapper aliquot) {
-                    // FIXME
-                    // return
-                    // aliquot.getProcessingEvent().getPatient().getPnumber()
-                    // .equals(pnumber);
-                    return true;
+                    return aliquot.getCollectionEvent().getPatient()
+                        .getPnumber().equals(pnumber);
                 }
             };
 
@@ -129,10 +126,9 @@ public class AliquotRequestTest extends AbstractReportTest {
         Integer limit) {
 
         AliquotRequest request = new AliquotRequest();
-        // FIXME
-        // request.setPnumber(aliquot.getProcessingEvent().getPatient()
-        // .getPnumber());
-        // request.setDateDrawn(aliquot.getProcessingEvent().getDateDrawn());
+        request.setPnumber(aliquot.getCollectionEvent().getPatient()
+            .getPnumber());
+        request.setDateDrawn(aliquot.getParentSpecimen().getCreatedAt());
         request.setSpecimenTypeNameShort(aliquot.getSpecimenType()
             .getNameShort());
         request.setMaxAliquots(limit);

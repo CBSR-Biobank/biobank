@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.grids;
 
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
@@ -35,8 +34,6 @@ public class Drawer36Display extends AbstractContainerDisplay {
 
     public static final int HEIGHT = GRID_HEIGHT + 10;
 
-    private Boolean hasLegend = false;
-
     private static final int DRAWER_SIZE = 36;
 
     public int LEGEND_WIDTH = 70;
@@ -44,15 +41,9 @@ public class Drawer36Display extends AbstractContainerDisplay {
     public static int LEGEND_HEIGHT = 20;
 
     @Override
-    public void initLegend(List<UICellStatus> status) {
-        super.initLegend(status);
-        hasLegend = true;
-    }
-
-    @Override
     public Point getSizeToApply() {
         int fullHeight = HEIGHT;
-        if (hasLegend) {
+        if (legendStatus != null) {
             fullHeight += LEGEND_HEIGHT;
         }
         return new Point(WIDTH, fullHeight);
@@ -132,7 +123,7 @@ public class Drawer36Display extends AbstractContainerDisplay {
                 }
             }
         }
-        if (hasLegend) {
+        if (legendStatus != null) {
             for (int i = 0; i < legendStatus.size(); i++) {
                 UICellStatus status = legendStatus.get(i);
                 drawLegend(e, status.getColor(), i, status.getLegend());
@@ -200,7 +191,7 @@ public class Drawer36Display extends AbstractContainerDisplay {
     @Override
     public Point computeSize(int wHint, int hHint, boolean changed) {
         int fullHeight = HEIGHT;
-        if (hasLegend) {
+        if (legendStatus != null) {
             fullHeight += LEGEND_HEIGHT;
         }
         return new Point(WIDTH, fullHeight);

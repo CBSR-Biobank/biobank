@@ -41,6 +41,7 @@ public class VetoListenerSupport<T, V> {
     public static class Event<T, V> {
         private final T type;
         private final V object;
+        public boolean doit = true;
 
         public Event(T type, V object) {
             this.type = type;

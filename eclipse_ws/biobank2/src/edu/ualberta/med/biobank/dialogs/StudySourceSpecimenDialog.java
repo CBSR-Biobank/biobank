@@ -33,8 +33,6 @@ public class StudySourceSpecimenDialog extends PagedDialog {
 
     private ComboViewer typeName;
 
-    private Button timeDrawn;
-
     private Button volume;
 
     private SourceSpecimenWrapper internalSourceSpecimen;
@@ -60,8 +58,6 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         internalSourceSpecimen.setStudy(origSourceSpecimen.getStudy());
         internalSourceSpecimen.setSpecimenType(origSourceSpecimen
             .getSpecimenType());
-        internalSourceSpecimen.setNeedTimeDrawn(origSourceSpecimen
-            .getNeedTimeDrawn());
         internalSourceSpecimen.setNeedOriginalVolume(origSourceSpecimen
             .getNeedOriginalVolume());
     }
@@ -106,12 +102,6 @@ public class StudySourceSpecimenDialog extends PagedDialog {
                 }
             });
 
-        timeDrawn = (Button) createBoundWidgetWithLabel(contents, Button.class,
-            SWT.BORDER,
-            Messages.getString("SourceSpecimen.field.timeDrawn.label"),
-            new String[0], internalSourceSpecimen,
-            SourceSpecimenPeer.NEED_TIME_DRAWN.getName(), null);
-
         volume = (Button) createBoundWidgetWithLabel(contents, Button.class,
             SWT.BORDER,
             Messages.getString("SourceSpecimen.field.originalVolume.label"),
@@ -139,7 +129,6 @@ public class StudySourceSpecimenDialog extends PagedDialog {
             BiobankPlugin.openAsyncError("Error", e);
         }
         typeName.getCombo().deselectAll();
-        timeDrawn.setSelection(false);
         volume.setSelection(false);
     }
 
@@ -147,8 +136,6 @@ public class StudySourceSpecimenDialog extends PagedDialog {
     protected void copy(ModelWrapper<?> newModelObject) {
         ((SourceSpecimenWrapper) newModelObject)
             .setSpecimenType((internalSourceSpecimen).getSpecimenType());
-        ((SourceSpecimenWrapper) newModelObject)
-            .setNeedTimeDrawn((internalSourceSpecimen).getNeedTimeDrawn());
         ((SourceSpecimenWrapper) newModelObject)
             .setNeedOriginalVolume((internalSourceSpecimen)
                 .getNeedOriginalVolume());

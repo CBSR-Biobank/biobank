@@ -2,7 +2,7 @@
 <project name="schema" basedir="." default="schemaexport">
 
 <!--
-  Generates the schema for the model specified in ../data_model/biobank2.uml.
+  Generates the schema for the model specified in ../data_model/biobank.uml.
 
   See http://www.hibernate.org/hib_docs/reference/en/html/toolsetguide.html
   for more information.
@@ -13,17 +13,17 @@
   <property name="cacore.sdk.system.lib.dir"
     location="${cacore.sdk.dir}/system/lib" />
 
-  <property name="codegen.biobank2"
-    location="${cacore.sdk.dir}/output/biobank2" />
-  <property name="codegen.biobank2.src"
-    location="${codegen.biobank2}/src" />
-  <property name="codegen.biobank2.hibernate.properties"
-    location="${codegen.biobank2}/src/hibernate.cfg.xml" />
+  <property name="codegen.biobank"
+    location="${cacore.sdk.dir}/output/biobank" />
+  <property name="codegen.biobank.src"
+    location="${codegen.biobank}/src" />
+  <property name="codegen.biobank.hibernate.properties"
+    location="${codegen.biobank}/src/hibernate.cfg.xml" />
 
-  <path  id="codegen.biobank2.hibernate.schemaexport.classpath">
+  <path  id="codegen.biobank.hibernate.schemaexport.classpath">
     <path>
       <pathelement location="." />
-      <pathelement location="${codegen.biobank2.src}" />
+      <pathelement location="${codegen.biobank.src}" />
       <fileset dir="${cacore.sdk.system.lib.dir}" >
         <include name="**/*.jar" />
       </fileset>
@@ -32,11 +32,11 @@
 
   <target name="schemaexport">
     <taskdef  name="schemaexport"
-      classpathref="codegen.biobank2.hibernate.schemaexport.classpath"
+      classpathref="codegen.biobank.hibernate.schemaexport.classpath"
       classname="org.hibernate.tool.hbm2ddl.SchemaExportTask" />
 
     <schemaexport
-      config="${codegen.biobank2.hibernate.properties}"
+      config="${codegen.biobank.hibernate.properties}"
         quiet="no"
         text="no"
         drop="no"

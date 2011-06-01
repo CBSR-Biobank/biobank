@@ -30,7 +30,11 @@ public class ContainerLabelingSchemeWrapper extends
 
     public static final int SCHEME_CBSR_SBS = 5;
 
-    public static final String CBSR_LABELLING_PATTERN = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+    public static final int SCHEME_2_CHAR_ALPHA = 6;
+
+    public static final String CBSR_2_CHAR_LABELLING_PATTERN = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+
+    public static final String TWO_CHAR_LABELLING_PATTERN = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGHIJKLMNOP";
 
@@ -108,6 +112,13 @@ public class ContainerLabelingSchemeWrapper extends
 
                     case SCHEME_CBSR_SBS:
                         if (!scheme.getName().equals("CBSR SBS")) {
+                            throw new ApplicationException(
+                                "labeling scheme is not " + scheme.getName());
+                        }
+                        break;
+
+                    case SCHEME_2_CHAR_ALPHA:
+                        if (!scheme.getName().equals("2 char alphabetic")) {
                             throw new ApplicationException(
                                 "labeling scheme is not " + scheme.getName());
                         }
@@ -300,13 +311,57 @@ public class ContainerLabelingSchemeWrapper extends
             throw new Exception("Label should be " + scheme.getMinChars()
                 + " characters");
 
-        int index1 = CBSR_LABELLING_PATTERN.indexOf(label.charAt(len - 2));
-        int index2 = CBSR_LABELLING_PATTERN.indexOf(label.charAt(len - 1));
+        int index1 = CBSR_2_CHAR_LABELLING_PATTERN.indexOf(label
+            .charAt(len - 2));
+        int index2 = CBSR_2_CHAR_LABELLING_PATTERN.indexOf(label
+            .charAt(len - 1));
         if ((index1 < 0) || (index2 < 0)) {
             throw new Exception(
                 "Invalid characters in label. Are they in upper case?");
         }
-        int pos = index1 * CBSR_LABELLING_PATTERN.length() + index2;
+        int pos = index1 * CBSR_2_CHAR_LABELLING_PATTERN.length() + index2;
+
+        if (pos >= rowCap * colCap) {
+            String maxValue = ContainerLabelingSchemeWrapper
+                .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
+                    rowCap, colCap);
+            throw new Exception("Address  " + label + " does not exist"
+                + (containerTypeName == null ? "" : " in " + containerTypeName)
+                + ". Max value is " + maxValue + ". (Max row: " + rowCap
+                + ". Max col: " + colCap + ".)");
+        }
+        RowColPos rowColPos = new RowColPos();
+        rowColPos.row = pos % rowCap;
+        rowColPos.col = pos / rowCap;
+        return rowColPos;
+
+    }
+
+    /**
+     * get the RowColPos in the given container corresponding to the given label
+     * AB and will return 1:0.
+     */
+    public static RowColPos twoCharToRowCol(
+        WritableApplicationService appService, String label, int rowCap,
+        int colCap, String containerTypeName) throws Exception {
+        ContainerLabelingSchemeWrapper scheme = getLabelingSchemeById(
+            appService, SCHEME_2_CHAR_ALPHA);
+        if (scheme == null) {
+            throw new BiobankCheckException(
+                "2 char alphabetic labeling scheme not found");
+        }
+        int len = label.length();
+        if ((len != scheme.getMinChars()) && (len != scheme.getMaxChars()))
+            throw new Exception("Label should be " + scheme.getMinChars()
+                + " characters");
+
+        int index1 = TWO_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 2));
+        int index2 = TWO_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 1));
+        if ((index1 < 0) || (index2 < 0)) {
+            throw new Exception(
+                "Invalid characters in label. Are they in upper case?");
+        }
+        int pos = index1 * TWO_CHAR_LABELLING_PATTERN.length() + index2;
 
         if (pos >= rowCap * colCap) {
             String maxValue = ContainerLabelingSchemeWrapper
@@ -364,7 +419,7 @@ public class ContainerLabelingSchemeWrapper extends
     public static String rowColToCbsrTwoChar(RowColPos rcp, int totalRows,
         int totalCols) {
         int pos1, pos2, index;
-        int lettersLength = CBSR_LABELLING_PATTERN.length();
+        int lettersLength = CBSR_2_CHAR_LABELLING_PATTERN.length();
         if (totalRows == 1) {
             index = rcp.col;
         } else if (totalCols == 1) {
@@ -377,8 +432,37 @@ public class ContainerLabelingSchemeWrapper extends
         pos2 = index % lettersLength;
 
         if (pos1 >= 0 && pos2 >= 0) {
-            return String.valueOf(CBSR_LABELLING_PATTERN.charAt(pos1))
-                + String.valueOf(CBSR_LABELLING_PATTERN.charAt(pos2));
+            return String.valueOf(CBSR_2_CHAR_LABELLING_PATTERN.charAt(pos1))
+                + String.valueOf(CBSR_2_CHAR_LABELLING_PATTERN.charAt(pos2));
+        }
+        return null;
+    }
+
+    /**
+     * Convert a position in row*column to two letter (in the CBSR way)
+     * 
+     * @throws Exception
+     * 
+     * @throws BiobankCheckException
+     */
+    public static String rowColToTwoChar(RowColPos rcp, int totalRows,
+        int totalCols) {
+        int pos1, pos2, index;
+        int lettersLength = TWO_CHAR_LABELLING_PATTERN.length();
+        if (totalRows == 1) {
+            index = rcp.col;
+        } else if (totalCols == 1) {
+            index = rcp.row;
+        } else {
+            index = totalRows * rcp.col + rcp.row;
+        }
+
+        pos1 = index / lettersLength;
+        pos2 = index % lettersLength;
+
+        if (pos1 >= 0 && pos2 >= 0) {
+            return String.valueOf(TWO_CHAR_LABELLING_PATTERN.charAt(pos1))
+                + String.valueOf(TWO_CHAR_LABELLING_PATTERN.charAt(pos2));
         }
         return null;
     }
@@ -395,7 +479,8 @@ public class ContainerLabelingSchemeWrapper extends
      */
     public static String rowColToDewar(RowColPos rcp, Integer colCapacity) {
         int pos = rcp.col + (colCapacity * rcp.row);
-        String letter = String.valueOf(CBSR_LABELLING_PATTERN.charAt(pos));
+        String letter = String.valueOf(CBSR_2_CHAR_LABELLING_PATTERN
+            .charAt(pos));
         return letter + letter;
     }
 
@@ -452,6 +537,9 @@ public class ContainerLabelingSchemeWrapper extends
         case 5:
             // CBSR SBS
             return rowColtoCbsrSbs(rcp);
+        case 6:
+            // 2 char alphabetic
+            return rowColToTwoChar(rcp, rowCapacity, colCapacity);
         }
         return null;
     }

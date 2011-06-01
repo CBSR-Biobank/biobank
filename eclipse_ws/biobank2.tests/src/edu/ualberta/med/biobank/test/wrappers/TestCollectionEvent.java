@@ -43,7 +43,7 @@ public class TestCollectionEvent extends TestDatabase {
     public void setUp() throws Exception {
         super.setUp();
         study = StudyHelper.addStudy("Study - Processing Event Test "
-            + Utils.getRandomString(10));
+            + Utils.getRandomString(8, 15));
     }
 
     @Test
@@ -97,6 +97,53 @@ public class TestCollectionEvent extends TestDatabase {
             cevent.reload();
             Assert.assertEquals(patient, cevent.getPatient());
         }
+    }
+
+    @Test
+    public void testAddSourceSpecimens() throws Exception {
+        String name = "testAddSourceSpecimens" + r.nextInt();
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
+        StudyWrapper study = StudyHelper.addStudy("study" + name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.addToContactCollection(Arrays.asList(contact));
+        study.persist();
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study);
+        SpecimenTypeWrapper type = SpecimenTypeWrapper.getAllSpecimenTypes(
+            appService, false).get(0);
+        SpecimenWrapper[] newSpecs = new SpecimenWrapper[r.nextInt(10) + 3];
+        for (int i = 0; i < newSpecs.length; i++) {
+            newSpecs[i] = SpecimenHelper.newSpecimen(type);
+        }
+        CollectionEventWrapper cevent = CollectionEventHelper
+            .addCollectionEvent(clinic, patient1, 1, newSpecs);
+
+        // new sources specimens should also be in the all specimen list.
+        Assert
+            .assertEquals(newSpecs.length, cevent.getAllSpecimensCount(false));
+        Assert.assertEquals(newSpecs.length, cevent
+            .getOriginalSpecimenCollection(false).size());
+
+        // need to make sure is using a fresh object, as if we just retrieved
+        // the object from the database. We used to have a problem
+        // (org.hibernate.NonUniqueObjectException) when adding new specimen
+        // because of cascade on both specimen relations. see issue #1186
+        cevent.reload();
+        // adding a new source specimen
+        OriginInfoWrapper oi = new OriginInfoWrapper(appService);
+        oi.setCenter(clinic);
+        oi.persist();
+        SpecimenWrapper newSrcSpc = SpecimenHelper.newSpecimen(type);
+        newSrcSpc.setOriginInfo(oi);
+        newSrcSpc.setCollectionEvent(cevent);
+        newSrcSpc.setOriginalCollectionEvent(cevent);
+        cevent.addToOriginalSpecimenCollection(Arrays.asList(newSrcSpc));
+        cevent.persist();
+
+        cevent.reload();
+        Assert.assertEquals(newSpecs.length + 1,
+            cevent.getAllSpecimensCount(false));
+        Assert.assertEquals(newSpecs.length + 1, cevent
+            .getOriginalSpecimenCollection(false).size());
     }
 
     @Test
@@ -225,11 +272,11 @@ public class TestCollectionEvent extends TestDatabase {
     public void testGetSetEventAttrLabels() throws Exception {
         String name = "testGetSetEventAttrLabels" + r.nextInt();
         ClinicWrapper clinic = ClinicHelper.addClinic(name + "CLINIC1");
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
         addEventAttrs(study);
         List<String> labels = Arrays.asList(study.getStudyEventAttrLabels());
         Assert.assertEquals(5, labels.size());
 
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
         CollectionEventWrapper cevent = CollectionEventHelper
             .addCollectionEvent(clinic, patient, 1);
 
@@ -515,7 +562,7 @@ public class TestCollectionEvent extends TestDatabase {
     }
 
     private void addEventAttrs(StudyWrapper study) throws Exception {
-        // add PvAtt to study
+        // add Event Attr to study
         Collection<String> types = EventAttrTypeWrapper
             .getAllEventAttrTypesMap(appService).keySet();
         Assert.assertTrue("EventAttrTypes not initialized",
@@ -528,7 +575,6 @@ public class TestCollectionEvent extends TestDatabase {
         study.setStudyEventAttr("Visit", EventAttrTypeEnum.SELECT_SINGLE,
             new String[] { "v1", "v2", "v3", "v4" });
         study.persist();
-        study.reload();
     }
 
 }

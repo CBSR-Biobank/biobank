@@ -161,7 +161,8 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             new InventoryIdValidator(
                 excludeList,
                 Messages
-                    .getString("CEventSourceSpecimenDialog.field.inventoryID.validator.msg"))); //$NON-NLS-1$
+                    .getString("CEventSourceSpecimenDialog.field.inventoryID.validator.msg"), //$NON-NLS-1$
+                editedSpecimen));
         GridData gd = (GridData) inventoryIdWidget.getLayoutData();
         gd.horizontalSpan = 2;
 
@@ -287,14 +288,12 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         if (type != null) {
             ssw = mapStudySourceSpecimen.get(type.getName());
         }
-        boolean enableTimeDrawn = (type != null)
-            && (ssw == null || Boolean.TRUE.equals(ssw.getNeedTimeDrawn()));
         boolean enableVolume = (type != null)
             && (ssw == null || Boolean.TRUE.equals(ssw.getNeedOriginalVolume()));
         boolean isVolumeRequired = ssw != null
             && Boolean.TRUE.equals(ssw.getNeedOriginalVolume());
 
-        if (!enableTimeDrawn && defaultTimeDrawn != null) {
+        if (defaultTimeDrawn != null) {
             timeDrawnWidget.setDate(defaultTimeDrawn);
         }
         quantityLabel.setVisible(enableVolume);

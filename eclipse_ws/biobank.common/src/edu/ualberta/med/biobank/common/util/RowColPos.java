@@ -6,9 +6,9 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public static int PALLET_96_ROW_MAX = 8;
+    public static Integer PALLET_96_ROW_MAX = 8;
 
-    public static int PALLET_96_COL_MAX = 12;
+    public static Integer PALLET_96_COL_MAX = 12;
 
     public Integer row;
     public Integer col;

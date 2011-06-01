@@ -12,6 +12,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
@@ -19,7 +20,6 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
@@ -40,15 +40,14 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ProcessingEventEntryForm"; //$NON-NLS-1$
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(ProcessingEventEntryForm.class.getName());
-
     private static final String MSG_NEW_PEVENT_OK = Messages
         .getString("ProcessingEventEntryForm.creation.msg"); //$NON-NLS-1$
+
     private static final String MSG_PEVENT_OK = Messages
         .getString("ProcessingEventEntryForm.edition.msg"); //$NON-NLS-1$
 
     private ProcessingEventAdapter pEventAdapter;
+
     private ProcessingEventWrapper pEvent;
 
     private ComboViewer activityStatusComboViewer;
@@ -207,12 +206,29 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                     .getStudy()))
                         throw new VetoException(
                             "All specimens must be part of the same study.");
+                    else if (specimen.getProcessingEvent() != null) {
+                        throw new VetoException(
+                            "This specimen is already in processing event '"
+                                + specimen.getProcessingEvent().getWorksheet()
+                                + "' ("
+                                + specimen.getProcessingEvent()
+                                    .getFormattedCreatedAt()
+                                + "). Remove it from the other processing event first.");
+                    }
                     break;
                 case POST_ADD:
                     specimen.setProcessingEvent(pEvent);
                     pEvent.addToSpecimenCollection(Arrays.asList(specimen));
                     break;
                 case PRE_DELETE:
+                    if (specimen.getChildSpecimenCollection(false).size() > 0) {
+                        boolean ok = BiobankPlugin
+                            .openConfirm(
+                                "Parent specimen",
+                                "This specimen is the parent of aliquoted specimen. "
+                                    + "Are you sure you want to remove it from this processing event ?");
+                        event.doit = ok;
+                    }
                     break;
                 case POST_DELETE:
                     pEvent
@@ -256,14 +272,11 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         CenterWrapper<?> center = pEvent.getCenter();
         pEvent.reset();
         pEvent.setCenter(center);
-
         if (pEvent.isNew()) {
             pEvent.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         }
-
         GuiUtil.reset(activityStatusComboViewer, pEvent.getActivityStatus());
-
         specimenEntryWidget.setSpecimens(pEvent.getSpecimenCollection(true));
     }
 }

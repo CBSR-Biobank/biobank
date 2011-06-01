@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -70,6 +71,8 @@ public class AliquotedSpecimenSelectionWidget {
     private Label sourceLabel;
     private Label resultLabel;
 
+    private List<SpecimenTypeWrapper> sourceChildTypes = new ArrayList<SpecimenTypeWrapper>();
+
     public AliquotedSpecimenSelectionWidget(Composite parent, Character letter,
         WidgetCreator widgetCreator, boolean oneRow) {
         this.widgetCreator = widgetCreator;
@@ -97,6 +100,19 @@ public class AliquotedSpecimenSelectionWidget {
                     + spc.getInventoryId() + ")";
             }
         });
+        cvSource.addSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                if (!event.getSelection().isEmpty()) {
+                    SpecimenWrapper spc = (SpecimenWrapper) ((IStructuredSelection) event
+                        .getSelection()).getFirstElement();
+                    sourceChildTypes = spc.getSpecimenType()
+                        .getChildSpecimenTypeCollection(false);
+                }
+                if (cvResult != null)
+                    cvResult.refresh();
+            }
+        });
 
         if (!oneRow) {
             resultLabel = widgetCreator.createLabel(parent,
@@ -116,6 +132,14 @@ public class AliquotedSpecimenSelectionWidget {
                 return ((SpecimenTypeWrapper) element).getName();
             }
         });
+        // FIXME waiting for issue #1011 to be resolved
+        // cvResult.addFilter(new ViewerFilter() {
+        // @Override
+        // public boolean select(Viewer viewer, Object parentElement,
+        // Object element) {
+        // return sourceChildTypes.contains(element);
+        // }
+        // });
         if (oneRow) {
             textNumber = widgetCreator.getToolkit().createLabel(parent, "",
                 SWT.BORDER);

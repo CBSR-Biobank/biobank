@@ -11,9 +11,6 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
-import edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm;
-import edu.ualberta.med.biobank.forms.ScanAssignEntryForm;
-import edu.ualberta.med.biobank.forms.ScanLinkEntryForm;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 
 /**
@@ -37,8 +34,8 @@ public class ActivityLogAppender extends AppenderSkeleton {
     public ActivityLogAppender(String name) {
         setName(name);
         messageConsole = new MessageConsole(name, null);
-        ConsolePlugin.getDefault().getConsoleManager().addConsoles(
-            new IConsole[] { messageConsole });
+        ConsolePlugin.getDefault().getConsoleManager()
+            .addConsoles(new IConsole[] { messageConsole });
         consoleStream = messageConsole.newMessageStream();
         setLayout(layout);
         logsList = new ArrayList<LogInfo>();
@@ -72,8 +69,8 @@ public class ActivityLogAppender extends AppenderSkeleton {
 
     @Override
     public void close() {
-        ConsolePlugin.getDefault().getConsoleManager().removeConsoles(
-            new IConsole[] { messageConsole });
+        ConsolePlugin.getDefault().getConsoleManager()
+            .removeConsoles(new IConsole[] { messageConsole });
     }
 
     @Override

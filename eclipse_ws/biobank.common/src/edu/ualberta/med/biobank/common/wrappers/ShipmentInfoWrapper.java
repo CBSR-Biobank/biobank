@@ -24,11 +24,6 @@ public class ShipmentInfoWrapper extends ShipmentInfoBaseWrapper {
         super(appService, ship);
     }
 
-    @Override
-    protected List<Property<?, ? super ShipmentInfo>> getProperties() {
-        return ShipmentInfoPeer.PROPERTIES;
-    }
-
     public String getFormattedDateReceived() {
         return DateFormatter.formatAsDateTime(getReceivedAt());
     }

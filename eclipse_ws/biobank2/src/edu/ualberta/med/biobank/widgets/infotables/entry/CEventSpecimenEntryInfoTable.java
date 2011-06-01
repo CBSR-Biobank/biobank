@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -46,6 +47,8 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
         List<SpecimenTypeWrapper> allSpecimenTypes,
         final CollectionEventWrapper cEvent, final Date defaultTimeDrawn) {
         NewListener newListener = null;
+        List<SpecimenWrapper> excludeList = new ArrayList<SpecimenWrapper>(
+            currentSpecimens);
         if (add) {
             newListener = new NewListener() {
                 @Override
@@ -63,10 +66,12 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
                     notifyListeners();
                 }
             };
+        } else {
+            excludeList.remove(specimen);
         }
         CEventSourceSpecimenDialog dlg = new CEventSourceSpecimenDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            specimen, studySourceTypes, allSpecimenTypes, currentSpecimens,
+            specimen, studySourceTypes, allSpecimenTypes, excludeList,
             newListener, defaultTimeDrawn);
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
