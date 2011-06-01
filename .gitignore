@@ -18,6 +18,8 @@ eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/VarCharLengths.pro
 eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/version.properties
 eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/peer/*.java
 eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/base/*.java
+eclipse_ws/biobank.gui.common/bin
+eclipse_ws/biobank.gui.common/lib/*.jar
 eclipse_ws/biobank2.tools/bin
 eclipse_ws/biobank2.tools/lib
 eclipse_ws/biobank2.tools/output
