@@ -1,7 +1,10 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -16,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
 import edu.ualberta.med.biobank.dialogs.StudyAliquotedSpecimenDialog;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
@@ -37,14 +41,12 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
 
     private List<AliquotedSpecimenWrapper> deletedAliquotedSpecimen;
 
-    private SourceSpecimenWrapper sourceSpecimen;
+    private StudyWrapper study;
 
-    public AliquotedSpecimenEntryInfoTable(Composite parent,
-        SourceSpecimenWrapper sourceSpecimen) {
+    public AliquotedSpecimenEntryInfoTable(Composite parent, StudyWrapper study) {
         super(parent, null);
-        this.sourceSpecimen = sourceSpecimen;
-        selectedAliquotedSpecimen = sourceSpecimen
-            .getAliquotedSpecimenCollection(true);
+        this.study = study;
+        selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection(true);
         if (selectedAliquotedSpecimen == null) {
             selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
         }
@@ -66,47 +68,53 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     public void addAliquotedSpecimen() {
         AliquotedSpecimenWrapper asw = new AliquotedSpecimenWrapper(
             SessionManager.getAppService());
-        asw.setSourceSpecimen(sourceSpecimen);
+        asw.setStudy(study);
         addOrEditAliquotedSpecimen(true, asw);
     }
 
     private void addOrEditAliquotedSpecimen(boolean add,
         final AliquotedSpecimenWrapper aliquotedSpecimen) {
+        final Collection<SpecimenTypeWrapper> availableSpecimenTypes = getAvailableSpecimenTypes();
+        if (!add) {
+            availableSpecimenTypes.add(aliquotedSpecimen.getSpecimenType());
+        }
         NewListener newListener = null;
         if (add) {
             // only add to the collection when adding and not editing
             newListener = new NewListener() {
                 @Override
                 public void newAdded(ModelWrapper<?> spec) {
-                    AliquotedSpecimenWrapper asw = (AliquotedSpecimenWrapper) spec;
-                    asw.setSourceSpecimen(sourceSpecimen);
-                    selectedAliquotedSpecimen.add(asw);
-                    addedOrModifiedAliquotedSpecimen.add(asw);
+                    ((AliquotedSpecimenWrapper) spec).setStudy(study);
+                    availableSpecimenTypes.remove(aliquotedSpecimen
+                        .getSpecimenType());
+                    selectedAliquotedSpecimen
+                        .add((AliquotedSpecimenWrapper) spec);
+                    addedOrModifiedAliquotedSpecimen
+                        .add((AliquotedSpecimenWrapper) spec);
                     reloadCollection(selectedAliquotedSpecimen);
                     notifyListeners();
                 }
             };
         }
-        List<SpecimenTypeWrapper> dialogTypes = new ArrayList<SpecimenTypeWrapper>();
-        if (sourceSpecimen.getSpecimenType() != null)
-            dialogTypes.addAll(sourceSpecimen.getSpecimenType()
-                .getChildSpecimenTypeCollection(true));
-        for (AliquotedSpecimenWrapper asw : sourceSpecimen
-            .getAliquotedSpecimenCollection(false)) {
-            dialogTypes.remove(asw.getSpecimenType());
-        }
-        if (!add) {
-            dialogTypes.add(aliquotedSpecimen.getSpecimenType());
-        }
         StudyAliquotedSpecimenDialog dlg = new StudyAliquotedSpecimenDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            aliquotedSpecimen, newListener, dialogTypes);
+            aliquotedSpecimen, newListener, availableSpecimenTypes);
 
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
             reloadCollection(selectedAliquotedSpecimen);
             notifyListeners();
         }
+    }
+
+    private Collection<SpecimenTypeWrapper> getAvailableSpecimenTypes() {
+        Set<SpecimenTypeWrapper> availableSpecimenTypes = new HashSet<SpecimenTypeWrapper>();
+        for (SourceSpecimenWrapper ssw : study
+            .getSourceSpecimenCollection(false)) {
+            availableSpecimenTypes.addAll(ssw.getSpecimenType()
+                .getChildSpecimenTypeCollection(false));
+        }
+        return availableSpecimenTypes;
     }
 
     private void addEditSupport() {
@@ -167,8 +175,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     }
 
     public void reload() {
-        selectedAliquotedSpecimen = sourceSpecimen
-            .getAliquotedSpecimenCollection(true);
+        selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection(true);
         if (selectedAliquotedSpecimen == null) {
             selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
         }

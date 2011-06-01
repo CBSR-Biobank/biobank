@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.wrappers.base.SourceSpecimenBaseWrapper;
@@ -46,23 +45,6 @@ public class SourceSpecimenWrapper extends SourceSpecimenBaseWrapper {
     protected void persistDependencies(SourceSpecimen origObject)
         throws Exception {
         deleteAliquotedSpecimens();
-    }
-
-    @Override
-    public void addToAliquotedSpecimenCollection(
-        List<AliquotedSpecimenWrapper> AliquotedSpecimenCollection) {
-        super.addToAliquotedSpecimenCollection(AliquotedSpecimenCollection);
-
-        // make sure previously deleted ones, that have been re-added, are
-        // no longer deleted
-        deletedAliquotedSpecimens.removeAll(AliquotedSpecimenCollection);
-    }
-
-    @Override
-    public void removeFromAliquotedSpecimenCollection(
-        List<AliquotedSpecimenWrapper> AliquotedSpecimensToRemove) {
-        deletedAliquotedSpecimens.addAll(AliquotedSpecimensToRemove);
-        super.removeFromAliquotedSpecimenCollection(AliquotedSpecimensToRemove);
     }
 
     @Override

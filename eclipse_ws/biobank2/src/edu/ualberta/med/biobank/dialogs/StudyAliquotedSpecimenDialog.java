@@ -91,7 +91,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         if (availableSpecimenTypes.size() > 0)
             return Messages.getString("AliquotedSpecimenDialog.msg");
         else
-            return "No more aliquoted specimen type can be derived from the selected source specimen type.";
+            return "No more aliquoted specimen type can be derived from the study source specimen types.";
     }
 
     @Override
