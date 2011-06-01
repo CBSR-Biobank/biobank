@@ -297,7 +297,8 @@ public class User implements Serializable, NotAProxy {
                 .getCenters(appService);
             workingCenters = new ArrayList<CenterWrapper<?>>();
             for (CenterWrapper<?> center : allCenters) {
-                if (getWorkingCenterIds().contains(center.getId())) {
+                if (getWorkingCenterIds().contains(center.getId())
+                    || isInSuperAdminMode()) {
                     workingCenters.add(center);
                 }
             }

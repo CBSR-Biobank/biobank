@@ -27,8 +27,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -289,23 +287,8 @@ public abstract class BiobankFormBase extends EditorPart implements
 
     protected void addSectionToolbar(Section section, String tooltip,
         SelectionListener listener, Class<?> wrapperTypeToAdd, String imageKey) {
-        if (wrapperTypeToAdd == null
-            || SessionManager.canCreate(wrapperTypeToAdd)) {
-            ToolBar tbar = (ToolBar) section.getTextClient();
-            if (tbar == null) {
-                tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
-                section.setTextClient(tbar);
-            }
-
-            ToolItem titem = new ToolItem(tbar, SWT.NULL);
-            if (imageKey == null) {
-                imageKey = BiobankPlugin.IMG_ADD;
-            }
-            titem.setImage(BiobankPlugin.getDefault().getImageRegistry()
-                .get(imageKey));
-            titem.setToolTipText(tooltip);
-            titem.addSelectionListener(listener);
-        }
+        widgetCreator.addSectionToolbar(section, tooltip, listener,
+            wrapperTypeToAdd, imageKey);
     }
 
     public FormToolkit getToolkit() {

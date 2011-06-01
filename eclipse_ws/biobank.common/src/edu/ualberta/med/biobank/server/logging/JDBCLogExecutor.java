@@ -89,6 +89,7 @@ public class JDBCLogExecutor implements Runnable {
         Connection con = null;
         try {
             if (getDbDriverClass() != null) {
+                System.out.println("driver class=" + getDbDriverClass());
                 Class.forName(getDbDriverClass());
             }
             con = DriverManager.getConnection(getDbUrl(), getDbUser(),
@@ -113,6 +114,7 @@ public class JDBCLogExecutor implements Runnable {
     }
 
     public void setDbDriverClass(String dbDriverClass) {
+        System.out.println("setDbDriver:" + dbDriverClass);
         this.dbDriverClass = dbDriverClass;
     }
 

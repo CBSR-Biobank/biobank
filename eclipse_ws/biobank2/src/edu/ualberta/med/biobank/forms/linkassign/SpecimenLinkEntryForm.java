@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms.linkassign;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -433,16 +434,14 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         List<SpecimenWrapper> availableSourceSpecimens = linkFormPatientManagement
             .getParentSpecimenForPEventAndCEvent();
         if (authorizedTypesInContainers != null) {
-            // FIXME wiating for issue #1011 to be done
             // availableSourceSpecimen should be parents of the authorized Types
             // !
-            // List<SpecimenWrapper> filteredSpecs = new
-            // ArrayList<SpecimenWrapper>();
-            // for (SpecimenWrapper spec : availableSourceSpecimens)
-            // if (!Collections.disjoint(authorizedTypesInContainers, spec
-            // .getSpecimenType().getChildSpecimenTypeCollection(false)))
-            // filteredSpecs.add(spec);
-            // availableSourceSpecimens = filteredSpecs;
+            List<SpecimenWrapper> filteredSpecs = new ArrayList<SpecimenWrapper>();
+            for (SpecimenWrapper spec : availableSourceSpecimens)
+                if (!Collections.disjoint(authorizedTypesInContainers, spec
+                    .getSpecimenType().getChildSpecimenTypeCollection(false)))
+                    filteredSpecs.add(spec);
+            availableSourceSpecimens = filteredSpecs;
         }
         // for multiple
         for (int row = 0; row < specimenTypesWidgets.size(); row++) {
@@ -483,6 +482,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
+        // FIXME need to use BatchQuery
+
         OriginInfoWrapper originInfo = new OriginInfoWrapper(
             SessionManager.getAppService());
         originInfo

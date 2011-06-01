@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets.infotables;
+package edu.ualberta.med.biobank.widgets.trees.infos;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,7 +11,6 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -21,14 +20,21 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
+import edu.ualberta.med.biobank.widgets.trees.infos.listener.IInfoTreeAddItemListener;
+import edu.ualberta.med.biobank.widgets.trees.infos.listener.IInfoTreeDeleteItemListener;
+import edu.ualberta.med.biobank.widgets.trees.infos.listener.IInfoTreeEditItemListener;
+import edu.ualberta.med.biobank.widgets.trees.infos.listener.InfoTreeEvent;
 
 /**
  * Used to display tabular information for an object in the object model or
@@ -65,7 +71,7 @@ import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
  * @param <T> The model object wrapper the table is based on.
  * 
  */
-public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
+public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
 
     /*
      * see http://lekkimworld.com/2008/03/27/setting_table_row_height_in_swt
@@ -73,9 +79,9 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
      */
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(InfoTableWidget.class.getName());
+        .getLogger(InfoTreeWidget.class.getName());
 
-    protected List<BiobankCollectionModel> model;
+    protected List<Node> model;
 
     protected ListenerList addItemListeners = new ListenerList();
 
@@ -87,24 +93,26 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     private MenuItem editItem;
 
-    public InfoTableWidget(Composite parent, List<T> collection,
+    private List<Node> modelSubList;
+
+    public InfoTreeWidget(Composite parent, List<T> collection,
         String[] headings) {
         super(parent, collection, headings, null, 5);
-        addTableClickListener();
+        addTreeClickListener();
     }
 
-    public InfoTableWidget(Composite parent, List<T> collection,
+    public InfoTreeWidget(Composite parent, List<T> collection,
         String[] headings, int rowsPerPage) {
         super(parent, collection, headings, null, rowsPerPage);
-        addTableClickListener();
+        addTreeClickListener();
     }
 
-    private void addTableClickListener() {
-        tableViewer.addDoubleClickListener(new IDoubleClickListener() {
+    private void addTreeClickListener() {
+        treeViewer.addDoubleClickListener(new IDoubleClickListener() {
             @Override
             public void doubleClick(DoubleClickEvent event) {
                 if (doubleClickListeners.size() > 0) {
-                    InfoTableWidget.this.doubleClick();
+                    InfoTreeWidget.this.doubleClick();
                 }
             }
         });
@@ -129,7 +137,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
     protected void init(List<T> collection) {
         reloadData = true;
 
-        model = new ArrayList<BiobankCollectionModel>();
+        model = new ArrayList<Node>();
         initModel(collection);
     }
 
@@ -144,7 +152,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
             paginationRequired = true;
             if (pageInfo.page == pageInfo.pageTotal)
                 pageInfo.page--;
-            getTableViewer().refresh();
+            getTreeViewer().refresh();
         } else
             paginationRequired = false;
     }
@@ -161,9 +169,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
     }
 
     protected BiobankCollectionModel getSelectionInternal() {
-        Assert.isTrue(!tableViewer.getTable().isDisposed(),
-            "widget is disposed");
-        IStructuredSelection stSelection = (IStructuredSelection) tableViewer
+        Assert.isTrue(!treeViewer.getTree().isDisposed(), "widget is disposed");
+        IStructuredSelection stSelection = (IStructuredSelection) treeViewer
             .getSelection();
 
         return (BiobankCollectionModel) stSelection.getFirstElement();
@@ -179,7 +186,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
         model.clear();
         for (int i = 0, n = collection.size(); i < n; ++i) {
-            model.add(new BiobankCollectionModel(i));
+            model.add(new BiobankCollectionModel(root, i));
         }
 
     }
@@ -190,7 +197,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     @Override
     public boolean setFocus() {
-        tableViewer.getControl().setFocus();
+        treeViewer.getControl().setFocus();
         return true;
     }
 
@@ -211,10 +218,9 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
     }
 
     @Override
-    protected void tableLoader(final List<T> collection, final T selection) {
-        final TableViewer viewer = getTableViewer();
-        final Table table = viewer.getTable();
-        Display display = viewer.getTable().getDisplay();
+    protected void treeLoader(final List<T> collection, final T selection) {
+        final Tree tree = treeViewer.getTree();
+        Display display = tree.getDisplay();
 
         initModel(collection);
 
@@ -226,14 +232,13 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
             end = model.size();
         }
 
-        final List<BiobankCollectionModel> modelSubList = model.subList(start,
-            end);
+        modelSubList = model.subList(start, end);
 
         display.syncExec(new Runnable() {
             @Override
             public void run() {
-                if (!table.isDisposed()) {
-                    tableViewer.setInput(modelSubList);
+                if (!tree.isDisposed()) {
+                    treeViewer.refresh();
                 }
             }
         });
@@ -241,9 +246,10 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         try {
             BiobankCollectionModel selItem = null;
             for (int i = start; i < end; ++i) {
-                if (table.isDisposed())
+                if (tree.isDisposed())
                     return;
-                final BiobankCollectionModel item = model.get(i);
+                final BiobankCollectionModel item = (BiobankCollectionModel) model
+                    .get(i);
                 Assert.isNotNull(item != null);
                 if (reloadData || (item.o == null)) {
                     item.o = getCollectionModelObject(collection
@@ -253,8 +259,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
                 display.syncExec(new Runnable() {
                     @Override
                     public void run() {
-                        if (!table.isDisposed()) {
-                            viewer.refresh(item, false);
+                        if (!tree.isDisposed()) {
+                            treeViewer.refresh(item, true);
                         }
                     }
                 });
@@ -269,12 +275,12 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
             display.syncExec(new Runnable() {
                 @Override
                 public void run() {
-                    if (!table.isDisposed()) {
+                    if (!tree.isDisposed()) {
                         if (paginationRequired) {
                             enablePaginationWidget(true);
                         }
                         if (selectedItem != null) {
-                            tableViewer.setSelection(new StructuredSelection(
+                            treeViewer.setSelection(new StructuredSelection(
                                 selectedItem));
                         }
                     }
@@ -286,7 +292,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
     }
 
     @SuppressWarnings("unused")
-    public Object getCollectionModelObject(T item) throws Exception {
+    public Object getCollectionModelObject(Object item) throws Exception {
         return item;
     }
 
@@ -294,9 +300,9 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
-        Object object = item.o;
-        Assert.isNotNull(object);
-        return object;
+        Object type = item.o;
+        Assert.isNotNull(type);
+        return type;
     }
 
     public void addClickListener(IDoubleClickListener listener) {
@@ -307,7 +313,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                ModelWrapper<?> selection = (ModelWrapper<?>) InfoTableWidget.this
+                ModelWrapper<?> selection = (ModelWrapper<?>) InfoTreeWidget.this
                     .getSelection();
                 if (selection != null) {
                     AdapterBase adapter = AdapterFactory.getAdapter(selection);
@@ -325,8 +331,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         // get selection as derived class object
         Object selection = getSelection();
 
-        final DoubleClickEvent event = new DoubleClickEvent(tableViewer,
-            new InfoTableSelection(selection));
+        final DoubleClickEvent event = new DoubleClickEvent(treeViewer,
+            new InfoTreeSelection(selection));
         Object[] listeners = doubleClickListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
             final IDoubleClickListener l = (IDoubleClickListener) listeners[i];
@@ -339,7 +345,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         }
     }
 
-    public void addAddItemListener(IInfoTableAddItemListener listener) {
+    public void addAddItemListener(IInfoTreeAddItemListener listener) {
         addItemListeners.add(listener);
 
         Assert.isNotNull(menu);
@@ -353,7 +359,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         });
     }
 
-    public void addEditItemListener(IInfoTableEditItemListener listener) {
+    public void addEditItemListener(IInfoTreeEditItemListener listener) {
         editItemListeners.add(listener);
 
         Assert.isNotNull(menu);
@@ -367,7 +373,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         });
     }
 
-    public void addDeleteItemListener(IInfoTableDeleteItemListener listener) {
+    public void addDeleteItemListener(IInfoTreeDeleteItemListener listener) {
         deleteItemListeners.add(listener);
 
         Assert.isNotNull(menu);
@@ -382,11 +388,11 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
     }
 
     protected void addItem() {
-        InfoTableSelection selection = new InfoTableSelection(getSelection());
-        final InfoTableEvent event = new InfoTableEvent(this, selection);
+        InfoTreeSelection selection = new InfoTreeSelection(getSelection());
+        final InfoTreeEvent event = new InfoTreeEvent(this, selection);
         Object[] listeners = addItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTableAddItemListener l = (IInfoTableAddItemListener) listeners[i];
+            final IInfoTreeAddItemListener l = (IInfoTreeAddItemListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {
@@ -397,11 +403,11 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
     }
 
     protected void editItem() {
-        InfoTableSelection selection = new InfoTableSelection(getSelection());
-        final InfoTableEvent event = new InfoTableEvent(this, selection);
+        InfoTreeSelection selection = new InfoTreeSelection(getSelection());
+        final InfoTreeEvent event = new InfoTreeEvent(this, selection);
         Object[] listeners = editItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTableEditItemListener l = (IInfoTableEditItemListener) listeners[i];
+            final IInfoTreeEditItemListener l = (IInfoTreeEditItemListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {
@@ -412,11 +418,11 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
     }
 
     protected void deleteItem() {
-        InfoTableSelection selection = new InfoTableSelection(getSelection());
-        final InfoTableEvent event = new InfoTableEvent(this, selection);
+        InfoTreeSelection selection = new InfoTreeSelection(getSelection());
+        final InfoTreeEvent event = new InfoTreeEvent(this, selection);
         Object[] listeners = deleteItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTableDeleteItemListener l = (IInfoTableDeleteItemListener) listeners[i];
+            final IInfoTreeDeleteItemListener l = (IInfoTreeDeleteItemListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {
@@ -505,4 +511,29 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
             + pageInfo.pageTotal);
     }
 
+    @Override
+    protected List<Node> getRootChildren() {
+        if (modelSubList == null)
+            return Collections.emptyList();
+        return modelSubList;
+    }
+
+    @Override
+    protected List<Node> getNodeChildren(Node node) throws Exception {
+        if (node == root) {
+            return node.getChildren();
+        }
+        return Collections.emptyList();
+    }
+
+    protected List<Node> createNodes(Node parent, List<?> objects)
+        throws Exception {
+        List<Node> nodes = new ArrayList<Node>();
+        for (int i = 0, n = objects.size(); i < n; ++i) {
+            BiobankCollectionModel model = new BiobankCollectionModel(parent, i);
+            model.o = getCollectionModelObject(objects.get(i));
+            nodes.add(model);
+        }
+        return nodes;
+    }
 }

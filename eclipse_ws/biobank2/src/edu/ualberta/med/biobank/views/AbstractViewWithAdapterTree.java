@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
-import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
+import edu.ualberta.med.biobank.widgets.trees.AdapterTreeWidget;
 
 public abstract class AbstractViewWithAdapterTree extends
     AbstractViewWithTree<AdapterBase> {

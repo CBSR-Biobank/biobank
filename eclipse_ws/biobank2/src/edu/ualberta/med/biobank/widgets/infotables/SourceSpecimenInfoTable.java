@@ -34,7 +34,6 @@ public class SourceSpecimenInfoTable extends
 
     private final static String[] HEADINGS = new String[] {
         Messages.getString("SourceSpecimen.field.type.label"),
-        Messages.getString("SourceSpecimen.field.timeDrawn.label"),
         Messages.getString("SourceSpecimen.field.originalVolume.label") };
 
     public SourceSpecimenInfoTable(Composite parent,

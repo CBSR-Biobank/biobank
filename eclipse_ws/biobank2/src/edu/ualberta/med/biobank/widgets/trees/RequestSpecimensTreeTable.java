@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.trees;
 
 import java.util.List;
 
@@ -32,6 +32,9 @@ import edu.ualberta.med.biobank.forms.utils.RequestTableGroup;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankClipboard;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
 public class RequestSpecimensTreeTable extends BiobankWidget {
 

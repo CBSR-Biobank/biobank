@@ -8,7 +8,7 @@ USAGE="
 Usage: $SCRIPT [OPTIONS]
 
 OPTIONS
-  -d DUMP     The original biobank2 database dump file name.
+  -d DUMP     The original biobank database dump file name.
   -H DBHOST   The hostname of the machine running the MySQL server. Defaults to
               localhost if not specified.
   -u DBUSER   The user to use on the MySQL server.

@@ -618,3 +618,4 @@ insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
 	values ((select id from specimen_type where name='urine cup'),
 	(select id from specimen_type where name='UrineSA900'));
+

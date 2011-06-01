@@ -47,8 +47,9 @@ public class ExceptionInterceptor implements ThrowsAdvice {
             PropertyValueException.class, ValueNotSetException.class);
         getNotNullPropertyValueException(cause, ae);
         if (cause != null && cause instanceof ValueNotSetException) {
-            ValueNotSetException pve = (ValueNotSetException) cause;
-            throw new ValueNotSetException(pve.getPropertyName(), ae);
+            ValueNotSetException vnse = (ValueNotSetException) cause;
+            throw new ValueNotSetException(vnse.getPropertyName(),
+                vnse.getObjectName(), ae);
         }
         throw ae;
     }
@@ -69,9 +70,12 @@ public class ExceptionInterceptor implements ThrowsAdvice {
         Throwable originalMainEx) throws ValueNotSetException {
         if (cause != null && cause instanceof PropertyValueException) {
             PropertyValueException pve = (PropertyValueException) cause;
-            if (pve.getMessage().startsWith("not-null"))
+            if (pve.getMessage().startsWith("not-null")) {
+                String objectName = pve.getEntityName();
+                int i = objectName.lastIndexOf(".");
                 throw new ValueNotSetException(pve.getPropertyName(),
-                    originalMainEx);
+                    objectName.substring(i + 1), originalMainEx);
+            }
         }
     }
 

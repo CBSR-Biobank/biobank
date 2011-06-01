@@ -4,7 +4,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
-import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
+import edu.ualberta.med.biobank.widgets.trees.AdapterTreeWidget;
 
 /**
  * This view contains a tree view that represents the link to the server and the

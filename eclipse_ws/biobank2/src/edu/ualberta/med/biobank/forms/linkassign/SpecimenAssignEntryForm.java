@@ -850,6 +850,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
+        // FIXME might need to use batch query
+
         if (mode.isSingleMode())
             saveSingleSpecimen();
         else
