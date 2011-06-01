@@ -34,7 +34,7 @@
   <property name="secu-log.dir" location="security-logs" />
   <property name="product.dir" location="${basedir}/product" />
   <property name="database.host" value="localhost" />
-  <property name="database.name" value="biobank3" />
+  <property name="database.name" value="biobank" />
   <property name="database.username" value="dummy" />
   <property name="database.password" value="ozzy498" />
   <property name="req.jars.dir" value="jars" />
