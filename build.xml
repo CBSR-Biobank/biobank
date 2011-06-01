@@ -830,7 +830,7 @@
 
   <!-- copied from sdk build.xml -->
   <target name="package-webapp-orm"
-          depends="sdk-nodeps,sdk-files,log4j-conf,package-codegen-orm,build-common-project">
+          depends="sdk-nodeps,sdk-files,prepare-webapp-orm,log4j-conf,package-codegen-orm,build-common-project">
     <war destfile="${cacore.sdk.dir}/${package.system.dir}/${PROJECT_NAME}.war"
          webxml="${cacore.sdk.dir}/${build.conf.web-inf.dir}/web.xml">
       <manifest>
