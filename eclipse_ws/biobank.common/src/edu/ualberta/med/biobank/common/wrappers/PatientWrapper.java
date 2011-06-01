@@ -279,24 +279,13 @@ public class PatientWrapper extends PatientBaseWrapper {
             if (!cevents.isEmpty()) {
                 patient2.removeFromCollectionEventCollection(cevents);
                 Set<CollectionEventWrapper> toAdd = new HashSet<CollectionEventWrapper>();
-                List<CollectionEventWrapper> toDelete = new ArrayList<CollectionEventWrapper>();
                 boolean merged = false;
                 for (CollectionEventWrapper p2event : cevents) {
                     for (CollectionEventWrapper p1event : getCollectionEventCollection(false))
                         if (p1event.getVisitNumber().equals(
                             p2event.getVisitNumber())) {
                             // merge collection event
-                            List<SpecimenWrapper> ospecs = p2event
-                                .getOriginalSpecimenCollection(false);
-                            p1event.addToOriginalSpecimenCollection(ospecs);
-                            List<SpecimenWrapper> aspecs = p2event
-                                .getAllSpecimenCollection(false);
-                            p1event.addToAllSpecimenCollection(aspecs);
-                            p2event
-                                .removeFromOriginalSpecimenCollection(ospecs);
-                            p2event.removeFromAllSpecimenCollection(aspecs);
-                            toDelete.add(p2event);
-                            p1event.persist();
+                            p1event.merge(p2event);
                             merged = true;
                         }
                     if (!merged)
@@ -308,12 +297,9 @@ public class PatientWrapper extends PatientBaseWrapper {
                     addMe.setPatient(this);
                     addMe.persist();
                 }
-                for (CollectionEventWrapper deleteMe : toDelete) {
-                    deleteMe.persist();
-                    deleteMe.delete();
-                }
-                patient2.delete();
+
                 persist();
+                patient2.delete();
 
                 ((BiobankApplicationService) appService).logActivity("merge",
                     null, patient2.getPnumber(), null, null,
