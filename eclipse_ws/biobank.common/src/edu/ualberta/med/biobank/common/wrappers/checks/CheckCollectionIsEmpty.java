@@ -7,13 +7,13 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.wrappers.BiobankCheck;
+import edu.ualberta.med.biobank.common.wrappers.BiobankWrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
 
-public class CheckCollectionIsEmpty<E> extends BiobankCheck<E> {
+public class CheckCollectionIsEmpty<E> extends BiobankWrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_MESSAGE = "{0} {1} has one or more {2}.";
     private static final String COUNT_HQL = "SELECT m.{0}.size FROM {1} m WHERE m = ?";

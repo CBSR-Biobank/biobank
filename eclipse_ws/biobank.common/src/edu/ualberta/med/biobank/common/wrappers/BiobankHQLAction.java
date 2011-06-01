@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import gov.nih.nci.system.query.hql.SearchHQLQuery;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -21,8 +21,8 @@ public abstract class BiobankHQLAction extends SearchHQLQuery implements
     BiobankSessionAction {
     private static final long serialVersionUID = 1L;
 
-    public BiobankHQLAction(String hql, List<Object> parameters) {
-        super(hql, parameters);
+    public BiobankHQLAction(String hql, Object... parameters) {
+        super(hql, Arrays.asList(parameters));
     }
 
     @Override
@@ -35,8 +35,8 @@ public abstract class BiobankHQLAction extends SearchHQLQuery implements
             i++;
         }
 
-        // TODO: is this appropriate?
-        return null;
+        List<?> results = query.list();
+        return doResults(results);
     }
 
     /**
@@ -44,8 +44,9 @@ public abstract class BiobankHQLAction extends SearchHQLQuery implements
      * parameters.
      * 
      * @param results
-     * @throws BiobankServerException
+     * @return whatever you want.
+     * @throws BiobankSessionException
      */
-    public abstract void doResults(List<?> results)
-        throws BiobankServerException;
+    public abstract Object doResults(List<?> results)
+        throws BiobankSessionException;
 }

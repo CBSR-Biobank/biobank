@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.test.wrappers.checks;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -54,5 +56,17 @@ public class TestChecks extends TestDatabase {
 
         tx.commit();
 
+    }
+
+    @Test
+    public void checkNumbers() throws Exception {
+        Integer i = 0;
+        Long l = 0L;
+
+        if (!i.equals(l)) {
+            System.out.println("not equal!");
+        }
+
+        Assert.assertEquals(i, l);
     }
 }

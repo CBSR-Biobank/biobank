@@ -10,24 +10,26 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-import edu.ualberta.med.biobank.common.wrappers.BiobankCheck;
+import edu.ualberta.med.biobank.common.wrappers.BiobankWrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 
-public class CheckUnique<E> extends BiobankCheck<E> {
+public class CheckUnique<E> extends BiobankWrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_STRING = "There already exists a {0} ({1}) with property value(s) ({2}) for ({3}), respectively. These field(s) must be unique.";
 
     private final Property<? extends Serializable, ? super E> idProperty;
     private final Collection<Property<?, E>> properties;
+    private final String modelString;
 
     protected CheckUnique(ModelWrapper<E> wrapper,
         Collection<Property<?, E>> properties) {
         super(wrapper);
         this.idProperty = wrapper.getIdProperty();
         this.properties = properties;
+        this.modelString = wrapper.toString();
     }
 
     @Override
@@ -50,7 +52,6 @@ public class CheckUnique<E> extends BiobankCheck<E> {
         for (Property<?, E> property : properties) {
             String name = property.getName();
             Object value = property.get(model);
-
             criteria.add(Restrictions.eq(name, value));
         }
 
@@ -59,7 +60,6 @@ public class CheckUnique<E> extends BiobankCheck<E> {
 
         if (count == null || count > 0) {
             String modelClass = Format.modelClass(getModelClass());
-            String modelString = getModelString();
             String values = Format.propertyValues(model, properties);
             String names = Format.propertyNames(properties);
 

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,13 +8,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.Check;
+import edu.ualberta.med.biobank.common.wrappers.checks.CheckHQLResult;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -21,6 +21,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
+    private static final String USED_BY_SPECIMENS_ERRMSG = "Unable to delete specimen type {0}. Specimens of this type exists in storage. Remove all instances before deleting this type.";
 
     public SpecimenTypeWrapper(WritableApplicationService appService,
         SpecimenType wrappedObject) {
@@ -64,20 +65,6 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return new ArrayList<SpecimenTypeWrapper>(SpecimenTypes);
     }
 
-    @Override
-    public boolean checkIntegrity() {
-        return true;
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankException, ApplicationException {
-        if (isUsedBySpecimens()) {
-            throw new BiobankDeleteException("Unable to delete specimen type "
-                + getName() + ". Specimens of this type exists in storage."
-                + " Remove all instances before deleting this type.");
-        }
-    }
-
     public static final String ALL_SAMPLE_TYPES_QRY = "from "
         + SpecimenType.class.getName();
 
@@ -97,31 +84,6 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     }
 
     @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        checkNameAndShortNameUnique();
-    }
-
-    /**
-     * This method should only be called to save the new sample type list.
-     */
-    public static void persistSpecimenTypes(
-        List<SpecimenTypeWrapper> addedOrModifiedTypes,
-        List<SpecimenTypeWrapper> typesToDelete) throws BiobankCheckException,
-        Exception {
-        if (addedOrModifiedTypes != null) {
-            for (SpecimenTypeWrapper ss : addedOrModifiedTypes) {
-                ss.persist();
-            }
-        }
-        if (typesToDelete != null) {
-            for (SpecimenTypeWrapper ss : typesToDelete) {
-                ss.delete();
-            }
-        }
-    }
-
-    @Override
     public int compareTo(ModelWrapper<SpecimenType> wrapper) {
         if (wrapper instanceof SpecimenTypeWrapper) {
             String name1 = wrappedObject.getName();
@@ -138,29 +100,60 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return getName();
     }
 
-    public static final String IS_USED_BY_SPECIMENS_QRY = "select count(s) from "
-        + Specimen.class.getName() + " as s where s."
+    public static final String IS_USED_BY_SPECIMENS_HQL = "select count(s) from "
+        + Specimen.class.getName()
+        + " as s where s."
         + SpecimenPeer.SPECIMEN_TYPE.getName() + "=?)";
 
     public boolean isUsedBySpecimens() throws ApplicationException,
         BiobankQueryResultSizeException {
-        HQLCriteria c = new HQLCriteria(IS_USED_BY_SPECIMENS_QRY,
+        if (isNew())
+            return false;
+        HQLCriteria c = new HQLCriteria(IS_USED_BY_SPECIMENS_HQL,
             Arrays.asList(new Object[] { wrappedObject }));
         return getCountResult(appService, c) > 0;
     }
 
     @Override
-    public void reload() throws Exception {
-        super.reload();
+    protected TaskList getPersistTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(Check.unique(this, SpecimenTypePeer.NAME));
+        tasks.add(Check.unique(this, SpecimenTypePeer.NAME_SHORT));
+
+        tasks.add(Check.notNull(this, SpecimenTypePeer.NAME));
+        tasks.add(Check.notNull(this, SpecimenTypePeer.NAME_SHORT));
+
+        tasks.add(super.getPersistTasks());
+
+        return tasks;
     }
 
-    public void checkNameAndShortNameUnique() throws ApplicationException,
-        BiobankException {
-        checkNoDuplicates(SpecimenType.class, SpecimenTypePeer.NAME.getName(),
-            getName(), "A sample type with name");
-        checkNoDuplicates(SpecimenType.class,
-            SpecimenTypePeer.NAME_SHORT.getName(), getNameShort(),
-            "A sample type with name short");
+    @Override
+    protected TaskList getDeleteTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(checkIsUsedBySpecimens());
+        tasks.add(super.getDeleteTasks());
+
+        return tasks;
     }
 
+    private BiobankSessionAction checkIsUsedBySpecimens() {
+        List<?> expected = Arrays.asList(new Long(0));
+        String msg = MessageFormat.format(USED_BY_SPECIMENS_ERRMSG, getName());
+        return new CheckHQLResult(expected, msg, IS_USED_BY_SPECIMENS_HQL,
+            wrappedObject);
+    }
+
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        getPersistTasks().execute(appService);
+    }
+
+    @Override
+    public void delete() throws Exception {
+        getDeleteTasks().execute(appService);
+    }
 }
