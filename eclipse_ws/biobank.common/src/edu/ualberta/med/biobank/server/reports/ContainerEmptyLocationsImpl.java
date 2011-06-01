@@ -20,12 +20,13 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
         + "    inner join fetch c.containerType"
         + "    ," + Container.class.getName() + " parent "
         + " WHERE parent.id in (" + CONTAINER_LIST + ")"
-        + "     and (c.path LIKE parent.path || '/%' OR c.id=parent.id) "
-        + "     and c.label LIKE ? || '%' "
-        + "     and c.containerType.specimenTypeCollection.size > 0"
-        + "     and (c.containerType.capacity.rowCapacity " 
-        + "          * c.containerType.capacity.colCapacity)"
-        + "     > c.container.specimenPositionCollection.size";
+        + "    and (c.path LIKE if(length(parent.path),parent.path || '/','') || parent.id || '/%' " 
+        + "         OR c.id=parent.id) "
+        + "    and c.label LIKE ? || '%' "
+        + "    and c.containerType.specimenTypeCollection.size > 0"
+        + "    and (c.containerType.capacity.rowCapacity " 
+        + "         * c.containerType.capacity.colCapacity)"
+        + "        > c.specimenPositionCollection.size";
     // @formatter:on 
 
     public ContainerEmptyLocationsImpl(BiobankReport report) {

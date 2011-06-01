@@ -22,6 +22,25 @@ ALTER TABLE request
       ADD CONSTRAINT FK6C1A7E6F80AB67E FOREIGN KEY FK6C1A7E6F80AB67E (REQUESTER_ID) REFERENCES center (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 /*****************************************************
+ * Container
+ ****************************************************/
+
+ALTER TABLE container
+      ADD COLUMN TOP_CONTAINER_ID INT(11) NULL DEFAULT NULL,
+      ADD COLUMN PATH varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+      ADD INDEX PATH_IDX (PATH),
+      ADD INDEX FK8D995C611BE0C379 (TOP_CONTAINER_ID),
+      ADD CONSTRAINT FK8D995C611BE0C379 FOREIGN KEY FK8D995C611BE0C379 (TOP_CONTAINER_ID) REFERENCES container (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+update container c, container_path cp
+       set c.path=if(locate('/',cp.path) > 0,
+           substr(cp.path,1,length(cp.path) - locate('/',reverse(cp.path))),''),
+       c.top_container_id=cp.top_container_id
+       where c.id=cp.container_id;
+
+DROP TABLE IF EXISTS container_path;
+
+/*****************************************************
  * Origin info
  ****************************************************/
 
