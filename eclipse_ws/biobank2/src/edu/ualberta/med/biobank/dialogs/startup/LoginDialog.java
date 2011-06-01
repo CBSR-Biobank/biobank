@@ -410,14 +410,14 @@ public class LoginDialog extends TitleAreaDialog {
     private void selectWorkingCenter(SessionHelper sessionHelper) {
         List<CenterWrapper<?>> workingCenters = null;
         try {
-            if (sessionHelper.getUser().isInSuperAdminMode()) {
-                // in super admin mode, can use all centers
-                workingCenters = CenterWrapper.getCenters(sessionHelper
-                    .getAppService());
-            } else {
-                workingCenters = sessionHelper.getUser().getWorkingCenters(
-                    sessionHelper.getAppService());
-            }
+            // if (sessionHelper.getUser().isInSuperAdminMode()) {
+            // // in super admin mode, can use all centers
+            // workingCenters = CenterWrapper.getCenters(sessionHelper
+            // .getAppService());
+            // } else {
+            workingCenters = sessionHelper.getUser().getWorkingCenters(
+                sessionHelper.getAppService());
+            // }
         } catch (Exception e) {
             BiobankPlugin
                 .openAsyncError(Messages
