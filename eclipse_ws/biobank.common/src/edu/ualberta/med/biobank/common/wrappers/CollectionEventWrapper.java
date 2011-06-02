@@ -6,8 +6,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -37,6 +39,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     private Map<String, EventAttrWrapper> eventAttrMap;
 
+    private Set<SpecimenWrapper> deletedSourceSpecimens = new HashSet<SpecimenWrapper>();
+
     public CollectionEventWrapper(WritableApplicationService appService) {
         super(appService);
     }
@@ -48,12 +52,14 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     private void removeFromSpecimenCollections(
         List<SpecimenWrapper> specimenCollection) {
+        deletedSourceSpecimens.addAll(specimenCollection);
         super.removeFromAllSpecimenCollection(specimenCollection);
         super.removeFromOriginalSpecimenCollection(specimenCollection);
     }
 
     private void removeFromSpecimenCollectionsWithCheck(
         List<SpecimenWrapper> specimenCollection) throws BiobankCheckException {
+        deletedSourceSpecimens.addAll(specimenCollection);
         super.removeFromAllSpecimenCollectionWithCheck(specimenCollection);
         super.removeFromOriginalSpecimenCollectionWithCheck(specimenCollection);
     }
@@ -86,6 +92,16 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     public void addToOriginalSpecimenCollection(List<SpecimenWrapper> specs) {
         super.addToOriginalSpecimenCollection(specs);
         super.addToAllSpecimenCollection(specs);
+        deletedSourceSpecimens.removeAll(specs);
+    }
+
+    private void deleteSpecimens() throws Exception {
+        // FIXME delete only if no children ??
+        for (SpecimenWrapper sv : deletedSourceSpecimens) {
+            if (!sv.isNew()) {
+                sv.delete();
+            }
+        }
     }
 
     @Override
@@ -133,6 +149,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     @Override
     protected void persistDependencies(CollectionEvent origObject)
         throws Exception {
+        deleteSpecimens();
         if (eventAttrMap != null) {
             setWrapperCollection(CollectionEventPeer.EVENT_ATTR_COLLECTION,
                 eventAttrMap.values());
