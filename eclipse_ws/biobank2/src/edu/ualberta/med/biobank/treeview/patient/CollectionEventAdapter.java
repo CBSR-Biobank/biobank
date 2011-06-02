@@ -51,20 +51,24 @@ public class CollectionEventAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        String tabName;
-        if (modelObject.isNew()) {
-            tabName = Messages.getString("CollectionEventEntryForm.title.new");
-            try {
-                ((CollectionEventWrapper) modelObject)
-                    .setActivityStatus(ActivityStatusWrapper
-                        .getActiveActivityStatus(SessionManager.getAppService()));
-            } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Error",
-                    "Unable to create collection event.");
-            }
-        } else
-            tabName = Messages.getString("CollectionEventEntryForm.title.edit",
-                ((CollectionEventWrapper) modelObject).getVisitNumber());
+        String tabName = null;
+        if (modelObject != null)
+            if (modelObject.isNew()) {
+                tabName = Messages
+                    .getString("CollectionEventEntryForm.title.new");
+                try {
+                    ((CollectionEventWrapper) modelObject)
+                        .setActivityStatus(ActivityStatusWrapper
+                            .getActiveActivityStatus(SessionManager
+                                .getAppService()));
+                } catch (Exception e) {
+                    BiobankPlugin.openAsyncError("Error",
+                        "Unable to create collection event.");
+                }
+            } else
+                tabName = Messages.getString(
+                    "CollectionEventEntryForm.title.edit",
+                    ((CollectionEventWrapper) modelObject).getVisitNumber());
         return tabName;
     }
 
