@@ -527,7 +527,7 @@
                     definitionId="biobank2.loggedIn">
               </reference>
               <reference
-                    definitionId="biobank2.isCBSR">
+                    definitionId="biobank2.hasClinicShipmentRights">
               </reference>
             </and>
          </activeWhen>
@@ -773,6 +773,9 @@
               </reference>
               <reference
                     definitionId="biobank2.loggedIn">
+              </reference>
+              <reference
+                    definitionId="biobank2.hasDispatchRights">
               </reference>
             </and>
          </activeWhen>
@@ -1045,6 +1048,12 @@
                   icon="icons/dispatch_add.png"
                   label="Add Dispatch"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.hasDispatchRights">
+                  </reference>
+               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
@@ -1054,7 +1063,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.isCBSR">
+                        definitionId="biobank2.hasClinicShipmentRights">
                   </reference>
                </visibleWhen>
             </command>
@@ -1386,9 +1395,14 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
+                  <and>
                   <reference
                         definitionId="biobank2.processingPerspectiveSelected">
                   </reference>
+                  <reference
+                        definitionId="biobank2.hasDispatchRights">
+                  </reference>
+                  </and>
                </visibleWhen>
             </command>
             <command
@@ -1403,7 +1417,7 @@
                         definitionId="biobank2.processingPerspectiveSelected">
                   </reference>
 				  <reference
-                        definitionId="biobank2.isCBSR">
+                        definitionId="biobank2.hasClinicShipmentRights">
                   </reference>
                   </and>
                </visibleWhen>
@@ -2496,14 +2510,23 @@
           </with>
        </definition>
        <definition
-             id="biobank2.isCBSR">
+             id="biobank2.hasClinicShipmentRights">
           <with
-                variable="edu.ualberta.med.biobank.sourceprovider.isCBSR">
+                variable="edu.ualberta.med.biobank.sourceprovider.clinicShipmentRights">
              <equals
                    value="true">
              </equals>
           </with>
        </definition>
+  	   <definition
+             id="biobank2.hasDispatchRights">
+          <with
+                variable="edu.ualberta.med.biobank.sourceprovider.dispatchRights">
+             <equals
+                   value="true">
+             </equals>
+          </with>
+       </definition>       
    </extension>
    <extension
          point="org.eclipse.ui.startup">
