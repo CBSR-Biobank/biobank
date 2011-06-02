@@ -526,6 +526,9 @@
               <reference
                     definitionId="biobank2.loggedIn">
               </reference>
+              <reference
+                    definitionId="biobank2.hasClinicShipmentRights">
+              </reference>
             </and>
          </activeWhen>
          <enabledWhen>
@@ -770,6 +773,9 @@
               </reference>
               <reference
                     definitionId="biobank2.loggedIn">
+              </reference>
+              <reference
+                    definitionId="biobank2.hasDispatchRights">
               </reference>
             </and>
          </activeWhen>
@@ -1042,12 +1048,24 @@
                   icon="icons/dispatch_add.png"
                   label="Add Dispatch"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.hasDispatchRights">
+                  </reference>
+               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
                   icon="icons/shipment_add.png"
                   label="Add Shipment"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.hasClinicShipmentRights">
+                  </reference>
+               </visibleWhen>
             </command>
             <separator
                   name="biobank2.separator3"
@@ -1377,9 +1395,14 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
+                  <and>
                   <reference
                         definitionId="biobank2.processingPerspectiveSelected">
                   </reference>
+                  <reference
+                        definitionId="biobank2.hasDispatchRights">
+                  </reference>
+                  </and>
                </visibleWhen>
             </command>
             <command
@@ -1389,9 +1412,14 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
+                  <and>
                   <reference
                         definitionId="biobank2.processingPerspectiveSelected">
                   </reference>
+				  <reference
+                        definitionId="biobank2.hasClinicShipmentRights">
+                  </reference>
+                  </and>
                </visibleWhen>
             </command>
             <command
@@ -2481,6 +2509,24 @@
              </equals>
           </with>
        </definition>
+       <definition
+             id="biobank2.hasClinicShipmentRights">
+          <with
+                variable="edu.ualberta.med.biobank.sourceprovider.clinicShipmentRights">
+             <equals
+                   value="true">
+             </equals>
+          </with>
+       </definition>
+  	   <definition
+             id="biobank2.hasDispatchRights">
+          <with
+                variable="edu.ualberta.med.biobank.sourceprovider.dispatchRights">
+             <equals
+                   value="true">
+             </equals>
+          </with>
+       </definition>       
    </extension>
    <extension
          point="org.eclipse.ui.startup">

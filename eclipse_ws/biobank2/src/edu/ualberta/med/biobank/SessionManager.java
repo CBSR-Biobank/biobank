@@ -139,10 +139,8 @@ public class SessionManager {
         SessionState sessionSourceProvider = (SessionState) service
             .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
         sessionSourceProvider.setLoggedInState(sessionAdapter != null);
-        sessionSourceProvider.setSuperAdminMode(sessionAdapter != null
-            && sessionAdapter.getUser().isInSuperAdminMode());
-        sessionSourceProvider.setHasWorkingCenter(sessionAdapter != null
-            && sessionAdapter.getUser().getCurrentWorkingCenter() != null);
+        sessionSourceProvider.setUser(sessionAdapter == null ? null
+            : sessionAdapter.getUser());
 
         // assign debug state
         DebugState debugStateSourceProvider = (DebugState) service

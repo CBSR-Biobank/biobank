@@ -34,7 +34,7 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private BiobankText sampleTypeLabel;
 
-    private BiobankText linkDateLabel;
+    private BiobankText createdDateLabel;
 
     private BiobankText volumeLabel;
 
@@ -49,6 +49,8 @@ public class SpecimenViewForm extends BiobankViewForm {
     private BiobankText positionLabel;
 
     private DispatchInfoTable dispatchInfoTable;
+
+    private BiobankText collectionLabel;
 
     @Override
     public void init() throws Exception {
@@ -102,15 +104,19 @@ public class SpecimenViewForm extends BiobankViewForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-        centerLabel = createReadOnlyLabelledField(client, SWT.NONE, "Center");
         sampleTypeLabel = createReadOnlyLabelledField(client, SWT.NONE, "Type");
-        linkDateLabel = createReadOnlyLabelledField(client, SWT.NONE, "Created");
+        createdDateLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Created");
         volumeLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Volume (ml)");
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
+        centerLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Current center");
         positionLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Position");
+        collectionLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Collection");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
         commentLabel = createReadOnlyLabelledField(client,
@@ -164,7 +170,7 @@ public class SpecimenViewForm extends BiobankViewForm {
     private void setValues() {
         setTextValue(centerLabel, specimen.getCurrentCenter().getNameShort());
         setTextValue(sampleTypeLabel, specimen.getSpecimenType().getName());
-        setTextValue(linkDateLabel, specimen.getFormattedCreatedAt());
+        setTextValue(createdDateLabel, specimen.getFormattedCreatedAt());
         setTextValue(volumeLabel, specimen.getQuantity() == null ? null
             : specimen.getQuantity().toString());
         setTextValue(studyLabel, specimen.getCollectionEvent().getPatient()
@@ -172,6 +178,7 @@ public class SpecimenViewForm extends BiobankViewForm {
         setTextValue(patientLabel, specimen.getCollectionEvent().getPatient()
             .getPnumber());
         setTextValue(positionLabel, specimen.getPositionString(true, false));
+        setTextValue(collectionLabel, specimen.getCollectionInfo());
         setTextValue(activityStatusLabel, specimen.getActivityStatus());
         setTextValue(commentLabel, specimen.getComment());
 

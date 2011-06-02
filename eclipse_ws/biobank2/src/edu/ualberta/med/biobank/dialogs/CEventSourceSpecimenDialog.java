@@ -311,7 +311,6 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
     @Override
     protected ModelWrapper<Specimen> getNew() {
         return new SpecimenWrapper(SessionManager.getAppService());
-
     }
 
     @Override
@@ -336,17 +335,13 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
     @Override
     protected void copy(ModelWrapper<?> newModelObject) {
-        ((SpecimenWrapper) newModelObject).setInventoryId(internalSpecimen
-            .getInventoryId());
-        ((SpecimenWrapper) newModelObject).setSpecimenType(internalSpecimen
-            .getSpecimenType());
-        ((SpecimenWrapper) newModelObject).setQuantity(internalSpecimen
-            .getQuantity());
-        ((SpecimenWrapper) newModelObject).setCreatedAt(internalSpecimen
-            .getCreatedAt());
-        ((SpecimenWrapper) newModelObject).setComment(internalSpecimen
-            .getComment());
-        ((SpecimenWrapper) newModelObject).setActivityStatus(internalSpecimen
-            .getActivityStatus());
+        SpecimenWrapper spec = (SpecimenWrapper) newModelObject;
+        spec.setInventoryId(internalSpecimen.getInventoryId());
+        spec.setSpecimenType(internalSpecimen.getSpecimenType());
+        spec.setQuantity(internalSpecimen.getQuantity());
+        spec.setCreatedAt(internalSpecimen.getCreatedAt());
+        spec.setComment(internalSpecimen.getComment());
+        spec.setActivityStatus(internalSpecimen.getActivityStatus());
+        excludeList.add(spec);
     }
 }

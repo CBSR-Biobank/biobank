@@ -532,4 +532,13 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     protected void setTopSpecimenInternal(SpecimenWrapper specimen) {
         super.setTopSpecimen(specimen);
     }
+
+    /**
+     * return a string with collection date (different from created at if it is
+     * an aliquoted specimen) + the collection center
+     */
+    public String getCollectionInfo() {
+        return getTopSpecimen().getFormattedCreatedAt() + " in "
+            + getTopSpecimen().getOriginInfo().getCenter().getNameShort();
+    }
 }

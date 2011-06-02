@@ -6,6 +6,8 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class AdapterBasePropertyTester extends PropertyTester {
 
+    public static final String CAN_DELETE = "canDelete";
+
     public AdapterBasePropertyTester() {
     }
 
@@ -14,9 +16,8 @@ public class AdapterBasePropertyTester extends PropertyTester {
         Object expectedValue) {
         if (receiver instanceof AdapterBase) {
             AdapterBase adapter = (AdapterBase) receiver;
-            if (property.equals("canDelete")) {
+            if (CAN_DELETE.equals(property))
                 return adapter.isDeletable();
-            }
         }
         return false;
     }
