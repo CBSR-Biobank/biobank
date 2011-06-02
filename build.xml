@@ -1053,9 +1053,11 @@
   </target>
 
 
-  <target name="product" depends="eclipse.home.env,deploy">
-    <property name="buildDirectory" value="${product.dir}/buildDirectory" />
+  <target name="product" depends="eclipse.home.env,deploy" description="build the product">
+  	<!-- buildDirectory is the folder where the plugins and products are found and build -->
+    <property name="buildDirectory" value="${product.dir}/buildDirectory" />  	  	
     <delete dir="${buildDirectory}" />
+  	<!-- plugins and features are copied into the buildDirectory -->
     <copy todir="${buildDirectory}/plugins/biobank2">
       <fileset dir="${eclipse.workspace.dir}/biobank2" />
     </copy>
@@ -1068,6 +1070,12 @@
     <copy todir="${buildDirectory}/plugins/sampleProcessingRobot">
       <fileset dir="${eclipse.workspace.dir}/sampleProcessingRobot" />
     </copy>
+  	<copy todir="${buildDirectory}/plugins/barcodeGenerator">
+  	  <fileset dir="${eclipse.workspace.dir}/barcodeGenerator" />
+  	</copy>
+  	<copy todir="${buildDirectory}/plugins/biobank.gui.common">
+  	  <fileset dir="${eclipse.workspace.dir}/biobank.gui.common" />
+  	</copy>  	
     <copy todir="${buildDirectory}/features/biobank2.feature.core">
       <fileset dir="${eclipse.workspace.dir}/biobank2.feature.core" />
     </copy>
@@ -1107,7 +1115,8 @@
     <antcall target="updateSiteMetadata" />
   </target>
 
-  <target name="updateSiteMetadata" depends="eclipse.home.env">
+
+  <target name="updateSiteMetadata" depends="eclipse.home.env" description="Build the update site folder">
     <property name="buildDirectory" value="${product.dir}/buildDirectory" />
     <property name="updateSiteFolder" value="${buildDirectory}/updateSite" />
     <copy todir="${updateSiteFolder}/features/">
