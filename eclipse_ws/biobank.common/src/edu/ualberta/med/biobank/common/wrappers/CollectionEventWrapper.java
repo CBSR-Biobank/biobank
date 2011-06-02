@@ -533,4 +533,17 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             return (Integer) result.get(0) + 1;
     }
 
+    public void merge(CollectionEventWrapper p2event) throws Exception {
+        List<SpecimenWrapper> ospecs = p2event
+            .getOriginalSpecimenCollection(false);
+        List<SpecimenWrapper> aspecs = p2event.getAllSpecimenCollection(false);
+        for (SpecimenWrapper aspec : aspecs) {
+            if (ospecs.contains(aspec))
+                aspec.setOriginalCollectionEvent(this);
+            aspec.setCollectionEvent(this);
+            aspec.persist();
+        }
+        p2event.delete();
+    }
+
 }

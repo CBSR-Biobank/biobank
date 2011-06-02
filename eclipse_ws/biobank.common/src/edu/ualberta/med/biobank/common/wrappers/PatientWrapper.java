@@ -279,21 +279,13 @@ public class PatientWrapper extends PatientBaseWrapper {
             if (!cevents.isEmpty()) {
                 patient2.removeFromCollectionEventCollection(cevents);
                 Set<CollectionEventWrapper> toAdd = new HashSet<CollectionEventWrapper>();
-                List<CollectionEventWrapper> toDelete = new ArrayList<CollectionEventWrapper>();
                 boolean merged = false;
                 for (CollectionEventWrapper p2event : cevents) {
                     for (CollectionEventWrapper p1event : getCollectionEventCollection(false))
                         if (p1event.getVisitNumber().equals(
                             p2event.getVisitNumber())) {
-                            p1event.addToOriginalSpecimenCollection(p2event
-                                .getOriginalSpecimenCollection(false));
-                            p1event.addToAllSpecimenCollection(p2event
-                                .getAllSpecimenCollection(false));
-                            for (SpecimenWrapper spec : p2event
-                                .getAllSpecimenCollection(false))
-                                spec.setCollectionEvent(p1event);
-                            toDelete.add(p2event);
-                            p1event.persist();
+                            // merge collection event
+                            p1event.merge(p2event);
                             merged = true;
                         }
                     if (!merged)
@@ -305,12 +297,9 @@ public class PatientWrapper extends PatientBaseWrapper {
                     addMe.setPatient(this);
                     addMe.persist();
                 }
-                for (CollectionEventWrapper deleteMe : toDelete) {
-                    deleteMe.persist();
-                    deleteMe.delete();
-                }
-                patient2.delete();
+
                 persist();
+                patient2.delete();
 
                 ((BiobankApplicationService) appService).logActivity("merge",
                     null, patient2.getPnumber(), null, null,
