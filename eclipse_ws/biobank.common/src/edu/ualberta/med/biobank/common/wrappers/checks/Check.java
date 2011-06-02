@@ -34,12 +34,24 @@ public class Check {
 
     public static <E> CheckCollectionIsEmpty<E> empty(ModelWrapper<E> wrapper,
         Property<? extends Collection<?>, ? super E> property) {
-        return new CheckCollectionIsEmpty<E>(wrapper, property);
+        return new CheckCollectionIsEmpty<E>(wrapper, property, null);
     }
 
     public static <E> CheckCollectionIsEmpty<E> empty(ModelWrapper<E> wrapper,
-        Property<? extends Collection<?>, ? super E> property, String msg) {
-        return new CheckCollectionIsEmpty<E>(wrapper, property, msg);
+        Property<? extends Collection<?>, ? super E> property, String exceptionMessage) {
+        return new CheckCollectionIsEmpty<E>(wrapper, property, exceptionMessage);
+    }
+
+    public static <E, T> CheckNotUsed<E> notUsed(ModelWrapper<E> wrapper,
+        Property<? super E, ? super T> property, Class<T> propertyClass) {
+        return new CheckNotUsed<E>(wrapper, property, propertyClass, null);
+    }
+
+    public static <E, T> CheckNotUsed<E> notUsed(ModelWrapper<E> wrapper,
+        Property<? super E, ? super T> property, Class<T> propertyClass,
+        String exceptionMessage) {
+        return new CheckNotUsed<E>(wrapper, property, propertyClass,
+            exceptionMessage);
     }
 
     public static Long getCountFromResult(List<?> results) {

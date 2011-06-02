@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.Check;
-import edu.ualberta.med.biobank.common.wrappers.checks.CheckHQLResult;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -101,8 +100,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     }
 
     public static final String HAS_SPECIMENS_HQL = "select count(s) from "
-        + Specimen.class.getName()
-        + " as s where s."
+        + Specimen.class.getName() + " as s where s."
         + SpecimenPeer.SPECIMEN_TYPE.getName() + "=?)";
 
     public boolean isUsedBySpecimens() throws ApplicationException,
@@ -133,17 +131,13 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     protected TaskList getDeleteTasks() {
         TaskList tasks = new TaskList();
 
-        tasks.add(checkIsUsedBySpecimens());
+        String isUsedMsg = MessageFormat.format(HAS_SPECIMENS_MSG, getName());
+        tasks.add(Check.notUsed(this, SpecimenPeer.SPECIMEN_TYPE,
+            Specimen.class, isUsedMsg));
+
         tasks.add(super.getDeleteTasks());
 
         return tasks;
-    }
-
-    private BiobankSessionAction checkIsUsedBySpecimens() {
-        List<?> expected = Arrays.asList(new Long(0));
-        String msg = MessageFormat.format(HAS_SPECIMENS_MSG, getName());
-        return new CheckHQLResult(expected, msg, HAS_SPECIMENS_HQL,
-            wrappedObject);
     }
 
     // TODO: remove this override when all persist()-s are like this!

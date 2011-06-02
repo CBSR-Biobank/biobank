@@ -21,6 +21,7 @@ public class PropertyFieldBuilder {
         "\tpublic static final Property<" + Token.PROPERTY_CLASS + ", " + Token.MODEL_CLASS + "> " + Token.VARIABLE_NAME + " = Property.create("
         + "\n\t\t\"" + Token.PROPERTY_NAME + "\""
         + "\n\t\t, new TypeReference<" + Token.PROPERTY_CLASS + ">() {}"
+//        + "\n\t\t, " + Token.MODEL_CLASS + ".class"
         + "\n\t\t, new Property.Accessor<" + Token.PROPERTY_CLASS + ", " + Token.MODEL_CLASS + ">() { private static final long serialVersionUID = 1L;"
         + "\n\t\t\t@Override"
         + "\n\t\t\tpublic " + Token.PROPERTY_CLASS + " get(" + Token.MODEL_CLASS + " model) {"

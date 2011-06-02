@@ -5,11 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShippingMethodPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ShippingMethodBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.Check;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -31,29 +31,12 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankDeleteException,
-        ApplicationException {
-        List<ShipmentInfoWrapper> shipments = ShipmentInfoWrapper
-            .getAllShipmentInfosByMethod(appService, this);
-        if (shipments != null && shipments.size() > 0) {
-            throw new BiobankDeleteException(
-                "Cannot delete this shipping company: shipments are still using it");
-        }
-    }
-
-    @Override
     public boolean equals(Object object) {
         if (object instanceof ShippingMethodWrapper)
             return ((ShippingMethodWrapper) object).getName().equals(
                 this.getName());
         else
             return false;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        checkUnique();
     }
 
     @Override
@@ -80,16 +63,19 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
         return getName();
     }
 
-    private static final String IS_USED_QRY = "select count(si) from "
+    private static final String IS_USED_HQL = "select count(si) from "
         + ShipmentInfo.class.getName() + " as si where si."
         + ShipmentInfoPeer.SHIPPING_METHOD.getName() + "=?";
 
     public boolean isUsed() throws ApplicationException, BiobankException {
-        HQLCriteria c = new HQLCriteria(IS_USED_QRY,
+        if (isNew())
+            return false;
+        HQLCriteria c = new HQLCriteria(IS_USED_HQL,
             Arrays.asList(new Object[] { wrappedObject }));
         return getCountResult(appService, c) > 0;
     }
 
+    // TODO: is this needed anymore?
     public static void persistShippingMethods(
         List<ShippingMethodWrapper> addedOrModifiedTypes,
         List<ShippingMethodWrapper> typesToDelete)
@@ -112,9 +98,38 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
             && !name.equals(DROP_OFF_NAME);
     }
 
-    public void checkUnique() throws BiobankException, ApplicationException {
-        checkNoDuplicates(ShippingMethod.class,
-            ShippingMethodPeer.NAME.getName(), getName(),
-            "A shipping method with name");
+    @Override
+    protected TaskList getPersistTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(Check.unique(this, ShippingMethodPeer.NAME));
+        tasks.add(Check.notNull(this, ShippingMethodPeer.NAME));
+
+        tasks.add(super.getPersistTasks());
+
+        return tasks;
+    }
+
+    @Override
+    protected TaskList getDeleteTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(Check.notUsed(this, ShipmentInfoPeer.SHIPPING_METHOD,
+            ShipmentInfo.class));
+
+        tasks.add(super.getDeleteTasks());
+
+        return tasks;
+    }
+
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        getPersistTasks().execute(appService);
+    }
+
+    @Override
+    public void delete() throws Exception {
+        getDeleteTasks().execute(appService);
     }
 }

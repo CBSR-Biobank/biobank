@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers.checks;
 
 import java.text.MessageFormat;
-import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -11,40 +10,42 @@ import edu.ualberta.med.biobank.common.wrappers.BiobankWrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 
-class CheckCollectionIsEmpty<E> extends BiobankWrapperAction<E> {
+class CheckNotUsed<E> extends BiobankWrapperAction<E> {
     private static final long serialVersionUID = 1L;
-    private static final String EXCEPTION_MESSAGE = "{0} {1} has one or more {2}.";
-    private static final String COUNT_HQL = "SELECT m.{0}.size FROM {1} m WHERE m = ?";
+    private static final String EXCEPTION_MESSAGE = "{0} {1} is still in use by {2}.";
+    private static final String COUNT_HQL = "SELECT count(m) FROM {0} m WHERE m.{1} = ?";
 
-    private final Property<?, ? super E> property;
+    private final Property<? super E, ?> property;
+    private final Class<?> propertyClass;
     private final String modelString;
     private final String exceptionMessage;
 
     /**
-     * Check that the {@code Collection} {@code Property} of the given
-     * {@code ModelWrapper} has a size of zero.
+     * Check that the model object in the {@code ModelWrapper} is not used by
+     * the given {@code Property}.
      * 
      * @param wrapper to get the model object from
-     * @param property the collection to ensure has size zero
-     * @param exceptionMessage (optional) will override a default message
-     *            generated if the collection is not empty. Set to null if you
-     *            want to use the default message.
+     * @param property the property of another object that references the model
+     *            object
+     * @param exceptionMessage the message in the {@code ModelIsUsedException}
+     *            thrown if this model object is used.
      */
-    CheckCollectionIsEmpty(ModelWrapper<E> wrapper,
-        Property<? extends Collection<?>, ? super E> property,
-        String exceptionMessage) {
+    <T> CheckNotUsed(ModelWrapper<E> wrapper,
+        Property<? super E, ? super T> property, Class<T> propertyClass,
+        String errorMessage) {
         super(wrapper);
+        this.propertyClass = propertyClass;
         this.property = property;
         this.modelString = wrapper.toString();
-        this.exceptionMessage = exceptionMessage;
+        this.exceptionMessage = errorMessage;
     }
 
     @Override
     public Object doAction(Session session) throws BiobankSessionException {
-        String hql = MessageFormat.format(COUNT_HQL, property.getName(),
-            getModelClass().getName());
+        String hql = MessageFormat.format(COUNT_HQL, propertyClass.getName(),
+            property.getName());
         Query query = session.createQuery(hql);
         query.setParameter(0, getModel());
 
@@ -53,7 +54,7 @@ class CheckCollectionIsEmpty<E> extends BiobankWrapperAction<E> {
 
         if (count == null || count > 0) {
             String message = getExceptionMessage();
-            throw new CollectionNotEmptyException(message);
+            throw new ModelIsUsedException(message);
         }
 
         return null;
@@ -64,10 +65,10 @@ class CheckCollectionIsEmpty<E> extends BiobankWrapperAction<E> {
 
         if (exceptionMessage == null) {
             String modelClass = Format.modelClass(getModelClass());
-            String propertyName = Format.propertyName(property);
+            String propertyClass = Format.modelClass(this.propertyClass);
 
             exceptionMessage = MessageFormat.format(EXCEPTION_MESSAGE,
-                modelClass, modelString, propertyName);
+                modelClass, modelString, propertyClass);
         }
 
         return exceptionMessage;

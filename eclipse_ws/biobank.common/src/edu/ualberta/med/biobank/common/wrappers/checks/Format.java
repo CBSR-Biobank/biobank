@@ -19,10 +19,10 @@ class Format {
         int i = 0;
         for (Property<?, ? super E> property : properties) {
             sb.append(property.get(model).toString());
+            i++;
             if (i < n) {
                 sb.append(DELIMITER);
             }
-            i++;
         }
         return sb.toString();
     }
@@ -34,10 +34,10 @@ class Format {
         int i = 0;
         for (Property<?, ? super E> property : properties) {
             sb.append(propertyName(property));
+            i++;
             if (i < n) {
                 sb.append(DELIMITER);
             }
-            i++;
         }
         return sb.toString();
     }

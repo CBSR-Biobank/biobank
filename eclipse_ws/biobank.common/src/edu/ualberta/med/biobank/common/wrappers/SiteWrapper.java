@@ -317,10 +317,10 @@ public class SiteWrapper extends SiteBaseWrapper {
     protected TaskList getDeleteTasks() {
         TaskList tasks = new TaskList();
 
-        String msg = MessageFormat.format(EXISTING_CHILDREN_MSG, getName());
-        tasks.add(Check.empty(this, SitePeer.CONTAINER_COLLECTION, msg));
-        tasks.add(Check.empty(this, SitePeer.CONTAINER_TYPE_COLLECTION, msg));
-        tasks.add(Check.empty(this, SitePeer.PROCESSING_EVENT_COLLECTION, msg));
+        String errMsg = MessageFormat.format(EXISTING_CHILDREN_MSG, getName());
+        tasks.add(Check.empty(this, SitePeer.CONTAINER_COLLECTION, errMsg));
+        tasks.add(Check.empty(this, SitePeer.CONTAINER_TYPE_COLLECTION, errMsg));
+        tasks.add(Check.empty(this, SitePeer.PROCESSING_EVENT_COLLECTION, errMsg));
 
         tasks.add(super.getDeleteTasks());
 

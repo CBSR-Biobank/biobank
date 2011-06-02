@@ -8,7 +8,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -22,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
@@ -206,7 +206,7 @@ public class TestShippingMethod extends TestDatabase {
         try {
             method.delete();
             Assert.fail("one cevent in the collection");
-        } catch (BiobankCheckException bce) {
+        } catch (ModelIsUsedException e) {
             Assert.assertTrue(true);
         }
 
@@ -287,8 +287,8 @@ public class TestShippingMethod extends TestDatabase {
             .addCollectionEvent(clinic1, patient1, 1, parentSpc1);
         parentSpc1 = cevent1.getOriginalSpecimenCollection(false).get(0);
         String waybill = "waybill_" + name;
-        ShipmentInfoWrapper shipInfo1 = ShipmentInfoHelper.addShipmentInfo(clinic1,
-            methods[0], waybill, Utils.getRandomDate(), parentSpc1);
+        ShipmentInfoWrapper shipInfo1 = ShipmentInfoHelper.addShipmentInfo(
+            clinic1, methods[0], waybill, Utils.getRandomDate(), parentSpc1);
 
         Assert.assertTrue(methods[0].isUsed());
         Assert.assertFalse(methods[1].isUsed());
@@ -298,8 +298,8 @@ public class TestShippingMethod extends TestDatabase {
         CollectionEventWrapper cevent2 = CollectionEventHelper
             .addCollectionEvent(clinic2, patient1, 2, parentSpc2);
         parentSpc1 = cevent2.getOriginalSpecimenCollection(false).get(0);
-        ShipmentInfoWrapper shipInfo2 = ShipmentInfoHelper.addShipmentInfo(clinic2,
-            methods[1], waybill, Utils.getRandomDate(), parentSpc2);
+        ShipmentInfoWrapper shipInfo2 = ShipmentInfoHelper.addShipmentInfo(
+            clinic2, methods[1], waybill, Utils.getRandomDate(), parentSpc2);
 
         methods[0].reload();
         methods[1].reload();

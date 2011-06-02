@@ -17,8 +17,14 @@ class CheckNotNull<E> extends BiobankWrapperAction<E> {
     private final Property<?, ? super E> property;
     private final String modelString;
 
-    protected CheckNotNull(ModelWrapper<E> wrapper,
-        Property<?, ? super E> property) {
+    /**
+     * Check that the given {@code Property} of the {@code ModelWrapper}'s
+     * wrapped object is not null.
+     * 
+     * @param wrapper
+     * @param property
+     */
+    CheckNotNull(ModelWrapper<E> wrapper, Property<?, ? super E> property) {
         super(wrapper);
         this.property = property;
         this.modelString = wrapper.toString();

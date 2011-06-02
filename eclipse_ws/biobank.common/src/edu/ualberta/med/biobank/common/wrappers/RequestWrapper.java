@@ -162,4 +162,14 @@ public class RequestWrapper extends RequestBaseWrapper {
         setState(state.getId());
     }
 
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        getPersistTasks().execute(appService);
+    }
+
+    @Override
+    public void delete() throws Exception {
+        getDeleteTasks().execute(appService);
+    }
 }

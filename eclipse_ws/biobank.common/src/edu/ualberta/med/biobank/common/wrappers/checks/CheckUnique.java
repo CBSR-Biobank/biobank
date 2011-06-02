@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 
-public class CheckUnique<E> extends BiobankWrapperAction<E> {
+class CheckUnique<E> extends BiobankWrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_STRING = "There already exists a {0} ({1}) with property value(s) ({2}) for ({3}), respectively. These field(s) must be unique.";
 
@@ -24,7 +24,15 @@ public class CheckUnique<E> extends BiobankWrapperAction<E> {
     private final Collection<Property<?, ? super E>> properties;
     private final String modelString;
 
-    protected CheckUnique(ModelWrapper<E> wrapper,
+    /**
+     * Checks that the {@code Collection} of {@code Property}-s is unique for
+     * the model object in the {@code ModelWrapper}, excluding the instance
+     * itself (if it is already persisted).
+     * 
+     * @param wrapper which holds the model object
+     * @param properties to ensure uniqueness on
+     */
+    CheckUnique(ModelWrapper<E> wrapper,
         Collection<Property<?, ? super E>> properties) {
         super(wrapper);
         this.idProperty = wrapper.getIdProperty();
