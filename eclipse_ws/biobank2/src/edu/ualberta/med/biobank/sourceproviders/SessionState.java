@@ -10,16 +10,19 @@ public class SessionState extends AbstractSourceProvider {
     public final static String LOGIN_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.loginState";
     public final static String IS_SUPER_ADMIN_MODE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.isSuperAdminMode";
     public final static String HAS_WORKING_CENTER_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter";
+    public final static String IS_CBSR = "edu.ualberta.med.biobank.sourceprovider.isCBSR";
     public final static String LOGGED_IN = "loggedIn";
     public final static String LOGGED_OUT = "loggedOut";
-    boolean loggedIn;
-    boolean isSuperAdminMode;
+    private boolean loggedIn;
+    private boolean isSuperAdminMode;
     private boolean hasWorkingCenter;
+    private boolean isCBSR;
 
     @Override
     public String[] getProvidedSourceNames() {
         return new String[] { LOGIN_STATE_SOURCE_NAME,
-            IS_SUPER_ADMIN_MODE_SOURCE_NAME, HAS_WORKING_CENTER_SOURCE_NAME };
+            IS_SUPER_ADMIN_MODE_SOURCE_NAME, HAS_WORKING_CENTER_SOURCE_NAME,
+            IS_CBSR };
     }
 
     @Override
@@ -31,6 +34,7 @@ public class SessionState extends AbstractSourceProvider {
             Boolean.toString((isSuperAdminMode)));
         currentStateMap.put(HAS_WORKING_CENTER_SOURCE_NAME,
             Boolean.toString(hasWorkingCenter));
+        currentStateMap.put(IS_CBSR, Boolean.toString(isCBSR));
         return currentStateMap;
     }
 
@@ -65,6 +69,13 @@ public class SessionState extends AbstractSourceProvider {
         this.hasWorkingCenter = hasWorkingCenter;
         fireSourceChanged(ISources.WORKBENCH, HAS_WORKING_CENTER_SOURCE_NAME,
             hasWorkingCenter);
+    }
+
+    public void setIsCBSR(boolean isCBSR) {
+        if (this.isCBSR == isCBSR)
+            return; // no change
+        this.isCBSR = isCBSR;
+        fireSourceChanged(ISources.WORKBENCH, IS_CBSR, isCBSR);
     }
 
 }

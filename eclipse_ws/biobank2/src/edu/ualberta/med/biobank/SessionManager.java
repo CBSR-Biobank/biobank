@@ -143,6 +143,8 @@ public class SessionManager {
             && sessionAdapter.getUser().isInSuperAdminMode());
         sessionSourceProvider.setHasWorkingCenter(sessionAdapter != null
             && sessionAdapter.getUser().getCurrentWorkingCenter() != null);
+        sessionSourceProvider.setIsCBSR(sessionAdapter != null
+            && sessionAdapter.getUser().isCBSRCenter());
 
         // assign debug state
         DebugState debugStateSourceProvider = (DebugState) service

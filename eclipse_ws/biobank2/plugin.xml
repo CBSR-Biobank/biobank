@@ -526,6 +526,9 @@
               <reference
                     definitionId="biobank2.loggedIn">
               </reference>
+              <reference
+                    definitionId="biobank2.isCBSR">
+              </reference>
             </and>
          </activeWhen>
          <enabledWhen>
@@ -1048,6 +1051,12 @@
                   icon="icons/shipment_add.png"
                   label="Add Shipment"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.isCBSR">
+                  </reference>
+               </visibleWhen>
             </command>
             <separator
                   name="biobank2.separator3"
@@ -1389,9 +1398,14 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
+                  <and>
                   <reference
                         definitionId="biobank2.processingPerspectiveSelected">
                   </reference>
+				  <reference
+                        definitionId="biobank2.isCBSR">
+                  </reference>
+                  </and>
                </visibleWhen>
             </command>
             <command
@@ -2476,6 +2490,15 @@
              id="biobank2.hasWorkingCenter">
           <with
                 variable="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter">
+             <equals
+                   value="true">
+             </equals>
+          </with>
+       </definition>
+       <definition
+             id="biobank2.isCBSR">
+          <with
+                variable="edu.ualberta.med.biobank.sourceprovider.isCBSR">
              <equals
                    value="true">
              </equals>
