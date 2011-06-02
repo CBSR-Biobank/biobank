@@ -44,7 +44,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private BiobankText volumeField;
 
-    private BiobankText siteLabel;
+    private BiobankText centerLabel;
 
     private BiobankText patientField;
 
@@ -101,12 +101,12 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             specimenTypes.add(specimen.getSpecimenType());
         }
 
-        siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
-        setTextValue(siteLabel, specimen.getCenterString());
+        centerLabel = createReadOnlyLabelledField(client, SWT.NONE, "Center");
+        setTextValue(centerLabel, specimen.getCenterString());
 
-        specimenTypeComboViewer = createComboViewer(client, "Type", specimenTypes,
-            specimen.getSpecimenType(), "Specimen must have a type",
-            new ComboSelectionUpdate() {
+        specimenTypeComboViewer = createComboViewer(client, "Type",
+            specimenTypes, specimen.getSpecimenType(),
+            "Specimen must have a type", new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     specimen

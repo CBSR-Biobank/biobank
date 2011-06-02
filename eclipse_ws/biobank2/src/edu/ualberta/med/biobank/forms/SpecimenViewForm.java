@@ -30,7 +30,7 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private SpecimenWrapper specimen;
 
-    private BiobankText siteLabel;
+    private BiobankText centerLabel;
 
     private BiobankText sampleTypeLabel;
 
@@ -102,7 +102,7 @@ public class SpecimenViewForm extends BiobankViewForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-        siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
+        centerLabel = createReadOnlyLabelledField(client, SWT.NONE, "Center");
         sampleTypeLabel = createReadOnlyLabelledField(client, SWT.NONE, "Type");
         linkDateLabel = createReadOnlyLabelledField(client, SWT.NONE, "Created");
         volumeLabel = createReadOnlyLabelledField(client, SWT.NONE,
@@ -162,7 +162,7 @@ public class SpecimenViewForm extends BiobankViewForm {
     }
 
     private void setValues() {
-        setTextValue(siteLabel, specimen.getCurrentCenter().getNameShort());
+        setTextValue(centerLabel, specimen.getCurrentCenter().getNameShort());
         setTextValue(sampleTypeLabel, specimen.getSpecimenType().getName());
         setTextValue(linkDateLabel, specimen.getFormattedCreatedAt());
         setTextValue(volumeLabel, specimen.getQuantity() == null ? null

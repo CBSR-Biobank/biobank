@@ -135,8 +135,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                     .getCell().getInformation());
             }
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error",
-                "Error receiving the specimen", e);
+            BiobankPlugin.openAsyncError("Error receiving the specimen", e);
         }
     }
 
