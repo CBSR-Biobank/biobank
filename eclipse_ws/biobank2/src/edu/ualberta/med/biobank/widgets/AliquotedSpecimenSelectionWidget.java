@@ -20,7 +20,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
@@ -132,14 +134,13 @@ public class AliquotedSpecimenSelectionWidget {
                 return ((SpecimenTypeWrapper) element).getName();
             }
         });
-        // FIXME waiting for issue #1011 to be resolved
-        // cvResult.addFilter(new ViewerFilter() {
-        // @Override
-        // public boolean select(Viewer viewer, Object parentElement,
-        // Object element) {
-        // return sourceChildTypes.contains(element);
-        // }
-        // });
+        cvResult.addFilter(new ViewerFilter() {
+            @Override
+            public boolean select(Viewer viewer, Object parentElement,
+                Object element) {
+                return sourceChildTypes.contains(element);
+            }
+        });
         if (oneRow) {
             textNumber = widgetCreator.getToolkit().createLabel(parent, "",
                 SWT.BORDER);

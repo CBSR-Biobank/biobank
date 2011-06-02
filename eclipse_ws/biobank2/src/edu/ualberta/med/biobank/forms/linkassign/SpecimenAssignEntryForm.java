@@ -91,6 +91,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private StringLengthValidator newSinglePositionValidator;
     private BiobankText newSinglePositionText;
     protected boolean positionTextModified;
+    private BiobankText singleTypeText;
+    private BiobankText singleCollectionDateText;
 
     // for multiple specimens assign
     private ContainerWrapper currentMultipleContainer;
@@ -203,7 +205,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         fieldsComposite.setLayoutData(gd);
 
         // check box to say it is a cabinet specimen or not
-        widgetCreator.createLabel(fieldsComposite,
+        Label cabinetCheckButtonLabel = widgetCreator.createLabel(
+            fieldsComposite,
             Messages.getString("SpecimenAssign.single.cabinet.check.label")); //$NON-NLS-1$
         cabinetCheckButton = toolkit.createButton(fieldsComposite,
             "", SWT.CHECK); //$NON-NLS-1$
@@ -223,6 +226,13 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 }
             }
         });
+        // this check box is there only for cbsr : specimens imported from
+        // cabinet from the old database where 4 letters. A 'C' has been added
+        // to them to make them different from the freezer specimen with exactly
+        // the same inventory id
+        boolean cbsrCenter = SessionManager.getUser().isCBSRCenter();
+        widgetCreator.showWidget(cabinetCheckButtonLabel, cbsrCenter);
+        widgetCreator.showWidget(cabinetCheckButton, cbsrCenter);
 
         // inventoryID
         inventoryIdText = (BiobankText) createBoundWidgetWithLabel(
@@ -257,6 +267,16 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 canSaveSingleSpecimen.setValue(false);
             }
         });
+
+        singleTypeText = createReadOnlyLabelledField(fieldsComposite, SWT.NONE,
+            Messages.getString("SpecimenAssign.single.type.label"));
+        singleTypeText.setEnabled(false);
+
+        singleCollectionDateText = createReadOnlyLabelledField(fieldsComposite,
+            SWT.NONE,
+            Messages.getString("SpecimenAssign.single.collection.date.label"));
+        singleCollectionDateText.setEnabled(false);
+
         createSinglePositionFields(fieldsComposite);
     }
 
@@ -267,6 +287,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      */
     protected void retrieveSingleSpecimenData() throws Exception {
         String inventoryId = inventoryIdText.getText();
+        singleTypeText.setText("");
+        singleCollectionDateText.setText("");
         if (inventoryId.isEmpty()) {
             return;
         }
@@ -296,6 +318,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 Messages
                     .getString("SpecimenAssign.single.specimen.transit.error")); //$NON-NLS-1$
         }
+        singleTypeText.setText(singleSpecimen.getSpecimenType().getNameShort());
+        singleCollectionDateText.setText(singleSpecimen.getTopSpecimen()
+            .getFormattedCreatedAt());
         String positionString = singleSpecimen.getPositionString(true, false);
         if (positionString == null) {
             displayOldSingleFields(false);

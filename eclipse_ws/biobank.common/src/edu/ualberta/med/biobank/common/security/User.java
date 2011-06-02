@@ -379,4 +379,9 @@ public class User implements Serializable, NotAProxy {
             return super.hashCode();
         return login.hashCode();
     }
+
+    public boolean isCBSRCenter() {
+        CenterWrapper<?> center = getCurrentWorkingCenter();
+        return center != null && center.getNameShort().equals("CBSR");
+    }
 }

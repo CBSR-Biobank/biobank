@@ -84,7 +84,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
     public static final String IMG_CANCEL_FORM = "cancelForm";
     public static final String IMG_CLINIC = "clinic";
     public static final String IMG_CLINICS = "clinics";
-    public static final String IMG_COMPUTER_KEY = "computerKey";
+    public static final String IMG_LOGINWIZ = "computerKey";
     public static final String IMG_CONFIRM_FORM = "confirmForm";
     public static final String IMG_CONTAINERS = "containers";
     public static final String IMG_CONTAINER_TYPES = "containerTypes";
@@ -150,6 +150,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
     public static final String IMG_PROCESSING_EVENT = "processingEvent";
     public static final String IMG_CHECK = "check";
     public static final String IMG_UNCHECK = "uncheck";
+    public static final String IMG_DIALOGS = "dialogs";
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -274,7 +275,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_CANCEL_FORM, "cancel.png");
         registerImage(registry, IMG_CLINIC, "clinic.png");
         registerImage(registry, IMG_CLINICS, "clinics.png");
-        registerImage(registry, IMG_COMPUTER_KEY, "computer_key.png");
+        registerImage(registry, IMG_LOGINWIZ, "loginWiz.png");
         registerImage(registry, IMG_CONFIRM_FORM, "confirm.png");
         registerImage(registry, IMG_CONTAINERS, "containers.png");
         registerImage(registry, IMG_CONTAINER_TYPES, "containerTypes.png");
@@ -343,6 +344,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_SAVE_AS_NEW, "application_form_add.png");
         registerImage(registry, IMG_CHECK, "checked.gif");
         registerImage(registry, IMG_UNCHECK, "unchecked.gif");
+        registerImage(registry, IMG_DIALOGS, "dialogs.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,

@@ -143,7 +143,7 @@ public class LoginDialog extends TitleAreaDialog {
         Control contents = super.createContents(parent);
         setTitle(Messages.getString("LoginDialog.title")); //$NON-NLS-1$
         setTitleImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_COMPUTER_KEY));
+            .get(BiobankPlugin.IMG_LOGINWIZ));
         setMessage(Messages.getString("LoginDialog.description")); //$NON-NLS-1$
         return contents;
     }

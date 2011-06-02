@@ -64,7 +64,8 @@ public abstract class BiobankDialog extends TitleAreaDialog {
     }
 
     protected Image getTitleAreaImage() {
-        return null;
+        return BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_DIALOGS);
     }
 
     protected int getTitleAreaMessageType() {

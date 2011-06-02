@@ -5,7 +5,6 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -75,13 +74,6 @@ public class StudySourceSpecimenDialog extends PagedDialog {
     @Override
     protected String getTitleAreaTitle() {
         return currentTitle;
-    }
-
-    @Override
-    protected Image getTitleAreaImage() {
-        // FIXME should use another icon
-        return BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_COMPUTER_KEY);
     }
 
     @Override

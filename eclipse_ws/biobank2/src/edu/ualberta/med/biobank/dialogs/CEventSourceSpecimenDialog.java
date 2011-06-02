@@ -11,7 +11,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -135,13 +134,6 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
     @Override
     protected String getTitleAreaTitle() {
         return currentTitle;
-    }
-
-    @Override
-    protected Image getTitleAreaImage() {
-        // FIXME should use another icon
-        return BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_COMPUTER_KEY);
     }
 
     @Override
