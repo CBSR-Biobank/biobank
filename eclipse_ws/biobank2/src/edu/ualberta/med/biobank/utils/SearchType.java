@@ -130,7 +130,6 @@ public enum SearchType {
             Assert.isNotNull(res);
             FormInput input = new FormInput(res, "Patient Visit List");
             try {
-                // FIXME result is processing event and we display CEvent ???
                 PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                     .getActivePage()
                     .openEditor(input, PeListViewForm.ID, false);
