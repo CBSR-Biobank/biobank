@@ -392,6 +392,11 @@
     <copy file="${secu-log.dir}/jboss/upt.war"
           tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war"
           overwrite="true" />
+    <delete includeemptydirs="true">
+      <fileset dir="${env.JBOSS_HOME}/server/default/deploy">
+        <include name="biobank*.war"/>
+      </fileset>
+    </delete>
     <copy file="${cacore.sdk.dir}/output/biobank/package/webapp/biobank.war"
           tofile="${env.JBOSS_HOME}/server/default/deploy/biobank.war"
           overwrite="true" />
@@ -1055,7 +1060,7 @@
 
   <target name="product" depends="eclipse.home.env,deploy" description="build the product">
   	<!-- buildDirectory is the folder where the plugins and products are found and build -->
-    <property name="buildDirectory" value="${product.dir}/buildDirectory" />  	  	
+    <property name="buildDirectory" value="${product.dir}/buildDirectory" />
     <delete dir="${buildDirectory}" />
   	<!-- plugins and features are copied into the buildDirectory -->
     <copy todir="${buildDirectory}/plugins/biobank2">
@@ -1075,7 +1080,7 @@
   	</copy>
   	<copy todir="${buildDirectory}/plugins/biobank.gui.common">
   	  <fileset dir="${eclipse.workspace.dir}/biobank.gui.common" />
-  	</copy>  	
+  	</copy>
     <copy todir="${buildDirectory}/features/biobank2.feature.core">
       <fileset dir="${eclipse.workspace.dir}/biobank2.feature.core" />
     </copy>
