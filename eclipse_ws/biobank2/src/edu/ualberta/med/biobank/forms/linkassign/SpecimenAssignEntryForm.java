@@ -813,6 +813,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         reset(false);
         super.setUseScanner(use);
         page.layout(true, true);
+        checkPalletContainerTypes();
     }
 
     /**
@@ -843,7 +844,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private void initPalletContainerTypes() throws ApplicationException {
         palletContainerTypes = ContainerTypeWrapper.getContainerTypesPallet96(
             appService, currentMultipleContainer.getSite());
-        if (palletContainerTypes.size() == 0) {
+    }
+
+    private void checkPalletContainerTypes() {
+        if (!isSingleMode() && useScanner && palletContainerTypes.size() == 0) {
             BiobankPlugin
                 .openAsyncError(
                     Messages
@@ -1039,6 +1043,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         widgetCreator.setBinding(PALLET_TYPES_BINDING, !isSingleMode);
         super.setBindings(isSingleMode);
         setScanHasBeenLaunched(isSingleMode || !useScanner);
+        checkPalletContainerTypes();
     }
 
     @Override
