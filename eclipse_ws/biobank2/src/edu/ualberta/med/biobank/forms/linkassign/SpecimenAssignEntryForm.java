@@ -553,8 +553,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                                 boolean ok = checkMultipleContainerPosition();
                                 setCanLaunchScan(ok);
                                 initCellsWithContainer(currentMultipleContainer);
-                                if (!ok)
+                                if (!ok) {
                                     focusControl(palletPositionText);
+                                    showOnlyPallet(true);
+                                }
                                 palletPositionTextModified = false;
                             }
                         });
@@ -596,7 +598,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 parent.addChild(
                     currentMultipleContainer.getLabel().replaceAll(
                         parent.getLabel(), ""), currentMultipleContainer); //$NON-NLS-1$
-                possibleTypes = get96Types(parent.getContainerType()
+                possibleTypes = getPossibleTypes(parent.getContainerType()
                     .getChildContainerTypeCollection());
                 if (possibleTypes.size() == 1) {
                     typeSelection = possibleTypes.get(0);
@@ -638,7 +640,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                                 containerAtPosition.getContainerType()
                                     .getName(), currentMultipleContainer
                                     .getProductBarcode()));
-                    } else {
+                    } else if (containerAtPosition.getContainerType()
+                        .getSpecimenTypeCollection().size() > 0) {
                         // Position initialised but not physically used
                         appendLog(Messages
                             .getString(
@@ -646,12 +649,16 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                                 currentMultipleContainer.getLabel(),
                                 containerAtPosition.getContainerType()
                                     .getName()));
+                    } else {
+                        BiobankPlugin.openError("Error",
+                            "Container found but can't hold specimens");
+                        return false;
                     }
                 }
                 String newBarcode = currentMultipleContainer
                     .getProductBarcode();
                 typeSelection = containerAtPosition.getContainerType();
-                possibleTypes = get96Types(Arrays.asList(typeSelection));
+                possibleTypes = getPossibleTypes(Arrays.asList(typeSelection));
                 currentMultipleContainer.initObjectWith(containerAtPosition);
                 currentMultipleContainer.reset();
                 containerAtPosition.reload();
@@ -667,7 +674,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 BiobankPlugin
                     .openAsyncError(
                         Messages
-                            .getString("SpecimenAssignEntryForm.pallet.96.error.title"), Messages.getString("SpecimenAssignEntryForm.pallet.96.error.msg")); //$NON-NLS-1$ //$NON-NLS-2$
+                            .getString("SpecimenAssignEntryForm.pallet.96.error.title"), //$NON-NLS-1$
+                        Messages
+                            .getString("SpecimenAssignEntryForm.pallet.96.error.msg")); //$NON-NLS-1$ 
                 typeSelection = null;
                 return false;
             }
@@ -690,17 +699,19 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         return true;
     }
 
-    private List<ContainerTypeWrapper> get96Types(
+    /**
+     * is use scanner, want only 8*12 pallets. Also check the container type can
+     * hold specimens
+     */
+    private List<ContainerTypeWrapper> getPossibleTypes(
         List<ContainerTypeWrapper> childContainerTypeCollection) {
-        if (useScanner) {
-            List<ContainerTypeWrapper> palletTypes = new ArrayList<ContainerTypeWrapper>();
-            for (ContainerTypeWrapper type : childContainerTypeCollection) {
-                if (type.isPallet96())
-                    palletTypes.add(type);
-            }
-            return palletTypes;
+        List<ContainerTypeWrapper> palletTypes = new ArrayList<ContainerTypeWrapper>();
+        for (ContainerTypeWrapper type : childContainerTypeCollection) {
+            if (type.getSpecimenTypeCollection().size() > 0
+                && (!useScanner || type.isPallet96()))
+                palletTypes.add(type);
         }
-        return childContainerTypeCollection;
+        return palletTypes;
     }
 
     protected boolean checkMultipleScanBarcode() {
@@ -1143,6 +1154,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             palletWidget.setCells(getCells());
 
             showOnlyPallet(false);
+
+            widgetCreator.showWidget(freezerLabel, freezerContainer != null);
+            widgetCreator.showWidget(freezerWidget, freezerContainer != null);
+            page.layout(true, true);
         }
     }
 
