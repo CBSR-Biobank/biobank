@@ -189,6 +189,7 @@ public class ContainerAdapter extends AdapterBase {
                         .searchFirstNode(newParentContainer);
                     if (parentAdapter != null) {
                         parentAdapter.getContainer().reload();
+                        parentAdapter.removeAll();
                         parentAdapter.performExpand();
                     }
                     // update old parent
