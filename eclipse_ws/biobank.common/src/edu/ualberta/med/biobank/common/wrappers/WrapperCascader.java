@@ -10,21 +10,26 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
-public class Cascade {
-    public static <W1 extends ModelWrapper<M1>, M1, M2> TaskList delete(
-        W1 wrapper, Property<M2, M1> property) {
+class WrapperCascader<E> {
+    private final ModelWrapper<E> wrapper;
+
+    WrapperCascader(ModelWrapper<E> wrapper) {
+        this.wrapper = wrapper;
+    }
+
+    public <T> TaskList delete(Property<T, E> property) {
         TaskList tasks = new TaskList();
 
         if (property.isCollection()) {
             @SuppressWarnings("unchecked")
-            Property<? extends Collection<M2>, ? super M1> tmp = (Property<? extends Collection<M2>, ? super M1>) property;
-            Collection<ModelWrapper<M2>> list = wrapper.getWrapperCollection(
+            Property<? extends Collection<T>, ? super E> tmp = (Property<? extends Collection<T>, ? super E>) property;
+            Collection<ModelWrapper<T>> list = wrapper.getWrapperCollection(
                 tmp, null, false);
             for (ModelWrapper<?> wrappedProperty : list) {
                 tasks.add(wrappedProperty.getDeleteTasks());
             }
         } else {
-            ModelWrapper<M2> wrapperProperty = wrapper.getWrappedProperty(
+            ModelWrapper<?> wrapperProperty = wrapper.getWrappedProperty(
                 property, null);
             tasks.add(wrapperProperty.getDeleteTasks());
         }
@@ -32,29 +37,62 @@ public class Cascade {
         return tasks;
     }
 
-    public static <W1 extends ModelWrapper<M1>, M1, M2> TaskList persist(
-        W1 wrapper, Property<M2, M1> property) {
+    public <T> TaskList persist(Property<T, E> property) {
         TaskList tasks = new TaskList();
 
         // persist if the property is initialized since it will be sent to the
         // server anyways.
+        // TODO: switch to an "isModified" check, called when setters are
+        // called...
         if (wrapper.isInitialized(property)) {
             if (property.isCollection()) {
                 @SuppressWarnings("unchecked")
-                Property<? extends Collection<M2>, ? super M1> tmp = (Property<? extends Collection<M2>, ? super M1>) property;
-                Collection<ModelWrapper<M2>> list = wrapper
+                Property<? extends Collection<T>, ? super E> tmp = (Property<? extends Collection<T>, ? super E>) property;
+                Collection<ModelWrapper<T>> list = wrapper
                     .getWrapperCollection(tmp, null, false);
                 for (ModelWrapper<?> wrappedProperty : list) {
                     tasks.add(wrappedProperty.getPersistTasks());
                 }
             } else {
-                ModelWrapper<M2> wrapperProperty = wrapper.getWrappedProperty(
+                ModelWrapper<T> wrapperProperty = wrapper.getWrappedProperty(
                     property, null);
                 tasks.add(wrapperProperty.getPersistTasks());
             }
         }
 
         return tasks;
+    }
+
+    // NOTE: this MUST use the WRAPPERS, otherwise the action might save
+    // something unintended by the programmer!!! BUT ONLY IF THEY ARE LOADED!!!!
+    public <T> TaskList persistRemoved(Property<T, E> property) {
+        TaskList tasks = new TaskList();
+
+        if (wrapper.isInitialized(property)) {
+
+        } else {
+            // tasks.add(new PersistRemoved<E>(wrapper, property));
+        }
+
+        return tasks;
+    }
+
+    private static class ActOnRemoved<E> extends BiobankWrapperAction<E> {
+        private static final long serialVersionUID = 1L;
+
+        protected ActOnRemoved(ModelWrapper<E> wrapper,
+            ModelSessionAction action) {
+            super(wrapper);
+        }
+
+        @Override
+        public Object doAction(Session session) throws BiobankSessionException {
+            return null;
+        }
+
+        public interface ModelSessionAction {
+            public Object act(Session session, Object model);
+        }
     }
 
     /**
@@ -65,16 +103,14 @@ public class Cascade {
      * defined in the corresponding wrapper object will NOT be applied. The
      * objects will simply be removed.
      * 
-     * @param wrapper
      * @param property
      * @return
      */
-    public static <W1 extends ModelWrapper<M1>, M1, M2> TaskList deleteOld(
-        W1 wrapper, Property<Collection<M2>, M1> property) {
+    public <T> TaskList deleteOld(Property<Collection<T>, E> property) {
         TaskList tasks = new TaskList();
 
         if (!wrapper.isNew() && wrapper.isInitialized(property)) {
-            tasks.add(new DeleteRemoved<M1>(wrapper, property));
+            tasks.add(new DeleteRemoved<E>(wrapper, property));
         }
 
         return tasks;

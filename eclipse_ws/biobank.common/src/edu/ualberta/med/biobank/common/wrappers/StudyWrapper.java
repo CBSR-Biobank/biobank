@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.Check;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -43,49 +42,6 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     public StudyWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    protected TaskList getPersistTasks() {
-        TaskList tasks = new TaskList();
-
-        tasks.add(Check.unique(this, StudyPeer.NAME));
-        tasks.add(Check.unique(this, StudyPeer.NAME_SHORT));
-
-        tasks.add(Check.notNull(this, StudyPeer.NAME));
-        tasks.add(Check.notNull(this, StudyPeer.NAME_SHORT));
-
-        tasks.add(Cascade
-            .deleteOld(this, StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
-        tasks
-            .add(Cascade.deleteOld(this, StudyPeer.SOURCE_SPECIMEN_COLLECTION));
-        tasks.add(Cascade.deleteOld(this,
-            StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
-
-        tasks.add(super.getPersistTasks());
-
-        tasks.add(Cascade.persist(this, StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
-        tasks.add(Cascade.persist(this, StudyPeer.SOURCE_SPECIMEN_COLLECTION));
-        tasks.add(Cascade
-            .persist(this, StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
-
-        return tasks;
-    }
-
-    @Override
-    protected TaskList getDeleteTasks() {
-        TaskList tasks = new TaskList();
-
-        tasks.add(Check.empty(this, StudyPeer.PATIENT_COLLECTION));
-
-        tasks.add(Cascade.delete(this, StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
-        tasks.add(Cascade.delete(this, StudyPeer.SOURCE_SPECIMEN_COLLECTION));
-        tasks
-            .add(Cascade.delete(this, StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
-
-        tasks.add(super.getDeleteTasks());
-
-        return tasks;
     }
 
     protected Collection<StudyEventAttrWrapper> getStudyEventAttrCollection() {
@@ -431,6 +387,41 @@ public class StudyWrapper extends StudyBaseWrapper {
         return user.isInSuperAdminMode()
             && user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass(),
                 getSecuritySpecificCenters());
+    }
+
+    @Override
+    protected TaskList getPersistTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(check().uniqueAndNotNull(StudyPeer.NAME));
+        tasks.add(check().uniqueAndNotNull(StudyPeer.NAME_SHORT));
+
+        tasks.add(cascade().deleteOld(StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
+        tasks.add(cascade().deleteOld(StudyPeer.SOURCE_SPECIMEN_COLLECTION));
+        tasks.add(cascade().deleteOld(StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
+
+        tasks.add(super.getPersistTasks());
+
+        tasks.add(cascade().persist(StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
+        tasks.add(cascade().persist(StudyPeer.SOURCE_SPECIMEN_COLLECTION));
+        tasks.add(cascade().persist(StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
+
+        return tasks;
+    }
+
+    @Override
+    protected TaskList getDeleteTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(check().empty(StudyPeer.PATIENT_COLLECTION));
+
+        tasks.add(cascade().delete(StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
+        tasks.add(cascade().delete(StudyPeer.SOURCE_SPECIMEN_COLLECTION));
+        tasks.add(cascade().delete(StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
+
+        tasks.add(super.getDeleteTasks());
+
+        return tasks;
     }
 
     // TODO: remove this override when all persist()-s are like this!

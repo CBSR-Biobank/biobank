@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropertyException;
 
-class CheckNotNull<E> extends BiobankWrapperAction<E> {
+public class CheckNotNull<E> extends BiobankWrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_STRING = "The {0} of {1} {2} must be defined (cannot be null).";
 
@@ -24,7 +24,7 @@ class CheckNotNull<E> extends BiobankWrapperAction<E> {
      * @param wrapper
      * @param property
      */
-    CheckNotNull(ModelWrapper<E> wrapper, Property<?, ? super E> property) {
+    public CheckNotNull(ModelWrapper<E> wrapper, Property<?, ? super E> property) {
         super(wrapper);
         this.property = property;
         this.modelString = wrapper.toString();

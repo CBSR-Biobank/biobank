@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 
-class CheckNotUsed<E> extends BiobankWrapperAction<E> {
+public class CheckNotUsed<E> extends BiobankWrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_MESSAGE = "{0} {1} is still in use by {2}.";
     private static final String COUNT_HQL = "SELECT count(m) FROM {0} m WHERE m.{1} = ?";
@@ -32,7 +32,7 @@ class CheckNotUsed<E> extends BiobankWrapperAction<E> {
      * @param exceptionMessage the message in the {@code ModelIsUsedException}
      *            thrown if this model object is used.
      */
-    <T> CheckNotUsed(ModelWrapper<E> wrapper,
+    public <T> CheckNotUsed(ModelWrapper<E> wrapper,
         Property<? super E, ? super T> property, Class<T> propertyClass,
         String errorMessage) {
         super(wrapper);
@@ -50,7 +50,7 @@ class CheckNotUsed<E> extends BiobankWrapperAction<E> {
         query.setParameter(0, getModel());
 
         List<?> results = query.list();
-        Long count = Check.getCountFromResult(results);
+        Long count = CheckUtil.getCountFromResult(results);
 
         if (count == null || count > 0) {
             String message = getExceptionMessage();

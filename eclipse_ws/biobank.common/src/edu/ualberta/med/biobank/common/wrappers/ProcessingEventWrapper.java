@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,8 +12,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -31,7 +30,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
-
+    private static final String HAS_DERIVED_SPECIMENS_MSG = "Unable to delete processing event '{0}' ({1}) since some of its specimens have already been derived into others specimens.";
     private Set<SpecimenWrapper> removedSpecimens = new HashSet<SpecimenWrapper>();
 
     public ProcessingEventWrapper(WritableApplicationService appService,
@@ -41,21 +40,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     public ProcessingEventWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        // TODO: new checks required
-        // TODO at least one specimen added ?
-        if (isNew()) {
-            if (getWorksheet() == null || getWorksheet().isEmpty())
-                throw new BiobankCheckException("Worksheet cannot be empty.");
-            else if (getProcessingEventsWithWorksheetCount(appService,
-                getWorksheet()) > 0)
-                throw new BiobankCheckException("Worksheet " + getWorksheet()
-                    + " is already used.");
-        }
     }
 
     @Override
@@ -72,6 +56,9 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     @Override
     public void addToSpecimenCollection(List<SpecimenWrapper> specimenCollection) {
         removedSpecimens.removeAll(specimenCollection);
+        for (SpecimenWrapper s : specimenCollection) {
+            s.setProcessingEvent(this);
+        }
         super.addToSpecimenCollection(specimenCollection);
     }
 
@@ -79,20 +66,10 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     public void removeFromSpecimenCollection(
         List<SpecimenWrapper> specimenCollection) {
         removedSpecimens.addAll(specimenCollection);
-        super.removeFromSpecimenCollection(specimenCollection);
-    }
-
-    @Override
-    protected void deleteChecks() throws ApplicationException, BiobankException {
-        if (getDerivedSpecimenCount(false) > 0) {
-            throw new BiobankDeleteException(
-                "Unable to delete processing event '"
-                    + getWorksheet()
-                    + "' ("
-                    + getFormattedCreatedAt()
-                    + ") since some of its specimens have already been derived "
-                    + "into others specimens.");
+        for (SpecimenWrapper s : specimenCollection) {
+            s.setProcessingEvent(null);
         }
+        super.removeFromSpecimenCollection(specimenCollection);
     }
 
     @Override
@@ -119,22 +96,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
             return getCountResult(appService, criteria);
         }
         return getSpecimenCollection(false).size();
-    }
-
-    private static final String DERIVED_SPECIMEN_COUNT_QRY = "select count(specimen) from "
-        + Specimen.class.getName()
-        + " as specimen where specimen."
-        + Property.concatNames(SpecimenPeer.PARENT_SPECIMEN,
-            SpecimenPeer.PROCESSING_EVENT, ProcessingEventPeer.ID) + "=?";
-
-    public long getDerivedSpecimenCount(boolean fast) throws BiobankException,
-        ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(DERIVED_SPECIMEN_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        return getDerivedSpecimenCollection(false).size();
     }
 
     public List<SpecimenWrapper> getDerivedSpecimenCollection(boolean sort) {
@@ -293,5 +254,44 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         List<CollectionEvent> res = appService.query(c);
         return wrapModelCollection(appService, res,
             CollectionEventWrapper.class);
+    }
+
+    @Override
+    protected TaskList getPersistTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(check().uniqueAndNotNull(ProcessingEventPeer.WORKSHEET));
+        tasks.add(cascade().persistRemoved(
+            ProcessingEventPeer.SPECIMEN_COLLECTION));
+
+        tasks.add(super.getPersistTasks());
+
+        return tasks;
+    }
+
+    @Override
+    protected TaskList getDeleteTasks() {
+        TaskList tasks = new TaskList();
+
+        String hasDerivedSpecimensMsg = MessageFormat.format(
+            HAS_DERIVED_SPECIMENS_MSG, getWorksheet(), getFormattedCreatedAt());
+        tasks.add(check().notUsedBy(Specimen.class,
+            SpecimenPeer.PARENT_SPECIMEN.to(SpecimenPeer.PROCESSING_EVENT),
+            hasDerivedSpecimensMsg));
+
+        tasks.add(super.getDeleteTasks());
+
+        return tasks;
+    }
+
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        getPersistTasks().execute(appService);
+    }
+
+    @Override
+    public void delete() throws Exception {
+        getDeleteTasks().execute(appService);
     }
 }

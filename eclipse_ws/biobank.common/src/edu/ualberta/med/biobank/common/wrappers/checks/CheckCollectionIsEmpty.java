@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
 
-class CheckCollectionIsEmpty<E> extends BiobankWrapperAction<E> {
+public class CheckCollectionIsEmpty<E> extends BiobankWrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_MESSAGE = "{0} {1} has one or more {2}.";
     private static final String COUNT_HQL = "SELECT m.{0}.size FROM {1} m WHERE m = ?";
@@ -32,7 +32,7 @@ class CheckCollectionIsEmpty<E> extends BiobankWrapperAction<E> {
      *            generated if the collection is not empty. Set to null if you
      *            want to use the default message.
      */
-    CheckCollectionIsEmpty(ModelWrapper<E> wrapper,
+    public CheckCollectionIsEmpty(ModelWrapper<E> wrapper,
         Property<? extends Collection<?>, ? super E> property,
         String exceptionMessage) {
         super(wrapper);
@@ -49,7 +49,7 @@ class CheckCollectionIsEmpty<E> extends BiobankWrapperAction<E> {
         query.setParameter(0, getModel());
 
         List<?> results = query.list();
-        Long count = Check.getCountFromResult(results);
+        Long count = CheckUtil.getCountFromResult(results);
 
         if (count == null || count > 0) {
             String message = getExceptionMessage();

@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.Check;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -116,11 +115,8 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     protected TaskList getPersistTasks() {
         TaskList tasks = new TaskList();
 
-        tasks.add(Check.unique(this, SpecimenTypePeer.NAME));
-        tasks.add(Check.unique(this, SpecimenTypePeer.NAME_SHORT));
-
-        tasks.add(Check.notNull(this, SpecimenTypePeer.NAME));
-        tasks.add(Check.notNull(this, SpecimenTypePeer.NAME_SHORT));
+        tasks.add(check().uniqueAndNotNull(SpecimenTypePeer.NAME));
+        tasks.add(check().uniqueAndNotNull(SpecimenTypePeer.NAME_SHORT));
 
         tasks.add(super.getPersistTasks());
 
@@ -132,8 +128,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         TaskList tasks = new TaskList();
 
         String isUsedMsg = MessageFormat.format(HAS_SPECIMENS_MSG, getName());
-        tasks.add(Check.notUsed(this, SpecimenPeer.SPECIMEN_TYPE,
-            Specimen.class, isUsedMsg));
+        tasks.add(check().notUsedBy(Specimen.class, SpecimenPeer.SPECIMEN_TYPE, isUsedMsg));
 
         tasks.add(super.getDeleteTasks());
 

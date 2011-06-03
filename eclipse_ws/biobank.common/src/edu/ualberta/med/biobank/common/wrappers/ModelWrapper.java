@@ -170,7 +170,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         TaskList tasks = new TaskList();
 
         tasks.add(new PersistModelWrapperQueryTask<E>(this));
-        tasks.add(new LengthCheck<E>(this));
+        tasks.add(check().stringLengths());
 
         return tasks;
     }
@@ -1126,33 +1126,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return Collections.emptyList();
     }
 
-    private static class LengthCheck<E> implements PreQueryTask {
-        private final ModelWrapper<E> modelWrapper;
+    protected WrapperCascader<E> cascade() {
+        // TODO: cache this?
+        return new WrapperCascader<E>(this);
+    }
 
-        public LengthCheck(ModelWrapper<E> modelWrapper) {
-            this.modelWrapper = modelWrapper;
-        }
-
-        @Override
-        public void beforeExecute() throws BiobankException {
-            E model = modelWrapper.getWrappedObject();
-            Class<E> modelClass = modelWrapper.getWrappedClass();
-
-            for (Property<?, ? super E> property : modelWrapper.getProperties()) {
-                String field = property.getName();
-
-                Integer max = VarCharLengths.getMaxSize(modelClass, field);
-                if (max == null)
-                    continue;
-
-                // TODO: does this work???
-                if (property.getElementClass().equals(String.class)) {
-                    String value = (String) property.get(model);
-                    if ((value != null) && (value.length() > max)) {
-                        throw new CheckFieldLimitsException(field, max, value);
-                    }
-                }
-            }
-        }
+    protected WrapperChecker<E> check() {
+        // TODO: cache this?
+        return new WrapperChecker<E>(this);
     }
 }

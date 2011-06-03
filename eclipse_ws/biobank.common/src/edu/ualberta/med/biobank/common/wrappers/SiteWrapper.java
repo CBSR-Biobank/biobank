@@ -24,7 +24,6 @@ import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.base.SiteBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.Check;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
@@ -302,11 +301,9 @@ public class SiteWrapper extends SiteBaseWrapper {
     protected TaskList getPersistTasks() {
         TaskList tasks = new TaskList();
 
-        tasks.add(Check.unique(this, SitePeer.NAME));
-        tasks.add(Check.unique(this, SitePeer.NAME_SHORT));
-
-        tasks.add(Check.notNull(this, SitePeer.NAME));
-        tasks.add(Check.notNull(this, SitePeer.NAME_SHORT));
+        // TODO: move to center?
+        tasks.add(check().uniqueAndNotNull(SitePeer.NAME));
+        tasks.add(check().uniqueAndNotNull(SitePeer.NAME_SHORT));
 
         tasks.add(super.getPersistTasks());
 
@@ -318,9 +315,9 @@ public class SiteWrapper extends SiteBaseWrapper {
         TaskList tasks = new TaskList();
 
         String errMsg = MessageFormat.format(EXISTING_CHILDREN_MSG, getName());
-        tasks.add(Check.empty(this, SitePeer.CONTAINER_COLLECTION, errMsg));
-        tasks.add(Check.empty(this, SitePeer.CONTAINER_TYPE_COLLECTION, errMsg));
-        tasks.add(Check.empty(this, SitePeer.PROCESSING_EVENT_COLLECTION, errMsg));
+        tasks.add(check().empty(SitePeer.CONTAINER_COLLECTION, errMsg));
+        tasks.add(check().empty(SitePeer.CONTAINER_TYPE_COLLECTION, errMsg));
+        tasks.add(check().empty(SitePeer.PROCESSING_EVENT_COLLECTION, errMsg));
 
         tasks.add(super.getDeleteTasks());
 

@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.common.wrappers.BiobankHQLAction;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.UnexpectedHQLResultsException;
 
-class CheckHQLResult extends BiobankHQLAction {
+public class CheckHQLResult extends BiobankHQLAction {
     private static final long serialVersionUID = 1L;
 
     private final String errMsg;
