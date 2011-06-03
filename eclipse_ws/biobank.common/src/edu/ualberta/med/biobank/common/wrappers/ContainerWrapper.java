@@ -1101,10 +1101,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 .getPossibleLabelLength(appService);
             StringBuffer res = new StringBuffer();
 
-            // String binLabel = parentLabelsTested.get(i);
-            //                res.append(binLabel).append("(") //$NON-NLS-1$
-            //                    .append(fullLabel.replace(binLabel, "")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
-
             for (int i = 0; i < validLengths.size(); i++) {
                 Integer crop = validLengths.get(i);
                 if (res.length() != 0)
@@ -1124,7 +1120,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 errorMsg = Messages
                     .getString(
                         "ContainerWrapper.getPossibleContainersFromPosition.error.notfoundWithType.msg",//$NON-NLS-1$
-                        res.toString(), contType.getNameShort());
+                        contType.getNameShort(), res.toString());
 
             throw new BiobankException(errorMsg);
         }
