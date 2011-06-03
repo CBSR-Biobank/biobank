@@ -15,7 +15,6 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -665,9 +664,8 @@ public class TestContainerType extends TestDatabase {
 
         SpecimenWrapper parentSpc = SpecimenHelper.addParentSpecimen();
 
-        List<SpecimenWrapper> spcs = SpecimenHelper.addSpecimens(parentSpc
-            .getCollectionEvent().getPatient(), (ClinicWrapper) parentSpc
-            .getOriginInfo().getCenter(), cont3, 0, 0, 2, selectedSampleTypes);
+        List<SpecimenWrapper> spcs = SpecimenHelper.addSpecimens(parentSpc,
+            cont3, 0, 0, 2, selectedSampleTypes);
 
         childTypeL3.removeFromSpecimenTypeCollection(Arrays.asList(spcs.get(1)
             .getSpecimenType()));

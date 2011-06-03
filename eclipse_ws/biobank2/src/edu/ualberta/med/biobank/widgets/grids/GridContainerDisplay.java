@@ -23,30 +23,17 @@ public class GridContainerDisplay extends AbstractGridDisplay {
     private UICellStatus defaultStatus = UICellStatus.NOT_INITIALIZED;
 
     @Override
-    protected void paintGrid(PaintEvent e, ContainerDisplayWidget displayWidget) {
-        super.paintGrid(e, displayWidget);
-        if (legendStatus != null) {
-            legendWidth = gridWidth / legendStatus.size();
-        }
-        if (hasLegend) {
-            for (int i = 0; i < legendStatus.size(); i++) {
-                UICellStatus status = legendStatus.get(i);
-                drawLegend(e, status.getColor(), i, status.getLegend());
-            }
-        }
-    }
-
-    @Override
     protected Color getDefaultBackgroundColor(PaintEvent e,
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
         int indexRow, int indexCol) {
         if (displayWidget.getCells() != null) {
-            ContainerCell cell = (ContainerCell) displayWidget.getCells().get(
+            AbstractUICell uiCell = displayWidget.getCells().get(
                 new RowColPos(indexRow, indexCol));
-            if (cell == null) {
-                cell = new ContainerCell();
+            if (uiCell == null) {
+                return super.getDefaultBackgroundColor(e, displayWidget,
+                    rectangle, indexRow, indexCol);
             }
-            UICellStatus status = cell.getStatus();
+            UICellStatus status = uiCell.getStatus();
             if (status == null)
                 status = defaultStatus;
             return status.getColor();
@@ -98,23 +85,8 @@ public class GridContainerDisplay extends AbstractGridDisplay {
         return sname;
     }
 
-    // public void setLegend(List<CellStatus> legendStatus) {
-    // hasLegend = true;
-    // this.legendStatus = legendStatus;
-    // }
-
     public void setDefaultStatus(UICellStatus status) {
         this.defaultStatus = status;
-    }
-
-    @Override
-    public RowColPos getPositionAtCoordinates(int x, int y) {
-        int col = x / getCellWidth();
-        int row = y / getCellHeight();
-        if (col >= 0 && col < getCols() && row >= 0 && row < getRows()) {
-            return new RowColPos(row, col);
-        }
-        return null;
     }
 
     @Override

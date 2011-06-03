@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.forms.AbstractSpecimenAdminForm;
+import edu.ualberta.med.biobank.forms.linkassign.AbstractSpecimenAdminForm;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 
 public class CancelConfirmWidget extends BiobankWidget {

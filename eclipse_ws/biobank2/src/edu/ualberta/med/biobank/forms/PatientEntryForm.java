@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
@@ -28,9 +27,6 @@ import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class PatientEntryForm extends BiobankEntryForm {
-
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(PatientEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientEntryForm";
 
@@ -99,6 +95,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         if (patient.isNew()) {
             if (studies.size() == 1) {
                 selectedStudy = studies.get(0);
+                patient.setStudy(selectedStudy);
             }
         } else {
             selectedStudy = patient.getStudy();
@@ -141,12 +138,11 @@ public class PatientEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         patient.persist();
-        // to update patient view:
+        SessionManager.updateAllSimilarNodes(adapter, true);
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                SessionManager.updateAllSimilarNodes(adapter, true);
-                CollectionView.showPatient(patient);
+                CollectionView.getCurrent().getSearchedNode().performExpand();
             }
         });
     }

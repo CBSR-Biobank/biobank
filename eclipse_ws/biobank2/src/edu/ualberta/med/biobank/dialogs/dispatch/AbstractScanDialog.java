@@ -163,8 +163,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             if (cells != null) {
                 serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell>();
                 for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
-                    serverCells.put(entry.getKey(),
-                        getServerCell(entry.getValue()));
+                    serverCells.put(entry.getKey(), entry.getValue()
+                        .transformIntoServerCell());
                 }
             }
             // server side call
@@ -208,14 +208,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     protected boolean checkBeforeProcessing(CenterWrapper<?> currentCenter)
         throws Exception {
         return true;
-    }
-
-    public static Cell getServerCell(PalletCell palletCell) {
-        return new edu.ualberta.med.biobank.common.scanprocess.Cell(
-            palletCell.getRow(), palletCell.getCol(), palletCell.getValue(),
-            palletCell.getStatus() == null ? null
-                : edu.ualberta.med.biobank.common.scanprocess.CellStatus
-                    .valueOf(palletCell.getStatus().name()));
     }
 
     @Override
@@ -453,8 +445,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
         CellProcessResult res = SessionManager.getAppService()
-            .processCellStatus(getServerCell(cell), getProcessData(),
-                SessionManager.getUser());
+            .processCellStatus(cell.transformIntoServerCell(),
+                getProcessData(), SessionManager.getUser());
         cell.merge(SessionManager.getAppService(), res.getCell());
         if (res.getProcessStatus() == CellStatus.ERROR) {
             Button okButton = getButton(IDialogConstants.PROCEED_ID);

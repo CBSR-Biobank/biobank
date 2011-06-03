@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -22,16 +23,14 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
+import edu.ualberta.med.biobank.views.CollectionView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicVisitInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientMergeForm extends BiobankEntryForm {
-
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(PatientMergeForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientMergeForm";
 
@@ -226,14 +225,10 @@ public class PatientMergeForm extends BiobankEntryForm {
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                PatientAdapter p = (PatientAdapter) SessionManager
-                    .searchFirstNode(patient2);
-                if (p != null) {
-                    p.getParent().removeChild(p);
-                }
-                patient1Adapter.rebuild();
-                SessionManager.getCurrentAdapterViewWithTree().getTreeViewer()
-                    .refresh();
+                PatientSearchedNode searcher = (PatientSearchedNode) CollectionView
+                    .getCurrent().getSearchedNode();
+                searcher.removeObjects(Arrays.asList(patient2));
+                searcher.performExpand();
                 closeEntryOpenView(false, true);
             }
         });

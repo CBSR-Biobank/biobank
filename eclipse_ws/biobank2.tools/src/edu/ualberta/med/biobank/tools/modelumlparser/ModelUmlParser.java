@@ -281,7 +281,10 @@ public class ModelUmlParser {
 
             if (typeNodes.getLength() != 1) {
                 throw new Exception(
-                    "Attribute does not have only one type child");
+                    "Attribute does not have only one type child for class "
+                        + modelClass.getName() + " ant attribute "
+                        + classAttrName + ", num types "
+                        + typeNodes.getLength());
             }
 
             String xmiIdRef = typeNodes.item(0).getNodeValue();

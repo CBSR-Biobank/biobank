@@ -25,7 +25,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(AbstractSearchedNode.class.getName());
 
-    private List<ModelWrapper<?>> searchedObjects = new ArrayList<ModelWrapper<?>>();
+    protected List<ModelWrapper<?>> searchedObjects = new ArrayList<ModelWrapper<?>>();
 
     private boolean keepDirectLeafChild;
 
@@ -57,15 +57,17 @@ public abstract class AbstractSearchedNode extends AdapterBase {
                 }
                 List<AdapterBase> subChildren = new ArrayList<AdapterBase>(
                     child.getChildren());
+                List<AdapterBase> toRemove = new ArrayList<AdapterBase>();
                 for (AdapterBase subChild : subChildren) {
                     ModelWrapper<?> subChildWrapper = subChild.getModelObject();
                     subChildWrapper.reload();
-                    if (!searchedObjects.contains(subChildWrapper)
-                        || !isParentTo(childWrapper, subChildWrapper)) {
-                        subChild.getParent().removeChild(subChild);
-                    }
-                    subChild.rebuild();
+                    if (!searchedObjects.contains(subChildWrapper)) {
+                        toRemove.add(subChild);
+                    } else
+                        subChild.rebuild();
                 }
+                for (AdapterBase subChild : toRemove)
+                    child.removeChild(subChild);
             }
 
             // add searched objects is not yet there

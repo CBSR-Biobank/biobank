@@ -524,4 +524,8 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
             getRowCapacity(), getColCapacity());
     }
 
+    public boolean isPallet96() {
+        return RowColPos.PALLET_96_ROW_MAX.equals(getRowCapacity())
+            && RowColPos.PALLET_96_COL_MAX.equals(getColCapacity());
+    }
 }

@@ -39,9 +39,8 @@ public class DAliquotsTest extends AbstractReportTest {
         Assert.assertTrue(aliquots.size() > 0);
 
         SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
-        // FIXME
-        // checkResults(getTopContainerIds(getContainers()),
-        // aliquot.getLinkDate(), aliquot.getLinkDate());
+        checkResults(getTopContainerIds(getContainers()),
+            aliquot.getCreatedAt(), aliquot.getCreatedAt());
     }
 
     @Test
@@ -52,13 +51,11 @@ public class DAliquotsTest extends AbstractReportTest {
         SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
 
         Calendar calendar = Calendar.getInstance();
-        // FIXME
-        // calendar.setTime(aliquot.getLinkDate());
+        calendar.setTime(aliquot.getCreatedAt());
         calendar.add(Calendar.HOUR_OF_DAY, 24);
 
-        // FIXME
-        // checkResults(getTopContainerIds(getContainers()),
-        // aliquot.getLinkDate(), calendar.getTime());
+        checkResults(getTopContainerIds(getContainers()),
+            aliquot.getCreatedAt(), calendar.getTime());
     }
 
     @Override
@@ -108,14 +105,12 @@ public class DAliquotsTest extends AbstractReportTest {
         final Calendar calendar = Calendar.getInstance();
         return new Mapper<SpecimenWrapper, List<Object>, Long>() {
             public List<Object> getKey(SpecimenWrapper aliquot) {
-                // FIXME
-                // calendar.setTime(aliquot.getLinkDate());
+                calendar.setTime(aliquot.getCreatedAt());
 
                 List<Object> key = new ArrayList<Object>();
-                // FIXME
-                // key.add(aliquot.getProcessingEvent().getPatient().getStudy()
-                // .getNameShort());
-                // key.add(aliquot.getProcessingEvent().getCenter().getNameShort());
+                key.add(aliquot.getCollectionEvent().getPatient().getStudy()
+                    .getNameShort());
+                key.add(aliquot.getProcessingEvent().getCenter().getNameShort());
                 key.add(new Integer(calendar.get(Calendar.YEAR)));
                 key.add(new Long(getDateFieldValue(calendar, dateField)));
 

@@ -8,7 +8,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import edu.ualberta.med.biobank.forms.AbstractSpecimenAdminForm;
+import edu.ualberta.med.biobank.forms.linkassign.AbstractSpecimenAdminForm;
 
 public class PrintHandler extends AbstractHandler implements IHandler {
 

@@ -21,10 +21,9 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 
 public class NewPsByStudyClinicTest extends AbstractReportTest {
     private static final Mapper<ProcessingEventWrapper, Integer, ProcessingEventWrapper> GROUP_BY_PATIENT = new Mapper<ProcessingEventWrapper, Integer, ProcessingEventWrapper>() {
-        public Integer getKey(ProcessingEventWrapper patientVisit) {
-            // FIXME
-            // return patientVisit.getPatient().getId();
-            return null;
+        public Integer getKey(ProcessingEventWrapper pevent) {
+            return pevent.getSpecimenCollection(false).get(0)
+                .getCollectionEvent().getPatient().getId();
         }
 
         public ProcessingEventWrapper getValue(ProcessingEventWrapper newPv,
@@ -33,11 +32,8 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
                 return newPv;
             }
 
-            // FIXME
-            // return oldPv.getDateProcessed().before(newPv.getDateProcessed())
-            // ? oldPv
-            // : newPv;
-            return null;
+            return oldPv.getCreatedAt().before(newPv.getCreatedAt()) ? oldPv
+                : newPv;
         }
     };
 
@@ -45,14 +41,12 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
         final String dateField) {
         final Calendar calendar = Calendar.getInstance();
         return new Mapper<ProcessingEventWrapper, List<Object>, Long>() {
-            public List<Object> getKey(ProcessingEventWrapper patientVisit) {
-                // FIXME
-                // calendar.setTime(patientVisit.getDateProcessed());
+            public List<Object> getKey(ProcessingEventWrapper pevent) {
+                calendar.setTime(pevent.getCreatedAt());
 
                 List<Object> key = new ArrayList<Object>();
-                // FIXME
-                // key.add(patientVisit.getPatient().getStudy().getNameShort());
-                key.add(patientVisit.getCenter().getName());
+                key.add(pevent.getCenter().getNameShort());
+                key.add(pevent.getCenter().getName());
                 key.add(new Integer(calendar.get(Calendar.YEAR)));
                 key.add(new Long(getDateFieldValue(calendar, dateField)));
 
@@ -82,27 +76,24 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
 
         ProcessingEventWrapper patientVisit = patientVisits.get(patientVisits
             .size() / 2);
-        // FIXME
-        // checkResults(patientVisit.getDateProcessed(),
-        // patientVisit.getDateProcessed());
+        checkResults(patientVisit.getCreatedAt(), patientVisit.getCreatedAt());
     }
 
     @Test
     public void testSecondPatientVisitDateRange() throws Exception {
         for (PatientWrapper patient : getPatients()) {
-            // FIXME
-            // List<ProcessingEventWrapper> visits = patient
-            // .getProcessingEventCollection(false);
-            // if (visits.size() >= 2) {
-            // ProcessingEventWrapper visit = visits.get(1);
-            //
-            // Calendar calendar = Calendar.getInstance();
-            // calendar.setTime(visit.getDateProcessed());
-            // calendar.add(Calendar.HOUR_OF_DAY, 24);
-            //
-            // checkResults(visit.getDateProcessed(), calendar.getTime());
-            // return;
-            // }
+            List<ProcessingEventWrapper> visits = patient
+                .getProcessingEventCollection(false);
+            if (visits.size() >= 2) {
+                ProcessingEventWrapper visit = visits.get(1);
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(visit.getCreatedAt());
+                calendar.add(Calendar.HOUR_OF_DAY, 24);
+
+                checkResults(visit.getCreatedAt(), calendar.getTime());
+                return;
+            }
         }
 
         Assert.fail("no patient with 2 or more patient visits");

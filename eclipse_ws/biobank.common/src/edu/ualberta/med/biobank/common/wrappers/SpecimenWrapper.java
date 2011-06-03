@@ -231,18 +231,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             return getPositionStringInParent(position, getParentContainer());
         }
         ContainerWrapper directParent = getParentContainer();
-        ContainerPathWrapper path = directParent.getContainerPath();
-        ContainerWrapper topContainer;
-
-        if (path != null) {
-            topContainer = path.getTopContainer();
-        } else {
-            topContainer = directParent;
-            while (topContainer.hasParentContainer()) {
-                topContainer = topContainer.getParentContainer();
-            }
-        }
-        String nameShort = topContainer.getContainerType().getNameShort();
+        // ContainerPathWrapper path = directParent.getContainerPath();
+        String nameShort = directParent.getTopContainer().getContainerType()
+            .getNameShort();
         if (addTopParentShortName && nameShort != null)
             return directParent.getLabel()
                 + getPositionStringInParent(position, directParent) + " ("
@@ -486,6 +477,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     @Override
     protected void resetInternalFields() {
         objectWithPositionManagement.resetInternalFields();
+        if (isNew())
+            setTopSpecimenInternal(this);
     }
 
     @Override

@@ -42,7 +42,7 @@ public class SessionHelper implements Runnable {
         } else {
             this.serverUrl = "http://";
         }
-        this.serverUrl += server + "/biobank2";
+        this.serverUrl += server + "/biobank";
         this.userName = userName;
         this.password = password;
 

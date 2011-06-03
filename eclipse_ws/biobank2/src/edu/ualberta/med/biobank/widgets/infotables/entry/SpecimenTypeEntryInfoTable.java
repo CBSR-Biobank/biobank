@@ -185,6 +185,7 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
         }
     }
 
+    @SuppressWarnings("serial")
     @Override
     protected BiobankTableSorter getComparator() {
         return new BiobankTableSorter() {

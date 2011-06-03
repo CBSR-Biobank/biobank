@@ -83,6 +83,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
         });
     }
 
+    @SuppressWarnings("serial")
     @Override
     protected BiobankTableSorter getComparator() {
         return new BiobankTableSorter() {

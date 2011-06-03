@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.grids;
 
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
@@ -15,7 +14,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileSettings;
 
@@ -62,14 +60,11 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         });
         setCellWidth(SAMPLE_WIDTH);
         setCellHeight(SAMPLE_WIDTH);
-        setStorageSize(ScanCell.ROW_MAX, ScanCell.COL_MAX);
+        setDefaultStorageSize();
     }
 
-    @Override
-    public void initLegend(List<UICellStatus> status) {
-        super.initLegend(status);
-        hasLegend = true;
-        legendWidth = PALLET_WIDTH / legendStatus.size();
+    public void setDefaultStorageSize() {
+        setStorageSize(ScanCell.ROW_MAX, ScanCell.COL_MAX);
     }
 
     protected void setProfile(ProfileSettings profile) {
@@ -82,12 +77,6 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         FontData fd2 = new FontData(fd.getName(), 8, fd.getStyle());
         e.gc.setFont(new Font(e.display, fd2));
         super.paintGrid(e, displayWidget);
-        if (hasLegend) {
-            for (int i = 0; i < legendStatus.size(); i++) {
-                UICellStatus status = legendStatus.get(i);
-                drawLegend(e, status.getColor(), i, status.getLegend());
-            }
-        }
     }
 
     @Override
@@ -154,17 +143,6 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         e.gc.fillRectangle(rectangle);
         e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
         e.gc.drawRectangle(rectangle);
-
     }
 
-    @Override
-    public RowColPos getPositionAtCoordinates(int xPosition, int yPosition) {
-        int col = xPosition / getCellWidth();
-        int row = yPosition / getCellHeight();
-        if (col >= 0 && col < ScanCell.COL_MAX && row >= 0
-            && row < ScanCell.ROW_MAX) {
-            return new RowColPos(row, col);
-        }
-        return null;
-    }
 }

@@ -151,7 +151,17 @@ public class ContainerDisplayWidget extends Canvas {
     }
 
     public void setContainerType(ContainerTypeWrapper type) {
-        setContainerType(type, false);
+        setContainerType(type, null, false);
+    }
+
+    public void setContainerType(ContainerTypeWrapper type, Integer cellSize) {
+        setContainerType(type, cellSize, false);
+    }
+
+    public void setContainerType(ContainerTypeWrapper type, Integer cellSize,
+        boolean createDefaultContainer) {
+        this.containerType = type;
+        initDisplayFromType(createDefaultContainer, cellSize);
     }
 
     public void setContainerType(ContainerTypeWrapper type,
@@ -161,6 +171,11 @@ public class ContainerDisplayWidget extends Canvas {
     }
 
     public void initDisplayFromType(boolean createDefaultContainer) {
+        initDisplayFromType(createDefaultContainer, null);
+    }
+
+    public void initDisplayFromType(boolean createDefaultContainer,
+        Integer cellSize) {
         AbstractContainerDisplay display = null;
         if (containerType == null) {
             if (createDefaultContainer) {
@@ -179,6 +194,10 @@ public class ContainerDisplayWidget extends Canvas {
             }
         }
         setContainerDisplay(display);
+        if (display instanceof AbstractGridDisplay && cellSize != null) {
+            ((AbstractGridDisplay) display).setCellWidth(cellSize);
+            ((AbstractGridDisplay) display).setCellHeight(cellSize);
+        }
     }
 
     protected void setContainerDisplay(AbstractContainerDisplay display) {

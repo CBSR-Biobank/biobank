@@ -6,6 +6,8 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.Collection;
@@ -69,15 +71,14 @@ public class DbHelper {
     }
 
     public static void deleteCollectionEvents(
-        Collection<CollectionEventWrapper> cevents) throws Exception {
-        Assert.assertNotNull("appService is null", appService);
-        if ((cevents == null) || (cevents.size() == 0))
-            return;
-
-        for (CollectionEventWrapper cevent : cevents) {
-            if (!cevent.isNew()) {
-                cevent.delete();
-            }
+        List<CollectionEventWrapper> cevents) throws Exception {
+        for (CollectionEventWrapper ce : cevents) {
+            if (ce.isNew())
+                continue;
+            ce.reload();
+            deleteFromList(ce.getAllSpecimenCollection(false));
+            ce.reload();
+            ce.delete();
         }
     }
 
@@ -96,12 +97,15 @@ public class DbHelper {
         }
     }
 
-    public static void deleteCollectionEvents(
-        List<CollectionEventWrapper> cevents) throws Exception {
-        for (CollectionEventWrapper ce : cevents) {
-            deleteFromList(ce.getAllSpecimenCollection(false));
-            ce.reload();
-            ce.delete();
+    public static void deleteProcessingEvents(
+        List<ProcessingEventWrapper> pevents) throws Exception {
+        for (ProcessingEventWrapper pevent : pevents) {
+            pevent.reload();
+            for (SpecimenWrapper spc : pevent.getSpecimenCollection(false)) {
+                spc.delete();
+            }
+            pevent.reload();
+            pevent.delete();
         }
     }
 

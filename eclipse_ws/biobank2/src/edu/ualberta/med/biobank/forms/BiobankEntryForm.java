@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.acegisecurity.AccessDeniedException;
+import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
@@ -217,7 +218,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                         });
                         monitor.setCanceled(true);
                         BiobankPlugin.openAsyncError("Save error", bse);
-                        throw new RuntimeException(bse);
                     } catch (Exception e) {
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
@@ -313,19 +313,19 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         return firstControl;
     }
 
-    protected void setFirstControl(Control c) {
+    public void setFirstControl(Control c) {
         firstControl = c;
     }
 
-    protected void addBooleanBinding(WritableValue writableValue,
+    public Binding addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, final String errorMsg) {
-        addBooleanBinding(writableValue, observableValue, errorMsg,
+        return addBooleanBinding(writableValue, observableValue, errorMsg,
             IStatus.ERROR);
     }
 
-    protected void addBooleanBinding(WritableValue writableValue,
+    public Binding addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, String errorMsg, int statusType) {
-        widgetCreator.addBooleanBinding(writableValue, observableValue,
+        return widgetCreator.addBooleanBinding(writableValue, observableValue,
             errorMsg, statusType);
     }
 

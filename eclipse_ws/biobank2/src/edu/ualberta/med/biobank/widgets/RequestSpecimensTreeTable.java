@@ -45,6 +45,7 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
     protected List<Node> groups;
     private Boolean selecting = false;
 
+    @SuppressWarnings("unused")
     public RequestSpecimensTreeTable(Composite parent, RequestWrapper shipment) {
         super(parent, SWT.NONE);
 

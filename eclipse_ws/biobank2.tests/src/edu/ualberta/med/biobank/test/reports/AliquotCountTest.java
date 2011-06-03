@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.reports;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
@@ -44,8 +45,7 @@ public class AliquotCountTest extends AbstractReportTest {
         Assert.assertTrue(aliquots.size() > 0);
 
         SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
-        // FIXME
-        // checkResults(aliquot.getLinkDate(), aliquot.getLinkDate());
+        checkResults(aliquot.getCreatedAt(), aliquot.getCreatedAt());
     }
 
     @Test
@@ -55,12 +55,11 @@ public class AliquotCountTest extends AbstractReportTest {
 
         SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
 
-        // FIXME
-        // Calendar calendar = Calendar.getInstance();
-        // calendar.setTime(aliquot.getLinkDate());
-        // calendar.add(Calendar.HOUR_OF_DAY, 24);
-        //
-        // checkResults(aliquot.getLinkDate(), calendar.getTime());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(aliquot.getCreatedAt());
+        calendar.add(Calendar.HOUR_OF_DAY, 24);
+
+        checkResults(aliquot.getCreatedAt(), calendar.getTime());
     }
 
     @Override

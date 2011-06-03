@@ -435,6 +435,15 @@ public abstract class BiobankFormBase extends EditorPart implements
             createBeansObservable(bean, propertyName), validator);
     }
 
+    protected Control createBoundWidgetWithLabel(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions,
+        String fieldLabel, String[] widgetValues, Object bean,
+        String propertyName, AbstractValidator validator, String bindingKey) {
+        return widgetCreator.createBoundWidgetWithLabel(composite, widgetClass,
+            widgetOptions, fieldLabel, widgetValues,
+            createBeansObservable(bean, propertyName), validator, bindingKey);
+    }
+
     public DateTimeWidget createDateTimeWidget(Composite client, Label label,
         Date date, Object bean, String propertyName,
         AbstractValidator validator, int typeShown, String bindingKey) {

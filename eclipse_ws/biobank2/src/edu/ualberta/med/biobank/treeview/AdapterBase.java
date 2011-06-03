@@ -270,8 +270,9 @@ public abstract class AdapterBase {
             return;
         AdapterBase itemToRemove = null;
         for (AdapterBase child : children) {
-            if ((child.getId().equals(item.getId()))
-                && child.getLabel().equals(item.getLabel()))
+            if ((child.getId() == null && item.getId() == null)
+                || (child.getId().equals(item.getId()) && child.getLabel()
+                    .equals(item.getLabel())))
                 itemToRemove = child;
         }
         if (itemToRemove != null) {
@@ -415,6 +416,7 @@ public abstract class AdapterBase {
         }
     }
 
+    @SuppressWarnings("unused")
     public void loadChildrenBackground(final boolean updateNode) {
         if ((childUpdateThread != null) && childUpdateThread.isAlive()) {
             loadChildrenSemaphore.release();

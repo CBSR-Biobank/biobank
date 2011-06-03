@@ -24,12 +24,11 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 
 public class PatientVisitSummaryTest extends AbstractReportTest {
     private static final Mapper<ProcessingEventWrapper, List<String>, PvCount> PV_COUNT_BY_STUDY_CLINIC_PATIENT = new Mapper<ProcessingEventWrapper, List<String>, PvCount>() {
-        public List<String> getKey(ProcessingEventWrapper patientVisit) {
-            // FIXME
-            // return Arrays.asList(patientVisit.getPatient().getStudy()
-            // .getNameShort(), patientVisit.getCenter().getNameShort(),
-            // patientVisit.getPatient().getPnumber());
-            return null;
+        public List<String> getKey(ProcessingEventWrapper pevent) {
+            return Arrays.asList(pevent.getCenter().getNameShort(), pevent
+                .getCenter().getNameShort(), pevent
+                .getSpecimenCollection(false).get(0).getCollectionEvent()
+                .getPatient().getPnumber());
         }
 
         public PvCount getValue(ProcessingEventWrapper patientVisit,
@@ -105,9 +104,7 @@ public class PatientVisitSummaryTest extends AbstractReportTest {
         ProcessingEventWrapper patientVisit = patientVisits.get(patientVisits
             .size() / 2);
 
-        // FIXME
-        // checkResults(patientVisit.getDateProcessed(),
-        // patientVisit.getDateProcessed());
+        checkResults(patientVisit.getCreatedAt(), patientVisit.getCreatedAt());
     }
 
     @Test
@@ -119,12 +116,10 @@ public class PatientVisitSummaryTest extends AbstractReportTest {
             .size() / 2);
 
         Calendar calendar = Calendar.getInstance();
-        // FIXME
-        // calendar.setTime(patientVisit.getDateProcessed());
+        calendar.setTime(patientVisit.getCreatedAt());
         calendar.add(Calendar.HOUR_OF_DAY, 24);
 
-        // FIXME
-        // checkResults(patientVisit.getDateProcessed(), calendar.getTime());
+        checkResults(patientVisit.getCreatedAt(), calendar.getTime());
     }
 
     @Override
