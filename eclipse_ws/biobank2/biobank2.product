@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="BioBank2" uid="biobank2.product" id="biobank2.product" application="biobank2.biobank2" version="1.4.0.rc6" useFeatures="true" includeLaunchers="false">
+<product name="BioBank" uid="biobank2.product" id="biobank2.product" application="biobank2.biobank2" version="1.0.0" useFeatures="true" includeLaunchers="false">
 
    <aboutInfo>
       <image path="/biobank2/icons/about.png"/>
       <text>
-         BioBank2 Java Client
+         BioBank3 Java Client
 Version {0}
 
 Developed for the Canadian BioSample Repository by AICML .
@@ -39,6 +39,7 @@ AICML: http://aicml.cs.ualberta.ca
             winMediumHigh="/biobank2/icons/biobank_launcher_32.bmp"/>
       </win>
    </launcher>
+
 
    <vm>
       <linux include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/OSGi%Minimum-1.0</linux>

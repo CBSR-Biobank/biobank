@@ -95,9 +95,9 @@ public class SessionState extends AbstractSourceProvider {
         setSuperAdminMode(user != null && user.isInSuperAdminMode());
         setHasWorkingCenter(user != null
             && user.getCurrentWorkingCenter() != null);
-        setHasClinicShipmentRights(user
-            .canPerformActions(SecurityFeature.CLINIC_SHIPMENT));
-        setDispatchRights(user
-            .canPerformActions(SecurityFeature.DISPATCH_REQUEST));
+        setHasClinicShipmentRights(user != null
+            && user.canPerformActions(SecurityFeature.CLINIC_SHIPMENT));
+        setDispatchRights(user != null
+            && user.canPerformActions(SecurityFeature.DISPATCH_REQUEST));
     }
 }

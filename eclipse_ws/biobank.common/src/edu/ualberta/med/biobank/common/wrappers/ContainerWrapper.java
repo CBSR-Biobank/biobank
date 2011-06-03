@@ -1107,25 +1107,24 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
             for (int i = 0; i < validLengths.size(); i++) {
                 Integer crop = validLengths.get(i);
-                if (i != 0) {
+                if (res.length() != 0)
                     res.append(", "); //$NON-NLS-1$
 
-                    if (crop < positionText.length())
-                        res.append(positionText.substring(0,
-                            positionText.length() - crop));
-                }
+                if (crop < positionText.length())
+                    res.append(positionText.substring(0, positionText.length()
+                        - crop));
             }
             String errorMsg;
             if (contType == null)
                 errorMsg = Messages
                     .getString(
                         "ContainerWrapper.getPossibleContainersFromPosition.error.notfound.msg", //$NON-NLS-1$
-                        positionText);
+                        res.toString());
             else
                 errorMsg = Messages
                     .getString(
                         "ContainerWrapper.getPossibleContainersFromPosition.error.notfoundWithType.msg",//$NON-NLS-1$
-                        positionText, contType.getNameShort());
+                        res.toString(), contType.getNameShort());
 
             throw new BiobankException(errorMsg);
         }
