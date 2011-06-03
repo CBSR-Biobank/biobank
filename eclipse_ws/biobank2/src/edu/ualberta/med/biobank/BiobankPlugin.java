@@ -54,10 +54,8 @@ import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
-import edu.ualberta.med.biobank.treeview.request.ApprovedRequestNode;
 import edu.ualberta.med.biobank.treeview.request.DispatchCenterAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
-import edu.ualberta.med.biobank.treeview.request.RequestSiteAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
@@ -202,10 +200,6 @@ public class BiobankPlugin extends AbstractUIPlugin {
             BiobankPlugin.IMG_DISPATCH_SHIPMENT);
         classToImageKey.put(DispatchCenterAdapter.class.getName(),
             BiobankPlugin.IMG_SITE);
-        classToImageKey.put(RequestSiteAdapter.class.getName(),
-            BiobankPlugin.IMG_SITE);
-        classToImageKey.put(ApprovedRequestNode.class.getName(),
-            BiobankPlugin.IMG_REQUEST);
         classToImageKey.put(RequestAdapter.class.getName(),
             BiobankPlugin.IMG_REQUEST);
         classToImageKey.put(SpecimenAdapter.class.getName(),

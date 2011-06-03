@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.peer.ContainerPathPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
@@ -41,15 +40,21 @@ public class RequestTableGroup implements Node {
         }
     }
 
-    public static final String TREE_QUERY = "select ra, cp."
-        + ContainerPathPeer.PATH.getName() + ", c.id, a.id, st.id, sp.id from "
-        + RequestSpecimen.class.getName() + " ra inner join fetch ra."
-        + RequestSpecimenPeer.SPECIMEN.getName() + " a inner join fetch a."
-        + SpecimenPeer.SPECIMEN_TYPE.getName() + " st inner join fetch a."
-        + SpecimenPeer.SPECIMEN_POSITION.getName() + " sp inner join fetch sp."
-        + SpecimenPositionPeer.CONTAINER.getName() + " c inner join fetch c."
-        + ContainerPeer.CONTAINER_PATH.getName() + " cp where ra."
-        + RequestSpecimenPeer.REQUEST.getName() + ".id=? order by ra."
+    public static final String TREE_QUERY = "select ra, cp, c.id, a.id, st.id, sp.id from "
+        + RequestSpecimen.class.getName()
+        + " ra inner join fetch ra."
+        + RequestSpecimenPeer.SPECIMEN.getName()
+        + " a inner join fetch a."
+        + SpecimenPeer.SPECIMEN_TYPE.getName()
+        + " st inner join fetch a."
+        + SpecimenPeer.SPECIMEN_POSITION.getName()
+        + " sp inner join fetch sp."
+        + SpecimenPositionPeer.CONTAINER.getName()
+        + " c inner join fetch c."
+        + ContainerPeer.PATH.getName()
+        + " cp where ra."
+        + RequestSpecimenPeer.REQUEST.getName()
+        + ".id=? order by ra."
         + RequestSpecimenPeer.STATE.getName();
 
     public static List<Node> getGroupsForShipment(RequestWrapper ship) {
