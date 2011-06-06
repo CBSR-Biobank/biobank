@@ -543,19 +543,40 @@ public abstract class AbstractLinkAssignEntryForm extends
                 widgetCreator.showWidget(thirdSingleParentWidget, show);
             }
             if (show) {
-                if (parentContainers != null && parentContainers.size() >= 3) {
-                    ContainerWrapper thirdParent = parentContainers.get(2);
-                    ContainerWrapper secondParent = parentContainers.get(1);
-                    ContainerWrapper firstParent = parentContainers.get(0);
-                    thirdSingleParentWidget.setContainerType(thirdParent
-                        .getContainerType());
-                    thirdSingleParentWidget.setSelection(secondParent
-                        .getPositionAsRowCol());
-                    thirdSingleParentLabel.setText(thirdParent.getLabel());
-                    secondSingleParentWidget.setContainer(secondParent);
-                    secondSingleParentWidget.setSelection(firstParent
-                        .getPositionAsRowCol());
-                    secondSingleParentLabel.setText(secondParent.getLabel());
+                if (parentContainers != null) {
+                    ContainerWrapper thirdParent = null;
+                    ContainerWrapper secondParent = null;
+                    ContainerWrapper firstParent = null;
+                    if (parentContainers.size() >= 3)
+                        thirdParent = parentContainers.get(2);
+                    if (parentContainers.size() >= 2)
+                        secondParent = parentContainers.get(1);
+                    if (parentContainers.size() >= 1)
+                        firstParent = parentContainers.get(0);
+                    boolean hasThirdParent = thirdParent != null;
+                    widgetCreator.showWidget(thirdSingleParentWidget,
+                        hasThirdParent);
+                    widgetCreator.showWidget(thirdSingleParentLabel,
+                        hasThirdParent);
+                    if (hasThirdParent) {
+                        thirdSingleParentWidget.setContainerType(thirdParent
+                            .getContainerType());
+                        thirdSingleParentWidget.setSelection(secondParent
+                            .getPositionAsRowCol());
+                        thirdSingleParentLabel.setText(thirdParent.getLabel());
+                    }
+                    boolean hasSecondParent = secondParent != null;
+                    widgetCreator.showWidget(secondSingleParentWidget,
+                        hasSecondParent);
+                    widgetCreator.showWidget(secondSingleParentLabel,
+                        hasSecondParent);
+                    if (hasSecondParent) {
+                        secondSingleParentWidget.setContainer(secondParent);
+                        secondSingleParentWidget.setSelection(firstParent
+                            .getPositionAsRowCol());
+                        secondSingleParentLabel
+                            .setText(secondParent.getLabel());
+                    }
                 }
             }
             showVisualisation(show);
