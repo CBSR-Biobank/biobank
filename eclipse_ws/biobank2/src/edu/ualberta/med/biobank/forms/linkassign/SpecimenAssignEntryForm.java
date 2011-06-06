@@ -117,6 +117,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private boolean isNewMultipleContainer;
     private boolean checkingMultipleContainerPosition;
 
+    private boolean initWithProduct = false;
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -268,12 +270,13 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             }
         });
 
-        singleTypeText = createReadOnlyLabelledField(fieldsComposite, SWT.NONE,
+        singleTypeText = (BiobankText) createLabelledWidget(fieldsComposite,
+            BiobankText.class, SWT.NONE,
             Messages.getString("SpecimenAssign.single.type.label"));
         singleTypeText.setEnabled(false);
 
-        singleCollectionDateText = createReadOnlyLabelledField(fieldsComposite,
-            SWT.NONE,
+        singleCollectionDateText = (BiobankText) createLabelledWidget(
+            fieldsComposite, BiobankText.class, SWT.NONE,
             Messages.getString("SpecimenAssign.single.collection.date.label"));
         singleCollectionDateText.setEnabled(false);
 
@@ -325,12 +328,12 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         if (positionString == null) {
             displayOldSingleFields(false);
             positionString = Messages.getString("SpecimenAssign.position.none"); //$NON-NLS-1$
-            newSinglePositionText.setFocus();
+            focusControl(newSinglePositionText);
         } else {
             displayOldSingleFields(true);
             oldSinglePositionCheckText.setText(oldSinglePositionCheckText
                 .getText());
-            oldSinglePositionCheckText.setFocus();
+            focusControl(oldSinglePositionCheckText);
         }
         oldSinglePositionText.setText(positionString);
         appendLog(Messages.getString(
@@ -550,7 +553,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         new Runnable() {
                             @Override
                             public void run() {
-                                boolean ok = checkMultipleContainerPosition();
+                                boolean ok = initWithProduct
+                                    || checkMultipleContainerPosition();
                                 setCanLaunchScan(ok);
                                 initCellsWithContainer(currentMultipleContainer);
                                 if (!ok) {
@@ -716,6 +720,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     protected boolean checkMultipleScanBarcode() {
         try {
+            initWithProduct = false;
             ContainerWrapper palletFoundWithProductBarcode = ContainerWrapper
                 .getContainerWithProductBarcodeInSite(appService,
                     currentMultipleContainer.getSite(),
@@ -750,10 +755,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                                         .getFullInfoLabel()));
                     return false;
                 }
-
                 currentMultipleContainer
                     .initObjectWith(palletFoundWithProductBarcode);
                 currentMultipleContainer.reset();
+                initWithProduct = true;
 
                 // display the type, which can't be modified.
                 palletTypesViewer.getCombo().setEnabled(false);
@@ -999,6 +1004,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         singleSpecimen.reset(); // reset internal values
         setDirty(false);
+        initWithProduct = false;
         if (mode.isSingleMode())
             inventoryIdText.setFocus();
         else if (useScanner)
@@ -1049,7 +1055,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         widgetCreator.setBinding(OLD_SINGLE_POSITION_BINDING, isSingleMode);
         oldSinglePositionCheckText.setText("?"); //$NON-NLS-1$
         widgetCreator.setBinding(NEW_SINGLE_POSITION_BINDING, isSingleMode);
-        widgetCreator.setBinding(PRODUCT_BARCODE_BINDING, !isSingleMode);
+        widgetCreator.setBinding(PRODUCT_BARCODE_BINDING, !isSingleMode
+            && useScanner);
         widgetCreator.setBinding(LABEL_BINDING, !isSingleMode);
         widgetCreator.setBinding(PALLET_TYPES_BINDING, !isSingleMode);
         super.setBindings(isSingleMode);
