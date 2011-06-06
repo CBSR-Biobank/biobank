@@ -36,8 +36,6 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     public static final String MSG_PATIENT_NOT_VALID = "Select a second patient";
 
-    private PatientAdapter patient1Adapter;
-
     private PatientWrapper patient1;
 
     private PatientWrapper patient2;
@@ -64,7 +62,6 @@ public class PatientMergeForm extends BiobankEntryForm {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        patient1Adapter = (PatientAdapter) adapter;
         patient1 = (PatientWrapper) getModelObject();
 
         String tabName = "Merging Patient " + patient1.getPnumber();
