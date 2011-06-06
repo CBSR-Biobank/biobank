@@ -299,7 +299,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         if (patientAdapter != null)
             cevent.setPatient(patientAdapter.getWrapper());
         cevent.addToOriginalSpecimenCollection(specimensTable
-            .getAddedSpecimens());
+            .getAddedOrModifiedSpecimens());
         cevent.removeFromOriginalSpecimenCollection(specimensTable
             .getRemovedSpecimens());
         savePvCustomInfo();
@@ -310,13 +310,14 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         // FIXME need to use batchquery for OriginInfo + Collection Event
 
         // create the origin info to be used
-        if (specimensTable.getAddedSpecimens().size() > 0) {
+        if (specimensTable.getAddedOrModifiedSpecimens().size() > 0) {
             OriginInfoWrapper originInfo = new OriginInfoWrapper(
                 SessionManager.getAppService());
             originInfo.setCenter(SessionManager.getUser()
                 .getCurrentWorkingCenter());
             originInfo.persist();
-            for (SpecimenWrapper spec : specimensTable.getAddedSpecimens()) {
+            for (SpecimenWrapper spec : specimensTable
+                .getAddedOrModifiedSpecimens()) {
                 spec.setOriginInfo(originInfo);
             }
         }

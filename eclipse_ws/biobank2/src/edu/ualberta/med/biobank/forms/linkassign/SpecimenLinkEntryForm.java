@@ -580,8 +580,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
+    public void onReset() throws Exception {
+        super.onReset();
         linkFormPatientManagement.reset(true);
         singleTypesWidget.deselectAll();
         showOnlyPallet(true);
@@ -589,7 +589,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    public void reset(boolean resetAll) {
+    public void onReset(boolean resetAll) {
         linkFormPatientManagement.reset(resetAll);
         if (resetAll) {
             palletWidget.setCells(null);
@@ -597,7 +597,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 stw.resetValues(true, true);
             }
         }
-        super.reset(resetAll);
+        super.onReset(resetAll);
     }
 
     @Override

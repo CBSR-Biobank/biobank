@@ -58,7 +58,7 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
                     spec.setCurrentCenter(SessionManager.getUser()
                         .getCurrentWorkingCenter());
                     currentSpecimens.add(spec);
-                    addedSpecimens.add(spec);
+                    addedorModifiedSpecimens.add(spec);
                     specimensAdded.setValue(true);
                     reloadCollection(currentSpecimens);
                     notifyListeners();
@@ -73,6 +73,7 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
             newListener, defaultTimeDrawn);
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
+            addedorModifiedSpecimens.add(specimen);
             reloadCollection(currentSpecimens);
             notifyListeners();
         }
@@ -122,7 +123,7 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
                         if (currentSpecimens.size() == 0) {
                             specimensAdded.setValue(false);
                         }
-                        addedSpecimens.remove(sw);
+                        addedorModifiedSpecimens.remove(sw);
                         removedSpecimens.add(sw);
                         notifyListeners();
                     }

@@ -1112,10 +1112,16 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             }
             String errorMsg;
             if (contType == null)
-                errorMsg = Messages
-                    .getString(
-                        "ContainerWrapper.getPossibleContainersFromPosition.error.notfound.msg", //$NON-NLS-1$
-                        res.toString());
+                if (isContainerPosition)
+                    errorMsg = Messages
+                        .getString(
+                            "ContainerWrapper.getPossibleContainersFromPosition.error.notfound.msg", //$NON-NLS-1$
+                            res.toString());
+                else
+                    errorMsg = Messages
+                        .getString(
+                            "ContainerWrapper.getPossibleContainersFromPosition.error.notfoundSpecimenHolder.msg", //$NON-NLS-1$
+                            res.toString());
             else
                 errorMsg = Messages
                     .getString(

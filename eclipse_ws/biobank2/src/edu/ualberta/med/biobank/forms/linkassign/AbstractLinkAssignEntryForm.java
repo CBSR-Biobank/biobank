@@ -495,14 +495,14 @@ public abstract class AbstractLinkAssignEntryForm extends
     }
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
+    public void onReset() throws Exception {
+        super.onReset();
         singleSpecimen.initObjectWith(new SpecimenWrapper(appService));
         setDirty(false);
-        reset(true);
+        onReset(true);
     }
 
-    public void reset(boolean resetAll) {
+    public void onReset(boolean resetAll) {
         cancelConfirmWidget.reset();
         removeRescanMode();
         setScanHasBeenLaunched(isSingleMode());

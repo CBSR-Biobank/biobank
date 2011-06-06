@@ -821,7 +821,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 toggleScanTubeAloneMode();
 
         }
-        reset(false);
+        onReset(false);
         super.setUseScanner(use);
         page.layout(true, true);
         checkPalletContainerTypes();
@@ -977,8 +977,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
+    public void onReset() throws Exception {
+        super.onReset();
         parentContainers = null;
         // resultShownValue.setValue(Boolean.FALSE);
         // the 2 following lines are needed. The validator won't update if don't
@@ -1008,8 +1008,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    public void reset(boolean resetAll) {
-        super.reset(resetAll);
+    public void onReset(boolean resetAll) {
+        super.onReset(resetAll);
         String productBarcode = ""; //$NON-NLS-1$
         String label = ""; //$NON-NLS-1$
         ContainerTypeWrapper type = null;

@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 
 public class SpecimenEntryInfoTable extends SpecimenInfoTable {
 
-    protected List<SpecimenWrapper> addedSpecimens = new ArrayList<SpecimenWrapper>();
+    protected List<SpecimenWrapper> addedorModifiedSpecimens = new ArrayList<SpecimenWrapper>();
     protected List<SpecimenWrapper> removedSpecimens = new ArrayList<SpecimenWrapper>();
 
     protected List<SpecimenWrapper> currentSpecimens;
@@ -54,12 +54,12 @@ public class SpecimenEntryInfoTable extends SpecimenInfoTable {
             currentSpecimens = new ArrayList<SpecimenWrapper>();
         }
         reloadCollection(currentSpecimens);
-        addedSpecimens = new ArrayList<SpecimenWrapper>();
+        addedorModifiedSpecimens = new ArrayList<SpecimenWrapper>();
         removedSpecimens = new ArrayList<SpecimenWrapper>();
     }
 
-    public List<SpecimenWrapper> getAddedSpecimens() {
-        return addedSpecimens;
+    public List<SpecimenWrapper> getAddedOrModifiedSpecimens() {
+        return addedorModifiedSpecimens;
     }
 
     public List<SpecimenWrapper> getRemovedSpecimens() {

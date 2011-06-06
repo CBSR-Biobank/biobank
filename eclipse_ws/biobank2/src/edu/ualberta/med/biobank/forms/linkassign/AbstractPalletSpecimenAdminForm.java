@@ -515,7 +515,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     @Override
     protected void onReset() throws Exception {
         scanValidValue.setValue(true);
-        palletScanManagement.reset();
+        palletScanManagement.onReset();
         enableFields(true);
     }
 

@@ -461,6 +461,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     protected void resetScan() {
         if (spw != null)
             spw.setCells(null);
-        palletScanManagement.reset();
+        palletScanManagement.onReset();
     }
 }

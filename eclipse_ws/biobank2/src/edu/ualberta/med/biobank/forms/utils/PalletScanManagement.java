@@ -250,7 +250,7 @@ public class PalletScanManagement {
         return cells;
     }
 
-    public void reset() {
+    public void onReset() {
         successfulScansCount = 0;
         initCells();
     }
