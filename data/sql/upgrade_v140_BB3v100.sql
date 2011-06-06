@@ -75,547 +75,459 @@ INSERT INTO `CONTAINER_LABELING_SCHEME` (ID, NAME, MIN_CHARS, MAX_CHARS, MAX_ROW
 ALTER TABLE specimen_type_specimen_type
       ADD PRIMARY KEY (PARENT_SPECIMEN_TYPE_ID, CHILD_SPECIMEN_TYPE_ID);
 
+set @ss = null;
+
+select id from specimen_type where name='10mL lavender top EDTA tube' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),
-	(select id from specimen_type where name='Buffy coat'));
+	values (@ss, (select id from specimen_type where name='Buffy coat'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),
-	(select id from specimen_type where name='Cells500'));
+	values (@ss, (select id from specimen_type where name='Cells500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA (Blood)'));
+	values (@ss, (select id from specimen_type where name='DNA (Blood)'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA (White blood cells)'));
+	values (@ss, (select id from specimen_type where name='DNA (White blood cells)'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA E 1000'));
+	values (@ss, (select id from specimen_type where name='DNA E 1000'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA E 500'));
+	values (@ss, (select id from specimen_type where name='DNA E 500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),
-	(select id from specimen_type where name='Plasma'));
+	values (@ss, (select id from specimen_type where name='Plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE200'));
+	values (@ss, (select id from specimen_type where name='PlasmaE200'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE250'));
+	values (@ss, (select id from specimen_type where name='PlasmaE250'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE400'));
+	values (@ss, (select id from specimen_type where name='PlasmaE400'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE500'));
+	values (@ss, (select id from specimen_type where name='PlasmaE500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE800'));
+	values (@ss, (select id from specimen_type where name='PlasmaE800'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),
-	(select id from specimen_type where name='Platelet free plasma'));
+	values (@ss, (select id from specimen_type where name='Platelet free plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),
-	(select id from specimen_type where name='WB DMSO'));
+	values (@ss, (select id from specimen_type where name='WB DMSO'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10mL lavender top EDTA tube'),
-	(select id from specimen_type where name='Whole Blood EDTA'));
+	values (@ss, (select id from specimen_type where name='Whole Blood EDTA'));
+
+select id from specimen_type where name='10ml green top Lithium Heparin tube' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top Lithium Heparin tube'),
+	values (@ss,
 	(select id from specimen_type where name='DNA L 1000'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top Lithium Heparin tube'),
-	(select id from specimen_type where name='Heparin Blood'));
+	values (@ss, (select id from specimen_type where name='Heparin Blood'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top Lithium Heparin tube'),
-	(select id from specimen_type where name='LH PFP 200'));
+	values (@ss, (select id from specimen_type where name='LH PFP 200'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top Lithium Heparin tube'),
-	(select id from specimen_type where name='LH PFP 500'));
+	values (@ss, (select id from specimen_type where name='LH PFP 500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top Lithium Heparin tube'),
-	(select id from specimen_type where name='Lithium Heparin Plasma'));
+	values (@ss, (select id from specimen_type where name='Lithium Heparin Plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top Lithium Heparin tube'),
-	(select id from specimen_type where name='PlasmaL200'));
+	values (@ss, (select id from specimen_type where name='PlasmaL200'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top Lithium Heparin tube'),
-	(select id from specimen_type where name='PlasmaL500'));
+	values (@ss, (select id from specimen_type where name='PlasmaL500'));
+
+select id from specimen_type where name='10ml green top sodium heparin tube' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top sodium heparin tube'),
-	(select id from specimen_type where name='Cells500'));
+	values (@ss, (select id from specimen_type where name='Cells500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top sodium heparin tube'),
-	(select id from specimen_type where name='Cord Blood Mononuclear Cells'));
+	values (@ss, (select id from specimen_type where name='Cord Blood Mononuclear Cells'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top sodium heparin tube'),
-	(select id from specimen_type where name='DNA (White blood cells)'));
+	values (@ss, (select id from specimen_type where name='DNA (White blood cells)'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top sodium heparin tube'),
-	(select id from specimen_type where name='Heparin Blood'));
+	values (@ss, (select id from specimen_type where name='Heparin Blood'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top sodium heparin tube'),
-	(select id from specimen_type where name='Plasma (Na Heparin) - DAD'));
+	values (@ss, (select id from specimen_type where name='Plasma (Na Heparin) - DAD'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top sodium heparin tube'),
-	(select id from specimen_type where name='Platelet free plasma'));
+	values (@ss, (select id from specimen_type where name='Platelet free plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top sodium heparin tube'),
-	(select id from specimen_type where name='RNA CBMC'));
+	values (@ss, (select id from specimen_type where name='RNA CBMC'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top sodium heparin tube'),
-	(select id from specimen_type where name='WB - BABY'));
+	values (@ss, (select id from specimen_type where name='WB - BABY'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top sodium heparin tube'),
-	(select id from specimen_type where name='WB Plasma - BABY'));
+	values (@ss, (select id from specimen_type where name='WB Plasma - BABY'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top sodium heparin tube'),
-	(select id from specimen_type where name='WB RNA - BABY'));
+	values (@ss, (select id from specimen_type where name='WB RNA - BABY'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml green top sodium heparin tube'),
-	(select id from specimen_type where name='WB Serum - BABY'));
+	values (@ss, (select id from specimen_type where name='WB Serum - BABY'));
+
+select id from specimen_type where name='10ml orange top PAXgene tube' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='10ml orange top PAXgene tube'),
-	(select id from specimen_type where name='Paxgene800'));
+	values (@ss, (select id from specimen_type where name='Paxgene800'));
+
+select id from specimen_type where name='15ml centrifuge tube (sodium azide urine)' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='15ml centrifuge tube (sodium azide urine)'),
-	(select id from specimen_type where name='SodiumAzideUrine'));
+	values (@ss, (select id from specimen_type where name='SodiumAzideUrine'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='15ml centrifuge tube (sodium azide urine)'),
-	(select id from specimen_type where name='UrineSA700'));
+	values (@ss, (select id from specimen_type where name='UrineSA700'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='15ml centrifuge tube (sodium azide urine)'),
-	(select id from specimen_type where name='UrineSA900'));
+	values (@ss, (select id from specimen_type where name='UrineSA900'));
+
+select id from specimen_type where name='3mL lavender top EDTA tube' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL lavender top EDTA tube'),
-	(select id from specimen_type where name='Buffy coat'));
+	values (@ss,(select id from specimen_type where name='Buffy coat'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL lavender top EDTA tube'),
-	(select id from specimen_type where name='Cells500'));
+	values (@ss,(select id from specimen_type where name='Cells500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA (Blood)'));
+	values (@ss,(select id from specimen_type where name='DNA (Blood)'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA (White blood cells)'));
+	values (@ss,(select id from specimen_type where name='DNA (White blood cells)'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA E 1000'));
+	values (@ss,(select id from specimen_type where name='DNA E 1000'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA E 500'));
+	values (@ss,(select id from specimen_type where name='DNA E 500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL lavender top EDTA tube'),
-	(select id from specimen_type where name='Plasma'));
+	values (@ss,(select id from specimen_type where name='Plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE200'));
+	values (@ss,(select id from specimen_type where name='PlasmaE200'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE250'));
+	values (@ss,(select id from specimen_type where name='PlasmaE250'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE400'));
+	values (@ss,(select id from specimen_type where name='PlasmaE400'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE500'));
+	values (@ss,(select id from specimen_type where name='PlasmaE500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE800'));
+	values (@ss,(select id from specimen_type where name='PlasmaE800'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL lavender top EDTA tube'),
-	(select id from specimen_type where name='Platelet free plasma'));
+	values (@ss,(select id from specimen_type where name='Platelet free plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL lavender top EDTA tube'),
-	(select id from specimen_type where name='WB DMSO'));
+	values (@ss,(select id from specimen_type where name='WB DMSO'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL lavender top EDTA tube'),
-	(select id from specimen_type where name='Whole Blood EDTA'));
+	values (@ss,(select id from specimen_type where name='Whole Blood EDTA'));
+
+select id from specimen_type where name='3mL red top tube (hemodialysate)' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3mL red top tube (hemodialysate)'),
-	(select id from specimen_type where name='Hemodialysate'));
+	values (@ss,(select id from specimen_type where name='Hemodialysate'));
+
+select id from specimen_type where name='3ml lavender top EDTA tube w BHT and Desferal' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3ml lavender top EDTA tube w BHT and Desferal'),
-	(select id from specimen_type where name='PlasmaE BHT200'));
+	values (@ss,(select id from specimen_type where name='PlasmaE BHT200'));
+
+select id from specimen_type where name='3ml red top tube (source water)' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='3ml red top tube (source water)'),
-	(select id from specimen_type where name='Source Water'));
+	values (@ss,(select id from specimen_type where name='Source Water'));
+
+select id from specimen_type where name='4ml gold top serum tube' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml gold top serum tube'),
-	(select id from specimen_type where name='SerumG200'));
+	values (@ss,(select id from specimen_type where name='SerumG200'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml gold top serum tube'),
-	(select id from specimen_type where name='SerumG400'));
+	values (@ss,(select id from specimen_type where name='SerumG400'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml gold top serum tube'),
-	(select id from specimen_type where name='SerumG500'));
+	values (@ss,(select id from specimen_type where name='SerumG500'));
+
+select id from specimen_type where name='4ml green top sodium heparin BD 367871' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml green top sodium heparin BD 367871'),
-	(select id from specimen_type where name='Cells500'));
+	values (@ss,(select id from specimen_type where name='Cells500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml green top sodium heparin BD 367871'),
-	(select id from specimen_type where name='Cord Blood Mononuclear Cells'));
+	values (@ss,(select id from specimen_type where name='Cord Blood Mononuclear Cells'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml green top sodium heparin BD 367871'),
-	(select id from specimen_type where name='DNA (White blood cells)'));
+	values (@ss,(select id from specimen_type where name='DNA (White blood cells)'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml green top sodium heparin BD 367871'),
-	(select id from specimen_type where name='Heparin Blood'));
+	values (@ss,(select id from specimen_type where name='Heparin Blood'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml green top sodium heparin BD 367871'),
-	(select id from specimen_type where name='Plasma (Na Heparin) - DAD'));
+	values (@ss,(select id from specimen_type where name='Plasma (Na Heparin) - DAD'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml green top sodium heparin BD 367871'),
-	(select id from specimen_type where name='Platelet free plasma'));
+	values (@ss,(select id from specimen_type where name='Platelet free plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml green top sodium heparin BD 367871'),
-	(select id from specimen_type where name='RNA CBMC'));
+	values (@ss,(select id from specimen_type where name='RNA CBMC'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml green top sodium heparin BD 367871'),
-	(select id from specimen_type where name='WB - BABY'));
+	values (@ss,(select id from specimen_type where name='WB - BABY'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml green top sodium heparin BD 367871'),
-	(select id from specimen_type where name='WB Plasma - BABY'));
+	values (@ss,(select id from specimen_type where name='WB Plasma - BABY'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml green top sodium heparin BD 367871'),
-	(select id from specimen_type where name='WB RNA - BABY'));
+	values (@ss,(select id from specimen_type where name='WB RNA - BABY'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml green top sodium heparin BD 367871'),
-	(select id from specimen_type where name='WB Serum - BABY'));
+	values (@ss,(select id from specimen_type where name='WB Serum - BABY'));
+
+select id from specimen_type where name='4ml lavender top EDTA tube' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml lavender top EDTA tube'),
-	(select id from specimen_type where name='Buffy coat'));
+	values (@ss,(select id from specimen_type where name='Buffy coat'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml lavender top EDTA tube'),
-	(select id from specimen_type where name='Cells500'));
+	values (@ss,(select id from specimen_type where name='Cells500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA (Blood)'));
+	values (@ss,(select id from specimen_type where name='DNA (Blood)'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA (White blood cells)'));
+	values (@ss,(select id from specimen_type where name='DNA (White blood cells)'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA E 1000'));
+	values (@ss,(select id from specimen_type where name='DNA E 1000'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA E 500'));
+	values (@ss,(select id from specimen_type where name='DNA E 500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml lavender top EDTA tube'),
-	(select id from specimen_type where name='Plasma'));
+	values (@ss,(select id from specimen_type where name='Plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE200'));
+	values (@ss,(select id from specimen_type where name='PlasmaE200'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE250'));
+	values (@ss,(select id from specimen_type where name='PlasmaE250'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE400'));
+	values (@ss,(select id from specimen_type where name='PlasmaE400'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE500'));
+	values (@ss,(select id from specimen_type where name='PlasmaE500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE800'));
+	values (@ss,(select id from specimen_type where name='PlasmaE800'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml lavender top EDTA tube'),
-	(select id from specimen_type where name='Platelet free plasma'));
+	values (@ss,(select id from specimen_type where name='Platelet free plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml lavender top EDTA tube'),
-	(select id from specimen_type where name='WB DMSO'));
+	values (@ss,(select id from specimen_type where name='WB DMSO'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='4ml lavender top EDTA tube'),
-	(select id from specimen_type where name='Whole Blood EDTA'));
+	values (@ss,(select id from specimen_type where name='Whole Blood EDTA'));
+
+select id from specimen_type where name='5mL gold top serum tube' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='5mL gold top serum tube'),
-	(select id from specimen_type where name='SerumG200'));
+	values (@ss,(select id from specimen_type where name='SerumG200'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='5mL gold top serum tube'),
-	(select id from specimen_type where name='SerumG400'));
+	values (@ss,(select id from specimen_type where name='SerumG400'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='5mL gold top serum tube'),
-	(select id from specimen_type where name='SerumG500'));
+	values (@ss,(select id from specimen_type where name='SerumG500'));
+
+select id from specimen_type where name='6mL beige top tube' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL beige top tube'),
-	(select id from specimen_type where name='Serum (Beige top)'));
+	values (@ss,(select id from specimen_type where name='Serum (Beige top)'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL beige top tube'),
-	(select id from specimen_type where name='SerumB400'));
+	values (@ss,(select id from specimen_type where name='SerumB400'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL beige top tube'),
-	(select id from specimen_type where name='SerumB900'));
+	values (@ss,(select id from specimen_type where name='SerumB900'));
+
+select id from specimen_type where name='6mL lavender top EDTA tube' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL lavender top EDTA tube'),
-	(select id from specimen_type where name='Buffy coat'));
+	values (@ss,(select id from specimen_type where name='Buffy coat'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL lavender top EDTA tube'),
-	(select id from specimen_type where name='Cells500'));
+	values (@ss,(select id from specimen_type where name='Cells500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA (Blood)'));
+	values (@ss,(select id from specimen_type where name='DNA (Blood)'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA (White blood cells)'));
+	values (@ss,(select id from specimen_type where name='DNA (White blood cells)'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA E 1000'));
+	values (@ss,(select id from specimen_type where name='DNA E 1000'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL lavender top EDTA tube'),
-	(select id from specimen_type where name='DNA E 500'));
+	values (@ss,(select id from specimen_type where name='DNA E 500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL lavender top EDTA tube'),
-	(select id from specimen_type where name='Plasma'));
+	values (@ss,(select id from specimen_type where name='Plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE200'));
+	values (@ss,(select id from specimen_type where name='PlasmaE200'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE250'));
+	values (@ss,(select id from specimen_type where name='PlasmaE250'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE400'));
+	values (@ss,(select id from specimen_type where name='PlasmaE400'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE500'));
+	values (@ss,(select id from specimen_type where name='PlasmaE500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL lavender top EDTA tube'),
-	(select id from specimen_type where name='PlasmaE800'));
+	values (@ss,(select id from specimen_type where name='PlasmaE800'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL lavender top EDTA tube'),
-	(select id from specimen_type where name='Platelet free plasma'));
+	values (@ss,(select id from specimen_type where name='Platelet free plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL lavender top EDTA tube'),
-	(select id from specimen_type where name='WB DMSO'));
+	values (@ss,(select id from specimen_type where name='WB DMSO'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6mL lavender top EDTA tube'),
-	(select id from specimen_type where name='Whole Blood EDTA'));
+	values (@ss,(select id from specimen_type where name='Whole Blood EDTA'));
+
+select id from specimen_type where name='6ml beige top tube (tap water)' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6ml beige top tube (tap water)'),
-	(select id from specimen_type where name='Tap Water'));
+	values (@ss,(select id from specimen_type where name='Tap Water'));
+
+select id from specimen_type where name='6ml light green top lithium heparin tube' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6ml light green top lithium heparin tube'),
-	(select id from specimen_type where name='DNA L 1000'));
+	values (@ss,(select id from specimen_type where name='DNA L 1000'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6ml light green top lithium heparin tube'),
-	(select id from specimen_type where name='Heparin Blood'));
+	values (@ss,(select id from specimen_type where name='Heparin Blood'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6ml light green top lithium heparin tube'),
-	(select id from specimen_type where name='LH PFP 200'));
+	values (@ss,(select id from specimen_type where name='LH PFP 200'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6ml light green top lithium heparin tube'),
-	(select id from specimen_type where name='LH PFP 500'));
+	values (@ss,(select id from specimen_type where name='LH PFP 500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6ml light green top lithium heparin tube'),
-	(select id from specimen_type where name='Lithium Heparin Plasma'));
+	values (@ss,(select id from specimen_type where name='Lithium Heparin Plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6ml light green top lithium heparin tube'),
-	(select id from specimen_type where name='PlasmaL200'));
+	values (@ss,(select id from specimen_type where name='PlasmaL200'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='6ml light green top lithium heparin tube'),
-	(select id from specimen_type where name='PlasmaL500'));
+	values (@ss,(select id from specimen_type where name='PlasmaL500'));
+
+select id from specimen_type where name='7ml EDTA conventional top' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='7ml EDTA conventional top'),
-	(select id from specimen_type where name='Buffy coat'));
+	values (@ss,(select id from specimen_type where name='Buffy coat'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='7ml EDTA conventional top'),
-	(select id from specimen_type where name='Cells500'));
+	values (@ss,(select id from specimen_type where name='Cells500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='7ml EDTA conventional top'),
-	(select id from specimen_type where name='DNA (Blood)'));
+	values (@ss,(select id from specimen_type where name='DNA (Blood)'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='7ml EDTA conventional top'),
-	(select id from specimen_type where name='DNA (White blood cells)'));
+	values (@ss,(select id from specimen_type where name='DNA (White blood cells)'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='7ml EDTA conventional top'),
-	(select id from specimen_type where name='DNA E 1000'));
+	values (@ss,(select id from specimen_type where name='DNA E 1000'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='7ml EDTA conventional top'),
-	(select id from specimen_type where name='DNA E 500'));
+	values (@ss,(select id from specimen_type where name='DNA E 500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='7ml EDTA conventional top'),
-	(select id from specimen_type where name='Plasma'));
+	values (@ss,(select id from specimen_type where name='Plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='7ml EDTA conventional top'),
-	(select id from specimen_type where name='PlasmaE200'));
+	values (@ss,(select id from specimen_type where name='PlasmaE200'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='7ml EDTA conventional top'),
-	(select id from specimen_type where name='PlasmaE250'));
+	values (@ss,(select id from specimen_type where name='PlasmaE250'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='7ml EDTA conventional top'),
-	(select id from specimen_type where name='PlasmaE400'));
+	values (@ss,(select id from specimen_type where name='PlasmaE400'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='7ml EDTA conventional top'),
-	(select id from specimen_type where name='PlasmaE500'));
+	values (@ss,(select id from specimen_type where name='PlasmaE500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='7ml EDTA conventional top'),
-	(select id from specimen_type where name='PlasmaE800'));
+	values (@ss,(select id from specimen_type where name='PlasmaE800'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='7ml EDTA conventional top'),
-	(select id from specimen_type where name='Platelet free plasma'));
+	values (@ss,(select id from specimen_type where name='Platelet free plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='7ml EDTA conventional top'),
-	(select id from specimen_type where name='WB DMSO'));
+	values (@ss,(select id from specimen_type where name='WB DMSO'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='7ml EDTA conventional top'),
-	(select id from specimen_type where name='Whole Blood EDTA'));
+	values (@ss,(select id from specimen_type where name='Whole Blood EDTA'));
+
+select id from specimen_type where name='8.5ml P100 orange top tube' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='8.5ml P100 orange top tube'),
-	(select id from specimen_type where name='P100 500'));
+	values (@ss,(select id from specimen_type where name='P100 500'));
+
+select id from specimen_type where name='9ml CPDA yellow top tube' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='9ml CPDA yellow top tube'),
-	(select id from specimen_type where name='CDPA Plasma'));
+	values (@ss,(select id from specimen_type where name='CDPA Plasma'));
+
+select id from specimen_type where name='Biopsy, RNA later' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Biopsy, RNA later'),
-	(select id from specimen_type where name='RNAlater Biopsies'));
+	values (@ss,(select id from specimen_type where name='RNAlater Biopsies'));
+
+select id from specimen_type where name='CHILD Meconium' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='CHILD Meconium'),
-	(select id from specimen_type where name='Meconium - BABY'));
+	values (@ss,(select id from specimen_type where name='Meconium - BABY'));
+
+select id from specimen_type where name='Colonoscopy Kit' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Colonoscopy Kit'),
-	(select id from specimen_type where name='Ascending Colon'));
+	values (@ss,(select id from specimen_type where name='Ascending Colon'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Colonoscopy Kit'),
-	(select id from specimen_type where name='Descending Colon'));
+	values (@ss,(select id from specimen_type where name='Descending Colon'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Colonoscopy Kit'),
-	(select id from specimen_type where name='Ileum'));
+	values (@ss,(select id from specimen_type where name='Ileum'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Colonoscopy Kit'),
-	(select id from specimen_type where name='RNA-Ascending Colon'));
+	values (@ss,(select id from specimen_type where name='RNA-Ascending Colon'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Colonoscopy Kit'),
-	(select id from specimen_type where name='RNA-Descending Colon'));
+	values (@ss,(select id from specimen_type where name='RNA-Descending Colon'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Colonoscopy Kit'),
-	(select id from specimen_type where name='RNA-Ileum'));
+	values (@ss,(select id from specimen_type where name='RNA-Ileum'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Colonoscopy Kit'),
-	(select id from specimen_type where name='RNA-Transverse Colon'));
+	values (@ss,(select id from specimen_type where name='RNA-Transverse Colon'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Colonoscopy Kit'),
-	(select id from specimen_type where name='Transverse Colon'));
+	values (@ss,(select id from specimen_type where name='Transverse Colon'));
+
+select id from specimen_type where name='EDTA cryovial' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='EDTA cryovial'),
-	(select id from specimen_type where name='Buffy coat'));
+	values (@ss,(select id from specimen_type where name='Buffy coat'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='EDTA cryovial'),
-	(select id from specimen_type where name='Cells500'));
+	values (@ss,(select id from specimen_type where name='Cells500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='EDTA cryovial'),
-	(select id from specimen_type where name='DNA (Blood)'));
+	values (@ss,(select id from specimen_type where name='DNA (Blood)'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='EDTA cryovial'),
-	(select id from specimen_type where name='DNA (White blood cells)'));
+	values (@ss,(select id from specimen_type where name='DNA (White blood cells)'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='EDTA cryovial'),
-	(select id from specimen_type where name='DNA E 1000'));
+	values (@ss,(select id from specimen_type where name='DNA E 1000'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='EDTA cryovial'),
-	(select id from specimen_type where name='DNA E 500'));
+	values (@ss,(select id from specimen_type where name='DNA E 500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='EDTA cryovial'),
-	(select id from specimen_type where name='Plasma'));
+	values (@ss,(select id from specimen_type where name='Plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='EDTA cryovial'),
-	(select id from specimen_type where name='PlasmaE200'));
+	values (@ss,(select id from specimen_type where name='PlasmaE200'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='EDTA cryovial'),
-	(select id from specimen_type where name='PlasmaE250'));
+	values (@ss,(select id from specimen_type where name='PlasmaE250'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='EDTA cryovial'),
-	(select id from specimen_type where name='PlasmaE400'));
+	values (@ss,(select id from specimen_type where name='PlasmaE400'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='EDTA cryovial'),
-	(select id from specimen_type where name='PlasmaE500'));
+	values (@ss,(select id from specimen_type where name='PlasmaE500'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='EDTA cryovial'),
-	(select id from specimen_type where name='PlasmaE800'));
+	values (@ss,(select id from specimen_type where name='PlasmaE800'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='EDTA cryovial'),
-	(select id from specimen_type where name='Platelet free plasma'));
+	values (@ss,(select id from specimen_type where name='Platelet free plasma'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='EDTA cryovial'),
-	(select id from specimen_type where name='WB DMSO'));
+	values (@ss,(select id from specimen_type where name='WB DMSO'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='EDTA cryovial'),
-	(select id from specimen_type where name='Whole Blood EDTA'));
+	values (@ss,(select id from specimen_type where name='Whole Blood EDTA'));
+
+select id from specimen_type where name='Enteroscopy Kit' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Enteroscopy Kit'),
-	(select id from specimen_type where name='Ileum'));
+	values (@ss,(select id from specimen_type where name='Ileum'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Enteroscopy Kit'),
-	(select id from specimen_type where name='Jejunum'));
+	values (@ss,(select id from specimen_type where name='Jejunum'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Enteroscopy Kit'),
-	(select id from specimen_type where name='RNA-Ileum'));
+	values (@ss,(select id from specimen_type where name='RNA-Ileum'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Enteroscopy Kit'),
-	(select id from specimen_type where name='RNA-Jejunum'));
+	values (@ss,(select id from specimen_type where name='RNA-Jejunum'));
+
+select id from specimen_type where name='Gastroscopy Kit' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Gastroscopy Kit'),
-	(select id from specimen_type where name='Duodenum'));
+	values (@ss,(select id from specimen_type where name='Duodenum'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Gastroscopy Kit'),
-	(select id from specimen_type where name='RNA-Duodenum'));
+	values (@ss,(select id from specimen_type where name='RNA-Duodenum'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Gastroscopy Kit'),
-	(select id from specimen_type where name='RNA-Stomach, Antrum'));
+	values (@ss,(select id from specimen_type where name='RNA-Stomach, Antrum'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Gastroscopy Kit'),
-	(select id from specimen_type where name='RNA-Stomach, Body'));
+	values (@ss,(select id from specimen_type where name='RNA-Stomach, Body'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Gastroscopy Kit'),
-	(select id from specimen_type where name='Stomach, Antrum'));
+	values (@ss,(select id from specimen_type where name='Stomach, Antrum'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Gastroscopy Kit'),
-	(select id from specimen_type where name='Stomach, Body'));
+	values (@ss,(select id from specimen_type where name='Stomach, Body'));
+
+select id from specimen_type where name='Unknown / import' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Unknown / import'),
-	(select id from specimen_type where name='RNA-adjacent diseased biopsy'));
+	values (@ss,(select id from specimen_type where name='RNA-adjacent diseased biopsy'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Unknown / import'),
-	(select id from specimen_type where name='RNA-diseased biopsy'));
+	values (@ss,(select id from specimen_type where name='RNA-diseased biopsy'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Unknown / import'),
-	(select id from specimen_type where name='RNA-normal biopsy'));
+	values (@ss,(select id from specimen_type where name='RNA-normal biopsy'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Unknown / import'),
-	(select id from specimen_type where name='RNA-normal left biopsy'));
+	values (@ss,(select id from specimen_type where name='RNA-normal left biopsy'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Unknown / import'),
-	(select id from specimen_type where name='RNA-normal rectum biopsy'));
+	values (@ss,(select id from specimen_type where name='RNA-normal rectum biopsy'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='Unknown / import'),
-	(select id from specimen_type where name='RNA-normal right biopsy'));
+	values (@ss,(select id from specimen_type where name='RNA-normal right biopsy'));
+
+select id from specimen_type where name='fingernail tube' into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='fingernail tube'),
-	(select id from specimen_type where name='Finger Nails'));
+	values (@ss,(select id from specimen_type where name='Finger Nails'));
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
 	values ((select id from specimen_type where name='hair bagette'),
 	(select id from specimen_type where name='Hair'));
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
 	values ((select id from specimen_type where name='toenail tube'),
 	(select id from specimen_type where name='Toe Nails'));
+
+select id from specimen_type where name='urine cup'	into @ss;
+
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='urine cup'),
-	(select id from specimen_type where name='Centrifuged Urine'));
+	values (@ss,(select id from specimen_type where name='Centrifuged Urine'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='urine cup'),
-	(select id from specimen_type where name='Filtered Urine'));
+	values (@ss,(select id from specimen_type where name='Filtered Urine'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='urine cup'),
-	(select id from specimen_type where name='SodiumAzideUrine'));
+	values (@ss,(select id from specimen_type where name='SodiumAzideUrine'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='urine cup'),
-	(select id from specimen_type where name='Urine'));
+	values (@ss,(select id from specimen_type where name='Urine'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='urine cup'),
-	(select id from specimen_type where name='UrineC900'));
+	values (@ss,(select id from specimen_type where name='UrineC900'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='urine cup'),
-	(select id from specimen_type where name='UrineSA700'));
+	values (@ss,(select id from specimen_type where name='UrineSA700'));
 insert into specimen_type_specimen_type (parent_specimen_type_id,child_specimen_type_id)
-	values ((select id from specimen_type where name='urine cup'),
-	(select id from specimen_type where name='UrineSA900'));
+	values (@ss,(select id from specimen_type where name='UrineSA900'));
 
