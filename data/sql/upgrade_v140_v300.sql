@@ -1,6 +1,6 @@
 /*------------------------------------------------------------------------------
  *
- *  MySQL upgrade script for model version BB2 v1.4.0 to BB3 v1.5.0
+ *  MySQL upgrade script for model version BioBank v1.4.0 to v3.0.0
  *
  *----------------------------------------------------------------------------*/
 
@@ -39,6 +39,27 @@ update container c, container_path cp
        where c.id=cp.container_id;
 
 DROP TABLE IF EXISTS container_path;
+
+/*****************************************************
+ * Printer Labels
+ ****************************************************/
+
+CREATE TABLE printed_ss_inv_item (
+    ID INT(11) NOT NULL,
+    VERSION INT(11) NOT NULL,
+    TXT VARCHAR(15) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    PRIMARY KEY (ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+CREATE TABLE printer_label_template (
+    ID INT(11) NOT NULL,
+    VERSION INT(11) NOT NULL,
+    NAME VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    PRINTER_NAME VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    CONFIG_DATA VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    JASPER_FILE VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    CONSTRAINT NAME UNIQUE KEY(NAME),
+    PRIMARY KEY (ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
 
 /*****************************************************
  * Origin info
