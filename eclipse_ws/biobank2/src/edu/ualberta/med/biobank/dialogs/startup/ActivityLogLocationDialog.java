@@ -89,7 +89,7 @@ public class ActivityLogLocationDialog extends BiobankDialog {
         createLabel(fileSelectionComposite, labelText);
 
         final String biobank2Dir = System.getProperty("user.home")
-            + System.getProperty("file.separator") + "biobank2";
+            + System.getProperty("file.separator") + "biobank";
         activityLogDirText = new Text(fileSelectionComposite, SWT.BORDER
             | SWT.FILL);
         activityLogDirText.setLayoutData(new GridData(GridData.FILL,
