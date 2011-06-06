@@ -364,6 +364,11 @@
     <copy file="${secu-log.dir}/jboss/upt.war"
           tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war"
           overwrite="true" />
+    <delete includeemptydirs="true">
+      <fileset dir="${env.JBOSS_HOME}/server/default/deploy">
+        <include name="biobank*.war"/>
+      </fileset>
+    </delete>
     <copy file="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war"
           tofile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war"
           overwrite="true" />
