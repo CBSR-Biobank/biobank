@@ -150,7 +150,6 @@ public class SpecimenEntryWidget extends BiobankWidget {
     }
 
     private void addSpecimen(SpecimenWrapper specimen) {
-        // TODO: move into a listener?
         if (specimen != null && specimens.contains(specimen)) {
             BiobankPlugin.openAsyncError("Error",
                 "Specimen " + specimen.getInventoryId()

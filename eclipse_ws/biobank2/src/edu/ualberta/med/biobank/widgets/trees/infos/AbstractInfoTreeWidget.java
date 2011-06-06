@@ -106,18 +106,13 @@ public abstract class AbstractInfoTreeWidget<T> extends BiobankWidget {
         // tableViewer.setUseHashlookup(true);
         treeViewer.setLabelProvider(getLabelProvider());
         treeViewer.setContentProvider(new ITreeContentProvider() {
-
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
-                // TODO Auto-generated method stub
-
             }
 
             @Override
             public void dispose() {
-                // TODO Auto-generated method stub
-
             }
 
             @Override
@@ -301,8 +296,6 @@ public abstract class AbstractInfoTreeWidget<T> extends BiobankWidget {
     }
 
     private void autoSizeColumns() {
-        // TODO: auto-size tree initially based on headers? Sort of already
-        // done with .pack().
         Tree tree = treeViewer.getTree();
         if (tree.isDisposed()) {
             return;
