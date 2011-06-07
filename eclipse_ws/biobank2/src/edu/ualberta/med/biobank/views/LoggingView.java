@@ -19,22 +19,19 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISourceProviderListener;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.services.ISourceProviderService;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.LogPeer;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.forms.LoggingForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.GuiCommonSessionState;
 import edu.ualberta.med.biobank.logs.LogQuery;
-import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -300,15 +297,13 @@ public class LoggingView extends ViewPart {
 
     // monitors the logged in / out state
     private void sessionMonitor() {
-        ISourceProvider siteSelectionStateSourceProvider = getSessionStateSourceProvider();
-
         siteStateListener = new ISourceProviderListener() {
             @Override
             public void sourceChanged(int sourcePriority, String sourceName,
                 Object sourceValue) {
-                if (sourceValue.equals(SessionState.LOGGED_OUT)) {
+                if (sourceValue.equals(GuiCommonSessionState.LOGGED_OUT)) {
                     setEnableAllFields(false);
-                } else if (sourceValue.equals(SessionState.LOGGED_IN)) {
+                } else if (sourceValue.equals(GuiCommonSessionState.LOGGED_IN)) {
                     loadComboFields();
                     setEnableAllFields(true);
                 }
@@ -321,7 +316,7 @@ public class LoggingView extends ViewPart {
             }
         };
 
-        siteSelectionStateSourceProvider
+        BiobankGuiCommonPlugin.getSessionStateSourceProvider()
             .addSourceProviderListener(siteStateListener);
     }
 
@@ -329,19 +324,9 @@ public class LoggingView extends ViewPart {
     public void dispose() {
         super.dispose();
         if (siteStateListener != null) {
-            getSessionStateSourceProvider().removeSourceProviderListener(
-                siteStateListener);
+            BiobankGuiCommonPlugin.getSessionStateSourceProvider()
+                .removeSourceProviderListener(siteStateListener);
         }
-    }
-
-    private ISourceProvider getSessionStateSourceProvider() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow();
-        ISourceProviderService service = (ISourceProviderService) window
-            .getService(ISourceProviderService.class);
-        ISourceProvider siteSelectionStateSourceProvider = service
-            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
-        return siteSelectionStateSourceProvider;
     }
 
     @Override

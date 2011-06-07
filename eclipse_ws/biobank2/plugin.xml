@@ -302,7 +302,7 @@
             commandId="edu.ualberta.med.biobank.commands.login">
          <activeWhen>
             <reference
-                  definitionId="biobank.loggedOut">
+                  definitionId="edu.ualberta.med.biobank.gui.common.loggedOut">
             </reference>
          </activeWhen>
       </handler>
@@ -311,7 +311,7 @@
             commandId="edu.ualberta.med.biobank.commands.logout">
          <activeWhen>
             <reference
-                  definitionId="biobank.loggedIn">
+                  definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
             </reference>
          </activeWhen>
       </handler>
@@ -371,7 +371,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
@@ -385,7 +385,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
@@ -399,7 +399,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
@@ -413,7 +413,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
@@ -432,7 +432,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
@@ -451,7 +451,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
@@ -465,7 +465,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
@@ -479,7 +479,7 @@
          <enabledWhen>
            <and>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
                <not>
                <or>
@@ -500,7 +500,7 @@
          <enabledWhen>
          <and>
             <reference
-                  definitionId="biobank.loggedIn">
+                  definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
             </reference>
                   <not>
                   <or>
@@ -524,7 +524,7 @@
                     definitionId="biobank.processingPerspectiveSelected">
               </reference>
               <reference
-                    definitionId="biobank.loggedIn">
+                    definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
               </reference>
               <reference
                     definitionId="biobank.hasClinicShipmentRights">
@@ -533,7 +533,7 @@
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank.processingPerspectiveSelected">
+                  definitionId="biobank.processingPersedu.ualberta.med.biobank.gui.common.loggedd">
             </reference>
          </enabledWhen>
       </handler>
@@ -546,7 +546,7 @@
                     definitionId="biobank.processingPerspectiveSelected">
               </reference>
               <reference
-                    definitionId="biobank.loggedIn">
+                    definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
               </reference>
             </and>
          </activeWhen>
@@ -590,7 +590,7 @@
          <enabledWhen>
             <and>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
                <not>
                   <or>
@@ -641,7 +641,7 @@
             commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree">
          <activeWhen>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
          </activeWhen>
       </handler>
@@ -659,7 +659,7 @@
             commandId="edu.ualberta.med.biobank.commands.search">
          <activeWhen>
             <reference
-                  definitionId="biobank.loggedIn">
+                  definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
             </reference>
          </activeWhen>
       </handler>
@@ -687,7 +687,7 @@
          <enabledWhen>
             <and>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
             </and>
          </enabledWhen>
@@ -722,7 +722,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
@@ -736,7 +736,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
@@ -750,7 +750,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
                <reference
                      definitionId="biobank.isSuperAdminMode">
@@ -772,7 +772,7 @@
                     definitionId="biobank.processingPerspectiveSelected">
               </reference>
               <reference
-                    definitionId="biobank.loggedIn">
+                    definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
               </reference>
               <reference
                     definitionId="biobank.hasDispatchRights">
@@ -794,7 +794,7 @@
                      definitionId="biobank.processingPerspectiveSelected">
                </reference>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
             </and>
          </activeWhen>
@@ -813,7 +813,7 @@
                      definitionId="biobank.processingPerspectiveSelected">
                </reference>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
             </and>
          </activeWhen>
@@ -832,7 +832,7 @@
                      definitionId="biobank.processingPerspectiveSelected">
                </reference>
                <reference
-                     definitionId="biobank.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
             </and>
          </activeWhen>
@@ -1153,7 +1153,7 @@
                   tooltip="Login">
                <visibleWhen
                      checkEnabled="false">
-                    <reference definitionId="biobank.loggedOut">
+                    <reference definitionId="edu.ualberta.med.biobank.gui.common.loggedOut">
                     </reference>
                </visibleWhen>
             </command>
@@ -1165,7 +1165,7 @@
                   tooltip="Logout">
                <visibleWhen
                      checkEnabled="false">
-                    <reference definitionId="biobank.loggedIn">
+                    <reference definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                     </reference>
                </visibleWhen>
             </command>
@@ -2419,24 +2419,6 @@
                variable="edu.ualberta.med.biobank.sourceprovider.isSuperAdminMode">
             <equals
                   value="true">
-            </equals>
-         </with>
-      </definition>
-      <definition
-            id="biobank.loggedIn">
-         <with
-               variable="edu.ualberta.med.biobank.sourceprovider.loginState">
-            <equals
-                  value="loggedIn">
-            </equals>
-         </with>
-      </definition>
-      <definition
-            id="biobank.loggedOut">
-         <with
-               variable="edu.ualberta.med.biobank.sourceprovider.loginState">
-            <equals
-                  value="loggedOut">
             </equals>
          </with>
       </definition>

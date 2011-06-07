@@ -2,8 +2,10 @@ package edu.ualberta.med.biobank.gui.common;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.services.ISourceProviderService;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -209,6 +211,15 @@ public class BiobankGuiCommonPlugin extends AbstractUIPlugin {
         if (ex != null) {
             logger.error("Connection Attempt Failed", ex);
         }
+    }
+
+    public static GuiCommonSessionState getSessionStateSourceProvider() {
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+        return (GuiCommonSessionState) service
+            .getSourceProvider(GuiCommonSessionState.SESSION_STATE_SOURCE_NAME);
     }
 
 }

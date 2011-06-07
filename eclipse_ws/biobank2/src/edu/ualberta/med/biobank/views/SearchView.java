@@ -20,15 +20,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISourceProviderListener;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.services.ISourceProviderService;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.sourceproviders.SessionState;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.GuiCommonSessionState;
 import edu.ualberta.med.biobank.utils.SearchType;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
@@ -46,15 +43,9 @@ public class SearchView extends ViewPart {
     @Override
     public void createPartControl(Composite parent) {
         parent.setLayout(new GridLayout(2, false));
-
-        IWorkbenchWindow window = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow();
-        ISourceProviderService service = (ISourceProviderService) window
-            .getService(ISourceProviderService.class);
-
         // listen to login state
-        SessionState sessionSourceProvider = (SessionState) service
-            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
+        GuiCommonSessionState sessionSourceProvider = BiobankGuiCommonPlugin
+            .getSessionStateSourceProvider();
         sessionSourceProvider
             .addSourceProviderListener(new ISourceProviderListener() {
 
@@ -66,8 +57,10 @@ public class SearchView extends ViewPart {
                 @Override
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
-                    if (sourceName.equals(SessionState.LOGIN_STATE_SOURCE_NAME)) {
-                        loggedIn = sourceValue.equals(SessionState.LOGGED_IN);
+                    if (sourceName
+                        .equals(GuiCommonSessionState.SESSION_STATE_SOURCE_NAME)) {
+                        loggedIn = sourceValue
+                            .equals(GuiCommonSessionState.LOGGED_IN);
                         setEnabled();
                     }
                 }
@@ -121,8 +114,8 @@ public class SearchView extends ViewPart {
         });
 
         loggedIn = sessionSourceProvider.getCurrentState()
-            .get(SessionState.LOGIN_STATE_SOURCE_NAME)
-            .equals(SessionState.LOGGED_IN);
+            .get(GuiCommonSessionState.SESSION_STATE_SOURCE_NAME)
+            .equals(GuiCommonSessionState.LOGGED_IN);
         setEnabled();
 
     }

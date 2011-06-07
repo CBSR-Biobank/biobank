@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.services">
+      <sourceProvider
+            provider="edu.ualberta.med.biobank.gui.common.GuiCommonSessionState">
+         <variable
+               name="edu.ualberta.med.biobank.gui.common.sourceprovider.loginState"
+               priorityLevel="workbench">
+         </variable>
+      </sourceProvider>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="edu.ualberta.med.biobank.gui.common.loggedIn">
+         <with
+               variable="edu.ualberta.med.biobank.gui.common.sourceprovider.loginState">
+            <equals
+                  value="loggedIn">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="edu.ualberta.med.biobank.gui.common.loggedOut">
+         <with
+               variable="edu.ualberta.med.biobank.gui.common.sourceprovider.loginState">
+            <equals
+                  value="loggedOut">
+            </equals>
+         </with>
+      </definition>
+   </extension>
+</plugin>

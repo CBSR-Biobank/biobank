@@ -18,18 +18,18 @@ import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
-import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.GuiCommonSessionState;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
-import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.utils.BindingContextHelper;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
@@ -111,24 +111,23 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
         BindingContextHelper.activateContextInWorkbench(currentPerspectiveId);
 
-        ISourceProviderService service = (ISourceProviderService) activeWindow
-            .getService(ISourceProviderService.class);
-        SessionState sessionSourceProvider = (SessionState) service
-            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
+        GuiCommonSessionState sessionSourceProvider = BiobankGuiCommonPlugin
+            .getSessionStateSourceProvider();
         sessionSourceProvider
             .addSourceProviderListener(new ISourceProviderListener() {
                 @Override
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
                     if (sourceValue != null) {
-                        if (sourceValue.equals(SessionState.LOGGED_IN)) {
+                        if (sourceValue.equals(GuiCommonSessionState.LOGGED_IN)) {
                             mainWindowUpdateTitle(SessionManager.getUser());
                             ServerMsgStatusItem.getInstance().setServerName(
                                 new StringBuffer(SessionManager.getUser()
                                     .getLogin()).append("@")
                                     .append(SessionManager.getServer())
                                     .toString());
-                        } else if (sourceValue.equals(SessionState.LOGGED_OUT)) {
+                        } else if (sourceValue
+                            .equals(GuiCommonSessionState.LOGGED_OUT)) {
                             mainWindowResetTitle();
                             ServerMsgStatusItem.getInstance().setServerName("");
                         }
