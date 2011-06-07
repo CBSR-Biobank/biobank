@@ -11,6 +11,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PrinterLabelTemplateWrapper extends
     PrinterLabelTemplateBaseWrapper {
+
     public PrinterLabelTemplateWrapper(WritableApplicationService appService,
         PrinterLabelTemplate wrappedObject) {
         super(appService, wrappedObject);
