@@ -287,7 +287,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
         IContextService contextService = (IContextService) getSite()
             .getService(IContextService.class);
-        contextService.activateContext("biobank2.context.entryForm");
+        contextService.activateContext("biobank.context.entryForm");
     }
 
     abstract protected void saveForm() throws Exception;
