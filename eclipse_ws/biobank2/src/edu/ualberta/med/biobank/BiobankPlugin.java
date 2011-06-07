@@ -67,9 +67,7 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 @SuppressWarnings("restriction")
 public class BiobankPlugin extends AbstractUIPlugin {
 
-    public static final String PLUGIN_ID = "biobank2";
-
-    public static final String IMAGE_ID = "biobank2.image";
+    public static final String PLUGIN_ID = "biobank";
 
     public static final String IMG_ADD = "add";
     public static final String IMG_ARROW_LEFT = "arrow_left";

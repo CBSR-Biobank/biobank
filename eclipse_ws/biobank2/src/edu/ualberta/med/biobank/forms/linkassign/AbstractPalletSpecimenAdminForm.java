@@ -332,8 +332,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         plateToScanText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                scanButton.setEnabled((Boolean) canLaunchScanValue.getValue()
-                    && fieldsValid());
+                if (scanButton != null)
+                    scanButton.setEnabled((Boolean) canLaunchScanValue
+                        .getValue() && fieldsValid());
             }
         });
         GridData gd = (GridData) plateToScanText.getLayoutData();
