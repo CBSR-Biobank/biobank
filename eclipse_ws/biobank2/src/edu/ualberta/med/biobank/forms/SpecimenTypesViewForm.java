@@ -8,9 +8,9 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.widgets.trees.infos.SpecimenTypeEntryInfoTree;
 
 public class SpecimenTypesViewForm extends BiobankFormBase {
@@ -63,7 +63,7 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
         if (!SessionManager.canUpdate(SpecimenTypeWrapper.class)
             && !SessionManager.canCreate(SpecimenTypeWrapper.class)
             && !SessionManager.canDelete(SpecimenTypeWrapper.class)) {
-            BiobankPlugin.openAccessDeniedErrorMessage();
+            BiobankGuiCommonPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 "Cannot access Specimen Type editor. Access Denied.");
         }

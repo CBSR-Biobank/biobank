@@ -16,13 +16,13 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
@@ -153,7 +153,7 @@ public class ContainerGroup extends AdapterBase {
                 adapter.openEntryForm(hasPreviousForm);
             }
         } catch (final RemoteConnectFailureException exp) {
-            BiobankPlugin.openRemoteConnectErrorMessage(exp);
+            BiobankGuiCommonPlugin.openRemoteConnectErrorMessage(exp);
         } catch (Exception e) {
             logger.error("BioBankFormBase.createPartControl Error", e);
         }

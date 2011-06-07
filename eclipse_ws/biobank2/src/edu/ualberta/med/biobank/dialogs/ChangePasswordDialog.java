@@ -14,8 +14,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.handlers.LogoutHandler;
 
 public class ChangePasswordDialog extends TitleAreaDialog {
@@ -145,7 +145,7 @@ public class ChangePasswordDialog extends TitleAreaDialog {
                 this.oldPassText.getText(), this.newPass2Text.getText());
 
             SessionManager.getInstance().getSession().resetAppService();
-            BiobankPlugin
+            BiobankGuiCommonPlugin
                 .openInformation(
                     "Password modified",
                     "Your password has been successfully changed. You will need to reconnect again to see your data");
@@ -159,7 +159,7 @@ public class ChangePasswordDialog extends TitleAreaDialog {
             // FIXME find a way to reconnect the user automatically ?
             super.okPressed();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error changing password", e);
+            BiobankGuiCommonPlugin.openAsyncError("Error changing password", e);
         }
 
     }

@@ -11,7 +11,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.dialogs.user.GroupEditDialog;
@@ -118,7 +118,7 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
             String message = MessageFormat.format(CONFIRM_DELETE_MESSAGE,
                 new Object[] { name });
 
-            if (BiobankPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
+            if (BiobankGuiCommonPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
                 SessionManager.getAppService().deleteGroup(group);
                 // remove the user from the collection
                 getCollection().remove(group);
@@ -127,7 +127,7 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
                 return true;
             }
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError(GROUP_DELETE_ERROR, e);
+            BiobankGuiCommonPlugin.openAsyncError(GROUP_DELETE_ERROR, e);
         }
         return false;
     }

@@ -9,7 +9,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.forms.ScanPlateForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 
 public class ScanPlateHandler extends AbstractHandler implements IHandler {
 

@@ -23,12 +23,12 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
@@ -380,7 +380,7 @@ public abstract class AdapterBase {
         try {
             loadChildrenSemaphore.acquire();
         } catch (InterruptedException e) {
-            BiobankPlugin.openAsyncError("Could not load children", e);
+            BiobankGuiCommonPlugin.openAsyncError("Could not load children", e);
         }
 
         if (loadChildrenInBackground) {
@@ -404,7 +404,7 @@ public abstract class AdapterBase {
                 SessionManager.refreshTreeNode(AdapterBase.this);
             }
         } catch (final RemoteAccessException exp) {
-            BiobankPlugin.openRemoteAccessErrorMessage(exp);
+            BiobankGuiCommonPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
             String text = getClass().getName();
             if (modelObject != null) {
@@ -474,7 +474,7 @@ public abstract class AdapterBase {
                             });
                         }
                     } catch (final RemoteAccessException exp) {
-                        BiobankPlugin.openRemoteAccessErrorMessage(exp);
+                        BiobankGuiCommonPlugin.openRemoteAccessErrorMessage(exp);
                     } catch (Exception e) {
                         String modelString = "'unknown'";
                         if (modelObject != null) {
@@ -696,7 +696,7 @@ public abstract class AdapterBase {
         }
         boolean doDelete = true;
         if (msg != null)
-            doDelete = BiobankPlugin.openConfirm("Confirm Delete", msg);
+            doDelete = BiobankGuiCommonPlugin.openConfirm("Confirm Delete", msg);
         if (doDelete) {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
@@ -712,7 +712,7 @@ public abstract class AdapterBase {
                             modelObject.delete();
                             page.closeEditor(part, true);
                         } catch (Exception e) {
-                            BiobankPlugin.openAsyncError("Delete failed", e);
+                            BiobankGuiCommonPlugin.openAsyncError("Delete failed", e);
                             getParent().addChild(AdapterBase.this);
                             return;
                         }

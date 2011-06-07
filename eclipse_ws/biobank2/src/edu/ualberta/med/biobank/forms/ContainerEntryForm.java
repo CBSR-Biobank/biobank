@@ -11,12 +11,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -221,7 +221,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         doSave = true;
         if (container.hasChildren() && oldContainerLabel != null
             && !oldContainerLabel.equals(container.getLabel())) {
-            doSave = BiobankPlugin
+            doSave = BiobankGuiCommonPlugin
                 .openConfirm(
                     "Renaming container",
                     "This container has been renamed. Its children will also be renamed. Are you sure you want to continue ?");

@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -125,7 +125,7 @@ public class ShipmentAdapter extends AdapterBase {
         }
         boolean doDelete = true;
         if (msg != null)
-            doDelete = BiobankPlugin.openConfirm("Confirm Delete", msg);
+            doDelete = BiobankGuiCommonPlugin.openConfirm("Confirm Delete", msg);
         if (doDelete) {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
@@ -138,9 +138,9 @@ public class ShipmentAdapter extends AdapterBase {
                             getParent().getParent().rebuild();
                         }
                     } catch (BiobankCheckException bce) {
-                        BiobankPlugin.openAsyncError("Delete failed", bce);
+                        BiobankGuiCommonPlugin.openAsyncError("Delete failed", bce);
                     } catch (Exception e) {
-                        BiobankPlugin.openAsyncError("Delete failed", e);
+                        BiobankGuiCommonPlugin.openAsyncError("Delete failed", e);
                     }
                 }
             });

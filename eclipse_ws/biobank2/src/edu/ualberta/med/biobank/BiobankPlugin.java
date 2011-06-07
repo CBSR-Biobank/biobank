@@ -9,23 +9,23 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.p2.ui.Policy;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.services.ISourceProviderService;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.p2.BiobankPolicy;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
+import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
@@ -385,158 +385,6 @@ public class BiobankPlugin extends AbstractUIPlugin {
         return plugin;
     }
 
-    /**
-     * Display an information message
-     */
-    public static void openMessage(String title, String message) {
-        MessageDialog.openInformation(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), title, message);
-    }
-
-    /**
-     * Display an information message
-     */
-    public static boolean openConfirm(String title, String message) {
-        return MessageDialog.openConfirm(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), title, message);
-    }
-
-    /**
-     * Display an error message
-     */
-    public static void openError(String title, String message) {
-        openError(title, message, null, null);
-    }
-
-    /**
-     * Display an error message with exception message and log the exception
-     */
-    public static void openError(String title, Exception e) {
-        openError(title, null, e, null);
-    }
-
-    /**
-     * Display an error message with exception message and log the exception
-     */
-    public static void openError(String title, String message, Exception e) {
-        openError(title, message, e, null);
-    }
-
-    /**
-     * Display an error message with exception message and log the exception
-     */
-    public static void openError(String title, String message, Exception e,
-        String secondMessage) {
-        String msg = message;
-        if (msg == null && e != null) {
-            msg = e.getMessage();
-            if (((msg == null) || msg.isEmpty()) && (e.getCause() != null)) {
-                msg = e.getCause().getMessage();
-            }
-        }
-        if (msg == null) {
-            msg = "";
-        }
-        if (secondMessage != null) {
-            if (!msg.isEmpty()) {
-                msg += "\n";
-            }
-            msg += secondMessage;
-        }
-        MessageDialog.openError(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), title, msg);
-        if (e != null)
-            logger.error(title, e);
-    }
-
-    /**
-     * Display an error message asynchronously
-     */
-    public static void openAsyncError(final String title, final String message,
-        final Exception e, final String secondMessage) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                openError(title, message, e, secondMessage);
-            }
-        });
-    }
-
-    public static void openAsyncError(final String title, final String message) {
-        openAsyncError(title, message, null, null);
-    }
-
-    public static void openAsyncError(final String title, final String message,
-        final Exception e) {
-        openAsyncError(title, message, e, null);
-    }
-
-    public static void openAsyncError(String title, Exception e,
-        String secondMessage) {
-        openAsyncError(title, null, e, secondMessage);
-    }
-
-    public static void openAsyncError(String title, Exception e) {
-        openAsyncError(title, null, e, null);
-    }
-
-    /**
-     * Display an info message
-     */
-    public static void openInformation(String title, String message) {
-        MessageDialog.openInformation(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), title, message);
-    }
-
-    public static void openAsyncInformation(final String title,
-        final String message) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                MessageDialog.openInformation(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(), title, message);
-            }
-        });
-    }
-
-    /**
-     * Display remote access error message
-     */
-    public static void openRemoteAccessErrorMessage(Throwable ex) {
-        openAsyncError(
-            "Connection Attempt Failed",
-            "Could not perform database operation. Make sure server is running correct version.");
-        if (ex != null) {
-            logger.error("Connection Attempt Failed", ex);
-        }
-    }
-
-    /**
-     * Display remote connect error message
-     */
-    public static void openRemoteConnectErrorMessage(Throwable ex) {
-        openAsyncError("Connection Attempt Failed",
-            "Could not connect to server. Make sure server is running.");
-        if (ex != null) {
-            logger.error("Connection Attempt Failed", ex);
-        }
-    }
-
-    public static void openAccessDeniedErrorMessage() {
-        openAccessDeniedErrorMessage(null);
-    }
-
-    /**
-     * Display remote access error message
-     */
-    public static void openAccessDeniedErrorMessage(Throwable ex) {
-        openAsyncError("Access Denied",
-            "You don't have rights to do this action.");
-        if (ex != null) {
-            logger.error("Connection Attempt Failed", ex);
-        }
-    }
-
     public boolean windowTitleShowVersionEnabled() {
         return getPreferenceStore().getBoolean(
             PreferenceConstants.GENERAL_SHOW_VERSION);
@@ -669,6 +517,15 @@ public class BiobankPlugin extends AbstractUIPlugin {
                 ((WorkbenchWindow) window).showHeapStatus(selection);
             }
         }
+    }
+
+    public static SessionState getSessionStateSourceProvider() {
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+        return (SessionState) service
+            .getSourceProvider(SessionState.SESSION_STATE_SOURCE_NAME);
     }
 
 }

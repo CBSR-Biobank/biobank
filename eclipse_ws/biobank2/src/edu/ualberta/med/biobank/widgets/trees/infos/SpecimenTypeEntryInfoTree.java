@@ -8,13 +8,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.dialogs.SpecimenTypeDialog;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.trees.infos.listener.IInfoTreeAddItemListener;
 import edu.ualberta.med.biobank.widgets.trees.infos.listener.IInfoTreeDeleteItemListener;
@@ -83,7 +83,7 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                 try {
                     specimenType.persist();
                 } catch (Exception e) {
-                    BiobankPlugin.openAsyncError("Save Failed", e);
+                    BiobankGuiCommonPlugin.openAsyncError("Save Failed", e);
                 }
                 reloadCollection(selectedSpecimenTypes);
                 return true;
@@ -91,7 +91,7 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                 try {
                     specimenType.reload();
                 } catch (Exception e) {
-                    BiobankPlugin.openAsyncError("Refresh Failed", e);
+                    BiobankGuiCommonPlugin.openAsyncError("Refresh Failed", e);
                 }
                 reloadCollection(selectedSpecimenTypes);
             }
@@ -123,7 +123,7 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                 if (specType != null) {
                     try {
                         if (!specType.isNew() && specType.isUsedBySpecimens()) {
-                            BiobankPlugin
+                            BiobankGuiCommonPlugin
                                 .openError(
                                     "Specimen Type Delete Error",
                                     "Cannot delete specimen type \""
@@ -146,7 +146,8 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                         specType.delete();
                         setCollection(selectedSpecimenTypes);
                     } catch (final RemoteConnectFailureException exp) {
-                        BiobankPlugin.openRemoteConnectErrorMessage(exp);
+                        BiobankGuiCommonPlugin
+                            .openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
                         logger.error("BioBankFormBase.createPartControl Error",
                             e);
@@ -164,7 +165,7 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                     throw new BiobankCheckException(
                         "That specimen type has already been added.");
         } catch (BiobankException bce) {
-            BiobankPlugin.openAsyncError("Check error", bce);
+            BiobankGuiCommonPlugin.openAsyncError("Check error", bce);
             return false;
         }
         return true;
@@ -180,7 +181,7 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
             setLists(SpecimenTypeWrapper.getAllSpecimenTypes(
                 SessionManager.getAppService(), true));
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError("AppService unavailable", e);
+            BiobankGuiCommonPlugin.openAsyncError("AppService unavailable", e);
         }
     }
 

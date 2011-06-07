@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.utils.EMailDescriptor;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
@@ -196,7 +197,7 @@ public class SendErrorMessageDialog extends BiobankDialog {
         try {
             sendMail();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error sending mail", e);
+            BiobankGuiCommonPlugin.openAsyncError("Error sending mail", e);
         }
         super.okPressed();
     }
@@ -246,14 +247,14 @@ public class SendErrorMessageDialog extends BiobankDialog {
                     Transport.send(getEmailMessage(session));
                     monitor.done();
                 } catch (AuthenticationFailedException afe) {
-                    BiobankPlugin.openAsyncError(
-                        "Authentification Error",
-                        "Wrong authentification for "
+                    BiobankGuiCommonPlugin.openAsyncError(
+                        "Authentification Error", "Wrong authentification for "
                             + email.getServerUsername());
                     monitor.setCanceled(true);
                     return;
                 } catch (Exception e) {
-                    BiobankPlugin.openAsyncError("Error in sending email", e);
+                    BiobankGuiCommonPlugin.openAsyncError(
+                        "Error in sending email", e);
                     monitor.setCanceled(true);
                     return;
                 }

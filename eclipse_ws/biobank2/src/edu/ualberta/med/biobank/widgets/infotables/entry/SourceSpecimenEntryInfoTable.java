@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
 import edu.ualberta.med.biobank.dialogs.StudySourceSpecimenDialog;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
@@ -180,7 +180,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
                 }
             }
         } catch (final RemoteConnectFailureException exp) {
-            BiobankPlugin.openRemoteConnectErrorMessage(exp);
+            BiobankGuiCommonPlugin.openRemoteConnectErrorMessage(exp);
         } catch (ApplicationException e) {
             logger.error("initSpecimenTypes", e);
         }

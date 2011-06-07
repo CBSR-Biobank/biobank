@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
@@ -262,7 +262,7 @@ public class ReportTreeWidget extends Composite {
                     .openEditor(new ReportInput(node),
                         ((ReportTreeNode) node).getReport().getEditorId());
         } catch (Exception ex) {
-            BiobankPlugin.openAsyncError("Error", ex,
+            BiobankGuiCommonPlugin.openAsyncError("Error", ex,
                 "There was an error while building page.");
         }
     }

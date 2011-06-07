@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -32,6 +31,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
@@ -593,7 +593,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                     for (ContainerWrapper cont : foundContainers) {
                         sb.append(cont.getFullInfoLabel());
                     }
-                    BiobankPlugin
+                    BiobankGuiCommonPlugin
                         .openError(
                             Messages
                                 .getString("SpecimenAssign.single.checkParent.error.toomany.title"), //$NON-NLS-1$
@@ -606,7 +606,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                     initParentContainers(dlg.getSelectedContainer());
             }
         } catch (BiobankException be) {
-            BiobankPlugin
+            BiobankGuiCommonPlugin
                 .openError(
                     Messages
                         .getString("SpecimenAssign.container.init.position.error.title"), //$NON-NLS-1$
@@ -616,7 +616,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                 be.getMessage()));
             focusControl(positionText);
         } catch (Exception ex) {
-            BiobankPlugin
+            BiobankGuiCommonPlugin
                 .openError(
                     Messages
                         .getString("SpecimenAssign.container.init.position.error.title"), //$NON-NLS-1$
@@ -677,7 +677,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                         canSaveSingleSpecimen.setValue(true);
                         cancelConfirmWidget.setFocus();
                     } else {
-                        BiobankPlugin.openError(
+                        BiobankGuiCommonPlugin.openError(
                             Messages
                                 .getString("SpecimenAssign.single.position.error.msg"), //$NON-NLS-1$
                             Messages
@@ -694,14 +694,15 @@ public abstract class AbstractLinkAssignEntryForm extends
                     }
                     setDirty(true);
                 } catch (RemoteConnectFailureException exp) {
-                    BiobankPlugin.openRemoteConnectErrorMessage(exp);
+                    BiobankGuiCommonPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (BiobankCheckException bce) {
-                    BiobankPlugin.openError(
+                    BiobankGuiCommonPlugin.openError(
                         "Error while checking position", bce); //$NON-NLS-1$
                     appendLog("ERROR: " + bce.getMessage()); //$NON-NLS-1$
                     focusControl(inventoryIdField);
                 } catch (Exception e) {
-                    BiobankPlugin.openError("Error while checking position", e); //$NON-NLS-1$
+                    BiobankGuiCommonPlugin.openError(
+                        "Error while checking position", e); //$NON-NLS-1$
                     focusControl(positionField);
                 }
             }

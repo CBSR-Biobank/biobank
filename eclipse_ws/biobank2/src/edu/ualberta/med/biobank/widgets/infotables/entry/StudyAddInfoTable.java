@@ -8,7 +8,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -61,7 +61,7 @@ public class StudyAddInfoTable extends StudyInfoTable {
                 }
             }
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError(
+            BiobankGuiCommonPlugin.openAsyncError(
                 "Unable to retrieve available contacts", e);
         }
     }
@@ -81,7 +81,7 @@ public class StudyAddInfoTable extends StudyInfoTable {
                 if (study == null)
                     return;
 
-                if (!BiobankPlugin.openConfirm(
+                if (!BiobankGuiCommonPlugin.openConfirm(
                     "Remove Study",
                     "Are you sure you want to remove study \""
                         + study.getName() + "\"")) {
@@ -94,7 +94,7 @@ public class StudyAddInfoTable extends StudyInfoTable {
                     setCollection(site.getStudyCollection(true));
                     notifyListeners();
                 } catch (BiobankCheckException e) {
-                    BiobankPlugin.openAsyncError("Delete failed", e);
+                    BiobankGuiCommonPlugin.openAsyncError("Delete failed", e);
                 }
             }
         });
