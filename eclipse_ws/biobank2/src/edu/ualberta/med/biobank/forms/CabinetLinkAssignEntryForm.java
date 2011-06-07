@@ -546,7 +546,8 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         cabinet = drawer.getParentContainer();
         appendLogNLS(
             "Cabinet.activitylog.containers.init", //$NON-NLS-1$
-            cabinet.getFullInfoLabel(), drawer.getFullInfoLabel(),
+            cabinet == null ? "none" : cabinet.getFullInfoLabel(),
+            drawer == null ? "none" : drawer.getFullInfoLabel(),
             bin.getFullInfoLabel());
     }
 
@@ -816,12 +817,17 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         widgetCreator.showWidget(drawerWidget, show);
         widgetCreator.showWidget(drawerLabel, show);
         if (show) {
-            cabinetWidget.setContainerType(cabinet.getContainerType());
-            cabinetWidget.setSelection(drawer.getPositionAsRowCol());
-            cabinetLabel.setText("Cabinet " + cabinet.getLabel()); //$NON-NLS-1$
+            if (cabinet == null) {
+                widgetCreator.showWidget(cabinetWidget, false);
+                widgetCreator.showWidget(cabinetLabel, false);
+            } else {
+                cabinetWidget.setContainerType(cabinet.getContainerType());
+                cabinetWidget.setSelection(drawer.getPositionAsRowCol());
+                cabinetLabel.setText(cabinet.getLabel());
+            }
             drawerWidget.setContainer(drawer);
             drawerWidget.setSelection(bin.getPositionAsRowCol());
-            drawerLabel.setText("Drawer " + drawer.getLabel()); //$NON-NLS-1$
+            drawerLabel.setText(drawer.getLabel());
         }
         page.layout(true, true);
         book.reflow(true);
