@@ -2242,18 +2242,6 @@
             name="Link / Assign">
       </page>
       <page
-            category="edu.ualberta.med.biobank.preferences.linkAssign"
-            class="edu.ualberta.med.biobank.preferences.PalletScanPreferencePage"
-            id="edu.ualberta.med.biobank.preferences.palletScan"
-            name="Pallet Scan">
-      </page>
-      <page
-            category="edu.ualberta.med.biobank.preferences.linkAssign"
-            class="edu.ualberta.med.biobank.preferences.CabinetPreferencePage"
-            id="edu.ualberta.med.biobank.preferences.cabinet"
-            name="Cabinet">
-      </page>
-      <page
             class="edu.ualberta.med.biobank.preferences.IssueTrackerPreferencePage"
             id="edu.ualberta.med.biobank.preferences.gereral"
             name="Issue Tracker">
