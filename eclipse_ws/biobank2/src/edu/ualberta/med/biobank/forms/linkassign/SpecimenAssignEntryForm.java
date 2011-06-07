@@ -582,11 +582,13 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         createPalletTypesViewer(multipleOptionsFields);
 
         createPlateToScanField(multipleOptionsFields);
+        // showPlateToScanField(useScanner && !mode.isSingleMode());
 
         createScanButton(parent);
     }
 
     private boolean checkMultipleContainerPosition() {
+        checkingMultipleContainerPosition = true;
         initContainersFromPosition(palletPositionText, true, null);
         if (parentContainers == null)
             return false;
@@ -666,8 +668,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 currentMultipleContainer.initObjectWith(containerAtPosition);
                 currentMultipleContainer.reset();
                 containerAtPosition.reload();
-                currentMultipleContainer.setLabel(containerAtPosition
-                    .getLabel());
                 if (newBarcode != null) {
                     palletproductBarcodeText.setText(newBarcode);
                 }
@@ -826,7 +826,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 toggleScanTubeAloneMode();
 
         }
-        onReset(false);
+        try {
+            reset();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         super.setUseScanner(use);
         page.layout(true, true);
         checkPalletContainerTypes();
@@ -859,7 +863,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      */
     private void initPalletContainerTypes() throws ApplicationException {
         palletContainerTypes = ContainerTypeWrapper.getContainerTypesPallet96(
-            appService, currentMultipleContainer.getSite());
+            appService, SessionManager.getUser().getCurrentWorkingSite());
     }
 
     private void checkPalletContainerTypes() {
@@ -887,8 +891,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         IStructuredSelection selection = (IStructuredSelection) palletTypesViewer
             .getSelection();
         return isPlateValid()
-            && productBarcodeValidator.validate(
-                palletproductBarcodeText.getText()).equals(Status.OK_STATUS)
+            && (!useScanner || productBarcodeValidator.validate(
+                palletproductBarcodeText.getText()).equals(Status.OK_STATUS))
             && palletLabelValidator.validate(palletPositionText.getText())
                 .equals(Status.OK_STATUS) && selection.size() > 0;
     }
@@ -990,6 +994,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         // do that (why ?)
         inventoryIdText.setText("**"); //$NON-NLS-1$ 
         inventoryIdText.setText(""); //$NON-NLS-1$
+        singleTypeText.setText(""); //$NON-NLS-1$ 
+        singleCollectionDateText.setText(""); //$NON-NLS-1$ 
         oldSinglePositionText.setText(""); //$NON-NLS-1$
         oldSinglePositionCheckText.setText(""); //$NON-NLS-1$
         newSinglePositionText.setText(""); //$NON-NLS-1$
@@ -999,23 +1005,22 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         form.layout(true, true);
         if (!mode.isSingleMode()) {
             palletproductBarcodeText.setFocus();
-            setCanLaunchScan(false);
         }
 
         singleSpecimen.reset(); // reset internal values
         setDirty(false);
         initWithProduct = false;
         if (mode.isSingleMode())
-            inventoryIdText.setFocus();
+            focusControl(inventoryIdText);
         else if (useScanner)
-            palletproductBarcodeText.setFocus();
+            focusControl(palletproductBarcodeText);
         else
-            palletPositionText.setFocus();
+            focusControl(palletPositionText);
     }
 
     @Override
-    public void onReset(boolean resetAll) {
-        super.onReset(resetAll);
+    public void reset(boolean resetAll) {
+        super.reset(resetAll);
         String productBarcode = ""; //$NON-NLS-1$
         String label = ""; //$NON-NLS-1$
         ContainerTypeWrapper type = null;
@@ -1046,11 +1051,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             setDirty(false);
             useNewProductBarcode = false;
         }
+        canSaveSingleSpecimen.setValue(!isSingleMode());
     }
 
     @Override
     protected void setBindings(boolean isSingleMode) {
-        setCanLaunchScan(isSingleMode);
         widgetCreator.setBinding(INVENTORY_ID_BINDING, isSingleMode);
         widgetCreator.setBinding(OLD_SINGLE_POSITION_BINDING, isSingleMode);
         oldSinglePositionCheckText.setText("?"); //$NON-NLS-1$
@@ -1062,6 +1067,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         super.setBindings(isSingleMode);
         setScanHasBeenLaunched(isSingleMode || !useScanner);
         checkPalletContainerTypes();
+        setCanLaunchScan(true);
     }
 
     @Override
@@ -1069,8 +1075,15 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         boolean single = mode.isSingleMode();
         if (single)
             setFirstControl(inventoryIdText);
-        else
+        else if (useScanner)
             setFirstControl(palletproductBarcodeText);
+        else
+            setFirstControl(palletPositionText);
+        try {
+            reset();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         super.showModeComposite(mode);
     }
 
@@ -1243,6 +1256,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         if (useScanner)
             return palletproductBarcodeText;
         return palletPositionText;
+    }
+
+    @Override
+    protected boolean needPlate() {
+        return useScanner;
     }
 
 }

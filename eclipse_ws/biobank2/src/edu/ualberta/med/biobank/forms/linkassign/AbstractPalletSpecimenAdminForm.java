@@ -348,7 +348,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected void showPlateToScanField(boolean show) {
         widgetCreator.showWidget(plateToScanLabel, show);
         widgetCreator.showWidget(plateToScanText, show);
-        widgetCreator.setBinding(PLATE_VALIDATOR, show);
+        widgetCreator.setBinding(PLATE_VALIDATOR, show && needPlate());
     }
 
     protected void createFakeOptions(
@@ -436,7 +436,11 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected void setBindings(boolean isSingleMode) {
         setScanHasBeenLaunched(isSingleMode);
-        widgetCreator.setBinding(PLATE_VALIDATOR, !isSingleMode);
+        widgetCreator.setBinding(PLATE_VALIDATOR, !isSingleMode && needPlate());
+    }
+
+    protected boolean needPlate() {
+        return true;
     }
 
     protected void setCanLaunchScan(boolean canLauch) {

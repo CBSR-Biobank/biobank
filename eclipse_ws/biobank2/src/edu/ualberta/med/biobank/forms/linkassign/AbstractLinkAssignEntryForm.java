@@ -491,18 +491,19 @@ public abstract class AbstractLinkAssignEntryForm extends
     protected void enableFields(boolean enable) {
         commonFieldsComposite.setEnabled(enable);
         radioSingle.setEnabled(enable);
+        radioSinglePosition.setEnabled(enable);
         radioMultiple.setEnabled(enable);
     }
 
     @Override
-    public void onReset() throws Exception {
+    protected void onReset() throws Exception {
         super.onReset();
         singleSpecimen.initObjectWith(new SpecimenWrapper(appService));
         setDirty(false);
-        onReset(true);
+        reset(true);
     }
 
-    public void onReset(boolean resetAll) {
+    protected void reset(boolean resetAll) {
         cancelConfirmWidget.reset();
         removeRescanMode();
         setScanHasBeenLaunched(isSingleMode());
@@ -747,6 +748,7 @@ public abstract class AbstractLinkAssignEntryForm extends
             widgetCreator.addBinding(canSaveSingleBinding);
         else
             widgetCreator.removeBinding(canSaveSingleBinding);
+        canSaveSingleSpecimen.setValue(!isSingleMode);
     }
 
     /**
