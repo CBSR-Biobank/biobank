@@ -31,7 +31,7 @@ public class ServerMsgStatusItem extends ContributionItem {
     private int heightHint = -1;
 
     private ServerMsgStatusItem() {
-        super("biobank2.serverMsg");
+        super("biobank.serverMsg");
     }
 
     public static ServerMsgStatusItem getInstance() {

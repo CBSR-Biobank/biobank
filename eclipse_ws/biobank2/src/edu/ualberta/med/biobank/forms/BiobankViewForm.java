@@ -73,7 +73,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         addToolbarButtons();
         IContextService contextService = (IContextService) getSite()
             .getService(IContextService.class);
-        contextService.activateContext("biobank2.context.viewForm");
+        contextService.activateContext("biobank.context.viewForm");
     }
 
     @Override

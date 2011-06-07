@@ -2,7 +2,7 @@ CSM UPT
   URL: http://localhost:8080/upt
   Login ID: bbadmin   
   Password: bbadmin
-  Application Name: biobank2
+  Application Name: biobank
   
 TO REBUILD DATABASE:
   run "ant dbcreate" in project root directory.

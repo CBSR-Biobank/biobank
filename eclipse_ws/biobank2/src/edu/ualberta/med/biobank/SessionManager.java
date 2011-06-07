@@ -35,9 +35,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
 
-    public static final String BIOBANK2_CONTEXT_LOGGED_OUT = "biobank2.context.loggedOut";
+    public static final String BIOBANK2_CONTEXT_LOGGED_OUT = "biobank.context.loggedOut";
 
-    public static final String BIOBANK2_CONTEXT_LOGGED_IN = "biobank2.context.loggedIn";
+    public static final String BIOBANK2_CONTEXT_LOGGED_IN = "biobank.context.loggedIn";
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(SessionManager.class.getName());
