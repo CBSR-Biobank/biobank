@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
@@ -112,7 +112,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             allActivityStatus = ActivityStatusWrapper
                 .getAllActivityStatuses(SessionManager.getAppService());
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError(Messages
+            BiobankGuiCommonPlugin.openAsyncError(Messages
                 .getString("CEventSourceSpecimenDialog.activity.error.msg"), e); //$NON-NLS-1$
         }
     }
@@ -319,7 +319,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         try {
             internalSpecimen.reset();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error", e);
+            BiobankGuiCommonPlugin.openAsyncError("Error", e);
         }
         inventoryIdWidget.setText(""); //$NON-NLS-1$
         inventoryIdWidget.setFocus();

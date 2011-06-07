@@ -51,7 +51,8 @@ import edu.ualberta.med.biobank.export.DataExporter;
 import edu.ualberta.med.biobank.export.PdfDataExporter;
 import edu.ualberta.med.biobank.export.PrintPdfDataExporter;
 import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
@@ -329,7 +330,8 @@ public class ReportEntryForm extends BiobankEntryForm {
                     appService.logActivity(logMessage);
 
                 } catch (Exception e) {
-                    BiobankPlugin.openAsyncError("Report Generation Error", e);
+                    BiobankGuiCommonPlugin.openAsyncError(
+                        "Report Generation Error", e);
                 }
                 monitor.done();
             }

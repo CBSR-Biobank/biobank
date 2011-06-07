@@ -26,7 +26,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.services.ISourceProviderService;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.LogPeer;
@@ -394,7 +394,7 @@ public class LoggingView extends ViewPart {
         if (startDateWidget.getDate() != null
             && endDateWidget.getDate() != null
             && startDateWidget.getDate().after(endDateWidget.getDate())) {
-            BiobankPlugin.openAsyncError("Error",
+            BiobankGuiCommonPlugin.openAsyncError("Error",
                 "Error: start date cannot be ahead end date.");
             return;
         }
@@ -443,7 +443,7 @@ public class LoggingView extends ViewPart {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, LoggingForm.ID);
         } catch (Exception ex) {
-            BiobankPlugin.openAsyncError("Error",
+            BiobankGuiCommonPlugin.openAsyncError("Error",
                 "There was an error opening: LoggingForm.", ex);
         }
     }
@@ -488,7 +488,7 @@ public class LoggingView extends ViewPart {
             return result.toArray(new String[0]);
 
         } catch (ApplicationException ex) {
-            BiobankPlugin.openAsyncError("Error",
+            BiobankGuiCommonPlugin.openAsyncError("Error",
                 "There was an error loading combo values.", ex);
         }
         return null;

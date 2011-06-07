@@ -8,7 +8,7 @@ import org.eclipse.ui.IWorkbenchPage;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 
 public class LogoutHandler extends AbstractHandler {
 

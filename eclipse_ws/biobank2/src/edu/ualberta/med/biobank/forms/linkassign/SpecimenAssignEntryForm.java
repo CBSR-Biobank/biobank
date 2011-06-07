@@ -30,7 +30,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
@@ -43,7 +42,8 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
@@ -253,7 +253,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     try {
                         retrieveSingleSpecimenData();
                     } catch (Exception ex) {
-                        BiobankPlugin.openError("Move - specimen error", ex); //$NON-NLS-1$
+                        BiobankGuiCommonPlugin.openError(
+                            "Move - specimen error", ex); //$NON-NLS-1$
                         focusControl(inventoryIdText);
                     }
                 inventoryIdModified = false;
@@ -609,7 +610,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 if (barcodeAtPosition != null && !barcodeAtPosition.isEmpty()) {
                     if (!barcodeAtPosition.equals(currentMultipleContainer
                         .getProductBarcode())) {
-                        BiobankPlugin
+                        BiobankGuiCommonPlugin
                             .openError(
                                 Messages
                                     .getString("SpecimenAssign.multiple.dialog.positionUsed.error.title"), //$NON-NLS-1$
@@ -650,7 +651,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                                 containerAtPosition.getContainerType()
                                     .getName()));
                     } else {
-                        BiobankPlugin.openError("Error",
+                        BiobankGuiCommonPlugin.openError("Error",
                             "Container found but can't hold specimens");
                         return false;
                     }
@@ -671,7 +672,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             palletTypesViewer.getCombo().setEnabled(enableCombo);
             palletTypesViewer.setInput(possibleTypes);
             if (possibleTypes.size() == 0) {
-                BiobankPlugin
+                BiobankGuiCommonPlugin
                     .openAsyncError(
                         Messages
                             .getString("SpecimenAssignEntryForm.pallet.96.error.title"), //$NON-NLS-1$
@@ -686,7 +687,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 palletTypesViewer.setSelection(new StructuredSelection(
                     typeSelection));
         } catch (Exception ex) {
-            BiobankPlugin.openError(Messages
+            BiobankGuiCommonPlugin.openError(Messages
                 .getString("SpecimenAssign.multiple.validation.error.title"), //$NON-NLS-1$
                 ex);
             appendLog(Messages.getString(
@@ -724,7 +725,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             if (palletFoundWithProductBarcode != null) {
                 // a container with this barcode exists
                 if (!palletFoundWithProductBarcode.isPallet96()) {
-                    BiobankPlugin
+                    BiobankGuiCommonPlugin
                         .openAsyncError(
                             Messages
                                 .getString("SpecimenAssign.multiple.validation.error.title"), //$NON-NLS-1$
@@ -737,7 +738,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         palletFoundWithProductBarcode.getLabel())) {
                     // a label was entered but is different from the one set to
                     // the pallet retrieved
-                    BiobankPlugin
+                    BiobankGuiCommonPlugin
                         .openAsyncError(
                             Messages
                                 .getString("SpecimenAssign.multiple.validation.error.title"), //$NON-NLS-1$
@@ -774,7 +775,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 focusPlateToScan();
             }
         } catch (Exception ex) {
-            BiobankPlugin
+            BiobankGuiCommonPlugin
                 .openError(
                     Messages
                         .getString("SpecimenAssign.multiple.validation.error.title"), ex); //$NON-NLS-1$
@@ -859,7 +860,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     private void checkPalletContainerTypes() {
         if (!isSingleMode() && useScanner && palletContainerTypes.size() == 0) {
-            BiobankPlugin
+            BiobankGuiCommonPlugin
                 .openAsyncError(
                     Messages
                         .getString("SpecimenAssign.multiple.dialog.noPalletFoundError.title"), //$NON-NLS-1$
@@ -1193,7 +1194,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         if (!mode.isSingleMode()) {
             saveEvenIfMissing = true;
             if (currentScanState == UICellStatus.MISSING) {
-                boolean save = BiobankPlugin
+                boolean save = BiobankGuiCommonPlugin
                     .openConfirm(
                         Messages
                             .getString("SpecimenAssign.multiple.dialog.reallySave.title"), //$NON-NLS-1$

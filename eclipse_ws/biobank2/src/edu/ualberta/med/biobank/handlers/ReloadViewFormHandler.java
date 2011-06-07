@@ -8,7 +8,7 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.forms.BiobankViewForm;
 
 public class ReloadViewFormHandler extends AbstractHandler implements IHandler {
@@ -23,7 +23,7 @@ public class ReloadViewFormHandler extends AbstractHandler implements IHandler {
                         .getActiveWorkbenchWindow().getActivePage()
                         .getActiveEditor()).reload();
                 } catch (Exception e) {
-                    BiobankPlugin.openAsyncError("Reload error",
+                    BiobankGuiCommonPlugin.openAsyncError("Reload error",
                         "An error occurred while reloading the form.");
                 }
             }

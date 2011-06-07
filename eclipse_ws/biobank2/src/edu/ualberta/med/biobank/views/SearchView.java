@@ -25,7 +25,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.services.ISourceProviderService;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
@@ -152,11 +152,11 @@ public class SearchView extends ViewPart {
                     if (res != null && res.size() > 0) {
                         type.processResults(res);
                     } else {
-                        BiobankPlugin.openInformation("Search Result",
+                        BiobankGuiCommonPlugin.openInformation("Search Result",
                             "no result");
                     }
                 } catch (Exception ex) {
-                    BiobankPlugin.openAsyncError("Search error", ex);
+                    BiobankGuiCommonPlugin.openAsyncError("Search error", ex);
                 }
             }
         });

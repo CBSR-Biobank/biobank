@@ -8,7 +8,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
@@ -111,17 +111,17 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                 setDirty(true);
                 break;
             case IN_SHIPMENT_RECEIVED:
-                BiobankPlugin.openInformation("Specimen already accepted",
+                BiobankGuiCommonPlugin.openInformation("Specimen already accepted",
                     "Specimen with inventory id " + inventoryId
                         + " is already in received list.");
                 break;
             case EXTRA:
-                BiobankPlugin.openInformation("Specimen not found",
+                BiobankGuiCommonPlugin.openInformation("Specimen not found",
                     "Specimen with inventory id " + inventoryId
                         + " has not been found in this dispatch."
                         + " It will be moved into the extra-pending list.");
                 if (specimen == null) {
-                    BiobankPlugin.openAsyncError("Problem with specimen",
+                    BiobankGuiCommonPlugin.openAsyncError("Problem with specimen",
                         "Specimen is extra but object is null");
                     break;
                 }
@@ -131,11 +131,11 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                 setDirty(true);
                 break;
             default:
-                BiobankPlugin.openInformation("Problem with specimen", res
+                BiobankGuiCommonPlugin.openInformation("Problem with specimen", res
                     .getCell().getInformation());
             }
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error receiving the specimen", e);
+            BiobankGuiCommonPlugin.openAsyncError("Error receiving the specimen", e);
         }
     }
 

@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Biobank GUI Common
 Bundle-SymbolicName: biobank.gui.common
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: edu.ualberta.med.biobank.gui.common.Activator
+Bundle-Activator: edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-ActivationPolicy: lazy

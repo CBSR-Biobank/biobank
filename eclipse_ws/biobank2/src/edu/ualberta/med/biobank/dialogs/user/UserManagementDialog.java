@@ -27,6 +27,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.GroupInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.UserInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -148,7 +149,7 @@ public class UserManagementDialog extends BiobankDialog {
             return SessionManager.getAppService().getSecurityGroups(
                 includeSuperAdmin);
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError("Unable to load groups.", e);
+            BiobankGuiCommonPlugin.openAsyncError("Unable to load groups.", e);
         }
         return null;
     }
@@ -159,7 +160,8 @@ public class UserManagementDialog extends BiobankDialog {
                 currentUserList = SessionManager.getAppService()
                     .getSecurityUsers();
             } catch (ApplicationException e) {
-                BiobankPlugin.openAsyncError("Unable to load users.", e);
+                BiobankGuiCommonPlugin.openAsyncError("Unable to load users.",
+                    e);
             }
         }
         return currentUserList;
@@ -171,7 +173,7 @@ public class UserManagementDialog extends BiobankDialog {
             .getActiveWorkbenchWindow().getShell(), user, getGroups(true), true);
         int res = dlg.open();
         if (res == Status.OK) {
-            BiobankPlugin.openAsyncInformation(USER_ADDED_TITLE,
+            BiobankGuiCommonPlugin.openAsyncInformation(USER_ADDED_TITLE,
                 MessageFormat.format(USER_ADDED_MESSAGE, user.getLogin()));
             getUsers().add(user);
             userInfoTable.reloadCollection(getUsers(), user);
@@ -184,7 +186,7 @@ public class UserManagementDialog extends BiobankDialog {
             .getActiveWorkbenchWindow().getShell(), group, true);
         int res = dlg.open();
         if (res == Status.OK) {
-            BiobankPlugin.openAsyncInformation(GROUP_ADDED_TITLE,
+            BiobankGuiCommonPlugin.openAsyncInformation(GROUP_ADDED_TITLE,
                 MessageFormat.format(GROUP_ADDED_MESSAGE, group.getName()));
             groupInfoTable.reloadCollection(getGroups(false), group);
         }

@@ -14,6 +14,7 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
@@ -49,7 +50,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
         }
         if (BiobankPlugin.isAskPrintActivityLog()
             && page.getPerspective().getId().equals(LinkAssignPerspective.ID)) {
-            BiobankPlugin.openInformation("Can't close",
+            BiobankGuiCommonPlugin.openInformation("Can't close",
                 "Please end specimen management session before closing");
             return false;
         }

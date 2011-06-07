@@ -9,7 +9,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -189,7 +189,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         try {
             site.reload();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError(
+            BiobankGuiCommonPlugin.openAsyncError(
                 Messages.getString("SiteViewForm.reload.error.msg"), e); //$NON-NLS-1$
         }
     }

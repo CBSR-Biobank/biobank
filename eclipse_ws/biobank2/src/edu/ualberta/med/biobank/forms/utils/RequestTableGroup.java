@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -53,7 +53,7 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
         try {
             results = SessionManager.getAppService().query(query);
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error",
+            BiobankGuiCommonPlugin.openAsyncError("Error",
                 "Unable to retrieve data from server");
         }
 
