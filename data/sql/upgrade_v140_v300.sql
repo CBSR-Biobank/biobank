@@ -1,6 +1,6 @@
 /*------------------------------------------------------------------------------
  *
- *  MySQL upgrade script for model version BB2 v1.4.0 to BB3 v1.5.0
+ *  MySQL upgrade script for model version BioBank v1.4.0 to v3.0.0
  *
  *----------------------------------------------------------------------------*/
 
@@ -39,6 +39,41 @@ update container c, container_path cp
        where c.id=cp.container_id;
 
 DROP TABLE IF EXISTS container_path;
+
+/*****************************************************
+ * Printer Labels
+ ****************************************************/
+
+CREATE TABLE printed_ss_inv_item (
+    ID INT(11) NOT NULL,
+    VERSION INT(11) NOT NULL,
+    TXT VARCHAR(15) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    PRIMARY KEY (ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+
+CREATE TABLE printer_label_template (
+    ID INT(11) NOT NULL,
+    VERSION INT(11) NOT NULL,
+    NAME VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    PRINTER_NAME VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    CONFIG_DATA TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    JASPER_TEMPLATE_ID INT(11) NOT NULL COMMENT '',
+    CONSTRAINT NAME UNIQUE KEY(NAME),
+    PRIMARY KEY (ID),
+    INDEX FKC6463C6AA4B878C8 (JASPER_TEMPLATE_ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+
+CREATE TABLE jasper_template (
+    ID INT(11) NOT NULL,
+    VERSION INT(11) NOT NULL,
+    NAME VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    XML TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    CONSTRAINT NAME UNIQUE KEY(NAME),
+    PRIMARY KEY (ID)
+) ENGINE=InnoDB COLLATE=latin1_general_cs;
+
+ALTER TABLE printer_label_template
+    ADD CONSTRAINT FKC6463C6AA4B878C8 FOREIGN KEY FKC6463C6AA4B878C8 (JASPER_TEMPLATE_ID) REFERENCES jasper_template (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 /*****************************************************
  * Origin info

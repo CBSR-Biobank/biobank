@@ -9,8 +9,8 @@
     <arg value="-f" />
   </exec>
 
-  <property name="server.version.num" value="1.0.0" />
-  <property name="java.client.version.num" value="1.0.0" />
+  <property name="server.version.num" value="3.0.0.pre" />
+  <property name="java.client.version.num" value="3.0.0.pre" />
 
   <property environment="env" />
   <property name="host" value="aicml-med.cs.ualberta.ca" />
@@ -840,7 +840,7 @@
          webxml="${cacore.sdk.dir}/${build.conf.web-inf.dir}/web.xml">
       <manifest>
         <attribute name="Generated-By"
-                   value="biobank2 caCORE SDK Code Generator" />
+                   value="biobank caCORE SDK Code Generator" />
         <attribute name="Version" value="${VERSION}" />
       </manifest>
       <lib dir="${cacore.sdk.dir}/${system.dir}/${system.dist.dir}"
@@ -1075,12 +1075,12 @@
     <copy todir="${buildDirectory}/plugins/sampleProcessingRobot">
       <fileset dir="${eclipse.workspace.dir}/sampleProcessingRobot" />
     </copy>
-  	<copy todir="${buildDirectory}/plugins/barcodeGenerator">
-  	  <fileset dir="${eclipse.workspace.dir}/barcodeGenerator" />
-  	</copy>
-  	<copy todir="${buildDirectory}/plugins/biobank.gui.common">
-  	  <fileset dir="${eclipse.workspace.dir}/biobank.gui.common" />
-  	</copy>
+    <copy todir="${buildDirectory}/plugins/barcodeGenerator">
+      <fileset dir="${eclipse.workspace.dir}/barcodeGenerator" />
+    </copy>
+    <copy todir="${buildDirectory}/plugins/biobank.gui.common">
+      <fileset dir="${eclipse.workspace.dir}/biobank.gui.common" />
+    </copy>
     <copy todir="${buildDirectory}/features/biobank2.feature.core">
       <fileset dir="${eclipse.workspace.dir}/biobank2.feature.core" />
     </copy>

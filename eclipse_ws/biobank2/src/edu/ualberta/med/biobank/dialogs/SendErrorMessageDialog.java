@@ -280,7 +280,7 @@ public class SendErrorMessageDialog extends BiobankDialog {
                     .getLogin();
         }
 
-        text += "\nSent from BioBank2 Java Client, version "
+        text += "\nSent from BioBank Java Client, version "
             + BiobankPlugin.getDefault().getBundle().getVersion();
 
         mbp1.setText(text);

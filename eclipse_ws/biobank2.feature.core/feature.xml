@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="biobank2.feature.core"
-      label="BioBank3 Core Feature"
-      version="1.0.0.qualifier"
+      label="BioBank Core Feature"
+      version="1.0.0"
       provider-name="AICML"
-      plugin="biobank2">
+      plugin="biobank">
 
    <description>
       This feature contains all plugins developped by AICML for the
-BioBank3 application
+BioBank application
    </description>
 
    <license url="epl-v10.html">
@@ -23,7 +23,7 @@ BioBank3 application
          unpack="false"/>
 
    <plugin
-         id="biobank2"
+         id="biobank"
          download-size="0"
          install-size="0"
          version="0.0.0"

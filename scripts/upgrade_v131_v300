@@ -61,7 +61,7 @@ mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD create biobank
 gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
 echo "upgrading database..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v131_v140.sql
-mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v140_BB3v100.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v140_v300.sql
 echo "setting global security..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < $DUMPFILE
 echo "setting CBSR sites security..."

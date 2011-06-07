@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
 /**
- * The base class for all BioBank2 Java Client view forms. The forms are usually
+ * The base class for all BioBank Java Client view forms. The forms are usually
  * created when the user selects a node in the <code>SessionView</code> tree
  * view.
  */
@@ -73,7 +73,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         addToolbarButtons();
         IContextService contextService = (IContextService) getSite()
             .getService(IContextService.class);
-        contextService.activateContext("biobank2.context.viewForm");
+        contextService.activateContext("biobank.context.viewForm");
     }
 
     @Override

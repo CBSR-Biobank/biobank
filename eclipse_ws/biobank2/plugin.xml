@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin>
    <extension
-         id="biobank2"
+         id="biobank"
          point="org.eclipse.core.runtime.applications">
       <application>
          <run
@@ -19,15 +19,15 @@
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
-            application="biobank2.biobank2"
-            name="BioBank2">
+            application="biobank.biobank"
+            name="BioBank">
          <property
                name="appName"
-               value="BioBank2">
+               value="BioBank">
          </property>
          <property
                name="aboutText"
-               value="BioBank2 Java Client&#x0A;Version {0}&#x0A;&#x0A;Developed for the Canadian BioSample Repository by AICML .&#x0A;&#x0A;Canadian BioSample Repository: http://www.biosample.ca&#x0A;AICML: http://aicml.cs.ualberta.ca">
+               value="BioBank Java Client&#x0A;Version {0}&#x0A;&#x0A;Developed for the Canadian BioSample Repository by AICML .&#x0A;&#x0A;Canadian BioSample Repository: http://www.biosample.ca&#x0A;AICML: http://aicml.cs.ualberta.ca">
          </property>
          <property
                name="aboutImage"
@@ -64,12 +64,12 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            categoryId="biobank2.command.category.server"
+            categoryId="biobank.command.category.server"
             id="edu.ualberta.med.biobank.commands.login"
             name="Login">
       </command>
       <command
-            categoryId="biobank2.command.category.server"
+            categoryId="biobank.command.category.server"
             id="edu.ualberta.med.biobank.commands.logout"
             name="Logout">
       </command>
@@ -238,12 +238,12 @@
          name="Edit Activity Status">
       </command>
       <command
-            categoryId="biobank2.command.category.server"
+            categoryId="biobank.command.category.server"
             id="edu.ualberta.med.biobank.commands.userManagement"
             name="User Management">
       </command>
       <command
-            categoryId="biobank2.command.category.server"
+            categoryId="biobank.command.category.server"
             id="edu.ualberta.med.biobank.commands.changePassword"
             name="Change Password">
       </command>
@@ -276,7 +276,7 @@
              name="Process Request">
        </command>
        <category
-             id="biobank2.command.category.server"
+             id="biobank.command.category.server"
              name="Server">
        </category>
        <command
@@ -302,7 +302,7 @@
             commandId="edu.ualberta.med.biobank.commands.login">
          <activeWhen>
             <reference
-                  definitionId="biobank2.loggedOut">
+                  definitionId="biobank.loggedOut">
             </reference>
          </activeWhen>
       </handler>
@@ -311,7 +311,7 @@
             commandId="edu.ualberta.med.biobank.commands.logout">
          <activeWhen>
             <reference
-                  definitionId="biobank2.loggedIn">
+                  definitionId="biobank.loggedIn">
             </reference>
          </activeWhen>
       </handler>
@@ -339,7 +339,7 @@
                   </instanceof>
                </with>
                <reference
-                     definitionId="biobank2.confirmEnabled">
+                     definitionId="biobank.confirmEnabled">
                </reference>
             </and>
          </activeWhen>
@@ -361,7 +361,7 @@
             commandId="edu.ualberta.med.biobank.commands.print">
          <activeWhen>
             <reference
-                  definitionId="biobank2.sampleManagementPerspectiveSelected">
+                  definitionId="biobank.sampleManagementPerspectiveSelected">
             </reference>
          </activeWhen>
       </handler>
@@ -371,10 +371,10 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
                <reference
-                     definitionId="biobank2.mainPerspectiveSelected">
+                     definitionId="biobank.mainPerspectiveSelected">
                </reference>
             </and>
          </activeWhen>
@@ -385,10 +385,10 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
                <reference
-                     definitionId="biobank2.mainPerspectiveSelected">
+                     definitionId="biobank.mainPerspectiveSelected">
                </reference>
             </and>
          </activeWhen>
@@ -399,10 +399,10 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
                <reference
-                     definitionId="biobank2.mainPerspectiveSelected">
+                     definitionId="biobank.mainPerspectiveSelected">
                </reference>
             </and>
          </activeWhen>
@@ -413,14 +413,14 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
                <reference
-                     definitionId="biobank2.mainPerspectiveSelected">
+                     definitionId="biobank.mainPerspectiveSelected">
                </reference>
                <not>
                   <reference
-                        definitionId="biobank2.isSuperAdminMode">
+                        definitionId="biobank.isSuperAdminMode">
                   </reference>
                </not>
             </and>
@@ -432,14 +432,14 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
                <reference
-                     definitionId="biobank2.mainPerspectiveSelected">
+                     definitionId="biobank.mainPerspectiveSelected">
                </reference>
                <not>
                   <reference
-                        definitionId="biobank2.isSuperAdminMode">
+                        definitionId="biobank.isSuperAdminMode">
                   </reference>
                </not>
             </and>
@@ -451,10 +451,10 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
                <reference
-                     definitionId="biobank2.mainPerspectiveSelected">
+                     definitionId="biobank.mainPerspectiveSelected">
                </reference>
             </and>
          </activeWhen>
@@ -465,10 +465,10 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
                <reference
-                     definitionId="biobank2.mainPerspectiveSelected">
+                     definitionId="biobank.mainPerspectiveSelected">
                </reference>
             </and>
          </activeWhen>
@@ -479,15 +479,15 @@
          <enabledWhen>
            <and>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
                <not>
                <or>
                 <reference
-                      definitionId="biobank2.reportsPerspectiveSelected">
+                      definitionId="biobank.reportsPerspectiveSelected">
                 </reference>
                 <reference
-                      definitionId="biobank2.sampleManagementPerspectiveSelected">
+                      definitionId="biobank.sampleManagementPerspectiveSelected">
                 </reference>
                </or>
                </not>
@@ -500,15 +500,15 @@
          <enabledWhen>
          <and>
             <reference
-                  definitionId="biobank2.loggedIn">
+                  definitionId="biobank.loggedIn">
             </reference>
                   <not>
                   <or>
                      <reference
-                           definitionId="biobank2.mainPerspectiveSelected">
+                           definitionId="biobank.mainPerspectiveSelected">
                      </reference>
                      <reference
-                      definitionId="biobank2.sampleManagementPerspectiveSelected">
+                      definitionId="biobank.sampleManagementPerspectiveSelected">
                 </reference>
                 </or>
                   </not>
@@ -521,19 +521,19 @@
          <activeWhen>
             <and>
               <reference	
-                    definitionId="biobank2.processingPerspectiveSelected">
+                    definitionId="biobank.processingPerspectiveSelected">
               </reference>
               <reference
-                    definitionId="biobank2.loggedIn">
+                    definitionId="biobank.loggedIn">
               </reference>
               <reference
-                    definitionId="biobank2.hasClinicShipmentRights">
+                    definitionId="biobank.hasClinicShipmentRights">
               </reference>
             </and>
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank2.processingPerspectiveSelected">
+                  definitionId="biobank.processingPerspectiveSelected">
             </reference>
          </enabledWhen>
       </handler>
@@ -543,16 +543,16 @@
          <activeWhen>
             <and>
               <reference
-                    definitionId="biobank2.processingPerspectiveSelected">
+                    definitionId="biobank.processingPerspectiveSelected">
               </reference>
               <reference
-                    definitionId="biobank2.loggedIn">
+                    definitionId="biobank.loggedIn">
               </reference>
             </and>
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank2.processingPerspectiveSelected">
+                  definitionId="biobank.processingPerspectiveSelected">
             </reference>
          </enabledWhen>
       </handler>
@@ -562,14 +562,14 @@
          <activeWhen>
             <and>
               <reference
-                    definitionId="biobank2.processingPerspectiveSelected">
+                    definitionId="biobank.processingPerspectiveSelected">
               </reference>
             </and>
          </activeWhen>
           <enabledWhen>
             <and>
                <reference
-                     definitionId="biobank2.oneElementSelected">
+                     definitionId="biobank.oneElementSelected">
                </reference>
 			   <with
                   variable="selection">
@@ -590,20 +590,20 @@
          <enabledWhen>
             <and>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
                <not>
                   <or>
                      <reference
-                           definitionId="biobank2.processingPerspectiveSelected">
+                           definitionId="biobank.processingPerspectiveSelected">
                      </reference>
                      <reference
-                           definitionId="biobank2.sampleManagementPerspectiveSelected">
+                           definitionId="biobank.sampleManagementPerspectiveSelected">
                      </reference>
                   </or>
                </not>
                <reference
-                     definitionId="biobank2.hasWorkingCenter">
+                     definitionId="biobank.hasWorkingCenter">
                </reference>
             </and>
          </enabledWhen>
@@ -614,14 +614,14 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.processingPerspectiveSelected">
+                     definitionId="biobank.processingPerspectiveSelected">
                </reference>
             </and>
          </activeWhen>
          <enabledWhen>
             <and>
                <reference
-                     definitionId="biobank2.oneElementSelected">
+                     definitionId="biobank.oneElementSelected">
                </reference>
 			   <with
                   variable="selection">
@@ -641,7 +641,7 @@
             commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree">
          <activeWhen>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
          </activeWhen>
       </handler>
@@ -650,7 +650,7 @@
             commandId="edu.ualberta.med.biobank.commands.deleteSelection">
          <enabledWhen>
             <reference
-                  definitionId="biobank2.canDelete">
+                  definitionId="biobank.canDelete">
             </reference>
          </enabledWhen>
       </handler>
@@ -659,7 +659,7 @@
             commandId="edu.ualberta.med.biobank.commands.search">
          <activeWhen>
             <reference
-                  definitionId="biobank2.loggedIn">
+                  definitionId="biobank.loggedIn">
             </reference>
          </activeWhen>
       </handler>
@@ -687,7 +687,7 @@
          <enabledWhen>
             <and>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
             </and>
          </enabledWhen>
@@ -722,10 +722,10 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
                <reference
-                     definitionId="biobank2.mainPerspectiveSelected">
+                     definitionId="biobank.mainPerspectiveSelected">
                </reference>
             </and>
          </activeWhen>
@@ -736,10 +736,10 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
                <reference
-                     definitionId="biobank2.mainPerspectiveSelected">
+                     definitionId="biobank.mainPerspectiveSelected">
                </reference>
             </and>
          </activeWhen>
@@ -750,16 +750,16 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
                <reference
-                     definitionId="biobank2.isSuperAdminMode">
+                     definitionId="biobank.isSuperAdminMode">
                </reference>
             </and>
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank2.isSuperAdminMode">
+                  definitionId="biobank.isSuperAdminMode">
             </reference>
          </enabledWhen>
       </handler>
@@ -769,19 +769,19 @@
          <activeWhen>
             <and>
               <reference
-                    definitionId="biobank2.processingPerspectiveSelected">
+                    definitionId="biobank.processingPerspectiveSelected">
               </reference>
               <reference
-                    definitionId="biobank2.loggedIn">
+                    definitionId="biobank.loggedIn">
               </reference>
               <reference
-                    definitionId="biobank2.hasDispatchRights">
+                    definitionId="biobank.hasDispatchRights">
               </reference>
             </and>
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank2.processingPerspectiveSelected">
+                  definitionId="biobank.processingPerspectiveSelected">
             </reference>
          </enabledWhen>
       </handler>
@@ -791,16 +791,16 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.processingPerspectiveSelected">
+                     definitionId="biobank.processingPerspectiveSelected">
                </reference>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
             </and>
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank2.processingPerspectiveSelected">
+                  definitionId="biobank.processingPerspectiveSelected">
             </reference>
          </enabledWhen>
       </handler>
@@ -810,16 +810,16 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.processingPerspectiveSelected">
+                     definitionId="biobank.processingPerspectiveSelected">
                </reference>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
             </and>
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank2.processingPerspectiveSelected">
+                  definitionId="biobank.processingPerspectiveSelected">
             </reference>
          </enabledWhen>
       </handler>
@@ -829,16 +829,16 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.processingPerspectiveSelected">
+                     definitionId="biobank.processingPerspectiveSelected">
                </reference>
                <reference
-                     definitionId="biobank2.loggedIn">
+                     definitionId="biobank.loggedIn">
                </reference>
             </and>
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank2.processingPerspectiveSelected">
+                  definitionId="biobank.processingPerspectiveSelected">
             </reference>
          </enabledWhen>
       </handler>
@@ -887,7 +887,7 @@
                   <visibleWhen
                         checkEnabled="false">
                      <reference
-                           definitionId="biobank2.isSuperAdminMode">
+                           definitionId="biobank.isSuperAdminMode">
                      </reference>
                   </visibleWhen>
                </command>
@@ -900,7 +900,7 @@
                   <visibleWhen
                         checkEnabled="false">
                      <reference
-                           definitionId="biobank2.isSuperAdminMode">
+                           definitionId="biobank.isSuperAdminMode">
                      </reference>
                   </visibleWhen>
                </command>
@@ -913,7 +913,7 @@
                   <visibleWhen
                         checkEnabled="false">
                      <reference
-                           definitionId="biobank2.isSuperAdminMode">
+                           definitionId="biobank.isSuperAdminMode">
                      </reference>
                   </visibleWhen>
                </command>
@@ -927,7 +927,7 @@
                         checkEnabled="false">
                      <not>
                         <reference
-                              definitionId="biobank2.isSuperAdminMode">
+                              definitionId="biobank.isSuperAdminMode">
                         </reference>
                      </not>
                   </visibleWhen>
@@ -942,7 +942,7 @@
                         checkEnabled="false">
                      <not>
                         <reference
-                              definitionId="biobank2.isSuperAdminMode">
+                              definitionId="biobank.isSuperAdminMode">
                         </reference>
                      </not>
                   </visibleWhen>
@@ -955,7 +955,7 @@
                    <visibleWhen
                          checkEnabled="false">
                       <reference
-                            definitionId="biobank2.isSuperAdminMode">
+                            definitionId="biobank.isSuperAdminMode">
                       </reference>
                    </visibleWhen>
                </command>
@@ -967,7 +967,7 @@
                    <visibleWhen
                          checkEnabled="false">
                       <reference
-                            definitionId="biobank2.isSuperAdminMode">
+                            definitionId="biobank.isSuperAdminMode">
                       </reference>
                    </visibleWhen>
                 </command>
@@ -979,7 +979,7 @@
                    <visibleWhen
                          checkEnabled="false">
                       <reference
-                            definitionId="biobank2.isSuperAdminMode">
+                            definitionId="biobank.isSuperAdminMode">
                       </reference>
                    </visibleWhen>
                 </command>
@@ -991,7 +991,7 @@
                    <visibleWhen
                          checkEnabled="false">
                       <reference
-                            definitionId="biobank2.isSuperAdminMode">
+                            definitionId="biobank.isSuperAdminMode">
                       </reference>
                    </visibleWhen>
                 </command>
@@ -1024,7 +1024,7 @@
                   style="push">
             </command>
             <separator
-                  name="biobank2.separator2"
+                  name="biobank.separator2"
                   visible="true">
             </separator>
             <command
@@ -1040,7 +1040,7 @@
                   style="push">
             </command>
             <separator
-                  name="biobank2.separator4"
+                  name="biobank.separator4"
                   visible="true">
             </separator>
             <command
@@ -1051,7 +1051,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.hasDispatchRights">
+                        definitionId="biobank.hasDispatchRights">
                   </reference>
                </visibleWhen>
             </command>
@@ -1063,12 +1063,12 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.hasClinicShipmentRights">
+                        definitionId="biobank.hasClinicShipmentRights">
                   </reference>
                </visibleWhen>
             </command>
             <separator
-                  name="biobank2.separator3"
+                  name="biobank.separator3"
                   visible="true">
             </separator>
             <command
@@ -1153,7 +1153,7 @@
                   tooltip="Login">
                <visibleWhen
                      checkEnabled="false">
-                    <reference definitionId="biobank2.loggedOut">
+                    <reference definitionId="biobank.loggedOut">
                     </reference>
                </visibleWhen>
             </command>
@@ -1165,7 +1165,7 @@
                   tooltip="Logout">
                <visibleWhen
                      checkEnabled="false">
-                    <reference definitionId="biobank2.loggedIn">
+                    <reference definitionId="biobank.loggedIn">
                     </reference>
                </visibleWhen>
             </command>
@@ -1206,7 +1206,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.isSuperAdminMode">
+                        definitionId="biobank.isSuperAdminMode">
                   </reference>
                </visibleWhen>
             </command>
@@ -1218,7 +1218,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.isSuperAdminMode">
+                        definitionId="biobank.isSuperAdminMode">
                   </reference>
                </visibleWhen>
             </command>
@@ -1230,7 +1230,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.isSuperAdminMode">
+                        definitionId="biobank.isSuperAdminMode">
                   </reference>
                </visibleWhen>
             </command>
@@ -1243,7 +1243,7 @@
                      checkEnabled="false">
                   <not>
                      <reference
-                           definitionId="biobank2.isSuperAdminMode">
+                           definitionId="biobank.isSuperAdminMode">
                      </reference>
                   </not>
                </visibleWhen>
@@ -1257,7 +1257,7 @@
                      checkEnabled="false">
                   <not>
                      <reference
-                           definitionId="biobank2.isSuperAdminMode">
+                           definitionId="biobank.isSuperAdminMode">
                      </reference>
                   </not>
                </visibleWhen>
@@ -1294,7 +1294,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.processingPerspectiveSelected">
+                        definitionId="biobank.processingPerspectiveSelected">
                   </reference>
                </visibleWhen>
             </command>
@@ -1306,7 +1306,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.processingPerspectiveSelected">
+                        definitionId="biobank.processingPerspectiveSelected">
                   </reference>
                </visibleWhen>
             </command>
@@ -1318,7 +1318,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.processingPerspectiveSelected">
+                        definitionId="biobank.processingPerspectiveSelected">
                   </reference>
                </visibleWhen>
             </command>
@@ -1397,10 +1397,10 @@
                      checkEnabled="false">
                   <and>
                   <reference
-                        definitionId="biobank2.processingPerspectiveSelected">
+                        definitionId="biobank.processingPerspectiveSelected">
                   </reference>
                   <reference
-                        definitionId="biobank2.hasDispatchRights">
+                        definitionId="biobank.hasDispatchRights">
                   </reference>
                   </and>
                </visibleWhen>
@@ -1414,10 +1414,10 @@
                      checkEnabled="false">
                   <and>
                   <reference
-                        definitionId="biobank2.processingPerspectiveSelected">
+                        definitionId="biobank.processingPerspectiveSelected">
                   </reference>
 				  <reference
-                        definitionId="biobank2.hasClinicShipmentRights">
+                        definitionId="biobank.hasClinicShipmentRights">
                   </reference>
                   </and>
                </visibleWhen>
@@ -2036,196 +2036,196 @@
       <key
             commandId="edu.ualberta.med.biobank.commands.mainAdmin"
             contextId="not.edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M1+M2+A">
       </key>
       <key commandId="edu.ualberta.med.biobank.commands.processingAdmin"
            contextId="not.edu.ualberta.med.biobank.perspective.processing"
-           schemeId="biobank2.scheme"
+           schemeId="biobank.scheme"
            sequence="M1+M2+P">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.reports"
             contextId="not.edu.ualberta.med.biobank.perspective.reports"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M1+M2+R">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.login"
-            contextId="biobank2.context.loggedOut"
-            schemeId="biobank2.scheme"
+            contextId="biobank.context.loggedOut"
+            schemeId="biobank.scheme"
             sequence="M1+L">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.logout"
-            contextId="biobank2.context.loggedIn"
-            schemeId="biobank2.scheme"
+            contextId="biobank.context.loggedIn"
+            schemeId="biobank.scheme"
             sequence="M1+M2+L">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.siteAdd"
             contextId="edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M3+R">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.clinicAdd"
             contextId="edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M3+C">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.studyAdd"
             contextId="edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M3+S">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.quit"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M1+Q">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
             contextId="edu.ualberta.med.biobank.perspective.processing"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M3+P">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd"
             contextId="edu.ualberta.med.biobank.perspective.processing"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M3+E">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.processing.link"
             contextId="edu.ualberta.med.biobank.perspective.processing"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M2+M3+L">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.processing.assign"
             contextId="edu.ualberta.med.biobank.perspective.processing"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M2+M3+A">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.reset"
-            contextId="biobank2.context.entryForm"
-            schemeId="biobank2.scheme"
+            contextId="biobank.context.entryForm"
+            schemeId="biobank.scheme"
             sequence="M1+R"/>
       <key
             commandId="edu.ualberta.med.biobank.commands.confirm"
-            contextId="biobank2.context.entryForm"
-            schemeId="biobank2.scheme"
+            contextId="biobank.context.entryForm"
+            schemeId="biobank.scheme"
             sequence="M1+S">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.cancel"
-            contextId="biobank2.context.entryForm"
-            schemeId="biobank2.scheme"
+            contextId="biobank.context.entryForm"
+            schemeId="biobank.scheme"
             sequence="M1+Z"/>
       <key
             commandId="org.eclipse.ui.file.close"
             sequence="M1+W"
-            schemeId="biobank2.scheme" />
+            schemeId="biobank.scheme" />
       <key
             commandId="org.eclipse.ui.file.close"
             sequence="M1+F4"
-            schemeId="biobank2.scheme" />
+            schemeId="biobank.scheme" />
       <key
             commandId="org.eclipse.ui.file.closeAll"
             sequence="M1+M2+W"
-            schemeId="biobank2.scheme" />
+            schemeId="biobank.scheme" />
       <key
             commandId="org.eclipse.ui.file.closeAll"
             sequence="M1+M2+F4"
-            schemeId="biobank2.scheme" />
+            schemeId="biobank.scheme" />
       <scheme
-            id="biobank2.scheme"
+            id="biobank.scheme"
             name="Scheme Biobank">
       </scheme>
       <key
             commandId="edu.ualberta.med.biobank.commands.reloadViewForm"
-            contextId="biobank2.context.viewForm"
-            schemeId="biobank2.scheme"
+            contextId="biobank.context.viewForm"
+            schemeId="biobank.scheme"
             sequence="M1+R">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.edit"
-            contextId="biobank2.context.viewForm"
-            schemeId="biobank2.scheme"
+            contextId="biobank.context.viewForm"
+            schemeId="biobank.scheme"
             sequence="M1+E">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.containerTypeAdd"
             contextId="edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M3+T">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.containerAdd"
             contextId="edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M3+N">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.editSpecimenTypes"
             contextId="edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M3+L">
       </key>    
 	  <key
             commandId="edu.ualberta.med.biobank.commands.editShippingMethods"
             contextId="edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M3+M">
       </key> 
 	  <key
             commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
             contextId="edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M3+A">
       </key>  
 	  <key
             commandId="edu.ualberta.med.biobank.commands.changePassword"
             contextId="edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M3+P">
       </key>  
 	  <key
             commandId="edu.ualberta.med.biobank.commands.userManagement"
             contextId="edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M3+U">
       </key>
 	  <key
             commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
             contextId="edu.ualberta.med.biobank.perspective.processing"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M3+M">
       </key>      
 	  <key
             commandId="edu.ualberta.med.biobank.commands.deleteSelection"
-            schemeId="biobank2.scheme"
+            schemeId="biobank.scheme"
             sequence="M3+Delete">
       </key>   
 	  <key
          commandId="edu.ualberta.med.biobank.commands.print"
          contextId="edu.ualberta.med.biobank.perspective.linkAssign"
-         schemeId="biobank2.scheme"
+         schemeId="biobank.scheme"
          sequence="M1+P">
       </key>    
 	  <key
          commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
          contextId="edu.ualberta.med.biobank.perspective.processing"
-         schemeId="biobank2.scheme"
+         schemeId="biobank.scheme"
          sequence="M3+S">
       </key>    
 	  <key
          commandId="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
          contextId="edu.ualberta.med.biobank.perspective.processing"
-         schemeId="biobank2.scheme"
+         schemeId="biobank.scheme"
          sequence="M3+D">
       </key>
    </extension>
@@ -2378,7 +2378,7 @@
    <extension
          point="org.eclipse.core.expressions.definitions">
       <definition
-            id="biobank2.mainPerspectiveSelected">
+            id="biobank.mainPerspectiveSelected">
          <with
                variable="activeWorkbenchWindow.activePerspective">
             <equals
@@ -2387,7 +2387,7 @@
          </with>
       </definition>
       <definition
-            id="biobank2.reportsPerspectiveSelected">
+            id="biobank.reportsPerspectiveSelected">
          <with
                variable="activeWorkbenchWindow.activePerspective">
             <equals
@@ -2396,7 +2396,7 @@
          </with>
       </definition>
       <definition
-            id="biobank2.processingPerspectiveSelected">
+            id="biobank.processingPerspectiveSelected">
          <with
                variable="activeWorkbenchWindow.activePerspective">
             <equals
@@ -2405,7 +2405,7 @@
          </with>
       </definition>
       <definition
-            id="biobank2.sampleManagementPerspectiveSelected">
+            id="biobank.sampleManagementPerspectiveSelected">
          <with
                variable="activeWorkbenchWindow.activePerspective">
             <equals
@@ -2414,7 +2414,7 @@
          </with>
       </definition>
       <definition
-            id="biobank2.isSuperAdminMode">
+            id="biobank.isSuperAdminMode">
          <with
                variable="edu.ualberta.med.biobank.sourceprovider.isSuperAdminMode">
             <equals
@@ -2423,7 +2423,7 @@
          </with>
       </definition>
       <definition
-            id="biobank2.loggedIn">
+            id="biobank.loggedIn">
          <with
                variable="edu.ualberta.med.biobank.sourceprovider.loginState">
             <equals
@@ -2432,7 +2432,7 @@
          </with>
       </definition>
       <definition
-            id="biobank2.loggedOut">
+            id="biobank.loggedOut">
          <with
                variable="edu.ualberta.med.biobank.sourceprovider.loginState">
             <equals
@@ -2441,7 +2441,7 @@
          </with>
       </definition>
       <definition
-        id="biobank2.debugState">
+        id="biobank.debugState">
          <with
                variable="edu.ualberta.med.biobank.sourceprovider.debugState">
             <equals
@@ -2450,7 +2450,7 @@
          </with>
       </definition>
       <definition
-            id="biobank2.nonDebugState">
+            id="biobank.nonDebugState">
          <with
                variable="edu.ualberta.med.biobank.sourceprovider.debugState">
             <equals
@@ -2459,7 +2459,7 @@
          </with>
       </definition>
       <definition
-            id="biobank2.oneElementSelected">
+            id="biobank.oneElementSelected">
          <with
                variable="selection">
             <count
@@ -2468,7 +2468,7 @@
          </with>
       </definition>
       <definition
-            id="biobank2.editorDirty">
+            id="biobank.editorDirty">
          <with
                variable="activeEditorId">
             <test
@@ -2479,7 +2479,7 @@
          </with>
       </definition>
       <definition
-            id="biobank2.confirmEnabled">
+            id="biobank.confirmEnabled">
          <with
                variable="edu.ualberta.med.biobank.sourceprovider.confirmState">
             <equals
@@ -2488,20 +2488,20 @@
          </with>
       </definition>
        <definition
-           id="biobank2.canDelete">
+           id="biobank.canDelete">
         <with
               variable="selection">
            <iterate
                  ifEmpty="false"
                  operator="and">
               <test
-                    property="biobank2.canDelete">
+                    property="biobank.canDelete">
               </test>
            </iterate>
         </with>
      </definition>
        <definition
-             id="biobank2.hasWorkingCenter">
+             id="biobank.hasWorkingCenter">
           <with
                 variable="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter">
              <equals
@@ -2510,7 +2510,7 @@
           </with>
        </definition>
        <definition
-             id="biobank2.hasClinicShipmentRights">
+             id="biobank.hasClinicShipmentRights">
           <with
                 variable="edu.ualberta.med.biobank.sourceprovider.clinicShipmentRights">
              <equals
@@ -2519,7 +2519,7 @@
           </with>
        </definition>
   	   <definition
-             id="biobank2.hasDispatchRights">
+             id="biobank.hasDispatchRights">
           <with
                 variable="edu.ualberta.med.biobank.sourceprovider.dispatchRights">
              <equals
@@ -2538,8 +2538,8 @@
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
             class="edu.ualberta.med.biobank.expressions.AdapterBasePropertyTester"
-            id="biobank2.adapterBasePropertyTester"
-            namespace="biobank2"
+            id="biobank.adapterBasePropertyTester"
+            namespace="biobank"
             properties="canDelete"
             type="edu.ualberta.med.biobank.treeview.AdapterBase">
       </propertyTester>
@@ -2563,19 +2563,19 @@
             name="Reports View">
       </context>
       <context
-            id="biobank2.context.entryForm"
+            id="biobank.context.entryForm"
             name="Biobank Entry Form">
       </context>
       <context
-            id="biobank2.context.viewForm"
+            id="biobank.context.viewForm"
             name="Biobank View Form">
       </context>
       <context
-            id="biobank2.context.loggedIn"
+            id="biobank.context.loggedIn"
             name="Logged In">
       </context>
       <context
-            id="biobank2.context.loggedOut"
+            id="biobank.context.loggedOut"
             name="Logged Out">
       </context>
       <context

@@ -55,7 +55,7 @@ import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 /**
- * Base class for data all BioBank2 view and entry forms. This class is the
+ * Base class for data all BioBank view and entry forms. This class is the
  * superclass for {@link BiobankEntryForm} and {@link BiobankViewForm}. Please
  * extend from these two classes instead of <code>BiobankFormBase</code>.
  * <p>

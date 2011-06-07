@@ -41,6 +41,7 @@ eclipse_ws/biobank2.ws-client/lib/*.jar
 eclipse_ws/biobank2/dmscanlib.txt
 log/
 model/*.png
+model/biobank.uml~
 model/biobank2.uml~
 runtime-BioSampleScan.BioSampleScan/
 runtime-BioSampleScan.product1/

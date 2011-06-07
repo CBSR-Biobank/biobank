@@ -8,7 +8,7 @@ Bundle-ClassPath: .,lib/gluegen.jar,lib/SuperCSV-1.52.jar,lib/spiffy-a
 Bundle-Activator: edu.ualberta.med.biobank.BiobankPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ManifestVersion: 2
-Bundle-SymbolicName: biobank2; singleton:=true
+Bundle-SymbolicName: biobank;singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.eclipse.co
  re.databinding;bundle-version="1.1.1",org.eclipse.core.databinding.be
@@ -22,9 +22,9 @@ Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.eclipse.co
  ",org.eclipse.equinox.p2.operations;bundle-version="2.0.0",org.eclips
  e.equinox.p2.ui.sdk.scheduler;bundle-version="1.0.0",biobank.gui.comm
  on;bundle-version="1.0.0",sampleProcessingRobot;bundle-version="1.0.0
- ";resolution:=optional,barcodeGenerator;bundle-version="0.0.1";resolu
- tion:=optional
-Bundle-Version: 1.0.0
+ ";resolution:=optional
+Bundle-Version: 3.0.0.pre
 Bundle-Vendor: AICML
 Bundle-Localization: plugin
+Export-Package: edu.ualberta.med.biobank
 
