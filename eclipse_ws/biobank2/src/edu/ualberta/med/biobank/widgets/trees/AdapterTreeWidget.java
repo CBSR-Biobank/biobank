@@ -59,14 +59,14 @@ public class AdapterTreeWidget extends Composite {
 
         if (patternFilter) {
             FilteredTree filteredTree = new FilteredTree(this, SWT.BORDER
-                | SWT.MULTI | SWT.V_SCROLL, new TreeFilter(), true);
+                | SWT.SINGLE | SWT.V_SCROLL, new TreeFilter(), true);
             filteredTree.setBackground(parent.getDisplay().getSystemColor(
                 SWT.COLOR_LIST_BACKGROUND));
             filteredTree.setCursor(new Cursor(parent.getDisplay(),
                 SWT.CURSOR_HAND));
             treeViewer = filteredTree.getViewer();
         } else {
-            treeViewer = new TreeViewer(this);
+            treeViewer = new TreeViewer(this, SWT.SINGLE);
         }
 
         gl = new GridLayout(1, false);

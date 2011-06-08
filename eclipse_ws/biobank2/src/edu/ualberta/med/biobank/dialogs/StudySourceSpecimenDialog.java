@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -118,7 +118,7 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         try {
             internalSourceSpecimen.reset();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error", e);
+            BiobankGuiCommonPlugin.openAsyncError("Error", e);
         }
         typeName.getCombo().deselectAll();
         volume.setSelection(false);

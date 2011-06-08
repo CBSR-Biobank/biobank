@@ -12,7 +12,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
@@ -71,7 +71,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
                         .getActiveActivityStatus(origAliquotedSpecimen
                             .getAppService()));
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Database Error",
+                BiobankGuiCommonPlugin.openAsyncError("Database Error",
                     "Error while retrieving activity status");
             }
         } else {
@@ -146,7 +146,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
                         newAliquotedSpecimen
                             .setActivityStatus((ActivityStatusWrapper) selectedObject);
                     } catch (Exception e) {
-                        BiobankPlugin.openAsyncError(
+                        BiobankGuiCommonPlugin.openAsyncError(
                             "Error setting activity status", e);
                     }
                 }
@@ -208,7 +208,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         try {
             newAliquotedSpecimen.reset();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error", e);
+            BiobankGuiCommonPlugin.openAsyncError("Error", e);
         }
         specimenTypeComboViewer.getCombo().deselectAll();
         quantity.setText("");

@@ -8,9 +8,9 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
@@ -99,7 +99,7 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
                 }
             }
         } catch (final RemoteAccessException exp) {
-            BiobankPlugin.openRemoteAccessErrorMessage(exp);
+            BiobankGuiCommonPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
             logger.error("Error while getting " + getLabel(), e);
         }

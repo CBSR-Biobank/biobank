@@ -6,7 +6,6 @@ import java.util.TreeMap;
 
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
@@ -16,6 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
@@ -36,7 +36,7 @@ public class DispatchReceiveScanDialog extends
     @Override
     protected void addExtraCells() {
         if (extras != null && extras.size() > 0) {
-            BiobankPlugin
+            BiobankGuiCommonPlugin
                 .openAsyncInformation(
                     Messages
                         .getString("DispatchReceiveScanDialog.notInDispatch.error.title"), //$NON-NLS-1$
@@ -46,7 +46,7 @@ public class DispatchReceiveScanDialog extends
                 currentShipment.addSpecimens(extras,
                     DispatchSpecimenState.EXTRA);
             } catch (Exception e) {
-                BiobankPlugin
+                BiobankGuiCommonPlugin
                     .openAsyncError(
                         Messages
                             .getString("DispatchReceiveScanDialog.flagging.error.title"), //$NON-NLS-1$

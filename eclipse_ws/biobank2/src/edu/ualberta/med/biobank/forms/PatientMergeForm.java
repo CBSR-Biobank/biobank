@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
 import edu.ualberta.med.biobank.views.CollectionView;
@@ -179,13 +180,14 @@ public class PatientMergeForm extends BiobankEntryForm {
             patient2 = PatientWrapper.getPatient(
                 SessionManager.getAppService(), pnumber);
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError("Error retrieving patient", e);
+            BiobankGuiCommonPlugin
+                .openAsyncError("Error retrieving patient", e);
             patient2VisitsTable.setCollection(newContents);
             study2Text.setText("");
             return;
         }
         if (patient2 == null) {
-            BiobankPlugin.openAsyncError("Invalid Patient Number",
+            BiobankGuiCommonPlugin.openAsyncError("Invalid Patient Number",
                 "Cannot find a patient with that pnumber");
             patient2VisitsTable.setCollection(newContents);
             study2Text.setText("");
@@ -193,7 +195,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         }
 
         if (patient2.equals(patient1)) {
-            BiobankPlugin.openAsyncError("Duplicate Patient Number",
+            BiobankGuiCommonPlugin.openAsyncError("Duplicate Patient Number",
                 "Cannot merge a patient with himself");
             patient2VisitsTable.setCollection(newContents);
             return;
@@ -203,7 +205,7 @@ public class PatientMergeForm extends BiobankEntryForm {
 
         if (!patient2.getStudy().equals(patient1.getStudy())) {
             patient2VisitsTable.setCollection(newContents);
-            BiobankPlugin.openAsyncError("Invalid Patient Number",
+            BiobankGuiCommonPlugin.openAsyncError("Invalid Patient Number",
                 "Patients from different studies cannot be merged");
         } else {
             patient2VisitsTable.setCollection(patient2
@@ -216,7 +218,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         try {
             patient1.merge(patient2);
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Merge failed.", e);
+            BiobankGuiCommonPlugin.openAsyncError("Merge failed.", e);
         }
 
         Display.getDefault().syncExec(new Runnable() {
@@ -235,7 +237,7 @@ public class PatientMergeForm extends BiobankEntryForm {
     protected void doBeforeSave() throws Exception {
         canMerge = false;
         if (patient2 != null) {
-            if (BiobankPlugin
+            if (BiobankGuiCommonPlugin
                 .openConfirm(
                     "Confirm Merge",
                     "Are you sure you want to merge patient "

@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.widgets;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
@@ -143,17 +144,17 @@ public class SpecimenEntryWidget extends BiobankWidget {
                     appService, inventoryId, SessionManager.getUser());
                 addSpecimen(specimen);
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Error while looking up specimen",
-                    e);
+                BiobankGuiCommonPlugin.openAsyncError(
+                    "Error while looking up specimen", e);
             }
         }
     }
 
     private void addSpecimen(SpecimenWrapper specimen) {
         if (specimen != null && specimens.contains(specimen)) {
-            BiobankPlugin.openAsyncError("Error",
-                "Specimen " + specimen.getInventoryId()
-                    + " has already been added to this list");
+            BiobankGuiCommonPlugin.openAsyncError("Error", "Specimen "
+                + specimen.getInventoryId()
+                + " has already been added to this list");
             return;
         }
 
@@ -175,7 +176,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
 
             vetoListenerSupport.notifyListeners(postAdd);
         } catch (VetoException e) {
-            BiobankPlugin.openAsyncError("Error", e.getMessage());
+            BiobankGuiCommonPlugin.openAsyncError("Error", e.getMessage());
         }
     }
 
@@ -216,7 +217,8 @@ public class SpecimenEntryWidget extends BiobankWidget {
                             vetoListenerSupport.notifyListeners(postDelete);
                         }
                     } catch (VetoException e) {
-                        BiobankPlugin.openAsyncError("Error", e.getMessage());
+                        BiobankGuiCommonPlugin.openAsyncError("Error",
+                            e.getMessage());
                     }
                 }
             }

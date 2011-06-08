@@ -1043,8 +1043,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     public static <T> void persistBatch(Set<? extends ModelWrapper<T>> wrappers)
         throws Exception {
-        // once the persist method is using batch queries, we should use batch
-        // queries here
+        // FIXME once the persist method is using batch queries, we should use
+        // batch queries here
         for (ModelWrapper<T> wrapper : wrappers) {
             wrapper.persist();
         }

@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -159,7 +159,7 @@ public class MoveSpecimensToDialog extends BiobankDialog {
                     .getCurrentWorkingSite(), typesFromOlContainer,
                 oldContainer.getRowCapacity(), oldContainer.getColCapacity());
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError("Error",
+            BiobankGuiCommonPlugin.openAsyncError("Error",
                 "Failed to retrieve empty containers.");
         }
         for (ContainerWrapper cont : conts) {
@@ -176,7 +176,7 @@ public class MoveSpecimensToDialog extends BiobankDialog {
 
     @Override
     public void okPressed() {
-        boolean sure = BiobankPlugin.openConfirm("Other site",
+        boolean sure = BiobankGuiCommonPlugin.openConfirm("Other site",
             "You are about to move these specimens into a container that belongs "
                 + "to another site. Are you sure ?");
         if (sure)

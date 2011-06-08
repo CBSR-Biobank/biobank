@@ -19,11 +19,12 @@ import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.GuiCommonSessionState;
 import edu.ualberta.med.biobank.rcp.perspective.PerspectiveSecurity;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
-import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
@@ -117,11 +118,6 @@ public class SessionManager {
     }
 
     private void updateSessionState() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow();
-        ISourceProviderService service = (ISourceProviderService) window
-            .getService(ISourceProviderService.class);
-
         // for key binding contexts:
         if (sessionAdapter == null) {
             BindingContextHelper
@@ -136,13 +132,19 @@ public class SessionManager {
         }
 
         // assign logged in state
-        SessionState sessionSourceProvider = (SessionState) service
-            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
-        sessionSourceProvider.setLoggedInState(sessionAdapter != null);
-        sessionSourceProvider.setUser(sessionAdapter == null ? null
-            : sessionAdapter.getUser());
+        GuiCommonSessionState guiCommonSessionState = BiobankGuiCommonPlugin
+            .getSessionStateSourceProvider();
+        guiCommonSessionState.setLoggedInState(sessionAdapter != null);
+
+        BiobankPlugin.getSessionStateSourceProvider().setUser(
+            sessionAdapter == null ? null : sessionAdapter.getUser());
 
         // assign debug state
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+
         DebugState debugStateSourceProvider = (DebugState) service
             .getSourceProvider(DebugState.SESSION_STATE);
         debugStateSourceProvider.setState(BiobankPlugin.getDefault()
@@ -344,8 +346,8 @@ public class SessionManager {
                 }
             }
         } catch (PartInitException e) {
-            BiobankPlugin.openAsyncError("Error displaying available actions",
-                e);
+            BiobankGuiCommonPlugin.openAsyncError(
+                "Error displaying available actions", e);
         }
     }
 }

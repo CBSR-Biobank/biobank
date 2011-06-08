@@ -16,7 +16,7 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -103,7 +103,7 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
                 throw new ApplicationException();
             }
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError("Invalid label",
+            BiobankGuiCommonPlugin.openAsyncError("Invalid label",
                 "No container labelled " + label);
         }
 

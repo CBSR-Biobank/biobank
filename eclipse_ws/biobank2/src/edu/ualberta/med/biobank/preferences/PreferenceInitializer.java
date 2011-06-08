@@ -23,9 +23,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_ASK_PRINT, true);
         store.setDefault(PreferenceConstants.SCANNER_DPI, 300);
-        store.setDefault(PreferenceConstants.SCAN_LINK_ROW_SELECT_ONLY, true);
-        store.setDefault(PreferenceConstants.CABINET_CONTAINER_NAME_CONTAINS,
-            "cabinet");
 
         store.setDefault(PreferenceConstants.ISSUE_TRACKER_EMAIL,
             "biobank@cs.ualberta.ca");

@@ -42,6 +42,7 @@ import edu.ualberta.med.biobank.common.util.HQLCriteriaListProxy;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
@@ -130,7 +131,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 try {
                     printTable(false, false);
                 } catch (Exception ex) {
-                    BiobankPlugin.openAsyncError(
+                    BiobankGuiCommonPlugin.openAsyncError(
                         "Error while printing the results", ex);
                 }
             }
@@ -145,7 +146,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 try {
                     printTable(false, true);
                 } catch (Exception ex) {
-                    BiobankPlugin.openAsyncError(
+                    BiobankGuiCommonPlugin.openAsyncError(
                         "Error while exporting the results", ex);
                 }
             }
@@ -160,7 +161,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 try {
                     printTable(true, false);
                 } catch (Exception ex) {
-                    BiobankPlugin.openAsyncError(
+                    BiobankGuiCommonPlugin.openAsyncError(
                         "Error while exporting the results", ex);
                 }
             }
@@ -206,7 +207,8 @@ public abstract class ReportsEditor extends BiobankFormBase {
         try {
             initReport();
         } catch (Exception e1) {
-            BiobankPlugin.openAsyncError("Failed to load parameters", e1);
+            BiobankGuiCommonPlugin.openAsyncError("Failed to load parameters",
+                e1);
         }
 
         try {
@@ -224,7 +226,8 @@ public abstract class ReportsEditor extends BiobankFormBase {
                                 reportData = appService.startQuery(query);
                             } catch (Exception e) {
                                 reportData = new ArrayList<Object>();
-                                BiobankPlugin.openAsyncError("Query Error", e);
+                                BiobankGuiCommonPlugin.openAsyncError(
+                                    "Query Error", e);
                             }
                         }
                     };
@@ -236,7 +239,8 @@ public abstract class ReportsEditor extends BiobankFormBase {
                             try {
                                 appService.stopQuery(query);
                             } catch (Exception e) {
-                                BiobankPlugin.openAsyncError("Stop Failed", e);
+                                BiobankGuiCommonPlugin.openAsyncError(
+                                    "Stop Failed", e);
                             }
                             reportData = new ArrayList<Object>();
                             break;
@@ -251,7 +255,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 };
             });
         } catch (Exception e1) {
-            BiobankPlugin.openAsyncError("Failed to load query", e1);
+            BiobankGuiCommonPlugin.openAsyncError("Failed to load query", e1);
         }
 
         if (reportData instanceof HQLCriteriaListProxy)
@@ -316,7 +320,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
         try {
             bw = new PrintWriter(new FileWriter(path));
         } catch (IOException e) {
-            BiobankPlugin.openAsyncError("Error writing to CSV.", e);
+            BiobankGuiCommonPlugin.openAsyncError("Error writing to CSV.", e);
             return;
         }
         // write title
@@ -384,7 +388,8 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 path = runExportDialog(report.getName().replaceAll(" ", "_")
                     + "_" + DateFormatter.formatAsDate(new Date()), filterExt);
                 if (path == null) {
-                    BiobankPlugin.openAsyncError("Exporting canceled.",
+                    BiobankGuiCommonPlugin.openAsyncError(
+                        "Exporting canceled.",
                         "Select a valid path and try again.");
                     return;
                 }
@@ -422,8 +427,8 @@ public abstract class ReportsEditor extends BiobankFormBase {
                                 path, exportPDF);
                         }
                     } catch (Exception e) {
-                        BiobankPlugin.openAsyncError("Error exporting results",
-                            e);
+                        BiobankGuiCommonPlugin.openAsyncError(
+                            "Error exporting results", e);
                         return;
                     }
                 }
@@ -446,26 +451,27 @@ public abstract class ReportsEditor extends BiobankFormBase {
                         report.getName(), stringParams, columnInfo, listData),
                         path);
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Error saving to PDF", e);
+                BiobankGuiCommonPlugin.openAsyncError("Error saving to PDF", e);
                 return;
             }
             try {
                 SessionManager.log("exportPDF", report.getName(), "report");
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Error logging export", e);
+                BiobankGuiCommonPlugin
+                    .openAsyncError("Error logging export", e);
             }
         } else {
             try {
                 ReportingUtils.printReport(ReportingUtils.createDynamicReport(
                     report.getName(), stringParams, columnInfo, listData));
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Printer Error", e);
+                BiobankGuiCommonPlugin.openAsyncError("Printer Error", e);
                 return;
             }
             try {
                 SessionManager.log("print", report.getName(), "report");
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Error logging print", e);
+                BiobankGuiCommonPlugin.openAsyncError("Error logging print", e);
             }
         }
     }

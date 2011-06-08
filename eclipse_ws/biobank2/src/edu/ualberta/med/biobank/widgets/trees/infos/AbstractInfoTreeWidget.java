@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.widgets.BiobankClipboard;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -289,7 +290,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BiobankWidget {
             };
             backgroundThread.start();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Cannot Load Tree Data", e);
+            BiobankGuiCommonPlugin.openAsyncError("Cannot Load Tree Data", e);
         }
 
         layout(true, true);

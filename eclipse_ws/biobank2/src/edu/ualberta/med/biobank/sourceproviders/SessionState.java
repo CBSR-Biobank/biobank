@@ -10,14 +10,13 @@ import edu.ualberta.med.biobank.common.security.SecurityFeature;
 import edu.ualberta.med.biobank.common.security.User;
 
 public class SessionState extends AbstractSourceProvider {
-    public final static String LOGIN_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.loginState";
+    public final static String SESSION_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.loginState";
+
     public final static String IS_SUPER_ADMIN_MODE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.isSuperAdminMode";
     public final static String HAS_WORKING_CENTER_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter";
     public final static String HAS_CLINIC_SHIPMENT_RIGHTS = "edu.ualberta.med.biobank.sourceprovider.clinicShipmentRights";
     public final static String HAS_DISPATCH_RIGHTS = "edu.ualberta.med.biobank.sourceprovider.dispatchRights";
-    public final static String LOGGED_IN = "loggedIn";
-    public final static String LOGGED_OUT = "loggedOut";
-    private boolean loggedIn;
+
     private boolean isSuperAdminMode;
     private boolean hasWorkingCenter;
     private boolean hasClinicShipmentRights;
@@ -25,7 +24,7 @@ public class SessionState extends AbstractSourceProvider {
 
     @Override
     public String[] getProvidedSourceNames() {
-        return new String[] { LOGIN_STATE_SOURCE_NAME,
+        return new String[] { SESSION_STATE_SOURCE_NAME,
             IS_SUPER_ADMIN_MODE_SOURCE_NAME, HAS_WORKING_CENTER_SOURCE_NAME,
             HAS_CLINIC_SHIPMENT_RIGHTS, HAS_DISPATCH_RIGHTS };
     }
@@ -33,8 +32,6 @@ public class SessionState extends AbstractSourceProvider {
     @Override
     public Map<String, String> getCurrentState() {
         Map<String, String> currentStateMap = new HashMap<String, String>(1);
-        String currentState = loggedIn ? LOGGED_IN : LOGGED_OUT;
-        currentStateMap.put(LOGIN_STATE_SOURCE_NAME, currentState);
         currentStateMap.put(IS_SUPER_ADMIN_MODE_SOURCE_NAME,
             Boolean.toString((isSuperAdminMode)));
         currentStateMap.put(HAS_WORKING_CENTER_SOURCE_NAME,
@@ -44,15 +41,6 @@ public class SessionState extends AbstractSourceProvider {
 
     @Override
     public void dispose() {
-    }
-
-    public void setLoggedInState(boolean loggedIn) {
-        if (this.loggedIn == loggedIn)
-            return; // no change
-        this.loggedIn = loggedIn;
-        String currentState = loggedIn ? LOGGED_IN : LOGGED_OUT;
-        fireSourceChanged(ISources.WORKBENCH, LOGIN_STATE_SOURCE_NAME,
-            currentState);
     }
 
     private void setSuperAdminMode(boolean isSuperAdminMode) {
