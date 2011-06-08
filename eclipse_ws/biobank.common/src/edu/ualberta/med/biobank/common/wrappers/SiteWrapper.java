@@ -270,8 +270,9 @@ public class SiteWrapper extends SiteBaseWrapper {
         return user.isSuperAdministrator();
     }
 
+    @Override
     public List<StudyWrapper> getStudyCollection() {
-        return getStudyCollection(false);
+        return getStudyCollection(true);
     }
 
     private static final String COLLECTION_EVENT_COUNT_FOR_STUDY_QRY = "select count(distinct cEvent) from "

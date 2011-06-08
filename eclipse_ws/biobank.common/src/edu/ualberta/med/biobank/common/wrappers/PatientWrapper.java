@@ -364,4 +364,23 @@ public class PatientWrapper extends PatientBaseWrapper {
         return (long) getCollectionEventCollection(false).size();
     }
 
+    /**
+     * return true if the user can delete this object
+     */
+    @Override
+    public boolean canDelete(User user) {
+        return super.canDelete(user)
+            && user.getCurrentWorkingCenter().getStudyCollection()
+                .contains(getStudy());
+    }
+
+    /**
+     * return true if the user can edit this object
+     */
+    @Override
+    public boolean canUpdate(User user) {
+        return super.canUpdate(user)
+            && user.getCurrentWorkingCenter().getStudyCollection()
+                .contains(getStudy());
+    }
 }

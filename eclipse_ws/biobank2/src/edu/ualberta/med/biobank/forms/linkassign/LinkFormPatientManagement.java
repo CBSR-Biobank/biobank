@@ -106,6 +106,8 @@ public class LinkFormPatientManagement {
             @Override
             public void modifyText(ModifyEvent e) {
                 patientNumberTextModified = true;
+                if (viewerCollectionEvents != null)
+                    viewerCollectionEvents.setInput(null);
                 if (patientTextCallback != null) {
                     patientTextCallback.textModified();
                 }
@@ -240,13 +242,27 @@ public class LinkFormPatientManagement {
             currentPatient = PatientWrapper.getPatient(
                 SessionManager.getAppService(), patientNumberText.getText());
             if (currentPatient != null) {
-                specimenAdminForm.appendLog("--------"); //$NON-NLS-1$
-                specimenAdminForm.appendLog(Messages.getString(
-                    "LinkForm.activitylog.patient", //$NON-NLS-1$
-                    currentPatient.getPnumber()));
+                if (!SessionManager.getUser().getCurrentWorkingCenter()
+                    .getStudyCollection().contains(currentPatient.getStudy())) {
+                    BiobankGuiCommonPlugin.openError("Patient search error",
+                        "Patient "
+                            + currentPatient.getPnumber()
+                            + " has been found but it is linked to the study "
+                            + currentPatient.getStudy().getNameShort()
+                            + ". The center "
+                            + SessionManager.getUser()
+                                .getCurrentWorkingCenter().getNameShort()
+                            + " is not working with this study.");
+                    currentPatient = null;
+                } else {
+                    specimenAdminForm.appendLog("--------"); //$NON-NLS-1$
+                    specimenAdminForm.appendLog(Messages.getString(
+                        "LinkForm.activitylog.patient", //$NON-NLS-1$
+                        currentPatient.getPnumber()));
+                }
             }
         } catch (ApplicationException e) {
-            BiobankGuiCommonPlugin.openError("", e); //$NON-NLS-1$
+            BiobankGuiCommonPlugin.openError("Patient search error", e);
         }
         setProcessingEventListFromPatient();
     }

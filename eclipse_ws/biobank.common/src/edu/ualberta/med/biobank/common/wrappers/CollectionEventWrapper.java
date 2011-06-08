@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.base.CollectionEventBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
@@ -546,4 +547,23 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         p2event.delete();
     }
 
+    /**
+     * return true if the user can delete this object
+     */
+    @Override
+    public boolean canDelete(User user) {
+        return super.canDelete(user)
+            && user.getCurrentWorkingCenter().getStudyCollection()
+                .contains(getPatient().getStudy());
+    }
+
+    /**
+     * return true if the user can edit this object
+     */
+    @Override
+    public boolean canUpdate(User user) {
+        return super.canUpdate(user)
+            && user.getCurrentWorkingCenter().getStudyCollection()
+                .contains(getPatient().getStudy());
+    }
 }

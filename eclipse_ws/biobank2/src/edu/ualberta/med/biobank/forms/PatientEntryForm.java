@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -81,7 +80,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         }
     }
 
-    private void createPatientSection() throws Exception {
+    private void createPatientSection() {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -89,8 +88,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        List<StudyWrapper> studies = new ArrayList<StudyWrapper>(
-            StudyWrapper.getAllStudies(appService));
+        List<StudyWrapper> studies = SessionManager.getUser()
+            .getCurrentWorkingCenter().getStudyCollection();
         StudyWrapper selectedStudy = null;
         if (patient.isNew()) {
             if (studies.size() == 1) {
