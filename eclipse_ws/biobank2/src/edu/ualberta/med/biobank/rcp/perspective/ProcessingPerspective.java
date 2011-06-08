@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.rcp.perspective;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +25,7 @@ public class ProcessingPerspective implements IPerspectiveFactory {
         Map<String, Map<String, List<SecurityFeature>>> featureEnablements) {
         Map<String, List<SecurityFeature>> map = featureEnablements.get(ID);
         if (map == null) {
-            map = new HashMap<String, List<SecurityFeature>>();
+            map = new LinkedHashMap<String, List<SecurityFeature>>();
             map.put(CollectionView.ID,
                 Arrays.asList(SecurityFeature.COLLECTION_EVENT));
             map.put(ProcessingView.ID, Arrays.asList(

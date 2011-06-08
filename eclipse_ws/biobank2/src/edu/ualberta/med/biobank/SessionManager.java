@@ -12,6 +12,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
@@ -22,6 +23,7 @@ import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
 import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.gui.common.GuiCommonSessionState;
+import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.PerspectiveSecurity;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
@@ -349,5 +351,15 @@ public class SessionManager {
             BiobankGuiCommonPlugin.openAsyncError(
                 "Error displaying available actions", e);
         }
+        if (page.getViewReferences().length == 0)
+            try {
+                page.getWorkbenchWindow()
+                    .getWorkbench()
+                    .showPerspective(MainPerspective.ID,
+                        page.getWorkbenchWindow());
+            } catch (WorkbenchException e) {
+                logger.error("Error opening main perspective", e);
+            }
+
     }
 }
