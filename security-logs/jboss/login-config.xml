@@ -143,7 +143,7 @@ $Revision: 43749 $
           com.mysql.jdbc.Driver
         </module-option>
         <module-option name="url">
-          jdbc:mysql://localhost:3306/biobank2
+          jdbc:mysql://localhost:3306/biobank
         </module-option>
         <module-option name="user">dummy</module-option>
         <module-option name="passwd">ozzy498</module-option>
@@ -155,7 +155,7 @@ $Revision: 43749 $
     </authentication>
   </application-policy>
 
-  <application-policy name ="biobank2">
+  <application-policy name ="biobank">
     <authentication>
       <login-module
         code="gov.nih.nci.security.authentication.loginmodules.RDBMSLoginModule"
@@ -164,7 +164,7 @@ $Revision: 43749 $
           com.mysql.jdbc.Driver
         </module-option>
         <module-option name="url">
-          jdbc:mysql://localhost:3306/biobank2
+          jdbc:mysql://localhost:3306/biobank
         </module-option>
         <module-option name="user">dummy</module-option>
         <module-option name="passwd">ozzy498</module-option>
@@ -185,7 +185,7 @@ $Revision: 43749 $
           com.mysql.jdbc.Driver
         </module-option>
         <module-option name="url">
-          jdbc:mysql://localhost:3306/biobank2
+          jdbc:mysql://localhost:3306/biobank
         </module-option>
         <module-option name="user">dummy</module-option>
         <module-option name="passwd">ozzy498</module-option>

@@ -31,14 +31,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -195,7 +197,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             }
         } catch (Exception ex) {
-            BiobankPlugin.openAsyncError(
+            BiobankGuiCommonPlugin.openAsyncError(
                 Messages.getString("ContainerViewForm.initCell.error.title"), //$NON-NLS-1$
                 Messages.getString("ContainerViewForm.initCell.error.msg")); //$NON-NLS-1$
             childrenOk = false;
@@ -383,7 +385,7 @@ public class ContainerViewForm extends BiobankViewForm {
                         container.initChildrenWithType(type, positions);
                     } catch (Exception e) {
                         initDone = false;
-                        BiobankPlugin.openAsyncError(
+                        BiobankGuiCommonPlugin.openAsyncError(
                             Messages
                                 .getString("ContainerViewForm.visualization.init.error.msg"), //$NON-NLS-1$
                             e);
@@ -401,7 +403,7 @@ public class ContainerViewForm extends BiobankViewForm {
             });
 
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError(Messages
+            BiobankGuiCommonPlugin.openAsyncError(Messages
                 .getString("ContainerViewForm.visualization.init.error.msg"), //$NON-NLS-1$
                 e);
             refresh(false, false);
@@ -427,7 +429,7 @@ public class ContainerViewForm extends BiobankViewForm {
                         deleteDones = container.deleteChildrenWithType(type,
                             positions);
                     } catch (Exception ex) {
-                        BiobankPlugin.openAsyncError(
+                        BiobankGuiCommonPlugin.openAsyncError(
                             Messages
                                 .getString("ContainerViewForm.visualization.delete.error.msg"), //$NON-NLS-1$
                             ex);
@@ -444,7 +446,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             });
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError(Messages
+            BiobankGuiCommonPlugin.openAsyncError(Messages
                 .getString("ContainerViewForm.visualization.delete.error.msg"), //$NON-NLS-1$
                 e);
             refresh(false, false);
@@ -473,33 +475,34 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void openFormFor(ContainerCell cell) {
-        ContainerAdapter newAdapter = null;
-        if (cell.getStatus() == UICellStatus.NOT_INITIALIZED) {
-            if (canCreate) {
-                ContainerWrapper containerToOpen = cell.getContainer();
-                if (containerToOpen == null) {
-                    containerToOpen = new ContainerWrapper(appService);
+        try {
+            ContainerAdapter newAdapter = null;
+            if (cell.getStatus() == UICellStatus.NOT_INITIALIZED) {
+                if (canCreate) {
+                    ContainerWrapper containerToOpen = cell.getContainer();
+                    if (containerToOpen == null) {
+                        containerToOpen = new ContainerWrapper(appService);
+                    }
+                    containerToOpen.setSite(containerAdapter
+                        .getParentFromClass(SiteAdapter.class).getWrapper());
+                    containerToOpen.setParent(container);
+                    containerToOpen.setPositionAsRowCol(new RowColPos(cell
+                        .getRow(), cell.getCol()));
+                    newAdapter = new ContainerAdapter(containerAdapter,
+                        containerToOpen);
+                    newAdapter.openEntryForm(true);
                 }
-                containerToOpen.setSite(containerAdapter.getParentFromClass(
-                    SiteAdapter.class).getWrapper());
-                containerToOpen.setParent(container);
-                containerToOpen.setPositionAsRowCol(new RowColPos(
-                    cell.getRow(), cell.getCol()));
-                containerToOpen.setSite(containerAdapter.getParentFromClass(
-                    SiteAdapter.class).getWrapper());
-                containerToOpen.setParent(container);
-                containerToOpen.setPositionAsRowCol(new RowColPos(
-                    cell.getRow(), cell.getCol()));
-                newAdapter = new ContainerAdapter(containerAdapter,
-                    containerToOpen);
-                newAdapter.openEntryForm(true);
+            } else {
+                ContainerWrapper child = cell.getContainer();
+                Assert.isNotNull(child);
+                SessionManager.openViewForm(child);
             }
-        } else {
-            ContainerWrapper child = cell.getContainer();
-            Assert.isNotNull(child);
-            SessionManager.openViewForm(child);
+            containerAdapter.performExpand();
+        } catch (BiobankFailedQueryException e) {
+            BiobankGuiCommonPlugin.openAsyncError("error", e);
+        } catch (BiobankCheckException e) {
+            BiobankGuiCommonPlugin.openAsyncError("error", e);
         }
-        containerAdapter.performExpand();
     }
 
     private void setContainerValues() {

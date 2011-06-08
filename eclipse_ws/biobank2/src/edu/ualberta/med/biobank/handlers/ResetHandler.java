@@ -8,7 +8,7 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 
 public class ResetHandler extends AbstractHandler implements IHandler {
@@ -24,7 +24,7 @@ public class ResetHandler extends AbstractHandler implements IHandler {
                         .getActivePage().getActiveEditor();
                     biobankEntryForm.reset();
                 } catch (Exception ex) {
-                    BiobankPlugin.openAsyncError("Error on reset", ex);
+                    BiobankGuiCommonPlugin.openAsyncError("Error on reset", ex);
                 }
             }
         });

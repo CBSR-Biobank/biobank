@@ -19,25 +19,31 @@ public class ContainerEmptyLocationsPostProcessTester implements
         List<Object> processedResults = new ArrayList<Object>();
 
         for (Object c : results) {
-            ContainerWrapper container = new ContainerWrapper(appService,
-                (Container) c);
+            try {
+                ContainerWrapper container = new ContainerWrapper(appService,
+                    (Container) c);
 
-            Map<RowColPos, SpecimenWrapper> aliquots = container.getSpecimens();
+                Map<RowColPos, SpecimenWrapper> aliquots = container
+                    .getSpecimens();
 
-            for (int i = 0, numRows = container.getRowCapacity(); i < numRows; i++) {
-                for (int j = 0, numCols = container.getColCapacity(); j < numCols; j++) {
-                    RowColPos rowColPos = new RowColPos(i, j);
-                    if (!aliquots.containsKey(rowColPos)) {
-                        processedResults.add(new Object[] {
-                            container.getLabel()
-                                + ContainerLabelingSchemeWrapper
-                                    .getPositionString(rowColPos, container
-                                        .getContainerType()
-                                        .getChildLabelingSchemeId(), numRows,
-                                        numCols),
-                            container.getContainerType().getNameShort() });
+                for (int i = 0, numRows = container.getRowCapacity(); i < numRows; i++) {
+                    for (int j = 0, numCols = container.getColCapacity(); j < numCols; j++) {
+                        RowColPos rowColPos = new RowColPos(i, j);
+                        if (!aliquots.containsKey(rowColPos)) {
+                            processedResults.add(new Object[] {
+                                container.getLabel()
+                                    + ContainerLabelingSchemeWrapper
+                                        .getPositionString(rowColPos, container
+                                            .getContainerType()
+                                            .getChildLabelingSchemeId(),
+                                            numRows, numCols),
+                                container.getContainerType().getNameShort() });
+                        }
                     }
                 }
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
 

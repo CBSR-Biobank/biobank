@@ -27,8 +27,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -47,7 +45,8 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
@@ -57,7 +56,7 @@ import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 /**
- * Base class for data all BioBank2 view and entry forms. This class is the
+ * Base class for data all BioBank view and entry forms. This class is the
  * superclass for {@link BiobankEntryForm} and {@link BiobankViewForm}. Please
  * extend from these two classes instead of <code>BiobankFormBase</code>.
  * <p>
@@ -180,7 +179,7 @@ public abstract class BiobankFormBase extends EditorPart implements
         try {
             init();
         } catch (final RemoteConnectFailureException exp) {
-            BiobankPlugin.openRemoteConnectErrorMessage(exp);
+            BiobankGuiCommonPlugin.openRemoteConnectErrorMessage(exp);
         } catch (Exception e) {
             logger.error("BioBankFormBase.createPartControl Error", e);
         }
@@ -234,9 +233,9 @@ public abstract class BiobankFormBase extends EditorPart implements
                     createFormContent();
                     form.reflow(true);
                 } catch (final RemoteConnectFailureException exp) {
-                    BiobankPlugin.openRemoteConnectErrorMessage(exp);
+                    BiobankGuiCommonPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
-                    BiobankPlugin.openError(
+                    BiobankGuiCommonPlugin.openError(
                         "BioBankFormBase.createPartControl Error", e);
                 }
             }
@@ -289,23 +288,8 @@ public abstract class BiobankFormBase extends EditorPart implements
 
     protected void addSectionToolbar(Section section, String tooltip,
         SelectionListener listener, Class<?> wrapperTypeToAdd, String imageKey) {
-        if (wrapperTypeToAdd == null
-            || SessionManager.canCreate(wrapperTypeToAdd)) {
-            ToolBar tbar = (ToolBar) section.getTextClient();
-            if (tbar == null) {
-                tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
-                section.setTextClient(tbar);
-            }
-
-            ToolItem titem = new ToolItem(tbar, SWT.NULL);
-            if (imageKey == null) {
-                imageKey = BiobankPlugin.IMG_ADD;
-            }
-            titem.setImage(BiobankPlugin.getDefault().getImageRegistry()
-                .get(imageKey));
-            titem.setToolTipText(tooltip);
-            titem.addSelectionListener(listener);
-        }
+        widgetCreator.addSectionToolbar(section, tooltip, listener,
+            wrapperTypeToAdd, imageKey);
     }
 
     public FormToolkit getToolkit() {

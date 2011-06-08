@@ -28,15 +28,15 @@ public class ContainerHelper extends DbHelper {
         ContainerWrapper container;
 
         container = new ContainerWrapper(appService);
+        container.setContainerType(type);
         if (label != null) {
             container.setLabel(label);
         }
         container.setProductBarcode(barcode);
-        if (parent != null) {
+        if ((parent != null) && !parent.isNew()) {
             container.setParent(parent);
         }
         container.setSite(site);
-        container.setContainerType(type);
         container.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
         return container;

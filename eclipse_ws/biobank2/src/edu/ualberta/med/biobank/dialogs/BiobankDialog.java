@@ -30,6 +30,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
@@ -64,7 +65,8 @@ public abstract class BiobankDialog extends TitleAreaDialog {
     }
 
     protected Image getTitleAreaImage() {
-        return null;
+        return BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_DIALOGS);
     }
 
     protected int getTitleAreaMessageType() {
@@ -107,13 +109,13 @@ public abstract class BiobankDialog extends TitleAreaDialog {
         try {
             createDialogAreaInternal(contents);
         } catch (final RemoteConnectFailureException exp) {
-            BiobankPlugin.openRemoteConnectErrorMessage(exp);
+            BiobankGuiCommonPlugin.openRemoteConnectErrorMessage(exp);
         } catch (final RemoteAccessException exp) {
-            BiobankPlugin.openRemoteAccessErrorMessage(exp);
+            BiobankGuiCommonPlugin.openRemoteAccessErrorMessage(exp);
         } catch (final AccessDeniedException ade) {
-            BiobankPlugin.openAccessDeniedErrorMessage(ade);
+            BiobankGuiCommonPlugin.openAccessDeniedErrorMessage(ade);
         } catch (BiobankCheckException bce) {
-            BiobankPlugin.openAsyncError("Save error", bce);
+            BiobankGuiCommonPlugin.openAsyncError("Save error", bce);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

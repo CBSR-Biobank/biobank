@@ -6,14 +6,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerPath;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
@@ -43,18 +42,18 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
         List<Object[]> results = new ArrayList<Object[]>();
         // test hql
         HQLCriteria query = new HQLCriteria(
-            "select ra, cp.container, cp.path from "
+            "select ra, cp.container, c.path from "
                 + Request.class.getName()
                 + " ra inner join fetch ra.specimen inner join fetch ra.specimen.specimenType, "
-                + ContainerPath.class.getName()
-                + " cp where ra.request ="
+                + Container.class.getName()
+                + " c where ra.request ="
                 + request.getId()
-                + " and ra.specimen.specimenPosition.container=cp.container and ra.state=?",
+                + " and ra.specimen.specimenPosition.container=c and ra.state=?",
             Arrays.asList(new Object[] { state }));
         try {
             results = SessionManager.getAppService().query(query);
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error",
+            BiobankGuiCommonPlugin.openAsyncError("Error",
                 "Unable to retrieve data from server");
         }
 

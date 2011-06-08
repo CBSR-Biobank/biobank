@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.Label;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchState;
@@ -31,15 +30,16 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DispatchSpecimensTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
+import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
 public class DispatchViewForm extends BiobankViewForm {
 
@@ -113,7 +113,7 @@ public class DispatchViewForm extends BiobankViewForm {
         canSeeEverything = true;
         if (dispatch.getSenderCenter() == null) {
             canSeeEverything = false;
-            BiobankPlugin
+            BiobankGuiCommonPlugin
                 .openAsyncError(
                     "Access Denied",
                     "It seems you don't have access to the sender site. Please see administrator to resolve this problem.");
@@ -123,7 +123,7 @@ public class DispatchViewForm extends BiobankViewForm {
         }
         if (dispatch.getReceiverCenter() == null) {
             canSeeEverything = false;
-            BiobankPlugin
+            BiobankGuiCommonPlugin
                 .openAsyncError(
                     "Access Denied",
                     "It seems you don't have access to the receiver site. Please see administrator to resolve this problem.");
@@ -261,27 +261,27 @@ public class DispatchViewForm extends BiobankViewForm {
                                 try {
                                     dispatch.persist();
                                 } catch (final RemoteConnectFailureException exp) {
-                                    BiobankPlugin
+                                    BiobankGuiCommonPlugin
                                         .openRemoteConnectErrorMessage(exp);
                                     return;
                                 } catch (final RemoteAccessException exp) {
-                                    BiobankPlugin
+                                    BiobankGuiCommonPlugin
                                         .openRemoteAccessErrorMessage(exp);
                                     return;
                                 } catch (final AccessDeniedException ade) {
-                                    BiobankPlugin
+                                    BiobankGuiCommonPlugin
                                         .openAccessDeniedErrorMessage(ade);
                                     return;
                                 } catch (Exception ex) {
-                                    BiobankPlugin.openAsyncError("Save error",
-                                        ex);
+                                    BiobankGuiCommonPlugin.openAsyncError(
+                                        "Save error", ex);
                                     return;
                                 }
                                 monitor.done();
                             }
                         });
                     } catch (Exception e1) {
-                        BiobankPlugin.openAsyncError("Save error", e1);
+                        BiobankGuiCommonPlugin.openAsyncError("Save error", e1);
                     }
                     SpecimenTransitView.getCurrent().reload();
                     dispatchAdapter.openViewForm();

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="biobank2.feature.core"
-      label="BioBank2 Core Feature"
-      version="1.4.0.qualifier"
+      label="BioBank Core Feature"
+      version="1.0.0"
       provider-name="AICML"
-      plugin="biobank2">
+      plugin="biobank">
 
    <description>
-      This feature contains all plugins developped by AICML for the BioBank2 application
+      This feature contains all plugins developped by AICML for the
+BioBank application
    </description>
 
    <license url="epl-v10.html">
@@ -22,7 +23,7 @@
          unpack="false"/>
 
    <plugin
-         id="biobank2"
+         id="biobank"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -30,6 +31,20 @@
 
    <plugin
          id="scannerConfig"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="barcodeGenerator"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="biobank.gui.common"
          download-size="0"
          install-size="0"
          version="0.0.0"

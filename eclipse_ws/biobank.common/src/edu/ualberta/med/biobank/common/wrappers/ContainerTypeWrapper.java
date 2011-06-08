@@ -85,7 +85,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
                 getSite().getId(), ContainerTypePeer.NAME_SHORT.getName());
         }
         if (getCapacity() == null) {
-            throw new ValueNotSetException("capacity");
+            throw new ValueNotSetException("capacity", "container type");
         }
         if (getChildLabelingSchemeId() != null) {
             // should throw error if labeling scheme too small for container

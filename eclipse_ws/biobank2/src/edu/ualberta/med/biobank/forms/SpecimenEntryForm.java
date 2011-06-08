@@ -40,11 +40,11 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private ComboViewer activityStatusComboViewer;
 
-    private ComboViewer sampleTypeComboViewer;
+    private ComboViewer specimenTypeComboViewer;
 
     private BiobankText volumeField;
 
-    private BiobankText siteLabel;
+    private BiobankText centerLabel;
 
     private BiobankText patientField;
 
@@ -73,40 +73,40 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             .getStudy();
         study.reload();
 
-        List<AliquotedSpecimenWrapper> allowedSampleStorage = study
+        List<AliquotedSpecimenWrapper> allowedAliquotedSpecimen = study
             .getAliquotedSpecimenCollection(true);
 
-        List<SpecimenTypeWrapper> containerSampleTypeList = null;
+        List<SpecimenTypeWrapper> containerSpecimenTypeList = null;
         if (specimen.hasParent()) {
             ContainerTypeWrapper ct = specimen.getParentContainer()
                 .getContainerType();
             ct.reload();
-            containerSampleTypeList = ct.getSpecimenTypeCollection();
+            containerSpecimenTypeList = ct.getSpecimenTypeCollection();
         }
 
-        List<SpecimenTypeWrapper> sampleTypes = new ArrayList<SpecimenTypeWrapper>();
-        for (AliquotedSpecimenWrapper ss : allowedSampleStorage) {
+        List<SpecimenTypeWrapper> specimenTypes = new ArrayList<SpecimenTypeWrapper>();
+        for (AliquotedSpecimenWrapper ss : allowedAliquotedSpecimen) {
             SpecimenTypeWrapper sst = ss.getSpecimenType();
-            if (containerSampleTypeList == null) {
-                sampleTypes.add(sst);
+            if (containerSpecimenTypeList == null) {
+                specimenTypes.add(sst);
             } else {
-                for (SpecimenTypeWrapper st : containerSampleTypeList) {
+                for (SpecimenTypeWrapper st : containerSpecimenTypeList) {
                     if (sst.equals(st))
-                        sampleTypes.add(st);
+                        specimenTypes.add(st);
                 }
             }
         }
         if (specimen.getSpecimenType() != null
-            && !sampleTypes.contains(specimen.getSpecimenType())) {
-            sampleTypes.add(specimen.getSpecimenType());
+            && !specimenTypes.contains(specimen.getSpecimenType())) {
+            specimenTypes.add(specimen.getSpecimenType());
         }
 
-        siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
-        setTextValue(siteLabel, specimen.getCenterString());
+        centerLabel = createReadOnlyLabelledField(client, SWT.NONE, "Center");
+        setTextValue(centerLabel, specimen.getCenterString());
 
-        sampleTypeComboViewer = createComboViewer(client, "Type", sampleTypes,
-            specimen.getSpecimenType(), "Specimen must have a sample type",
-            new ComboSelectionUpdate() {
+        specimenTypeComboViewer = createComboViewer(client, "Type",
+            specimenTypes, specimen.getSpecimenType(),
+            "Specimen must have a type", new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     specimen
@@ -200,7 +200,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.WRAP
             | SWT.MULTI, "Comments", null, specimen, "comment", null);
 
-        setFirstControl(sampleTypeComboViewer.getControl());
+        setFirstControl(specimenTypeComboViewer.getControl());
     }
 
     @Override
@@ -229,7 +229,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         specimen.reset();
 
         GuiUtil.reset(activityStatusComboViewer, specimen.getActivityStatus());
-        GuiUtil.reset(sampleTypeComboViewer, specimen.getSpecimenType());
+        GuiUtil.reset(specimenTypeComboViewer, specimen.getSpecimenType());
     }
 
 }

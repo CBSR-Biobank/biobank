@@ -82,28 +82,25 @@ public class PatientWrapper extends PatientBaseWrapper {
      * Search a patient in the site with the given number. Will return the
      * patient only if the current user has read access on a site that works
      * with this patient study
+     * 
+     * @throws Exception
      */
-    // FIXME not sure the result is still what is explain in the comments
     public static PatientWrapper getPatient(
         WritableApplicationService appService, String patientNumber, User user)
-        throws ApplicationException {
+        throws Exception {
         PatientWrapper patient = getPatient(appService, patientNumber);
         if (patient != null) {
-            boolean canRead = true;
-            // StudyWrapper study = patient.getStudy();
-            // List<SiteWrapper> sites = study.getSiteCollection(false);
-            // boolean canRead = false;
-            // for (SiteWrapper site : sites) {
-            // if (user.hasPrivilegeOnObject(Privilege.READ, null, Site.class,
-            // site.getId())) {
-            // canRead = true;
-            // break;
-            // }
-            // }
-            if (!canRead) {
-                throw new ApplicationException("Patient " + patientNumber
-                    + " exists but you don't have access to it."
-                    + " Check studies linked to the sites you can access.");
+            StudyWrapper study = patient.getStudy();
+            List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>(
+                study.getSiteCollection(false));
+            centers.addAll(study.getClinicCollection());
+            if (Collections.disjoint(centers,
+                user.getWorkingCenters(appService))) {
+                throw new ApplicationException(
+                    "Patient "
+                        + patientNumber
+                        + " exists but you don't have access to it."
+                        + " Check studies linked to the sites and clinics you can access.");
             }
         }
         return patient;
@@ -279,21 +276,13 @@ public class PatientWrapper extends PatientBaseWrapper {
             if (!cevents.isEmpty()) {
                 patient2.removeFromCollectionEventCollection(cevents);
                 Set<CollectionEventWrapper> toAdd = new HashSet<CollectionEventWrapper>();
-                List<CollectionEventWrapper> toDelete = new ArrayList<CollectionEventWrapper>();
                 boolean merged = false;
                 for (CollectionEventWrapper p2event : cevents) {
                     for (CollectionEventWrapper p1event : getCollectionEventCollection(false))
                         if (p1event.getVisitNumber().equals(
                             p2event.getVisitNumber())) {
-                            p1event.addToOriginalSpecimenCollection(p2event
-                                .getOriginalSpecimenCollection(false));
-                            p1event.addToAllSpecimenCollection(p2event
-                                .getAllSpecimenCollection(false));
-                            for (SpecimenWrapper spec : p2event
-                                .getAllSpecimenCollection(false))
-                                spec.setCollectionEvent(p1event);
-                            toDelete.add(p2event);
-                            p1event.persist();
+                            // merge collection event
+                            p1event.merge(p2event);
                             merged = true;
                         }
                     if (!merged)
@@ -305,12 +294,9 @@ public class PatientWrapper extends PatientBaseWrapper {
                     addMe.setPatient(this);
                     addMe.persist();
                 }
-                for (CollectionEventWrapper deleteMe : toDelete) {
-                    deleteMe.persist();
-                    deleteMe.delete();
-                }
-                patient2.delete();
+
                 persist();
+                patient2.delete();
 
                 ((BiobankApplicationService) appService).logActivity("merge",
                     null, patient2.getPnumber(), null, null,

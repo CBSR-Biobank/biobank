@@ -10,7 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
@@ -54,13 +54,13 @@ public class PdfDataExporter extends GuiDataExporter {
                 maps);
             ReportingUtils.saveReport(jasperPrint, path);
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error saving to PDF", e);
+            BiobankGuiCommonPlugin.openAsyncError("Error saving to PDF", e);
             return;
         }
         try {
             SessionManager.log("exportPDF", data.getTitle(), "data");
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error Logging Export", e);
+            BiobankGuiCommonPlugin.openAsyncError("Error Logging Export", e);
         }
     }
 

@@ -88,13 +88,13 @@ public class ActivityLogLocationDialog extends BiobankDialog {
 
         createLabel(fileSelectionComposite, labelText);
 
-        final String biobank2Dir = System.getProperty("user.home")
-            + System.getProperty("file.separator") + "biobank2";
+        final String biobankDir = System.getProperty("user.home")
+            + System.getProperty("file.separator") + "biobank";
         activityLogDirText = new Text(fileSelectionComposite, SWT.BORDER
             | SWT.FILL);
         activityLogDirText.setLayoutData(new GridData(GridData.FILL,
             GridData.FILL, true, false));
-        activityLogDirText.setText(biobank2Dir);
+        activityLogDirText.setText(biobankDir);
 
         browseBtn = new Button(fileSelectionComposite, SWT.BUTTON1);
         browseBtn.setText("  Browse...  ");
@@ -105,7 +105,7 @@ public class ActivityLogLocationDialog extends BiobankDialog {
                 DirectoryDialog fd = new DirectoryDialog(fileSelectionComposite
                     .getShell(), SWT.SAVE);
                 fd.setText("Select Directory");
-                fd.setFilterPath(biobank2Dir);
+                fd.setFilterPath(biobankDir);
                 String selected = fd.open();
                 if (selected != null) {
                     activityLogDirText.setText(selected);

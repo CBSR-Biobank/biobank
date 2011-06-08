@@ -5,19 +5,18 @@ import java.util.Map;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.ISourceProviderListener;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.sourceproviders.SessionState;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.GuiCommonSessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
-import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
+import edu.ualberta.med.biobank.widgets.trees.AdapterTreeWidget;
 
 public abstract class AbstractViewWithAdapterTree extends
     AbstractViewWithTree<AdapterBase> {
@@ -30,23 +29,19 @@ public abstract class AbstractViewWithAdapterTree extends
         .getLogger(AbstractViewWithAdapterTree.class.getName());
 
     protected AbstractViewWithAdapterTree() {
-        IWorkbench workbench = PlatformUI.getWorkbench();
-        IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-        ISourceProviderService service = (ISourceProviderService) window
-            .getService(ISourceProviderService.class);
-        SessionState sessionSourceProvider = (SessionState) service
-            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
-        sessionSourceProvider
+        BiobankGuiCommonPlugin.getSessionStateSourceProvider()
             .addSourceProviderListener(new ISourceProviderListener() {
                 @Override
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
-                    if (sourceName.equals(SessionState.LOGIN_STATE_SOURCE_NAME)) {
+                    if (sourceName
+                        .equals(GuiCommonSessionState.SESSION_STATE_SOURCE_NAME)) {
                         if (sourceValue != null) {
-                            if (sourceValue.equals(SessionState.LOGGED_IN))
+                            if (sourceValue
+                                .equals(GuiCommonSessionState.LOGGED_IN))
                                 reload();
                             else if (sourceValue
-                                .equals(SessionState.LOGGED_OUT))
+                                .equals(GuiCommonSessionState.LOGGED_OUT))
                                 clear();
                         }
                     }

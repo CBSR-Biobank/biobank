@@ -3,16 +3,16 @@ package edu.ualberta.med.biobank.dialogs;
 import java.util.Collection;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
@@ -71,7 +71,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
                         .getActiveActivityStatus(origAliquotedSpecimen
                             .getAppService()));
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Database Error",
+                BiobankGuiCommonPlugin.openAsyncError("Database Error",
                     "Error while retrieving activity status");
             }
         } else {
@@ -87,19 +87,23 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.getString("AliquotedSpecimenDialog.msg");
+        if (availableSpecimenTypes.size() > 0)
+            return Messages.getString("AliquotedSpecimenDialog.msg");
+        else
+            return "No more aliquoted specimen type can be derived from the study source specimen types.";
+    }
+
+    @Override
+    protected int getTitleAreaMessageType() {
+        if (availableSpecimenTypes.size() > 0)
+            return IMessageProvider.NONE;
+        else
+            return IMessageProvider.INFORMATION;
     }
 
     @Override
     protected String getTitleAreaTitle() {
         return currentTitle;
-    }
-
-    @Override
-    protected Image getTitleAreaImage() {
-        // FIXME should use another icon
-        return BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_COMPUTER_KEY);
     }
 
     @Override
@@ -142,7 +146,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
                         newAliquotedSpecimen
                             .setActivityStatus((ActivityStatusWrapper) selectedObject);
                     } catch (Exception e) {
-                        BiobankPlugin.openAsyncError(
+                        BiobankGuiCommonPlugin.openAsyncError(
                             "Error setting activity status", e);
                     }
                 }
@@ -204,7 +208,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         try {
             newAliquotedSpecimen.reset();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error", e);
+            BiobankGuiCommonPlugin.openAsyncError("Error", e);
         }
         specimenTypeComboViewer.getCombo().deselectAll();
         quantity.setText("");

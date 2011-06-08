@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms.linkassign;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +27,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
@@ -44,7 +45,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.CEventComboCallback;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.PatientTextCallback;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
@@ -384,13 +385,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(appService,
                 inventoryIdText.getText(), null);
             if (specimen != null) {
-                BiobankPlugin.openAsyncError("InventoryId error",
+                BiobankGuiCommonPlugin.openAsyncError("InventoryId error",
                     "InventoryId " + inventoryIdText.getText()
                         + " already exists.");
                 ok = false;
             }
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error checking inventoryId", e);
+            BiobankGuiCommonPlugin.openAsyncError("Error checking inventoryId", e);
             ok = false;
         }
         singleTypesWidget.setEnabled(ok);
@@ -433,16 +434,14 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         List<SpecimenWrapper> availableSourceSpecimens = linkFormPatientManagement
             .getParentSpecimenForPEventAndCEvent();
         if (authorizedTypesInContainers != null) {
-            // FIXME wiating for issue #1011 to be done
             // availableSourceSpecimen should be parents of the authorized Types
             // !
-            // List<SpecimenWrapper> filteredSpecs = new
-            // ArrayList<SpecimenWrapper>();
-            // for (SpecimenWrapper spec : availableSourceSpecimens)
-            // if (!Collections.disjoint(authorizedTypesInContainers, spec
-            // .getSpecimenType().getChildSpecimenTypeCollection(false)))
-            // filteredSpecs.add(spec);
-            // availableSourceSpecimens = filteredSpecs;
+            List<SpecimenWrapper> filteredSpecs = new ArrayList<SpecimenWrapper>();
+            for (SpecimenWrapper spec : availableSourceSpecimens)
+                if (!Collections.disjoint(authorizedTypesInContainers, spec
+                    .getSpecimenType().getChildSpecimenTypeCollection(false)))
+                    filteredSpecs.add(spec);
+            availableSourceSpecimens = filteredSpecs;
         }
         // for multiple
         for (int row = 0; row < specimenTypesWidgets.size(); row++) {
@@ -483,6 +482,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
+        // FIXME need to use BatchQuery
+
         OriginInfoWrapper originInfo = new OriginInfoWrapper(
             SessionManager.getAppService());
         originInfo
@@ -648,7 +649,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 appService, SessionManager.getUser().getCurrentWorkingCenter()
                     .getId());
         } catch (Exception ex) {
-            BiobankPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
+            BiobankGuiCommonPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
         }
         return null;
     }

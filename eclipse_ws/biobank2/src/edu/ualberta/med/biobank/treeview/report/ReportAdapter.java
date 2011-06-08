@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
@@ -60,7 +60,7 @@ public class ReportAdapter extends AdapterBase {
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                boolean delete = BiobankPlugin.openConfirm("Delete Report",
+                boolean delete = BiobankGuiCommonPlugin.openConfirm("Delete Report",
                     "Are you sure you want to delete the report named '"
                         + ((ReportWrapper) modelObject).getName()
                         + "'? This action cannot be undone.");

@@ -38,6 +38,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
@@ -391,7 +392,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             try {
                 doProceed();
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Error", e);
+                BiobankGuiCommonPlugin.openAsyncError("Error", e);
             }
         } else if (IDialogConstants.FINISH_ID == buttonId) {
             setReturnCode(OK);

@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {

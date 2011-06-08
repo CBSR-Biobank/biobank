@@ -297,7 +297,8 @@ public class User implements Serializable, NotAProxy {
                 .getCenters(appService);
             workingCenters = new ArrayList<CenterWrapper<?>>();
             for (CenterWrapper<?> center : allCenters) {
-                if (getWorkingCenterIds().contains(center.getId())) {
+                if (getWorkingCenterIds().contains(center.getId())
+                    || isInSuperAdminMode()) {
                     workingCenters.add(center);
                 }
             }
@@ -377,5 +378,10 @@ public class User implements Serializable, NotAProxy {
         if (login == null)
             return super.hashCode();
         return login.hashCode();
+    }
+
+    public boolean isCBSRCenter() {
+        CenterWrapper<?> center = getCurrentWorkingCenter();
+        return center != null && center.getNameShort().equals("CBSR");
     }
 }

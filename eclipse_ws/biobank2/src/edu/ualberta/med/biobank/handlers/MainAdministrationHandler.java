@@ -19,8 +19,8 @@ public class MainAdministrationHandler extends AbstractHandler implements
         try {
             if (workbench.getActiveWorkbenchWindow().getActivePage()
                 .closeAllEditors(true))
-                workbench.showPerspective(MainPerspective.ID, workbench
-                    .getActiveWorkbenchWindow());
+                workbench.showPerspective(MainPerspective.ID,
+                    workbench.getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
             throw new ExecutionException("Error while opening Main perpective",
                 e);

@@ -26,7 +26,7 @@ public class SwVersion {
     public SwVersion(String versionString) throws VersionInvalidException {
         String[] versionSplit = versionString.split("\\.");
 
-        if (versionSplit.length != 4) {
+        if (versionSplit.length < 3 || versionSplit.length > 4) {
             throw new VersionInvalidException(
                 "The version string is formatted incorrectly.");
         }
@@ -39,8 +39,8 @@ public class SwVersion {
             throw new VersionInvalidException(
                 "The version string is formatted incorrectly.");
         }
-
-        this.qualifier = versionSplit[3];
+        if (versionSplit.length == 4)
+            this.qualifier = versionSplit[3];
     }
 
     public int getMajor() {

@@ -4,21 +4,21 @@ Created-By: 1.6.0_22-b04 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
 Bundle-Name: BioBank2 Common
 Bundle-SymbolicName: biobank.common
-Bundle-Version: 1.4.0.rc6
+Bundle-Version: 3.0.0.pre
 Bundle-ClassPath: conf/,lib/client/acegi-security-1.0.4.jar,lib/client
  /antlr-2.7.6.jar,lib/client/asm.jar,lib/client/axis.jar,lib/client/bi
- obank2-beans.jar,lib/client/caGrid-CQL-cql.1.0-1.2.jar,lib/client/cas
- tor-1.0.2.jar,lib/client/cglib-2.1.3.jar,lib/client/cog-jglobus.jar,l
- ib/client/commons-codec-1.3.jar,lib/client/commons-collections-3.2.ja
- r,lib/client/commons-discovery-0.2.jar,lib/client/commons-lang-2.4.ja
- r,lib/client/commons-logging-1.1.jar,lib/client/hibernate-validator.j
- ar,lib/client/hibernate3.jar,lib/client/jaxrpc.jar,lib/client/log4j-1
- .2.14.jar,lib/client/sdk-client-framework.jar,lib/client/sdk-grid-rem
- oting.jar,lib/client/sdk-security.jar,lib/client/sdk-writable-client-
- framework.jar,lib/client/spring.jar,lib/client/xercesImpl.jar,lib/cli
- ent/xpp3-1.1.3.4.C.jar,lib/client/xstream-1.3.1.jar,lib/server/csmapi
- -4.1.jar,lib/server/sdk-core.jar,lib/server/sdk-writable-core.jar,.,c
- onf/,lib/client/mysql-connector-java-5.1.15-bin.jar
+ obank-beans.jar,lib/client/caGrid-CQL-cql.1.0-1.2.jar,lib/client/cast
+ or-1.0.2.jar,lib/client/cglib-2.1.3.jar,lib/client/cog-jglobus.jar,li
+ b/client/commons-codec-1.3.jar,lib/client/commons-collections-3.2.jar
+ ,lib/client/commons-discovery-0.2.jar,lib/client/commons-lang-2.4.jar
+ ,lib/client/commons-logging-1.1.jar,lib/client/hibernate-validator.ja
+ r,lib/client/hibernate3.jar,lib/client/jaxrpc.jar,lib/client/log4j-1.
+ 2.14.jar,lib/client/sdk-client-framework.jar,lib/client/sdk-grid-remo
+ ting.jar,lib/client/sdk-security.jar,lib/client/sdk-writable-client-f
+ ramework.jar,lib/client/spring.jar,lib/client/xercesImpl.jar,lib/clie
+ nt/xpp3-1.1.3.4.C.jar,lib/client/xstream-1.3.1.jar,lib/server/csmapi-
+ 4.1.jar,lib/server/sdk-core.jar,lib/server/sdk-writable-core.jar,.,co
+ nf/,lib/client/mysql-connector-java-5.1.15-bin.jar
 Bundle-Vendor: AICML
 Export-Package: antlr; uses:="antlr.collections.impl,  antlr.debug,  a
  ntlr.ASdebug,  antlr.collections",antlr.ASdebug;uses:="antlr",antlr.a

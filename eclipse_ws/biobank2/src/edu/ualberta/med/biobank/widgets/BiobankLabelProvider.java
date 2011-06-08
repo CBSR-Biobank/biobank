@@ -5,7 +5,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -61,7 +61,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                 try {
                     return String.valueOf(study.getPatientCount(true));
                 } catch (Exception e) {
-                    BiobankPlugin.openAsyncError("Error in count", e);
+                    BiobankGuiCommonPlugin.openAsyncError("Error in count", e);
                 }
             }
         } else if (element instanceof SpecimenWrapper) {

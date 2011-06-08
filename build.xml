@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="biobank2" basedir="." default="deploy">
+<project name="biobank" basedir="." default="deploy">
 
   <!--
   Overall build file
@@ -9,8 +9,8 @@
     <arg value="-f" />
   </exec>
 
-  <property name="server.version.num" value="1.4.0.rc6" />
-  <property name="java.client.version.num" value="1.4.0.rc6" />
+  <property name="server.version.num" value="3.0.0.pre" />
+  <property name="java.client.version.num" value="3.0.0.pre" />
 
   <property environment="env" />
   <property name="host" value="aicml-med.cs.ualberta.ca" />
@@ -19,6 +19,8 @@
   <property name="cacore.sdk.filename" value="caCORE_SDK_411.tar.gz" />
   <property name="eclipse.workspace.dir" location="eclipse_ws" />
   <property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
+  <property name="eclipse.proj.dir.gui.common"
+            location="eclipse_ws/biobank.gui.common" />
   <property name="eclipse.proj.dir.common"
             location="eclipse_ws/biobank.common" />
   <property name="eclipse.proj.dir.tools"
@@ -34,13 +36,15 @@
   <property name="secu-log.dir" location="security-logs" />
   <property name="product.dir" location="${basedir}/product" />
   <property name="database.host" value="localhost" />
-  <property name="database.name" value="biobank2" />
+  <property name="database.name" value="biobank" />
   <property name="database.username" value="dummy" />
   <property name="database.password" value="ozzy498" />
   <property name="req.jars.dir" value="jars" />
   <property name="lib-sources.dir" value="lib-sources" />
-  <property name="biobank2.jar.files"
-            value="gluegen.jar,jdom.jar,commons-beanutils-1.8.0.jar, commons-digester-1.7.jar, iText-2.1.0.jar, jasperreports-3.7.0.jar,DynamicJasper-3.0.14.jar,jdt-compiler-3.1.1.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
+  <property name="biobank.gui.common.jar.files"
+            value="commons-beanutils-1.8.0.jar,commons-digester-1.7.jar,commons-javaflow-20060411.jar,iText-2.1.7.jar,jasperreports-4.0.2.jar,jdt-compiler-3.1.1.jar" />
+  <property name="biobank.jar.files"
+            value="DynamicJasper-3.0.14.jar,gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
   <property name="biobank.common.jar.files"
             value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar" />
   <property name="biobank.tools.jar.files"
@@ -100,10 +104,10 @@
   </condition>
 
   <path id="biobank.common.build.classpath">
-    <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib">
+    <fileset dir="${cacore.sdk.dir}/output/biobank/package/remote-client/lib">
       <include name="*.jar" />
     </fileset>
-    <fileset dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib">
+    <fileset dir="${cacore.sdk.dir}/output/biobank/package/local-client/lib">
       <include name="*.jar" />
     </fileset>
     <fileset dir="${cacore.sdk.dir}/writable-api/dist">
@@ -144,13 +148,13 @@
   </target>
   <target name="check-cacore-sdk-uptodate">
     <uptodate property="cacore.sdk.uptodate"
-              targetfile="${cacore.sdk.dir}/output/biobank2">
+              targetfile="${cacore.sdk.dir}/output/biobank">
       <srcfiles file="sdk_conf/deploy.properties" />
       <srcfiles file="sdk_conf/build.properties" />
       <srcfiles file="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
       <srcfiles file="sdk_conf/config.xml" />
       <srcfiles file="sdk_conf/application-config-client.xml" />
-      <srcfiles file="${model.proj.dir}/biobank2.uml" />
+      <srcfiles file="${model.proj.dir}/biobank.uml" />
     </uptodate>
   </target>
 
@@ -182,9 +186,9 @@
 
   <target name="log4j-conf">
     <copy file="security-logs/log4j.xml"
-          tofile="${cacore.sdk.dir}/output/biobank2/conf/system/web/WEB-INF/classes/log4j.xml"
+          tofile="${cacore.sdk.dir}/output/biobank/conf/system/web/WEB-INF/classes/log4j.xml"
           overwrite="true" />
-    <replace file="${cacore.sdk.dir}/output/biobank2/conf/system/web/WEB-INF/classes/log4j.xml">
+    <replace file="${cacore.sdk.dir}/output/biobank/conf/system/web/WEB-INF/classes/log4j.xml">
       <replacefilter token="@LOG4J_LEVEL_WARN@" value="${LOG4J_LEVEL_WARN}" />
       <replacefilter token="@LOG4J_LEVEL_DEBUG@" value="${LOG4J_LEVEL_DEBUG}" />
       <!-- these one are copied from the caCore ant build file. -->
@@ -199,22 +203,22 @@
   </target>
 
   <target name="sdk-files" depends="sdk">
-    <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib"
+    <fileset dir="${cacore.sdk.dir}/output/biobank/package/remote-client/lib"
              id="sdk.jar.files">
       <include name="*.jar" />
     </fileset>
     <pathconvert pathsep="," property="sdk.jar.files.basename"
       refid="sdk.jar.files">
-      <map from="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/"
+      <map from="${cacore.sdk.dir}/output/biobank/package/remote-client/lib/"
         to="" />
     </pathconvert>
-    <fileset dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib"
+    <fileset dir="${cacore.sdk.dir}/output/biobank/package/local-client/lib"
              id="sdk.local.jar.files">
       <include name="*.jar" />
     </fileset>
     <pathconvert pathsep="," property="sdk.local.jar.files.basename"
       refid="sdk.local.jar.files">
-      <map from="${cacore.sdk.dir}/output/biobank2/package/local-client/lib/"
+      <map from="${cacore.sdk.dir}/output/biobank/package/local-client/lib/"
            to="" />
     </pathconvert>
   </target>
@@ -249,9 +253,14 @@
                       files="${biobank.common.jar.files}" />
     </dependset>
     <dependset>
-      <srcfilelist dir="${req.jars.dir}" files="${biobank2.jar.files}" />
+      <srcfilelist dir="${req.jars.dir}" files="${biobank.gui.common.jar.files}" />
+      <targetfilelist dir="${eclipse.proj.dir.gui.common}/lib"
+                      files="${biobank.gui.commmon.jar.files}" />
+    </dependset>
+    <dependset>
+      <srcfilelist dir="${req.jars.dir}" files="${biobank.jar.files}" />
       <targetfilelist dir="${eclipse.proj.dir}/lib"
-                      files="${biobank2.jar.files}" />
+                      files="${biobank.jar.files}" />
     </dependset>
     <dependset>
       <srcfilelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}" />
@@ -271,14 +280,14 @@
                       files="sdk-security.jar" />
     </dependset>
     <dependset>
-      <srcfilelist dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib"
+      <srcfilelist dir="${cacore.sdk.dir}/output/biobank/package/remote-client/lib"
                    files="${sdk.jar.files.basename}" />
       <targetfilelist dir="${eclipse.proj.dir.common}/lib"
                       files="${sdk.jar.files.basename}" />
     </dependset>
     <copy todir="${eclipse.proj.dir.common}/lib/client" overwrite="true">
-      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
-      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib" />
+      <fileset dir="${cacore.sdk.dir}/output/biobank/package/remote-client/lib" />
+      <fileset dir="${cacore.sdk.dir}/output/biobank/package/ws-client/lib" />
       <filelist dir="${cacore.sdk.dir}/system/lib"
                 files="${cacore.system.jar.files}" />
       <filelist dir="${req.jars.dir}" files="${biobank.common.jar.files}" />
@@ -292,18 +301,24 @@
       <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-core.jar" />
     </copy>
     <copy todir="${eclipse.proj.dir.common}/conf" overwrite="true">
-      <filelist dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf"
+      <filelist dir="${cacore.sdk.dir}/output/biobank/package/remote-client/conf"
                 files="application-config-client.xml,application-config-client-info.xml" />
     </copy>
+    <copy todir="${eclipse.proj.dir.gui.common}/lib" overwrite="true">
+      <filelist dir="${req.jars.dir}" files="${biobank.gui.common.jar.files}" />
+    </copy>
+    <copy todir="${eclipse.proj.dir.gui.common}/lib" overwrite="true">
+      <filelist dir="${cacore.sdk.dir}/system/lib" files="commons-collections-3.2.jar,commons-logging-1.1.jar" />
+    </copy>
     <copy todir="${eclipse.proj.dir}/lib" overwrite="true">
-      <filelist dir="${req.jars.dir}" files="${biobank2.jar.files}" />
+      <filelist dir="${req.jars.dir}" files="${biobank.jar.files}" />
     </copy>
     <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
       <filelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}" />
     </copy>
     <!--copy todir="${eclipse.workspace.dir}/biobank2.ws-client/lib">
-      <filelist dir="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib"
-                files="biobank2-beans.jar" />
+      <filelist dir="${cacore.sdk.dir}/output/biobank/package/ws-client/lib"
+                files="biobank-beans.jar" />
     </copy-->
     <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
       <fileset file="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
@@ -312,8 +327,8 @@
   <!-- JBoss -->
   <target name="check-jboss-uptodate">
     <uptodate property="jboss.uptodate"
-              targetfile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war"
-              srcfile="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war" />
+              targetfile="${env.JBOSS_HOME}/server/default/deploy/biobank.war"
+              srcfile="${cacore.sdk.dir}/output/biobank/package/webapp/biobank.war" />
   </target>
   <target name="hostAicmlMed" if="isHostAicmlMed">
     <copy file="${secu-log.dir}/jboss/${host.name}.cs.ualberta.ca.keystore"
@@ -377,8 +392,13 @@
     <copy file="${secu-log.dir}/jboss/upt.war"
           tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war"
           overwrite="true" />
-    <copy file="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war"
-          tofile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war"
+    <delete includeemptydirs="true">
+      <fileset dir="${env.JBOSS_HOME}/server/default/deploy">
+        <include name="biobank*.war"/>
+      </fileset>
+    </delete>
+    <copy file="${cacore.sdk.dir}/output/biobank/package/webapp/biobank.war"
+          tofile="${env.JBOSS_HOME}/server/default/deploy/biobank.war"
           overwrite="true" />
   </target>
 
@@ -446,11 +466,11 @@
           description="creates the default tables">
   </target>
   <target name="dbbackup"
-          description="makes a copy of the current biobank2 database">
+          description="makes a copy of the current biobank database">
     <echo message="running scripts/dbbackup..." />
     <exec executable="scripts/dbbackup"
           failonerror="true"
-          output="biobank2.sql">
+          output="biobank.sql">
       <arg line="${database.host} ${database.username} ${database.password} ${database.name}" />
     </exec>
   </target>
@@ -467,8 +487,8 @@
   <target name="build-modelextender" depends="sdk">
     <echo message="Building model peer tool" />
     <dependset>
-      <srcfilelist dir="${cacore.sdk.dir}/output/biobank2/build/jar"
-                   files="biobank2-beans.jar" />
+      <srcfilelist dir="${cacore.sdk.dir}/output/biobank/build/jar"
+                   files="biobank-beans.jar" />
       <targetfileset refid="modelextender.class.files" />
     </dependset>
     <mkdir dir="${eclipse.proj.dir.tools}/output" />
@@ -496,8 +516,8 @@
   <target name="check-run-modelextender">
     <uptodate property="modelextender.uptodate"
               targetfile="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer/SitePeer.java">
-      <srcfiles dir="${cacore.sdk.dir}/output/biobank2/build/jar"
-                includes="biobank2-beans.jar" />
+      <srcfiles dir="${cacore.sdk.dir}/output/biobank/build/jar"
+                includes="biobank-beans.jar" />
       <srcfiles refid="modelextender.class.files" />
     </uptodate>
   </target>
@@ -510,7 +530,7 @@
           failonerror="true"
           fork="true">
       <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
-      <arg value="${model.proj.dir}/biobank2.uml" />
+      <arg value="${model.proj.dir}/biobank.uml" />
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer" />
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/wrappers" />
       <classpath>
@@ -535,7 +555,7 @@
   <target name="build-validators" depends="cacore-untar">
     <echo message="Building hibernate validators generation tool" />
     <dependset>
-      <srcfilelist dir="${model.proj.dir}" files="biobank2.uml" />
+      <srcfilelist dir="${model.proj.dir}" files="biobank.uml" />
       <targetfileset refid="validators.class.files" />
     </dependset>
     <mkdir dir="${eclipse.proj.dir.tools}/output-validators" />
@@ -567,7 +587,7 @@
   <target name="check-run-validators">
     <uptodate property="validators.uptodate"
               targetfile="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml">
-      <srcfiles dir="${model.proj.dir}" includes="biobank2.uml" />
+      <srcfiles dir="${model.proj.dir}" includes="biobank.uml" />
       <srcfiles refid="validators.class.files" />
     </uptodate>
   </target>
@@ -580,7 +600,7 @@
           failonerror="true"
           fork="true">
       <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
-      <arg value="${model.proj.dir}/biobank2.uml" />
+      <arg value="${model.proj.dir}/biobank.uml" />
       <arg value="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
       <classpath>
         <pathelement location="${req.jars.dir}/jargs.jar" />
@@ -600,8 +620,8 @@
   <target name="build-hbmpostproc" depends="sdk" unless="hmbstrings.uptodate">
     <mkdir dir="${eclipse.proj.dir.tools}/output" />
     <dependset>
-      <srcfilelist dir="${cacore.sdk.dir}/output/biobank2/build/jar"
-                   files="biobank2-beans.jar" />
+      <srcfilelist dir="${cacore.sdk.dir}/output/biobank/build/jar"
+                   files="biobank-beans.jar" />
       <targetfileset refid="hbmpostproc.class.files" />
     </dependset>
     <javac debug="on"
@@ -630,8 +650,8 @@
     <uptodate property="hbmpostproc.uptodate"
               targetfile="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/VarCharLengths.java">
 
-      <srcfiles dir="${cacore.sdk.dir}/output/biobank2/build/jar"
-                includes="biobank2-beans.jar" />
+      <srcfiles dir="${cacore.sdk.dir}/output/biobank/build/jar"
+                includes="biobank-beans.jar" />
       <srcfiles refid="hbmpostproc.class.files" />
     </uptodate>
   </target>
@@ -641,8 +661,8 @@
           unless="hbmpostproc.uptodate"
           description="Adds the length='#' field into *.hbm.xml files, references the biobank.uml file for the VARCHAR(#)">
     <dependset>
-      <srcfilelist dir="${cacore.sdk.dir}/output/biobank2/build/jar"
-                   files="biobank2-beans.jar" />
+      <srcfilelist dir="${cacore.sdk.dir}/output/biobank/build/jar"
+                   files="biobank-beans.jar" />
       <targetfilelist dir="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common"
                       files="VarCharLengths.java" />
     </dependset>
@@ -650,8 +670,8 @@
           failonerror="true"
           fork="true">
       <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
-      <arg value="${model.proj.dir}/biobank2.uml" />
-      <arg value="${cacore.sdk.dir}/output/biobank2/src/edu/ualberta/med/biobank/model" />
+      <arg value="${model.proj.dir}/biobank.uml" />
+      <arg value="${cacore.sdk.dir}/output/biobank/src/edu/ualberta/med/biobank/model" />
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/VarCharLengths.java.template" />
       <classpath>
         <pathelement location="${req.jars.dir}/jargs.jar" />
@@ -663,7 +683,7 @@
   </target>
 
   <target name="build-common-project"
-          depends="sdk-files,modelextender">
+          depends="sdk-files,prepare-webapp-orm,package-codegen-orm,modelextender">
     <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output">
@@ -684,6 +704,7 @@
   </target>
 
   <target name="compile-generated-beans"
+    depends="prepare-webapp-orm"
     description="REDO:: Compiles the generated beans">
     <copy todir="${cacore.sdk.dir}/${output.src.dir}/edu/ualberta/med/biobank/model"
       overwrite="true">
@@ -715,11 +736,11 @@
       <fileset dir="${cacore.sdk.dir}/${output.src.dir}" includes="**/*.java" />
     </jar>
     <copy overwrite="true" file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
-      tofile="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/${bean.file}"/>
+      tofile="${cacore.sdk.dir}/output/biobank/package/remote-client/lib/${bean.file}"/>
     <copy overwrite="true" file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
-      tofile="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib/${bean.file}"/>
+      tofile="${cacore.sdk.dir}/output/biobank/package/ws-client/lib/${bean.file}"/>
     <copy overwrite="true" file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
-      tofile="${cacore.sdk.dir}/output/biobank2/package/local-client/lib/${bean.file}"/>
+      tofile="${cacore.sdk.dir}/output/biobank/package/local-client/lib/${bean.file}"/>
     <jar destfile="${cacore.sdk.dir}/${build.jar.dir}/${orm.file}"
       basedir="${cacore.sdk.dir}/${output.src.dir}">
       <manifest>
@@ -819,7 +840,7 @@
          webxml="${cacore.sdk.dir}/${build.conf.web-inf.dir}/web.xml">
       <manifest>
         <attribute name="Generated-By"
-                   value="biobank2 caCORE SDK Code Generator" />
+                   value="biobank caCORE SDK Code Generator" />
         <attribute name="Version" value="${VERSION}" />
       </manifest>
       <lib dir="${cacore.sdk.dir}/${system.dir}/${system.dist.dir}"
@@ -1037,9 +1058,11 @@
   </target>
 
 
-  <target name="product" depends="eclipse.home.env,deploy">
+  <target name="product" depends="eclipse.home.env,deploy" description="build the product">
+  	<!-- buildDirectory is the folder where the plugins and products are found and build -->
     <property name="buildDirectory" value="${product.dir}/buildDirectory" />
     <delete dir="${buildDirectory}" />
+  	<!-- plugins and features are copied into the buildDirectory -->
     <copy todir="${buildDirectory}/plugins/biobank2">
       <fileset dir="${eclipse.workspace.dir}/biobank2" />
     </copy>
@@ -1051,6 +1074,12 @@
     </copy>
     <copy todir="${buildDirectory}/plugins/sampleProcessingRobot">
       <fileset dir="${eclipse.workspace.dir}/sampleProcessingRobot" />
+    </copy>
+    <copy todir="${buildDirectory}/plugins/barcodeGenerator">
+      <fileset dir="${eclipse.workspace.dir}/barcodeGenerator" />
+    </copy>
+    <copy todir="${buildDirectory}/plugins/biobank.gui.common">
+      <fileset dir="${eclipse.workspace.dir}/biobank.gui.common" />
     </copy>
     <copy todir="${buildDirectory}/features/biobank2.feature.core">
       <fileset dir="${eclipse.workspace.dir}/biobank2.feature.core" />
@@ -1091,7 +1120,8 @@
     <antcall target="updateSiteMetadata" />
   </target>
 
-  <target name="updateSiteMetadata" depends="eclipse.home.env">
+
+  <target name="updateSiteMetadata" depends="eclipse.home.env" description="Build the update site folder">
     <property name="buildDirectory" value="${product.dir}/buildDirectory" />
     <property name="updateSiteFolder" value="${buildDirectory}/updateSite" />
     <copy todir="${updateSiteFolder}/features/">

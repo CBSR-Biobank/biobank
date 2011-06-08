@@ -16,9 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.Map.Entry;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -53,8 +53,7 @@ class Resources {
     public static final String ICON_BULLET = "bullet";
 
     private static final String BUNDLE_NAME = Resources.class.getPackage()
-        .getName()
-        + ".messages"; //$NON-NLS-1$
+        .getName() + ".messages"; //$NON-NLS-1$
 
     private static ResourceBundle defaultBundle;
     private static final Map<Locale, ResourceBundle> bundles = new HashMap<Locale, ResourceBundle>();

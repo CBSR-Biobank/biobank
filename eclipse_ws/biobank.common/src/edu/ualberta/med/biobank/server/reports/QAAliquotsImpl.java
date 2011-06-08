@@ -5,28 +5,31 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.model.ContainerPath;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class QAAliquotsImpl extends AbstractReport {
 
-    private static final String QUERY = ("FROM " + Specimen.class.getName() + " as s")
-        + ("    inner join fetch s.collectionEvent ce")
-        + ("    inner join fetch s.specimenType st")
-        + ("    inner join fetch ce.patient p")
-        + ("    inner join fetch s.specimenPosition sp")
-        + ("    left join fetch s.parentSpecimen ps")
-        + ("    left join fetch ps.processingEvent pe")
+    // @formatter:off
+    private static final String QUERY = 
+        "FROM " + Specimen.class.getName() + " as s"
+        + "    inner join fetch s.collectionEvent ce"
+        + "    inner join fetch s.specimenType st"
+        + "    inner join fetch ce.patient p"
+        + "    inner join fetch s.specimenPosition sp"
+        + "    left join fetch s.parentSpecimen ps"
+        + "    left join fetch ps.processingEvent pe"
         + " WHERE s.createdAt between ? and ?"
         + "     and s.specimenType.nameShort = ?"
-        + "     and s.specimenPosition.container.id in (SELECT path1.container.id"
-        + ("        FROM " + ContainerPath.class.getName() + " as path1 ")
-        + ("            ," + ContainerPath.class.getName() + " as path2 ")
-        + "         WHERE path1.path like path2.path || '/%' "
-        + ("             and path2.container.id in (" + CONTAINER_LIST + "))")
+        + "     and s.specimenPosition.container.id in (SELECT c1.id"
+        + "        FROM " + Container.class.getName() + " as c1 "
+        + "            ," + Container.class.getName() + " as c2"
+        + "         WHERE c1.path LIKE if(length(c2.path),c2.path || '/','') || c2.id || '/%' " 
+        + "             and c2.id in (" + CONTAINER_LIST + "))"
         + " ORDER BY RAND()";
+    // @formatter:on
 
     private int numResults;
 
@@ -66,8 +69,9 @@ public class QAAliquotsImpl extends AbstractReport {
                 }
             }
 
-            String positionString = specimen.getSpecimenPosition()
-                .getPositionString();
+            String positionString = new StringBuilder(specimen
+                .getSpecimenPosition().getContainer().getLabel()).append(
+                specimen.getSpecimenPosition().getPositionString()).toString();
             modifiedResults.add(new Object[] { positionString, inventoryId,
                 pnumber, dateProcessed, specimenType });
         }

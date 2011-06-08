@@ -43,7 +43,7 @@ public class BiobankSecurityUtil {
     private static Logger log = Logger.getLogger(BiobankSecurityUtil.class
         .getName());
 
-    public static final String APPLICATION_CONTEXT_NAME = "biobank2";
+    public static final String APPLICATION_CONTEXT_NAME = "biobank";
 
     public static final String GLOBAL_FEATURE_START_NAME = "Global Feature: ";
 

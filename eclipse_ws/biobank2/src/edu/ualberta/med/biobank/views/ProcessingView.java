@@ -11,7 +11,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -153,13 +153,13 @@ public class ProcessingView extends AbstractAdministrationView {
                     msg += " for date "
                         + DateFormatter.formatAsDate(dateWidget.getDate());
                 }
-                BiobankPlugin.openMessage("Processing Event not found", msg);
+                BiobankGuiCommonPlugin.openMessage("Processing Event not found", msg);
             } else {
                 showSearchedObjectsInTree(searchedObject, true);
                 getTreeViewer().expandToLevel(processingNode, 2);
             }
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Search error", e);
+            BiobankGuiCommonPlugin.openAsyncError("Search error", e);
         }
     }
 

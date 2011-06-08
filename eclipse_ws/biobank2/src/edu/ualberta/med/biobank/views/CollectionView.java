@@ -10,7 +10,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -73,13 +73,15 @@ public class CollectionView extends AbstractAdministrationView {
     }
 
     protected void notFound(String text) {
-        boolean create = BiobankPlugin.openConfirm("Patient not found",
+        boolean create = BiobankGuiCommonPlugin.openConfirm("Patient not found",
             "Do you want to create this patient ?");
         if (create) {
             PatientWrapper patient = new PatientWrapper(
                 SessionManager.getAppService());
             patient.setPnumber(text);
-            PatientAdapter adapter = new PatientAdapter(searchedNode, patient);
+            ((PatientSearchedNode) CollectionView.getCurrent()
+                .getSearchedNode()).addSearchObject(patient);
+            AdapterBase adapter = new PatientAdapter(null, patient);
             adapter.openEntryForm();
         }
     }
@@ -187,7 +189,7 @@ public class CollectionView extends AbstractAdministrationView {
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Search error", e);
+            BiobankGuiCommonPlugin.openAsyncError("Search error", e);
         }
     }
 

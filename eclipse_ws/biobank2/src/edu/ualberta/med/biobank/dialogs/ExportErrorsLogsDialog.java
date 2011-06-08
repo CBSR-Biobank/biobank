@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 
 public class ExportErrorsLogsDialog extends BiobankDialog {
 
@@ -87,7 +88,7 @@ public class ExportErrorsLogsDialog extends BiobankDialog {
             if (parentFolder.canWrite())
                 createZip(selected);
             else {
-                BiobankPlugin.openAsyncError("Path problem",
+                BiobankGuiCommonPlugin.openAsyncError("Path problem",
                     "Cannot write in '" + parentFolder.getAbsolutePath() + "'");
                 openFileSelection();
             }
@@ -132,7 +133,8 @@ public class ExportErrorsLogsDialog extends BiobankDialog {
                         if (out != null)
                             out.close();
                     } catch (IOException e) {
-                        BiobankPlugin.openAsyncError("Error closing files", e);
+                        BiobankGuiCommonPlugin.openAsyncError(
+                            "Error closing files", e);
                     }
                 }
                 exportComplete(zipFile);
@@ -179,7 +181,8 @@ public class ExportErrorsLogsDialog extends BiobankDialog {
             props.load(ExportErrorsLogsDialog.class
                 .getResourceAsStream("ExportErrorsLogs.properties"));
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error retrieving log file list", e);
+            BiobankGuiCommonPlugin.openAsyncError(
+                "Error retrieving log file list", e);
         }
         if (needExportScannerInfos)
             files.addAll(getFilesListFromPropertiesKey(props, "scanner_files"));
@@ -204,14 +207,14 @@ public class ExportErrorsLogsDialog extends BiobankDialog {
     }
 
     protected void exportComplete(String zipFile) {
-        BiobankPlugin.openInformation("Export complete",
+        BiobankGuiCommonPlugin.openInformation("Export complete",
             "Log informations have been successfully exported in file "
                 + zipFile);
 
     }
 
     protected void openError(Exception e) {
-        BiobankPlugin.openAsyncError("Problem while exporting", e);
+        BiobankGuiCommonPlugin.openAsyncError("Problem while exporting", e);
     }
 
     private String openFileSelection() {

@@ -231,18 +231,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             return getPositionStringInParent(position, getParentContainer());
         }
         ContainerWrapper directParent = getParentContainer();
-        ContainerPathWrapper path = directParent.getContainerPath();
-        ContainerWrapper topContainer;
-
-        if (path != null) {
-            topContainer = path.getTopContainer();
-        } else {
-            topContainer = directParent;
-            while (topContainer.hasParentContainer()) {
-                topContainer = topContainer.getParentContainer();
-            }
-        }
-        String nameShort = topContainer.getContainerType().getNameShort();
+        // ContainerPathWrapper path = directParent.getContainerPath();
+        String nameShort = directParent.getTopContainer().getContainerType()
+            .getNameShort();
         if (addTopParentShortName && nameShort != null)
             return directParent.getLabel()
                 + getPositionStringInParent(position, directParent) + " ("
@@ -540,5 +531,14 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
     protected void setTopSpecimenInternal(SpecimenWrapper specimen) {
         super.setTopSpecimen(specimen);
+    }
+
+    /**
+     * return a string with collection date (different from created at if it is
+     * an aliquoted specimen) + the collection center
+     */
+    public String getCollectionInfo() {
+        return getTopSpecimen().getFormattedCreatedAt() + " in "
+            + getTopSpecimen().getOriginInfo().getCenter().getNameShort();
     }
 }

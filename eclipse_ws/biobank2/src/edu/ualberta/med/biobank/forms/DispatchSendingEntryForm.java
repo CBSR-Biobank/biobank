@@ -32,10 +32,11 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DispatchSpecimensTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
+import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -151,7 +152,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                         }
                     });
             } catch (ApplicationException e) {
-                BiobankPlugin.openAsyncError("Error",
+                BiobankGuiCommonPlugin.openAsyncError("Error",
                     "Unable to retrieve Centers");
             }
         }
@@ -243,13 +244,13 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 reloadSpecimens();
                 break;
             case ERROR:
-                BiobankPlugin.openAsyncError("Invalid specimen", res.getCell()
-                    .getInformation());
+                BiobankGuiCommonPlugin.openAsyncError("Invalid specimen", res
+                    .getCell().getInformation());
                 break;
             }
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error", "Error adding the specimen",
-                e);
+            BiobankGuiCommonPlugin.openAsyncError("Error",
+                "Error adding the specimen", e);
         }
     }
 

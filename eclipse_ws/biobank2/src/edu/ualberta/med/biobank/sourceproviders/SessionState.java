@@ -6,27 +6,32 @@ import java.util.Map;
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
+import edu.ualberta.med.biobank.common.security.SecurityFeature;
+import edu.ualberta.med.biobank.common.security.User;
+
 public class SessionState extends AbstractSourceProvider {
-    public final static String LOGIN_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.loginState";
+    public final static String SESSION_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.loginState";
+
     public final static String IS_SUPER_ADMIN_MODE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.isSuperAdminMode";
     public final static String HAS_WORKING_CENTER_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter";
-    public final static String LOGGED_IN = "loggedIn";
-    public final static String LOGGED_OUT = "loggedOut";
-    boolean loggedIn;
-    boolean isSuperAdminMode;
+    public final static String HAS_CLINIC_SHIPMENT_RIGHTS = "edu.ualberta.med.biobank.sourceprovider.clinicShipmentRights";
+    public final static String HAS_DISPATCH_RIGHTS = "edu.ualberta.med.biobank.sourceprovider.dispatchRights";
+
+    private boolean isSuperAdminMode;
     private boolean hasWorkingCenter;
+    private boolean hasClinicShipmentRights;
+    private boolean hasDispatchRights;
 
     @Override
     public String[] getProvidedSourceNames() {
-        return new String[] { LOGIN_STATE_SOURCE_NAME,
-            IS_SUPER_ADMIN_MODE_SOURCE_NAME, HAS_WORKING_CENTER_SOURCE_NAME };
+        return new String[] { SESSION_STATE_SOURCE_NAME,
+            IS_SUPER_ADMIN_MODE_SOURCE_NAME, HAS_WORKING_CENTER_SOURCE_NAME,
+            HAS_CLINIC_SHIPMENT_RIGHTS, HAS_DISPATCH_RIGHTS };
     }
 
     @Override
     public Map<String, String> getCurrentState() {
         Map<String, String> currentStateMap = new HashMap<String, String>(1);
-        String currentState = loggedIn ? LOGGED_IN : LOGGED_OUT;
-        currentStateMap.put(LOGIN_STATE_SOURCE_NAME, currentState);
         currentStateMap.put(IS_SUPER_ADMIN_MODE_SOURCE_NAME,
             Boolean.toString((isSuperAdminMode)));
         currentStateMap.put(HAS_WORKING_CENTER_SOURCE_NAME,
@@ -38,16 +43,7 @@ public class SessionState extends AbstractSourceProvider {
     public void dispose() {
     }
 
-    public void setLoggedInState(boolean loggedIn) {
-        if (this.loggedIn == loggedIn)
-            return; // no change
-        this.loggedIn = loggedIn;
-        String currentState = loggedIn ? LOGGED_IN : LOGGED_OUT;
-        fireSourceChanged(ISources.WORKBENCH, LOGIN_STATE_SOURCE_NAME,
-            currentState);
-    }
-
-    public void setSuperAdminMode(boolean isSuperAdminMode) {
+    private void setSuperAdminMode(boolean isSuperAdminMode) {
         if (this.isSuperAdminMode == isSuperAdminMode) {
             return;
         }
@@ -59,7 +55,7 @@ public class SessionState extends AbstractSourceProvider {
             isSuperAdminMode);
     }
 
-    public void setHasWorkingCenter(boolean hasWorkingCenter) {
+    private void setHasWorkingCenter(boolean hasWorkingCenter) {
         if (this.hasWorkingCenter == hasWorkingCenter)
             return; // no change
         this.hasWorkingCenter = hasWorkingCenter;
@@ -67,4 +63,29 @@ public class SessionState extends AbstractSourceProvider {
             hasWorkingCenter);
     }
 
+    private void setHasClinicShipmentRights(boolean hasClinicShipmentRights) {
+        if (this.hasClinicShipmentRights == hasClinicShipmentRights)
+            return; // no change
+        this.hasClinicShipmentRights = hasClinicShipmentRights;
+        fireSourceChanged(ISources.WORKBENCH, HAS_CLINIC_SHIPMENT_RIGHTS,
+            hasClinicShipmentRights);
+    }
+
+    private void setDispatchRights(boolean hasDispatchRights) {
+        if (this.hasDispatchRights == hasDispatchRights)
+            return; // no change
+        this.hasDispatchRights = hasDispatchRights;
+        fireSourceChanged(ISources.WORKBENCH, HAS_DISPATCH_RIGHTS,
+            hasDispatchRights);
+    }
+
+    public void setUser(User user) {
+        setSuperAdminMode(user != null && user.isInSuperAdminMode());
+        setHasWorkingCenter(user != null
+            && user.getCurrentWorkingCenter() != null);
+        setHasClinicShipmentRights(user != null
+            && user.canPerformActions(SecurityFeature.CLINIC_SHIPMENT));
+        setDispatchRights(user != null
+            && user.canPerformActions(SecurityFeature.DISPATCH_REQUEST));
+    }
 }

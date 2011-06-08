@@ -96,6 +96,26 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return list;
     }
 
+    public static final String ALL_SOURCE_ONLY_SPECIMEN_TYPES_QRY = "from "
+        + SpecimenType.class.getName() + " where "
+        + SpecimenTypePeer.PARENT_SPECIMEN_TYPE_COLLECTION.getName()
+        + ".size = 0";
+
+    public static List<SpecimenTypeWrapper> getAllSourceOnlySpecimenTypes(
+        WritableApplicationService appService, boolean sort)
+        throws ApplicationException {
+        HQLCriteria c = new HQLCriteria(ALL_SOURCE_ONLY_SPECIMEN_TYPES_QRY);
+
+        List<SpecimenType> SpecimenTypes = appService.query(c);
+        List<SpecimenTypeWrapper> list = new ArrayList<SpecimenTypeWrapper>();
+        for (SpecimenType type : SpecimenTypes) {
+            list.add(new SpecimenTypeWrapper(appService, type));
+        }
+        if (sort)
+            Collections.sort(list);
+        return list;
+    }
+
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
@@ -139,7 +159,8 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     }
 
     public static final String IS_USED_BY_SPECIMENS_QRY = "select count(s) from "
-        + Specimen.class.getName() + " as s where s."
+        + Specimen.class.getName()
+        + " as s where s."
         + SpecimenPeer.SPECIMEN_TYPE.getName() + "=?)";
 
     public boolean isUsedBySpecimens() throws ApplicationException,

@@ -11,7 +11,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -19,7 +18,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
@@ -113,7 +112,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             allActivityStatus = ActivityStatusWrapper
                 .getAllActivityStatuses(SessionManager.getAppService());
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError(Messages
+            BiobankGuiCommonPlugin.openAsyncError(Messages
                 .getString("CEventSourceSpecimenDialog.activity.error.msg"), e); //$NON-NLS-1$
         }
     }
@@ -135,13 +134,6 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
     @Override
     protected String getTitleAreaTitle() {
         return currentTitle;
-    }
-
-    @Override
-    protected Image getTitleAreaImage() {
-        // FIXME should use another icon
-        return BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_COMPUTER_KEY);
     }
 
     @Override
@@ -319,7 +311,6 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
     @Override
     protected ModelWrapper<Specimen> getNew() {
         return new SpecimenWrapper(SessionManager.getAppService());
-
     }
 
     @Override
@@ -328,7 +319,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         try {
             internalSpecimen.reset();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error", e);
+            BiobankGuiCommonPlugin.openAsyncError("Error", e);
         }
         inventoryIdWidget.setText(""); //$NON-NLS-1$
         inventoryIdWidget.setFocus();
@@ -344,17 +335,13 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
     @Override
     protected void copy(ModelWrapper<?> newModelObject) {
-        ((SpecimenWrapper) newModelObject).setInventoryId(internalSpecimen
-            .getInventoryId());
-        ((SpecimenWrapper) newModelObject).setSpecimenType(internalSpecimen
-            .getSpecimenType());
-        ((SpecimenWrapper) newModelObject).setQuantity(internalSpecimen
-            .getQuantity());
-        ((SpecimenWrapper) newModelObject).setCreatedAt(internalSpecimen
-            .getCreatedAt());
-        ((SpecimenWrapper) newModelObject).setComment(internalSpecimen
-            .getComment());
-        ((SpecimenWrapper) newModelObject).setActivityStatus(internalSpecimen
-            .getActivityStatus());
+        SpecimenWrapper spec = (SpecimenWrapper) newModelObject;
+        spec.setInventoryId(internalSpecimen.getInventoryId());
+        spec.setSpecimenType(internalSpecimen.getSpecimenType());
+        spec.setQuantity(internalSpecimen.getQuantity());
+        spec.setCreatedAt(internalSpecimen.getCreatedAt());
+        spec.setComment(internalSpecimen.getComment());
+        spec.setActivityStatus(internalSpecimen.getActivityStatus());
+        excludeList.add(spec);
     }
 }

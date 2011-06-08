@@ -53,7 +53,7 @@ public class VButtonPainter extends VControlPainter {
                     // Bug 260624 - ButtonDrawData#draw does not respect alpha
                     // setting
                     //
-                    // BioBank2 - the following code crashes on Linux 64 bit
+                    // BioBank - the following code crashes on Linux 64 bit
                     // systems
                     if (isWindows) {
                         Image img = new Image(e.display, new Rectangle(0, 0,

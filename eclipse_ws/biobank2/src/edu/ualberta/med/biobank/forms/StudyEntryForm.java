@@ -285,12 +285,9 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        study.addToSourceSpecimenCollection(sourceSpecimenEntryTable
-            .getAddedOrModifiedSourceSpecimens());
-        study.removeFromSourceSpecimenCollection(sourceSpecimenEntryTable
-            .getDeletedSourceSpecimens());
+        // save of source specimen is made inside the entryinfotable
 
-        // sample storage
+        // aliquoted Specimen :
         study.addToAliquotedSpecimenCollection(aliquotedSpecimenEntryTable
             .getAddedOrModifiedAliquotedSpecimens());
         study.removeFromAliquotedSpecimenCollection(aliquotedSpecimenEntryTable

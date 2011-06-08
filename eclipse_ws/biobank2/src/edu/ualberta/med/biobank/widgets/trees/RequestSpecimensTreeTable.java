@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.trees;
 
 import java.util.List;
 
@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
@@ -29,9 +28,13 @@ import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.forms.utils.DispatchTableGroup;
 import edu.ualberta.med.biobank.forms.utils.RequestTableGroup;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankClipboard;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
 public class RequestSpecimensTreeTable extends BiobankWidget {
 
@@ -212,7 +215,7 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
                     claim(child);
             }
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Failed to claim", e);
+            BiobankGuiCommonPlugin.openAsyncError("Failed to claim", e);
         }
     }
 
@@ -228,7 +231,7 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
                 try {
                     getSelectedSpecimen().persist();
                 } catch (Exception e) {
-                    BiobankPlugin.openAsyncError("Save Error", e);
+                    BiobankGuiCommonPlugin.openAsyncError("Save Error", e);
                 }
                 refresh();
             }

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.logs;
+package edu.ualberta.med.biobank.gui.common;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,8 +6,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-
-import edu.ualberta.med.biobank.BiobankPlugin;
 
 /**
  * Log into Eclipse RCP logs (see Logs view) and .logs file
@@ -48,9 +46,9 @@ public class BiobankLogger {
     }
 
     public void addRcpLogStatus(int severity, String message, Throwable e) {
-        ILog rcpLogger = BiobankPlugin.getDefault().getLog();
-        IStatus status = new Status(severity, BiobankPlugin.PLUGIN_ID, name
-            + ": " + message, e);
+        ILog rcpLogger = BiobankGuiCommonPlugin.getDefault().getLog();
+        IStatus status = new Status(severity, BiobankGuiCommonPlugin.PLUGIN_ID,
+            name + ": " + message, e);
         rcpLogger.log(status);
     }
 
