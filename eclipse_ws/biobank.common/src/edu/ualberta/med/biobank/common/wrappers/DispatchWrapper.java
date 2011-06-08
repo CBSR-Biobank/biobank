@@ -37,7 +37,11 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private List<DispatchSpecimenWrapper> deletedDispatchedSpecimens = new ArrayList<DispatchSpecimenWrapper>();
 
-    private List<DispatchSpecimenWrapper> receivedDispatchedSpecimens = new ArrayList<DispatchSpecimenWrapper>();
+    /**
+     * Contains specimen that need to be persisted when this dispatch is
+     * persisted
+     */
+    private List<DispatchSpecimenWrapper> toBePersistedDispatchedSpecimens = new ArrayList<DispatchSpecimenWrapper>();
 
     private boolean hasNewSpecimens = false;
 
@@ -113,7 +117,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         }
 
         // FIXME: temporary fix - this should be converted to a batch update
-        for (DispatchSpecimenWrapper rds : receivedDispatchedSpecimens) {
+        for (DispatchSpecimenWrapper rds : toBePersistedDispatchedSpecimens) {
             rds.getSpecimen().persist();
         }
     }
@@ -214,6 +218,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                     dsa.setSpecimen(specimen);
                     dsa.setDispatch(this);
                     dsa.setDispatchSpecimenState(state);
+                    if (state == DispatchSpecimenState.EXTRA) {
+                        specimen.setCurrentCenter(getReceiverCenter());
+                        toBePersistedDispatchedSpecimens.add(dsa);
+                    }
                     newDispatchSpecimens.add(dsa);
                     hasNewSpecimens = true;
                 }
@@ -280,7 +288,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             if (specimensToReceive.contains(ds.getSpecimen())) {
                 ds.setDispatchSpecimenState(DispatchSpecimenState.RECEIVED);
                 ds.getSpecimen().setCurrentCenter(getReceiverCenter());
-                receivedDispatchedSpecimens.add(ds);
+                toBePersistedDispatchedSpecimens.add(ds);
             }
         }
         resetMap();
@@ -412,7 +420,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         super.resetInternalFields();
         resetMap();
         deletedDispatchedSpecimens.clear();
-        receivedDispatchedSpecimens.clear();
+        toBePersistedDispatchedSpecimens.clear();
         hasNewSpecimens = false;
     }
 
