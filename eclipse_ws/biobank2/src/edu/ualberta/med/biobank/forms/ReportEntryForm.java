@@ -76,8 +76,8 @@ public class ReportEntryForm extends BiobankEntryForm {
         .getLogger(ReportEntryForm.class.getName());
 
     private static ImageDescriptor SAVE_AS_NEW_ACTION_IMAGE = ImageDescriptor
-        .createFromImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_SAVE_AS_NEW));
+        .createFromImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_SAVE_AS_NEW));
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ReportEntryForm";
 

@@ -172,7 +172,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                         public void widgetSelected(SelectionEvent e) {
                             openScanDialog();
                         }
-                    }, null, BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN);
+                    }, null, BgcPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN);
 
                 createSpecimensSelectionActions(composite, false);
                 createSpecimensNonProcessedSection(true);

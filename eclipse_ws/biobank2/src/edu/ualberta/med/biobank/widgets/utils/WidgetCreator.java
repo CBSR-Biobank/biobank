@@ -11,6 +11,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
 
 public class WidgetCreator extends CommonWidgetCreator {
@@ -31,9 +32,9 @@ public class WidgetCreator extends CommonWidgetCreator {
 
             ToolItem titem = new ToolItem(tbar, SWT.NULL);
             if (imageKey == null) {
-                imageKey = BiobankPlugin.IMG_ADD;
+                imageKey = BgcPlugin.IMG_ADD;
             }
-            titem.setImage(BiobankPlugin.getDefault().getImageRegistry()
+            titem.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(imageKey));
             titem.setToolTipText(tooltip);
             titem.addSelectionListener(listener);

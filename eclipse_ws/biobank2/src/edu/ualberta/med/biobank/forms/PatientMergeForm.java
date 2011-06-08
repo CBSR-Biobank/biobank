@@ -79,8 +79,8 @@ public class PatientMergeForm extends BiobankEntryForm {
     protected void createFormContent() throws Exception {
         form.setText("Merging into Patient " + patient1.getPnumber());
         page.setLayout(new GridLayout(1, false));
-        form.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_PATIENT));
+        form.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_PATIENT));
 
         toolkit.createLabel(
             page,
@@ -107,8 +107,8 @@ public class PatientMergeForm extends BiobankEntryForm {
         patientArea1.setLayoutData(patient1Data);
 
         Label arrow = toolkit.createLabel(client, "Arrow", SWT.IMAGE_BMP);
-        arrow.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_ARROW_LEFT2));
+        arrow.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ARROW_LEFT2));
 
         Composite patientArea2 = toolkit.createComposite(client);
         GridLayout patient2Layout = new GridLayout(2, false);
@@ -183,8 +183,7 @@ public class PatientMergeForm extends BiobankEntryForm {
             patient2 = PatientWrapper.getPatient(
                 SessionManager.getAppService(), pnumber);
         } catch (ApplicationException e) {
-            BgcPlugin
-                .openAsyncError("Error retrieving patient", e);
+            BgcPlugin.openAsyncError("Error retrieving patient", e);
             patient2VisitsTable.setCollection(newContents);
             study2Text.setText("");
             return;

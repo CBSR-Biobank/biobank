@@ -51,13 +51,12 @@ import org.eclipse.ui.services.ISourceProviderService;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -92,20 +91,20 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     public Action confirmAction;
 
     private static ImageDescriptor printActionImage = ImageDescriptor
-        .createFromImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_PRINTER));
+        .createFromImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_PRINTER));
 
     private static ImageDescriptor resetActionImage = ImageDescriptor
-        .createFromImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_RESET_FORM));
+        .createFromImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_RESET_FORM));
 
     private static ImageDescriptor cancelActionImage = ImageDescriptor
-        .createFromImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_CANCEL_FORM));
+        .createFromImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_CANCEL_FORM));
 
     private static ImageDescriptor confirmActionImage = ImageDescriptor
-        .createFromImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_CONFIRM_FORM));
+        .createFromImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_CONFIRM_FORM));
 
     protected KeyListener keyListener = new KeyAdapter() {
         @Override
@@ -177,8 +176,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                         saveForm();
                         monitor.done();
                     } catch (final RemoteConnectFailureException exp) {
-                        BgcPlugin
-                            .openRemoteConnectErrorMessage(exp);
+                        BgcPlugin.openRemoteConnectErrorMessage(exp);
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
                             public void run() {
@@ -187,8 +185,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                         });
                         monitor.setCanceled(true);
                     } catch (final RemoteAccessException exp) {
-                        BgcPlugin
-                            .openRemoteAccessErrorMessage(exp);
+                        BgcPlugin.openRemoteAccessErrorMessage(exp);
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
                             public void run() {
@@ -197,8 +194,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                         });
                         monitor.setCanceled(true);
                     } catch (final AccessDeniedException ade) {
-                        BgcPlugin
-                            .openAccessDeniedErrorMessage(ade);
+                        BgcPlugin.openAccessDeniedErrorMessage(ade);
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
                             public void run() {
@@ -214,8 +210,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                             }
                         });
                         monitor.setCanceled(true);
-                        BgcPlugin
-                            .openAsyncError("Save error", bce);
+                        BgcPlugin.openAsyncError("Save error", bce);
                     } catch (BiobankServerException bse) {
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
@@ -224,8 +219,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                             }
                         });
                         monitor.setCanceled(true);
-                        BgcPlugin
-                            .openAsyncError("Save error", bse);
+                        BgcPlugin.openAsyncError("Save error", bse);
                     } catch (Exception e) {
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
@@ -481,8 +475,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                         try {
                             BiobankEntryForm.this.print();
                         } catch (Exception ex) {
-                            BgcPlugin.openAsyncError(
-                                "Error printing.", ex);
+                            BgcPlugin.openAsyncError("Error printing.", ex);
                         }
                     }
                 });

@@ -49,8 +49,8 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.helpers.SessionHelper;
@@ -143,8 +143,8 @@ public class LoginDialog extends TitleAreaDialog {
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
         setTitle(Messages.getString("LoginDialog.title")); //$NON-NLS-1$
-        setTitleImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_LOGINWIZ));
+        setTitleImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_LOGINWIZ));
         setMessage(Messages.getString("LoginDialog.description")); //$NON-NLS-1$
         return contents;
     }

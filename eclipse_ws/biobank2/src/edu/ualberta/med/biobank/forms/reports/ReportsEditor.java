@@ -122,8 +122,8 @@ public abstract class ReportsEditor extends BiobankFormBase {
         });
 
         printButton = toolkit.createButton(buttonSection, "Print", SWT.NONE);
-        printButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_PRINTER));
+        printButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_PRINTER));
         printButton.setEnabled(false);
         printButton.addSelectionListener(new SelectionAdapter() {
             @Override

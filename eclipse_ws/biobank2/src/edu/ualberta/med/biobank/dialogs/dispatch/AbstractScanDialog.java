@@ -418,21 +418,20 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         gd.verticalAlignment = SWT.TOP;
         scanTubeAloneSwitch.setLayoutData(gd);
         scanTubeAloneSwitch.setText("");
-        scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
-            .getImageRegistry().get(BiobankPlugin.IMG_SCAN_EDIT));
+        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_SCAN_EDIT));
         scanTubeAloneSwitch.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDown(MouseEvent e) {
                 if (isScanHasBeenLaunched()) {
                     palletScanManagement.toggleScanTubeAloneMode();
                     if (palletScanManagement.isScanTubeAloneMode()) {
-                        scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
+                        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault()
                             .getImageRegistry()
-                            .get(BiobankPlugin.IMG_SCAN_CLOSE_EDIT));
+                            .get(BgcPlugin.IMG_SCAN_CLOSE_EDIT));
                     } else {
-                        scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
-                            .getImageRegistry()
-                            .get(BiobankPlugin.IMG_SCAN_EDIT));
+                        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault()
+                            .getImageRegistry().get(BgcPlugin.IMG_SCAN_EDIT));
                     }
                 }
             }

@@ -80,8 +80,8 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
 
     @Override
     protected Image getTitleAreaImage() {
-        return BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_EMAIL_BANNER);
+        return BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_EMAIL_BANNER);
     }
 
     @Override
@@ -121,8 +121,8 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         attachmentsComposite.setLayoutData(gd);
 
         Button addButton = new Button(contents, SWT.PUSH);
-        addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_ADD));
+        addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ADD));
         addButton.setToolTipText("Add attachment");
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -175,7 +175,7 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
     // });
     // Button removeButton = new Button(attachmentLine, SWT.PUSH);
     // removeButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-    // .get(BioBankPlugin.IMG_DELETE));
+    // .get(BgcPlugin.IMG_DELETE));
     // removeButton.setToolTipText("Remove this attachment");
     // removeButton.addSelectionListener(new SelectionAdapter() {
     // @Override
@@ -249,13 +249,13 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
                     monitor.done();
                 } catch (AuthenticationFailedException afe) {
                     BgcPlugin.openAsyncError(
-                        "Authentification Error", "Wrong authentification for "
+                        "Authentification Error",
+                        "Wrong authentification for "
                             + email.getServerUsername());
                     monitor.setCanceled(true);
                     return;
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError(
-                        "Error in sending email", e);
+                    BgcPlugin.openAsyncError("Error in sending email", e);
                     monitor.setCanceled(true);
                     return;
                 }
@@ -356,8 +356,8 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
                 }
             });
             removeButton = new Button(this, SWT.PUSH);
-            removeButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-                .get(BiobankPlugin.IMG_DELETE));
+            removeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+                .get(BgcPlugin.IMG_DELETE));
             removeButton.setToolTipText("Remove this attachment");
             removeButton.addSelectionListener(new SelectionAdapter() {
                 @Override

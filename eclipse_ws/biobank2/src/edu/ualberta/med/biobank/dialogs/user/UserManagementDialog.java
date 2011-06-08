@@ -22,7 +22,6 @@ import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
@@ -160,8 +159,7 @@ public class UserManagementDialog extends BgcBaseDialog {
                 currentUserList = SessionManager.getAppService()
                     .getSecurityUsers();
             } catch (ApplicationException e) {
-                BgcPlugin.openAsyncError("Unable to load users.",
-                    e);
+                BgcPlugin.openAsyncError("Unable to load users.", e);
             }
         }
         return currentUserList;
@@ -228,8 +226,8 @@ public class UserManagementDialog extends BgcBaseDialog {
         }
 
         ToolItem titem = new ToolItem(tbar, SWT.NULL);
-        titem.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_ADD));
+        titem.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ADD));
         titem.setToolTipText(addTooltip);
         titem.addSelectionListener(addListener);
         return section;

@@ -24,6 +24,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.dialogs.ListAddDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 
@@ -92,8 +93,8 @@ public class PvInfoWidget extends BgcBaseWidget {
             bcomp.setLayoutData(new GridData());
 
             addButton = new Button(bcomp, SWT.PUSH);
-            addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-                .get(BiobankPlugin.IMG_ADD));
+            addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+                .get(BgcPlugin.IMG_ADD));
             addButton.setToolTipText("Add");
             addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -137,8 +138,8 @@ public class PvInfoWidget extends BgcBaseWidget {
             });
 
             removeButton = new Button(bcomp, SWT.PUSH);
-            removeButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-                .get(BiobankPlugin.IMG_DELETE));
+            removeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+                .get(BgcPlugin.IMG_DELETE));
             removeButton.setToolTipText("Remove");
             removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 

@@ -322,8 +322,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         paginationWidget.setLayout(new GridLayout(5, false));
 
         firstButton = new Button(paginationWidget, SWT.NONE);
-        firstButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_RESULTSET_FIRST));
+        firstButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_RESULTSET_FIRST));
         firstButton.setToolTipText("First page");
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -333,8 +333,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         });
 
         prevButton = new Button(paginationWidget, SWT.NONE);
-        prevButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_RESULTSET_PREV));
+        prevButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_RESULTSET_PREV));
         prevButton.setToolTipText("Previous page");
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -346,8 +346,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         pageLabel = new Label(paginationWidget, SWT.NONE);
 
         nextButton = new Button(paginationWidget, SWT.NONE);
-        nextButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_RESULTSET_NEXT));
+        nextButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_RESULTSET_NEXT));
         nextButton.setToolTipText("Next page");
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -357,8 +357,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         });
 
         lastButton = new Button(paginationWidget, SWT.NONE);
-        lastButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_RESULTSET_LAST));
+        lastButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_RESULTSET_LAST));
         lastButton.setToolTipText("Last page");
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override

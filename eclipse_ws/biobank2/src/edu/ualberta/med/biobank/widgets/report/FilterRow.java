@@ -379,8 +379,8 @@ class FilterRow extends Composite {
 
         autoButton
             .setToolTipText("Suggest possible values (considers other filters)");
-        autoButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_WAND));
+        autoButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_WAND));
         autoButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {

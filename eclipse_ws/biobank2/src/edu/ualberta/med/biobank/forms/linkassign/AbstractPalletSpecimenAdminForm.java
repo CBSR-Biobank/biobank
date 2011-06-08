@@ -42,6 +42,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -489,21 +490,20 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         GridData gd = new GridData();
         gd.verticalAlignment = SWT.TOP;
         scanTubeAloneSwitch.setLayoutData(gd);
-        scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
-            .getImageRegistry().get(BiobankPlugin.IMG_SCAN_EDIT));
+        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_SCAN_EDIT));
         scanTubeAloneSwitch.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDown(MouseEvent e) {
                 if (isScanHasBeenLaunched()) {
                     palletScanManagement.toggleScanTubeAloneMode();
                     if (palletScanManagement.isScanTubeAloneMode()) {
-                        scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
+                        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault()
                             .getImageRegistry()
-                            .get(BiobankPlugin.IMG_SCAN_CLOSE_EDIT));
+                            .get(BgcPlugin.IMG_SCAN_CLOSE_EDIT));
                     } else {
-                        scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
-                            .getImageRegistry()
-                            .get(BiobankPlugin.IMG_SCAN_EDIT));
+                        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault()
+                            .getImageRegistry().get(BgcPlugin.IMG_SCAN_EDIT));
                     }
                 }
             }

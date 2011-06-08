@@ -103,8 +103,8 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                     }
                 });
             addButton = toolkit.createButton(this, "", SWT.PUSH);
-            addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-                .get(BiobankPlugin.IMG_ADD));
+            addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+                .get(BgcPlugin.IMG_ADD));
             addButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {

@@ -123,7 +123,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                 User user = (User) ((BiobankCollectionModel) element).o;
                 if (user != null && user.isLockedOut() && columnIndex == 0) {
                     return BiobankPlugin.getDefault().getImage(
-                        BiobankPlugin.IMG_LOCK);
+                        BgcPlugin.IMG_LOCK);
                 }
                 return null;
             }
