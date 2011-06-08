@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.services">
       <sourceProvider
-            provider="edu.ualberta.med.biobank.gui.common.GuiCommonSessionState">
+            provider="edu.ualberta.med.biobank.gui.common.BgcSessionState">
          <variable
                name="edu.ualberta.med.biobank.gui.common.sourceprovider.loginState"
                priorityLevel="workbench">

@@ -12,10 +12,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
 
-public class SelectClinicContactDialog extends BiobankDialog {
+public class SelectClinicContactDialog extends BgcBaseDialog {
 
     public static final int ADD_BTN_ID = 100;
 

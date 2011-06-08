@@ -18,23 +18,23 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class BiobankGuiCommonPlugin extends AbstractUIPlugin {
+public class BgcPlugin extends AbstractUIPlugin {
 
     public static final String IMG_DIALOGS = "dialogs";
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(BiobankGuiCommonPlugin.class.getName());
+    private static BgcLogger logger = BgcLogger
+        .getLogger(BgcPlugin.class.getName());
 
     // The plug-in ID
     public static final String PLUGIN_ID = "biobank.gui.common"; //$NON-NLS-1$
 
     // The shared instance
-    private static BiobankGuiCommonPlugin plugin;
+    private static BgcPlugin plugin;
 
     /**
      * The constructor
      */
-    public BiobankGuiCommonPlugin() {
+    public BgcPlugin() {
     }
 
     @Override
@@ -85,7 +85,7 @@ public class BiobankGuiCommonPlugin extends AbstractUIPlugin {
      * 
      * @return the shared instance
      */
-    public static BiobankGuiCommonPlugin getDefault() {
+    public static BgcPlugin getDefault() {
         return plugin;
     }
 
@@ -241,13 +241,13 @@ public class BiobankGuiCommonPlugin extends AbstractUIPlugin {
         }
     }
 
-    public static GuiCommonSessionState getSessionStateSourceProvider() {
+    public static BgcSessionState getSessionStateSourceProvider() {
         IWorkbenchWindow window = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
-        return (GuiCommonSessionState) service
-            .getSourceProvider(GuiCommonSessionState.SESSION_STATE_SOURCE_NAME);
+        return (BgcSessionState) service
+            .getSourceProvider(BgcSessionState.SESSION_STATE_SOURCE_NAME);
     }
 
 }

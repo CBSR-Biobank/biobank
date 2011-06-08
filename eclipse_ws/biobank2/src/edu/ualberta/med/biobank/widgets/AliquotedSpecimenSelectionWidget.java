@@ -38,7 +38,7 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.SpecimenHierarchy;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
 
 /**
@@ -86,7 +86,7 @@ public class AliquotedSpecimenSelectionWidget {
         }
         if (!oneRow) {
             sourceLabel = widgetCreator.createLabel(parent, "Source specimen");
-            sourceControlDecoration = BiobankWidget
+            sourceControlDecoration = BgcBaseWidget
                 .createDecorator(
                     sourceLabel,
                     Messages
@@ -120,7 +120,7 @@ public class AliquotedSpecimenSelectionWidget {
         if (!oneRow) {
             resultLabel = widgetCreator.createLabel(parent,
                 "Aliquoted specimen type");
-            resultControlDecoration = BiobankWidget
+            resultControlDecoration = BgcBaseWidget
                 .createDecorator(
                     resultLabel,
                     Messages
@@ -150,7 +150,7 @@ public class AliquotedSpecimenSelectionWidget {
             gd.horizontalAlignment = SWT.LEFT;
             textNumber.setLayoutData(gd);
             setNumber(null);
-            rowControlDecoration = BiobankWidget
+            rowControlDecoration = BgcBaseWidget
                 .createDecorator(
                     textNumber,
                     Messages

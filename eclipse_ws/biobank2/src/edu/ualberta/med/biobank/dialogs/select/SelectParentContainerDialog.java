@@ -15,14 +15,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 /**
  * Allows the user to select a parent container when more than one is available
  */
 
-public class SelectParentContainerDialog extends BiobankDialog {
+public class SelectParentContainerDialog extends BgcBaseDialog {
     private Collection<ContainerWrapper> containers;
     private ComboViewer comboViewer;
     protected ContainerWrapper selectedContainer;

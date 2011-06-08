@@ -20,9 +20,9 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 
@@ -33,7 +33,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
  */
 public abstract class BiobankViewForm extends BiobankFormBase {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(BiobankViewForm.class.getName());
 
     protected String sessionName;
@@ -96,9 +96,9 @@ public abstract class BiobankViewForm extends BiobankFormBase {
             if (value != null) {
                 Control widget = getWidget(label);
                 if ((fi.widgetClass == Combo.class)
-                    || (fi.widgetClass == BiobankText.class)
+                    || (fi.widgetClass == BgcBaseText.class)
                     || (fi.widgetClass == Label.class)) {
-                    ((BiobankText) widget).setText((String) value);
+                    ((BgcBaseText) widget).setText((String) value);
                 }
             }
         }

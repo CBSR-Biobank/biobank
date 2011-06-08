@@ -37,9 +37,9 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
@@ -48,12 +48,12 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
-    BiobankDialog {
+    BgcBaseDialog {
 
     private static final String TITLE = Messages
         .getString("DispatchScanDialog.title"); //$NON-NLS-1$
 
-    private BiobankText plateToScanText;
+    private BgcBaseText plateToScanText;
 
     private String plateToScan;
 
@@ -219,8 +219,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
         createCustomDialogPreContents(contents);
 
-        plateToScanText = (BiobankText) createBoundWidgetWithLabel(contents,
-            BiobankText.class, SWT.NONE,
+        plateToScanText = (BgcBaseText) createBoundWidgetWithLabel(contents,
+            BgcBaseText.class, SWT.NONE,
             Messages.getString("linkAssign.plateToScan.label"), //$NON-NLS-1$
             new String[0], this, "plateToScan", new ScannerBarcodeValidator(
                 Messages.getString("linkAssign.plateToScan.validationMsg"))); //$NON-NLS-1$
@@ -392,7 +392,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             try {
                 doProceed();
             } catch (Exception e) {
-                BiobankGuiCommonPlugin.openAsyncError("Error", e);
+                BgcPlugin.openAsyncError("Error", e);
             }
         } else if (IDialogConstants.FINISH_ID == buttonId) {
             setReturnCode(OK);

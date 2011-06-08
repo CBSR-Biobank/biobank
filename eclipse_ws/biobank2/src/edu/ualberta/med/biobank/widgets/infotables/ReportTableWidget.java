@@ -13,12 +13,12 @@ import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(ReportTableWidget.class.getName());
 
     public ReportTableWidget(Composite parent, List<T> collection,

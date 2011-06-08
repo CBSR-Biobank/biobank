@@ -13,11 +13,11 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class SpecimenOriginSelectDialog extends BiobankDialog {
+public class SpecimenOriginSelectDialog extends BgcBaseDialog {
     private SpecimenWrapper specimen;
     private CenterWrapper<?> selectedCenter;
     private List<CenterWrapper<?>> centers;

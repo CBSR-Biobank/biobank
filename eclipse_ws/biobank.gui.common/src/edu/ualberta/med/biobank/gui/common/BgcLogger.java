@@ -10,20 +10,20 @@ import org.eclipse.core.runtime.Status;
 /**
  * Log into Eclipse RCP logs (see Logs view) and .logs file
  */
-public class BiobankLogger {
+public class BgcLogger {
 
-    private static Map<String, BiobankLogger> loggers = new HashMap<String, BiobankLogger>();
+    private static Map<String, BgcLogger> loggers = new HashMap<String, BgcLogger>();
 
     private String name;
 
-    public BiobankLogger(String name) {
+    public BgcLogger(String name) {
         this.name = name;
     }
 
-    public static BiobankLogger getLogger(String name) {
-        BiobankLogger logger = loggers.get(name);
+    public static BgcLogger getLogger(String name) {
+        BgcLogger logger = loggers.get(name);
         if (logger == null) {
-            logger = new BiobankLogger(name);
+            logger = new BgcLogger(name);
             loggers.put(name, logger);
         }
         return logger;
@@ -46,8 +46,8 @@ public class BiobankLogger {
     }
 
     public void addRcpLogStatus(int severity, String message, Throwable e) {
-        ILog rcpLogger = BiobankGuiCommonPlugin.getDefault().getLog();
-        IStatus status = new Status(severity, BiobankGuiCommonPlugin.PLUGIN_ID,
+        ILog rcpLogger = BgcPlugin.getDefault().getLog();
+        IStatus status = new Status(severity, BgcPlugin.PLUGIN_ID,
             name + ": " + message, e);
         rcpLogger.log(status);
     }

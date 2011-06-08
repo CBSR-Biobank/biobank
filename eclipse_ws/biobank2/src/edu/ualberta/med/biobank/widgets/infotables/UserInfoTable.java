@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.dialogs.user.UserEditDialog;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -70,7 +70,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                     selectedUser.setLockedOut(false);
                     reloadCollection(getCollection(), selectedUser);
                 } catch (ApplicationException e) {
-                    BiobankGuiCommonPlugin.openAsyncError(MessageFormat.format(
+                    BgcPlugin.openAsyncError(MessageFormat.format(
                         CANNOT_UNLOCK_USER, new Object[] { userName }), e);
                 }
             }
@@ -162,7 +162,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
         try {
             groups = SessionManager.getAppService().getSecurityGroups(true);
         } catch (ApplicationException e) {
-            BiobankGuiCommonPlugin.openAsyncError(GROUPS_LOADING_ERROR, e);
+            BgcPlugin.openAsyncError(GROUPS_LOADING_ERROR, e);
             return Dialog.CANCEL;
         }
 
@@ -188,7 +188,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                     new Object[] { loginName });
             }
 
-            if (BiobankGuiCommonPlugin.openConfirm(CONFIRM_DELETE_TITLE,
+            if (BgcPlugin.openConfirm(CONFIRM_DELETE_TITLE,
                 message)) {
                 SessionManager.getAppService().deleteUser(loginName);
 
@@ -200,7 +200,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                 return true;
             }
         } catch (ApplicationException e) {
-            BiobankGuiCommonPlugin.openAsyncError(USER_DELETE_ERROR, e);
+            BgcPlugin.openAsyncError(USER_DELETE_ERROR, e);
         }
         return false;
     }

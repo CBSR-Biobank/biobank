@@ -18,16 +18,16 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-public class BiobankText extends BiobankWidget {
+public class BgcBaseText extends BgcBaseWidget {
 
     private Text text;
     private boolean alreadyFocused;
 
-    public BiobankText(Composite parent, int style) {
+    public BgcBaseText(Composite parent, int style) {
         this(parent, style, null);
     }
 
-    public BiobankText(Composite parent, int style, FormToolkit toolkit) {
+    public BgcBaseText(Composite parent, int style, FormToolkit toolkit) {
         super(parent, SWT.NONE);
         this.alreadyFocused = false;
         if (toolkit == null) {

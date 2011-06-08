@@ -9,14 +9,14 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 
-public class ComboAndQuantityWidget extends BiobankWidget {
+public class ComboAndQuantityWidget extends BgcBaseWidget {
 
     private Combo valuesCombo;
 
-    private BiobankText quantitiesText;
+    private BgcBaseText quantitiesText;
 
     public ComboAndQuantityWidget(Composite parent, int style) {
         super(parent, style | SWT.BORDER);
@@ -29,7 +29,7 @@ public class ComboAndQuantityWidget extends BiobankWidget {
         valuesCombo = new Combo(this, SWT.NONE);
         Label l = new Label(this, SWT.NONE);
         l.setText("Quantity:");
-        quantitiesText = new BiobankText(this, SWT.NONE);
+        quantitiesText = new BgcBaseText(this, SWT.NONE);
     }
 
     public void addValues(String[] values) {

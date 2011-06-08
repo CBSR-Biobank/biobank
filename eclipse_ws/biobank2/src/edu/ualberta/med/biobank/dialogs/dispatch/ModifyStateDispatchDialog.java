@@ -9,11 +9,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
-public class ModifyStateDispatchDialog extends BiobankDialog {
+public class ModifyStateDispatchDialog extends BgcBaseDialog {
 
     private static final String TITLE_STATE = "Setting {0} state to specimens in current dispatch";
     private static final String TITLE_COMMENT_ONLY = "Modifying comment of specimens in current dispatch";
@@ -70,7 +70,7 @@ public class ModifyStateDispatchDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.MULTI,
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.MULTI,
             "Comment", null, commentValue, "value",
             new NonEmptyStringValidator("Comment should not be empty"));
     }

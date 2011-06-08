@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.gui.common.widgets.nebula.CDT;
 import edu.ualberta.med.biobank.gui.common.widgets.nebula.CDateTime;
 
-public class DateTimeWidget extends BiobankWidget {
+public class DateTimeWidget extends BgcBaseWidget {
 
     private CDateTime dateEntry;
 

@@ -19,10 +19,10 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
@@ -116,7 +116,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
         setFirstControl(dateWidget);
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
             Messages.getString("ProcessingEvent.field.worksheet.label"), null, //$NON-NLS-1$
             pEvent, ProcessingEventPeer.WORKSHEET.getName(),
             (!pEvent.isNew() && pEvent.getWorksheet() == null) ? null
@@ -141,7 +141,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             activityStatusComboViewer.setSelection(new StructuredSelection(
                 pEvent.getActivityStatus()));
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             Messages.getString("label.comments"), null, pEvent, //$NON-NLS-1$
             ProcessingEventPeer.COMMENT.getName(), null);
     }
@@ -159,7 +159,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         specimenEntryWidget = new SpecimenEntryWidget(client, SWT.NONE,
             toolkit, appService, true);
         specimenEntryWidget
-            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
+            .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
                 @Override
                 public void selectionChanged(MultiSelectEvent event) {
                     setDirty(true);
@@ -222,7 +222,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     break;
                 case PRE_DELETE:
                     if (specimen.getChildSpecimenCollection(false).size() > 0) {
-                        boolean ok = BiobankGuiCommonPlugin
+                        boolean ok = BgcPlugin
                             .openConfirm(
                                 "Parent specimen",
                                 "This specimen is the parent of aliquoted specimen. "

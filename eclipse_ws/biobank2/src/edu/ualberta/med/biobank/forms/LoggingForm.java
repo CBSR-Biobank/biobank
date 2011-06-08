@@ -8,7 +8,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.peer.LogPeer;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.logs.LogQuery;
 import edu.ualberta.med.biobank.views.LoggingView;
 import edu.ualberta.med.biobank.widgets.infotables.LoggingInfoTable;
@@ -17,17 +17,17 @@ public class LoggingForm extends BiobankViewForm {
 
     public static String ID = "edu.ualberta.med.biobank.forms.LoggingForm";
 
-    private BiobankText userLabel;
-    private BiobankText typeLabel;
-    private BiobankText actionLabel;
-    private BiobankText patientNumLabel;
-    private BiobankText inventoryIDLabel;
-    private BiobankText locationLabel;
-    private BiobankText detailsLabel;
-    private BiobankText startDateLabel;
-    private BiobankText endDateLabel;
+    private BgcBaseText userLabel;
+    private BgcBaseText typeLabel;
+    private BgcBaseText actionLabel;
+    private BgcBaseText patientNumLabel;
+    private BgcBaseText inventoryIDLabel;
+    private BgcBaseText locationLabel;
+    private BgcBaseText detailsLabel;
+    private BgcBaseText startDateLabel;
+    private BgcBaseText endDateLabel;
 
-    private BiobankText centerLabel;
+    private BgcBaseText centerLabel;
 
     // private BiobankText containerTypeLabel;
     // private BiobankText containerLabelLabel;

@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
@@ -56,7 +56,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     AbstractSpecimenAdminForm {
 
     private static final String PLATE_VALIDATOR = "plate-validator";
-    private BiobankText plateToScanText;
+    private BgcBaseText plateToScanText;
     protected Button scanButton;
     private String scanButtonTitle;
 
@@ -317,10 +317,10 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected void createPlateToScanField(Composite fieldsComposite) {
         plateToScanLabel = widgetCreator.createLabel(fieldsComposite,
             Messages.getString("linkAssign.plateToScan.label")); //$NON-NLS-1$);
-        plateToScanText = (BiobankText) widgetCreator
+        plateToScanText = (BgcBaseText) widgetCreator
             .createBoundWidget(
                 fieldsComposite,
-                BiobankText.class,
+                BgcBaseText.class,
                 SWT.NONE,
                 plateToScanLabel,
                 new String[0],

@@ -13,12 +13,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 
-public class FileBrowser extends BiobankWidget {
-    private BiobankText textfield;
+public class FileBrowser extends BgcBaseWidget {
+    private BgcBaseText textfield;
     private Button browse;
     private String text;
 
@@ -27,7 +27,7 @@ public class FileBrowser extends BiobankWidget {
         setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         setLayout(new GridLayout(2, true));
         GridData data = new GridData(GridData.FILL_BOTH);
-        textfield = new BiobankText(this, SWT.NONE);
+        textfield = new BgcBaseText(this, SWT.NONE);
         textfield.setEditable(false);
         textfield.setLayoutData(data);
         browse = new Button(this, style);
@@ -62,7 +62,7 @@ public class FileBrowser extends BiobankWidget {
                     contents.append(br.readLine()).append("\n");
                 br.close();
             } catch (Exception e1) {
-                BiobankGuiCommonPlugin.openError("IO Error", "Unable to read file.", e1);
+                BgcPlugin.openError("IO Error", "Unable to read file.", e1);
             }
             setText(contents.toString());
         }

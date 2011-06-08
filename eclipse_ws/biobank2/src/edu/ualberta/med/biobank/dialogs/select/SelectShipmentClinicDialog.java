@@ -17,14 +17,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 
 /**
  * Allows the user to choose the clinic from which the shipment comes from
  */
 
 @Deprecated
-public class SelectShipmentClinicDialog extends BiobankDialog {
+public class SelectShipmentClinicDialog extends BgcBaseDialog {
     private List<CollectionEventWrapper> shipments;
     private ComboViewer comboViewer;
     protected CollectionEventWrapper selectedShipment;

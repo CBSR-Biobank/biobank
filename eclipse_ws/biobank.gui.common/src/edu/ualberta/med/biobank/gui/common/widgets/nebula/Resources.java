@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 class Resources {
 
@@ -84,7 +84,7 @@ class Resources {
         if (img == null || img.isDisposed()) {
             Display display = Display.getDefault();
             display.addListener(SWT.Dispose, disposeListener);
-            img = BiobankGuiCommonPlugin.getDefault().getImageRegistry()
+            img = BgcPlugin.getDefault().getImageRegistry()
                 .get(name);
             images.put(name, img);
         }

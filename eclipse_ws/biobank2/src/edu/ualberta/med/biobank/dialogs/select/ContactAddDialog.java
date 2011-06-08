@@ -10,10 +10,10 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
-public class ContactAddDialog extends BiobankDialog {
+public class ContactAddDialog extends BgcBaseDialog {
 
     private static final String TITLE = "Contact Information";
 
@@ -63,28 +63,28 @@ public class ContactAddDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        Control c = createBoundWidgetWithLabel(contents, BiobankText.class,
+        Control c = createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER, "Name", new String[0], contactWrapper, "name", null);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 250;
         c.setLayoutData(gd);
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             "Title", new String[0], contactWrapper, "title", null);
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             "email", new String[0], contactWrapper, "emailAddress", null);
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             "Mobile #", new String[0], contactWrapper, "mobileNumber", null);
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             "Pager #", new String[0], contactWrapper, "pagerNumber", null);
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             "Office #", new String[0], contactWrapper, "officeNumber", null);
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             "Fax #", new String[0], contactWrapper, "faxNumber", null);
     }
 

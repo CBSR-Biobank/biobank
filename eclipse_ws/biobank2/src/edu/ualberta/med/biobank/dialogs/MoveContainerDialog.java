@@ -8,14 +8,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 
 /**
  * Allows the user to move a container and its contents to a new location
  */
-public class MoveContainerDialog extends BiobankDialog {
+public class MoveContainerDialog extends BgcBaseDialog {
 
     private ContainerWrapper srcContainer;
     private ContainerWrapper dstContainer;
@@ -51,8 +51,8 @@ public class MoveContainerDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        BiobankText bbt = (BiobankText) createBoundWidgetWithLabel(contents,
-            BiobankText.class, SWT.FILL, "Destination Address", null, this,
+        BgcBaseText bbt = (BgcBaseText) createBoundWidgetWithLabel(contents,
+            BgcBaseText.class, SWT.FILL, "Destination Address", null, this,
             "newLabel", new StringLengthValidator(2,
                 "Destination label must be another container "
                     + "(4 characters minimum)."));

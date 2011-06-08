@@ -32,8 +32,8 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
@@ -114,14 +114,14 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                     }
                 }, new BiobankLabelProvider());
 
-            createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+            createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
                 "Waybill", null, shipmentInfo,
                 ShipmentInfoPeer.WAYBILL.getName(), null);
         }
 
         createBoundWidgetWithLabel(
             client,
-            BiobankText.class,
+            BgcBaseText.class,
             SWT.MULTI,
             "Comments",
             null,
@@ -133,7 +133,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     private void createReceiverCombo(Composite client) {
         if (dispatch.isInTransitState()) {
-            BiobankText receiverLabel = createReadOnlyLabelledField(client,
+            BgcBaseText receiverLabel = createReadOnlyLabelledField(client,
                 SWT.NONE, "Receiver");
             setTextValue(receiverLabel, dispatch.getReceiverCenter()
                 .getNameShort());
@@ -153,7 +153,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                         }
                     });
             } catch (ApplicationException e) {
-                BiobankGuiCommonPlugin.openAsyncError("Error",
+                BgcPlugin.openAsyncError("Error",
                     "Unable to retrieve Centers");
             }
         }
@@ -245,12 +245,12 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 reloadSpecimens();
                 break;
             case ERROR:
-                BiobankGuiCommonPlugin.openAsyncError("Invalid specimen", res
+                BgcPlugin.openAsyncError("Invalid specimen", res
                     .getCell().getInformation());
                 break;
             }
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError("Error",
+            BgcPlugin.openAsyncError("Error",
                 "Error adding the specimen", e);
         }
     }

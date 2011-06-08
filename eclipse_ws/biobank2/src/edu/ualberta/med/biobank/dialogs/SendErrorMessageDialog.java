@@ -42,15 +42,15 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.utils.EMailDescriptor;
 
-public class SendErrorMessageDialog extends BiobankDialog {
+public class SendErrorMessageDialog extends BgcBaseDialog {
 
     private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
 
@@ -95,12 +95,12 @@ public class SendErrorMessageDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.NONE,
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.NONE,
             "Title", new String[0], email, "title",
             new NonEmptyStringValidator("Please enter a title"));
 
-        BiobankText descText = (BiobankText) createBoundWidgetWithLabel(
-            contents, BiobankText.class, SWT.MULTI, "Description",
+        BgcBaseText descText = (BgcBaseText) createBoundWidgetWithLabel(
+            contents, BgcBaseText.class, SWT.MULTI, "Description",
             new String[0], email, "description", new NonEmptyStringValidator(
                 "Please enter at least a very small comment"));
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -198,7 +198,7 @@ public class SendErrorMessageDialog extends BiobankDialog {
         try {
             sendMail();
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError("Error sending mail", e);
+            BgcPlugin.openAsyncError("Error sending mail", e);
         }
         super.okPressed();
     }
@@ -248,13 +248,13 @@ public class SendErrorMessageDialog extends BiobankDialog {
                     Transport.send(getEmailMessage(session));
                     monitor.done();
                 } catch (AuthenticationFailedException afe) {
-                    BiobankGuiCommonPlugin.openAsyncError(
+                    BgcPlugin.openAsyncError(
                         "Authentification Error", "Wrong authentification for "
                             + email.getServerUsername());
                     monitor.setCanceled(true);
                     return;
                 } catch (Exception e) {
-                    BiobankGuiCommonPlugin.openAsyncError(
+                    BgcPlugin.openAsyncError(
                         "Error in sending email", e);
                     monitor.setCanceled(true);
                     return;
@@ -316,9 +316,9 @@ public class SendErrorMessageDialog extends BiobankDialog {
         }
     }
 
-    private class AttachmentComposite extends BiobankWidget {
+    private class AttachmentComposite extends BgcBaseWidget {
 
-        private BiobankText attachmentText;
+        private BgcBaseText attachmentText;
 
         private Button browseButton;
 
@@ -339,8 +339,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
             gd.grabExcessHorizontalSpace = true;
             setLayoutData(gd);
 
-            attachmentText = (BiobankText) widgetCreator.createWidget(this,
-                BiobankText.class, SWT.READ_ONLY, null);
+            attachmentText = (BgcBaseText) widgetCreator.createWidget(this,
+                BgcBaseText.class, SWT.READ_ONLY, null);
             browseButton = new Button(this, SWT.PUSH);
             browseButton.setText("Browse");
             browseButton.addSelectionListener(new SelectionAdapter() {

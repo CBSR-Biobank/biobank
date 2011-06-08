@@ -23,8 +23,8 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
 import edu.ualberta.med.biobank.views.CollectionView;
@@ -43,15 +43,15 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     private PatientWrapper patient2;
 
-    private BiobankText study2Text;
+    private BgcBaseText study2Text;
 
     private ClinicVisitInfoTable patient2VisitsTable;
 
-    private BiobankText pnumber2Text;
+    private BgcBaseText pnumber2Text;
 
-    private BiobankText pnumber1Text;
+    private BgcBaseText pnumber1Text;
 
-    private BiobankText study1Text;
+    private BgcBaseText study1Text;
 
     private IObservableValue patientNotNullValue;
 
@@ -125,8 +125,8 @@ public class PatientMergeForm extends BiobankEntryForm {
             "Patient Number");
         pnumber1Text.setText(patient1.getPnumber());
 
-        pnumber2Text = (BiobankText) createLabelledWidget(patientArea2,
-            BiobankText.class, SWT.NONE, "Patient Number");
+        pnumber2Text = (BgcBaseText) createLabelledWidget(patientArea2,
+            BgcBaseText.class, SWT.NONE, "Patient Number");
         pnumber2Text.addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -183,14 +183,14 @@ public class PatientMergeForm extends BiobankEntryForm {
             patient2 = PatientWrapper.getPatient(
                 SessionManager.getAppService(), pnumber);
         } catch (ApplicationException e) {
-            BiobankGuiCommonPlugin
+            BgcPlugin
                 .openAsyncError("Error retrieving patient", e);
             patient2VisitsTable.setCollection(newContents);
             study2Text.setText("");
             return;
         }
         if (patient2 == null) {
-            BiobankGuiCommonPlugin.openAsyncError("Invalid Patient Number",
+            BgcPlugin.openAsyncError("Invalid Patient Number",
                 "Cannot find a patient with that pnumber");
             patient2VisitsTable.setCollection(newContents);
             study2Text.setText("");
@@ -198,7 +198,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         }
 
         if (patient2.equals(patient1)) {
-            BiobankGuiCommonPlugin.openAsyncError("Duplicate Patient Number",
+            BgcPlugin.openAsyncError("Duplicate Patient Number",
                 "Cannot merge a patient with himself");
             patient2VisitsTable.setCollection(newContents);
             return;
@@ -208,7 +208,7 @@ public class PatientMergeForm extends BiobankEntryForm {
 
         if (!patient2.getStudy().equals(patient1.getStudy())) {
             patient2VisitsTable.setCollection(newContents);
-            BiobankGuiCommonPlugin.openAsyncError("Invalid Patient Number",
+            BgcPlugin.openAsyncError("Invalid Patient Number",
                 "Patients from different studies cannot be merged");
         } else {
             patient2VisitsTable.setCollection(patient2
@@ -221,7 +221,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         try {
             patient1.merge(patient2);
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError("Merge failed.", e);
+            BgcPlugin.openAsyncError("Merge failed.", e);
         }
 
         Display.getDefault().syncExec(new Runnable() {
@@ -240,7 +240,7 @@ public class PatientMergeForm extends BiobankEntryForm {
     protected void doBeforeSave() throws Exception {
         canMerge = false;
         if (patient2 != null) {
-            if (BiobankGuiCommonPlugin
+            if (BgcPlugin
                 .openConfirm(
                     "Confirm Merge",
                     "Are you sure you want to merge patient "

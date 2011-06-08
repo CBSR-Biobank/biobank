@@ -45,11 +45,11 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -68,7 +68,7 @@ import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 public abstract class BiobankFormBase extends EditorPart implements
     ISelectionProvider {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(BiobankFormBase.class.getName());
 
     protected BiobankApplicationService appService;
@@ -181,7 +181,7 @@ public abstract class BiobankFormBase extends EditorPart implements
         try {
             init();
         } catch (final RemoteConnectFailureException exp) {
-            BiobankGuiCommonPlugin.openRemoteConnectErrorMessage(exp);
+            BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (Exception e) {
             logger.error("BioBankFormBase.createPartControl Error", e);
         }
@@ -235,9 +235,9 @@ public abstract class BiobankFormBase extends EditorPart implements
                     createFormContent();
                     form.reflow(true);
                 } catch (final RemoteConnectFailureException exp) {
-                    BiobankGuiCommonPlugin.openRemoteConnectErrorMessage(exp);
+                    BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
-                    BiobankGuiCommonPlugin.openError(
+                    BgcPlugin.openError(
                         "BioBankFormBase.createPartControl Error", e);
                 }
             }
@@ -331,39 +331,39 @@ public abstract class BiobankFormBase extends EditorPart implements
         widgetCreator.createWidgetsFromMap(fieldsMap, parent);
     }
 
-    protected BiobankText createReadOnlyLabelledField(Composite parent,
+    protected BgcBaseText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value) {
         return widgetCreator.createReadOnlyLabelledField(parent, widgetOptions,
             fieldLabel, value, false);
     }
 
-    protected BiobankText createReadOnlyLabelledField(Composite parent,
+    protected BgcBaseText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value,
         boolean useBackgroundColor) {
         return widgetCreator.createReadOnlyLabelledField(parent, widgetOptions,
             fieldLabel, value, useBackgroundColor);
     }
 
-    protected BiobankText createReadOnlyLabelledField(Composite parent,
+    protected BgcBaseText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel) {
         return createReadOnlyLabelledField(parent, widgetOptions, fieldLabel,
             null);
     }
 
-    public static void setTextValue(BiobankText label, String value) {
+    public static void setTextValue(BgcBaseText label, String value) {
         if (value != null && !label.isDisposed()) {
             label.setText(value);
         }
     }
 
-    protected BiobankText createReadOnlyWidget(Composite parent,
+    protected BgcBaseText createReadOnlyWidget(Composite parent,
         int widgetOptions, String value) {
-        BiobankText result = (BiobankText) createWidget(parent,
-            BiobankText.class, SWT.READ_ONLY | widgetOptions, value);
+        BgcBaseText result = (BgcBaseText) createWidget(parent,
+            BgcBaseText.class, SWT.READ_ONLY | widgetOptions, value);
         return result;
     }
 
-    public static void setTextValue(BiobankText label, Object value) {
+    public static void setTextValue(BgcBaseText label, Object value) {
         if (value != null) {
             setTextValue(label, value.toString());
         }

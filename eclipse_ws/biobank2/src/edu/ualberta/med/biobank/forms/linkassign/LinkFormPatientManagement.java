@@ -33,9 +33,9 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -44,7 +44,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class LinkFormPatientManagement {
 
     private boolean patientNumberTextModified = false;
-    protected BiobankText patientNumberText;
+    protected BgcBaseText patientNumberText;
     protected ComboViewer viewerCollectionEvents;
 
     // currentPatient
@@ -68,7 +68,7 @@ public class LinkFormPatientManagement {
     private ComboViewer viewerProcessingEvents;
     protected ProcessingEventWrapper currentPEventSelected;
     private Label pEventTextLabel;
-    private BiobankText pEventText;
+    private BgcBaseText pEventText;
     private Button pEventListCheck;
     private static Boolean pEventListCheckSelection = true;
 
@@ -85,8 +85,8 @@ public class LinkFormPatientManagement {
             GridData.VERTICAL_ALIGN_BEGINNING));
         patientValidator = new NonEmptyStringValidator(
             Messages.getString("LinkForm.patientNumber.validationMsg"));//$NON-NLS-1$
-        patientNumberText = (BiobankText) widgetCreator.createBoundWidget(
-            parent, BiobankText.class, SWT.NONE, patientLabel, new String[0],
+        patientNumberText = (BgcBaseText) widgetCreator.createBoundWidget(
+            parent, BgcBaseText.class, SWT.NONE, patientLabel, new String[0],
             new WritableValue("", String.class), patientValidator); //$NON-NLS-1$
         GridData gd = (GridData) patientNumberText.getLayoutData();
         gd.horizontalSpan = 2;
@@ -184,8 +184,8 @@ public class LinkFormPatientManagement {
             Messages.getString("LinkForm.pEvent.date")); //$NON-NLS-1$
         pEventTextLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        pEventText = (BiobankText) widgetCreator.createWidget(compositeFields,
-            BiobankText.class, SWT.NONE, ""); //$NON-NLS-1$
+        pEventText = (BgcBaseText) widgetCreator.createWidget(compositeFields,
+            BgcBaseText.class, SWT.NONE, ""); //$NON-NLS-1$
         pEventText.setEnabled(false);
         GridData gd = (GridData) pEventText.getLayoutData();
         gd.horizontalSpan = 2;
@@ -247,7 +247,7 @@ public class LinkFormPatientManagement {
                     currentPatient.getPnumber()));
             }
         } catch (ApplicationException e) {
-            BiobankGuiCommonPlugin.openError("", e); //$NON-NLS-1$
+            BgcPlugin.openError("", e); //$NON-NLS-1$
         }
         setProcessingEventListFromPatient();
     }
@@ -340,7 +340,7 @@ public class LinkFormPatientManagement {
                             .getLast7DaysProcessingEvents(SessionManager
                                 .getUser().getCurrentWorkingCenter());
                     } catch (ApplicationException e) {
-                        BiobankGuiCommonPlugin
+                        BgcPlugin
                             .openAsyncError(
                                 Messages
                                     .getString("LinkForm.pEvent.retrieve.error.msg"), e); //$NON-NLS-1$
@@ -373,7 +373,7 @@ public class LinkFormPatientManagement {
                     collection = currentPEventSelected
                         .getCollectionEventFromSpecimensAndPatient(currentPatient);
                 } catch (ApplicationException e) {
-                    BiobankGuiCommonPlugin.openAsyncError(Messages
+                    BgcPlugin.openAsyncError(Messages
                         .getString("LinkForm.cEvent.retrieve.error.msg"), e); //$NON-NLS-1$
                 }
                 viewerCollectionEvents.setInput(collection);
@@ -399,7 +399,7 @@ public class LinkFormPatientManagement {
         List<SpecimenWrapper> specs = currentCEventSelected
             .getSourceSpecimenCollectionInProcess(currentPEventSelected, true);
         if (specs.size() == 0) {
-            BiobankGuiCommonPlugin.openAsyncError(Messages
+            BgcPlugin.openAsyncError(Messages
                 .getString("LinkForm.sourceSpecimenInProcess.error.title"), //$NON-NLS-1$
                 Messages
                     .getString("LinkForm.sourceSpecimenInProcess.error.msg")); //$NON-NLS-1$
@@ -423,7 +423,7 @@ public class LinkFormPatientManagement {
             // same patient)
             study.reload();
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError(
+            BgcPlugin.openAsyncError(
                 Messages.getString("LinkForm.study.reload.error.msg"), e); //$NON-NLS-1$
         }
         List<SpecimenTypeWrapper> studiesAliquotedTypes;
@@ -444,7 +444,7 @@ public class LinkFormPatientManagement {
                 .getString("LinkForm.study.unknown.label"); //$NON-NLS-1$
             if (getCurrentPatient() != null)
                 studyNameShort = study.getNameShort();
-            BiobankGuiCommonPlugin.openAsyncError(Messages
+            BgcPlugin.openAsyncError(Messages
                 .getString("LinkForm.aliquotedSpecimenTypes.error.title"), //$NON-NLS-1$
                 Messages.getString("LinkForm.aliquotedSpecimenTypes.error.msg", //$NON-NLS-1$
                     studyNameShort));

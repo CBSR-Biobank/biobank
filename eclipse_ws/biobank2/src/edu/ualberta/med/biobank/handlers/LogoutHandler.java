@@ -8,11 +8,11 @@ import org.eclipse.ui.IWorkbenchPage;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 
 public class LogoutHandler extends AbstractHandler {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(LogoutHandler.class.getName());
 
     @Override

@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -40,8 +40,8 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
@@ -58,7 +58,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerViewForm"; //$NON-NLS-1$
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(ContainerViewForm.class.getName());
 
     private ContainerAdapter containerAdapter;
@@ -67,23 +67,23 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private SpecimenInfoTable specimensWidget;
 
-    private BiobankText siteLabel;
+    private BgcBaseText siteLabel;
 
-    private BiobankText containerLabelLabel;
+    private BgcBaseText containerLabelLabel;
 
-    private BiobankText productBarcodeLabel;
+    private BgcBaseText productBarcodeLabel;
 
-    private BiobankText activityStatusLabel;
+    private BgcBaseText activityStatusLabel;
 
-    private BiobankText commentsLabel;
+    private BgcBaseText commentsLabel;
 
-    private BiobankText containerTypeLabel;
+    private BgcBaseText containerTypeLabel;
 
-    private BiobankText temperatureLabel;
+    private BgcBaseText temperatureLabel;
 
-    private BiobankText rowLabel = null;
+    private BgcBaseText rowLabel = null;
 
-    private BiobankText colLabel;
+    private BgcBaseText colLabel;
 
     private ContainerDisplayWidget containerWidget;
 
@@ -197,7 +197,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             }
         } catch (Exception ex) {
-            BiobankGuiCommonPlugin.openAsyncError(
+            BgcPlugin.openAsyncError(
                 Messages.getString("ContainerViewForm.initCell.error.title"), //$NON-NLS-1$
                 Messages.getString("ContainerViewForm.initCell.error.msg")); //$NON-NLS-1$
             childrenOk = false;
@@ -385,7 +385,7 @@ public class ContainerViewForm extends BiobankViewForm {
                         container.initChildrenWithType(type, positions);
                     } catch (Exception e) {
                         initDone = false;
-                        BiobankGuiCommonPlugin.openAsyncError(
+                        BgcPlugin.openAsyncError(
                             Messages
                                 .getString("ContainerViewForm.visualization.init.error.msg"), //$NON-NLS-1$
                             e);
@@ -403,7 +403,7 @@ public class ContainerViewForm extends BiobankViewForm {
             });
 
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError(Messages
+            BgcPlugin.openAsyncError(Messages
                 .getString("ContainerViewForm.visualization.init.error.msg"), //$NON-NLS-1$
                 e);
             refresh(false, false);
@@ -429,7 +429,7 @@ public class ContainerViewForm extends BiobankViewForm {
                         deleteDones = container.deleteChildrenWithType(type,
                             positions);
                     } catch (Exception ex) {
-                        BiobankGuiCommonPlugin.openAsyncError(
+                        BgcPlugin.openAsyncError(
                             Messages
                                 .getString("ContainerViewForm.visualization.delete.error.msg"), //$NON-NLS-1$
                             ex);
@@ -446,7 +446,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             });
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError(Messages
+            BgcPlugin.openAsyncError(Messages
                 .getString("ContainerViewForm.visualization.delete.error.msg"), //$NON-NLS-1$
                 e);
             refresh(false, false);
@@ -499,9 +499,9 @@ public class ContainerViewForm extends BiobankViewForm {
             }
             containerAdapter.performExpand();
         } catch (BiobankFailedQueryException e) {
-            BiobankGuiCommonPlugin.openAsyncError("error", e);
+            BgcPlugin.openAsyncError("error", e);
         } catch (BiobankCheckException e) {
-            BiobankGuiCommonPlugin.openAsyncError("error", e);
+            BgcPlugin.openAsyncError("error", e);
         }
     }
 

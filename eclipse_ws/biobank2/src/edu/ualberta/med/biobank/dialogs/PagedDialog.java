@@ -6,9 +6,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 
-public abstract class PagedDialog extends BiobankDialog {
+public abstract class PagedDialog extends BgcBaseDialog {
 
     public PagedDialog(Shell parentShell, NewListener listener, boolean addMode) {
         super(parentShell);

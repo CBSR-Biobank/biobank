@@ -23,11 +23,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDragListener;
 import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDropListener;
 
-public class MultiSelectWidget extends BiobankWidget {
+public class MultiSelectWidget extends BgcBaseWidget {
 
     private TreeViewer selTree;
 

@@ -15,21 +15,21 @@ import org.eclipse.swt.widgets.Listener;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
 public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(AbstractDispatchEntryForm.class.getName());
 
     protected DispatchWrapper dispatch;
 
-    protected BiobankEntryFormWidgetListener biobankListener = new BiobankEntryFormWidgetListener() {
+    protected BgcEntryFormWidgetListener biobankListener = new BgcEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
             reloadSpecimens();
@@ -71,7 +71,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
         toolkit.createLabel(addComposite, "Enter inventory ID to add:");
-        final BiobankText newSpecimenText = new BiobankText(addComposite,
+        final BgcBaseText newSpecimenText = new BgcBaseText(addComposite,
             SWT.NONE, toolkit);
         GridData gd = new GridData();
         gd.widthHint = 100;

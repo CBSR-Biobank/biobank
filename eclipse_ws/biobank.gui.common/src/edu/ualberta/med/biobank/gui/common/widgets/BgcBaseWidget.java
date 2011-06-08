@@ -11,9 +11,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-public class BiobankWidget extends Composite {
+public class BgcBaseWidget extends Composite {
 
-    List<BiobankEntryFormWidgetListener> listeners;
+    List<BgcEntryFormWidgetListener> listeners;
 
     public static ControlDecoration createDecorator(Control control,
         String message) {
@@ -26,9 +26,9 @@ public class BiobankWidget extends Composite {
         return controlDecoration;
     }
 
-    public BiobankWidget(Composite parent, int style) {
+    public BgcBaseWidget(Composite parent, int style) {
         super(parent, style); // | SWT.H_SCROLL | SWT.V_SCROLL);
-        listeners = new ArrayList<BiobankEntryFormWidgetListener>();
+        listeners = new ArrayList<BgcEntryFormWidgetListener>();
     }
 
     public void adaptToToolkit(FormToolkit toolkit, boolean paintBorder) {
@@ -50,17 +50,17 @@ public class BiobankWidget extends Composite {
     }
 
     public void addSelectionChangedListener(
-        BiobankEntryFormWidgetListener listener) {
+        BgcEntryFormWidgetListener listener) {
         listeners.add(listener);
     }
 
     public void removeSelectionChangedListener(
-        BiobankEntryFormWidgetListener listener) {
+        BgcEntryFormWidgetListener listener) {
         listeners.remove(listener);
     }
 
     public void notifyListeners(MultiSelectEvent event) {
-        for (BiobankEntryFormWidgetListener listener : listeners) {
+        for (BgcEntryFormWidgetListener listener : listeners) {
             listener.selectionChanged(event);
         }
     }

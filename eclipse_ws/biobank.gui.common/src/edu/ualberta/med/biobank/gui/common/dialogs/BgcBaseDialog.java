@@ -29,12 +29,12 @@ import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
 
-public abstract class BiobankDialog extends TitleAreaDialog {
+public abstract class BgcBaseDialog extends TitleAreaDialog {
 
     protected CommonWidgetCreator widgetCreator;
 
@@ -42,7 +42,7 @@ public abstract class BiobankDialog extends TitleAreaDialog {
 
     protected boolean setupFinished = false;
 
-    public BiobankDialog(Shell parentShell) {
+    public BgcBaseDialog(Shell parentShell) {
         super(parentShell);
         widgetCreator = new CommonWidgetCreator(null);
         widgetCreator.initDataBinding();
@@ -64,8 +64,8 @@ public abstract class BiobankDialog extends TitleAreaDialog {
     }
 
     protected Image getTitleAreaImage() {
-        return BiobankGuiCommonPlugin.getDefault().getImageRegistry()
-            .get(BiobankGuiCommonPlugin.IMG_DIALOGS);
+        return BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_DIALOGS);
     }
 
     protected int getTitleAreaMessageType() {
@@ -108,13 +108,13 @@ public abstract class BiobankDialog extends TitleAreaDialog {
         try {
             createDialogAreaInternal(contents);
         } catch (final RemoteConnectFailureException exp) {
-            BiobankGuiCommonPlugin.openRemoteConnectErrorMessage(exp);
+            BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (final RemoteAccessException exp) {
-            BiobankGuiCommonPlugin.openRemoteAccessErrorMessage(exp);
+            BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (final AccessDeniedException ade) {
-            BiobankGuiCommonPlugin.openAccessDeniedErrorMessage(ade);
+            BgcPlugin.openAccessDeniedErrorMessage(ade);
         } catch (BiobankCheckException bce) {
-            BiobankGuiCommonPlugin.openAsyncError("Save error", bce);
+            BgcPlugin.openAsyncError("Save error", bce);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

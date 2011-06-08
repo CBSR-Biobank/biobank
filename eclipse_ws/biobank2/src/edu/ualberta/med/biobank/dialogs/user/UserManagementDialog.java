@@ -26,13 +26,13 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.widgets.infotables.GroupInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.UserInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class UserManagementDialog extends BiobankDialog {
+public class UserManagementDialog extends BgcBaseDialog {
     private static final String TITLE = "User Management";
     private static final String TITLE_AREA_MESSAGE = "Right-click to modify, delete or unlock users and groups.";
     private UserInfoTable userInfoTable;
@@ -149,7 +149,7 @@ public class UserManagementDialog extends BiobankDialog {
             return SessionManager.getAppService().getSecurityGroups(
                 includeSuperAdmin);
         } catch (ApplicationException e) {
-            BiobankGuiCommonPlugin.openAsyncError("Unable to load groups.", e);
+            BgcPlugin.openAsyncError("Unable to load groups.", e);
         }
         return null;
     }
@@ -160,7 +160,7 @@ public class UserManagementDialog extends BiobankDialog {
                 currentUserList = SessionManager.getAppService()
                     .getSecurityUsers();
             } catch (ApplicationException e) {
-                BiobankGuiCommonPlugin.openAsyncError("Unable to load users.",
+                BgcPlugin.openAsyncError("Unable to load users.",
                     e);
             }
         }
@@ -173,7 +173,7 @@ public class UserManagementDialog extends BiobankDialog {
             .getActiveWorkbenchWindow().getShell(), user, getGroups(true), true);
         int res = dlg.open();
         if (res == Status.OK) {
-            BiobankGuiCommonPlugin.openAsyncInformation(USER_ADDED_TITLE,
+            BgcPlugin.openAsyncInformation(USER_ADDED_TITLE,
                 MessageFormat.format(USER_ADDED_MESSAGE, user.getLogin()));
             getUsers().add(user);
             userInfoTable.reloadCollection(getUsers(), user);
@@ -186,7 +186,7 @@ public class UserManagementDialog extends BiobankDialog {
             .getActiveWorkbenchWindow().getShell(), group, true);
         int res = dlg.open();
         if (res == Status.OK) {
-            BiobankGuiCommonPlugin.openAsyncInformation(GROUP_ADDED_TITLE,
+            BgcPlugin.openAsyncInformation(GROUP_ADDED_TITLE,
                 MessageFormat.format(GROUP_ADDED_MESSAGE, group.getName()));
             groupInfoTable.reloadCollection(getGroups(false), group);
         }

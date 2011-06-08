@@ -24,10 +24,10 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.dialogs.ListAddDialog;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 
-public class PvInfoWidget extends BiobankWidget {
+public class PvInfoWidget extends BgcBaseWidget {
     private Button checkButton;
     private Button addButton;
     private Button removeButton;

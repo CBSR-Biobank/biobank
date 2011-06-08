@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
@@ -26,19 +26,19 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private ClinicStudyInfoTable studiesTable;
 
-    private BiobankText nameLabel;
+    private BgcBaseText nameLabel;
 
-    private BiobankText nameShortLabel;
+    private BgcBaseText nameShortLabel;
 
     private Button hasShipmentsButton;
 
-    private BiobankText activityStatusLabel;
+    private BgcBaseText activityStatusLabel;
 
-    private BiobankText commentLabel;
+    private BgcBaseText commentLabel;
 
-    private BiobankText patientTotal;
+    private BgcBaseText patientTotal;
 
-    private BiobankText ceventTotal;
+    private BgcBaseText ceventTotal;
 
     @Override
     protected void init() throws Exception {

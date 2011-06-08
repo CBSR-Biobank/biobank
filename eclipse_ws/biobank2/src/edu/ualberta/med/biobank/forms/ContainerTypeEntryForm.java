@@ -18,7 +18,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -29,10 +29,10 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
@@ -46,7 +46,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     @SuppressWarnings("unused")
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(ContainerTypeEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm"; //$NON-NLS-1$
@@ -69,7 +69,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private List<ContainerTypeWrapper> availSubContainerTypes;
 
-    private BiobankEntryFormWidgetListener multiSelectListener;
+    private BgcEntryFormWidgetListener multiSelectListener;
 
     private ComboViewer labelingSchemeComboViewer;
 
@@ -85,7 +85,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     public ContainerTypeEntryForm() {
         super();
-        multiSelectListener = new BiobankEntryFormWidgetListener() {
+        multiSelectListener = new BgcEntryFormWidgetListener() {
             @Override
             public void selectionChanged(MultiSelectEvent event) {
                 setDirty(true);
@@ -144,9 +144,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             }
         }
 
-        BiobankText name = (BiobankText) createBoundWidgetWithLabel(
+        BgcBaseText name = (BgcBaseText) createBoundWidgetWithLabel(
             client,
-            BiobankText.class,
+            BgcBaseText.class,
             SWT.NONE,
             Messages.getString("label.name"), //$NON-NLS-1$
             null,
@@ -159,7 +159,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(
             client,
-            BiobankText.class,
+            BgcBaseText.class,
             SWT.NONE,
             Messages.getString("label.nameShort"), //$NON-NLS-1$
             null,
@@ -178,7 +178,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(
             client,
-            BiobankText.class,
+            BgcBaseText.class,
             SWT.NONE,
             Messages.getString("containerType.field.label.rows"), //$NON-NLS-1$
             null,
@@ -189,7 +189,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(
             client,
-            BiobankText.class,
+            BgcBaseText.class,
             SWT.NONE,
             Messages.getString("containerType.field.label.cols"), //$NON-NLS-1$
             null,
@@ -200,7 +200,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(
             client,
-            BiobankText.class,
+            BgcBaseText.class,
             SWT.NONE,
             Messages.getString("containerType.field.label.temperature"), //$NON-NLS-1$
             null,
@@ -227,7 +227,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                         containerType
                             .setChildLabelingSchemeName((String) selectedObject);
                     } catch (Exception e) {
-                        BiobankGuiCommonPlugin.openAsyncError(
+                        BgcPlugin.openAsyncError(
                             Messages
                                 .getString("ContainerTypeEntryForm.scheme.error.msg"), //$NON-NLS-1$
                             e);
@@ -250,7 +250,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             Messages.getString("label.comments"), null, containerType, //$NON-NLS-1$
             ContainerTypePeer.COMMENT.getName(), null);
 

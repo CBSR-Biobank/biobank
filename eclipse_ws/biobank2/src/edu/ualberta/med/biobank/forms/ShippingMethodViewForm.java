@@ -10,7 +10,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ShippingMethodEntryInfoTable;
 
 public class ShippingMethodViewForm extends BiobankFormBase {
@@ -60,7 +60,7 @@ public class ShippingMethodViewForm extends BiobankFormBase {
         if (!SessionManager.canUpdate(ShippingMethodWrapper.class)
             && !SessionManager.canCreate(ShippingMethodWrapper.class)
             && !SessionManager.canDelete(ShippingMethodWrapper.class)) {
-            BiobankGuiCommonPlugin.openAccessDeniedErrorMessage();
+            BgcPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 "Cannot access  Shipping Method editor. Access Denied.");
         }

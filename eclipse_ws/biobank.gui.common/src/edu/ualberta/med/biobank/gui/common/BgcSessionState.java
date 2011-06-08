@@ -6,7 +6,7 @@ import java.util.Map;
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
-public class GuiCommonSessionState extends AbstractSourceProvider {
+public class BgcSessionState extends AbstractSourceProvider {
 
     public final static String SESSION_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.gui.common.sourceprovider.loginState";
 

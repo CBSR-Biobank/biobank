@@ -28,15 +28,15 @@ import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.forms.utils.DispatchTableGroup;
 import edu.ualberta.med.biobank.forms.utils.RequestTableGroup;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankClipboard;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class RequestSpecimensTreeTable extends BiobankWidget {
+public class RequestSpecimensTreeTable extends BgcBaseWidget {
 
     private TreeViewer tv;
 
@@ -215,7 +215,7 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
                     claim(child);
             }
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError("Failed to claim", e);
+            BgcPlugin.openAsyncError("Failed to claim", e);
         }
     }
 
@@ -231,7 +231,7 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
                 try {
                     getSelectedSpecimen().persist();
                 } catch (Exception e) {
-                    BiobankGuiCommonPlugin.openAsyncError("Save Error", e);
+                    BgcPlugin.openAsyncError("Save Error", e);
                 }
                 refresh();
             }

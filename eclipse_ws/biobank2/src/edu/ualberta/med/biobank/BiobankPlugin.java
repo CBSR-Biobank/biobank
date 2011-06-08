@@ -18,7 +18,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.p2.BiobankPolicy;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
@@ -340,7 +340,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
 
     private void registerImage(ImageRegistry registry, String key,
         String fileName) {
-        BiobankGuiCommonPlugin.getDefault().registerImage(registry, key,
+        BgcPlugin.getDefault().registerImage(registry, key,
             fileName);
     }
 
@@ -452,7 +452,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
                 imageKey = (String) object;
             }
         }
-        return BiobankGuiCommonPlugin.getDefault().getImageRegistry()
+        return BgcPlugin.getDefault().getImageRegistry()
             .get(imageKey);
     }
 

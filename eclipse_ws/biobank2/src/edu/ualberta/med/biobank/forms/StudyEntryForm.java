@@ -26,8 +26,8 @@ import edu.ualberta.med.biobank.common.wrappers.GlobalEventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.exception.UserUIException;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
@@ -60,7 +60,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private AliquotedSpecimenEntryInfoTable aliquotedSpecimenEntryTable;
 
-    private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
             setDirty(true);
@@ -116,14 +116,14 @@ public class StudyEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client,
-            BiobankText.class,
+            BgcBaseText.class,
             SWT.NONE,
             Messages.getString("label.name"), null, study, //$NON-NLS-1$
             StudyPeer.NAME.getName(),
             new NonEmptyStringValidator(Messages
                 .getString("StudyEntryForm.name.validator.msg")))); //$NON-NLS-1$
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
             Messages.getString("label.nameShort"), null, study, //$NON-NLS-1$
             StudyPeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 Messages.getString("StudyEntryForm.nameShort.validator.msg"))); //$NON-NLS-1$
@@ -142,7 +142,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             Messages.getString("label.comments"), null, study, //$NON-NLS-1$
             StudyPeer.COMMENT.getName(), null);
 

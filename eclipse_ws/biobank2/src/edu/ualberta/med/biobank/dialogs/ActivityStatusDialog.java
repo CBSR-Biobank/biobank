@@ -7,11 +7,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
-public class ActivityStatusDialog extends BiobankDialog {
+public class ActivityStatusDialog extends BgcBaseDialog {
 
     private static final String TITLE = "Activity Status";
     private static final String MSG_NO_ST_NAME = "Activity status must have a name.";
@@ -49,7 +49,7 @@ public class ActivityStatusDialog extends BiobankDialog {
         content.setLayout(new GridLayout(2, false));
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
+        createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
             "Name", null, activityStatus, "name", new NonEmptyStringValidator(
                 MSG_NO_ST_NAME));
     }

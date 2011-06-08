@@ -24,12 +24,12 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(ApplicationActionBarAdvisor.class.getName());
 
     public static final String VIEW_ID_PARM = "org.eclipse.ui.views.showView.viewId";
@@ -76,7 +76,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                 try {
                     handlerService.executeCommand(commandId, null);
                 } catch (Exception e) {
-                    BiobankGuiCommonPlugin.openAsyncError("Problem with command", e);
+                    BgcPlugin.openAsyncError("Problem with command", e);
                 }
             }
         };
@@ -113,7 +113,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                 try {
                     handlerService.executeCommand(cmd, null);
                 } catch (Exception e) {
-                    BiobankGuiCommonPlugin.openAsyncError("Problem with command", e);
+                    BgcPlugin.openAsyncError("Problem with command", e);
                 }
             }
         };

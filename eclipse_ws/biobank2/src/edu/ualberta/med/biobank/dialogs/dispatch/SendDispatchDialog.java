@@ -13,13 +13,13 @@ import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class SendDispatchDialog extends BiobankDialog {
+public class SendDispatchDialog extends BgcBaseDialog {
 
     private static final String TITLE = "Dispatching specimens";
     private DispatchWrapper shipment;
@@ -67,7 +67,7 @@ public class SendDispatchDialog extends BiobankDialog {
                 }
             }, new BiobankLabelProvider());
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.NONE,
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.NONE,
             "Waybill", null, shipInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
 
         Date date = new Date();

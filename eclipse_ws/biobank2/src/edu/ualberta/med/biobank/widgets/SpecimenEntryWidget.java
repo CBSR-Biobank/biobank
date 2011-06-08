@@ -3,9 +3,9 @@ package edu.ualberta.med.biobank.widgets;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
@@ -45,13 +45,13 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-public class SpecimenEntryWidget extends BiobankWidget {
+public class SpecimenEntryWidget extends BgcBaseWidget {
     private WritableApplicationService appService;
     private List<SpecimenWrapper> specimens;
     private List<SpecimenWrapper> addedOrModifiedSpecimens = new ArrayList<SpecimenWrapper>();
     private List<SpecimenWrapper> removedSpecimens = new ArrayList<SpecimenWrapper>();
     private SpecimenInfoTable specTable;
-    private BiobankText newSpecimenInventoryId;
+    private BgcBaseText newSpecimenInventoryId;
     private boolean editable;
     private Button addButton;
     private IObservableValue hasSpecimens = new WritableValue(Boolean.FALSE,
@@ -92,7 +92,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
             GridData gd = new GridData();
             gd.horizontalSpan = 2;
             label.setLayoutData(gd);
-            newSpecimenInventoryId = new BiobankText(this, SWT.NONE, toolkit);
+            newSpecimenInventoryId = new BgcBaseText(this, SWT.NONE, toolkit);
             newSpecimenInventoryId.addListener(SWT.DefaultSelection,
                 new Listener() {
                     @Override
@@ -146,7 +146,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
                     appService, inventoryId, SessionManager.getUser());
                 addSpecimen(specimen);
             } catch (Exception e) {
-                BiobankGuiCommonPlugin.openAsyncError(
+                BgcPlugin.openAsyncError(
                     "Error while looking up specimen", e);
             }
         }
@@ -155,7 +155,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
     private void addSpecimen(SpecimenWrapper specimen) {
         // TODO: move into a listener?
         if (specimen != null && specimens.contains(specimen)) {
-            BiobankGuiCommonPlugin.openAsyncError("Error", "Specimen "
+            BgcPlugin.openAsyncError("Error", "Specimen "
                 + specimen.getInventoryId()
                 + " has already been added to this list");
             return;
@@ -179,7 +179,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
 
             vetoListenerSupport.notifyListeners(postAdd);
         } catch (VetoException e) {
-            BiobankGuiCommonPlugin.openAsyncError("Error", e.getMessage());
+            BgcPlugin.openAsyncError("Error", e.getMessage());
         }
     }
 
@@ -220,7 +220,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
                             vetoListenerSupport.notifyListeners(postDelete);
                         }
                     } catch (VetoException e) {
-                        BiobankGuiCommonPlugin.openAsyncError("Error",
+                        BgcPlugin.openAsyncError("Error",
                             e.getMessage());
                     }
                 }

@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchViewForm;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
@@ -138,7 +138,7 @@ public class DispatchAdapter extends AdapterBase {
             }
             addEditMenu(menu, "Dispatch");
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError("Error checking permissions",
+            BgcPlugin.openAsyncError("Error checking permissions",
                 e);
         }
     }
@@ -186,13 +186,13 @@ public class DispatchAdapter extends AdapterBase {
         try {
             getWrapper().persist();
         } catch (final RemoteConnectFailureException exp) {
-            BiobankGuiCommonPlugin.openRemoteConnectErrorMessage(exp);
+            BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (final RemoteAccessException exp) {
-            BiobankGuiCommonPlugin.openRemoteAccessErrorMessage(exp);
+            BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (final AccessDeniedException ade) {
-            BiobankGuiCommonPlugin.openAccessDeniedErrorMessage(ade);
+            BgcPlugin.openAccessDeniedErrorMessage(ade);
         } catch (Exception ex) {
-            BiobankGuiCommonPlugin.openAsyncError("Save error", ex);
+            BgcPlugin.openAsyncError("Save error", ex);
         }
         SpecimenTransitView.getCurrent().reload();
     }

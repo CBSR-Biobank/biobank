@@ -55,8 +55,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 
 public class CommonWidgetCreator {
@@ -143,7 +143,7 @@ public class CommonWidgetCreator {
 
         label = createLabel(composite, fieldLabel);
         int gridDataStyle = GridData.VERTICAL_ALIGN_CENTER;
-        if (widgetClass.equals(BiobankText.class)
+        if (widgetClass.equals(BgcBaseText.class)
             && (widgetOptions & SWT.MULTI) != 0) {
             gridDataStyle = GridData.VERTICAL_ALIGN_BEGINNING;
         }
@@ -171,7 +171,7 @@ public class CommonWidgetCreator {
             uvs = new UpdateValueStrategy();
             uvs.setAfterGetValidator(validator);
         }
-        if (widgetClass == BiobankText.class) {
+        if (widgetClass == BgcBaseText.class) {
             return createText(composite, widgetOptions, modelObservableValue,
                 uvs, bindingKey);
         } else if (widgetClass == Combo.class) {
@@ -254,13 +254,13 @@ public class CommonWidgetCreator {
         return combo;
     }
 
-    public BiobankText createText(Composite composite, int widgetOptions,
+    public BgcBaseText createText(Composite composite, int widgetOptions,
         IObservableValue modelObservableValue, UpdateValueStrategy uvs) {
         return createText(composite, widgetOptions, modelObservableValue, uvs,
             null);
     }
 
-    public BiobankText createText(Composite composite, int widgetOptions,
+    public BgcBaseText createText(Composite composite, int widgetOptions,
         IObservableValue modelObservableValue, UpdateValueStrategy uvs,
         String bindingKey) {
         if (widgetOptions == SWT.NONE) {
@@ -272,11 +272,11 @@ public class CommonWidgetCreator {
                 | SWT.WRAP;
         }
 
-        BiobankText text = null;
+        BgcBaseText text = null;
         if (toolkit == null) {
-            text = new BiobankText(composite, widgetOptions);
+            text = new BgcBaseText(composite, widgetOptions);
         } else {
-            text = new BiobankText(composite, widgetOptions, toolkit);
+            text = new BgcBaseText(composite, widgetOptions, toolkit);
         }
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         if ((widgetOptions & SWT.MULTI) != 0) {
@@ -347,7 +347,7 @@ public class CommonWidgetCreator {
         AbstractValidator validator, String bindingKey) {
 
         if (validator != null) {
-            validator.setControlDecoration(BiobankWidget.createDecorator(label,
+            validator.setControlDecoration(BgcBaseWidget.createDecorator(label,
                 validator.getErrorMessage()));
         }
 
@@ -432,7 +432,7 @@ public class CommonWidgetCreator {
         if (dbc != null && fieldLabel != null) {
             NonEmptyStringValidator validator = new NonEmptyStringValidator(
                 errorMessage);
-            validator.setControlDecoration(BiobankWidget.createDecorator(
+            validator.setControlDecoration(BgcBaseWidget.createDecorator(
                 fieldLabel, errorMessage));
             UpdateValueStrategy uvs = new UpdateValueStrategy();
             uvs.setAfterGetValidator(validator);
@@ -541,7 +541,7 @@ public class CommonWidgetCreator {
         if (modelObservableValue != null) {
             UpdateValueStrategy uvs = null;
             if (validator != null) {
-                validator.setControlDecoration(BiobankWidget.createDecorator(
+                validator.setControlDecoration(BgcBaseWidget.createDecorator(
                     label, validator.getErrorMessage()));
                 uvs = new UpdateValueStrategy();
                 uvs.setAfterConvertValidator(validator);
@@ -687,11 +687,11 @@ public class CommonWidgetCreator {
 
     public Control createWidget(Composite parent, Class<?> widgetClass,
         int widgetOptions, String value) {
-        if (widgetClass == BiobankText.class) {
+        if (widgetClass == BgcBaseText.class) {
             if (widgetOptions == SWT.NONE) {
                 widgetOptions = SWT.SINGLE;
             }
-            BiobankText field = createText(parent, widgetOptions | SWT.LEFT,
+            BgcBaseText field = createText(parent, widgetOptions | SWT.LEFT,
                 null, null);
             if (value != null) {
                 field.setText(value);
@@ -738,32 +738,32 @@ public class CommonWidgetCreator {
         showWidget(widget, false);
     }
 
-    public BiobankText createReadOnlyLabelledField(Composite parent,
+    public BgcBaseText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value,
         boolean useBackgroundColor) {
-        BiobankText widget = (BiobankText) createLabelledWidget(parent,
-            BiobankText.class, SWT.READ_ONLY | widgetOptions, fieldLabel, value);
+        BgcBaseText widget = (BgcBaseText) createLabelledWidget(parent,
+            BgcBaseText.class, SWT.READ_ONLY | widgetOptions, fieldLabel, value);
         if (useBackgroundColor)
             widget.setBackground(READ_ONLY_TEXT_BGR);
         return widget;
     }
 
-    public BiobankText createReadOnlyField(Composite parent, int widgetOptions,
+    public BgcBaseText createReadOnlyField(Composite parent, int widgetOptions,
         String value, boolean useBackgroundColor) {
-        BiobankText widget = (BiobankText) createWidget(parent,
-            BiobankText.class, SWT.READ_ONLY | widgetOptions, value);
+        BgcBaseText widget = (BgcBaseText) createWidget(parent,
+            BgcBaseText.class, SWT.READ_ONLY | widgetOptions, value);
         if (useBackgroundColor)
             widget.setBackground(READ_ONLY_TEXT_BGR);
         return widget;
     }
 
-    protected BiobankText createReadOnlyLabelledField(Composite parent,
+    protected BgcBaseText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value) {
         return createReadOnlyLabelledField(parent, widgetOptions, fieldLabel,
             value, false);
     }
 
-    public BiobankText createReadOnlyLabelledField(Composite parent,
+    public BgcBaseText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel) {
         return createReadOnlyLabelledField(parent, widgetOptions, fieldLabel,
             null);

@@ -14,7 +14,7 @@ import org.eclipse.ui.PartInitException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.validators.PostalCodeValidator;
 
 public abstract class AddressEntryFormCommon extends BiobankEntryForm {
@@ -25,15 +25,15 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
     public static final Map<String, FieldInfo> ADDRESS_FIELDS;
     static {
         Map<String, FieldInfo> aMap = new LinkedHashMap<String, FieldInfo>();
-        aMap.put("street1", new FieldInfo("Street 1", BiobankText.class,
+        aMap.put("street1", new FieldInfo("Street 1", BgcBaseText.class,
             SWT.NONE, null, null, null));
-        aMap.put("street2", new FieldInfo("Street 2", BiobankText.class,
+        aMap.put("street2", new FieldInfo("Street 2", BgcBaseText.class,
             SWT.NONE, null, null, null));
-        aMap.put("city", new FieldInfo("City", BiobankText.class, SWT.NONE,
+        aMap.put("city", new FieldInfo("City", BgcBaseText.class, SWT.NONE,
             null, NonEmptyStringValidator.class, "Enter a city"));
         aMap.put("province", new FieldInfo("Province", Combo.class, SWT.NONE,
             FormConstants.PROVINCES, null, null));
-        aMap.put("postalCode", new FieldInfo("Postal Code", BiobankText.class,
+        aMap.put("postalCode", new FieldInfo("Postal Code", BgcBaseText.class,
             SWT.NONE, null, PostalCodeValidator.class, "Invalid postal code"));
         ADDRESS_FIELDS = Collections.unmodifiableMap(aMap);
     };

@@ -11,9 +11,9 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
-import edu.ualberta.med.biobank.gui.common.GuiCommonSessionState;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcSessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.widgets.trees.AdapterTreeWidget;
@@ -25,23 +25,23 @@ public abstract class AbstractViewWithAdapterTree extends
 
     protected RootNode rootNode;
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(AbstractViewWithAdapterTree.class.getName());
 
     protected AbstractViewWithAdapterTree() {
-        BiobankGuiCommonPlugin.getSessionStateSourceProvider()
+        BgcPlugin.getSessionStateSourceProvider()
             .addSourceProviderListener(new ISourceProviderListener() {
                 @Override
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
                     if (sourceName
-                        .equals(GuiCommonSessionState.SESSION_STATE_SOURCE_NAME)) {
+                        .equals(BgcSessionState.SESSION_STATE_SOURCE_NAME)) {
                         if (sourceValue != null) {
                             if (sourceValue
-                                .equals(GuiCommonSessionState.LOGGED_IN))
+                                .equals(BgcSessionState.LOGGED_IN))
                                 reload();
                             else if (sourceValue
-                                .equals(GuiCommonSessionState.LOGGED_OUT))
+                                .equals(BgcSessionState.LOGGED_OUT))
                                 clear();
                         }
                     }

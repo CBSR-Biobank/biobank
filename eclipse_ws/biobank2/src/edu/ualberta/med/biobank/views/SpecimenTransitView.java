@@ -14,14 +14,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
@@ -38,7 +38,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     public static final String ID = "edu.ualberta.med.biobank.views.SpecimenTransitView";
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(SpecimenTransitView.class.getName());
 
     private Button radioWaybill;
@@ -190,13 +190,13 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                     msg += " for date "
                         + DateFormatter.formatAsDate(dateWidget.getDate());
                 }
-                BiobankGuiCommonPlugin.openMessage("Dispatch not found", msg);
+                BgcPlugin.openMessage("Dispatch not found", msg);
             } else {
                 showSearchedObjectsInTree(searchedObject, true);
                 getTreeViewer().expandToLevel(searchedNode, 2);
             }
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openError("Search error", e);
+            BgcPlugin.openError("Search error", e);
         }
     }
 
@@ -244,7 +244,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             List<AdapterBase> nodeRes = rootNode.search(searchedObjects.get(0));
             nodeRes.get(0).performDoubleClick();
         } else
-            BiobankGuiCommonPlugin.openMessage("Shipments", searchedObjects.size()
+            BgcPlugin.openMessage("Shipments", searchedObjects.size()
                 + " found.");
     }
 
