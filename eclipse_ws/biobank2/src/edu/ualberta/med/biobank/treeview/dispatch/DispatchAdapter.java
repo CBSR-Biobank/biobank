@@ -79,7 +79,8 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public boolean isDeletable() {
-        if (SessionManager.getUser().getCurrentWorkingCenter() != null)
+        if (SessionManager.getInstance().isConnected()
+            && SessionManager.getUser().getCurrentWorkingCenter() != null)
             return SessionManager.getUser().getCurrentWorkingCenter()
                 .equals(getWrapper().getSenderCenter())
                 && getWrapper().canDelete(SessionManager.getUser())

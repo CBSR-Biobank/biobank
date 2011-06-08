@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
@@ -140,8 +139,12 @@ public class SpecimenEntryWidget extends BiobankWidget {
         String inventoryId = newSpecimenInventoryId.getText().trim();
         if (!inventoryId.isEmpty()) {
             try {
+                // FIXME related to issue #1198 : should call this method with
+                // the current user, but can be a problem in dispatch. What
+                // security modification should be made ? Should we check that
+                // anyway ?
                 SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
-                    appService, inventoryId, SessionManager.getUser());
+                    appService, inventoryId, null);
                 addSpecimen(specimen);
             } catch (Exception e) {
                 BiobankGuiCommonPlugin.openAsyncError(
