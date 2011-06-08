@@ -1,6 +1,13 @@
 package edu.ualberta.med.biobank.gui.common;
 
+import java.net.URL;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -12,6 +19,8 @@ import org.osgi.framework.BundleContext;
  * The activator class controls the plug-in life cycle
  */
 public class BiobankGuiCommonPlugin extends AbstractUIPlugin {
+
+    public static final String IMG_DIALOGS = "dialogs";
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(BiobankGuiCommonPlugin.class.getName());
@@ -26,6 +35,25 @@ public class BiobankGuiCommonPlugin extends AbstractUIPlugin {
      * The constructor
      */
     public BiobankGuiCommonPlugin() {
+    }
+
+    @Override
+    protected void initializeImageRegistry(ImageRegistry registry) {
+        registerImage(registry, IMG_DIALOGS, "dialogs.png");
+    }
+
+    public void registerImage(ImageRegistry registry, String key,
+        String fileName) {
+        try {
+            IPath path = new Path("icons/" + fileName);
+            URL url = FileLocator.find(getBundle(), path, null);
+            if (url != null) {
+                ImageDescriptor desc = ImageDescriptor.createFromURL(url);
+                registry.put(key, desc);
+            }
+        } catch (Exception e) {
+            logger.error("Error registering an image", e);
+        }
     }
 
     /*

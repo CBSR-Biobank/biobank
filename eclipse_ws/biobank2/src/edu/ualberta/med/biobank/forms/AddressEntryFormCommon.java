@@ -12,9 +12,10 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
 import edu.ualberta.med.biobank.validators.PostalCodeValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public abstract class AddressEntryFormCommon extends BiobankEntryForm {
 

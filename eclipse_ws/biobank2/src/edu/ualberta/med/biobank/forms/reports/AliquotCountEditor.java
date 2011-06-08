@@ -6,7 +6,7 @@ import java.util.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 
 public class AliquotCountEditor extends ReportsEditor {
 

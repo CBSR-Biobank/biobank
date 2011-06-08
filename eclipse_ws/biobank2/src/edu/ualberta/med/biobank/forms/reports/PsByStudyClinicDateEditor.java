@@ -10,7 +10,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.util.DateGroup;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class PsByStudyClinicDateEditor extends ReportsEditor {
 
@@ -30,8 +31,10 @@ public class PsByStudyClinicDateEditor extends ReportsEditor {
 
     @Override
     protected void createOptionSection(Composite parent) {
-        dateRangeCombo = widgetCreator.createComboViewer(parent, "Group By",
-            Arrays.asList(DateGroup.values()), null);
+        dateRangeCombo = widgetCreator
+            .createComboViewer(parent, "Group By",
+                Arrays.asList(DateGroup.values()), null,
+                new BiobankLabelProvider());
         dateRangeCombo.getCombo().select(0);
         start = widgetCreator.createDateTimeWidget(parent,
             "Start Date (Linked)", null, null, null, SWT.DATE);

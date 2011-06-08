@@ -8,9 +8,9 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.peer.LogPeer;
+import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
 import edu.ualberta.med.biobank.logs.LogQuery;
 import edu.ualberta.med.biobank.views.LoggingView;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.LoggingInfoTable;
 
 public class LoggingForm extends BiobankViewForm {

@@ -12,7 +12,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
@@ -20,11 +19,12 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class StudyAliquotedSpecimenDialog extends PagedDialog {
 
@@ -125,7 +125,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
                     newAliquotedSpecimen
                         .setSpecimenType((SpecimenTypeWrapper) selectedObject);
                 }
-            });
+            }, new BiobankLabelProvider());
         specimenTypeComboViewer.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {
@@ -150,7 +150,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
                             "Error setting activity status", e);
                     }
                 }
-            });
+            }, new BiobankLabelProvider());
 
         volume = (BiobankText) createBoundWidgetWithLabel(contents,
             BiobankText.class, SWT.BORDER,

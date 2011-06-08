@@ -5,6 +5,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
 
 public abstract class AddressViewFormCommon extends BiobankViewForm {
 

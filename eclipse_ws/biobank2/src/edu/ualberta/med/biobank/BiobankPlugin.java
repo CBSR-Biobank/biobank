@@ -1,12 +1,8 @@
 package edu.ualberta.med.biobank;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.p2.ui.Policy;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -22,7 +18,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.p2.BiobankPolicy;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
@@ -150,7 +146,6 @@ public class BiobankPlugin extends AbstractUIPlugin {
     public static final String IMG_PROCESSING_EVENT = "processingEvent";
     public static final String IMG_CHECK = "check";
     public static final String IMG_UNCHECK = "uncheck";
-    public static final String IMG_DIALOGS = "dialogs";
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -227,9 +222,6 @@ public class BiobankPlugin extends AbstractUIPlugin {
 
     public static final String BARCODES_FILE = BiobankPlugin.class.getPackage()
         .getName() + ".barcode";
-
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(BiobankPlugin.class.getName());
 
     // The shared instance
     private static BiobankPlugin plugin;
@@ -344,21 +336,12 @@ public class BiobankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_SAVE_AS_NEW, "application_form_add.png");
         registerImage(registry, IMG_CHECK, "checked.gif");
         registerImage(registry, IMG_UNCHECK, "unchecked.gif");
-        registerImage(registry, IMG_DIALOGS, "dialogs.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,
         String fileName) {
-        try {
-            IPath path = new Path("icons/" + fileName);
-            URL url = FileLocator.find(getBundle(), path, null);
-            if (url != null) {
-                ImageDescriptor desc = ImageDescriptor.createFromURL(url);
-                registry.put(key, desc);
-            }
-        } catch (Exception e) {
-            logger.error("Error registering an image", e);
-        }
+        BiobankGuiCommonPlugin.getDefault().registerImage(registry, key,
+            fileName);
     }
 
     /*
@@ -469,7 +452,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
                 imageKey = (String) object;
             }
         }
-        return BiobankPlugin.getDefault().getImageRegistry().get(imageKey);
+        return BiobankGuiCommonPlugin.getDefault().getImageRegistry()
+            .get(imageKey);
     }
 
     public static ImageDescriptor getImageDescriptor(String key) {

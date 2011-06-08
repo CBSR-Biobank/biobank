@@ -28,6 +28,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
 
 public class ExportErrorsLogsDialog extends BiobankDialog {
 

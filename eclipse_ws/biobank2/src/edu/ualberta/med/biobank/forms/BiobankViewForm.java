@@ -21,9 +21,10 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
+import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 
 /**
  * The base class for all BioBank Java Client view forms. The forms are usually

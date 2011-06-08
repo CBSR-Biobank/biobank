@@ -12,8 +12,9 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class WorkingCenterSelectDialog extends BiobankDialog {
 
@@ -63,7 +64,7 @@ public class WorkingCenterSelectDialog extends BiobankDialog {
                     else
                         currentCenter = null;
                 }
-            });
+            }, new BiobankLabelProvider());
     }
 
     @Override

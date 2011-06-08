@@ -13,7 +13,9 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SpecimenOriginSelectDialog extends BiobankDialog {
     private SpecimenWrapper specimen;
@@ -60,7 +62,7 @@ public class SpecimenOriginSelectDialog extends BiobankDialog {
                     else
                         selectedCenter = null;
                 }
-            });
+            }, new BiobankLabelProvider());
     }
 
     @Override

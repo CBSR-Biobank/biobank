@@ -915,6 +915,11 @@
     <ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
   </target>
 
+  <target name="clean-all"
+          depends="clean-tests,clean-jars"
+          description="deletes caCORE SDK directory and deletes jars from eclipse projects">
+    <delete dir="${cacore.sdk.dir}" />
+  </target>
 
   <!-- JUnit -->
 

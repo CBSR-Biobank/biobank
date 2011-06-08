@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
 
 public class SelectStudyDialog extends BiobankDialog {

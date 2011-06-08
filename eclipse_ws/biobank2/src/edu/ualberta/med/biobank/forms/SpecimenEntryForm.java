@@ -24,10 +24,10 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
-import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import edu.ualberta.med.biobank.wizards.SelectCollectionEventWizard;
 
 public class SpecimenEntryForm extends BiobankEntryForm {
@@ -150,7 +150,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             BiobankText.class, SWT.READ_ONLY, null, BeansObservables
                 .observeValue(specimen, "collectionEvent.patient.pnumber"),
             null);
-        patientField.setBackground(WidgetCreator.READ_ONLY_TEXT_BGR);
+        patientField.setBackground(CommonWidgetCreator.READ_ONLY_TEXT_BGR);
 
         Button editPatientButton = new Button(c, SWT.NONE);
         editPatientButton.setText("Change Patient");

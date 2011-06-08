@@ -34,10 +34,11 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class LinkFormPatientManagement {
@@ -49,7 +50,7 @@ public class LinkFormPatientManagement {
     // currentPatient
     protected PatientWrapper currentPatient;
 
-    private WidgetCreator widgetCreator;
+    private CommonWidgetCreator widgetCreator;
 
     private AbstractSpecimenAdminForm specimenAdminForm;
 
@@ -71,7 +72,7 @@ public class LinkFormPatientManagement {
     private Button pEventListCheck;
     private static Boolean pEventListCheckSelection = true;
 
-    public LinkFormPatientManagement(WidgetCreator widgetCreator,
+    public LinkFormPatientManagement(CommonWidgetCreator widgetCreator,
         AbstractSpecimenAdminForm specimenAdminForm) {
         this.widgetCreator = widgetCreator;
         this.specimenAdminForm = specimenAdminForm;
@@ -133,7 +134,7 @@ public class LinkFormPatientManagement {
                     currentPEventSelected = (ProcessingEventWrapper) selectedObject;
                     setCollectionEventListFromPEvent();
                 }
-            });
+            }, new BiobankLabelProvider());
         viewerProcessingEvents.setComparator(new ViewerComparator() {
             @Override
             public int compare(Viewer viewer, Object e1, Object e2) {
@@ -205,7 +206,7 @@ public class LinkFormPatientManagement {
                     if (cEventComboCallback != null)
                         cEventComboCallback.selectionChanged();
                 }
-            });
+            }, new BiobankLabelProvider());
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalAlignment = SWT.FILL;

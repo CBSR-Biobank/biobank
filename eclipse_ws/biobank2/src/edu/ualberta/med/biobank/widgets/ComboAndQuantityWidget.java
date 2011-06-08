@@ -9,6 +9,9 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.BiobankWidget;
+
 public class ComboAndQuantityWidget extends BiobankWidget {
 
     private Combo valuesCombo;

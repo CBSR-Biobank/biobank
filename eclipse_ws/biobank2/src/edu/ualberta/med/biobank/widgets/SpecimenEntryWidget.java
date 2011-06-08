@@ -4,6 +4,9 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
@@ -12,7 +15,6 @@ import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
-import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.ArrayList;
@@ -244,7 +246,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
         specTable.addClickListener(listener);
     }
 
-    public void addBinding(WidgetCreator dbc, final String message) {
+    public void addBinding(CommonWidgetCreator dbc, final String message) {
         final ControlDecoration controlDecoration = createDecorator(addButton,
             message);
         WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
