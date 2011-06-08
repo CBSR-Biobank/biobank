@@ -39,12 +39,19 @@ public class PerspectiveSecurity {
         if (map != null) {
             IWorkbenchPart activePart = page.getActivePart();
             boolean usePreviousActivePart = false;
+
+            // hide it. then show it if needed (to be sure the order is still
+            // the same)
+            for (IViewReference ref : page.getViewReferences()) {
+                page.hideView(ref);
+            }
             for (Entry<String, List<SecurityFeature>> entry : map.entrySet()) {
                 boolean show = user.canPerformActions(entry.getValue());
-                updateVisibility(entry.getKey(), show, page);
-                if (show
-                    && entry.getKey().equals(activePart.getClass().getName()))
-                    usePreviousActivePart = true;
+                if (show) {
+                    page.showView(entry.getKey());
+                    if (entry.getKey().equals(activePart.getClass().getName()))
+                        usePreviousActivePart = true;
+                }
             }
 
             // want to display preferred view on top
@@ -62,17 +69,4 @@ public class PerspectiveSecurity {
         }
     }
 
-    private static void updateVisibility(String viewId, boolean show,
-        IWorkbenchPage activePage) throws PartInitException {
-        // hide it. then show it if needed (to be sure the order is still the
-        // same)
-        for (IViewReference ref : activePage.getViewReferences()) {
-            if (viewId.equals(ref.getId())) {
-                activePage.hideView(ref);
-                break;
-            }
-        }
-        if (show)
-            activePage.showView(viewId);
-    }
 }
