@@ -55,6 +55,19 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return patients;
     }
 
+    @Override
+    protected void deleteDependencies() throws Exception {
+        // all specimen should be linked to another origin info. This origin
+        // info center will be the specimen current center.
+        for (SpecimenWrapper spc : getSpecimenCollection()) {
+            OriginInfoWrapper oi = new OriginInfoWrapper(appService);
+            oi.setCenter(spc.getCurrentCenter());
+            oi.persist();
+            spc.setOriginInfo(oi);
+            spc.persist();
+        }
+    }
+
     public void checkAtLeastOneSpecimen() {
         // FIXME don't want that when create from collection event
         // List<SpecimenWrapper> spc = getSpecimenCollection(false);

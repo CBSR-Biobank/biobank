@@ -36,6 +36,10 @@ public class SessionState extends AbstractSourceProvider {
             Boolean.toString((isSuperAdminMode)));
         currentStateMap.put(HAS_WORKING_CENTER_SOURCE_NAME,
             Boolean.toString(hasWorkingCenter));
+        currentStateMap.put(HAS_CLINIC_SHIPMENT_RIGHTS,
+            Boolean.toString(hasClinicShipmentRights));
+        currentStateMap.put(HAS_DISPATCH_RIGHTS,
+            Boolean.toString(hasDispatchRights));
         return currentStateMap;
     }
 

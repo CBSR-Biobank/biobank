@@ -49,10 +49,9 @@ public class SpecimenOriginSelectDialog extends BiobankDialog {
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         List<Object> objectList = new ArrayList<Object>(centers);
-        String noCenterString = "-- no center selection --";
         widgetCreator.createComboViewer(contents,
             Messages.getString("SpecimenOriginSelectDialog.centers.label"), //$NON-NLS-1$
-            objectList, noCenterString, null, new ComboSelectionUpdate() {
+            objectList, null, null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     if (selectedObject instanceof CenterWrapper<?>)

@@ -533,7 +533,7 @@
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank.processingPersedu.ualberta.med.biobank.gui.common.loggedd">
+                  definitionId="biobank.processingPerspectiveSelected">
             </reference>
          </enabledWhen>
       </handler>
