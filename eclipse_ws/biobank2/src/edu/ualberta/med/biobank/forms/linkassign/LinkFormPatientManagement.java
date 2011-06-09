@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
@@ -69,6 +68,7 @@ public class LinkFormPatientManagement {
     private Label pEventTextLabel;
     private BiobankText pEventText;
     private Button pEventListCheck;
+    private boolean settingCollectionEvent;
     private static Boolean pEventListCheckSelection = true;
 
     public LinkFormPatientManagement(WidgetCreator widgetCreator,
@@ -204,7 +204,7 @@ public class LinkFormPatientManagement {
                 @Override
                 public void doSelection(Object selectedObject) {
                     currentCEventSelected = (CollectionEventWrapper) selectedObject;
-                    if (cEventComboCallback != null)
+                    if (cEventComboCallback != null && !settingCollectionEvent)
                         cEventComboCallback.selectionChanged();
                 }
             });
@@ -382,6 +382,7 @@ public class LinkFormPatientManagement {
 
     public void setCollectionEventListFromPEvent() {
         if (viewerCollectionEvents != null) {
+            settingCollectionEvent = true;
             if (currentPEventSelected != null) {
                 List<CollectionEventWrapper> collection = null;
                 try {
@@ -401,6 +402,7 @@ public class LinkFormPatientManagement {
             } else {
                 viewerCollectionEvents.setInput(null);
             }
+            settingCollectionEvent = false;
         }
     }
 
@@ -411,13 +413,22 @@ public class LinkFormPatientManagement {
     protected List<SpecimenWrapper> getParentSpecimenForPEventAndCEvent() {
         if (currentCEventSelected == null)
             return Collections.emptyList();
-        List<SpecimenWrapper> specs = currentCEventSelected
-            .getSourceSpecimenCollectionInProcess(currentPEventSelected, true);
-        if (specs.size() == 0) {
-            BiobankGuiCommonPlugin.openAsyncError(Messages
-                .getString("LinkForm.sourceSpecimenInProcess.error.title"), //$NON-NLS-1$
-                Messages
-                    .getString("LinkForm.sourceSpecimenInProcess.error.msg")); //$NON-NLS-1$
+        List<SpecimenWrapper> specs;
+        try {
+            specs = currentCEventSelected.getSourceSpecimenCollectionInProcess(
+                currentPEventSelected, true);
+            if (specs.size() == 0) {
+                BiobankGuiCommonPlugin
+                    .openAsyncError(
+                        Messages
+                            .getString("LinkForm.sourceSpecimenInProcess.error.title"), //$NON-NLS-1$
+                        Messages
+                            .getString("LinkForm.sourceSpecimenInProcess.error.msg")); //$NON-NLS-1$
+            }
+        } catch (ApplicationException e) {
+            specs = new ArrayList<SpecimenWrapper>();
+            BiobankGuiCommonPlugin.openAsyncError(
+                "Problem retrieveing source specimens", e);
         }
         return specs;
     }
@@ -430,39 +441,36 @@ public class LinkFormPatientManagement {
         List<SpecimenTypeWrapper> authorizedSpecimenTypesInContainer) {
         if (currentPatient == null)
             return Collections.emptyList();
-
         StudyWrapper study = currentPatient.getStudy();
         try {
             // need to reload study to avoid performance problem when using
-            // the same lots of time (like is try different positions for
-            // same patient)
+            // the same lots of time (for instance if try different positions
+            // for same patient)
             study.reload();
         } catch (Exception e) {
             BiobankGuiCommonPlugin.openAsyncError(
                 Messages.getString("LinkForm.study.reload.error.msg"), e); //$NON-NLS-1$
         }
+
         List<SpecimenTypeWrapper> studiesAliquotedTypes;
-        // done at first successful scan
-        studiesAliquotedTypes = new ArrayList<SpecimenTypeWrapper>();
-        for (AliquotedSpecimenWrapper ss : study
-            .getAliquotedSpecimenCollection(true)) {
-            if (ss.getActivityStatus().isActive()) {
-                SpecimenTypeWrapper type = ss.getSpecimenType();
-                if (authorizedSpecimenTypesInContainer == null
-                    || authorizedSpecimenTypesInContainer.contains(type)) {
-                    studiesAliquotedTypes.add(type);
-                }
+        try {
+            studiesAliquotedTypes = study
+                .getAuthorizedActiveAliquotedTypes(authorizedSpecimenTypesInContainer);
+            if (studiesAliquotedTypes.size() == 0) {
+                String studyNameShort = Messages
+                    .getString("LinkForm.study.unknown.label"); //$NON-NLS-1$
+                if (getCurrentPatient() != null)
+                    studyNameShort = study.getNameShort();
+                BiobankGuiCommonPlugin.openAsyncError(Messages
+                    .getString("LinkForm.aliquotedSpecimenTypes.error.title"), //$NON-NLS-1$
+                    Messages.getString(
+                        "LinkForm.aliquotedSpecimenTypes.error.msg", //$NON-NLS-1$
+                        studyNameShort));
             }
-        }
-        if (studiesAliquotedTypes.size() == 0) {
-            String studyNameShort = Messages
-                .getString("LinkForm.study.unknown.label"); //$NON-NLS-1$
-            if (getCurrentPatient() != null)
-                studyNameShort = study.getNameShort();
-            BiobankGuiCommonPlugin.openAsyncError(Messages
-                .getString("LinkForm.aliquotedSpecimenTypes.error.title"), //$NON-NLS-1$
-                Messages.getString("LinkForm.aliquotedSpecimenTypes.error.msg", //$NON-NLS-1$
-                    studyNameShort));
+        } catch (ApplicationException e) {
+            studiesAliquotedTypes = new ArrayList<SpecimenTypeWrapper>();
+            BiobankGuiCommonPlugin.openAsyncError(
+                "Error retrieving available types", e);
         }
         return studiesAliquotedTypes;
     }

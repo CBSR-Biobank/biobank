@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.User;
@@ -309,18 +311,34 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return aliquotedSpecimens;
     }
 
+    private static String SOURCE_SPEC_IN_PROCESS_QRY = "select spec from "
+        + Specimen.class.getName()
+        + " as spec where spec."
+        + Property.concatNames(SpecimenPeer.ORIGINAL_COLLECTION_EVENT,
+            CollectionEventPeer.ID)
+        + " = ? and spec."
+        + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
+            ProcessingEventPeer.ID) + " = ?";
+
     /**
      * source specimen that are in a process event
+     * 
+     * @throws ApplicationException
      */
     public List<SpecimenWrapper> getSourceSpecimenCollectionInProcess(
-        ProcessingEventWrapper pEvent, boolean sort) {
-        List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
-        for (SpecimenWrapper specimen : getOriginalSpecimenCollection(sort)) {
-            if (specimen.getProcessingEvent() != null
-                && specimen.getProcessingEvent().equals(pEvent))
-                specimens.add(specimen);
+        ProcessingEventWrapper pEvent, boolean sort)
+        throws ApplicationException {
+        List<Specimen> raw = appService.query(new HQLCriteria(
+            SOURCE_SPEC_IN_PROCESS_QRY, Arrays.asList(new Object[] { getId(),
+                pEvent.getId() })));
+        if (raw == null) {
+            return new ArrayList<SpecimenWrapper>();
         }
-        return specimens;
+        List<SpecimenWrapper> specs = wrapModelCollection(appService, raw,
+            SpecimenWrapper.class);
+        if (sort)
+            Collections.sort(specs);
+        return specs;
     }
 
     private Map<String, StudyEventAttrWrapper> getStudyEventAttrMap() {

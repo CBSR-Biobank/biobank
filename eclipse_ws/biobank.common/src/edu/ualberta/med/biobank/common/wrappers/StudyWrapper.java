@@ -15,6 +15,8 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
+import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
@@ -25,9 +27,11 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -500,4 +504,36 @@ public class StudyWrapper extends StudyBaseWrapper {
                 getSecuritySpecificCenters());
     }
 
+    private static final String ACTIVE_ALIQUOTED_SPECIMENS_TYPE_QRY = "select aspec."
+        + AliquotedSpecimenPeer.SPECIMEN_TYPE.getName()
+        + " from "
+        + AliquotedSpecimen.class.getName()
+        + " as aspec where aspec."
+        + Property.concatNames(AliquotedSpecimenPeer.STUDY, StudyPeer.ID)
+        + " = ? and aspec."
+        + Property.concatNames(AliquotedSpecimenPeer.ACTIVITY_STATUS,
+            ActivityStatusPeer.NAME)
+        + " = '"
+        + ActivityStatusWrapper.ACTIVE_STATUS_STRING + "'";
+
+    public List<SpecimenTypeWrapper> getAuthorizedActiveAliquotedTypes(
+        List<SpecimenTypeWrapper> authorizedTypes) throws ApplicationException {
+        long start = System.currentTimeMillis();
+        List<SpecimenType> raw = appService.query(new HQLCriteria(
+            ACTIVE_ALIQUOTED_SPECIMENS_TYPE_QRY, Arrays
+                .asList(new Object[] { getId() })));
+        if (raw == null) {
+            return new ArrayList<SpecimenTypeWrapper>();
+        }
+        List<SpecimenTypeWrapper> studiesAliquotedTypes = new ArrayList<SpecimenTypeWrapper>();
+        for (SpecimenType st : raw) {
+            SpecimenTypeWrapper type = new SpecimenTypeWrapper(appService, st);
+            if (authorizedTypes == null || authorizedTypes.contains(type)) {
+                studiesAliquotedTypes.add(type);
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("end1:" + (end - start) / 1000.0);
+        return studiesAliquotedTypes;
+    }
 }
