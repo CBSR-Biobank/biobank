@@ -213,7 +213,7 @@ public abstract class AdapterBase {
             ModelWrapper<?> childModelObject = child.getModelObject();
             if ((childModelObject != null)
                 && childModelObject.getClass().equals(wrapperClass)
-                && child.getId().equals(wrapperId))
+                && child.getId() != null && child.getId().equals(wrapperId))
                 return child;
         }
         return null;
