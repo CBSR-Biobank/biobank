@@ -533,7 +533,7 @@
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank.processingPersedu.ualberta.med.biobank.gui.common.loggedd">
+                  definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
             </reference>
          </enabledWhen>
       </handler>

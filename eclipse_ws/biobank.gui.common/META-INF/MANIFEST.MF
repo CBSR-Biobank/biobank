@@ -22,7 +22,8 @@ Bundle-ClassPath: lib/commons-beanutils-1.8.0.jar,
  lib/iText-2.1.7.jar,
  lib/jasperreports-4.0.2.jar,
  lib/jdt-compiler-3.1.1.jar,
- .
+ .,
+ icons/
 Export-Package: com.lowagie.text,
  com.lowagie.text.exceptions,
  com.lowagie.text.factories,
