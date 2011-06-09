@@ -55,6 +55,10 @@ public class RequestContainerAdapter implements Node {
         children.add(c);
     }
 
+    public void setParent(Node p) {
+        this.parent = p;
+    }
+
     public List<TreeItemAdapter> getSpecimenChildren() {
         List<TreeItemAdapter> specs = new ArrayList<TreeItemAdapter>();
         for (Object child : getChildren()) {

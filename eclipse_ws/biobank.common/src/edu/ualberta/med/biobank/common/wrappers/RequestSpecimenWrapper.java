@@ -36,6 +36,10 @@ public class RequestSpecimenWrapper extends RequestSpecimenBaseWrapper
         return RequestSpecimenState.getState(getState());
     }
 
+    public void setState(RequestSpecimenState state) {
+        setState(state.getId());
+    }
+
     @Override
     public boolean equals(Object object) {
         if (object instanceof RequestSpecimenWrapper && object != null) {

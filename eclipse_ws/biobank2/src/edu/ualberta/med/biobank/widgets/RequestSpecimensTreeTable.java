@@ -11,6 +11,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -41,21 +42,21 @@ import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 public class RequestSpecimensTreeTable extends BiobankWidget {
 
     private TreeViewer tv;
-    private RequestWrapper shipment;
+    private RequestWrapper request;
     protected List<Node> groups;
     private Boolean selecting = false;
 
     @SuppressWarnings("unused")
-    public RequestSpecimensTreeTable(Composite parent, RequestWrapper shipment) {
+    public RequestSpecimensTreeTable(Composite parent, RequestWrapper request) {
         super(parent, SWT.NONE);
 
-        this.shipment = shipment;
+        this.request = request;
 
         setLayout(new GridLayout(1, false));
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;
-        gd.heightHint = 500;
+        gd.heightHint = 400;
         setLayoutData(gd);
 
         tv = new TreeViewer(this, SWT.MULTI | SWT.BORDER);
@@ -86,7 +87,7 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Location");
+        tc.setText("Patient");
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
@@ -106,7 +107,7 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
                 groups = RequestTableGroup
-                    .getGroupsForShipment(RequestSpecimensTreeTable.this.shipment);
+                    .getGroupsForRequest(RequestSpecimensTreeTable.this.request);
             }
 
             @Override
@@ -186,8 +187,11 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
                 for (MenuItem menuItem : menu.getItems()) {
                     menuItem.dispose();
                 }
-                addSetUnavailableMenu(menu);
-                addClaimMenu(menu);
+                if (((Node) ((StructuredSelection) tv.getSelection())
+                    .getFirstElement()).getParent() != null) {
+                    addSetUnavailableMenu(menu);
+                    addClaimMenu(menu);
+                }
             }
         });
         GridData gdtree = new GridData();
@@ -212,13 +216,11 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
         });
     }
 
-    protected void claim(Object ob) {
+    protected void claim(List<RequestSpecimenWrapper> specs) {
         try {
-            if (ob instanceof TreeItemAdapter) {
-                RequestSpecimenWrapper a = (RequestSpecimenWrapper) ((TreeItemAdapter) ob)
-                    .getSpecimen();
-                a.setClaimedBy(SessionManager.getUser().getFirstName());
-                a.persist();
+            for (RequestSpecimenWrapper spec : specs) {
+                spec.setClaimedBy(SessionManager.getUser().getFirstName());
+                spec.persist();
             }
         } catch (Exception e) {
             BiobankPlugin.openAsyncError("Failed to claim", e);
@@ -237,6 +239,7 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
                         .getId());
                     try {
                         spec.persist();
+                        spec.reload();
                     } catch (Exception e) {
                         BiobankPlugin.openAsyncError("Save Error", e);
                     }
@@ -268,7 +271,9 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
     }
 
     public void refresh() {
+        Object[] expanded = tv.getExpandedTreePaths();
         tv.setInput("refresh");
+        tv.setExpandedTreePaths((TreePath[]) expanded);
+        this.notifyListeners(SWT.CHANGED, new Event());
     }
-
 }

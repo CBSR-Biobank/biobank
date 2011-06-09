@@ -24,7 +24,7 @@ public abstract class TableGroup<T extends ModelWrapper<?>> implements Node {
         this.state = state;
         this.alternateLabel = alternateLabel;
         try {
-            createAdapterTree(state.getId(), request);
+            createAdapterTree(state, request);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -42,7 +42,7 @@ public abstract class TableGroup<T extends ModelWrapper<?>> implements Node {
             + " (" + numSpecimens + ")";
     }
 
-    protected abstract void createAdapterTree(Integer state, T request)
+    protected abstract void createAdapterTree(ItemState state, T request)
         throws Exception;
 
     @Override

@@ -36,10 +36,13 @@ public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                 case 1:
                     return item.getReceiverCenter().getNameShort();
                 case 2:
-                    return item.getFormattedPackedAt();
+                    return ((Integer) item.getDispatchSpecimenCollection(false)
+                        .size()).toString();
                 case 3:
-                    return item.getFormattedReceivedAt();
+                    return item.getFormattedPackedAt();
                 case 4:
+                    return item.getFormattedReceivedAt();
+                case 5:
                     return item.getStateDescription();
                 default:
                     return "";

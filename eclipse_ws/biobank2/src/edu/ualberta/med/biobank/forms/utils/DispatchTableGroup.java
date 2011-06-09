@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
+import edu.ualberta.med.biobank.common.util.ItemState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.treeview.Node;
@@ -44,13 +45,12 @@ public class DispatchTableGroup extends TableGroup<DispatchWrapper> {
     }
 
     @Override
-    public void createAdapterTree(Integer state, DispatchWrapper request) {
-        List<DispatchSpecimenWrapper> cache = request.getMap().get(
-            DispatchSpecimenState.getState(state));
+    public void createAdapterTree(ItemState state, DispatchWrapper request) {
+        List<DispatchSpecimenWrapper> cache = request.getMap().get(state);
         List<Node> adapters = new ArrayList<Node>();
 
         if (cache == null) {
-            switch (DispatchSpecimenState.getState(state)) {
+            switch (DispatchSpecimenState.getState(state.getId())) {
             case NONE:
                 cache = request.getNonProcessedDispatchSpecimenCollection();
                 break;

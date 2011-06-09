@@ -5,8 +5,8 @@ package edu.ualberta.med.biobank.common.util;
  * anymore.
  */
 public enum RequestSpecimenState implements ItemState {
-    NONPROCESSED_STATE(0, "Non-Processed"),
-    PROCESSED_STATE(1, "Processed"),
+    AVAILABLE_STATE(0, "Available"),
+    PULLED_STATE(1, "Pulled"),
     UNAVAILABLE_STATE(2, "Unavailable"),
     DISPATCHED_STATE(3, "Dispatched");
 

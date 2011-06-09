@@ -46,7 +46,7 @@ public class RequestWrapper extends RequestBaseWrapper {
     public void flagSpecimens(List<RequestSpecimenWrapper> scanned)
         throws Exception {
         for (RequestSpecimenWrapper a : scanned) {
-            a.setState(RequestSpecimenState.PROCESSED_STATE.getId());
+            a.setState(RequestSpecimenState.PULLED_STATE.getId());
             a.persist();
         }
         cache.put(NON_PROCESSED_SPECIMENS_CACHE_KEY, null);
@@ -61,20 +61,20 @@ public class RequestWrapper extends RequestBaseWrapper {
                 return;
             }
         throw new Exception("Specimen " + text
-            + " is not in the non-processed list.");
+            + " is not a member of this request.");
 
     }
 
     public List<RequestSpecimenWrapper> getNonProcessedRequestSpecimenCollection() {
         return getRequestSpecimenCollectionWithState(
             NON_PROCESSED_SPECIMENS_CACHE_KEY, true,
-            RequestSpecimenState.NONPROCESSED_STATE);
+            RequestSpecimenState.AVAILABLE_STATE);
     }
 
     public List<RequestSpecimenWrapper> getProcessedRequestSpecimenCollection() {
         return getRequestSpecimenCollectionWithState(
             PROCESSED_SPECIMENS_CACHE_KEY, true,
-            RequestSpecimenState.PROCESSED_STATE);
+            RequestSpecimenState.PULLED_STATE);
     }
 
     @SuppressWarnings("unchecked")
