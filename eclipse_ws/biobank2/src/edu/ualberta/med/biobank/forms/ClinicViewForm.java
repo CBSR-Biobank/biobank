@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.ClinicViewForm"; //$NON-NLS-1$
@@ -113,7 +112,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(contactsTable);
     }
 
-    protected void createStudiesSection() throws ApplicationException {
+    protected void createStudiesSection() {
         Composite client = createSectionWithClient(Messages
             .getString("ClinicViewForm.studies.title")); //$NON-NLS-1$
 

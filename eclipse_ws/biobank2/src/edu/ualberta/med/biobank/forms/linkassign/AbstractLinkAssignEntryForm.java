@@ -749,7 +749,7 @@ public abstract class AbstractLinkAssignEntryForm extends
             widgetCreator.addBinding(canSaveSingleBinding);
         else
             widgetCreator.removeBinding(canSaveSingleBinding);
-        canSaveSingleSpecimen.setValue(!isSingleMode);
+        canSaveSingleSpecimen.setValue(true);
     }
 
     /**

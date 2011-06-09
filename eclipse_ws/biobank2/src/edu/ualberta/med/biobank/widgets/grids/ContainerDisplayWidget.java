@@ -211,24 +211,6 @@ public class ContainerDisplayWidget extends Canvas {
         return containerDisplay;
     }
 
-    /**
-     * Get the text to write inside the cell. This default implementation use
-     * the cell position and the containerType.
-     */
-    protected String getDefaultTextForBox(int indexRow, int indexCol) {
-        RowColPos rowcol = new RowColPos();
-        rowcol.row = indexRow;
-        rowcol.col = indexCol;
-        String parentLabel = "";
-        if (displayFullInfoString && container != null) {
-            parentLabel = container.getLabel();
-        }
-        if (containerType != null) {
-            return parentLabel + containerType.getPositionString(rowcol);
-        }
-        return "";
-    }
-
     public Map<RowColPos, ? extends AbstractUICell> getCells() {
         return cells;
     }

@@ -7,7 +7,6 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
@@ -30,8 +29,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     private ClinicWrapper clinic;
 
-    public ClinicStudyInfoTable(Composite parent, ClinicWrapper clinic)
-        throws ApplicationException {
+    public ClinicStudyInfoTable(Composite parent, ClinicWrapper clinic) {
         super(parent, null, HEADINGS, 10);
         this.clinic = clinic;
         setCollection(clinic.getStudyCollection());

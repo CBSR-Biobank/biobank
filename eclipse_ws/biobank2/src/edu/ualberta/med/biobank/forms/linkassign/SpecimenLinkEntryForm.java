@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
@@ -45,6 +44,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.CEventComboCallback;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.PatientTextCallback;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
@@ -92,6 +92,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     private List<SpecimenTypeWrapper> palletSpecimenTypes;
     // source/type hierarchy selected (use rows order)
     private List<SpecimenHierarchy> preSelections;
+
+    protected boolean modifyingType;
 
     @Override
     protected void init() throws Exception {
@@ -332,7 +334,9 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
+                    modifyingType = true;
                     newSinglePositionText.setText("");
+                    modifyingType = false;
                 }
             });
         singleTypesWidget.addBindings();
@@ -370,9 +374,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         newSinglePositionText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                positionTextModified = true;
-                displaySinglePositions(false);
-                canSaveSingleSpecimen.setValue(false);
+                if (!modifyingType) {
+                    positionTextModified = true;
+                    displaySinglePositions(false);
+                    canSaveSingleSpecimen.setValue(false);
+                }
             }
         });
         newSinglePositionText
@@ -391,7 +397,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 ok = false;
             }
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError("Error checking inventoryId", e);
+            BiobankGuiCommonPlugin.openAsyncError("Error checking inventoryId",
+                e);
             ok = false;
         }
         singleTypesWidget.setEnabled(ok);
