@@ -6,8 +6,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
 public class EnterPnumberPage extends BiobankWizardPage {
     public static final String PAGE_NAME = EnterPnumberPage.class
@@ -34,7 +34,7 @@ public class EnterPnumberPage extends BiobankWizardPage {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         getWidgetCreator().createBoundWidgetWithLabel(content,
-            BiobankText.class, SWT.BORDER, "Patient Number", null,
+            BgcBaseText.class, SWT.BORDER, "Patient Number", null,
             PojoObservables.observeValue(this, "pnumber"),
             new NonEmptyStringValidator(PATIENT_NUMBER_REQUIRED));
 

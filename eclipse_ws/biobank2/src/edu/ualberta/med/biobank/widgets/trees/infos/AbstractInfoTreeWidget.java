@@ -26,14 +26,13 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.widgets.BiobankClipboard;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
-public abstract class AbstractInfoTreeWidget<T> extends BiobankWidget {
+public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
 
     class PageInformation {
         int page;
@@ -290,7 +289,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BiobankWidget {
             };
             backgroundThread.start();
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError("Cannot Load Tree Data", e);
+            BgcPlugin.openAsyncError("Cannot Load Tree Data", e);
         }
 
         layout(true, true);
@@ -383,8 +382,8 @@ public abstract class AbstractInfoTreeWidget<T> extends BiobankWidget {
         paginationWidget.setLayout(new GridLayout(5, false));
 
         firstButton = new Button(paginationWidget, SWT.NONE);
-        firstButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_RESULTSET_FIRST));
+        firstButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_RESULTSET_FIRST));
         firstButton.setToolTipText("First page");
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -394,8 +393,8 @@ public abstract class AbstractInfoTreeWidget<T> extends BiobankWidget {
         });
 
         prevButton = new Button(paginationWidget, SWT.NONE);
-        prevButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_RESULTSET_PREV));
+        prevButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_RESULTSET_PREV));
         prevButton.setToolTipText("Previous page");
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -407,8 +406,8 @@ public abstract class AbstractInfoTreeWidget<T> extends BiobankWidget {
         pageLabel = new Label(paginationWidget, SWT.NONE);
 
         nextButton = new Button(paginationWidget, SWT.NONE);
-        nextButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_RESULTSET_NEXT));
+        nextButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_RESULTSET_NEXT));
         nextButton.setToolTipText("Next page");
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -418,8 +417,8 @@ public abstract class AbstractInfoTreeWidget<T> extends BiobankWidget {
         });
 
         lastButton = new Button(paginationWidget, SWT.NONE);
-        lastButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_RESULTSET_LAST));
+        lastButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_RESULTSET_LAST));
         lastButton.setToolTipText("Last page");
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override

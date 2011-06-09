@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.Holder;
 
@@ -50,7 +50,7 @@ public abstract class GuiDataExporter implements DataExporter {
                     try {
                         export(data, labelProvider, monitor);
                     } catch (Exception e) {
-                        BiobankGuiCommonPlugin.openAsyncError("Error Exporting Data", e);
+                        BgcPlugin.openAsyncError("Error Exporting Data", e);
                         return;
                     }
                 }

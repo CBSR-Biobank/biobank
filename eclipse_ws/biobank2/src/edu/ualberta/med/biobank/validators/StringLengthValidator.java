@@ -4,6 +4,8 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
+
 /**
  * This validator will evaluate to false if the string is less than the
  * specified length.

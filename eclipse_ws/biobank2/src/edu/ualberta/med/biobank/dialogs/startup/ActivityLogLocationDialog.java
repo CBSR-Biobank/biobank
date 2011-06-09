@@ -17,11 +17,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.utils.FilePromptUtil;
 
-public class ActivityLogLocationDialog extends BiobankDialog {
+public class ActivityLogLocationDialog extends BgcBaseDialog {
 
     private Text activityLogDirText;
 

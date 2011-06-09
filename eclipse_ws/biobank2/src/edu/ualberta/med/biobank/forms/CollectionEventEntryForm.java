@@ -31,21 +31,21 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 import edu.ualberta.med.biobank.widgets.infotables.entry.CEventSpecimenEntryInfoTable;
-import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -71,7 +71,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private List<FormPvCustomInfo> pvCustomInfoList;
 
-    private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
             setDirty(true);
@@ -81,7 +81,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     private ComboViewer activityStatusComboViewer;
 
     private CEventSpecimenEntryInfoTable specimensTable;
-    private BiobankText visitNumberText;
+    private BgcBaseText visitNumberText;
 
     private DateTimeWidget timeDrawnWidget;
 
@@ -139,9 +139,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             Messages.getString("CollectionEventEntryForm.field.patient.label"),
             patient.getPnumber());
 
-        visitNumberText = (BiobankText) createBoundWidgetWithLabel(
+        visitNumberText = (BgcBaseText) createBoundWidgetWithLabel(
             client,
-            BiobankText.class,
+            BgcBaseText.class,
             SWT.NONE,
             Messages
                 .getString("CollectionEventEntryForm.field.visitNumber.label"),
@@ -181,7 +181,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
         createPvDataSection(client);
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             Messages.getString("label.comments"), null, cevent,
             CollectionEventPeer.COMMENT.getName(), null);
     }
@@ -213,7 +213,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                     }
                 });
         } catch (ApplicationException e) {
-            BiobankGuiCommonPlugin
+            BgcPlugin
                 .openAsyncError(
                     Messages
                         .getString("CollectionEventEntryForm.specimenstypes.error.msg"),
@@ -246,11 +246,11 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         FormPvCustomInfo pvCustomInfo) {
         Control control;
         if (EventAttrTypeEnum.NUMBER == pvCustomInfo.getType()) {
-            control = createBoundWidgetWithLabel(client, BiobankText.class,
+            control = createBoundWidgetWithLabel(client, BgcBaseText.class,
                 SWT.NONE, pvCustomInfo.getLabel(), null, pvCustomInfo, "value",
                 new DoubleNumberValidator("You should select a valid number"));
         } else if (EventAttrTypeEnum.TEXT == pvCustomInfo.getType()) {
-            control = createBoundWidgetWithLabel(client, BiobankText.class,
+            control = createBoundWidgetWithLabel(client, BgcBaseText.class,
                 SWT.NONE, pvCustomInfo.getLabel(), null, pvCustomInfo, "value",
                 null);
         } else if (EventAttrTypeEnum.DATE_TIME == pvCustomInfo.getType()) {

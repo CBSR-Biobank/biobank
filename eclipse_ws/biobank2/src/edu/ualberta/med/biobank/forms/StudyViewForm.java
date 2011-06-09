@@ -14,9 +14,9 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SourceSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
@@ -31,19 +31,19 @@ public class StudyViewForm extends BiobankViewForm {
     private StudyAdapter studyAdapter;
     private StudyWrapper study;
 
-    private BiobankText nameLabel;
-    private BiobankText nameShortLabel;
-    private BiobankText activityStatusLabel;
-    private BiobankText commentLabel;
-    private BiobankText patientTotal;
-    private BiobankText visitTotal;
+    private BgcBaseText nameLabel;
+    private BgcBaseText nameShortLabel;
+    private BgcBaseText activityStatusLabel;
+    private BgcBaseText commentLabel;
+    private BgcBaseText patientTotal;
+    private BgcBaseText visitTotal;
 
     private StudyContactInfoTable contactsTable;
     private AliquotedSpecimenInfoTable aliquotedSpecimenTable;
     private SourceSpecimenInfoTable sourceSpecimenTable;
 
     private static class StudyPvCustomInfo extends PvAttrCustom {
-        public BiobankText wiget;
+        public BgcBaseText wiget;
     }
 
     private List<StudyPvCustomInfo> pvCustomInfoList;

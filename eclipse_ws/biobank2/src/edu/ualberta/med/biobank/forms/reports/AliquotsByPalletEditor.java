@@ -16,10 +16,10 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.TopContainerListWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -27,7 +27,7 @@ public class AliquotsByPalletEditor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.AliquotsByPalletEditor";
 
-    private BiobankText palletLabel;
+    private BgcBaseText palletLabel;
     private TopContainerListWidget topContainers;
     private IObservableValue listStatus = new WritableValue(Boolean.FALSE,
         Boolean.class);
@@ -59,9 +59,9 @@ public class AliquotsByPalletEditor extends ReportsEditor {
         });
     }
 
-    protected BiobankText createCustomText(String labelText, Composite parent) {
-        final BiobankText widget = (BiobankText) widgetCreator
-            .createLabelledWidget(parent, BiobankText.class, SWT.NONE,
+    protected BgcBaseText createCustomText(String labelText, Composite parent) {
+        final BgcBaseText widget = (BgcBaseText) widgetCreator
+            .createLabelledWidget(parent, BgcBaseText.class, SWT.NONE,
                 labelText, "");
         widget.addKeyListener(new KeyListener() {
             @Override
@@ -111,7 +111,7 @@ public class AliquotsByPalletEditor extends ReportsEditor {
                 throw new ApplicationException();
             }
         } catch (ApplicationException e) {
-            BiobankGuiCommonPlugin.openAsyncError("Invalid label",
+            BgcPlugin.openAsyncError("Invalid label",
                 "No bottom-level container labelled " + label);
         }
     }

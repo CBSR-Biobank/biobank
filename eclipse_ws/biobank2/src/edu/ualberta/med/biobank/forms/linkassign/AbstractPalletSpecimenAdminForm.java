@@ -42,8 +42,10 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
@@ -55,7 +57,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     AbstractSpecimenAdminForm {
 
     private static final String PLATE_VALIDATOR = "plate-validator";
-    private BiobankText plateToScanText;
+    private BgcBaseText plateToScanText;
     protected Button scanButton;
     private String scanButtonTitle;
 
@@ -282,8 +284,13 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected void createProfileComboBox(Composite fieldsComposite) {
         Label lbl = widgetCreator.createLabel(fieldsComposite, "Profile");
-        profilesCombo = widgetCreator.createComboViewer(fieldsComposite, lbl,
-            null, null, "Invalid profile selected", false, null, null); //$NON-NLS-1$
+        profilesCombo = widgetCreator
+            .createComboViewer(
+                fieldsComposite,
+                lbl,
+                null,
+                null,
+                "Invalid profile selected", false, null, null, new BiobankLabelProvider()); //$NON-NLS-1$
 
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
@@ -311,10 +318,10 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected void createPlateToScanField(Composite fieldsComposite) {
         plateToScanLabel = widgetCreator.createLabel(fieldsComposite,
             Messages.getString("linkAssign.plateToScan.label")); //$NON-NLS-1$);
-        plateToScanText = (BiobankText) widgetCreator
+        plateToScanText = (BgcBaseText) widgetCreator
             .createBoundWidget(
                 fieldsComposite,
-                BiobankText.class,
+                BgcBaseText.class,
                 SWT.NONE,
                 plateToScanLabel,
                 new String[0],
@@ -488,21 +495,20 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         GridData gd = new GridData();
         gd.verticalAlignment = SWT.TOP;
         scanTubeAloneSwitch.setLayoutData(gd);
-        scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
-            .getImageRegistry().get(BiobankPlugin.IMG_SCAN_EDIT));
+        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_SCAN_EDIT));
         scanTubeAloneSwitch.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDown(MouseEvent e) {
                 if (isScanHasBeenLaunched()) {
                     palletScanManagement.toggleScanTubeAloneMode();
                     if (palletScanManagement.isScanTubeAloneMode()) {
-                        scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
+                        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault()
                             .getImageRegistry()
-                            .get(BiobankPlugin.IMG_SCAN_CLOSE_EDIT));
+                            .get(BgcPlugin.IMG_SCAN_CLOSE_EDIT));
                     } else {
-                        scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
-                            .getImageRegistry()
-                            .get(BiobankPlugin.IMG_SCAN_EDIT));
+                        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault()
+                            .getImageRegistry().get(BgcPlugin.IMG_SCAN_EDIT));
                     }
                 }
             }

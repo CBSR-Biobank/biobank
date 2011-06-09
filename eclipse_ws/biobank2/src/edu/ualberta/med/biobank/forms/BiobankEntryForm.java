@@ -51,20 +51,21 @@ import org.eclipse.ui.services.ISourceProviderService;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
+import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.sourceproviders.ConfirmState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.validators.AbstractValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 /**
  * Base class for data entry forms.
@@ -75,7 +76,7 @@ import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
  */
 public abstract class BiobankEntryForm extends BiobankFormBase {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(BiobankEntryForm.class.getName());
 
     protected String sessionName;
@@ -90,20 +91,20 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     public Action confirmAction;
 
     private static ImageDescriptor printActionImage = ImageDescriptor
-        .createFromImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_PRINTER));
+        .createFromImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_PRINTER));
 
     private static ImageDescriptor resetActionImage = ImageDescriptor
-        .createFromImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_RESET_FORM));
+        .createFromImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_RESET_FORM));
 
     private static ImageDescriptor cancelActionImage = ImageDescriptor
-        .createFromImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_CANCEL_FORM));
+        .createFromImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_CANCEL_FORM));
 
     private static ImageDescriptor confirmActionImage = ImageDescriptor
-        .createFromImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_CONFIRM_FORM));
+        .createFromImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_CONFIRM_FORM));
 
     protected KeyListener keyListener = new KeyAdapter() {
         @Override
@@ -151,7 +152,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         if (!confirmAction.isEnabled()) {
             monitor.setCanceled(true);
             setDirty(true);
-            BiobankGuiCommonPlugin.openAsyncError("Form state",
+            BgcPlugin.openAsyncError("Form state",
                 "Form in invalid state, save failed.");
             return;
         }
@@ -175,8 +176,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                         saveForm();
                         monitor.done();
                     } catch (final RemoteConnectFailureException exp) {
-                        BiobankGuiCommonPlugin
-                            .openRemoteConnectErrorMessage(exp);
+                        BgcPlugin.openRemoteConnectErrorMessage(exp);
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
                             public void run() {
@@ -185,8 +185,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                         });
                         monitor.setCanceled(true);
                     } catch (final RemoteAccessException exp) {
-                        BiobankGuiCommonPlugin
-                            .openRemoteAccessErrorMessage(exp);
+                        BgcPlugin.openRemoteAccessErrorMessage(exp);
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
                             public void run() {
@@ -195,8 +194,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                         });
                         monitor.setCanceled(true);
                     } catch (final AccessDeniedException ade) {
-                        BiobankGuiCommonPlugin
-                            .openAccessDeniedErrorMessage(ade);
+                        BgcPlugin.openAccessDeniedErrorMessage(ade);
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
                             public void run() {
@@ -212,8 +210,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                             }
                         });
                         monitor.setCanceled(true);
-                        BiobankGuiCommonPlugin
-                            .openAsyncError("Save error", bce);
+                        BgcPlugin.openAsyncError("Save error", bce);
                     } catch (BiobankServerException bse) {
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
@@ -222,8 +219,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                             }
                         });
                         monitor.setCanceled(true);
-                        BiobankGuiCommonPlugin
-                            .openAsyncError("Save error", bse);
+                        BgcPlugin.openAsyncError("Save error", bse);
                     } catch (Exception e) {
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
@@ -270,7 +266,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected void checkEditAccess() {
         if (adapter != null && adapter.getModelObject() != null
             && !adapter.getModelObject().canUpdate(SessionManager.getUser())) {
-            BiobankGuiCommonPlugin.openAccessDeniedErrorMessage();
+            BgcPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException("Cannot edit. Access Denied.");
         }
     }
@@ -353,7 +349,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         String fieldLabel, Collection<T> input, T selection,
         String errorMessage, ComboSelectionUpdate csu) {
         return widgetCreator.createComboViewer(parent, fieldLabel, input,
-            selection, errorMessage, csu);
+            selection, errorMessage, csu, new BiobankLabelProvider());
     }
 
     protected DateTimeWidget createDateTimeWidget(Composite client,
@@ -367,7 +363,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
      * Applies a background color to the read only field.
      */
     @Override
-    protected BiobankText createReadOnlyLabelledField(Composite parent,
+    protected BgcBaseText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value) {
         return createReadOnlyLabelledField(parent, widgetOptions, fieldLabel,
             value, true);
@@ -479,8 +475,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                         try {
                             BiobankEntryForm.this.print();
                         } catch (Exception ex) {
-                            BiobankGuiCommonPlugin.openAsyncError(
-                                "Error printing.", ex);
+                            BgcPlugin.openAsyncError("Error printing.", ex);
                         }
                     }
                 });

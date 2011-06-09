@@ -42,7 +42,7 @@
   <property name="req.jars.dir" value="jars" />
   <property name="lib-sources.dir" value="lib-sources" />
   <property name="biobank.gui.common.jar.files"
-            value="commons-beanutils-1.8.0.jar,commons-digester-1.7.jar,commons-javaflow-20060411.jar,iText-2.1.7.jar,jasperreports-4.0.2.jar,jdt-compiler-3.1.1.jar" />
+            value="commons-beanutils-1.8.0.jar,commons-io-1.4.jar,commons-digester-1.7.jar,commons-javaflow-20060411.jar,iText-2.1.7.jar,jasperreports-4.0.2.jar,jdt-compiler-3.1.1.jar" />
   <property name="biobank.jar.files"
             value="DynamicJasper-3.0.14.jar,gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
   <property name="biobank.common.jar.files"
@@ -915,6 +915,11 @@
     <ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
   </target>
 
+  <target name="clean-all"
+          depends="clean-tests,clean-jars"
+          description="deletes caCORE SDK directory and deletes jars from eclipse projects">
+    <delete dir="${cacore.sdk.dir}" />
+  </target>
 
   <!-- JUnit -->
 

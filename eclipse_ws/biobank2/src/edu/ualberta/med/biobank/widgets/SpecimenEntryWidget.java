@@ -1,19 +1,5 @@
 package edu.ualberta.med.biobank.widgets;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
-import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
-import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenEntryInfoTable;
-import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport;
-import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
-import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
-import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,13 +28,28 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-public class SpecimenEntryWidget extends BiobankWidget {
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
+import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport;
+import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
+import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
+public class SpecimenEntryWidget extends BgcBaseWidget {
     private WritableApplicationService appService;
     private List<SpecimenWrapper> specimens;
     private List<SpecimenWrapper> addedOrModifiedSpecimens = new ArrayList<SpecimenWrapper>();
     private List<SpecimenWrapper> removedSpecimens = new ArrayList<SpecimenWrapper>();
     private SpecimenInfoTable specTable;
-    private BiobankText newSpecimenInventoryId;
+    private BgcBaseText newSpecimenInventoryId;
     private boolean editable;
     private Button addButton;
     private IObservableValue hasSpecimens = new WritableValue(Boolean.FALSE,
@@ -89,7 +90,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
             GridData gd = new GridData();
             gd.horizontalSpan = 2;
             label.setLayoutData(gd);
-            newSpecimenInventoryId = new BiobankText(this, SWT.NONE, toolkit);
+            newSpecimenInventoryId = new BgcBaseText(this, SWT.NONE, toolkit);
             newSpecimenInventoryId.addListener(SWT.DefaultSelection,
                 new Listener() {
                     @Override
@@ -100,8 +101,8 @@ public class SpecimenEntryWidget extends BiobankWidget {
                     }
                 });
             addButton = toolkit.createButton(this, "", SWT.PUSH);
-            addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-                .get(BiobankPlugin.IMG_ADD));
+            addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+                .get(BgcPlugin.IMG_ADD));
             addButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -147,17 +148,16 @@ public class SpecimenEntryWidget extends BiobankWidget {
                     appService, inventoryId, null);
                 addSpecimen(specimen);
             } catch (Exception e) {
-                BiobankGuiCommonPlugin.openAsyncError(
-                    "Error while looking up specimen", e);
+                BgcPlugin.openAsyncError("Error while looking up specimen", e);
             }
         }
     }
 
     private void addSpecimen(SpecimenWrapper specimen) {
         if (specimen != null && specimens.contains(specimen)) {
-            BiobankGuiCommonPlugin.openAsyncError("Error", "Specimen "
-                + specimen.getInventoryId()
-                + " has already been added to this list");
+            BgcPlugin.openAsyncError("Error",
+                "Specimen " + specimen.getInventoryId()
+                    + " has already been added to this list");
             return;
         }
 
@@ -179,7 +179,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
 
             vetoListenerSupport.notifyListeners(postAdd);
         } catch (VetoException e) {
-            BiobankGuiCommonPlugin.openAsyncError("Error", e.getMessage());
+            BgcPlugin.openAsyncError("Error", e.getMessage());
         }
     }
 
@@ -220,8 +220,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
                             vetoListenerSupport.notifyListeners(postDelete);
                         }
                     } catch (VetoException e) {
-                        BiobankGuiCommonPlugin.openAsyncError("Error",
-                            e.getMessage());
+                        BgcPlugin.openAsyncError("Error", e.getMessage());
                     }
                 }
             }
@@ -246,7 +245,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
         specTable.addClickListener(listener);
     }
 
-    public void addBinding(WidgetCreator dbc, final String message) {
+    public void addBinding(CommonWidgetCreator dbc, final String message) {
         final ControlDecoration controlDecoration = createDecorator(addButton,
             message);
         WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);

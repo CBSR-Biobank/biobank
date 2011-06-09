@@ -16,13 +16,13 @@ import org.springframework.remoting.RemoteAccessException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 
 public abstract class AbstractSearchedNode extends AdapterBase {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(AbstractSearchedNode.class.getName());
 
     protected List<ModelWrapper<?>> searchedObjects = new ArrayList<ModelWrapper<?>>();
@@ -93,7 +93,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
                 }
             }
         } catch (final RemoteAccessException exp) {
-            BiobankGuiCommonPlugin.openRemoteAccessErrorMessage(exp);
+            BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
             logger.error("Error while refreshing searched elements", e);
         }

@@ -11,14 +11,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.RequestReceiveScanDialog;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.trees.RequestSpecimensTreeTable;
 
 public class RequestEntryForm extends BiobankFormBase {
@@ -48,23 +47,23 @@ public class RequestEntryForm extends BiobankFormBase {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        BiobankText orderNumberLabel = createReadOnlyLabelledField(client,
+        BgcBaseText orderNumberLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Request Number");
         setTextValue(orderNumberLabel, request.getId());
-        BiobankText requestStateLabel = createReadOnlyLabelledField(client,
+        BgcBaseText requestStateLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "State");
         setTextValue(requestStateLabel,
             RequestState.getState(request.getState()));
 
-        BiobankText studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
+        BgcBaseText studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Study");
         setTextValue(studyLabel, request.getStudy());
 
-        BiobankText researchGroupLabel = createReadOnlyLabelledField(client,
+        BgcBaseText researchGroupLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Research Group");
         setTextValue(researchGroupLabel, request.getStudy().getResearchGroup()
             .getNameShort());
-        BiobankText submittedLabel = createReadOnlyLabelledField(client,
+        BgcBaseText submittedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Date Submitted");
         setTextValue(submittedLabel,
             DateFormatter.formatAsDateTime(request.getSubmitted()));
@@ -90,18 +89,18 @@ public class RequestEntryForm extends BiobankFormBase {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
         toolkit.createLabel(addComposite, "Enter inventory ID to add:");
-        final BiobankText newSpecimenText = new BiobankText(addComposite,
+        final BgcBaseText newSpecimenText = new BgcBaseText(addComposite,
             SWT.NONE, toolkit);
         Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
-        addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_ADD));
+        addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 try {
                     request.receiveSpecimen(newSpecimenText.getText());
                 } catch (Exception e1) {
-                    BiobankGuiCommonPlugin.openAsyncError("Save Error", e1);
+                    BgcPlugin.openAsyncError("Save Error", e1);
                 }
                 newSpecimenText.setFocus();
                 newSpecimenText.setText("");
@@ -109,15 +108,15 @@ public class RequestEntryForm extends BiobankFormBase {
                 try {
                     button.setEnabled(request.isAllProcessed());
                 } catch (Exception ex) {
-                    BiobankGuiCommonPlugin.openAsyncError("Query error", ex);
+                    BgcPlugin.openAsyncError("Query error", ex);
                 }
             }
         });
         toolkit.createLabel(addComposite, "or open scan dialog:");
         Button openScanButton = toolkit
             .createButton(addComposite, "", SWT.PUSH);
-        openScanButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
+        openScanButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -138,7 +137,7 @@ public class RequestEntryForm extends BiobankFormBase {
         try {
             button.setEnabled(request.isAllProcessed());
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError("Query error", e);
+            BgcPlugin.openAsyncError("Query error", e);
         }
     }
 

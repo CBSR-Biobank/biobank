@@ -23,9 +23,9 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
-import edu.ualberta.med.biobank.gui.common.GuiCommonSessionState;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcSessionState;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.utils.BindingContextHelper;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(ApplicationWorkbenchWindowAdvisor.class.getName());
 
     private IPropertyChangeListener propertyListener;
@@ -111,7 +111,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
         BindingContextHelper.activateContextInWorkbench(currentPerspectiveId);
 
-        GuiCommonSessionState sessionSourceProvider = BiobankGuiCommonPlugin
+        BgcSessionState sessionSourceProvider = BgcPlugin
             .getSessionStateSourceProvider();
         sessionSourceProvider
             .addSourceProviderListener(new ISourceProviderListener() {
@@ -119,7 +119,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
                     if (sourceValue != null) {
-                        if (sourceValue.equals(GuiCommonSessionState.LOGGED_IN)) {
+                        if (sourceValue.equals(BgcSessionState.LOGGED_IN)) {
                             mainWindowUpdateTitle(SessionManager.getUser());
                             ServerMsgStatusItem.getInstance().setServerName(
                                 new StringBuffer(SessionManager.getUser()
@@ -127,7 +127,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                                     .append(SessionManager.getServer())
                                     .toString());
                         } else if (sourceValue
-                            .equals(GuiCommonSessionState.LOGGED_OUT)) {
+                            .equals(BgcSessionState.LOGGED_OUT)) {
                             mainWindowResetTitle();
                             ServerMsgStatusItem.getInstance().setServerName("");
                         }

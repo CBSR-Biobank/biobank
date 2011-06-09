@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 
@@ -37,7 +37,7 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
 
         if (ts.getFirstElement() instanceof ContainerAdapter) {
             if (ts.size() != 1)
-                BiobankGuiCommonPlugin
+                BgcPlugin
                     .openError("Cannot move multiple container",
                         "You cannot move multiple containers, please drag them one at a time.");
 
@@ -82,7 +82,7 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
                         }
                     }
                 } catch (Exception ex) {
-                    BiobankGuiCommonPlugin.openAsyncError("Error in drag", ex);
+                    BgcPlugin.openAsyncError("Error in drag", ex);
                 }
             }
         }
@@ -130,14 +130,14 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
                         srcContainerAdapter.moveContainer(dstContainer);
                         return;
                     } else {
-                        BiobankGuiCommonPlugin
+                        BgcPlugin
                             .openError(
                                 "Invalid state",
                                 "ERROR: an unexpected state occured in TreeDragDropListener. Please report this.");
 
                     }
                 } catch (Exception ex) {
-                    BiobankGuiCommonPlugin.openAsyncError("Drop error", ex);
+                    BgcPlugin.openAsyncError("Drop error", ex);
                 }
             }
         }

@@ -8,17 +8,18 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 
-public class ScanOneTubeDialog extends BiobankDialog {
+public class ScanOneTubeDialog extends BgcBaseDialog {
 
     private static final String PALLET_TUBE_SCAN = "Pallet tube scan";
     private String scannedValue;
-    private BiobankText valueText;
+    private BgcBaseText valueText;
     private RowColPos position;
     private Map<RowColPos, PalletCell> cells;
 
@@ -63,7 +64,7 @@ public class ScanOneTubeDialog extends BiobankDialog {
         for (PalletCell otherCell : cells.values()) {
             if (otherCell.getValue() != null
                 && otherCell.getValue().equals(scannedValue)) {
-                BiobankGuiCommonPlugin.openAsyncError(
+                BgcPlugin.openAsyncError(
                     "Tube Scan Error",
                     "The value entered already exists in position "
                         + ContainerLabelingSchemeWrapper

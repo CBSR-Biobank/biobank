@@ -38,7 +38,7 @@ public class SampleTypePvCountEditor extends ReportsEditor {
         studyWrappers = StudyWrapper.getAllStudies(SessionManager
             .getAppService());
         ComboViewer combo = widgetCreator.createComboViewer(parent, labelText,
-            studyWrappers, null);
+            studyWrappers, null, new BiobankLabelProvider());
         combo.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {

@@ -6,6 +6,8 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
+
 public class CabinetInventoryIDValidator extends AbstractValidator {
 
     private static final Pattern PATTERN = Pattern.compile("^[a-zA-Z]{6}$");

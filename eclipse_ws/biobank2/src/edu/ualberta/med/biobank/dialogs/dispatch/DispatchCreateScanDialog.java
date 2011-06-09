@@ -27,9 +27,9 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
@@ -37,7 +37,7 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 public class DispatchCreateScanDialog extends
     AbstractScanDialog<DispatchWrapper> {
 
-    private BiobankText palletproductBarcodeText;
+    private BgcBaseText palletproductBarcodeText;
     private NonEmptyStringValidator productBarcodeValidator;
     private String currentProductBarcode;
     private boolean isPalletWithPosition;
@@ -88,8 +88,8 @@ public class DispatchCreateScanDialog extends
             Label palletproductBarcodeLabel = widgetCreator
                 .createLabel(parent, Messages
                     .getString("DispatchCreateScanDialog.productBarcode.label"));//$NON-NLS-1$
-            palletproductBarcodeText = (BiobankText) createBoundWidget(parent,
-                BiobankText.class, SWT.NONE, palletproductBarcodeLabel,
+            palletproductBarcodeText = (BgcBaseText) createBoundWidget(parent,
+                BgcBaseText.class, SWT.NONE, palletproductBarcodeLabel,
                 new String[0], this,
                 "currentProductBarcode", productBarcodeValidator); //$NON-NLS-1$
             palletproductBarcodeText
@@ -136,7 +136,7 @@ public class DispatchCreateScanDialog extends
                         SessionManager.getAppService(), (SiteWrapper) center,
                         currentProductBarcode);
             if (currentPallet == null) {
-                BiobankGuiCommonPlugin
+                BgcPlugin
                     .openAsyncError(
                         Messages
                             .getString("DispatchCreateScanDialog.pallet.search.error.title"), //$NON-NLS-1$

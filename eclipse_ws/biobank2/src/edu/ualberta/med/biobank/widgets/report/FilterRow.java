@@ -28,13 +28,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.common.reports.filters.FilterTypes;
 import edu.ualberta.med.biobank.common.reports.filters.SelectableFilterType;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Entity;
 import edu.ualberta.med.biobank.model.EntityColumn;
 import edu.ualberta.med.biobank.model.EntityFilter;
@@ -379,8 +378,8 @@ class FilterRow extends Composite {
 
         autoButton
             .setToolTipText("Suggest possible values (considers other filters)");
-        autoButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_WAND));
+        autoButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_WAND));
         autoButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -455,7 +454,7 @@ class FilterRow extends Composite {
                 MAX_SUGGESTIONS, 0, MAX_QUERY_TIME);
 
             if (results.size() >= MAX_SUGGESTIONS) {
-                BiobankGuiCommonPlugin.openError("Cannot Suggest Options",
+                BgcPlugin.openError("Cannot Suggest Options",
                     "There are too many possible suggestions to display.");
                 return false;
             }
@@ -463,10 +462,10 @@ class FilterRow extends Composite {
             long end = System.currentTimeMillis();
 
             if ((end - start) / 1000 >= MAX_QUERY_TIME) {
-                BiobankGuiCommonPlugin.openError("Cannot Suggest Options",
+                BgcPlugin.openError("Cannot Suggest Options",
                     "It is taking too long to find suggestions.", e);
             } else {
-                BiobankGuiCommonPlugin.openError("Cannot Suggest Options",
+                BgcPlugin.openError("Cannot Suggest Options",
                     "There was a problem trying to find suggestions.", e);
             }
             return false;
@@ -490,7 +489,7 @@ class FilterRow extends Composite {
         Collections.sort(suggestions);
 
         if (suggestions.isEmpty()) {
-            BiobankGuiCommonPlugin.openError("Cannot Suggest Options",
+            BgcPlugin.openError("Cannot Suggest Options",
                 "There are no possible values to suggest.");
 
             // forget old suggestions, if any

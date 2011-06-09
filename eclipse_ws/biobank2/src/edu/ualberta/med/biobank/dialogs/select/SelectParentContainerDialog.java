@@ -15,13 +15,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 /**
  * Allows the user to select a parent container when more than one is available
  */
 
-public class SelectParentContainerDialog extends BiobankDialog {
+public class SelectParentContainerDialog extends BgcBaseDialog {
     private Collection<ContainerWrapper> containers;
     private ComboViewer comboViewer;
     protected ContainerWrapper selectedContainer;
@@ -56,7 +57,7 @@ public class SelectParentContainerDialog extends BiobankDialog {
 
         comboViewer = getWidgetCreator().createComboViewer(contents,
             "Select parent", containers, null,
-            "A container should be selected", null);
+            "A container should be selected", null, new BiobankLabelProvider());
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {

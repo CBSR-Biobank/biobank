@@ -38,7 +38,8 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.SpecimenHierarchy;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
 
 /**
  * Create widgets to show types selection for specimens on a pallet: one label,
@@ -68,7 +69,7 @@ public class AliquotedSpecimenSelectionWidget {
     private Binding resultBinding;
 
     private Object nextWidget;
-    private WidgetCreator widgetCreator;
+    private CommonWidgetCreator widgetCreator;
     private boolean oneRow;
     private Label sourceLabel;
     private Label resultLabel;
@@ -76,7 +77,7 @@ public class AliquotedSpecimenSelectionWidget {
     private List<SpecimenTypeWrapper> sourceChildTypes = new ArrayList<SpecimenTypeWrapper>();
 
     public AliquotedSpecimenSelectionWidget(Composite parent, Character letter,
-        WidgetCreator widgetCreator, boolean oneRow) {
+        CommonWidgetCreator widgetCreator, boolean oneRow) {
         this.widgetCreator = widgetCreator;
         this.oneRow = oneRow;
         if (letter != null) {
@@ -85,14 +86,14 @@ public class AliquotedSpecimenSelectionWidget {
         }
         if (!oneRow) {
             sourceLabel = widgetCreator.createLabel(parent, "Source specimen");
-            sourceControlDecoration = BiobankWidget
+            sourceControlDecoration = BgcBaseWidget
                 .createDecorator(
                     sourceLabel,
                     Messages
                         .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
         }
         cvSource = widgetCreator.createComboViewerWithoutLabel(parent, null,
-            null);
+            null, new BiobankLabelProvider());
         setComboProperties(cvSource, widgetCreator.getToolkit(), 0);
         cvSource.setLabelProvider(new LabelProvider() {
             @Override
@@ -119,14 +120,14 @@ public class AliquotedSpecimenSelectionWidget {
         if (!oneRow) {
             resultLabel = widgetCreator.createLabel(parent,
                 "Aliquoted specimen type");
-            resultControlDecoration = BiobankWidget
+            resultControlDecoration = BgcBaseWidget
                 .createDecorator(
                     resultLabel,
                     Messages
                         .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
         }
         cvResult = widgetCreator.createComboViewerWithoutLabel(parent, null,
-            null);
+            null, new BiobankLabelProvider());
         setComboProperties(cvResult, widgetCreator.getToolkit(), 1);
         cvResult.setLabelProvider(new LabelProvider() {
             @Override
@@ -149,7 +150,7 @@ public class AliquotedSpecimenSelectionWidget {
             gd.horizontalAlignment = SWT.LEFT;
             textNumber.setLayoutData(gd);
             setNumber(null);
-            rowControlDecoration = BiobankWidget
+            rowControlDecoration = BgcBaseWidget
                 .createDecorator(
                     textNumber,
                     Messages

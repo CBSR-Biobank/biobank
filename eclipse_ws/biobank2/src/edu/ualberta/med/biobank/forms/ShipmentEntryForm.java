@@ -25,20 +25,20 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.SpecimenOriginSelectDialog;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget.ItemAction;
-import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.Event;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -76,7 +76,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private NotNullValidator departedValidator;
 
-    private BiobankText waybillWidget;
+    private BgcBaseText waybillWidget;
 
     private Set<SpecimenWrapper> specimensToPersist = new HashSet<SpecimenWrapper>();
 
@@ -143,8 +143,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             GridData.VERTICAL_ALIGN_BEGINNING));
         waybillValidator = new NonEmptyStringValidator(
             "A waybill should be set");
-        waybillWidget = (BiobankText) createBoundWidget(client,
-            BiobankText.class, SWT.NONE, waybillLabel, new String[0],
+        waybillWidget = (BgcBaseText) createBoundWidget(client,
+            BgcBaseText.class, SWT.NONE, waybillLabel, new String[0],
             shipmentInfo, ShipmentInfoPeer.WAYBILL.getName(), waybillValidator,
             WAYBILL_BINDING);
 
@@ -181,7 +181,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         activateDepartedWidget(shipmentInfo.getShippingMethod() != null
             && shipmentInfo.getShippingMethod().needDate());
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
             "Box Number", null, shipmentInfo,
             ShipmentInfoPeer.BOX_NUMBER.getName(), null);
 
@@ -237,7 +237,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         specimenEntryWidget = new SpecimenEntryWidget(client, SWT.NONE,
             toolkit, appService, true);
         specimenEntryWidget
-            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
+            .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
                 @Override
                 public void selectionChanged(MultiSelectEvent event) {
                     setDirty(true);

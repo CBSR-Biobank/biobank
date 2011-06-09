@@ -15,10 +15,10 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.TopContainerListWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -87,7 +87,8 @@ public class QAAliquotsEditor extends ReportsEditor {
         Collection<SpecimenTypeWrapper> sampleTypeWrappers = SpecimenTypeWrapper
             .getAllSpecimenTypes(SessionManager.getAppService(), true);
         ComboViewer widget = widgetCreator.createComboViewer(parent, labelText,
-            sampleTypeWrappers, null, "No selection", null);
+            sampleTypeWrappers, null, "No selection", null,
+            new BiobankLabelProvider());
         widget.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {
@@ -99,11 +100,11 @@ public class QAAliquotsEditor extends ReportsEditor {
         return widget;
     }
 
-    protected BiobankText createValidatedIntegerText(String labelText,
+    protected BgcBaseText createValidatedIntegerText(String labelText,
         Composite parent) {
         numAliquots = new WritableValue("", String.class);
-        BiobankText widget = (BiobankText) widgetCreator
-            .createBoundWidgetWithLabel(parent, BiobankText.class, SWT.BORDER,
+        BgcBaseText widget = (BgcBaseText) widgetCreator
+            .createBoundWidgetWithLabel(parent, BgcBaseText.class, SWT.BORDER,
                 labelText, new String[0], numAliquots,
                 new IntegerNumberValidator("Enter a valid integer.", false));
         return widget;

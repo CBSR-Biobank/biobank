@@ -14,8 +14,8 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class DateTimeFilterValueWidget implements FilterValueWidget {
     private static final SimpleDateFormat SQL_DATETIME_FORMAT = new SimpleDateFormat(

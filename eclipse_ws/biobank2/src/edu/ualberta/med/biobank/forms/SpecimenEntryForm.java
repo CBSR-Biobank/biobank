@@ -24,10 +24,10 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
-import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import edu.ualberta.med.biobank.wizards.SelectCollectionEventWizard;
 
 public class SpecimenEntryForm extends BiobankEntryForm {
@@ -42,11 +42,11 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private ComboViewer specimenTypeComboViewer;
 
-    private BiobankText volumeField;
+    private BgcBaseText volumeField;
 
-    private BiobankText centerLabel;
+    private BgcBaseText centerLabel;
 
-    private BiobankText patientField;
+    private BgcBaseText patientField;
 
     @Override
     protected void init() throws Exception {
@@ -146,11 +146,11 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         c.setLayout(gl);
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 
-        patientField = (BiobankText) widgetCreator.createBoundWidget(c,
-            BiobankText.class, SWT.READ_ONLY, null, BeansObservables
+        patientField = (BgcBaseText) widgetCreator.createBoundWidget(c,
+            BgcBaseText.class, SWT.READ_ONLY, null, BeansObservables
                 .observeValue(specimen, "collectionEvent.patient.pnumber"),
             null);
-        patientField.setBackground(WidgetCreator.READ_ONLY_TEXT_BGR);
+        patientField.setBackground(CommonWidgetCreator.READ_ONLY_TEXT_BGR);
 
         Button editPatientButton = new Button(c, SWT.NONE);
         editPatientButton.setText("Change Patient");
@@ -197,7 +197,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.WRAP
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.WRAP
             | SWT.MULTI, "Comments", null, specimen, "comment", null);
 
         setFirstControl(specimenTypeComboViewer.getControl());

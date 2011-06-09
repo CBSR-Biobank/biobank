@@ -9,14 +9,14 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 
 public class ShipmentViewForm extends BiobankViewForm {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(ShipmentViewForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ShipmentViewForm";
@@ -25,19 +25,19 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private OriginInfoWrapper originInfo;
 
-    private BiobankText senderLabel;
+    private BgcBaseText senderLabel;
 
-    private BiobankText receiverLabel;
+    private BgcBaseText receiverLabel;
 
-    private BiobankText waybillLabel;
+    private BgcBaseText waybillLabel;
 
-    private BiobankText departedLabel;
+    private BgcBaseText departedLabel;
 
-    private BiobankText dateReceivedLabel;
+    private BgcBaseText dateReceivedLabel;
 
-    private BiobankText shippingMethodLabel;
+    private BgcBaseText shippingMethodLabel;
 
-    private BiobankText boxNumberLabel;
+    private BgcBaseText boxNumberLabel;
 
     private SpecimenEntryWidget specimenWidget;
 
