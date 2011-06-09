@@ -518,7 +518,6 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     public List<SpecimenTypeWrapper> getAuthorizedActiveAliquotedTypes(
         List<SpecimenTypeWrapper> authorizedTypes) throws ApplicationException {
-        long start = System.currentTimeMillis();
         List<SpecimenType> raw = appService.query(new HQLCriteria(
             ACTIVE_ALIQUOTED_SPECIMENS_TYPE_QRY, Arrays
                 .asList(new Object[] { getId() })));
@@ -532,8 +531,6 @@ public class StudyWrapper extends StudyBaseWrapper {
                 studiesAliquotedTypes.add(type);
             }
         }
-        long end = System.currentTimeMillis();
-        System.out.println("end1:" + (end - start) / 1000.0);
         return studiesAliquotedTypes;
     }
 }
