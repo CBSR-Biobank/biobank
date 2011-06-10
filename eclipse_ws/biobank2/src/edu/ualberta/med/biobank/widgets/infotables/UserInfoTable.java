@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserInfoTable extends InfoTableWidget<User> {
-    public static final int ROWS_PER_PAGE = 10;
+    public static final int ROWS_PER_PAGE = 8;
     private static final String[] HEADINGS = new String[] { "Login", "Email",
         "First Name", "Last Name" };
     private static final String LOADING_ROW = "loading...";

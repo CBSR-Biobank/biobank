@@ -11,15 +11,15 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.dialogs.user.GroupEditDialog;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class GroupInfoTable extends InfoTableWidget<Group> {
-    public static final int ROWS_PER_PAGE = 5;
+    public static final int ROWS_PER_PAGE = 8;
     private static final String[] HEADINGS = new String[] { "Name" };
     private static final String LOADING_ROW = "loading...";
     private static final String GROUP_DELETE_ERROR = "Unable to delete group.";
@@ -118,7 +118,8 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
             String message = MessageFormat.format(CONFIRM_DELETE_MESSAGE,
                 new Object[] { name });
 
-            if (BiobankGuiCommonPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
+            if (BiobankGuiCommonPlugin.openConfirm(CONFIRM_DELETE_TITLE,
+                message)) {
                 SessionManager.getAppService().deleteGroup(group);
                 // remove the user from the collection
                 getCollection().remove(group);

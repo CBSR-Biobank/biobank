@@ -81,6 +81,9 @@ public class BiobankSecurityUtil {
 
     public static List<edu.ualberta.med.biobank.common.security.Group> getSecurityGroups(
         boolean includeSuperAdmin) throws ApplicationException {
+        // long start = System.currentTimeMillis();
+        // System.out
+        // .println("**********************************getSecurityGroups*****************************");
         if (isSuperAdministrator()) {
             try {
                 UserProvisioningManager upm = SecurityServiceProvider
@@ -94,6 +97,8 @@ public class BiobankSecurityUtil {
                             .equals(g.getGroupId()))
                         list.add(createGroup(upm, (Group) object));
                 }
+                // long end = System.currentTimeMillis();
+                // System.out.println("groups:" + ((end - start) / 1000.0));
                 return list;
             } catch (Exception ex) {
                 log.error("Error retrieving security groups", ex);
@@ -172,6 +177,9 @@ public class BiobankSecurityUtil {
 
     public static List<edu.ualberta.med.biobank.common.security.User> getSecurityUsers()
         throws ApplicationException {
+        // long start = System.currentTimeMillis();
+        // System.out
+        // .println("**********************************getSecurityUsers*****************************");
         if (isSuperAdministrator()) {
             try {
                 UserProvisioningManager upm = SecurityServiceProvider
@@ -195,6 +203,8 @@ public class BiobankSecurityUtil {
                         }
                     }
                 }
+                // long end = System.currentTimeMillis();
+                // System.out.println("users:" + ((end - start) / 1000.0));
                 return list;
             } catch (Exception ex) {
                 log.error("Error retrieving security users", ex);
@@ -202,7 +212,7 @@ public class BiobankSecurityUtil {
             }
         } else {
             throw new ApplicationException(
-                "Only Website Administrators can retrieve security users");
+                "Only Website Administrators can retrieve all security users");
         }
     }
 
