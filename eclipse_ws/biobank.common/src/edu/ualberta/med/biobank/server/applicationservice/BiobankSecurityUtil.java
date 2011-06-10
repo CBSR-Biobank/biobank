@@ -81,9 +81,9 @@ public class BiobankSecurityUtil {
 
     public static List<edu.ualberta.med.biobank.common.security.Group> getSecurityGroups(
         boolean includeSuperAdmin) throws ApplicationException {
-        // long start = System.currentTimeMillis();
-        // System.out
-        // .println("**********************************getSecurityGroups*****************************");
+        long start = System.currentTimeMillis();
+        System.out
+            .println("**********************************getSecurityGroups*****************************");
         if (isSuperAdministrator()) {
             try {
                 UserProvisioningManager upm = SecurityServiceProvider
@@ -97,8 +97,8 @@ public class BiobankSecurityUtil {
                             .equals(g.getGroupId()))
                         list.add(createGroup(upm, (Group) object));
                 }
-                // long end = System.currentTimeMillis();
-                // System.out.println("groups:" + ((end - start) / 1000.0));
+                long end = System.currentTimeMillis();
+                System.out.println("groups:" + ((end - start) / 1000.0));
                 return list;
             } catch (Exception ex) {
                 log.error("Error retrieving security groups", ex);
@@ -177,9 +177,9 @@ public class BiobankSecurityUtil {
 
     public static List<edu.ualberta.med.biobank.common.security.User> getSecurityUsers()
         throws ApplicationException {
-        // long start = System.currentTimeMillis();
-        // System.out
-        // .println("**********************************getSecurityUsers*****************************");
+        long start = System.currentTimeMillis();
+        System.out
+            .println("**********************************getSecurityUsers*****************************");
         if (isSuperAdministrator()) {
             try {
                 UserProvisioningManager upm = SecurityServiceProvider
@@ -188,14 +188,17 @@ public class BiobankSecurityUtil {
                 List<edu.ualberta.med.biobank.common.security.User> list = new ArrayList<edu.ualberta.med.biobank.common.security.User>();
                 Map<Long, User> allUsers = new HashMap<Long, User>();
                 Map<Long, edu.ualberta.med.biobank.common.security.Group> allGroups = new HashMap<Long, edu.ualberta.med.biobank.common.security.Group>();
+                long end = System.currentTimeMillis();
+                System.out.println("before getSecuritygroups:"
+                    + ((end - start) / 1000.0));
                 for (edu.ualberta.med.biobank.common.security.Group group : getSecurityGroups(true)) {
                     allGroups.put(group.getId(), group);
                 }
-                for (Object g : upm.getObjects(new GroupSearchCriteria(
-                    new Group()))) {
-                    Group serverGroup = (Group) g;
-                    for (Object u : upm.getUsers(serverGroup.getGroupId()
-                        .toString())) {
+                end = System.currentTimeMillis();
+                System.out.println("after getSecuritygroups and loop:"
+                    + ((end - start) / 1000.0));
+                for (Long groupId : allGroups.keySet()) {
+                    for (Object u : upm.getUsers(groupId.toString())) {
                         User serverUser = (User) u;
                         if (!allUsers.containsKey(serverUser.getUserId())) {
                             list.add(createUser(upm, serverUser, allGroups));
@@ -203,8 +206,8 @@ public class BiobankSecurityUtil {
                         }
                     }
                 }
-                // long end = System.currentTimeMillis();
-                // System.out.println("users:" + ((end - start) / 1000.0));
+                end = System.currentTimeMillis();
+                System.out.println("users:" + ((end - start) / 1000.0));
                 return list;
             } catch (Exception ex) {
                 log.error("Error retrieving security users", ex);
