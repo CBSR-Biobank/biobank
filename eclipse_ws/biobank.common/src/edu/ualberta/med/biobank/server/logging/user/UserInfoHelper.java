@@ -9,7 +9,7 @@ public class UserInfoHelper {
         LocalInfo userInfo = BiobankThreadVariable.get();
         if (null == userInfo)
             userInfo = new LocalInfo();
-        if (!(null == userName || userName.trim().length() == 0)) {
+        if ((userName != null) && !userName.trim().isEmpty()) {
             userInfo.setUsername(userName);
         }
         BiobankThreadVariable.set(userInfo);
