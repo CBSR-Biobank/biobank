@@ -96,7 +96,7 @@ public class LinkProcess extends ServerProcess {
             String value = cell.getValue();
             if (value != null) {
                 SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(
-                    appService, value, user);
+                    appService, value);
                 if (foundSpecimen != null) {
                     cell.setStatus(CellStatus.ERROR);
                     cell.setInformation(Messages

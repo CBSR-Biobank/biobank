@@ -91,7 +91,7 @@ public class ShipmentReceiveProcess extends ServerProcess {
      */
     private void processCellDipatchReceiveStatus(Cell cell) throws Exception {
         SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(appService,
-            cell.getValue(), user);
+            cell.getValue());
         if (foundSpecimen == null) {
             // not in db
             cell.setStatus(CellStatus.ERROR);
