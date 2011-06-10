@@ -79,7 +79,7 @@ public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
             if (obj != null)
                 return createNodes(node,
                     ((SpecimenTypeWrapper) obj)
-                        .getChildSpecimenTypeCollection(false));
+                        .getChildSpecimenTypeCollection(true));
         }
         return super.getNodeChildren(node);
     }

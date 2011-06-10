@@ -144,7 +144,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
                 // security modification should be made ? Should we check that
                 // anyway ?
                 SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
-                    appService, inventoryId, null);
+                    appService, inventoryId);
                 addSpecimen(specimen);
             } catch (Exception e) {
                 BiobankGuiCommonPlugin.openAsyncError(

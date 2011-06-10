@@ -310,7 +310,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             "SpecimenAssign.single.activitylog.gettingInfoId", //$NON-NLS-1$
             singleSpecimen.getInventoryId()));
         SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(appService,
-            singleSpecimen.getInventoryId(), SessionManager.getUser());
+            singleSpecimen.getInventoryId());
         if (foundSpecimen == null) {
             throw new Exception(Messages.getString(
                 "SpecimenAssign.single.inventoryId.error", //$NON-NLS-1$
