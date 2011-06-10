@@ -389,7 +389,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         boolean ok = true;
         try {
             SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(appService,
-                inventoryIdText.getText(), null);
+                inventoryIdText.getText());
             if (specimen != null) {
                 BiobankGuiCommonPlugin.openAsyncError("InventoryId error",
                     "InventoryId " + inventoryIdText.getText()
