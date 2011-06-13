@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
@@ -293,5 +294,25 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         List<CollectionEvent> res = appService.query(c);
         return wrapModelCollection(appService, res,
             CollectionEventWrapper.class);
+    }
+
+    /**
+     * return true if the user can delete this object
+     */
+    @Override
+    public boolean canDelete(User user) {
+        return super.canDelete(user)
+            && (getCenter() == null || user.getCurrentWorkingCenter().equals(
+                getCenter()));
+    }
+
+    /**
+     * return true if the user can edit this object
+     */
+    @Override
+    public boolean canUpdate(User user) {
+        return super.canUpdate(user)
+            && (getCenter() == null || user.getCurrentWorkingCenter().equals(
+                getCenter()));
     }
 }

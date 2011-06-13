@@ -100,9 +100,8 @@ public class AssignProcess extends ServerProcess {
             updateCellAsMissing(positionString, scanCell, expectedSpecimen,
                 movedAndMissingSpecimensFromPallet);
         } else {
-            // FIXME test what happen if don't have read rights on the site
             SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(
-                appService, value, user);
+                appService, value);
             if (foundSpecimen == null) {
                 updateCellAsNotLinked(positionString, scanCell);
             } else if (!foundSpecimen.getCurrentCenter().equals(

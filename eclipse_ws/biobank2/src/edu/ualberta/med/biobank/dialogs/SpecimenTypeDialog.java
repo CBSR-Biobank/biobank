@@ -109,6 +109,11 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
             addedTypes.add(allOthersTypesObjects.get(addedId));
         }
         specimenType.addToChildSpecimenTypeCollection(addedTypes);
+        List<SpecimenTypeWrapper> removedTypes = new ArrayList<SpecimenTypeWrapper>();
+        for (Integer removedId : multiSelectChildren.getRemovedToSelection()) {
+            removedTypes.add(allOthersTypesObjects.get(removedId));
+        }
+        specimenType.removeFromChildSpecimenTypeCollection(removedTypes);
         super.okPressed();
     }
 }

@@ -558,10 +558,6 @@ INSERT INTO `csm_user_group` VALUES (36,12,6);
 INSERT INTO `csm_user_group` VALUES (44,11,5);
 INSERT INTO `csm_user_group` VALUES (45,20,8);
 INSERT INTO `csm_user_group` VALUES (46,19,9);
-INSERT INTO `csm_user_group` VALUES (50,24,5);
-INSERT INTO `csm_user_group` VALUES (51,24,6);
-INSERT INTO `csm_user_group` VALUES (52,25,5);
-INSERT INTO `csm_user_group` VALUES (53,25,6);
 /*!40000 ALTER TABLE `csm_user_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -660,4 +656,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-06-07 10:17:35
+-- Dump completed on 2011-06-10 10:40:18
