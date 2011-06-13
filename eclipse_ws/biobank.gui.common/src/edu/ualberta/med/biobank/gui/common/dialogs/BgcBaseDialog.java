@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.gui.common.dialogs;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.Date;
 
 import org.acegisecurity.AccessDeniedException;
@@ -15,6 +16,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -33,6 +36,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 
 public abstract class BgcBaseDialog extends TitleAreaDialog {
 
@@ -206,6 +210,14 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
         return widgetCreator.createBoundWidgetWithLabel(composite, widgetClass,
             widgetOptions, fieldLabel, widgetValues,
             createPojoObservable(pojo, propertyName), validator);
+    }
+
+    public <T> ComboViewer createComboViewer(Composite parent,
+        String fieldLabel, Collection<T> input, T selection,
+        String errorMessage, final ComboSelectionUpdate csu,
+        IBaseLabelProvider labelProvider) {
+        return widgetCreator.createComboViewer(parent, fieldLabel, input,
+            selection, errorMessage, true, csu, labelProvider);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client, Label label,
