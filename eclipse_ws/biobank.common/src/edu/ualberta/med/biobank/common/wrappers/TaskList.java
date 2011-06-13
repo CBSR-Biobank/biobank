@@ -1,10 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.exception.BiobankException;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.SDKQueryResult;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -68,41 +64,11 @@ class TaskList {
         preQueryTasks.addAll(list.preQueryTasks);
     }
 
-    /**
-     * Execute the tasks in this {@code TaskList}.
-     * 
-     * @param service
-     * @throws ApplicationException
-     */
-    public void execute(WritableApplicationService service)
-        throws BiobankException, ApplicationException {
-        executePreQueryTasks();
-        executeQueryTasks(service);
+    public List<QueryTask> getQueryTasks() {
+        return queryTasks;
     }
 
-    private void executePreQueryTasks() throws BiobankException {
-        for (PreQueryTask task : preQueryTasks) {
-            task.beforeExecute();
-        }
-    }
-
-    private void executeQueryTasks(WritableApplicationService service)
-        throws ApplicationException {
-        if (!queryTasks.isEmpty()) {
-            List<SDKQuery> queries = new ArrayList<SDKQuery>();
-            for (QueryTask task : queryTasks) {
-                SDKQuery query = task.getSDKQuery();
-                queries.add(query);
-            }
-
-            List<SDKQueryResult> results = service.executeBatchQuery(queries);
-
-            int i = 0;
-            for (QueryTask task : queryTasks) {
-                SDKQueryResult result = results.get(i);
-                task.afterExecute(result);
-                i++;
-            }
-        }
+    public List<PreQueryTask> getPreQueryTasks() {
+        return preQueryTasks;
     }
 }

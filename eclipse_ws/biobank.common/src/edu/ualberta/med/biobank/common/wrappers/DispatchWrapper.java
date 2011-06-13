@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.DispatchSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Log;
@@ -230,7 +231,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     @Override
     public void removeFromDispatchSpecimenCollection(
-        List<DispatchSpecimenWrapper> dasToRemove) {
+        List<? extends DispatchSpecimenBaseWrapper> dasToRemove) {
         super.removeFromDispatchSpecimenCollection(dasToRemove);
         resetMap();
     }

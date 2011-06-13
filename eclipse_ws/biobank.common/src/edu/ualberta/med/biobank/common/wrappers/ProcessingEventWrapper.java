@@ -47,36 +47,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         throws Exception {
         for (SpecimenWrapper ss : removedSpecimens) {
             if (!ss.isNew()) {
-                ss.setProcessingEvent(null);
-                ss.persist();
-            }
-        }
-    }
-
-    @Override
-    public void addToSpecimenCollection(List<SpecimenWrapper> specimenCollection) {
-        removedSpecimens.removeAll(specimenCollection);
-        for (SpecimenWrapper s : specimenCollection) {
-            s.setProcessingEvent(this);
-        }
-        super.addToSpecimenCollection(specimenCollection);
-    }
-
-    @Override
-    public void removeFromSpecimenCollection(
-        List<SpecimenWrapper> specimenCollection) {
-        removedSpecimens.addAll(specimenCollection);
-        for (SpecimenWrapper s : specimenCollection) {
-            s.setProcessingEvent(null);
-        }
-        super.removeFromSpecimenCollection(specimenCollection);
-    }
-
-    @Override
-    protected void deleteDependencies() throws Exception {
-        for (SpecimenWrapper ss : getSpecimenCollection(false)) {
-            if (!ss.isNew()) {
-                ss.setProcessingEvent(null);
                 ss.persist();
             }
         }
@@ -261,8 +231,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         TaskList tasks = new TaskList();
 
         tasks.add(check().uniqueAndNotNull(ProcessingEventPeer.WORKSHEET));
-        tasks.add(cascade().persistRemoved(
-            ProcessingEventPeer.SPECIMEN_COLLECTION));
 
         tasks.add(super.getPersistTasks());
 
@@ -287,11 +255,11 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     // TODO: remove this override when all persist()-s are like this!
     @Override
     public void persist() throws Exception {
-        getPersistTasks().execute(appService);
+        WrapperTransaction.persist(this, appService);
     }
 
     @Override
     public void delete() throws Exception {
-        getDeleteTasks().execute(appService);
+        WrapperTransaction.delete(this, appService);
     }
 }

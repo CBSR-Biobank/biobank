@@ -31,7 +31,7 @@ public class DeleteModelWrapperQueryTask<E> implements QueryTask {
 
     @Override
     public void afterExecute(SDKQueryResult result) {
-        setWrappedObject(modelWrapper, result.getObjectResult());
+        // setWrappedObject(modelWrapper, result.getObjectResult());
 
         // TODO: not sure this is necessary.
         modelWrapper.setId(null);

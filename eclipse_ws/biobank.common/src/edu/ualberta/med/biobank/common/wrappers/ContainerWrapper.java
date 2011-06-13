@@ -266,7 +266,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     @Override
-    public void setTopContainer(ContainerWrapper c) {
+    public void setTopContainer(ContainerBaseWrapper c) {
         throw new BiobankRuntimeException("cannot set path on container");
     }
 

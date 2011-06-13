@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.cglib.proxy.Enhancer;
 
@@ -47,19 +48,18 @@ import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
-
-    private final Map<Property<?, ?>, Object> propertyCache = new HashMap<Property<?, ?>, Object>();
-
     protected WritableApplicationService appService;
-
     protected E wrappedObject;
-
     protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
         this);
-
     protected HashMap<String, Object> cache = new HashMap<String, Object>();
 
-    private List<WrapperListener> listeners = new ArrayList<WrapperListener>();
+    final Map<Property<?, ?>, Object> propertyCache = new HashMap<Property<?, ?>, Object>();
+    private final List<WrapperListener> listeners = new ArrayList<WrapperListener>();
+    private final ElementTracker<E> elementTracker = new ElementTracker<E>(this);
+    private final ElementQueue<E> elementQueue = new ElementQueue<E>(this);
+    private final WrapperCascader<E> cascader = new WrapperCascader<E>(this);
+    private final WrapperChecker<E> checker = new WrapperChecker<E>(this);
 
     public ModelWrapper(WritableApplicationService appService, E wrappedObject) {
         this.appService = appService;
@@ -93,9 +93,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         E oldWrappedObject = wrappedObject;
         wrappedObject = newWrappedObject;
 
-        cache.clear();
-        propertyCache.clear();
-        resetInternalFields();
+        clear();
 
         firePropertyChanges(oldWrappedObject, newWrappedObject);
     }
@@ -139,9 +137,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public void reload() throws Exception {
-        cache.clear();
-        propertyCache.clear();
-        resetInternalFields();
+        clear();
 
         E oldWrappedObject = wrappedObject;
 
@@ -308,9 +304,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         if (logMessage != null) {
             ((BiobankApplicationService) appService).logActivity(logMessage);
         }
-        cache.clear();
-        propertyCache.clear();
-        resetInternalFields();
+
+        clear();
+
         notifyListeners(new WrapperEvent(eventType, this));
     }
 
@@ -413,9 +409,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public void reset() throws Exception {
-        cache.clear();
-        propertyCache.clear();
-        resetInternalFields();
+        clear();
         if (isNew()) {
             resetToNewObject();
         } else {
@@ -541,7 +535,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         Integer id = getId();
         Integer id2 = ((ModelWrapper<?>) object).getId();
         if (id == null && id2 == null) {
-            return toString().equals(object.toString());
+            return wrappedObject == ((ModelWrapper<?>) object).wrappedObject;
         }
         return id != null && id2 != null && id.equals(id2);
     }
@@ -774,12 +768,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public static <W extends ModelWrapper<? extends R>, R, M> List<W> wrapModelCollection(
-        WritableApplicationService appService, List<R> modelCollection,
-        Class<W> wrapperKlazz) {
+        WritableApplicationService appService,
+        List<? extends R> modelCollection, Class<W> wrapperKlazz) {
         List<W> wrappers = new ArrayList<W>();
 
         if (modelCollection != null) {
-
             for (R element : modelCollection) {
                 try {
                     W wrapper = ModelWrapper.wrapModel(appService, element,
@@ -839,12 +832,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         modelWrapper.cacheProperty(property, wrapper);
     }
 
-    protected <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
+    public <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
         Property<? extends Collection<R>, ? super E> property,
         Collection<W> wrappers) {
         setWrapperCollection(this, property, wrappers);
     }
 
+    // TODO: make methods static that take a ModelWrapper instance
     private <W extends ModelWrapper<? extends R>, R, M> void setWrapperCollection(
         ModelWrapper<M> modelWrapper,
         Property<? extends Collection<R>, ? super M> property,
@@ -854,19 +848,22 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             newValues.add(element.getWrappedObject());
         }
 
+        // do this only for 1-to-N relationships, not M-to-N!!
+        modelWrapper.elementTracker.track(property);
+
         setModelProperty(modelWrapper, property, newValues);
         modelWrapper.cacheProperty(property, wrappers);
     }
 
     protected <W extends ModelWrapper<? extends R>, R> List<W> getWrapperCollection(
-        Property<? extends Collection<R>, ? super E> property,
+        Property<? extends Collection<? extends R>, ? super E> property,
         Class<W> wrapperKlazz, boolean sort) {
         return getWrapperCollection(this, property, wrapperKlazz, sort);
     }
 
     private <W extends ModelWrapper<? extends R>, R, M> List<W> getWrapperCollection(
         ModelWrapper<M> modelWrapper,
-        Property<? extends Collection<R>, ? super M> property,
+        Property<? extends Collection<? extends R>, ? super M> property,
         Class<W> wrapperKlazz, boolean sort) {
         if (modelWrapper == null) {
             return null;
@@ -876,12 +873,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         List<W> wrappers = (List<W>) modelWrapper.recallProperty(property);
 
         if (wrappers == null && !modelWrapper.isPropertyCached(property)) {
-            Collection<R> raw = getModelProperty(modelWrapper, property);
+            Collection<? extends R> raw = getModelProperty(modelWrapper,
+                property);
 
-            List<R> list = new ArrayList<R>();
+            List<? extends R> list = new ArrayList<R>();
             if (raw != null) {
                 if (raw instanceof List) {
-                    list = (List<R>) raw;
+                    list = (List<? extends R>) raw;
                 } else {
                     list = new ArrayList<R>(raw);
                 }
@@ -889,6 +887,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
             wrappers = wrapModelCollection(appService, list, wrapperKlazz);
             modelWrapper.cacheProperty(property, wrappers);
+            modelWrapper.elementQueue.flush(property);
         }
 
         if (wrappers != null && sort) {
@@ -906,7 +905,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             return;
         }
 
-        Collection<W> allWrappers = new ArrayList<W>();
+        // Use a set so that wrappers of the same object are not double-added.
+        Set<W> allWrappers = new HashSet<W>();
 
         @SuppressWarnings("unchecked")
         Class<W> wrapperKlazz = (Class<W>) newWrappers.get(0).getClass();
@@ -914,13 +914,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         List<W> currentWrappers = getWrapperCollection(property, wrapperKlazz,
             false);
 
+        // if the new wrapper is already in the collection, use the new one
+        allWrappers.addAll(newWrappers);
+
         if (currentWrappers != null) {
             allWrappers.addAll(currentWrappers);
         }
 
-        allWrappers.addAll(newWrappers);
-
-        setWrapperCollection(property, allWrappers);
+        setWrapperCollection(property, new ArrayList<W>(allWrappers));
     }
 
     protected <W extends ModelWrapper<? extends R>, R> void removeFromWrapperCollection(
@@ -1089,7 +1090,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return propertyCache.containsKey(property);
     }
 
-    private Object recallProperty(Property<?, ?> property) {
+    protected Object recallProperty(Property<?, ?> property) {
         return propertyCache.get(property);
     }
 
@@ -1126,13 +1127,31 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return Collections.emptyList();
     }
 
+    /**
+     * Clear internal state, cached, and state-tracking objects.
+     */
+    private void clear() {
+        elementQueue.clear();
+        elementTracker.clear();
+        propertyCache.clear();
+        cache.clear();
+
+        resetInternalFields();
+    }
+
+    protected ElementTracker<E> getElementTracker() {
+        return elementTracker;
+    }
+
+    protected ElementQueue<E> getElementQueue() {
+        return elementQueue;
+    }
+
     protected WrapperCascader<E> cascade() {
-        // TODO: cache this?
-        return new WrapperCascader<E>(this);
+        return cascader;
     }
 
     protected WrapperChecker<E> check() {
-        // TODO: cache this?
-        return new WrapperChecker<E>(this);
+        return checker;
     }
 }

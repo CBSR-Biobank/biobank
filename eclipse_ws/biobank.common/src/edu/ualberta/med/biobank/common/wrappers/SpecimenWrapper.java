@@ -509,7 +509,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     @Override
-    public void setParentSpecimen(SpecimenWrapper specimen) {
+    public void setParentSpecimen(SpecimenBaseWrapper specimen) {
         super.setParentSpecimen(specimen);
         // topSpecimen should never be null
         setTopSpecimenInternal(specimen != null ? specimen.getTopSpecimen()
@@ -523,7 +523,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
      */
     @Override
     @Deprecated
-    public void setTopSpecimen(SpecimenWrapper specimen) {
+    public void setTopSpecimen(SpecimenBaseWrapper specimen) {
         // this method should never be called outside of the wrapper.
         throw new UnsupportedOperationException(
             "this method should never be called");

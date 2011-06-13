@@ -128,7 +128,8 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         TaskList tasks = new TaskList();
 
         String isUsedMsg = MessageFormat.format(HAS_SPECIMENS_MSG, getName());
-        tasks.add(check().notUsedBy(Specimen.class, SpecimenPeer.SPECIMEN_TYPE, isUsedMsg));
+        tasks.add(check().notUsedBy(Specimen.class, SpecimenPeer.SPECIMEN_TYPE,
+            isUsedMsg));
 
         tasks.add(super.getDeleteTasks());
 
@@ -138,11 +139,11 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     // TODO: remove this override when all persist()-s are like this!
     @Override
     public void persist() throws Exception {
-        getPersistTasks().execute(appService);
+        WrapperTransaction.persist(this, appService);
     }
 
     @Override
     public void delete() throws Exception {
-        getDeleteTasks().execute(appService);
+        WrapperTransaction.delete(this, appService);
     }
 }

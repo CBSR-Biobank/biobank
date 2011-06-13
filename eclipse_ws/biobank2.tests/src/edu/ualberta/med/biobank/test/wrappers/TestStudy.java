@@ -61,6 +61,8 @@ public class TestStudy extends TestDatabase {
 
         // delete a site
         sites.remove(site);
+        site.reload(); // because stale from adding study through a different
+                       // wrapper
         site.delete();
         SiteHelper.createdSites.remove(site);
 

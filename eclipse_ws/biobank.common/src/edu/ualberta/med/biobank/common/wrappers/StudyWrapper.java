@@ -396,15 +396,20 @@ public class StudyWrapper extends StudyBaseWrapper {
         tasks.add(check().uniqueAndNotNull(StudyPeer.NAME));
         tasks.add(check().uniqueAndNotNull(StudyPeer.NAME_SHORT));
 
-        tasks.add(cascade().deleteOld(StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
-        tasks.add(cascade().deleteOld(StudyPeer.SOURCE_SPECIMEN_COLLECTION));
-        tasks.add(cascade().deleteOld(StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
+        tasks.add(cascade()
+            .deleteRemoved(StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
+        tasks
+            .add(cascade().deleteRemoved(StudyPeer.SOURCE_SPECIMEN_COLLECTION));
+        tasks.add(cascade().deleteRemoved(
+            StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
 
         tasks.add(super.getPersistTasks());
 
-        tasks.add(cascade().persist(StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
-        tasks.add(cascade().persist(StudyPeer.SOURCE_SPECIMEN_COLLECTION));
-        tasks.add(cascade().persist(StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
+        tasks
+            .add(cascade().persistAdded(StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
+        tasks.add(cascade().persistAdded(StudyPeer.SOURCE_SPECIMEN_COLLECTION));
+        tasks.add(cascade().persistAdded(
+            StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
 
         return tasks;
     }
@@ -427,11 +432,16 @@ public class StudyWrapper extends StudyBaseWrapper {
     // TODO: remove this override when all persist()-s are like this!
     @Override
     public void persist() throws Exception {
-        getPersistTasks().execute(appService);
+        WrapperTransaction.persist(this, appService);
     }
 
     @Override
     public void delete() throws Exception {
-        getDeleteTasks().execute(appService);
+        WrapperTransaction.delete(this, appService);
     }
+
+    // public List<PatientWrapper> getPatientCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this, PatientPeer.STUDY,
+    // Patient.class, PatientWrapper.class, sort);
+    // }
 }

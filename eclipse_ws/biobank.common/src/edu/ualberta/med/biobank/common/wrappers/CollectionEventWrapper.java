@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.CollectionEventBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -39,7 +40,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     private Map<String, EventAttrWrapper> eventAttrMap;
 
-    private Set<SpecimenWrapper> deletedSourceSpecimens = new HashSet<SpecimenWrapper>();
+    private Set<SpecimenBaseWrapper> deletedSourceSpecimens = new HashSet<SpecimenBaseWrapper>();
 
     public CollectionEventWrapper(WritableApplicationService appService) {
         super(appService);
@@ -51,14 +52,15 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     private void removeFromSpecimenCollections(
-        List<SpecimenWrapper> specimenCollection) {
+        List<? extends SpecimenBaseWrapper> specimenCollection) {
         deletedSourceSpecimens.addAll(specimenCollection);
         super.removeFromAllSpecimenCollection(specimenCollection);
         super.removeFromOriginalSpecimenCollection(specimenCollection);
     }
 
     private void removeFromSpecimenCollectionsWithCheck(
-        List<SpecimenWrapper> specimenCollection) throws BiobankCheckException {
+        List<? extends SpecimenBaseWrapper> specimenCollection)
+        throws BiobankCheckException {
         deletedSourceSpecimens.addAll(specimenCollection);
         super.removeFromAllSpecimenCollectionWithCheck(specimenCollection);
         super.removeFromOriginalSpecimenCollectionWithCheck(specimenCollection);
@@ -66,30 +68,33 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     @Override
     public void removeFromAllSpecimenCollection(
-        List<SpecimenWrapper> specCollection) {
+        List<? extends SpecimenBaseWrapper> specCollection) {
         removeFromSpecimenCollections(specCollection);
     }
 
     @Override
     public void removeFromOriginalSpecimenCollection(
-        List<SpecimenWrapper> specCollection) {
+        List<? extends SpecimenBaseWrapper> specCollection) {
         removeFromSpecimenCollections(specCollection);
     }
 
     @Override
     public void removeFromAllSpecimenCollectionWithCheck(
-        List<SpecimenWrapper> specCollection) throws BiobankCheckException {
+        List<? extends SpecimenBaseWrapper> specCollection)
+        throws BiobankCheckException {
         removeFromSpecimenCollectionsWithCheck(specCollection);
     }
 
     @Override
     public void removeFromOriginalSpecimenCollectionWithCheck(
-        List<SpecimenWrapper> specCollection) throws BiobankCheckException {
+        List<? extends SpecimenBaseWrapper> specCollection)
+        throws BiobankCheckException {
         removeFromSpecimenCollectionsWithCheck(specCollection);
     }
 
     @Override
-    public void addToOriginalSpecimenCollection(List<SpecimenWrapper> specs) {
+    public void addToOriginalSpecimenCollection(
+        List<? extends SpecimenBaseWrapper> specs) {
         super.addToOriginalSpecimenCollection(specs);
         super.addToAllSpecimenCollection(specs);
         deletedSourceSpecimens.removeAll(specs);
@@ -97,9 +102,9 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     private void deleteSpecimens() throws Exception {
         // FIXME delete only if no children ??
-        for (SpecimenWrapper sv : deletedSourceSpecimens) {
-            if (!sv.isNew()) {
-                sv.delete();
+        for (SpecimenBaseWrapper s : deletedSourceSpecimens) {
+            if (!s.isNew()) {
+                s.delete();
             }
         }
     }

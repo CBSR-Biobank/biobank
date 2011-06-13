@@ -327,11 +327,11 @@ public class SiteWrapper extends SiteBaseWrapper {
     // TODO: remove this override when all persist()-s are like this!
     @Override
     public void persist() throws Exception {
-        getPersistTasks().execute(appService);
+        WrapperTransaction.persist(this, appService);
     }
 
     @Override
     public void delete() throws Exception {
-        getDeleteTasks().execute(appService);
+        WrapperTransaction.delete(this, appService);
     }
 }

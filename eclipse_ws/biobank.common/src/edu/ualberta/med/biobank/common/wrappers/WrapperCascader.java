@@ -29,7 +29,7 @@ class WrapperCascader<E> {
                 tasks.add(wrappedProperty.getDeleteTasks());
             }
         } else {
-            ModelWrapper<?> wrapperProperty = wrapper.getWrappedProperty(
+            ModelWrapper<T> wrapperProperty = wrapper.getWrappedProperty(
                 property, null);
             tasks.add(wrapperProperty.getDeleteTasks());
         }
@@ -63,36 +63,43 @@ class WrapperCascader<E> {
         return tasks;
     }
 
-    // NOTE: this MUST use the WRAPPERS, otherwise the action might save
-    // something unintended by the programmer!!! BUT ONLY IF THEY ARE LOADED!!!!
-    public <T> TaskList persistRemoved(Property<T, E> property) {
+    public <T> TaskList deleteRemoved(
+        Property<? extends Collection<T>, E> property) {
         TaskList tasks = new TaskList();
 
-        if (wrapper.isInitialized(property)) {
-
-        } else {
-            // tasks.add(new PersistRemoved<E>(wrapper, property));
+        Collection<ModelWrapper<T>> removed = wrapper.getElementTracker()
+            .getRemovedElements(property);
+        for (ModelWrapper<T> wrapper : removed) {
+            tasks.add(wrapper.getDeleteTasks());
         }
 
         return tasks;
     }
 
-    private static class ActOnRemoved<E> extends BiobankWrapperAction<E> {
-        private static final long serialVersionUID = 1L;
+    public <T> TaskList persistRemoved(
+        Property<? extends Collection<T>, E> property) {
+        TaskList tasks = new TaskList();
 
-        protected ActOnRemoved(ModelWrapper<E> wrapper,
-            ModelSessionAction action) {
-            super(wrapper);
+        Collection<ModelWrapper<T>> removed = wrapper.getElementTracker()
+            .getRemovedElements(property);
+        for (ModelWrapper<T> wrapper : removed) {
+            tasks.add(wrapper.getPersistTasks());
         }
 
-        @Override
-        public Object doAction(Session session) throws BiobankSessionException {
-            return null;
+        return tasks;
+    }
+
+    public <T> TaskList persistAdded(
+        Property<? extends Collection<T>, E> property) {
+        TaskList tasks = new TaskList();
+
+        Collection<ModelWrapper<T>> added = wrapper.getElementTracker()
+            .getAddedElements(property);
+        for (ModelWrapper<T> wrapper : added) {
+            tasks.add(wrapper.getPersistTasks());
         }
 
-        public interface ModelSessionAction {
-            public Object act(Session session, Object model);
-        }
+        return tasks;
     }
 
     /**
@@ -106,7 +113,10 @@ class WrapperCascader<E> {
      * @param property
      * @return
      */
-    public <T> TaskList deleteOld(Property<Collection<T>, E> property) {
+    // TODO: remove this in favour of deleteRemoved()
+    @Deprecated
+    public <T> TaskList deleteRemovedProperty(
+        Property<Collection<T>, E> property) {
         TaskList tasks = new TaskList();
 
         if (!wrapper.isNew() && wrapper.isInitialized(property)) {
@@ -131,7 +141,6 @@ class WrapperCascader<E> {
         public Object doAction(Session session) throws BiobankSessionException {
             Collection<Object> newValues = getNewValues();
             Collection<Object> oldValues = getOldValues(session);
-
             Collection<Object> removedValues = new ArrayList<Object>(oldValues);
             removedValues.removeAll(newValues);
 

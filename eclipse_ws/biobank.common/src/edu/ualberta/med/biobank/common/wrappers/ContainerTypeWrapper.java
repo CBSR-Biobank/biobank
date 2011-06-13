@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerTypeBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
@@ -39,9 +40,9 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
-    private Set<ContainerTypeWrapper> deletedChildTypes = new HashSet<ContainerTypeWrapper>();
+    private Set<ContainerTypeBaseWrapper> deletedChildTypes = new HashSet<ContainerTypeBaseWrapper>();
 
-    private Set<SpecimenTypeWrapper> deletedSpecimenTypes = new HashSet<SpecimenTypeWrapper>();
+    private Set<SpecimenTypeBaseWrapper> deletedSpecimenTypes = new HashSet<SpecimenTypeBaseWrapper>();
 
     public static final Property<Integer, ContainerType> ROW_CAPACITY = ContainerTypePeer.CAPACITY
         .wrap(CapacityPeer.ROW_CAPACITY);
@@ -126,7 +127,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
             return;
 
         List<String> ids = new ArrayList<String>();
-        for (SpecimenTypeWrapper type : deletedSpecimenTypes) {
+        for (SpecimenTypeBaseWrapper type : deletedSpecimenTypes) {
             ids.add(Integer.toString(type.getId()));
         }
         StringBuilder sb = new StringBuilder(DELETED_SPECIMEN_TYPES_BASE_QRY)
@@ -158,7 +159,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         throws BiobankCheckException, ApplicationException {
         if (deletedChildTypes.size() > 0) {
             List<Integer> ids = new ArrayList<Integer>();
-            for (ContainerTypeWrapper type : deletedChildTypes) {
+            for (ContainerTypeBaseWrapper type : deletedChildTypes) {
                 ids.add(type.getId());
             }
             StringBuilder sb = new StringBuilder(DELETED_CHILD_CONTAINER_TYPES)
@@ -233,7 +234,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
     @Override
     public void addToSpecimenTypeCollection(
-        List<SpecimenTypeWrapper> newSpecimenTypes) {
+        List<? extends SpecimenTypeBaseWrapper> newSpecimenTypes) {
         super.addToSpecimenTypeCollection(newSpecimenTypes);
 
         // make sure previously deleted ones, that have been re-added, are
@@ -243,7 +244,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
     @Override
     public void removeFromSpecimenTypeCollection(
-        List<SpecimenTypeWrapper> typesToRemove) {
+        List<? extends SpecimenTypeBaseWrapper> typesToRemove) {
         deletedSpecimenTypes.addAll(typesToRemove);
         super.removeFromSpecimenTypeCollection(typesToRemove);
     }
@@ -266,7 +267,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
     @Override
     public void addToChildContainerTypeCollection(
-        List<ContainerTypeWrapper> newContainerTypes) {
+        List<? extends ContainerTypeBaseWrapper> newContainerTypes) {
         super.addToChildContainerTypeCollection(newContainerTypes);
 
         // make sure previously deleted ones, that have been re-added, are
@@ -276,7 +277,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
     @Override
     public void removeFromChildContainerTypeCollection(
-        List<ContainerTypeWrapper> typesToRemove) {
+        List<? extends ContainerTypeBaseWrapper> typesToRemove) {
         deletedChildTypes.addAll(typesToRemove);
         super.removeFromChildContainerTypeCollection(typesToRemove);
     }

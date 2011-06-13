@@ -397,4 +397,35 @@ public abstract class CenterWrapper<E extends Center> extends
             return wrapModel(appService, centers.get(0), null);
 
     }
+
+    // TODO: remove if allowing bi-direcitonal links.
+    // public List<DispatchWrapper> getSrcDispatchCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // DispatchPeer.SENDER_CENTER, Dispatch.class, DispatchWrapper.class,
+    // sort);
+    // }
+    //
+    // public List<DispatchWrapper> getDstDispatchCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // DispatchPeer.RECEIVER_CENTER, Dispatch.class,
+    // DispatchWrapper.class, sort);
+    // }
+    //
+    // public List<SpecimenWrapper> getSpecimenCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // SpecimenPeer.CURRENT_CENTER, Specimen.class, SpecimenWrapper.class,
+    // sort);
+    // }
+    //
+    // public List<OriginInfoWrapper> getOriginInfoCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this, OriginInfoPeer.CENTER,
+    // OriginInfo.class, OriginInfoWrapper.class, sort);
+    // }
+    //
+    // public List<ProcessingEventWrapper> getProcessingEventCollection(
+    // boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // ProcessingEventPeer.CENTER, ProcessingEvent.class,
+    // ProcessingEventWrapper.class, sort);
+    // }
 }

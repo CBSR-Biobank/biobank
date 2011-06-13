@@ -38,7 +38,28 @@ public class PersistModelWrapperQueryTask<E> implements QueryTask {
             eventType = WrapperEventType.UPDATE;
         }
 
-        setWrappedObject(modelWrapper, result.getObjectResult());
+        // Do not want to clear caches as that will destroy the
+        // wrapper-to-wrapper associations. Only property that might change is
+        // the id (and version, which is not tracked). So, set the wrapped
+        // object directly rather than through ModelWrapper.setWrappedObject().
+        // WAIT. THIS IS SO BROKEN! :-(
+        // WHAT IF WE DO A, oh, oops... what if we do a "NullAction" that just
+        // resets to the new object that came back from the server?
+        // @SuppressWarnings("unchecked")
+        // E newWrappedObject = (E) result.getObjectResult();
+        // E oldWrappedObject = modelWrapper.wrappedObject;
+        // modelWrapper.wrappedObject = newWrappedObject;
+        //
+        // Property<? extends Integer, ? super E> idProperty = modelWrapper
+        // .getIdProperty();
+        // Integer newId = idProperty.get(newWrappedObject);
+        // Integer oldId = idProperty.get(oldWrappedObject);
+        // if (!newId.equals(oldId)) {
+        // modelWrapper.propertyChangeSupport.firePropertyChange(
+        // idProperty.getName(), oldId, newId);
+        // }
+
+        // setWrappedObject(modelWrapper, result.getObjectResult());
 
         WrapperEvent event = new WrapperEvent(eventType, modelWrapper);
         modelWrapper.notifyListeners(event);

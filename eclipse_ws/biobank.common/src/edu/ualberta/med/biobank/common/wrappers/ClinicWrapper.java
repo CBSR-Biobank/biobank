@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ClinicBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.ContactBaseWrapper;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
@@ -29,7 +30,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ClinicWrapper extends ClinicBaseWrapper {
 
     private static final String STUDY_COLLECTION_CACHE_KEY = "studyCollection";
-    private Set<ContactWrapper> deletedContacts = new HashSet<ContactWrapper>();
+    private Set<ContactBaseWrapper> deletedContacts = new HashSet<ContactBaseWrapper>();
 
     public ClinicWrapper(WritableApplicationService appService) {
         super(appService);
@@ -53,9 +54,9 @@ public class ClinicWrapper extends ClinicBaseWrapper {
 
     @Override
     protected void persistDependencies(Clinic origObject) throws Exception {
-        for (ContactWrapper cw : deletedContacts) {
-            if (!cw.isNew()) {
-                cw.delete();
+        for (ContactBaseWrapper c : deletedContacts) {
+            if (!c.isNew()) {
+                c.delete();
             }
         }
     }
@@ -237,14 +238,15 @@ public class ClinicWrapper extends ClinicBaseWrapper {
 
     @Override
     public void removeFromContactCollection(
-        List<ContactWrapper> contactCollection) {
+        List<? extends ContactBaseWrapper> contactCollection) {
         super.removeFromContactCollection(contactCollection);
         deletedContacts.addAll(contactCollection);
     }
 
     @Override
     public void removeFromContactCollectionWithCheck(
-        List<ContactWrapper> contactCollection) throws BiobankCheckException {
+        List<? extends ContactBaseWrapper> contactCollection)
+        throws BiobankCheckException {
         super.removeFromContactCollectionWithCheck(contactCollection);
         deletedContacts.addAll(contactCollection);
     }
