@@ -8,8 +8,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
@@ -18,6 +16,8 @@ import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
 public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
@@ -86,7 +86,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             dispatch, dispatch.getReceiverCenter());
         dialog.open();
-        if (dispatch.hasNewSpecimens())
+        if (dispatch.hasNewSpecimens() || dispatch.hasSpecimenStatesChanged())
             setDirty(true);
         reloadSpecimens();
     }

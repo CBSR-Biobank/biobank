@@ -145,7 +145,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                 // security modification should be made ? Should we check that
                 // anyway ?
                 SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
-                    appService, inventoryId, null);
+                    appService, inventoryId);
                 addSpecimen(specimen);
             } catch (Exception e) {
                 BgcPlugin.openAsyncError("Error while looking up specimen", e);

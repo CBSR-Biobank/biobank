@@ -20,11 +20,11 @@ import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
     AbstractScanDialog<T> {
 
-    private int pendingSpecimensNumber = 0;
-
     private boolean specimensReceived = false;
 
     protected List<SpecimenWrapper> extras = new ArrayList<SpecimenWrapper>();
+
+    private boolean hasExpectedSpecimens = false;
 
     public ReceiveScanDialog(Shell parentShell, final T currentShipment,
         CenterWrapper<?> currentSite) {
@@ -41,8 +41,13 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
 
     @Override
     protected void specificScanPosProcess(PalletCell palletCell) {
-        if (palletCell.getStatus() == UICellStatus.EXTRA)
+        if (palletCell.getStatus() == UICellStatus.EXTRA) {
             extras.add(palletCell.getSpecimen());
+            hasExpectedSpecimens = true;
+        }
+        if (palletCell.getStatus() == UICellStatus.IN_SHIPMENT_EXPECTED) {
+            hasExpectedSpecimens = true;
+        }
     }
 
     @Override
@@ -53,12 +58,12 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
 
     @Override
     protected boolean canActivateProceedButton() {
-        return pendingSpecimensNumber != 0;
+        return hasExpectedSpecimens;
     }
 
     @Override
     protected boolean canActivateNextAndFinishButton() {
-        return pendingSpecimensNumber == 0;
+        return !hasExpectedSpecimens;
     }
 
     @Override
@@ -86,7 +91,8 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
         }
         receiveSpecimens(specimens);
         redrawPallet();
-        pendingSpecimensNumber = 0;
+        extras.clear();
+        hasExpectedSpecimens = false;
         setOkButtonEnabled(true);
         specimensReceived = true;
         Button cancelButton = getButton(IDialogConstants.CANCEL_ID);

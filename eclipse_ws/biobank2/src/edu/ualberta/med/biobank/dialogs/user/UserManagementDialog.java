@@ -124,21 +124,31 @@ public class UserManagementDialog extends BgcBaseDialog {
         Thread t = new Thread() {
             @Override
             public void run() {
-                final List<User> users = getUsers();
-                getShell().getDisplay().syncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        userInfoTable.setCollection(users);
-                    }
-                });
-                getShell().getDisplay().syncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        groupInfoTable.setCollection(getGroups(false));
-                    }
-                });
+                try {
+                    final List<User> users = getUsers();
+                    getShell().getDisplay().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            userInfoTable.setCollection(users);
+                        }
+                    });
+                    final List<Group> groups = getGroups(false);
+                    getShell().getDisplay().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            groupInfoTable.setCollection(groups);
+                        }
+                    });
+                } catch (final Exception ex) {
+                    getShell().getDisplay().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            BgcPlugin.openAsyncError(
+                                "Problem getting users and groups", ex);
+                        }
+                    });
+                }
             }
-
         };
         t.start();
     }
@@ -150,7 +160,7 @@ public class UserManagementDialog extends BgcBaseDialog {
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Unable to load groups.", e);
         }
-        return null;
+        return new ArrayList<Group>();
     }
 
     protected List<User> getUsers() {

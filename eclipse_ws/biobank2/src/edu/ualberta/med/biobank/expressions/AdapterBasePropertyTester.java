@@ -7,6 +7,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public class AdapterBasePropertyTester extends PropertyTester {
 
     public static final String CAN_DELETE = "canDelete";
+    public static final String CAN_UPDATE = "canUpdate";
 
     public AdapterBasePropertyTester() {
     }
@@ -18,6 +19,8 @@ public class AdapterBasePropertyTester extends PropertyTester {
             AdapterBase adapter = (AdapterBase) receiver;
             if (CAN_DELETE.equals(property))
                 return adapter.isDeletable();
+            if (CAN_UPDATE.equals(property))
+                return adapter.isEditable();
         }
         return false;
     }

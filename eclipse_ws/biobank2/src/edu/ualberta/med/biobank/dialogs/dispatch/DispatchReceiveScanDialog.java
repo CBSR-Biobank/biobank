@@ -68,10 +68,11 @@ public class DispatchReceiveScanDialog extends
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
-        if (currentShipment.getSpecimenCollection(false).size() > 0) {
+        if (currentShipment.getDispatchSpecimenCollection(false).size() > 0) {
             int i = 0;
-            for (DispatchSpecimenWrapper dsa : (currentShipment)
-                .getDispatchSpecimenCollection(false)) {
+            do {
+                DispatchSpecimenWrapper dsa = currentShipment
+                    .getDispatchSpecimenCollection(false).get(i);
                 int row = i / 12;
                 int col = i % 12;
                 if (!DispatchSpecimenState.MISSING.isEquals(dsa.getState()))
@@ -79,11 +80,13 @@ public class DispatchReceiveScanDialog extends
                         new ScanCell(row, col, dsa.getSpecimen()
                             .getInventoryId())));
                 i++;
-            }
+            } while (i < (8 * 12 - 1)
+                && i < currentShipment.getDispatchSpecimenCollection(false)
+                    .size());
+
             palletScanned.put(new RowColPos(6, 6), new PalletCell(new ScanCell(
                 6, 6, "aaar")));
         }
         return palletScanned;
     }
-
 }
