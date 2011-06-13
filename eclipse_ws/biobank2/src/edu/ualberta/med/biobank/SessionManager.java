@@ -350,7 +350,10 @@ public class SessionManager {
         } catch (PartInitException e) {
             BgcPlugin.openAsyncError("Error displaying available actions", e);
         }
-        if (page.getViewReferences().length == 0)
+        System.out.println();
+        if (page.getPerspective().getId()
+            .startsWith("edu.ualberta.med.biobank")
+            && page.getViewReferences().length == 0)
             try {
                 page.getWorkbenchWindow()
                     .getWorkbench()
