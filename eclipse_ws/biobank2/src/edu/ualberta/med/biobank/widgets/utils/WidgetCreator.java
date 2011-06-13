@@ -11,9 +11,9 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 
-public class WidgetCreator extends CommonWidgetCreator {
+public class WidgetCreator extends BgcWidgetCreator {
 
     public WidgetCreator(Map<String, Control> controls) {
         super(controls);

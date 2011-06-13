@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 /**
@@ -262,7 +262,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
             setGridLayout(2, this);
 
             readOnlyText = new Text(this, SWT.BORDER | SWT.READ_ONLY);
-            readOnlyText.setBackground(CommonWidgetCreator.READ_ONLY_TEXT_BGR);
+            readOnlyText.setBackground(BgcWidgetCreator.READ_ONLY_TEXT_BGR);
             readOnlyText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL
                 | GridData.GRAB_HORIZONTAL));
 

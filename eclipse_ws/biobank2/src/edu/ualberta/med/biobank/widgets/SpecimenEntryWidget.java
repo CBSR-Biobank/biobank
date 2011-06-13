@@ -32,7 +32,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
-import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
@@ -245,7 +245,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         specTable.addClickListener(listener);
     }
 
-    public void addBinding(CommonWidgetCreator dbc, final String message) {
+    public void addBinding(BgcWidgetCreator dbc, final String message) {
         final ControlDecoration controlDecoration = createDecorator(addButton,
             message);
         WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);

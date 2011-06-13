@@ -27,5 +27,4 @@ public class ScanPlateHandler extends AbstractHandler implements IHandler {
             return null;
         }
     }
-
 }

@@ -139,8 +139,8 @@ public enum SearchType {
         }
     };
 
-    private static BgcLogger logger = BgcLogger
-        .getLogger(SearchType.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(SearchType.class
+        .getName());
 
     private String label;
 
