@@ -226,8 +226,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                     hasNewSpecimens = true;
                 }
             } else
-                throw new BiobankCheckException(
-                    "Specimen does not belong to this sender.");
+                throw new BiobankCheckException("Specimen "
+                    + specimen.getInventoryId()
+                    + " does not belong to this sender.");
         }
         addToDispatchSpecimenCollection(newDispatchSpecimens);
         // make sure previously deleted ones, that have been re-added, are
