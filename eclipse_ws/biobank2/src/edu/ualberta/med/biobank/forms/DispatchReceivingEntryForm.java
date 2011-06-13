@@ -8,7 +8,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
@@ -17,6 +16,7 @@ import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
@@ -86,7 +86,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             dispatch, dispatch.getReceiverCenter());
         dialog.open();
-        if (dispatch.hasNewSpecimens())
+        if (dispatch.hasNewSpecimens() || dispatch.hasSpecimenStatesChanged())
             setDirty(true);
         reloadSpecimens();
     }
@@ -111,9 +111,9 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                 setDirty(true);
                 break;
             case IN_SHIPMENT_RECEIVED:
-                BiobankGuiCommonPlugin.openInformation("Specimen already accepted",
-                    "Specimen with inventory id " + inventoryId
-                        + " is already in received list.");
+                BiobankGuiCommonPlugin.openInformation(
+                    "Specimen already accepted", "Specimen with inventory id "
+                        + inventoryId + " is already in received list.");
                 break;
             case EXTRA:
                 BiobankGuiCommonPlugin.openInformation("Specimen not found",
@@ -121,7 +121,8 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                         + " has not been found in this dispatch."
                         + " It will be moved into the extra-pending list.");
                 if (specimen == null) {
-                    BiobankGuiCommonPlugin.openAsyncError("Problem with specimen",
+                    BiobankGuiCommonPlugin.openAsyncError(
+                        "Problem with specimen",
                         "Specimen is extra but object is null");
                     break;
                 }
@@ -131,11 +132,12 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                 setDirty(true);
                 break;
             default:
-                BiobankGuiCommonPlugin.openInformation("Problem with specimen", res
-                    .getCell().getInformation());
+                BiobankGuiCommonPlugin.openInformation("Problem with specimen",
+                    res.getCell().getInformation());
             }
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError("Error receiving the specimen", e);
+            BiobankGuiCommonPlugin.openAsyncError(
+                "Error receiving the specimen", e);
         }
     }
 

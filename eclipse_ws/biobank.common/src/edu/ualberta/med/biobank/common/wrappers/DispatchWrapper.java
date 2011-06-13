@@ -45,6 +45,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private boolean hasNewSpecimens = false;
 
+    private boolean hasSpecimenStatesChanged = false;
+
     public DispatchWrapper(WritableApplicationService appService) {
         super(appService);
     }
@@ -287,6 +289,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         List<DispatchSpecimenWrapper> nonProcessedSpecimens = getDispatchSpecimenCollectionWithState(DispatchSpecimenState.NONE);
         for (DispatchSpecimenWrapper ds : nonProcessedSpecimens) {
             if (specimensToReceive.contains(ds.getSpecimen())) {
+                hasSpecimenStatesChanged = true;
                 ds.setDispatchSpecimenState(DispatchSpecimenState.RECEIVED);
                 ds.getSpecimen().setCurrentCenter(getReceiverCenter());
                 toBePersistedDispatchedSpecimens.add(ds);
@@ -423,6 +426,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         deletedDispatchedSpecimens.clear();
         toBePersistedDispatchedSpecimens.clear();
         hasNewSpecimens = false;
+        hasSpecimenStatesChanged = false;
     }
 
     public void resetMap() {
@@ -557,5 +561,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public boolean hasNewSpecimens() {
         return hasNewSpecimens;
+    }
+
+    public boolean hasSpecimenStatesChanged() {
+        return hasSpecimenStatesChanged;
     }
 }
