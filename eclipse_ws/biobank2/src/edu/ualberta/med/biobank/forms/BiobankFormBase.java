@@ -79,8 +79,6 @@ public abstract class BiobankFormBase extends BgcFormBase {
         if (!(input instanceof FormInput))
             throw new PartInitException("Invalid editor input");
         FormInput formInput = (FormInput) input;
-        setSite(editorSite);
-        setInput(input);
 
         adapter = (AdapterBase) formInput.getAdapter(AdapterBase.class);
         if (adapter != null) {
