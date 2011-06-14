@@ -1,13 +1,14 @@
-package edu.ualberta.med.biobank.forms.input;
+package edu.ualberta.med.biobank.gui.common.forms;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
-import edu.ualberta.med.biobank.gui.common.forms.BgcFormInput;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class FormInput extends BgcFormInput {
+public class BgcFormInput implements IEditorInput {
     protected Object obj;
     private boolean hasPreviousForm;
     private String name;
