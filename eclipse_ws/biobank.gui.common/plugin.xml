@@ -32,4 +32,49 @@
          </with>
       </definition>
    </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+        <handler
+            class="edu.ualberta.med.biobank.gui.common.handlers.BgcCancelHandler"
+            commandId="edu.ualberta.med.biobank.commands.cancel">
+     <activeWhen>
+        <with
+              variable="activeEditor">
+           <instanceof
+                 value="edu.ualberta.med.biobank.gui.common.forms.BgcEntryForm">
+           </instanceof>
+        </with>
+     </activeWhen>
+      </handler> 
+      <handler
+            class="edu.ualberta.med.biobank.gui.common.handlers.BgcResetHandler"
+            commandId="edu.ualberta.med.biobank.commands.reset">
+         <activeWhen>
+            <with
+                  variable="activeEditor">
+               <instanceof
+                     value="edu.ualberta.med.biobank.gui.common.forms.BgcEntryForm">
+               </instanceof>
+            </with>
+         </activeWhen>
+      </handler>         
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="edu.ualberta.med.biobank.gui.common.commands.confirm"
+            name="Confirm">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="edu.ualberta.med.biobank.gui.common.commands.cancel"
+            name="Cancel">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="edu.ualberta.med.biobank.gui.common.commands.reset"
+            name="Reset">
+      </command>
+   </extension>
 </plugin>

@@ -8,8 +8,8 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class ResetHandler extends AbstractHandler implements IHandler {
 
