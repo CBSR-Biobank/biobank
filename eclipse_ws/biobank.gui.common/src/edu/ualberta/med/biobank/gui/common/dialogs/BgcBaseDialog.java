@@ -35,8 +35,8 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
-import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 
 public abstract class BgcBaseDialog extends TitleAreaDialog {
 
@@ -212,12 +212,12 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
             createPojoObservable(pojo, propertyName), validator);
     }
 
-    public <T> ComboViewer createComboViewer(Composite parent,
+    protected <T> ComboViewer createComboViewer(Composite parent,
         String fieldLabel, Collection<T> input, T selection,
-        String errorMessage, final ComboSelectionUpdate csu,
+        String errorMessage, ComboSelectionUpdate csu,
         IBaseLabelProvider labelProvider) {
         return widgetCreator.createComboViewer(parent, fieldLabel, input,
-            selection, errorMessage, true, csu, labelProvider);
+            selection, errorMessage, csu, labelProvider);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client, Label label,

@@ -446,8 +446,10 @@ public class BgcWidgetCreator {
         }
         if (selection != null) {
             comboViewer.setSelection(new StructuredSelection(selection));
+            
         }
         if (csu != null) {
+
             comboViewer
                 .addSelectionChangedListener(new ISelectionChangedListener() {
                     @Override
