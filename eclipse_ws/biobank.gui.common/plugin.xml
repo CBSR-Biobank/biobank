@@ -36,7 +36,7 @@
          point="org.eclipse.ui.handlers">
         <handler
             class="edu.ualberta.med.biobank.gui.common.handlers.BgcCancelHandler"
-            commandId="edu.ualberta.med.biobank.commands.cancel">
+            commandId="edu.ualberta.med.biobank.gui.common.commands.cancel">
      <activeWhen>
         <with
               variable="activeEditor">
@@ -48,7 +48,7 @@
       </handler> 
       <handler
             class="edu.ualberta.med.biobank.gui.common.handlers.BgcResetHandler"
-            commandId="edu.ualberta.med.biobank.commands.reset">
+            commandId="edu.ualberta.med.biobank.gui.common.commands.reset">
          <activeWhen>
             <with
                   variable="activeEditor">
