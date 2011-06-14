@@ -45,6 +45,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private boolean hasNewSpecimens = false;
 
+    private boolean hasSpecimenStatesChanged = false;
+
     public DispatchWrapper(WritableApplicationService appService) {
         super(appService);
     }
@@ -226,8 +228,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                     hasNewSpecimens = true;
                 }
             } else
-                throw new BiobankCheckException(
-                    "Specimen does not belong to this sender.");
+                throw new BiobankCheckException("Specimen "
+                    + specimen.getInventoryId()
+                    + " does not belong to this sender.");
         }
         addToDispatchSpecimenCollection(newDispatchSpecimens);
         // make sure previously deleted ones, that have been re-added, are
@@ -286,6 +289,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         List<DispatchSpecimenWrapper> nonProcessedSpecimens = getDispatchSpecimenCollectionWithState(DispatchSpecimenState.NONE);
         for (DispatchSpecimenWrapper ds : nonProcessedSpecimens) {
             if (specimensToReceive.contains(ds.getSpecimen())) {
+                hasSpecimenStatesChanged = true;
                 ds.setDispatchSpecimenState(DispatchSpecimenState.RECEIVED);
                 ds.getSpecimen().setCurrentCenter(getReceiverCenter());
                 toBePersistedDispatchedSpecimens.add(ds);
@@ -422,6 +426,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         deletedDispatchedSpecimens.clear();
         toBePersistedDispatchedSpecimens.clear();
         hasNewSpecimens = false;
+        hasSpecimenStatesChanged = false;
     }
 
     public void resetMap() {
@@ -556,5 +561,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public boolean hasNewSpecimens() {
         return hasNewSpecimens;
+    }
+
+    public boolean hasSpecimenStatesChanged() {
+        return hasSpecimenStatesChanged;
     }
 }

@@ -31,8 +31,7 @@ public enum SearchType {
             CenterWrapper<?> center) throws Exception {
             List<SpecimenWrapper> res = new ArrayList<SpecimenWrapper>();
             SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
-                SessionManager.getAppService(), searchString,
-                SessionManager.getUser());
+                SessionManager.getAppService(), searchString);
             if (specimen != null) {
                 res.add(specimen);
             }
@@ -139,8 +138,8 @@ public enum SearchType {
         }
     };
 
-    private static BgcLogger logger = BgcLogger
-        .getLogger(SearchType.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(SearchType.class
+        .getName());
 
     private String label;
 

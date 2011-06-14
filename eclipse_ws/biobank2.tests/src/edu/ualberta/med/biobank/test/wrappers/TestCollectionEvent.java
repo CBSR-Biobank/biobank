@@ -148,7 +148,6 @@ public class TestCollectionEvent extends TestDatabase {
 
     @Test
     public void testRemoveSpecimens() throws Exception {
-        // FIXME: issue 1180
         String name = "testRemoveSpecimens" + r.nextInt();
         ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
         StudyWrapper study = StudyHelper.addStudy("study" + name);

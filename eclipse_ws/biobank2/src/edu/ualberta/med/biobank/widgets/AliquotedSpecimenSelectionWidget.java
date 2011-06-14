@@ -39,7 +39,7 @@ import edu.ualberta.med.biobank.common.scanprocess.SpecimenHierarchy;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
-import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 
 /**
  * Create widgets to show types selection for specimens on a pallet: one label,
@@ -69,7 +69,7 @@ public class AliquotedSpecimenSelectionWidget {
     private Binding resultBinding;
 
     private Object nextWidget;
-    private CommonWidgetCreator widgetCreator;
+    private BgcWidgetCreator widgetCreator;
     private boolean oneRow;
     private Label sourceLabel;
     private Label resultLabel;
@@ -77,7 +77,7 @@ public class AliquotedSpecimenSelectionWidget {
     private List<SpecimenTypeWrapper> sourceChildTypes = new ArrayList<SpecimenTypeWrapper>();
 
     public AliquotedSpecimenSelectionWidget(Composite parent, Character letter,
-        CommonWidgetCreator widgetCreator, boolean oneRow) {
+        BgcWidgetCreator widgetCreator, boolean oneRow) {
         this.widgetCreator = widgetCreator;
         this.oneRow = oneRow;
         if (letter != null) {

@@ -14,7 +14,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -22,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
@@ -259,13 +259,14 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 Date date;
                 if (currentInstance.radioDateReceived.getSelection()) {
                     text = "Received";
-                    date = (Date) originInfo.getShipmentInfo().getReceivedAt()
-                        .clone();
+                    date = originInfo.getShipmentInfo().getReceivedAt();
                 } else {
                     text = "Packed";
-                    date = (Date) originInfo.getShipmentInfo().getPackedAt()
-                        .clone();
+                    date = originInfo.getShipmentInfo().getPackedAt();
                 }
+                if (date == null)
+                    return null;
+                date = (Date) date.clone();
                 Calendar c = Calendar.getInstance();
                 c.setTime(date);
                 c.set(Calendar.SECOND, 0);

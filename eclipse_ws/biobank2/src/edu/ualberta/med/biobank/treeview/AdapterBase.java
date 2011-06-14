@@ -23,12 +23,12 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
@@ -43,8 +43,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  */
 public abstract class AdapterBase {
 
-    private static BgcLogger logger = BgcLogger
-        .getLogger(AdapterBase.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(AdapterBase.class
+        .getName());
 
     protected static final String BGR_LOADING_LABEL = "loading...";
 
@@ -213,7 +213,7 @@ public abstract class AdapterBase {
             ModelWrapper<?> childModelObject = child.getModelObject();
             if ((childModelObject != null)
                 && childModelObject.getClass().equals(wrapperClass)
-                && child.getId().equals(wrapperId))
+                && child.getId() != null && child.getId().equals(wrapperId))
                 return child;
         }
         return null;
@@ -741,7 +741,8 @@ public abstract class AdapterBase {
     }
 
     public boolean isEditable() {
-        return editable && modelObject.canUpdate(SessionManager.getUser());
+        return editable && SessionManager.getInstance().isConnected()
+            && modelObject.canUpdate(SessionManager.getUser());
     }
 
     public void setEditable(boolean editable) {

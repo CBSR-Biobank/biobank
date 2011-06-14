@@ -36,7 +36,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -49,7 +49,7 @@ public class LinkFormPatientManagement {
     // currentPatient
     protected PatientWrapper currentPatient;
 
-    private CommonWidgetCreator widgetCreator;
+    private BgcWidgetCreator widgetCreator;
 
     private AbstractSpecimenAdminForm specimenAdminForm;
 
@@ -72,7 +72,7 @@ public class LinkFormPatientManagement {
     private boolean settingCollectionEvent;
     private static Boolean pEventListCheckSelection = true;
 
-    public LinkFormPatientManagement(CommonWidgetCreator widgetCreator,
+    public LinkFormPatientManagement(BgcWidgetCreator widgetCreator,
         AbstractSpecimenAdminForm specimenAdminForm) {
         this.widgetCreator = widgetCreator;
         this.specimenAdminForm = specimenAdminForm;

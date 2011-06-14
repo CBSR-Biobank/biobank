@@ -36,11 +36,11 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 
 public abstract class BgcBaseDialog extends TitleAreaDialog {
 
-    protected CommonWidgetCreator widgetCreator;
+    protected BgcWidgetCreator widgetCreator;
 
     protected Boolean okButtonEnabled;
 
@@ -48,7 +48,7 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
 
     public BgcBaseDialog(Shell parentShell) {
         super(parentShell);
-        widgetCreator = new CommonWidgetCreator(null);
+        widgetCreator = new BgcWidgetCreator(null);
         widgetCreator.initDataBinding();
     }
 
@@ -243,7 +243,7 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
             null);
     }
 
-    protected CommonWidgetCreator getWidgetCreator() {
+    protected BgcWidgetCreator getWidgetCreator() {
         return widgetCreator;
     }
 

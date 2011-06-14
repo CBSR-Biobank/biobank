@@ -59,7 +59,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 
-public class CommonWidgetCreator {
+public class BgcWidgetCreator {
 
     protected DataBindingContext dbc;
 
@@ -78,7 +78,7 @@ public class CommonWidgetCreator {
     public static final Color READ_ONLY_TEXT_BGR = Display.getCurrent()
         .getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
 
-    public CommonWidgetCreator(Map<String, Control> controls) {
+    public BgcWidgetCreator(Map<String, Control> controls) {
         this.controls = controls;
     }
 

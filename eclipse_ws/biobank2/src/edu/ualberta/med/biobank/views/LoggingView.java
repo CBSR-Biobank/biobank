@@ -316,8 +316,8 @@ public class LoggingView extends ViewPart {
             }
         };
 
-        BgcPlugin.getSessionStateSourceProvider()
-            .addSourceProviderListener(siteStateListener);
+        BgcPlugin.getSessionStateSourceProvider().addSourceProviderListener(
+            siteStateListener);
     }
 
     @Override

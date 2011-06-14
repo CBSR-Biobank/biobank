@@ -57,6 +57,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.forms.BgcFormBase;
 import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -523,7 +524,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             int previousFormIndex = entryIndex - 1;
             if (previousFormIndex >= 0
                 && previousFormIndex < linkedForms.size()) {
-                BiobankFormBase form = linkedForms.get(previousFormIndex);
+                BgcFormBase form = linkedForms.get(previousFormIndex);
                 IWorkbenchPage page = PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getActivePage();
                 page.bringToTop(form);

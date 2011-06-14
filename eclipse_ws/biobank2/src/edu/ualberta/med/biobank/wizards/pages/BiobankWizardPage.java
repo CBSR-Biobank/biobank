@@ -9,16 +9,16 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.gui.common.widgets.utils.CommonWidgetCreator;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 
 public abstract class BiobankWizardPage extends WizardPage {
-    private CommonWidgetCreator widgetCreator;
+    private BgcWidgetCreator widgetCreator;
 
     protected BiobankWizardPage(String pageName, String title,
         ImageDescriptor titleImage) {
         super(pageName, title, titleImage);
 
-        widgetCreator = new CommonWidgetCreator(null);
+        widgetCreator = new BgcWidgetCreator(null);
         widgetCreator.initDataBinding();
     }
 
@@ -59,7 +59,7 @@ public abstract class BiobankWizardPage extends WizardPage {
         }
     }
 
-    protected CommonWidgetCreator getWidgetCreator() {
+    protected BgcWidgetCreator getWidgetCreator() {
         return widgetCreator;
     }
 }
