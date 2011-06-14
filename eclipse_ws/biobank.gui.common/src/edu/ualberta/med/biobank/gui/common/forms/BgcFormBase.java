@@ -101,6 +101,8 @@ public abstract class BgcFormBase extends EditorPart implements
 
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
+        setSite(editorSite);
+        setInput(input);
         try {
             init();
         } catch (final RemoteConnectFailureException exp) {
