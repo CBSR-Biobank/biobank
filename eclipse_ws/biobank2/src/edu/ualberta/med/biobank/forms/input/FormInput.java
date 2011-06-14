@@ -2,27 +2,24 @@ package edu.ualberta.med.biobank.forms.input;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.IPersistableElement;
 
 import edu.ualberta.med.biobank.gui.common.forms.BgcFormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class FormInput extends BgcFormInput {
-    protected Object obj;
+
     private boolean hasPreviousForm;
-    private String name;
 
     public FormInput(Object o) {
         this(o, false);
     }
 
     public FormInput(Object o, String name) {
-        obj = o;
-        this.name = name;
+        super(o, name);
     }
 
     public FormInput(Object o, boolean hasPreviousForm) {
-        obj = o;
+        super(o, null);
         this.hasPreviousForm = hasPreviousForm;
     }
 
@@ -64,16 +61,6 @@ public class FormInput extends BgcFormInput {
             return ((AdapterBase) obj).getTooltipText();
         }
         return name;
-    }
-
-    @Override
-    public IPersistableElement getPersistable() {
-        return null;
-    }
-
-    @Override
-    public String getToolTipText() {
-        return getName();
     }
 
     @SuppressWarnings({ "rawtypes" })
