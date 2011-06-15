@@ -587,7 +587,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
         }
         currentScanState = UICellStatus.valueOf(res.getProcessStatus().name());
-        setScanValid(!getCells().isEmpty()
+        setScanValid(getCells() != null && !getCells().isEmpty()
             && currentScanState != UICellStatus.ERROR);
     }
 
