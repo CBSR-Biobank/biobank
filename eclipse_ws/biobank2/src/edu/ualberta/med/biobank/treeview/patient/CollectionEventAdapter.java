@@ -7,7 +7,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -15,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
@@ -65,10 +65,12 @@ public class CollectionEventAdapter extends AdapterBase {
                     BiobankGuiCommonPlugin.openAsyncError("Error",
                         "Unable to create collection event.");
                 }
-            } else
+            } else {
+                CollectionEventWrapper cevent = (CollectionEventWrapper) modelObject;
                 tabName = Messages.getString(
-                    "CollectionEventEntryForm.title.edit",
-                    ((CollectionEventWrapper) modelObject).getVisitNumber());
+                    "CollectionEventEntryForm.title.edit", cevent.getPatient()
+                        .getPnumber(), cevent.getVisitNumber());
+            }
         return tabName;
     }
 

@@ -105,6 +105,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 appService, cevent));
         } else {
             tabName = Messages.getString("CollectionEventEntryForm.title.edit",
+                cevent.getPatient().getPnumber(),
                 cevent.getVisitNumber());
         }
 
