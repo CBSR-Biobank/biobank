@@ -317,16 +317,11 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected void createPlateToScanField(Composite fieldsComposite) {
         plateToScanLabel = widgetCreator.createLabel(fieldsComposite,
             Messages.getString("linkAssign.plateToScan.label")); //$NON-NLS-1$);
-        plateToScanText = (BiobankText) widgetCreator
-            .createBoundWidget(
-                fieldsComposite,
-                BiobankText.class,
-                SWT.NONE,
-                plateToScanLabel,
-                new String[0],
-                plateToScanValue,
-                new ScannerBarcodeValidator(Messages
-                    .getString("linkAssign.plateToScan.validationMsg")), PLATE_VALIDATOR); //$NON-NLS-1$
+        plateToScanText = (BiobankText) widgetCreator.createBoundWidget(
+            fieldsComposite, BiobankText.class, SWT.NONE, plateToScanLabel,
+            new String[0], plateToScanValue, new ScannerBarcodeValidator(
+                Messages.getString("linkAssign.plateToScan.validationMsg")), //$NON-NLS-1$
+            PLATE_VALIDATOR);
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
@@ -379,6 +374,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             setConfirmEnabled(true);
             setDirty(true);
         } else {
+            scanButton.setEnabled((Boolean) canLaunchScanValue.getValue()
+                && fieldsValid());
             setFormHeaderErrorMessage(status.getMessage(),
                 IMessageProvider.ERROR);
             cancelConfirmWidget.setConfirmEnabled(false);
@@ -436,8 +433,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void resetPlateToScan() {
-        plateToScanText.setText(""); //$NON-NLS-1$
-        plateToScanValue.setValue(""); //$NON-NLS-1$
+        plateToScanText.setText(plateToScanSessionString);
+        plateToScanValue.setValue(plateToScanSessionString);
     }
 
     protected void setBindings(boolean isSingleMode) {
@@ -534,6 +531,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         scanValidValue.setValue(true);
         palletScanManagement.onReset();
         enableFields(true);
+        resetPlateToScan();
     }
 
     protected void setUseScanner(boolean useScanner) {

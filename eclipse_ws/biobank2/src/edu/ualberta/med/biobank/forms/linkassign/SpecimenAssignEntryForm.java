@@ -167,10 +167,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected void setMode(Mode m) {
         mode = m;
-        if (m.isSingleMode())
-            setFirstControl(inventoryIdText);
-        else
-            setFirstControl(useScannerButton);
     }
 
     @Override
@@ -595,7 +591,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         createPalletTypesViewer(multipleOptionsFields);
 
         createPlateToScanField(multipleOptionsFields);
-        // showPlateToScanField(useScanner && !mode.isSingleMode());
 
         createScanButton(parent);
     }
@@ -806,6 +801,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected void defaultInitialisation() {
+        super.defaultInitialisation();
         useScannerButton.setSelection(useScanner);
         setUseScanner(useScanner);
     }
