@@ -189,9 +189,8 @@ public abstract class BgcFormBase extends EditorPart implements
      */
     protected abstract void createFormContent() throws Exception;
 
-    protected Section createSection(String title, Composite parent) {
-        Section section = toolkit.createSection(parent, Section.TWISTIE
-            | Section.TITLE_BAR | Section.EXPANDED);
+    protected Section createSection(String title, Composite parent, int style) {
+        Section section = toolkit.createSection(parent, style);
         if (title != null) {
             section.setText(title);
         }
@@ -204,6 +203,11 @@ public abstract class BgcFormBase extends EditorPart implements
             }
         });
         return section;
+    }
+
+    protected Section createSection(String title, Composite parent) {
+        return createSection(title, parent, Section.TWISTIE | Section.TITLE_BAR
+            | Section.EXPANDED);
     }
 
     protected Section createSection(String title) {
