@@ -93,8 +93,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     // source/type hierarchy selected (use rows order)
     private List<SpecimenHierarchy> preSelections;
 
-    protected boolean modifyingType;
-
     @Override
     protected void init() throws Exception {
         super.init();
@@ -327,20 +325,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             }
         });
 
-        // widget to select the source and the type
-        singleTypesWidget = new AliquotedSpecimenSelectionWidget(
-            fieldsComposite, null, widgetCreator, false);
-        singleTypesWidget
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    modifyingType = true;
-                    newSinglePositionText.setText("");
-                    modifyingType = false;
-                }
-            });
-        singleTypesWidget.addBindings();
-
+        // position field
         newSinglePositionLabel = widgetCreator.createLabel(fieldsComposite,
             Messages.getString("SpecimenAssign.single.position.label")); //$NON-NLS-1$
         newSinglePositionValidator = new StringLengthValidator(4,
@@ -374,15 +359,18 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         newSinglePositionText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                if (!modifyingType) {
-                    positionTextModified = true;
-                    displaySinglePositions(false);
-                    canSaveSingleSpecimen.setValue(false);
-                }
+                positionTextModified = true;
+                displaySinglePositions(false);
+                canSaveSingleSpecimen.setValue(false);
             }
         });
         newSinglePositionText
             .addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+
+        // widget to select the source and the type
+        singleTypesWidget = new AliquotedSpecimenSelectionWidget(
+            fieldsComposite, null, widgetCreator, false);
+        singleTypesWidget.addBindings();
     }
 
     private void checkInventoryId(BiobankText inventoryIdText) {
