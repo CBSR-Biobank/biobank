@@ -326,9 +326,6 @@ abstract_shipment as aship, origin_info as oi
        and specimen.pv_id=pv.id
        and specimen.pv_sv_id is null;
 
-       join clinic_shipment_patient as csp on aship.id=csp.CLINIC_SHIPMENT_ID
-       left join patient_visit pv on pv.clinic_shipment_patient_id=csp.id
-
 drop index aship_id_idx on origin_info;
 
 ALTER TABLE origin_info MODIFY COLUMN ID INT(11) NOT NULL;
