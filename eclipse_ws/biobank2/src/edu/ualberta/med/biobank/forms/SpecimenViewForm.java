@@ -32,6 +32,8 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private BiobankText centerLabel;
 
+    private BiobankText originCenterLabel;
+
     private BiobankText sampleTypeLabel;
 
     private BiobankText createdDateLabel;
@@ -111,6 +113,8 @@ public class SpecimenViewForm extends BiobankViewForm {
             "Volume (ml)");
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
+        originCenterLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Origin center");
         centerLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Current center");
         positionLabel = createReadOnlyLabelledField(client, SWT.NONE,
@@ -168,6 +172,8 @@ public class SpecimenViewForm extends BiobankViewForm {
     }
 
     private void setValues() {
+        setTextValue(originCenterLabel, specimen.getOriginInfo().getCenter()
+            .getNameShort());
         setTextValue(centerLabel, specimen.getCurrentCenter().getNameShort());
         setTextValue(sampleTypeLabel, specimen.getSpecimenType().getName());
         setTextValue(createdDateLabel, specimen.getFormattedCreatedAt());

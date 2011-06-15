@@ -186,7 +186,7 @@ INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,
        join specimen_type on specimen_type.name=sv.name;
 
 -- initialize the current center on source specimens to be where they were
--- created, dispatches are handled in the next step
+-- shipped, dispatches are handled in the next step
 
 UPDATE specimen,patient_visit
        as pv, clinic_shipment_patient as csp,abstract_shipment as aship,
