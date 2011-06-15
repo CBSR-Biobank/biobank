@@ -43,7 +43,7 @@ public class CancelConfirmWidget extends BiobankWidget {
     }
 
     private void createContents() {
-        form.getToolkit().createLabel(this, "Cancel/Confirm barcode:");
+        form.getToolkit().createLabel(this, "Cancel/Confirm:");
         confirmCancelText = new BiobankText(this, SWT.NONE, form.getToolkit());
         confirmCancelText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         GridData gd = new GridData();
