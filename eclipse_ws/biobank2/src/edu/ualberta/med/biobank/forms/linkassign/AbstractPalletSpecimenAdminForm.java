@@ -95,6 +95,12 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         addScannerPreferencesPropertyListener();
         palletScanManagement = new PalletScanManagement() {
             @Override
+            public boolean isScanTubeAloneMode() {
+                // FIXME: see issue #1230. always activate this mode
+                return true;
+            }
+
+            @Override
             protected void beforeThreadStart() {
                 currentPlateToScan = plateToScanValue.getValue().toString();
                 AbstractPalletSpecimenAdminForm.this.beforeScanThreadStart();
@@ -507,10 +513,16 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                 }
             }
         });
+        // FIXME: see issue #1230. deactivate this button until the users say we
+        // can really remove it
+        scanTubeAloneSwitch.setVisible(false);
     }
 
-    protected void showScanTubeAloneSwitch(boolean show) {
-        widgetCreator.showWidget(scanTubeAloneSwitch, show);
+    protected void showScanTubeAloneSwitch(
+        @SuppressWarnings("unused") boolean show) {
+        // FIXME: see issue #1230. deactivate this button until the users say we
+        // can really remove it
+        // widgetCreator.showWidget(scanTubeAloneSwitch, show);
     }
 
     protected Map<RowColPos, PalletCell> getCells() {

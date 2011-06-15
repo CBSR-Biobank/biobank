@@ -153,7 +153,7 @@ public class PalletScanManagement {
     }
 
     public void scanTubeAlone(MouseEvent e) {
-        if (scanTubeAloneMode) {
+        if (isScanTubeAloneMode()) {
             RowColPos rcp = ((ScanPalletWidget) e.widget)
                 .getPositionAtCoordinates(e.x, e.y);
             if (rcp != null) {
