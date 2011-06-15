@@ -575,7 +575,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             posStr = Messages.getString("SpecimenLink.position.label.none"); //$NON-NLS-1$
         }
         // LINKED\: specimen {0} of type\: {1} to source\: {2} ({3}) -
-        // Patient\: {4} - Visit\: {5} - Center\: {6} \n
+        // Patient\: {4} - Visit\: {5} - Center\: {6} - Position\: {7}\n
         appendLog(Messages.getString(
             "SpecimenLink.activitylog.specimen.linked", singleSpecimen //$NON-NLS-1$
                 .getInventoryId(), singleSpecimen.getSpecimenType().getName(),
@@ -583,7 +583,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 .getParentSpecimen().getSpecimenType().getNameShort(),
             linkFormPatientManagement.getCurrentPatient().getPnumber(),
             singleSpecimen.getCollectionEvent().getVisitNumber(),
-            singleSpecimen.getCurrentCenter().getNameShort()));
+            singleSpecimen.getCurrentCenter().getNameShort(), posStr));
     }
 
     @Override

@@ -499,6 +499,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     protected void onReset() throws Exception {
         super.onReset();
         singleSpecimen.initObjectWith(new SpecimenWrapper(appService));
+        singleSpecimen.reset();
         setDirty(false);
         reset(true);
     }
