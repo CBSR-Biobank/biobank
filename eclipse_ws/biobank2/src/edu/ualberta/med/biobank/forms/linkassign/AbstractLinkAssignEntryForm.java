@@ -154,6 +154,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     }
 
     protected void defaultInitialisation() {
+
     }
 
     protected void setNeedSinglePosition(

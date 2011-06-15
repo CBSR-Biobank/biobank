@@ -8,9 +8,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 
@@ -63,7 +63,7 @@ public class ScanOneTubeDialog extends BiobankDialog {
         for (PalletCell otherCell : cells.values()) {
             if (otherCell.getValue() != null
                 && otherCell.getValue().equals(scannedValue)) {
-                BiobankGuiCommonPlugin.openAsyncError(
+                BiobankGuiCommonPlugin.openError(
                     "Tube Scan Error",
                     "The value entered already exists in position "
                         + ContainerLabelingSchemeWrapper

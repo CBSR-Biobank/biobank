@@ -265,6 +265,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected void defaultInitialisation() {
+        super.defaultInitialisation();
         setNeedSinglePosition(mode == Mode.SINGLE_POSITION);
     }
 
