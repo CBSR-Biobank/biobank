@@ -204,7 +204,7 @@ UPDATE specimen,patient_visit
 
 update specimen spc, aliquot aq,dispatch_shipment_aliquot dsa,abstract_shipment aship,
        site,center
-       set current_center_id=center.id
+       set spc.current_center_id=center.id
        where spc.inventory_id=aq.inventory_id
        and dsa.aliquot_id=aq.id
        and aship.id=dsa.dispatch_shipment_id
@@ -256,9 +256,13 @@ CREATE TABLE shipment_info (
 create index WAYBILL_IDX on shipment_info(WAYBILL);
 create index RECEIVED_AT_IDX on shipment_info(RECEIVED_AT);
 
-INSERT INTO shipment_info (aship_id,received_at,packed_at,waybill,box_number,shipping_method_id)
-SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id FROM abstract_shipment
-WHERE discriminator='ClinicShipment';
+INSERT INTO shipment_info (aship_id,received_at,packed_at,waybill,box_number,
+       shipping_method_id)
+       SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id
+       FROM abstract_shipment
+       WHERE discriminator='ClinicShipment';
+
+-- some shipments do not have any patient visits, see below
 
 -- aship_type=0 for source specimens, aship_type=1 for aliquoted_specimens
 
@@ -321,6 +325,9 @@ abstract_shipment as aship, origin_info as oi
        and oi.aship_type=1
        and specimen.pv_id=pv.id
        and specimen.pv_sv_id is null;
+
+       join clinic_shipment_patient as csp on aship.id=csp.CLINIC_SHIPMENT_ID
+       left join patient_visit pv on pv.clinic_shipment_patient_id=csp.id
 
 drop index aship_id_idx on origin_info;
 

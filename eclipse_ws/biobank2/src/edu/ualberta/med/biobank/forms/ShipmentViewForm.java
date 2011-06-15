@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -114,7 +115,10 @@ public class ShipmentViewForm extends BiobankViewForm {
         ShippingMethodWrapper shipMethod = shipInfo.getShippingMethod();
 
         setTextValue(senderLabel, originInfo.getCenter().getName());
-        setTextValue(receiverLabel, originInfo.getReceiverSite().getName());
+
+        SiteWrapper rcvSite = originInfo.getReceiverSite();
+        setTextValue(receiverLabel, rcvSite != null ? rcvSite.getName() : "");
+
         setTextValue(waybillLabel, originInfo.getShipmentInfo().getWaybill());
         if (departedLabel != null) {
             setTextValue(departedLabel, shipInfo.getFormattedDatePacked());
