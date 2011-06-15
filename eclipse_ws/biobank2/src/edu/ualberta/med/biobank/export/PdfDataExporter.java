@@ -10,16 +10,16 @@ import net.sf.jasperreports.engine.JasperPrint;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
 public class PdfDataExporter extends GuiDataExporter {
-    private static final String[] VALID_EXTS = { "*.pdf" };
+    private static final String[] VALID_EXTS = { "*.pdf" }; //$NON-NLS-1$
 
     public PdfDataExporter() {
-        super("Export PDF");
+        super(Messages.PdfDataExporter_name);
     }
 
     protected PdfDataExporter(String name) {
@@ -34,7 +34,8 @@ public class PdfDataExporter extends GuiDataExporter {
             AbstractBiobankListProxy<?> proxy = (AbstractBiobankListProxy<?>) data
                 .getRows();
             if (proxy.getRealSize() == -1) {
-                throw new DataExportException("too many rows to export");
+                throw new DataExportException(
+                    Messages.PdfDataExporter_toomanyrows_error_msg);
             }
         }
     }
@@ -54,13 +55,16 @@ public class PdfDataExporter extends GuiDataExporter {
                 maps);
             ReportingUtils.saveReport(jasperPrint, path);
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error saving to PDF", e);
+            BgcPlugin.openAsyncError(Messages.PdfDataExporter_saving_error_msg,
+                e);
             return;
         }
         try {
-            SessionManager.log("exportPDF", data.getTitle(), "data");
+            SessionManager.log(Messages.PdfDataExporter_log_export,
+                data.getTitle(), LOG_TYPE);
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error Logging Export", e);
+            BgcPlugin.openAsyncError(
+                Messages.PdfDataExporter_logging_error_msg, e);
         }
     }
 
@@ -71,7 +75,8 @@ public class PdfDataExporter extends GuiDataExporter {
 
         for (Object row : data.getRows()) {
             if (monitor.isCanceled()) {
-                throw new DataExportException("exporting canceled");
+                throw new DataExportException(
+                    Messages.PdfDataExporter_cancel_msg);
             }
 
             Map<String, String> map = getPropertyMap(data, row, labelProvider);

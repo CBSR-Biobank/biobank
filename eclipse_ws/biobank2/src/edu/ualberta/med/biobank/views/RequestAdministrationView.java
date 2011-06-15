@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.views;
 
 import java.util.List;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -9,11 +10,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.request.RequestSearchedNode;
 import edu.ualberta.med.biobank.treeview.request.RequestSiteAdapter;
@@ -21,7 +22,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class RequestAdministrationView extends AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.RequestAdminView";
+    public static final String ID = "edu.ualberta.med.biobank.views.RequestAdminView"; //$NON-NLS-1$
 
     private Button radioRequestNumber;
 
@@ -45,7 +46,8 @@ public class RequestAdministrationView extends AbstractAdministrationView {
         try {
             siteNodes = SiteWrapper.getSites(SessionManager.getAppService());
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Failed to load sites", e);
+            BgcPlugin.openAsyncError(
+                Messages.RequestAdministrationView_sites_load_error_title, e);
         }
         if (siteNodes != null) {
             for (SiteWrapper site : siteNodes) {
@@ -71,7 +73,8 @@ public class RequestAdministrationView extends AbstractAdministrationView {
         composite.setLayout(layout);
 
         radioRequestNumber = new Button(composite, SWT.RADIO);
-        radioRequestNumber.setText("Request Number");
+        radioRequestNumber
+            .setText(Messages.RequestAdministrationView_request_nber_label);
         radioRequestNumber.setSelection(true);
         radioRequestNumber.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -100,16 +103,20 @@ public class RequestAdministrationView extends AbstractAdministrationView {
         try {
             List<? extends ModelWrapper<?>> searchedObject = search();
             if (searchedObject == null || searchedObject.size() == 0) {
-                String msg = "No Request found";
+                String msg = Messages.RequestAdministrationView_notfound_error_msg;
                 if (radioRequestNumber.getSelection())
-                    msg += " for number " + treeText.getText();
-                BgcPlugin.openMessage("Request not found", msg);
+                    msg = NLS.bind(Messages.RequestAdministrationView_notfound_nber_error_msg,
+                        treeText.getText());
+                BgcPlugin.openMessage(
+                    Messages.RequestAdministrationView_notfound_error_title,
+                    msg);
             } else {
                 showSearchedObjectsInTree(searchedObject, true);
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
-            BgcPlugin.openError("Search error", e);
+            BgcPlugin.openError(
+                Messages.RequestAdministrationView_search_error_msg, e);
         }
     }
 

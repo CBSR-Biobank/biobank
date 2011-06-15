@@ -38,7 +38,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class LoggingView extends ViewPart {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.LoggingView";
+    public static final String ID = "edu.ualberta.med.biobank.views.LoggingView"; //$NON-NLS-1$
 
     private ISourceProviderListener siteStateListener;
 
@@ -64,7 +64,7 @@ public class LoggingView extends ViewPart {
         public void handleEvent(Event e) {
             /* The user can only enter in alphanumeric */
             /* Applied to Patient#, Inventory ID, Location */
-            e.text = e.text.replaceAll("^(?:(?!\\p{Alnum}+).)*$", "");
+            e.text = e.text.replaceAll("^(?:(?!\\p{Alnum}+).)*$", ""); //$NON-NLS-1$ //$NON-NLS-2$
         }
     };
 
@@ -100,7 +100,7 @@ public class LoggingView extends ViewPart {
         parent.setBackground(colorWhite);
 
         Label label = new Label(parent, SWT.NO_BACKGROUND);
-        label.setText("Center:");
+        label.setText(Messages.LoggingView_center_label);
         label.setAlignment(SWT.LEFT);
         label.setBackground(colorWhite);
 
@@ -110,7 +110,7 @@ public class LoggingView extends ViewPart {
         centerCombo.addKeyListener(enterListener);
 
         label = new Label(parent, SWT.NO_BACKGROUND);
-        label.setText("User:");
+        label.setText(Messages.LoggingView_user_label);
         label.setAlignment(SWT.LEFT);
         label.setBackground(colorWhite);
 
@@ -120,7 +120,7 @@ public class LoggingView extends ViewPart {
         userCombo.addKeyListener(enterListener);
 
         label = new Label(parent, SWT.NO_BACKGROUND);
-        label.setText("Type:");
+        label.setText(Messages.LoggingView_type_label);
         label.setAlignment(SWT.LEFT);
         label.setBackground(colorWhite);
 
@@ -130,7 +130,7 @@ public class LoggingView extends ViewPart {
         typeCombo.addKeyListener(enterListener);
 
         label = new Label(parent, SWT.NO_BACKGROUND);
-        label.setText("Action:");
+        label.setText(Messages.LoggingView_action_label);
         label.setAlignment(SWT.LEFT);
         label.setBackground(colorWhite);
 
@@ -143,7 +143,7 @@ public class LoggingView extends ViewPart {
         new Label(parent, SWT.NONE);
 
         label = new Label(parent, SWT.NO_BACKGROUND);
-        label.setText("Patient #:");
+        label.setText(Messages.LoggingView_patientnber_label);
         label.setAlignment(SWT.LEFT);
         label.setBackground(colorWhite);
 
@@ -155,7 +155,7 @@ public class LoggingView extends ViewPart {
         patientNumTextInput.addKeyListener(enterListener);
 
         label = new Label(parent, SWT.NO_BACKGROUND);
-        label.setText("Inventory ID:");
+        label.setText(Messages.LoggingView_inventoryid_label);
         label.setAlignment(SWT.LEFT);
         label.setBackground(colorWhite);
 
@@ -167,7 +167,7 @@ public class LoggingView extends ViewPart {
         inventoryIdTextInput.addKeyListener(enterListener);
 
         label = new Label(parent, SWT.NO_BACKGROUND);
-        label.setText("Location:");
+        label.setText(Messages.LoggingView_location_label);
         label.setAlignment(SWT.LEFT);
         label.setBackground(colorWhite);
 
@@ -202,7 +202,7 @@ public class LoggingView extends ViewPart {
          * });
          */
         label = new Label(parent, SWT.NO_BACKGROUND);
-        label.setText("Details:");
+        label.setText(Messages.LoggingView_details_label);
         label.setAlignment(SWT.LEFT);
         label.setBackground(colorWhite);
 
@@ -215,7 +215,7 @@ public class LoggingView extends ViewPart {
         new Label(parent, SWT.NONE);
 
         label = new Label(parent, SWT.NO_BACKGROUND);
-        label.setText("Start Date:");
+        label.setText(Messages.LoggingView_startdate_label);
         label.setAlignment(SWT.LEFT);
         label.setBackground(colorWhite);
 
@@ -223,7 +223,7 @@ public class LoggingView extends ViewPart {
         startDateWidget.setBackground(colorWhite);
 
         label = new Label(parent, SWT.NO_BACKGROUND);
-        label.setText("End Date:");
+        label.setText(Messages.LoggingView_enddate_label);
         label.setAlignment(SWT.LEFT);
         label.setBackground(colorWhite);
 
@@ -249,7 +249,7 @@ public class LoggingView extends ViewPart {
         buttonComposite.setVisible(true);
 
         clearButton = new Button(buttonComposite, SWT.PUSH);
-        clearButton.setText("Clear");
+        clearButton.setText(Messages.LoggingView_clear_label);
         clearButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         clearButton.addListener(SWT.Selection, new Listener() {
             @Override
@@ -262,7 +262,7 @@ public class LoggingView extends ViewPart {
         });
 
         searchButton = new Button(buttonComposite, SWT.PUSH);
-        searchButton.setText("Search Logs");
+        searchButton.setText(Messages.LoggingView_search_label);
         searchButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         searchButton.addKeyListener(enterListener);
         searchButton.addListener(SWT.Selection, new Listener() {
@@ -365,10 +365,10 @@ public class LoggingView extends ViewPart {
         userCombo.select(0);
         typeCombo.select(0);
         actionCombo.select(0);
-        patientNumTextInput.setText("");
-        inventoryIdTextInput.setText("");
-        locationTextInput.setText("");
-        detailsTextInput.setText("");
+        patientNumTextInput.setText(""); //$NON-NLS-1$
+        inventoryIdTextInput.setText(""); //$NON-NLS-1$
+        locationTextInput.setText(""); //$NON-NLS-1$
+        detailsTextInput.setText(""); //$NON-NLS-1$
         startDateWidget.setDate(null);
         endDateWidget.setDate(null);
 
@@ -379,12 +379,12 @@ public class LoggingView extends ViewPart {
         if (startDateWidget.getDate() != null
             && endDateWidget.getDate() != null
             && startDateWidget.getDate().after(endDateWidget.getDate())) {
-            BgcPlugin.openAsyncError("Error",
-                "Error: start date cannot be ahead end date.");
+            BgcPlugin.openAsyncError(Messages.LoggingView_error_title,
+                Messages.LoggingView_date_error_msg);
             return;
         }
 
-        FormInput input = new FormInput(null, "Logging Form Input");
+        FormInput input = new FormInput(null, Messages.LoggingView_resform_title);
         try {
             LogQuery.getInstance().setSearchQueryItem(LogPeer.CENTER.getName(),
                 centerCombo.getText());
@@ -428,8 +428,8 @@ public class LoggingView extends ViewPart {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, LoggingForm.ID);
         } catch (Exception ex) {
-            BgcPlugin.openAsyncError("Error",
-                "There was an error opening: LoggingForm.", ex);
+            BgcPlugin.openAsyncError(Messages.LoggingView_error_title,
+                Messages.LoggingView_opening_error_msg, ex);
         }
     }
 
@@ -438,7 +438,7 @@ public class LoggingView extends ViewPart {
             List<String> arrayList = null;
 
             if (!SessionManager.getInstance().isConnected()) {
-                return new String[] { "ERROR" };
+                return new String[] { Messages.LoggingView_error_res_string };
             }
 
             switch (possibleList) {
@@ -473,8 +473,8 @@ public class LoggingView extends ViewPart {
             return result.toArray(new String[0]);
 
         } catch (ApplicationException ex) {
-            BgcPlugin.openAsyncError("Error",
-                "There was an error loading combo values.", ex);
+            BgcPlugin.openAsyncError(Messages.LoggingView_error_title,
+                Messages.LoggingView_combos_error_msg, ex);
         }
         return null;
     }

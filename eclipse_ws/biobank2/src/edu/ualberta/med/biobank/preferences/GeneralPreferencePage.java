@@ -31,7 +31,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     protected void createFieldEditors() {
         showVersionFieldEditor = new BooleanFieldEditor(
             PreferenceConstants.GENERAL_SHOW_VERSION,
-            "Show software version in main window title",
+            Messages.GeneralPreferencePage_version_label,
             getFieldEditorParent());
         addField(showVersionFieldEditor);
 

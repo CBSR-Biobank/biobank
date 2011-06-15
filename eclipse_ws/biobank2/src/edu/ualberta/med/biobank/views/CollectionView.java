@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.treeview.patient.StudyWithPatientAdapter;
 
 public class CollectionView extends AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.CollectionView";
+    public static final String ID = "edu.ualberta.med.biobank.views.CollectionView"; //$NON-NLS-1$
 
     private static CollectionView currentInstance;
 
@@ -62,7 +62,7 @@ public class CollectionView extends AbstractAdministrationView {
         composite.setLayout(layout);
 
         radioPnumber = new Button(composite, SWT.RADIO);
-        radioPnumber.setText("Patient Number");
+        radioPnumber.setText(Messages.CollectionView_patient_label);
         radioPnumber.setSelection(true);
         radioPnumber.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -73,8 +73,8 @@ public class CollectionView extends AbstractAdministrationView {
     }
 
     protected void notFound(String text) {
-        boolean create = BgcPlugin.openConfirm("Patient not found",
-            "Do you want to create this patient ?");
+        boolean create = BgcPlugin.openConfirm(Messages.CollectionView_patient_error_title,
+            Messages.CollectionView_patient_error_msg);
         if (create) {
             PatientWrapper patient = new PatientWrapper(
                 SessionManager.getAppService());
@@ -124,7 +124,7 @@ public class CollectionView extends AbstractAdministrationView {
 
     @Override
     protected String getTreeTextToolTip() {
-        return "Enter a patient number";
+        return Messages.CollectionView_patient_tooltip;
     }
 
     protected void showSearchedObjectsInTree(
@@ -189,7 +189,7 @@ public class CollectionView extends AbstractAdministrationView {
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Search error", e);
+            BgcPlugin.openAsyncError(Messages.CollectionView_search_error_msg, e);
         }
     }
 

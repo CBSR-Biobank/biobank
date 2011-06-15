@@ -48,7 +48,7 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
             for (int i = 0; i < items.length; i++) {
                 appendedList.append(items[i]);
                 if (i < items.length - 1)
-                    appendedList.append("\n");
+                    appendedList.append("\n"); //$NON-NLS-1$
             }
             return appendedList.toString();
         }
@@ -93,7 +93,8 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
         public Composite getButtonBoxControl(Composite parent) {
             Composite buttonBoxControl = super.getButtonBoxControl(parent);
             if (editButton == null) {
-                editButton = createPushButton(buttonBoxControl, "Edit");
+                editButton = createPushButton(buttonBoxControl,
+                    Messages.ServerPreferencePage_edit_button_label);
                 editButton.setEnabled(false);
                 editButton.addSelectionListener(new SelectionAdapter() {
                     @Override
@@ -122,8 +123,9 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
 
         protected String getModifiedEntry(String original) {
             InputDialog entryDialog = new InputDialog(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), "Edit", "Edit Server:",
-                original, null);
+                .getActiveWorkbenchWindow().getShell(),
+                Messages.ServerPreferencePage_edit_dialog_title,
+                Messages.ServerPreferencePage_edit_dialog_msg, original, null);
             if (entryDialog.open() == InputDialog.OK) {
                 return entryDialog.getValue();
             }
@@ -142,7 +144,7 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
 
         @Override
         protected String[] parseString(String stringList) {
-            StringTokenizer st = new StringTokenizer(stringList, "\n");
+            StringTokenizer st = new StringTokenizer(stringList, "\n"); //$NON-NLS-1$
             String[] items = new String[st.countTokens()];
             int i = 0;
             while (st.hasMoreTokens()) {
@@ -160,7 +162,7 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
     @Override
     protected void createFieldEditors() {
         addField(new BiobankListEditor(PreferenceConstants.SERVER_LIST,
-            "Servers:", getFieldEditorParent()));
+            Messages.ServerPreferencePage_servers_label, getFieldEditorParent()));
     }
 
     @Override

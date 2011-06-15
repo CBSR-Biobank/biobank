@@ -8,13 +8,13 @@ import net.sf.jasperreports.engine.JasperPrint;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
 public class PrintPdfDataExporter extends PdfDataExporter {
     public PrintPdfDataExporter() {
-        super("Print");
+        super(Messages.PrintPdfDataExporter_name);
     }
 
     @Override
@@ -31,13 +31,16 @@ public class PrintPdfDataExporter extends PdfDataExporter {
                 maps);
             ReportingUtils.printReport(jasperPrint);
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error printing PDF", e);
+            BgcPlugin
+                .openAsyncError(Messages.PrintPdfDataExporter_error_msg, e);
             return;
         }
         try {
-            SessionManager.log("print", data.getTitle(), "data");
+            SessionManager.log(Messages.PrintPdfDataExporter_log_msg,
+                data.getTitle(), LOG_TYPE);
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error Logging Print", e);
+            BgcPlugin.openAsyncError(
+                Messages.PrintPdfDataExporter_logging_error_msg, e);
         }
     }
 }

@@ -45,7 +45,7 @@ public class MatchingTextValidator extends AbstractValidator {
             @Override
             public void handleEvent(Event event) {
                 String originalText = confirmationText.getText();
-                confirmationText.setText(originalText + "+1");
+                confirmationText.setText(originalText + "+1"); //$NON-NLS-1$
                 confirmationText.setText(originalText);
             }
         });

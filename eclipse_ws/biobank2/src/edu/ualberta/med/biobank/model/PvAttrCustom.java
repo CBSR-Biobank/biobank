@@ -20,7 +20,7 @@ public class PvAttrCustom {
     }
 
     public void setIsDefault(Boolean isDefault) {
-        propertyChangeSupport.firePropertyChange("isDefault", this.isDefault,
+        propertyChangeSupport.firePropertyChange("isDefault", this.isDefault, //$NON-NLS-1$
             this.isDefault = isDefault);
     }
 
@@ -29,7 +29,7 @@ public class PvAttrCustom {
     }
 
     public void setLabel(String label) {
-        propertyChangeSupport.firePropertyChange("label", this.label,
+        propertyChangeSupport.firePropertyChange("label", this.label, //$NON-NLS-1$
             this.label = label);
     }
 
@@ -38,7 +38,7 @@ public class PvAttrCustom {
     }
 
     public void setType(EventAttrTypeEnum type) {
-        propertyChangeSupport.firePropertyChange("type", this.type,
+        propertyChangeSupport.firePropertyChange("type", this.type, //$NON-NLS-1$
             this.type = type);
     }
 
@@ -51,7 +51,7 @@ public class PvAttrCustom {
     }
 
     public void setAllowedValues(String[] allowedValues) {
-        propertyChangeSupport.firePropertyChange("allowedValues",
+        propertyChangeSupport.firePropertyChange("allowedValues", //$NON-NLS-1$
             this.allowedValues, this.allowedValues = allowedValues);
     }
 
@@ -60,7 +60,7 @@ public class PvAttrCustom {
     }
 
     public void setValue(String value) {
-        propertyChangeSupport.firePropertyChange("value", this.value,
+        propertyChangeSupport.firePropertyChange("value", this.value, //$NON-NLS-1$
             this.value = value);
     }
 
