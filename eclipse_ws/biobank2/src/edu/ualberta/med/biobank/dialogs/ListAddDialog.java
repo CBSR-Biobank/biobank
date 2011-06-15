@@ -11,6 +11,9 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
+/**
+ * Used to edit PVInfos (see PvInfoWidget)
+ */
 public class ListAddDialog extends Dialog {
 
     private String title;
@@ -56,7 +59,7 @@ public class ListAddDialog extends Dialog {
 
     @Override
     protected void okPressed() {
-        result = items.getText().split(";");
+        result = items.getText().split(";"); //$NON-NLS-1$
         super.okPressed();
     }
 

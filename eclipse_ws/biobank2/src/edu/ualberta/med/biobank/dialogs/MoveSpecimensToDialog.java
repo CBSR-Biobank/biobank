@@ -15,6 +15,7 @@ import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -24,14 +25,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -60,20 +61,18 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
 
     @Override
     protected String getDialogShellTitle() {
-        return "Move specimens from one container to another";
+        return Messages.MoveSpecimensToDialog_title_shell;
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Select the new container that can hold the specimens.\n"
-            + "It should be initialized, empty, as big as the previous one,"
-            + " and should accept these specimens.";
+        return Messages.MoveSpecimensToDialog_description;
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return "Move specimens from container " + oldContainer.getLabel()
-            + " to another";
+        return NLS.bind(Messages.MoveSpecimensToDialog_title,
+            oldContainer.getLabel());
     }
 
     @Override
@@ -82,18 +81,19 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        Label siteLabel = widgetCreator
-            .createLabel(contents, "Repository Site");
+        Label siteLabel = widgetCreator.createLabel(contents,
+            Messages.MoveSpecimensToDialog_site_label);
         siteLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_CENTER));
         buildContainersMap();
         if (!SessionManager.getUser().isSuperAdministrator()) {
             siteLabel
-                .setToolTipText("Only Website administrator can move specimens to another site");
+                .setToolTipText(Messages.MoveSpecimensToDialog_site_tooltip);
         }
 
         newLabelText = (BgcBaseText) createBoundWidgetWithLabel(contents,
-            BgcBaseText.class, SWT.FILL, "New Container Label", null, null,
-            null, null);
+            BgcBaseText.class, SWT.FILL,
+            Messages.MoveSpecimensToDialog_newLabel_label, null, null, null,
+            null);
         newLabelText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
@@ -114,7 +114,7 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
         });
 
         Label listLabel = widgetCreator.createLabel(contents,
-            "Available containers");
+            Messages.MoveSpecimensToDialog_available_containers_label);
         lv = new ListViewer(contents);
         lv.setContentProvider(new ArrayContentProvider());
         lv.setLabelProvider(new BiobankLabelProvider());
@@ -137,14 +137,14 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
         // + "must be initialized but empty, "
         // + " and as big as the previous one.") {
 
-        String errorMessage = "A label should be selected";
+        String errorMessage = Messages.MoveSpecimensToDialog_newLabel_validation_msg;
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
             errorMessage);
         validator.setControlDecoration(BgcBaseWidget.createDecorator(listLabel,
             errorMessage));
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterGetValidator(validator);
-        selectedValue = new WritableValue("", String.class);
+        selectedValue = new WritableValue("", String.class); //$NON-NLS-1$
         listObserveSelection = SWTObservables.observeSelection(lv.getList());
         widgetCreator.bindValue(listObserveSelection, selectedValue, uvs, uvs);
     }
@@ -160,8 +160,9 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
                     .getCurrentWorkingSite(), typesFromOlContainer,
                 oldContainer.getRowCapacity(), oldContainer.getColCapacity());
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error",
-                "Failed to retrieve empty containers.");
+            BgcPlugin.openAsyncError(
+                Messages.MoveSpecimensToDialog_getEmptyContainers_error_title,
+                Messages.MoveSpecimensToDialog_getEmptyContainers_error_msg);
         }
         for (ContainerWrapper cont : conts) {
             map.put(cont.getLabel(), cont);
@@ -177,9 +178,9 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
 
     @Override
     public void okPressed() {
-        boolean sure = BgcPlugin.openConfirm("Other site",
-            "You are about to move these specimens into a container that belongs "
-                + "to another site. Are you sure ?");
+        boolean sure = BgcPlugin.openConfirm(
+            Messages.MoveSpecimensToDialog_move_confirm_title,
+            Messages.MoveSpecimensToDialog_move_confirm_msg);
         if (sure)
             super.okPressed();
     }

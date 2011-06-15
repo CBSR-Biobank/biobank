@@ -9,7 +9,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -31,17 +30,17 @@ public class SpecimenOriginSelectDialog extends BgcBaseDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.getString("SpecimenOriginSelectDialog.description"); //$NON-NLS-1$
+        return Messages.SpecimenOriginSelectDialog_description;
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.getString("SpecimenOriginSelectDialog.title"); //$NON-NLS-1$
+        return Messages.SpecimenOriginSelectDialog_title;
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.getString("SpecimenOriginSelectDialog.title"); //$NON-NLS-1$
+        return Messages.SpecimenOriginSelectDialog_title;
     }
 
     @Override
@@ -52,8 +51,8 @@ public class SpecimenOriginSelectDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         List<Object> objectList = new ArrayList<Object>(centers);
         widgetCreator.createComboViewer(contents,
-            Messages.getString("SpecimenOriginSelectDialog.centers.label"), //$NON-NLS-1$
-            objectList, null, null, new ComboSelectionUpdate() {
+            Messages.SpecimenOriginSelectDialog_centers_label, objectList,
+            null, null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     if (selectedObject instanceof CenterWrapper<?>)

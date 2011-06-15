@@ -6,6 +6,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
+import edu.ualberta.med.biobank.common.peer.ShippingMethodPeer;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -13,8 +14,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
 public class ShippingMethodDialog extends BgcBaseDialog {
 
-    private static final String TITLE = "Shipping Method";
-    private static final String MSG_NO_ST_NAME = "Shipping method must have a name.";
     private String message;
     private ShippingMethodWrapper shippingMethod;
     private String currentTitle;
@@ -24,8 +23,8 @@ public class ShippingMethodDialog extends BgcBaseDialog {
         super(parent);
         this.shippingMethod = shippingMethod;
         this.message = message;
-        currentTitle = (shippingMethod.getName() == null ? "Add " : "Edit ")
-            + TITLE;
+        currentTitle = (shippingMethod.getName() == null ? Messages.ShippingMethodDialog_title_add
+            : Messages.ShippingMethodDialog_title_edit);
     }
 
     @Override
@@ -50,7 +49,8 @@ public class ShippingMethodDialog extends BgcBaseDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            "Name", null, shippingMethod, "name", new NonEmptyStringValidator(
-                MSG_NO_ST_NAME));
+            Messages.ShippingMethodDialog_name_label, null, shippingMethod,
+            ShippingMethodPeer.NAME.getName(), new NonEmptyStringValidator(
+                Messages.ShippingMethodDialog_name_validation_msg));
     }
 }

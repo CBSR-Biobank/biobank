@@ -135,7 +135,7 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
             NewServerDialog dlg = new NewServerDialog(getFieldEditorParent()
                 .getShell());
             if (dlg.open() == Dialog.OK) {
-                return dlg.getText();
+                return dlg.getServerAddress();
             } else
                 return null;
         }

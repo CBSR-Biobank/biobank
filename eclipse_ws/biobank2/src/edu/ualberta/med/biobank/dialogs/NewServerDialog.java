@@ -12,11 +12,9 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
 public class NewServerDialog extends BgcBaseDialog {
 
-    private static final String TITLE = "New Server";
+    private static final String TITLE = Messages.NewServerDialog_title;
 
-    protected BgcBaseText textBox;
-
-    protected String text;
+    protected String serverAddress;
 
     public NewServerDialog(Shell parentShell) {
         super(parentShell);
@@ -24,7 +22,7 @@ public class NewServerDialog extends BgcBaseDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Enter the domain-name or IP address of the server:";
+        return Messages.NewServerDialog_description;
     }
 
     @Override
@@ -40,10 +38,11 @@ public class NewServerDialog extends BgcBaseDialog {
         area.setLayout(layout);
         area.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
-            "Server field cannot be empty");
-        textBox = (BgcBaseText) createBoundWidgetWithLabel(area,
-            BgcBaseText.class, SWT.NONE, "Address", new String[0], this,
-            "text", validator);
+            Messages.NewServerDialog_server_validation_msg);
+        BgcBaseText textBox = (BgcBaseText) createBoundWidgetWithLabel(area,
+            BgcBaseText.class, SWT.NONE,
+            Messages.NewServerDialog_address_label, new String[0], this,
+            "serverAddress", validator); //$NON-NLS-1$
         GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
@@ -60,12 +59,12 @@ public class NewServerDialog extends BgcBaseDialog {
         this.close();
     }
 
-    public String getText() {
-        return text;
+    public String getServerAddress() {
+        return serverAddress;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setServerAddress(String text) {
+        this.serverAddress = text;
     }
 
 }
