@@ -19,7 +19,7 @@
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
-            application="biobank2.biobank2"
+            application="biobank.biobank2"
             name="BioBank2">
          <property
                name="appName"

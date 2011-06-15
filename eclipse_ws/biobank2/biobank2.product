@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="BioBank2" uid="biobank2.product" id="biobank2.product" application="biobank2.biobank2" version="1.4.0.rc6" useFeatures="true" includeLaunchers="false">
+<product name="BioBank2" uid="biobank.product" id="biobank.product" application="biobank2.biobank2" version="1.4.0.rc6" useFeatures="true" includeLaunchers="false">
 
    <aboutInfo>
       <image path="/biobank2/icons/about.png"/>
