@@ -167,6 +167,18 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected void setMode(Mode m) {
         mode = m;
+        if (m.isSingleMode())
+            setFirstControl(inventoryIdText);
+        else
+            setFirstControl(useScannerButton);
+    }
+
+    @Override
+    protected void setFirstControl(Mode mode) {
+        if (mode.isSingleMode())
+            setFirstControl(inventoryIdText);
+        else
+            setFirstControl(useScannerButton);
     }
 
     @Override
