@@ -47,4 +47,19 @@ public class JasperTemplateWrapper extends JasperTemplateBaseWrapper {
         return appService.query(criteria);
     }
 
+    private static final String TEMPLATE_BY_NAME_QRY = "from "
+        + JasperTemplate.class.getName() + " where name=?";
+
+    public static JasperTemplateWrapper getTemplateByName(
+        WritableApplicationService appService, String name)
+        throws ApplicationException {
+        StringBuilder qry = new StringBuilder(TEMPLATE_BY_NAME_QRY);
+        List<Object> qryParms = new ArrayList<Object>();
+        qryParms.add(name);
+
+        HQLCriteria criteria = new HQLCriteria(qry.toString(), qryParms);
+        List<JasperTemplate> templates = appService.query(criteria);
+        return new JasperTemplateWrapper(appService, templates.get(0));
+    }
+
 }
