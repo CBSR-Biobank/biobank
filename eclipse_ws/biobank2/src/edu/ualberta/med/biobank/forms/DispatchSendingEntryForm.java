@@ -242,6 +242,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 dispatch.addSpecimens(Arrays.asList(specimen),
                     DispatchSpecimenState.NONE);
                 reloadSpecimens();
+                setDirty(true);
                 break;
             case ERROR:
                 BiobankGuiCommonPlugin.openAsyncError("Invalid specimen", res
