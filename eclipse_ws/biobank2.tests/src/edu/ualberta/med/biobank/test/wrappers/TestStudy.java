@@ -39,7 +39,6 @@ import edu.ualberta.med.biobank.test.internal.SourceSpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestStudy extends TestDatabase {
-
     @Test
     public void testGetSiteCollection() throws Exception {
         String name = "testGetSiteCollection" + r.nextInt();

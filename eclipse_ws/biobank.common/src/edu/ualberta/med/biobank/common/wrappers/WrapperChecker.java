@@ -10,6 +10,8 @@ import edu.ualberta.med.biobank.common.wrappers.checks.CheckCollectionIsEmpty;
 import edu.ualberta.med.biobank.common.wrappers.checks.CheckNotNull;
 import edu.ualberta.med.biobank.common.wrappers.checks.CheckNotUsed;
 import edu.ualberta.med.biobank.common.wrappers.checks.CheckUnique;
+import edu.ualberta.med.biobank.common.wrappers.checks.LazyMessage;
+import edu.ualberta.med.biobank.common.wrappers.checks.PostCheckLegalOption;
 
 class WrapperChecker<E> {
     private final ModelWrapper<E> wrapper;
@@ -57,6 +59,14 @@ class WrapperChecker<E> {
         String exceptionMessage) {
         return new CheckCollectionIsEmpty<E>(wrapper, property,
             exceptionMessage);
+    }
+
+    public <T> PostCheckLegalOption<E> legalOption(
+        Property<? extends Collection<? extends T>, ? super E> legalOptions,
+        Property<? extends T, ? super E> selectedOption,
+        LazyMessage exceptionMessage) {
+        return new PostCheckLegalOption<E>(wrapper, legalOptions,
+            selectedOption, exceptionMessage);
     }
 
     public <T> CheckNotUsed<E> notUsedBy(Class<T> propertyClass,

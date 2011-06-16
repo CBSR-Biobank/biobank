@@ -44,7 +44,7 @@ class WrapperCascader<E> {
         // server anyways.
         // TODO: switch to an "isModified" check, called when setters are
         // called...
-        if (wrapper.isInitialized(property)) {
+        if (wrapper.isPropertyCached(property)) {
             if (property.isCollection()) {
                 @SuppressWarnings("unchecked")
                 Property<? extends Collection<T>, ? super E> tmp = (Property<? extends Collection<T>, ? super E>) property;
@@ -89,6 +89,19 @@ class WrapperCascader<E> {
         return tasks;
     }
 
+    /**
+     * Persists all newly added elements in the collection for the given
+     * {@code Property}.
+     * 
+     * NOTE: this is actually dangerous because if a property is added and
+     * modified then _ALL_ changes will be peristed, not just it being added to
+     * the collection (e.g. if the name was changed, the name change will be
+     * persisted as well).
+     * 
+     * @param <T>
+     * @param property
+     * @return
+     */
     public <T> TaskList persistAdded(
         Property<? extends Collection<T>, E> property) {
         TaskList tasks = new TaskList();
@@ -114,24 +127,23 @@ class WrapperCascader<E> {
      * @return
      */
     // TODO: remove this in favour of deleteRemoved()
-    @Deprecated
-    public <T> TaskList deleteRemovedProperty(
-        Property<Collection<T>, E> property) {
+    public <T> TaskList deleteRemovedUnchecked(Property<T, E> property) {
         TaskList tasks = new TaskList();
 
         if (!wrapper.isNew() && wrapper.isInitialized(property)) {
-            tasks.add(new DeleteRemoved<E>(wrapper, property));
+            tasks.add(new DeleteRemovedUnchecked<E>(wrapper, property));
         }
 
         return tasks;
     }
 
-    private static class DeleteRemoved<E> extends BiobankWrapperAction<E> {
+    private static class DeleteRemovedUnchecked<E> extends
+        BiobankWrapperAction<E> {
         private static final long serialVersionUID = 1L;
 
         private final Property<?, ? super E> property;
 
-        protected DeleteRemoved(ModelWrapper<E> wrapper,
+        protected DeleteRemovedUnchecked(ModelWrapper<E> wrapper,
             Property<?, ? super E> property) {
             super(wrapper);
             this.property = property;

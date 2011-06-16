@@ -167,6 +167,9 @@ public class WrapperTransaction {
                 setWrappedObject(cachedWrappers.get(i), newObjects.get(i));
                 // TODO: only thing that may have changed is the id, notify
                 // listeners?
+                // TODO: direct properties may have changed, but not
+                // associations (e.g. label if container rename) so should do
+                // some sort of notification.
             }
         }
 

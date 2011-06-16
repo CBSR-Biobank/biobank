@@ -42,16 +42,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         super(appService);
     }
 
-    @Override
-    protected void persistDependencies(ProcessingEvent origObject)
-        throws Exception {
-        for (SpecimenWrapper ss : removedSpecimens) {
-            if (!ss.isNew()) {
-                ss.persist();
-            }
-        }
-    }
-
     private static final String SPECIMEN_COUNT_QRY = "select count(specimen) from "
         + Specimen.class.getName()
         + " as specimen where specimen."
@@ -234,6 +224,9 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
         tasks.add(super.getPersistTasks());
 
+        tasks.add(cascade().persistAdded(
+            ProcessingEventPeer.SPECIMEN_COLLECTION));
+
         return tasks;
     }
 
@@ -241,11 +234,17 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     protected TaskList getDeleteTasks() {
         TaskList tasks = new TaskList();
 
+        tasks.add(cascade().persistRemoved(
+            ProcessingEventPeer.SPECIMEN_COLLECTION));
+
         String hasDerivedSpecimensMsg = MessageFormat.format(
             HAS_DERIVED_SPECIMENS_MSG, getWorksheet(), getFormattedCreatedAt());
         tasks.add(check().notUsedBy(Specimen.class,
             SpecimenPeer.PARENT_SPECIMEN.to(SpecimenPeer.PROCESSING_EVENT),
             hasDerivedSpecimensMsg));
+
+        tasks.add(check().notUsedBy(Specimen.class,
+            SpecimenPeer.PROCESSING_EVENT));
 
         tasks.add(super.getDeleteTasks());
 

@@ -11,24 +11,30 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.LazyMessage;
+import edu.ualberta.med.biobank.common.wrappers.checks.LazyMessage.LazyArg;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenWrapper extends SpecimenBaseWrapper {
-
+    private static final String BAD_SAMPLE_TYPE_MSG = "Container {0} does not allow inserts of sample type {1}.";
     private static final String DISPATCHS_CACHE_KEY = "dispatchs";
     private AbstractObjectWithPositionManagement<SpecimenPosition, SpecimenWrapper> objectWithPositionManagement;
 
@@ -41,6 +47,13 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     public SpecimenWrapper(WritableApplicationService appService) {
         super(appService);
         init();
+    }
+
+    @Override
+    protected Specimen getNewObject() throws Exception {
+        Specimen newObject = super.getNewObject();
+        newObject.setTopSpecimen(wrappedObject);
+        return newObject;
     }
 
     private void init() {
@@ -74,33 +87,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                 return null;
             }
         };
-    }
-
-    @Override
-    public void persist() throws Exception {
-        // check if position was deleted
-        if (getPosition() == null) {
-            // get original position
-            SpecimenPosition rawPos = wrappedObject.getSpecimenPosition();
-            if (rawPos != null) {
-                AbstractPositionWrapper<SpecimenPosition> pos = new SpecimenPositionWrapper(
-                    appService, rawPos);
-                if (!pos.isNew()) {
-                    pos.delete();
-                }
-            }
-            wrappedObject.setSpecimenPosition(null);
-        }
-        objectWithPositionManagement.persist();
-        super.persist();
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        checkInventoryIdUnique();
-        checkParentAcceptSampleType();
-        objectWithPositionManagement.persistChecks();
     }
 
     public void checkInventoryIdUnique() throws BiobankException,
@@ -475,13 +461,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     @Override
-    protected void resetInternalFields() {
-        objectWithPositionManagement.resetInternalFields();
-        if (isNew())
-            setTopSpecimenInternal(this);
-    }
-
-    @Override
     protected void persistDependencies(Specimen originalSpecimen)
         throws Exception {
 
@@ -531,5 +510,98 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
     protected void setTopSpecimenInternal(SpecimenWrapper specimen) {
         super.setTopSpecimen(specimen);
+    }
+
+    @Override
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
+        objectWithPositionManagement.persistChecks();
+    }
+
+    private TaskList postCheckLegalSampleType() {
+        LazyArg<Specimen> containerLabel = LazyArg.create(this,
+            SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.CONTAINER
+                .to(ContainerPeer.LABEL)));
+
+        LazyArg<Specimen> specimenType = LazyArg.create(this,
+            SpecimenPeer.SPECIMEN_TYPE.to(SpecimenTypePeer.NAME_SHORT));
+
+        LazyMessage badSampleTypeMsg = new LazyMessage(BAD_SAMPLE_TYPE_MSG,
+            containerLabel, specimenType);
+
+        Property<Collection<SpecimenType>, Specimen> pathToLegalSpecimenTypeOptions = SpecimenPeer.SPECIMEN_POSITION
+            .to(SpecimenPositionPeer.CONTAINER.to(ContainerPeer.CONTAINER_TYPE
+                .to(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION)));
+
+        TaskList tasks = new TaskList();
+
+        tasks.add(check().legalOption(pathToLegalSpecimenTypeOptions,
+            SpecimenPeer.SPECIMEN_TYPE, badSampleTypeMsg));
+
+        return tasks;
+    }
+
+    @Override
+    protected TaskList getPersistTasks() {
+        TaskList tasks = new TaskList();
+
+        // to make the entire loaded tree consistent, walk up to the highest
+        // loaded parent, then persist from the top down.
+
+        tasks.add(check().uniqueAndNotNull(SpecimenPeer.INVENTORY_ID));
+        tasks.add(check().notNull(SpecimenPeer.SPECIMEN_TYPE));
+
+        tasks.add(cascade().deleteRemovedUnchecked(
+            SpecimenPeer.SPECIMEN_POSITION));
+
+        // TODO: specimen position checks
+        //
+
+        tasks.add(super.getPersistTasks());
+
+        tasks.add(cascade().persist(SpecimenPeer.SPECIMEN_POSITION));
+
+        tasks.add(postCheckLegalSampleType());
+
+        // persist loaded children so that they are correctly updated
+        tasks.add(cascade().persist(SpecimenPeer.CHILD_SPECIMEN_COLLECTION));
+
+        return tasks;
+    }
+
+    /**
+     * Gets the top specimen that was cached in this tree.
+     * 
+     * @return
+     */
+    private SpecimenWrapper getTopCachedSpecimen() {
+        SpecimenWrapper topCached = this;
+
+        while (topCached.isPropertyCached(SpecimenPeer.PARENT_SPECIMEN)
+            && getParentSpecimen() != null) {
+            topCached = getParentSpecimen();
+        }
+
+        return topCached;
+    }
+
+    @Override
+    protected TaskList getDeleteTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(super.getDeleteTasks());
+
+        return tasks;
+    }
+
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        WrapperTransaction.persist(this, appService);
+    }
+
+    @Override
+    public void delete() throws Exception {
+        WrapperTransaction.delete(this, appService);
     }
 }

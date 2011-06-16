@@ -429,7 +429,15 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         firePropertyChanges(oldWrappedObject, wrappedObject);
     }
 
+    /**
+     * Override this method to supply default values.
+     * 
+     * @return
+     * @throws Exception
+     */
     protected E getNewObject() throws Exception {
+        // TODO: could override in base classes with "new WrappedClass();" then
+        // no exception would be thrown.
         Constructor<E> constructor = getWrappedClass().getConstructor();
         return constructor.newInstance();
     }
@@ -848,7 +856,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             newValues.add(element.getWrappedObject());
         }
 
-        // do this only for 1-to-N relationships, not M-to-N!!
         modelWrapper.elementTracker.track(property);
 
         setModelProperty(modelWrapper, property, newValues);
