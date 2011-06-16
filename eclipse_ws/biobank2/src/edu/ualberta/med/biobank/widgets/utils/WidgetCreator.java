@@ -548,9 +548,11 @@ public class WidgetCreator {
                 uvs = new UpdateValueStrategy();
                 uvs.setAfterConvertValidator(validator);
             }
+            dbc.bindValue(new DateTimeObservableValue(widget),
+                modelObservableValue, null, null);
             Binding binding = dbc.bindValue(
-                new DateTimeObservableValue(widget), modelObservableValue, uvs,
-                null);
+                new DateTimeObservableValue(widget), new WritableValue(
+                    modelObservableValue.getValue(), Date.class), uvs, null);
             if (bindingKey != null) {
                 bindings.put(bindingKey, binding);
             }
