@@ -8,7 +8,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -211,7 +213,14 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         info.activityStatus = (status == null) ? "" : status.getName();
         info.comment = specimen.getComment();
         info.center = specimen.getCurrentCenter().getNameShort();
-        info.originCenter = specimen.getOriginInfo().getCenter().getNameShort();
+
+        info.originCenter = "";
+        OriginInfoWrapper oi = specimen.getOriginInfo();
+        if (oi != null) {
+            CenterWrapper<?> originCenter = oi.getCenter();
+            if (originCenter != null)
+                info.originCenter = originCenter.getNameShort();
+        }
 
         return info;
     }
