@@ -177,6 +177,10 @@ public class BgcBaseText extends BgcBaseWidget {
     public void setEditable(boolean b) {
         text.setEditable(b);
     }
+    
+    public void setTextLimit(int limit){
+        text.setTextLimit(limit);
+    }
 
     @Override
     public void setEnabled(boolean enabled) {
