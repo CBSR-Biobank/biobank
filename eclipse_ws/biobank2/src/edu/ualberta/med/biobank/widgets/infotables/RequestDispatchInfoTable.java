@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.widgets.infotables;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -72,4 +73,14 @@ public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     protected BiobankTableSorter getComparator() {
         return null;
     }
+
+    public void setSelection(Object object) {
+        getTableViewer().setSelection((ISelection) object);
+    }
+
+    @Override
+    public boolean isEditMode() {
+        return true;
+    }
+
 }

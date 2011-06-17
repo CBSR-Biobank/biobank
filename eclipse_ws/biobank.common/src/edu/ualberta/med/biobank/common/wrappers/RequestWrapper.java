@@ -8,7 +8,6 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
-import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.base.RequestBaseWrapper;
 import edu.ualberta.med.biobank.model.Request;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -51,18 +50,6 @@ public class RequestWrapper extends RequestBaseWrapper {
         }
         cache.put(NON_PROCESSED_SPECIMENS_CACHE_KEY, null);
         cache.put(PROCESSED_SPECIMENS_CACHE_KEY, null);
-    }
-
-    public void receiveSpecimen(String text) throws Exception {
-        List<RequestSpecimenWrapper> ras = getNonProcessedRequestSpecimenCollection();
-        for (RequestSpecimenWrapper r : ras)
-            if (r.getSpecimen().getInventoryId().equals(text)) {
-                flagSpecimens(Arrays.asList(r));
-                return;
-            }
-        throw new Exception("Specimen " + text
-            + " is not a member of this request.");
-
     }
 
     public List<RequestSpecimenWrapper> getNonProcessedRequestSpecimenCollection() {
@@ -138,10 +125,6 @@ public class RequestWrapper extends RequestBaseWrapper {
             wrappers.add(new RequestWrapper(appService, s));
         }
         return wrappers;
-    }
-
-    public void setState(RequestState state) {
-        setState(state.getId());
     }
 
 }

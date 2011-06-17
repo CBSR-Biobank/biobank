@@ -20,7 +20,7 @@ public class TreeItemAdapter implements Node {
     }
 
     @Override
-    public Object getParent() {
+    public Node getParent() {
         return parent;
     }
 
@@ -42,5 +42,11 @@ public class TreeItemAdapter implements Node {
             return raw.getSpecimen().getActivityStatus().getName();
         }
         return "";
+    }
+
+    @Override
+    public void removeChild(Node o) {
+        // TODO Auto-generated method stub
+        
     }
 }

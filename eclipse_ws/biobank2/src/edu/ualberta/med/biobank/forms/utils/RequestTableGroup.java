@@ -49,8 +49,9 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
         + ".id=? order by ra."
         + RequestSpecimenPeer.STATE.getName();
 
-    public static List<Node> getGroupsForRequest(RequestWrapper ship) {
-        List<Node> groups = new ArrayList<Node>();
+    public static List<RequestTableGroup> getGroupsForRequest(
+        RequestWrapper ship) {
+        ArrayList<RequestTableGroup> groups = new ArrayList<RequestTableGroup>();
         groups.add(new RequestTableGroup(null, "All", ship));
         groups.add(new RequestTableGroup(RequestSpecimenState.PULLED_STATE,
             ship));
@@ -123,6 +124,17 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
                 }
             }
         }
+    }
+
+    public void addChild(Node c) {
+        tops.add(c);
+        numSpecimens++;
+    }
+
+    @Override
+    public void removeChild(Node o) {
+        tops.remove(o);
+        numSpecimens--;
     }
 
 }

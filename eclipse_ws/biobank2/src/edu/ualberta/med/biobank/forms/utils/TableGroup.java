@@ -14,7 +14,7 @@ public abstract class TableGroup<T extends ModelWrapper<?>> implements Node {
     protected String alternateLabel;
     protected List<Node> tops;
     protected static final Pattern p = Pattern.compile("/");
-    protected Object parent = null;
+    protected Node parent = null;
 
     protected TableGroup(ItemState state, T request) {
         this(state, null, request);
@@ -51,7 +51,7 @@ public abstract class TableGroup<T extends ModelWrapper<?>> implements Node {
     }
 
     @Override
-    public Object getParent() {
+    public Node getParent() {
         return parent;
     }
 }

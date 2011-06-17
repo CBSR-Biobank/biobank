@@ -73,4 +73,10 @@ public class DispatchTableGroup extends TableGroup<DispatchWrapper> {
 
         this.tops = adapters;
     }
+
+    @Override
+    public void removeChild(Node o) {
+        // TODO Auto-generated method stub
+        
+    }
 }

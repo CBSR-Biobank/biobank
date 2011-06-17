@@ -9,18 +9,18 @@ import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 
 public class RequestContainerAdapter implements Node {
 
-    public Object parent;
+    public Node parent;
     public ContainerWrapper container;
     List<Node> children;
 
-    public RequestContainerAdapter(Object parent, ContainerWrapper container) {
+    public RequestContainerAdapter(Node parent, ContainerWrapper container) {
         this.parent = parent;
         this.container = container;
         this.children = new ArrayList<Node>();
     }
 
     @Override
-    public Object getParent() {
+    public Node getParent() {
         return parent;
     }
 
@@ -55,6 +55,11 @@ public class RequestContainerAdapter implements Node {
         children.add(c);
     }
 
+    @Override
+    public void removeChild(Node c) {
+        children.remove(c);
+    }
+
     public void setParent(Node p) {
         this.parent = p;
     }
@@ -70,4 +75,5 @@ public class RequestContainerAdapter implements Node {
         }
         return specs;
     }
+
 }

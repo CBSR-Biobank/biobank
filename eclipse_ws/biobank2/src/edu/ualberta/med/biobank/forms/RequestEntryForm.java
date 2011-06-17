@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,21 +25,20 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
-import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.RequestReceiveScanDialog;
+import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.RequestSpecimensTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.RequestDispatchInfoTable;
 
-/* FIXME: HAMFISTED REFRESHES: SHOULD BE IMPROVED */
-
-public class RequestEntryForm extends BiobankFormBase {
+public class RequestEntryForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.RequestEntryFormBase";
     private RequestWrapper request;
@@ -55,9 +55,7 @@ public class RequestEntryForm extends BiobankFormBase {
             + request.getStudy().getNameShort());
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
         createMainSection();
-
     }
 
     private void createMainSection() {
@@ -71,10 +69,6 @@ public class RequestEntryForm extends BiobankFormBase {
         BiobankText orderNumberLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Request Number");
         setTextValue(orderNumberLabel, request.getId());
-        BiobankText requestStateLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "State");
-        setTextValue(requestStateLabel,
-            RequestState.getState(request.getState()));
 
         BiobankText studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Study");
@@ -126,19 +120,23 @@ public class RequestEntryForm extends BiobankFormBase {
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                SpecimenWrapper specimen;
+                RequestSpecimenWrapper specimen;
+                TreeItemAdapter specNode;
                 try {
-                    specimen = SpecimenWrapper.getSpecimen(
-                        SessionManager.getAppService(),
-                        newSpecimenText.getText(), SessionManager.getUser());
-                    if (specimen != null)
+                    specNode = (TreeItemAdapter) specimensTree
+                        .search(newSpecimenText.getText());
+                    if (specNode == null)
+                        throw new Exception("Specimen not found");
+                    specimen = (RequestSpecimenWrapper) specNode.getSpecimen();
+                    if (specimen != null) {
                         addToDispatch(getDispatchSelection(),
                             Arrays.asList(specimen));
+                        specimensTree.dispatch(specNode);
+                    }
                 } catch (Exception e1) {
-                    BiobankPlugin.openAsyncError("Database Error", e1);
+                    BiobankPlugin.openAsyncError("Error", e1.getMessage());
                 }
                 newSpecimenText.setText("");
-                specimensTree.refresh();
                 dispatchTable.reloadCollection(
                     request.getDispatchCollection(false),
                     getDispatchSelection());
@@ -189,9 +187,11 @@ public class RequestEntryForm extends BiobankFormBase {
     }
 
     protected void setEnabledActions() {
-        openScanButton.setEnabled(getDispatchSelection() != null);
-        addButton.setEnabled(getDispatchSelection() != null);
-        newSpecimenText.setEnabled(getDispatchSelection() != null);
+        Boolean b = getDispatchSelection() != null
+            && getDispatchSelection().isInCreationState();
+        openScanButton.setEnabled(b);
+        addButton.setEnabled(b);
+        newSpecimenText.setEnabled(b);
     }
 
     protected DispatchWrapper getDispatchSelection() {
@@ -213,13 +213,36 @@ public class RequestEntryForm extends BiobankFormBase {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 try {
-                    request.receiveSpecimen(newSpecimenText.getText());
+                    Node updateNode = specimensTree.search(newSpecimenText
+                        .getText());
+                    if (updateNode == null)
+                        throw new Exception("Specimen "
+                            + newSpecimenText.getText()
+                            + " is not a valid choice.");
+                    else if (((TreeItemAdapter) updateNode).getSpecimen()
+                        .getSpecimenState()
+                        .equals(RequestSpecimenState.AVAILABLE_STATE)) {
+                        RequestSpecimenWrapper spec = (RequestSpecimenWrapper) ((TreeItemAdapter) updateNode)
+                            .getSpecimen();
+                        if (spec.getSpecimen().getInventoryId()
+                            .equals(newSpecimenText.getText())) {
+                            if (spec.getClaimedBy() == null
+                                || !spec.getClaimedBy().equals(
+                                    SessionManager.getUser().getFirstName()))
+                                throw new Exception(
+                                    "You must claim this specimen before pulling is permitted.");
+                            request.flagSpecimens(Arrays.asList(spec));
+                            specimensTree.pull(updateNode);
+                        }
+                    } else
+                        throw new Exception(
+                            "This specimen has been already been processed.");
+
                 } catch (Exception e1) {
-                    BiobankPlugin.openAsyncError("Save Error", e1);
+                    BiobankPlugin.openAsyncError("Error", e1.getMessage());
                 }
                 newSpecimenText.setFocus();
                 newSpecimenText.setText("");
-                specimensTree.refresh();
             }
         });
     }
@@ -270,31 +293,29 @@ public class RequestEntryForm extends BiobankFormBase {
     }
 
     protected void addToDispatch(DispatchWrapper dispatch,
-        List<SpecimenWrapper> selectionWrappers) {
+        List<RequestSpecimenWrapper> specs) throws Exception {
         // FIXME: SHOULD BE IN ONE TRANSACTION
-        try {
-            Boolean found = false;
-            List<RequestSpecimenWrapper> specs = request
-                .getProcessedRequestSpecimenCollection();
-            for (SpecimenWrapper spec : selectionWrappers) {
-                for (RequestSpecimenWrapper rspec : specs) {
-                    if (spec.equals(rspec.getSpecimen())) {
-                        rspec.setState(RequestSpecimenState.DISPATCHED_STATE);
-                        rspec.persist();
-                        found = true;
-                    }
-                }
-                if (found == false)
-                    throw new Exception(
-                        "Error Adding: Specimen has not been pulled.");
-                found = false;
-            }
-            dispatch
-                .addSpecimens(selectionWrappers, DispatchSpecimenState.NONE);
-            dispatch.persist();
-        } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Add Failed", e);
+        List<SpecimenWrapper> dispatchSpecimens = new ArrayList<SpecimenWrapper>();
+        for (RequestSpecimenWrapper rspec : specs) {
+            if (rspec.getSpecimenState().equals(
+                RequestSpecimenState.PULLED_STATE)) {
+                rspec.setState(RequestSpecimenState.DISPATCHED_STATE);
+                rspec.persist();
+                dispatchSpecimens.add(rspec.getSpecimen());
+            } else
+                throw new Exception(
+                    "Error Adding: Specimen has not been pulled.");
         }
+        dispatch.addSpecimens(dispatchSpecimens, DispatchSpecimenState.NONE);
+        dispatch.persist();
+    }
 
+    @Override
+    public void reload() throws Exception {
+        request.reload();
+        specimensTree.refresh();
+        dispatchTable.setCollection(request.getDispatchCollection(false));
+        dispatchTable.setSelection(null);
+        setEnabledActions();
     }
 }

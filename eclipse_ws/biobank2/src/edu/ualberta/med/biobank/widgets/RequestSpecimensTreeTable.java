@@ -11,7 +11,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -43,7 +42,7 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
 
     private TreeViewer tv;
     private RequestWrapper request;
-    protected List<Node> groups;
+    protected List<RequestTableGroup> groups;
     private Boolean selecting = false;
 
     @SuppressWarnings("unused")
@@ -187,8 +186,9 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
                 for (MenuItem menuItem : menu.getItems()) {
                     menuItem.dispose();
                 }
-                if (((Node) ((StructuredSelection) tv.getSelection())
-                    .getFirstElement()).getParent() != null) {
+                Object node = ((StructuredSelection) tv.getSelection())
+                    .getFirstElement();
+                if (node != null && ((Node) node).getParent() != null) {
                     addSetUnavailableMenu(menu);
                     addClaimMenu(menu);
                 }
@@ -253,10 +253,11 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
         List<RequestSpecimenWrapper> wrappers = new ArrayList<RequestSpecimenWrapper>();
         for (Node adapter : getSelectionAdapters(((StructuredSelection) tv
             .getSelection()).toList())) {
-            if (adapter instanceof TreeItemAdapter)
-                wrappers
-                    .add((RequestSpecimenWrapper) ((TreeItemAdapter) adapter)
-                        .getSpecimen());
+            if (adapter instanceof TreeItemAdapter) {
+                RequestSpecimenWrapper spec = (RequestSpecimenWrapper) ((TreeItemAdapter) adapter)
+                    .getSpecimen();
+                wrappers.add(spec);
+            }
         }
         return wrappers;
     }
@@ -264,16 +265,53 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
     public List<Node> getSelectionAdapters(List<Node> sel) {
         HashSet<Node> adapters = new HashSet<Node>();
         for (Object o : sel) {
-            adapters.add((Node) o);
-            adapters.addAll(getSelectionAdapters(((Node) o).getChildren()));
+            // depth first (dont add parent if no children)
+            List<Node> children = getSelectionAdapters(((Node) o).getChildren());
+            adapters.addAll(children);
+            if (o instanceof TreeItemAdapter) {
+                RequestSpecimenWrapper spec = (RequestSpecimenWrapper) ((TreeItemAdapter) o)
+                    .getSpecimen();
+                if (spec.getSpecimenState().equals(
+                    RequestSpecimenState.AVAILABLE_STATE))
+                    adapters.add((Node) o);
+            } else if (children.size() > 0)
+                adapters.add((Node) o);
         }
         return new ArrayList<Node>(adapters);
     }
 
     public void refresh() {
-        Object[] expanded = tv.getExpandedTreePaths();
-        tv.setInput("refresh");
-        tv.setExpandedTreePaths((TreePath[]) expanded);
-        this.notifyListeners(SWT.CHANGED, new Event());
+        tv.refresh(true);
+    }
+
+    public Node search(String text) {
+        return search(groups.get(0), text);
+    }
+
+    public Node search(Node startNode, String text) {
+        if (startNode instanceof TreeItemAdapter
+            && ((RequestSpecimenWrapper) ((TreeItemAdapter) startNode)
+                .getSpecimen()).getSpecimen().getInventoryId().equals(text))
+            return startNode;
+        else {
+            Node found = null;
+            List<Node> children = startNode.getChildren();
+            for (Node child : children) {
+                found = search(child, text);
+                if (found != null)
+                    return found;
+            }
+            return null;
+        }
+    }
+
+    public void pull(Node updateNode) {
+        groups.get(1).addChild(updateNode);
+        tv.refresh();
+    }
+
+    public void dispatch(Node specNode) {
+        groups.get(1).removeChild(specNode);
+        tv.refresh();
     }
 }
