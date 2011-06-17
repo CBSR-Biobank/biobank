@@ -25,8 +25,8 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import edu.ualberta.med.biobank.wizards.SelectCollectionEventWizard;
 
@@ -46,7 +46,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private BgcBaseText centerLabel;
 
-    private BiobankText centerLabel;
+    private BgcBaseText originCenterLabel;
 
     private BgcBaseText patientField;
 

@@ -32,9 +32,9 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private BgcBaseText centerLabel;
 
-    private BgcBaseText sampleTypeLabel;
+    private BgcBaseText originCenterLabel;
 
-    private BiobankText sampleTypeLabel;
+    private BgcBaseText sampleTypeLabel;
 
     private BgcBaseText createdDateLabel;
 

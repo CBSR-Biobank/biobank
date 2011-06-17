@@ -1080,9 +1080,9 @@
     <copy todir="${buildDirectory}/plugins/sampleProcessingRobot">
       <fileset dir="${eclipse.workspace.dir}/sampleProcessingRobot" />
     </copy>
-    <!-- copy todir="${buildDirectory}/plugins/barcodeGenerator">
+    <copy todir="${buildDirectory}/plugins/barcodeGenerator">
       <fileset dir="${eclipse.workspace.dir}/barcodeGenerator" />
-    </copy -->
+    </copy>
     <copy todir="${buildDirectory}/plugins/biobank.gui.common">
       <fileset dir="${eclipse.workspace.dir}/biobank.gui.common" />
     </copy>
