@@ -93,8 +93,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     // source/type hierarchy selected (use rows order)
     private List<SpecimenHierarchy> preSelections;
 
-    protected boolean modifyingType;
-
     @Override
     protected void init() throws Exception {
         super.init();
@@ -267,6 +265,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected void defaultInitialisation() {
+        super.defaultInitialisation();
         setNeedSinglePosition(mode == Mode.SINGLE_POSITION);
     }
 
@@ -327,20 +326,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             }
         });
 
-        // widget to select the source and the type
-        singleTypesWidget = new AliquotedSpecimenSelectionWidget(
-            fieldsComposite, null, widgetCreator, false);
-        singleTypesWidget
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    modifyingType = true;
-                    newSinglePositionText.setText("");
-                    modifyingType = false;
-                }
-            });
-        singleTypesWidget.addBindings();
-
+        // position field
         newSinglePositionLabel = widgetCreator.createLabel(fieldsComposite,
             Messages.getString("SpecimenAssign.single.position.label")); //$NON-NLS-1$
         newSinglePositionValidator = new StringLengthValidator(4,
@@ -374,15 +360,18 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         newSinglePositionText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                if (!modifyingType) {
-                    positionTextModified = true;
-                    displaySinglePositions(false);
-                    canSaveSingleSpecimen.setValue(false);
-                }
+                positionTextModified = true;
+                displaySinglePositions(false);
+                canSaveSingleSpecimen.setValue(false);
             }
         });
         newSinglePositionText
             .addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+
+        // widget to select the source and the type
+        singleTypesWidget = new AliquotedSpecimenSelectionWidget(
+            fieldsComposite, null, widgetCreator, false);
+        singleTypesWidget.addBindings();
     }
 
     private void checkInventoryId(BgcBaseText inventoryIdText) {
@@ -574,7 +563,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             posStr = Messages.getString("SpecimenLink.position.label.none"); //$NON-NLS-1$
         }
         // LINKED\: specimen {0} of type\: {1} to source\: {2} ({3}) -
-        // Patient\: {4} - Visit\: {5} - Center\: {6} \n
+        // Patient\: {4} - Visit\: {5} - Center\: {6} - Position\: {7}\n
         appendLog(Messages.getString(
             "SpecimenLink.activitylog.specimen.linked", singleSpecimen //$NON-NLS-1$
                 .getInventoryId(), singleSpecimen.getSpecimenType().getName(),
@@ -582,7 +571,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 .getParentSpecimen().getSpecimenType().getNameShort(),
             linkFormPatientManagement.getCurrentPatient().getPnumber(),
             singleSpecimen.getCollectionEvent().getVisitNumber(),
-            singleSpecimen.getCurrentCenter().getNameShort()));
+            singleSpecimen.getCurrentCenter().getNameShort(), posStr));
     }
 
     @Override

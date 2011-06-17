@@ -45,8 +45,8 @@ public class CancelConfirmWidget extends BgcBaseWidget {
     }
 
     private void createContents() {
-        form.getToolkit().createLabel(this, "Cancel/Confirm barcode:");
-        confirmCancelText = new BgcBaseText(this, SWT.NONE, form.getToolkit());
+        form.getToolkit().createLabel(this, "Cancel/Confirm:");
+        confirmCancelText = new BiobankText(this, SWT.NONE, form.getToolkit());
         confirmCancelText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         GridData gd = new GridData();
         gd.widthHint = 100;

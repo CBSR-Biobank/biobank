@@ -241,6 +241,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 dispatch.addSpecimens(Arrays.asList(specimen),
                     DispatchSpecimenState.NONE);
                 reloadSpecimens();
+                setDirty(true);
                 break;
             case ERROR:
                 BgcPlugin.openAsyncError("Invalid specimen", res.getCell()
