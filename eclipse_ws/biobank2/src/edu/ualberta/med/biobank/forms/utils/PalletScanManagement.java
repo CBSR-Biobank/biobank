@@ -13,7 +13,6 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -56,8 +55,8 @@ public class PalletScanManagement {
                     scanAndProcessError(null);
                 } catch (Exception e) {
                     BgcPlugin
-                        .openAsyncError(Messages
-                            .getString("linkAssign.dialog.scanError.title"), //$NON-NLS-1$
+                        .openAsyncError(
+                            Messages.PalletScanManagement_dialog_scanError_title,
                             e);
                     String msg = e.getMessage();
                     if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
@@ -87,8 +86,8 @@ public class PalletScanManagement {
                 plateToScan);
             if (plateNum == -1) {
                 plateError();
-                BgcPlugin.openAsyncError("Scan error",
-                    "Plate with barcode " + plateToScan + " is not enabled");
+                BgcPlugin.openAsyncError("Scan error", "Plate with barcode "
+                    + plateToScan + " is not enabled");
                 return;
             } else {
                 ScanCell[][] scanCells = null;
@@ -171,8 +170,7 @@ public class PalletScanManagement {
                         try {
                             postprocessScanTubeAlone(cell);
                         } catch (Exception ex) {
-                            BgcPlugin.openAsyncError(
-                                "Scan tube error", ex);
+                            BgcPlugin.openAsyncError("Scan tube error", ex);
                         }
                     }
                 }

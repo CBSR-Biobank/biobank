@@ -5,6 +5,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -12,7 +13,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -31,11 +31,9 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private static final String CREATED_AT_BINDING = "patient-created-at-binding";
 
-    public static final String MSG_NEW_PATIENT_OK = Messages
-        .getString("PatientEntryForm.creation.msg");
+    public static final String MSG_NEW_PATIENT_OK = Messages.PatientEntryForm_creation_msg;
 
-    public static final String MSG_PATIENT_OK = Messages
-        .getString("PatientEntryForm.edition.msg");
+    public static final String MSG_PATIENT_OK = Messages.PatientEntryForm_edition_msg;
 
     private PatientWrapper patient;
 
@@ -46,7 +44,7 @@ public class PatientEntryForm extends BiobankEntryForm {
     private NotNullValidator createdAtValidator;
 
     private NonEmptyStringValidator pnumberNonEmptyValidator = new NonEmptyStringValidator(
-        Messages.getString("PatientEntryForm.patientNumber.validation.msg"));
+        Messages.PatientEntryForm_patientNumber_validation_msg);
 
     @Override
     public void init() throws Exception {
@@ -59,9 +57,9 @@ public class PatientEntryForm extends BiobankEntryForm {
         SessionManager.logEdit(patient);
         String tabName;
         if (patient.isNew()) {
-            tabName = Messages.getString("PatientEntryForm.new.title");
+            tabName = Messages.PatientEntryForm_new_title;
         } else {
-            tabName = Messages.getString("PatientEntryForm.edit.title",
+            tabName = NLS.bind(Messages.PatientEntryForm_edit_title,
                 patient.getPnumber());
         }
         setPartName(tabName);
@@ -69,7 +67,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("PatientEntryForm.main.title"));
+        form.setText(Messages.PatientEntryForm_main_title);
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
 
@@ -101,9 +99,9 @@ public class PatientEntryForm extends BiobankEntryForm {
         }
 
         studiesViewer = createComboViewer(client,
-            Messages.getString("PatientEntryForm.field.study.label"), studies,
+            Messages.PatientEntryForm_field_study_label, studies,
             selectedStudy,
-            Messages.getString("PatientEntryForm.field.study.validation.msg"),
+            Messages.PatientEntryForm_field_study_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -113,8 +111,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         setFirstControl(studiesViewer.getControl());
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.getString("PatientEntryForm.field.pNumber.label"), null,
-            patient, PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
+            Messages.PatientEntryForm_field_pNumber_label, null, patient,
+            PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
 
         createdAtLabel = widgetCreator.createLabel(client, "Created At");
         createdAtLabel.setLayoutData(new GridData(

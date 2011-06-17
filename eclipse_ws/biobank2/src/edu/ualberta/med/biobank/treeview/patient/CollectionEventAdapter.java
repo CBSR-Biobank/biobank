@@ -4,11 +4,10 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -16,6 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class CollectionEventAdapter extends AdapterBase {
@@ -54,8 +54,7 @@ public class CollectionEventAdapter extends AdapterBase {
         String tabName = null;
         if (modelObject != null)
             if (modelObject.isNew()) {
-                tabName = Messages
-                    .getString("CollectionEventEntryForm.title.new");
+                tabName = Messages.CollectionEventEntryForm_title_new;
                 try {
                     ((CollectionEventWrapper) modelObject)
                         .setActivityStatus(ActivityStatusWrapper
@@ -66,8 +65,8 @@ public class CollectionEventAdapter extends AdapterBase {
                         "Unable to create collection event.");
                 }
             } else
-                tabName = Messages.getString(
-                    "CollectionEventEntryForm.title.edit",
+                tabName = NLS.bind(
+                    Messages.CollectionEventEntryForm_title_edit,
                     ((CollectionEventWrapper) modelObject).getVisitNumber());
         return tabName;
     }

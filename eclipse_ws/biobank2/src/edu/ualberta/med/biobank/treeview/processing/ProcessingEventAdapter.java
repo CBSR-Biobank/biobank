@@ -4,10 +4,10 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.forms.ProcessingEventEntryForm;
@@ -55,10 +55,9 @@ public class ProcessingEventAdapter extends AdapterBase {
     @Override
     public String getTooltipText() {
         if (getWrapper() == null)
-            return Messages.getString("ProvessingEventAdapter.tooltiptext");
-        return Messages.getString(
-            "ProvessingEventAdapter.tooltiptext.withdate", getWrapper()
-                .getFormattedCreatedAt());
+            return Messages.ProvessingEventAdapter_tooltiptext;
+        return NLS.bind(Messages.ProvessingEventAdapter_tooltiptext_withdate,
+            getWrapper().getFormattedCreatedAt());
     }
 
     @Override
@@ -75,7 +74,7 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return Messages.getString("ProcessingEventAdapter.deleteMsg");
+        return Messages.ProcessingEventAdapter_deleteMsg;
     }
 
     @Override

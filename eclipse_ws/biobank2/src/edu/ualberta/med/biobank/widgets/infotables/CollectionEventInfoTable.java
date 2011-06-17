@@ -6,7 +6,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -30,12 +29,10 @@ public class CollectionEventInfoTable extends
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.getString("CollectionEventInfoTable.header.visitNumber"), //$NON-NLS-1$
-        Messages
-            .getString("CollectionEventInfoTable.header.numSourceSpecimens"), //$NON-NLS-1$
-        Messages
-            .getString("CollectionEventInfoTable.header.numAliquotedSpecimens"), //$NON-NLS-1$
-        Messages.getString("CollectionEventInfoTable.header.comment") }; //$NON-NLS-1$
+        Messages.CollectionEventInfoTable_header_visitNumber,
+        Messages.CollectionEventInfoTable_header_numSourceSpecimens,
+        Messages.CollectionEventInfoTable_header_numAliquotedSpecimens,
+        Messages.CollectionEventInfoTable_header_comment };
 
     public CollectionEventInfoTable(Composite parent,
         List<CollectionEventWrapper> collection) {
@@ -50,7 +47,7 @@ public class CollectionEventInfoTable extends
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.getString("infotable.loading.msg"); //$NON-NLS-1$
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }

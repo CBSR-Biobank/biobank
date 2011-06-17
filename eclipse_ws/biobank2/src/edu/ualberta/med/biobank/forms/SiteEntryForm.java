@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -11,14 +12,13 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
@@ -30,10 +30,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteEntryForm"; //$NON-NLS-1$
 
-    private static final String MSG_NEW_SITE_OK = Messages
-        .getString("SiteEntryForm.creation.msg"); //$NON-NLS-1$
-    private static final String MSG_SITE_OK = Messages
-        .getString("SiteEntryForm.edition.msg"); //$NON-NLS-1$
+    private static final String MSG_NEW_SITE_OK = Messages.SiteEntryForm_creation_msg;
+    private static final String MSG_SITE_OK = Messages.SiteEntryForm_edition_msg;
 
     private SiteAdapter siteAdapter;
 
@@ -63,11 +61,11 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
         String tabName;
         if (site.isNew()) {
-            tabName = Messages.getString("SiteEntryForm.title.new"); //$NON-NLS-1$
+            tabName = Messages.SiteEntryForm_title_new;
             site.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else {
-            tabName = Messages.getString("SiteEntryForm.title.edit", //$NON-NLS-1$
+            tabName = NLS.bind(Messages.SiteEntryForm_title_edit,
                 site.getNameShort());
         }
         setPartName(tabName);
@@ -75,7 +73,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void createFormContent() throws ApplicationException {
-        form.setText(Messages.getString("SiteEntryForm.main.title")); //$NON-NLS-1$
+        form.setText(Messages.SiteEntryForm_main_title);
         page.setLayout(new GridLayout(1, false));
         createSiteSection();
         createAddressArea(site);
@@ -87,8 +85,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     private void createSiteSection() throws ApplicationException {
-        toolkit.createLabel(page,
-            Messages.getString("SiteEntryForm.main.description"), SWT.LEFT); //$NON-NLS-1$
+        toolkit.createLabel(page, Messages.SiteEntryForm_main_description,
+            SWT.LEFT);
 
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -98,27 +96,20 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.NONE, Messages.getString("label.name"), //$NON-NLS-1$
-            null, site, SitePeer.NAME.getName(), new NonEmptyStringValidator(
-                Messages.getString("SiteEntryForm.field.name.validation.msg")))); //$NON-NLS-1$
+            SWT.NONE, Messages.label_name, null, site, SitePeer.NAME.getName(),
+            new NonEmptyStringValidator(
+                Messages.SiteEntryForm_field_name_validation_msg)));
 
-        createBoundWidgetWithLabel(
-            client,
-            BgcBaseText.class,
-            SWT.NONE,
-            Messages.getString("label.nameShort"), //$NON-NLS-1$
-            null,
-            site,
-            SitePeer.NAME_SHORT.getName(),
-            new NonEmptyStringValidator(Messages
-                .getString("SiteEntryForm.field.nameShort.validation.msg"))); //$NON-NLS-1$
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
+            Messages.label_nameShort, null, site,
+            SitePeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
+                Messages.SiteEntryForm_field_nameShort_validation_msg));
 
-        activityStatusComboViewer = createComboViewer(
-            client,
-            Messages.getString("label.activity"), //$NON-NLS-1$
+        activityStatusComboViewer = createComboViewer(client,
+            Messages.label_activity,
             ActivityStatusWrapper.getAllActivityStatuses(appService),
             site.getActivityStatus(),
-            Messages.getString("SiteEntryForm.field.activity.validation.msg"), //$NON-NLS-1$
+            Messages.SiteEntryForm_field_activity_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -127,15 +118,13 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             });
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.getString("label.comments"), null, site, //$NON-NLS-1$
-            SitePeer.COMMENT.getName(), null);
+            Messages.label_comments, null, site, SitePeer.COMMENT.getName(),
+            null);
     }
 
     private void createStudySection() {
-        Section section = createSection(Messages
-            .getString("SiteEntryForm.studies.title")); //$NON-NLS-1$
-        addSectionToolbar(section,
-            Messages.getString("SiteEntryForm.studies.add"), //$NON-NLS-1$
+        Section section = createSection(Messages.SiteEntryForm_studies_title);
+        addSectionToolbar(section, Messages.SiteEntryForm_studies_add,
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {

@@ -22,7 +22,6 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
@@ -47,7 +46,7 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
             plateFile.delete();
         }
 
-        setPartName(Messages.getString("ScanPlate.tabTitle")); //$NON-NLS-1$
+        setPartName(Messages.ScanPlate_tabTitle);
     }
 
     @Override
@@ -58,7 +57,7 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("ScanPlate.tabTitle"));
+        form.setText(Messages.ScanPlate_tabTitle);
         GridLayout layout = new GridLayout(2, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
@@ -141,8 +140,7 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
         plateToScan = plateSelectionWidget.getSelectedPlate();
 
         if (plateToScan == null) {
-            BgcPlugin.openAsyncError("Decode Plate Error",
-                "No plate selected");
+            BgcPlugin.openAsyncError("Decode Plate Error", "No plate selected");
             return;
         }
 
@@ -156,8 +154,7 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        Messages.getString("ScanPlate.dialog.scanError.title"), //$NON-NLS-1$
-                        e);
+                        Messages.ScanPlate_dialog_scanError_title, e);
                 }
                 monitor.done();
             }

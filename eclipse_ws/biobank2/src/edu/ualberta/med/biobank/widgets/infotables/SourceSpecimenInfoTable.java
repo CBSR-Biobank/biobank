@@ -6,7 +6,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -33,8 +32,8 @@ public class SourceSpecimenInfoTable extends
     }
 
     private final static String[] HEADINGS = new String[] {
-        Messages.getString("SourceSpecimen.field.type.label"),
-        Messages.getString("SourceSpecimen.field.originalVolume.label") };
+        Messages.SourceSpecimen_field_type_label,
+        Messages.SourceSpecimen_field_originalVolume_label };
 
     public SourceSpecimenInfoTable(Composite parent,
         List<SourceSpecimenWrapper> collection) {

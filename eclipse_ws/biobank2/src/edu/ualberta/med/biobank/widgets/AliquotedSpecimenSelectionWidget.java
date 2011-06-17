@@ -34,7 +34,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.SpecimenHierarchy;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -89,8 +88,7 @@ public class AliquotedSpecimenSelectionWidget {
             sourceControlDecoration = BgcBaseWidget
                 .createDecorator(
                     sourceLabel,
-                    Messages
-                        .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
+                    Messages.AliquotedSpecimenSelectionWidget_selections_validation_msg);
         }
         cvSource = widgetCreator.createComboViewerWithoutLabel(parent, null,
             null, new BiobankLabelProvider());
@@ -123,8 +121,7 @@ public class AliquotedSpecimenSelectionWidget {
             resultControlDecoration = BgcBaseWidget
                 .createDecorator(
                     resultLabel,
-                    Messages
-                        .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
+                    Messages.AliquotedSpecimenSelectionWidget_selections_validation_msg);
         }
         cvResult = widgetCreator.createComboViewerWithoutLabel(parent, null,
             null, new BiobankLabelProvider());
@@ -153,8 +150,7 @@ public class AliquotedSpecimenSelectionWidget {
             rowControlDecoration = BgcBaseWidget
                 .createDecorator(
                     textNumber,
-                    Messages
-                        .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
+                    Messages.AliquotedSpecimenSelectionWidget_selections_validation_msg);
         }
     }
 
@@ -316,8 +312,8 @@ public class AliquotedSpecimenSelectionWidget {
             public IStatus validate(Object value) {
                 if (value instanceof Boolean && !(Boolean) value) {
                     decoration.show();
-                    return ValidationStatus.error(Messages
-                        .getString("AliquotedSpecimenSelectionWidget.selections.status.msg"));
+                    return ValidationStatus
+                        .error(Messages.AliquotedSpecimenSelectionWidget_selections_status_msg);
                 } else {
                     decoration.hide();
                     return Status.OK_STATUS;

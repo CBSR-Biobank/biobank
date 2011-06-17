@@ -7,12 +7,12 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -21,8 +21,8 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
@@ -40,11 +40,9 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ProcessingEventEntryForm"; //$NON-NLS-1$
 
-    private static final String MSG_NEW_PEVENT_OK = Messages
-        .getString("ProcessingEventEntryForm.creation.msg"); //$NON-NLS-1$
+    private static final String MSG_NEW_PEVENT_OK = Messages.ProcessingEventEntryForm_creation_msg;
 
-    private static final String MSG_PEVENT_OK = Messages
-        .getString("ProcessingEventEntryForm.edition.msg"); //$NON-NLS-1$
+    private static final String MSG_PEVENT_OK = Messages.ProcessingEventEntryForm_edition_msg;
 
     private ProcessingEventAdapter pEventAdapter;
 
@@ -67,17 +65,17 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
         String tabName;
         if (pEvent.isNew()) {
-            tabName = Messages.getString("ProcessingEventEntryForm.title.new"); //$NON-NLS-1$
+            tabName = Messages.ProcessingEventEntryForm_title_new;
             pEvent.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else {
             if (pEvent.getWorksheet() == null)
-                tabName = Messages.getString(
-                    "ProcessingEventEntryForm.title.edit.worksheet", //$NON-NLS-1$
+                tabName = NLS.bind(
+                    Messages.ProcessingEventEntryForm_title_edit_worksheet,
                     pEvent.getWorksheet(), pEvent.getFormattedCreatedAt());
             else
-                tabName = Messages.getString(
-                    "ProcessingEventEntryForm.title.edit.noworksheet", //$NON-NLS-1$
+                tabName = NLS.bind(
+                    Messages.ProcessingEventEntryForm_title_edit_noworksheet,
                     pEvent.getFormattedCreatedAt());
         }
         setPartName(tabName);
@@ -85,7 +83,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("ProcessingEventEntryForm.main.title")); //$NON-NLS-1$
+        form.setText(Messages.ProcessingEventEntryForm_main_title);
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
         createMainSection();
@@ -101,34 +99,27 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("ProcessingEvent.field.center.label"), pEvent //$NON-NLS-1$
-                .getCenter().getName());
+            Messages.ProcessingEvent_field_center_label, pEvent.getCenter()
+                .getName());
 
-        dateWidget = createDateTimeWidget(
-            client,
-            Messages.getString("ProcessingEvent.field.date.label"), //$NON-NLS-1$
-            pEvent.getCreatedAt(),
-            pEvent,
-            ProcessingEventPeer.CREATED_AT.getName(),
+        dateWidget = createDateTimeWidget(client,
+            Messages.ProcessingEvent_field_date_label, pEvent.getCreatedAt(),
+            pEvent, ProcessingEventPeer.CREATED_AT.getName(),
             new NotNullValidator(
-                Messages
-                    .getString("ProcessingEventEntryForm.field.date.validation.msg"))); //$NON-NLS-1$
-
+                Messages.ProcessingEventEntryForm_field_date_validation_msg));
         setFirstControl(dateWidget);
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.getString("ProcessingEvent.field.worksheet.label"), null, //$NON-NLS-1$
-            pEvent, ProcessingEventPeer.WORKSHEET.getName(),
+            Messages.ProcessingEvent_field_worksheet_label, null, pEvent,
+            ProcessingEventPeer.WORKSHEET.getName(),
             (!pEvent.isNew() && pEvent.getWorksheet() == null) ? null
                 : new NonEmptyStringValidator("Worksheet cannot be null"));
 
-        activityStatusComboViewer = createComboViewer(
-            client,
-            Messages.getString("label.activity"), //$NON-NLS-1$
+        activityStatusComboViewer = createComboViewer(client,
+            Messages.label_activity,
             ActivityStatusWrapper.getAllActivityStatuses(appService),
             pEvent.getActivityStatus(),
-            Messages
-                .getString("ProcessingEventEntryForm.field.activity.validation.msg"), //$NON-NLS-1$
+            Messages.ProcessingEventEntryForm_field_activity_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -142,13 +133,12 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                 pEvent.getActivityStatus()));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.getString("label.comments"), null, pEvent, //$NON-NLS-1$
+            Messages.label_comments, null, pEvent,
             ProcessingEventPeer.COMMENT.getName(), null);
     }
 
     private void createSpecimensSection() {
-        Composite client = createSectionWithClient(Messages
-            .getString("ProcessingEventEntryForm.specimens.title")); //$NON-NLS-1$
+        Composite client = createSectionWithClient(Messages.ProcessingEventEntryForm_specimens_title);
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
