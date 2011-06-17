@@ -85,4 +85,7 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public CellProcessResult processCellStatus(Cell cell,
         ProcessData processData, User user) throws ApplicationException;
 
+    public List<String> executeGetSourceSpecimenUniqueInventoryIds(int numIds)
+        throws ApplicationException;
+
 }
