@@ -5,6 +5,18 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.dialogs.startup.messages"; //$NON-NLS-1$
 
+    public static String ActivityLogLocationDialog_browse_button_label;
+
+    public static String ActivityLogLocationDialog_button_save_label;
+
+    public static String ActivityLogLocationDialog_description;
+
+    public static String ActivityLogLocationDialog_directory_select_label;
+
+    public static String ActivityLogLocationDialog_folder_selection_label;
+
+    public static String ActivityLogLocationDialog_title;
+
     public static String LoginDialog_main_title;
     public static String LoginDialog_title;
     public static String LoginDialog_description;
@@ -55,6 +67,8 @@ public class Messages extends NLS {
     public static String WorkingCenterSelectDialog_title;
 
     public static String WorkingCenterSelectDialog_description;
+
+    public static String WorkingCenterSelectDialog_no_center_selection_text;
 
     static {
         // initialize resource bundle

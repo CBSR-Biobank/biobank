@@ -27,8 +27,8 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
-import edu.ualberta.med.biobank.widgets.BiobankClipboard;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.utils.BiobankClipboard;
 
 public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
 
@@ -226,7 +226,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
             };
             backgroundThread.start();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Cannot Load Table Data", e);
+            BgcPlugin.openAsyncError(Messages.AbstractInfoTableWidget_load_error_title, e);
         }
 
         layout(true, true);
@@ -323,7 +323,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         firstButton = new Button(paginationWidget, SWT.NONE);
         firstButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_FIRST));
-        firstButton.setToolTipText("First page");
+        firstButton.setToolTipText(Messages.AbstractInfoTableWidget_first_label);
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -334,7 +334,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         prevButton = new Button(paginationWidget, SWT.NONE);
         prevButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_PREV));
-        prevButton.setToolTipText("Previous page");
+        prevButton.setToolTipText(Messages.AbstractInfoTableWidget_previous_label);
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -347,7 +347,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         nextButton = new Button(paginationWidget, SWT.NONE);
         nextButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_NEXT));
-        nextButton.setToolTipText("Next page");
+        nextButton.setToolTipText(Messages.AbstractInfoTableWidget_next_label);
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -358,7 +358,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         lastButton = new Button(paginationWidget, SWT.NONE);
         lastButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_LAST));
-        lastButton.setToolTipText("Last page");
+        lastButton.setToolTipText(Messages.AbstractInfoTableWidget_last_label);
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

@@ -113,7 +113,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             Messages.ProcessingEvent_field_worksheet_label, null, pEvent,
             ProcessingEventPeer.WORKSHEET.getName(),
             (!pEvent.isNew() && pEvent.getWorksheet() == null) ? null
-                : new NonEmptyStringValidator("Worksheet cannot be null"));
+                : new NonEmptyStringValidator(
+                    Messages.ProcessingEventEntryForm_worksheet_validation_msg));
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
@@ -167,23 +168,24 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                 case PRE_ADD:
                     if (specimen == null)
                         throw new VetoException(
-                            "No specimen found for that inventory id.");
+                            Messages.ProcessingEventEntryForm_notfound_spec_error_msg);
                     else if (!SessionManager.getUser()
                         .getCurrentWorkingCenter()
                         .equals(specimen.getCurrentCenter())) {
-                        String centerName = "'none'";
+                        String centerName = Messages.ProcessingEventEntryForm_none_text;
                         if (specimen.getCurrentCenter() != null)
                             centerName = specimen.getCurrentCenter()
                                 .getNameShort();
                         throw new VetoException(
-                            "Specimen is currently in center " + centerName
-                                + ". You can't process it.");
+                            NLS.bind(
+                                Messages.ProcessingEventEntryForm_center_spec_error_msg,
+                                centerName));
                     } else if (specimen.isUsedInDispatch())
                         throw new VetoException(
-                            "Specimen is currently listed in a dispatch.");
+                            Messages.ProcessingEventEntryForm_spec_dispatch_error_msg);
                     else if (specimen.getParentContainer() != null)
                         throw new VetoException(
-                            "Specimen is currently listed as stored in a container.");
+                            Messages.ProcessingEventEntryForm_stored_spec_error_msg);
                     else if (pEvent.getSpecimenCollection(false).size() > 0
                         && !pEvent
                             .getSpecimenCollection(false)
@@ -195,15 +197,14 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                 specimen.getCollectionEvent().getPatient()
                                     .getStudy()))
                         throw new VetoException(
-                            "All specimens must be part of the same study.");
+                            Messages.ProcessingEventEntryForm_study_spec_error_msg);
                     else if (specimen.getProcessingEvent() != null) {
                         throw new VetoException(
-                            "This specimen is already in processing event '"
-                                + specimen.getProcessingEvent().getWorksheet()
-                                + "' ("
-                                + specimen.getProcessingEvent()
-                                    .getFormattedCreatedAt()
-                                + "). Remove it from the other processing event first.");
+                            NLS.bind(
+                                Messages.ProcessingEventEntryForm_other_pEvent_error_msg,
+                                specimen.getProcessingEvent().getWorksheet(),
+                                specimen.getProcessingEvent()
+                                    .getFormattedCreatedAt()));
                     }
                     break;
                 case POST_ADD:
@@ -214,9 +215,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     if (specimen.getChildSpecimenCollection(false).size() > 0) {
                         boolean ok = BgcPlugin
                             .openConfirm(
-                                "Parent specimen",
-                                "This specimen is the parent of aliquoted specimen. "
-                                    + "Are you sure you want to remove it from this processing event ?");
+                                Messages.ProcessingEventEntryForm_confirm_remove_title,
+                                Messages.ProcessingEventEntryForm_confirm_remove_msg);
                         event.doit = ok;
                     }
                     break;
@@ -229,7 +229,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         };
 
         specimenEntryWidget.addBinding(widgetCreator,
-            "Specimens should be added to a processing event");
+            Messages.ProcessingEventEntryForm_specimens_validation_msg);
 
         specimenEntryWidget.addVetoListener(ItemAction.PRE_ADD, vetoListener);
         specimenEntryWidget.addVetoListener(ItemAction.POST_ADD, vetoListener);

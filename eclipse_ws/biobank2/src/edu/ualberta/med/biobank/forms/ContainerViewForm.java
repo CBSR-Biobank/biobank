@@ -488,9 +488,9 @@ public class ContainerViewForm extends BiobankViewForm {
             }
             containerAdapter.performExpand();
         } catch (BiobankFailedQueryException e) {
-            BgcPlugin.openAsyncError("error", e);
+            BgcPlugin.openAsyncError(Messages.ContainerViewForm_error_title, e);
         } catch (BiobankCheckException e) {
-            BgcPlugin.openAsyncError("error", e);
+            BgcPlugin.openAsyncError(Messages.ContainerViewForm_error_title, e);
         }
     }
 

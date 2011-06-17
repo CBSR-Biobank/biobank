@@ -114,7 +114,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
             pEvent.reload();
         } catch (Exception ex) {
             logger.error(Messages.format(
-                "Error while retrieving processing event {0}/{1}/{2}", pEvent
+                "Error while retrieving processing event {0}/{1}/{2}", pEvent //$NON-NLS-1$
                     .getFormattedCreatedAt(),
                 pEvent.getCenter().getNameShort(), pEvent.getWorksheet()), ex);
         }

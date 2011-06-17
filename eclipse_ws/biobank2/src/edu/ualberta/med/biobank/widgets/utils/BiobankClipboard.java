@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.utils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,13 +18,15 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+
 public class BiobankClipboard {
 
     public static void addClipboardCopySupport(final ColumnViewer tv,
         Menu menu, final BiobankLabelProvider labelProvider, final int numCols) {
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Copy");
+        item.setText(Messages.BiobankClipboard_copy_label);
         item.addSelectionListener(new SelectionAdapter() {
             @SuppressWarnings("unchecked")
             @Override
@@ -41,16 +43,16 @@ public class BiobankClipboard {
                         if (text != null) {
                             row.add(text);
                         } else {
-                            row.add("");
+                            row.add(""); //$NON-NLS-1$
                         }
                     }
-                    selectedRows.add(StringUtils.join(row, ","));
+                    selectedRows.add(StringUtils.join(row, ",")); //$NON-NLS-1$
                 }
                 if (selectedRows.size() > 0) {
                     StringBuilder sb = new StringBuilder();
                     for (Object row : selectedRows) {
                         if (sb.length() != 0) {
-                            sb.append(System.getProperty("line.separator"));
+                            sb.append(System.getProperty("line.separator")); //$NON-NLS-1$
                         }
                         sb.append(row.toString());
                     }

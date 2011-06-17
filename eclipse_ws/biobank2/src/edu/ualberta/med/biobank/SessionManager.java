@@ -38,9 +38,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
 
-    public static final String BIOBANK2_CONTEXT_LOGGED_OUT = "biobank.context.loggedOut";
+    public static final String BIOBANK2_CONTEXT_LOGGED_OUT = "biobank.context.loggedOut"; //$NON-NLS-1$
 
-    public static final String BIOBANK2_CONTEXT_LOGGED_IN = "biobank.context.loggedIn";
+    public static final String BIOBANK2_CONTEXT_LOGGED_IN = "biobank.context.loggedIn"; //$NON-NLS-1$
 
     private static BgcLogger logger = BgcLogger.getLogger(SessionManager.class
         .getName());
@@ -82,7 +82,7 @@ public class SessionManager {
 
     public void addSession(final BiobankApplicationService appService,
         String serverName, User user) {
-        logger.debug("addSession: " + serverName + ", user/" + user.getLogin());
+        logger.debug("addSession: " + serverName + ", user/" + user.getLogin()); //$NON-NLS-1$ //$NON-NLS-2$
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, user);
         rootNode.addChild(sessionAdapter);
@@ -115,7 +115,7 @@ public class SessionManager {
     }
 
     public void updateSession() {
-        Assert.isNotNull(sessionAdapter, "session adapter is null");
+        Assert.isNotNull(sessionAdapter, "session adapter is null"); //$NON-NLS-1$
         sessionAdapter.performExpand();
     }
 
@@ -155,7 +155,7 @@ public class SessionManager {
 
     public SessionAdapter getSession() {
         Assert.isNotNull(sessionAdapter,
-            "No connection available. Please log in to continue.");
+            Messages.SessionManager_noconnection_error_msg);
         return sessionAdapter;
     }
 
@@ -316,13 +316,13 @@ public class SessionManager {
                                     if (ab != adapter)
                                         ab.resetObject();
                                 } catch (Exception ex) {
-                                    logger.error("Problem reseting object", ex);
+                                    logger.error("Problem reseting object", ex); //$NON-NLS-1$
                                 }
                             view.getTreeViewer().update(ab, null);
                         }
                     }
                 } catch (Exception ex) {
-                    logger.error("Error updating tree nodes", ex);
+                    logger.error("Error updating tree nodes", ex); //$NON-NLS-1$
                 }
             }
         });
@@ -348,11 +348,11 @@ public class SessionManager {
                 }
             }
         } catch (PartInitException e) {
-            BgcPlugin.openAsyncError("Error displaying available actions", e);
+            BgcPlugin.openAsyncError(Messages.SessionManager_actions_error_title, e);
         }
         System.out.println();
         if (page.getPerspective().getId()
-            .startsWith("edu.ualberta.med.biobank")
+            .startsWith("edu.ualberta.med.biobank") //$NON-NLS-1$
             && page.getViewReferences().length == 0)
             try {
                 page.getWorkbenchWindow()
@@ -360,7 +360,7 @@ public class SessionManager {
                     .showPerspective(MainPerspective.ID,
                         page.getWorkbenchWindow());
             } catch (WorkbenchException e) {
-                logger.error("Error opening main perspective", e);
+                logger.error("Error opening main perspective", e); //$NON-NLS-1$
             }
 
     }

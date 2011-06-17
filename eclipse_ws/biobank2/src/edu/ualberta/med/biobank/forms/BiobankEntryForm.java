@@ -77,6 +77,14 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
  */
 public abstract class BiobankEntryForm extends BiobankFormBase {
 
+    private static final String RESET_COMMAND_ID = "edu.ualberta.med.biobank.commands.reset"; //$NON-NLS-1$
+
+    private static final String CANCEL_COMMAND_ID = "edu.ualberta.med.biobank.commands.cancel"; //$NON-NLS-1$
+
+    private static final String CONFIRM_COMMAND_ID = "edu.ualberta.med.biobank.commands.confirm"; //$NON-NLS-1$
+
+    private static final String CONTEXT_ENTRY_FORM = "biobank.context.entryForm"; //$NON-NLS-1$
+
     private static BgcLogger logger = BgcLogger
         .getLogger(BiobankEntryForm.class.getName());
 
@@ -153,8 +161,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         if (!confirmAction.isEnabled()) {
             monitor.setCanceled(true);
             setDirty(true);
-            BgcPlugin.openAsyncError("Form state",
-                "Form in invalid state, save failed.");
+            BgcPlugin.openAsyncError(
+                Messages.BiobankEntryForm_state_error_title,
+                Messages.BiobankEntryForm_state_error_msg);
             return;
         }
         doSaveInternal(monitor);
@@ -172,8 +181,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                     throws InvocationTargetException, InterruptedException {
 
                     try {
-                        monitor
-                            .beginTask("Saving...", IProgressMonitor.UNKNOWN);
+                        monitor.beginTask(Messages.BiobankEntryForm_saving,
+                            IProgressMonitor.UNKNOWN);
                         saveForm();
                         monitor.done();
                     } catch (final RemoteConnectFailureException exp) {
@@ -211,7 +220,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                             }
                         });
                         monitor.setCanceled(true);
-                        BgcPlugin.openAsyncError("Save error", bce);
+                        BgcPlugin.openAsyncError(
+                            Messages.BiobankEntryForm_save_error_title, bce);
                     } catch (BiobankServerException bse) {
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
@@ -220,7 +230,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                             }
                         });
                         monitor.setCanceled(true);
-                        BgcPlugin.openAsyncError("Save error", bse);
+                        BgcPlugin.openAsyncError(
+                            Messages.BiobankEntryForm_save_error_title, bse);
                     } catch (Exception e) {
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
@@ -268,7 +279,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         if (adapter != null && adapter.getModelObject() != null
             && !adapter.getModelObject().canUpdate(SessionManager.getUser())) {
             BgcPlugin.openAccessDeniedErrorMessage();
-            throw new RuntimeException("Cannot edit. Access Denied.");
+            throw new RuntimeException(
+                Messages.BiobankEntryForm_access_denied_error_msg);
         }
     }
 
@@ -290,7 +302,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
         IContextService contextService = (IContextService) getSite()
             .getService(IContextService.class);
-        contextService.activateContext("biobank.context.entryForm");
+        contextService.activateContext(CONTEXT_ENTRY_FORM);
     }
 
     abstract protected void saveForm() throws Exception;
@@ -298,7 +310,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     @Override
     public void setFocus() {
         super.setFocus();
-        Assert.isNotNull(firstControl, "first control widget is not set");
+        Assert.isNotNull(firstControl, "first control widget is not set"); //$NON-NLS-1$
         if (!firstControl.isDisposed()) {
             firstControl.setFocus();
         }
@@ -449,25 +461,27 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                 confirm();
             }
         };
-        confirmAction
-            .setActionDefinitionId("edu.ualberta.med.biobank.commands.confirm");
+        confirmAction.setActionDefinitionId(CONFIRM_COMMAND_ID);
         confirmAction.setImageDescriptor(confirmActionImage);
-        confirmAction.setToolTipText("Confirm");
+        confirmAction.setToolTipText(Messages.BiobankEntryForm_confirm_tooltip);
         form.getToolBarManager().add(confirmAction);
     }
 
     protected void addCancelAction() {
         CommandContributionItem cancel = new CommandContributionItem(
             new CommandContributionItemParameter(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow(), "Cancel",
-                "edu.ualberta.med.biobank.commands.cancel", null,
-                cancelActionImage, null, null, "Cancel", "Cancel", "Cancel",
-                SWT.NONE, "Cancel", true));
+                .getActiveWorkbenchWindow(),
+                Messages.BiobankEntryForm_cancel_label, CANCEL_COMMAND_ID,
+                null, cancelActionImage, null, null,
+                Messages.BiobankEntryForm_cancel_label,
+                Messages.BiobankEntryForm_cancel_label,
+                Messages.BiobankEntryForm_cancel_label, SWT.NONE,
+                Messages.BiobankEntryForm_cancel_label, true));
         form.getToolBarManager().add(cancel);
     }
 
     protected void addPrintAction() {
-        Action print = new Action("Print") {
+        Action print = new Action(Messages.BiobankEntryForm_print_label) {
             @Override
             public void run() {
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
@@ -476,7 +490,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                         try {
                             BiobankEntryForm.this.print();
                         } catch (Exception ex) {
-                            BgcPlugin.openAsyncError("Error printing.", ex);
+                            BgcPlugin
+                                .openAsyncError(
+                                    Messages.BiobankEntryForm_print_error_title,
+                                    ex);
                         }
                     }
                 });
@@ -494,10 +511,13 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected void addResetAction() {
         CommandContributionItem reset = new CommandContributionItem(
             new CommandContributionItemParameter(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow(), "Reset",
-                "edu.ualberta.med.biobank.commands.reset", null,
-                resetActionImage, null, null, "Reset", "Reset", "Reset",
-                SWT.NONE, "Reset", true));
+                .getActiveWorkbenchWindow(),
+                Messages.BiobankEntryForm_reset_label, RESET_COMMAND_ID, null,
+                resetActionImage, null, null,
+                Messages.BiobankEntryForm_reset_label,
+                Messages.BiobankEntryForm_reset_label,
+                Messages.BiobankEntryForm_reset_label, SWT.NONE,
+                Messages.BiobankEntryForm_reset_label, true));
         form.getToolBarManager().add(reset);
     }
 
@@ -509,7 +529,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                 closeEntryOpenView(true, true);
             }
         } catch (Exception e) {
-            logger.error("Can't save the form", e);
+            logger.error("Can't save the form", e); //$NON-NLS-1$
         }
     }
 
@@ -538,7 +558,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                 && !adapter.getModelObject().isNew();
             closeEntryOpenView(true, openView);
         } catch (Exception e) {
-            logger.error("Can't cancel the form", e);
+            logger.error("Can't cancel the form", e); //$NON-NLS-1$
         }
     }
 

@@ -24,14 +24,14 @@ public class ServerMsgStatusItem extends ContributionItem {
 
     private CLabel label;
 
-    private String text = "";
+    private String text = ""; //$NON-NLS-1$
 
     private int widthHint = -1;
 
     private int heightHint = -1;
 
     private ServerMsgStatusItem() {
-        super("biobank.serverMsg");
+        super("biobank.serverMsg"); //$NON-NLS-1$
     }
 
     public static ServerMsgStatusItem getInstance() {
@@ -95,7 +95,7 @@ public class ServerMsgStatusItem extends ContributionItem {
 
         label.setText(this.text);
 
-        if ((text != null) && !text.equals("aicml-med.cs.ualberta.ca")) {
+        if ((text != null) && !text.equals("aicml-med.cs.ualberta.ca")) { //$NON-NLS-1$
             label.setBackground(PlatformUI.getWorkbench().getDisplay()
                 .getSystemColor(SWT.COLOR_YELLOW));
         }

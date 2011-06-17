@@ -57,7 +57,7 @@ public abstract class AbstractSelectableFilterValueWidget<T extends AbstractList
                 // that don't exist in the option, as they will be lost. DEAL
                 // WITH THIS! :P
                 if (value != null && value.getValue() != null) {
-                    ViewerEntry entry = new ViewerEntry(value.getValue(), "");
+                    ViewerEntry entry = new ViewerEntry(value.getValue(), ""); //$NON-NLS-1$
                     toSelect.add(entry);
                 }
             }
@@ -107,7 +107,7 @@ public abstract class AbstractSelectableFilterValueWidget<T extends AbstractList
                     ViewerEntry entry = (ViewerEntry) element;
                     return entry.getValue();
                 }
-                return "";
+                return ""; //$NON-NLS-1$
             }
         });
     }

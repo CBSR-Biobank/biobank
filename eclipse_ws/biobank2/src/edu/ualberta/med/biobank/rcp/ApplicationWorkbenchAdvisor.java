@@ -50,8 +50,8 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
         }
         if (BiobankPlugin.isAskPrintActivityLog()
             && page.getPerspective().getId().equals(LinkAssignPerspective.ID)) {
-            BgcPlugin.openInformation("Can't close",
-                "Please end specimen management session before closing");
+            BgcPlugin.openInformation(Messages.ApplicationWorkbenchAdvisor_close_error_title,
+                Messages.ApplicationWorkbenchAdvisor_close_error_msg);
             return false;
         }
         if (SessionManager.getInstance().isConnected()) {
@@ -71,13 +71,13 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
         // 'org.eclipse.ui.preferencePages.Workbench'
         // It will prevent the security preference page warning about its
         // missing category
-        pm.remove("org.eclipse.equinox.security.ui.category");
-        pm.remove("org.eclipse.ui.preferencePages.Workbench");
+        pm.remove("org.eclipse.equinox.security.ui.category"); //$NON-NLS-1$
+        pm.remove("org.eclipse.ui.preferencePages.Workbench"); //$NON-NLS-1$
         // this preference page is deactivated because it send a warning about
         // its missing parent. We have our own preference page definition that
         // is using the exact same
-        pm.remove("org.eclipse.equinox.internal.p2.ui.sdk.scheduler.AutomaticUpdatesPreferencePage");
-        pm.remove("org.eclipse.equinox.internal.p2.ui.sdk.ProvisioningPreferencePage");
+        pm.remove("org.eclipse.equinox.internal.p2.ui.sdk.scheduler.AutomaticUpdatesPreferencePage"); //$NON-NLS-1$
+        pm.remove("org.eclipse.equinox.internal.p2.ui.sdk.ProvisioningPreferencePage"); //$NON-NLS-1$
     }
 
 }

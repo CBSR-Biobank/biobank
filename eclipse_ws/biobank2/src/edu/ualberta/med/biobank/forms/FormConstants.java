@@ -7,11 +7,11 @@ package edu.ualberta.med.biobank.forms;
 public class FormConstants {
 
     // used to select a list
-    public static final String[] PROVINCES = new String[] { "Alberta",
-        "British Columbia", "Manitoba", "New Brunswick",
-        "Newfoundland and Labrador", "Northwest Territories", "Nova Scotia",
-        "Nunavut", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan",
-        "Yukon" };
+    public static final String[] PROVINCES = new String[] { "Alberta", //$NON-NLS-1$
+        "British Columbia", "Manitoba", "New Brunswick", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        "Newfoundland and Labrador", "Northwest Territories", "Nova Scotia", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        "Nunavut", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+        "Yukon" }; //$NON-NLS-1$
 
     private FormConstants() {
     }

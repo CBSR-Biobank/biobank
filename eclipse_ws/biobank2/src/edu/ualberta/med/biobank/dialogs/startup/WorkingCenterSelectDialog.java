@@ -50,22 +50,22 @@ public class WorkingCenterSelectDialog extends BgcBaseDialog {
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         List<Object> objectList = new ArrayList<Object>(availableCenters);
-        String noCenterString = "-- no center selection --";
+        String noCenterString = "-- " //$NON-NLS-1$ 
+            + Messages.WorkingCenterSelectDialog_no_center_selection_text
+            + " --"; //$NON-NLS-1$ 
         if (user.isInSuperAdminMode())
             objectList.add(noCenterString);
-        widgetCreator
-            .createComboViewer(
-                contents,
-                Messages.WorkingCenterSelectDialog_available_centers_label,
-                objectList, noCenterString, null, new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        if (selectedObject instanceof CenterWrapper<?>)
-                            currentCenter = (CenterWrapper<?>) selectedObject;
-                        else
-                            currentCenter = null;
-                    }
-                }, new BiobankLabelProvider());
+        widgetCreator.createComboViewer(contents,
+            Messages.WorkingCenterSelectDialog_available_centers_label,
+            objectList, noCenterString, null, new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    if (selectedObject instanceof CenterWrapper<?>)
+                        currentCenter = (CenterWrapper<?>) selectedObject;
+                    else
+                        currentCenter = null;
+                }
+            }, new BiobankLabelProvider());
     }
 
     @Override

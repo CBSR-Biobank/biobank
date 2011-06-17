@@ -43,7 +43,7 @@ public abstract class LinkAssignCommonHandler extends AbstractHandler implements
             }
         } catch (WorkbenchException e) {
             throw new ExecutionException(
-                "Error while opening specimen management perspective", e);
+                Messages.LinkAssignCommonHandler_link_assign_open_error_msg, e);
         }
         return null;
     }

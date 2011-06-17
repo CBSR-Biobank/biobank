@@ -35,7 +35,7 @@ public class FormInput implements IEditorInput {
                     return id.intValue();
             }
         } else {
-            Assert.isTrue(false, "invalid type for form input object");
+            Assert.isTrue(false, "invalid type for form input object"); //$NON-NLS-1$
         }
         return -1;
     }

@@ -26,8 +26,8 @@ public class AliquotedSpecimenInfoTable extends
         @Override
         public String toString() {
             return StringUtils.join(new String[] { typeName,
-                (volume != null) ? volume.toString() : "",
-                (quantity != null) ? quantity.toString() : "", status }, "\t");
+                (volume != null) ? volume.toString() : "", //$NON-NLS-1$
+                (quantity != null) ? quantity.toString() : "", status }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
@@ -48,12 +48,12 @@ public class AliquotedSpecimenInfoTable extends
         TableRowData info = new TableRowData();
         info.sampleStorage = sampleStorage;
         SpecimenTypeWrapper type = sampleStorage.getSpecimenType();
-        Assert.isNotNull(type, "sample storage - sample type is null");
+        Assert.isNotNull(type, "sample storage - sample type is null"); //$NON-NLS-1$
         info.typeName = type.getName();
         info.volume = sampleStorage.getVolume();
         info.quantity = sampleStorage.getQuantity();
         ActivityStatusWrapper status = sampleStorage.getActivityStatus();
-        Assert.isNotNull(status, "sample storage - activity status is null");
+        Assert.isNotNull(status, "sample storage - activity status is null"); //$NON-NLS-1$
         info.status = status.getName();
         return info;
     }
@@ -66,22 +66,22 @@ public class AliquotedSpecimenInfoTable extends
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.AliquotedSpecimenInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
                     return item.typeName;
                 case 1:
-                    return (item.volume != null) ? item.volume.toString() : "";
+                    return (item.volume != null) ? item.volume.toString() : ""; //$NON-NLS-1$
                 case 2:
                     return (item.quantity != null) ? item.quantity.toString()
-                        : "";
+                        : ""; //$NON-NLS-1$
                 case 3:
                     return item.status;
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };

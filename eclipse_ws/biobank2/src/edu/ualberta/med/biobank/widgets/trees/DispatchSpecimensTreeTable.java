@@ -35,8 +35,8 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankClipboard;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.utils.BiobankClipboard;
 
 public class DispatchSpecimensTreeTable extends BgcBaseWidget {
 
@@ -64,23 +64,23 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         tree.setLinesVisible(true);
 
         TreeColumn tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Inventory Id");
+        tc.setText(Messages.DispatchSpecimensTreeTable_inventoryid_label);
         tc.setWidth(200);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Type");
+        tc.setText(Messages.DispatchSpecimensTreeTable_type_label);
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Patient Number");
+        tc.setText(Messages.DispatchSpecimensTreeTable_pnumber_label);
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Activity Status");
+        tc.setText(Messages.DispatchSpecimensTreeTable_status_label);
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Dispatch comment");
+        tc.setText(Messages.DispatchSpecimensTreeTable_comment_label);
         tc.setWidth(100);
 
         ITreeContentProvider contentProvider = new ITreeContentProvider() {
@@ -123,21 +123,21 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                 if (element instanceof TableGroup) {
                     if (columnIndex == 0)
                         return ((TableGroup<?>) element).getTitle();
-                    return "";
+                    return ""; //$NON-NLS-1$
                 } else if (element instanceof RequestContainerAdapter) {
                     if (columnIndex == 0)
                         return ((RequestContainerAdapter) element)
                             .getLabelInternal();
-                    return "";
+                    return ""; //$NON-NLS-1$
                 } else if (element instanceof TreeItemAdapter) {
                     return ((TreeItemAdapter) element)
                         .getColumnText(columnIndex);
                 }
-                return "";
+                return ""; //$NON-NLS-1$
             }
         };
         tv.setLabelProvider(labelProvider);
-        tv.setInput("root");
+        tv.setInput("root"); //$NON-NLS-1$
 
         tv.addDoubleClickListener(new IDoubleClickListener() {
             @Override
@@ -190,7 +190,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     protected void addModifyCommentMenu(Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Modify comment");
+        item.setText(Messages.DispatchSpecimensTreeTable_modidy_comment_label);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -203,7 +203,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     private void addSetMissingMenu(final Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Set as missing");
+        item.setText(Messages.DispatchSpecimensTreeTable_set_missing_label);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -243,7 +243,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     }
 
     public void refresh() {
-        tv.setInput("refresh");
+        tv.setInput("refresh"); //$NON-NLS-1$
     }
 
 }

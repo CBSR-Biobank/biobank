@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 
 public class ContainerTypeAddHandler extends AbstractHandler {
-    public static final String ID = "edu.ualberta.med.biobank.commands.containerTypeAdd";
+    public static final String ID = "edu.ualberta.med.biobank.commands.containerTypeAdd"; //$NON-NLS-1$
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

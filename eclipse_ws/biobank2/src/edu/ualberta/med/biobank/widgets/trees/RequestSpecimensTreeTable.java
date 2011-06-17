@@ -33,8 +33,8 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankClipboard;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.utils.BiobankClipboard;
 
 public class RequestSpecimensTreeTable extends BgcBaseWidget {
 

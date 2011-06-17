@@ -77,14 +77,14 @@ public abstract class BiobankFormBase extends BgcFormBase {
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
         if (!(input instanceof FormInput))
-            throw new PartInitException("Invalid editor input");
+            throw new PartInitException("Invalid editor input"); //$NON-NLS-1$
         FormInput formInput = (FormInput) input;
         setSite(editorSite);
         setInput(input);
 
         adapter = (AdapterBase) formInput.getAdapter(AdapterBase.class);
         if (adapter != null) {
-            Assert.isNotNull(adapter, "Bad editor input (null value)");
+            Assert.isNotNull(adapter, "Bad editor input (null value)"); //$NON-NLS-1$
             appService = (BiobankApplicationService) adapter.getAppService();
             if (!formInput.hasPreviousForm()) {
                 currentLinkedForms = new ArrayList<BgcFormBase>();

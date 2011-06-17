@@ -179,7 +179,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (ApplicationException e) {
-            logger.error("initSpecimenTypes", e);
+            logger.error("initSpecimenTypes", e); //$NON-NLS-1$
         }
     }
 

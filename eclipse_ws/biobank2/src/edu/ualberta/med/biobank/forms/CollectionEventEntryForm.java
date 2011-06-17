@@ -17,7 +17,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -51,7 +50,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionEventEntryForm extends BiobankEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventEntryForm"; //$NON-NLS-1$
 
     public static final String MSG_NEW_PATIENT_VISIT_OK = Messages.CollectionEventEntryForm_creation_msg;
 
@@ -86,7 +85,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof CollectionEventAdapter,
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         ceventAdapter = (CollectionEventAdapter) adapter;
@@ -236,12 +235,13 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         Control control;
         if (EventAttrTypeEnum.NUMBER == pvCustomInfo.getType()) {
             control = createBoundWidgetWithLabel(client, BgcBaseText.class,
-                SWT.NONE, pvCustomInfo.getLabel(), null, pvCustomInfo, "value",
-                new DoubleNumberValidator("You should select a valid number"));
+                SWT.NONE, pvCustomInfo.getLabel(), null, pvCustomInfo,
+                FormPvCustomInfo.VALUE_BIND_STRING, new DoubleNumberValidator(
+                    Messages.CollectionEventEntryForm_number_validation_msg));
         } else if (EventAttrTypeEnum.TEXT == pvCustomInfo.getType()) {
             control = createBoundWidgetWithLabel(client, BgcBaseText.class,
-                SWT.NONE, pvCustomInfo.getLabel(), null, pvCustomInfo, "value",
-                null);
+                SWT.NONE, pvCustomInfo.getLabel(), null, pvCustomInfo,
+                FormPvCustomInfo.VALUE_BIND_STRING, null);
         } else if (EventAttrTypeEnum.DATE_TIME == pvCustomInfo.getType()) {
             control = createDateTimeWidget(client, pvCustomInfo.getLabel(),
                 DateFormatter.parseToDateTime(pvCustomInfo.getValue()), null,
@@ -249,30 +249,25 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         } else if (EventAttrTypeEnum.SELECT_SINGLE == pvCustomInfo.getType()) {
             control = createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
                 pvCustomInfo.getLabel(), pvCustomInfo.getAllowedValues(),
-                pvCustomInfo, "value", null);
+                pvCustomInfo, FormPvCustomInfo.VALUE_BIND_STRING, null);
         } else if (EventAttrTypeEnum.SELECT_MULTIPLE == pvCustomInfo.getType()) {
-            createFieldLabel(client, pvCustomInfo.getLabel());
+            widgetCreator.createLabel(client, pvCustomInfo.getLabel());
             SelectMultipleWidget s = new SelectMultipleWidget(client,
                 SWT.BORDER, pvCustomInfo.getAllowedValues(), selectionListener);
             s.adaptToToolkit(toolkit, true);
             if (pvCustomInfo.getValue() != null) {
-                s.setSelections(pvCustomInfo.getValue().split(";"));
+                s.setSelections(pvCustomInfo.getValue().split(
+                    FormPvCustomInfo.VALUE_MULTIPLE_SEPARATOR));
             }
             control = s;
         } else {
             Assert.isTrue(false,
-                "Invalid pvInfo type: " + pvCustomInfo.getType());
+                "Invalid pvInfo type: " + pvCustomInfo.getType()); //$NON-NLS-1$
             return null;
         }
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         control.setLayoutData(gd);
         return control;
-    }
-
-    private void createFieldLabel(Composite parent, String label) {
-        Label labelWidget = toolkit.createLabel(parent, label + ":", SWT.LEFT);
-        labelWidget.setLayoutData(new GridData(
-            GridData.VERTICAL_ALIGN_BEGINNING));
     }
 
     @Override
@@ -338,7 +333,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         } else if (pvCustomInfo.control instanceof SelectMultipleWidget) {
             String[] values = ((SelectMultipleWidget) pvCustomInfo.control)
                 .getSelections();
-            pvCustomInfo.setValue(StringUtils.join(values, ";"));
+            pvCustomInfo.setValue(StringUtils.join(values,
+                FormPvCustomInfo.VALUE_MULTIPLE_SEPARATOR));
         }
     }
 
@@ -384,7 +380,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 .getType()) {
                 SelectMultipleWidget s = (SelectMultipleWidget) pvCustomInfo.control;
                 if (pvCustomInfo.getValue() != null) {
-                    s.setSelections(pvCustomInfo.getValue().split(";"));
+                    s.setSelections(pvCustomInfo.getValue().split(
+                        FormPvCustomInfo.VALUE_MULTIPLE_SEPARATOR));
                 } else
                     s.setSelections(new String[] {});
             }

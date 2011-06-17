@@ -45,7 +45,7 @@ public class CancelConfirmWidget extends BgcBaseWidget {
     }
 
     private void createContents() {
-        form.getToolkit().createLabel(this, "Cancel/Confirm barcode:");
+        form.getToolkit().createLabel(this, Messages.CancelConfirmWidget_cancelconfirm_label);
         confirmCancelText = new BgcBaseText(this, SWT.NONE, form.getToolkit());
         confirmCancelText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         GridData gd = new GridData();
@@ -74,7 +74,7 @@ public class CancelConfirmWidget extends BgcBaseWidget {
             }
         });
 
-        cancelButton = form.getToolkit().createButton(this, "Cancel", SWT.PUSH);
+        cancelButton = form.getToolkit().createButton(this, Messages.CancelConfirmWidget_cancel_label, SWT.PUSH);
         cancelButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -86,7 +86,7 @@ public class CancelConfirmWidget extends BgcBaseWidget {
             }
         });
 
-        confirmButton = form.getToolkit().createButton(this, "Confirm",
+        confirmButton = form.getToolkit().createButton(this, Messages.CancelConfirmWidget_confirm_label,
             SWT.PUSH);
         confirmButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -116,7 +116,7 @@ public class CancelConfirmWidget extends BgcBaseWidget {
     }
 
     public void reset() {
-        confirmCancelText.setText("");
+        confirmCancelText.setText(""); //$NON-NLS-1$
     }
 
     @Override

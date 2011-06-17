@@ -28,12 +28,12 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         public String toString() {
             return StringUtils.join(new String[] { clinicNameShort, name,
                 title, emailAddress, mobileNumber, pagerNumber, officeNumber },
-                "\t");
+                "\t"); //$NON-NLS-1$
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Clinic",
-        "Contact Name", "Title", "Email", "Mobile #", "Pager #", "Office #" };
+    private static final String[] HEADINGS = new String[] { Messages.StudyContactEntryInfoTable_clinic_label,
+        Messages.StudyContactEntryInfoTable_name_label, Messages.StudyContactEntryInfoTable_title_label, Messages.StudyContactEntryInfoTable_email_label, Messages.StudyContactEntryInfoTable_mobile_label, Messages.StudyContactEntryInfoTable_pager_label, Messages.StudyContactEntryInfoTable_office_label };
 
     public StudyContactEntryInfoTable(Composite parent,
         List<ContactWrapper> contactCollection) {
@@ -48,9 +48,9 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.StudyContactEntryInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
@@ -68,7 +68,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
                 case 6:
                     return item.officeNumber;
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };
@@ -82,12 +82,12 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         TableRowData info = new TableRowData();
         info.contact = contact;
         ClinicWrapper clinic = contact.getClinic();
-        Assert.isNotNull(clinic, "contact's clinic is null");
+        Assert.isNotNull(clinic, "contact's clinic is null"); //$NON-NLS-1$
         info.clinicNameShort = clinic.getNameShort();
         info.name = contact.getName();
         info.title = contact.getTitle();
         if (info.title == null) {
-            info.title = "";
+            info.title = ""; //$NON-NLS-1$
         }
         info.emailAddress = contact.getEmailAddress();
         info.mobileNumber = contact.getMobileNumber();

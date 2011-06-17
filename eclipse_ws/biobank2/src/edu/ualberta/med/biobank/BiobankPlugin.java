@@ -63,7 +63,7 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 @SuppressWarnings("restriction")
 public class BiobankPlugin extends AbstractUIPlugin {
 
-    public static final String PLUGIN_ID = "biobank";
+    public static final String PLUGIN_ID = "biobank"; //$NON-NLS-1$
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -134,7 +134,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
         BgcPlugin.IMG_PALLET, };
 
     public static final String BARCODES_FILE = BiobankPlugin.class.getPackage()
-        .getName() + ".barcode";
+        .getName() + ".barcode"; //$NON-NLS-1$
 
     // The shared instance
     private static BiobankPlugin plugin;
@@ -238,7 +238,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
 
     public static boolean isRealScanEnabled() {
         String realScan = Platform.getDebugOption(BiobankPlugin.PLUGIN_ID
-            + "/realScan");
+            + "/realScan"); //$NON-NLS-1$
         if (realScan != null) {
             return Boolean.valueOf(realScan);
         }

@@ -19,13 +19,13 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { studyShortName,
-                (patientCount != null) ? patientCount.toString() : "",
-                (visitCount != null) ? visitCount.toString() : "" }, "\t");
+                (patientCount != null) ? patientCount.toString() : "", //$NON-NLS-1$
+                (visitCount != null) ? visitCount.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Study",
-        "#Patients", "#Collection Events" };
+    private static final String[] HEADINGS = new String[] { Messages.ClinicStudyInfoTable_study_label,
+        Messages.ClinicStudyInfoTable_patient_count_label, Messages.ClinicStudyInfoTable_cvent_count_label };
 
     private ClinicWrapper clinic;
 
@@ -43,9 +43,9 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.ClinicStudyInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
 
                 switch (columnIndex) {
@@ -53,12 +53,12 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
                     return item.studyShortName;
                 case 1:
                     return (item.patientCount != null) ? item.patientCount
-                        .toString() : "";
+                        .toString() : ""; //$NON-NLS-1$
                 case 2:
                     return (item.visitCount != null) ? item.visitCount
-                        .toString() : "";
+                        .toString() : ""; //$NON-NLS-1$
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };
@@ -70,7 +70,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         info.study = study;
         info.studyShortName = study.getNameShort();
         if (info.studyShortName == null) {
-            info.studyShortName = "";
+            info.studyShortName = ""; //$NON-NLS-1$
         }
         info.patientCount = clinic.getPatientCountForStudy(study);
         info.visitCount = clinic.getCollectionEventCountForStudy(study);

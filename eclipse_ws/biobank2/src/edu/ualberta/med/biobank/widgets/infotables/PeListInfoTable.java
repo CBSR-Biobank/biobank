@@ -23,12 +23,12 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { startDate, studyNameShort,
-                numSVs.toString(), numAliquots.toString() }, "\t");
+                numSVs.toString(), numAliquots.toString() }, "\t"); //$NON-NLS-1$
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Start date",
-        "Study", "Source Specimens", "Aliquoted Specimens" };
+    private static final String[] HEADINGS = new String[] { Messages.PeListInfoTable_start_label,
+        Messages.PeListInfoTable_study_label, Messages.PeListInfoTable_sources_label, Messages.PeListInfoTable_aliquoteds_label };
 
     public PeListInfoTable(Composite parent, List<ProcessingEventWrapper> pvs) {
         super(parent, pvs, HEADINGS, PAGE_SIZE_ROWS);
@@ -42,9 +42,9 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.PeListInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
@@ -56,7 +56,7 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
                 case 3:
                     return item.numAliquots.toString();
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };
@@ -73,7 +73,7 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
         if (study != null) {
             info.studyNameShort = study.getNameShort();
         } else {
-            info.studyNameShort = "";
+            info.studyNameShort = ""; //$NON-NLS-1$
         }
         info.numSVs = pEvent.getSpecimenCount(false);
         info.numAliquots = pEvent.getChildSpecimenCount();

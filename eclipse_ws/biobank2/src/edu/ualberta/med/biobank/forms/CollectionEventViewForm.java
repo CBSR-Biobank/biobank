@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShow
 
 public class CollectionEventViewForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventViewForm"; //$NON-NLS-1$
 
     private static BgcLogger logger = BgcLogger
         .getLogger(CollectionEventViewForm.class.getName());
@@ -55,7 +55,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof CollectionEventAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         ceventAdapter = (CollectionEventAdapter) adapter;
@@ -86,10 +86,10 @@ public class CollectionEventViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
-        patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
+        studyLabel = createReadOnlyLabelledField(client, SWT.NONE, Messages.CollectionEventViewForm_study_label);
+        patientLabel = createReadOnlyLabelledField(client, SWT.NONE, Messages.CollectionEventViewForm_patient_label);
         visitNumberLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Visit#");
+            Messages.CollectionEventViewForm_visitNber_label);
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.label_activity);
 
@@ -182,9 +182,9 @@ public class CollectionEventViewForm extends BiobankViewForm {
             cevent.reload();
         } catch (Exception ex) {
             logger.error(
-                "Error while retrieving patient visit "
-                    + cevent.getVisitNumber() + "(patient "
-                    + cevent.getPatient() + ")", ex);
+                "Error while retrieving patient visit " //$NON-NLS-1$
+                    + cevent.getVisitNumber() + "(patient " //$NON-NLS-1$
+                    + cevent.getPatient() + ")", ex); //$NON-NLS-1$
         }
     }
 

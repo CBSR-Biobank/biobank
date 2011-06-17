@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.widgets.infotables.LoggingInfoTable;
 
 public class LoggingForm extends BiobankViewForm {
 
-    public static String ID = "edu.ualberta.med.biobank.forms.LoggingForm";
+    public static String ID = "edu.ualberta.med.biobank.forms.LoggingForm"; //$NON-NLS-1$
 
     private BgcBaseText userLabel;
     private BgcBaseText typeLabel;
@@ -34,7 +34,7 @@ public class LoggingForm extends BiobankViewForm {
 
     @Override
     public void init() throws Exception {
-        setPartName("Logging: results");
+        setPartName(Messages.LoggingForm_title);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class LoggingForm extends BiobankViewForm {
 
         PlatformUI.getWorkbench().getViewRegistry().find(LoggingView.ID);
 
-        form.setText("Logging: Browse through your search results");
+        form.setText(Messages.LoggingForm_form_title);
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -68,24 +68,24 @@ public class LoggingForm extends BiobankViewForm {
 
         /* a grid might make this easier */
         centerLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
-            "Center");
-        userLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "User");
-        typeLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "Type");
+            Messages.LoggingForm_center_label);
+        userLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, Messages.LoggingForm_user_label);
+        typeLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, Messages.LoggingForm_type_label);
         actionLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
-            "Action");
+            Messages.LoggingForm_action_label);
         startDateLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
-            "Start Date");
+            Messages.LoggingForm_start_label);
 
         patientNumLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            "Patient #");
+            Messages.LoggingForm_pnumber_label);
         locationLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            "Location");
+            Messages.LoggingForm_location_label);
         inventoryIDLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            "Inventory ID");
+            Messages.LoggingForm_inventoryid_label);
         detailsLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            "Details");
+            Messages.LoggingForm_details_label);
         endDateLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            "End Date");
+            Messages.LoggingForm_end_label);
 
         getSearchRequestFields();
 
@@ -95,7 +95,7 @@ public class LoggingForm extends BiobankViewForm {
     private void generateSearchQueryTable() {
         LogQuery.getInstance().queryDatabase();
 
-        Composite client = createSectionWithClient("Search Results");
+        Composite client = createSectionWithClient(Messages.LoggingForm_search_title);
         LoggingInfoTable loggingTable = new LoggingInfoTable(client, LogQuery
             .getInstance().getDatabaseResults());
         loggingTable.adaptToToolkit(toolkit, true);

@@ -24,14 +24,14 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { clinicName, clinicNameShort,
-                studyCount.toString(), (status != null) ? status : "",
-                (patientCount != null) ? patientCount.toString() : "",
-                (visitCount != null) ? visitCount.toString() : "" }, "\t");
+                studyCount.toString(), (status != null) ? status : "", //$NON-NLS-1$
+                (patientCount != null) ? patientCount.toString() : "", //$NON-NLS-1$
+                (visitCount != null) ? visitCount.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Name",
-        "Short name", "Study Count", "Status", "Patients", "Patient Visits" };
+    private static final String[] HEADINGS = new String[] { Messages.ClinicInfoTable_name_label,
+        Messages.ClinicInfoTable_nameshort_label, Messages.ClinicInfoTable_study_count_label, Messages.ClinicInfoTable_status_label, Messages.ClinicInfoTable_patients_label, Messages.ClinicInfoTable_visits_label };
 
     public ClinicInfoTable(Composite parent, List<ClinicWrapper> collection) {
         super(parent, collection, HEADINGS, 10);
@@ -45,9 +45,9 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.ClinicInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
@@ -63,7 +63,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
                 case 5:
                     return item.visitCount.toString();
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };

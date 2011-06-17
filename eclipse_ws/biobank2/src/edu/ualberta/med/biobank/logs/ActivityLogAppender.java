@@ -28,9 +28,9 @@ public class ActivityLogAppender extends AppenderSkeleton {
     private MessageConsoleStream consoleStream;
     private List<LogInfo> logsList;
     private static final char[] SYSTEM_LINE_SEPARATOR = System.getProperty(
-        "line.separator").toCharArray();
+        "line.separator").toCharArray(); //$NON-NLS-1$
     public static final PatternLayout layout = new PatternLayout(
-        "%d{HH:mm:ss} %m%n");
+        "%d{HH:mm:ss} %m%n"); //$NON-NLS-1$
 
     public ActivityLogAppender(String name) {
         setName(name);

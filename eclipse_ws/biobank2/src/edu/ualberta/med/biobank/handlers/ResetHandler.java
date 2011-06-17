@@ -24,7 +24,7 @@ public class ResetHandler extends AbstractHandler implements IHandler {
                         .getActivePage().getActiveEditor();
                     biobankEntryForm.reset();
                 } catch (Exception ex) {
-                    BgcPlugin.openAsyncError("Error on reset", ex);
+                    BgcPlugin.openAsyncError(Messages.ResetHandler_reset_error, ex);
                 }
             }
         });

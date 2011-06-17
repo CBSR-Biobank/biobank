@@ -31,12 +31,12 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
         public String toString() {
             return StringUtils.join(new String[] { label, typeNameShort,
                 status, barcode,
-                (temperature != null) ? temperature.toString() : "" }, "\t");
+                (temperature != null) ? temperature.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Name",
-        "Container Type", "Status", "Product Barcode", "Temperature" };
+    private static final String[] HEADINGS = new String[] { Messages.ContainerInfoTable_name_label,
+        Messages.ContainerInfoTable_type_label, Messages.ContainerInfoTable_status_label, Messages.ContainerInfoTable_barcode_label, Messages.ContainerInfoTable_temperature_label };
 
     private SiteAdapter siteAdapter;
 
@@ -55,9 +55,9 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.ContainerInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
@@ -70,11 +70,11 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
                     return item.barcode;
                 case 4:
                     if (item.temperature == null) {
-                        return "";
+                        return ""; //$NON-NLS-1$
                     }
                     return item.temperature.toString();
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };
@@ -123,7 +123,7 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
     public void addClickListener(IDoubleClickListener listener) {
         doubleClickListeners.add(listener);
         MenuItem mi = new MenuItem(getMenu(), SWT.PUSH);
-        mi.setText("Edit");
+        mi.setText(Messages.ContainerInfoTable_edit_label);
         mi.addSelectionListener(new SelectionListener() {
 
             @Override

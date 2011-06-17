@@ -4,7 +4,6 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.reporting.messages"; //$NON-NLS-1$
-    public static String ReportingUtils_10;
     public static String ReportingUtils_cancel_error_msg;
     public static String ReportingUtils_extension_error_msg;
     public static String ReportingUtils_file_type_error_msg;

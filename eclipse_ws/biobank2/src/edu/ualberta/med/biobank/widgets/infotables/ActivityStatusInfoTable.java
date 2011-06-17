@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class ActivityStatusInfoTable extends
     InfoTableWidget<ActivityStatusWrapper> {
 
-    private static final String[] HEADINGS = new String[] { "Activity Status" };
+    private static final String[] HEADINGS = new String[] { Messages.ActivityStatusInfoTable_status_label };
 
     public ActivityStatusInfoTable(Composite parent,
         List<ActivityStatusWrapper> activityStatusCollection) {
@@ -26,15 +26,15 @@ public class ActivityStatusInfoTable extends
                 ActivityStatusWrapper item = (ActivityStatusWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.ActivityStatusInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
                     return item.getName();
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };

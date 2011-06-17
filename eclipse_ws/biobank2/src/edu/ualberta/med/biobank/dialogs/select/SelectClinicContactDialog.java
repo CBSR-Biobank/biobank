@@ -19,7 +19,7 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
 
     public static final int ADD_BTN_ID = 100;
 
-    private static final String TITLE = "Clinic Contacts";
+    private static final String TITLE = Messages.SelectClinicContactDialog_dialog_title;
 
     private StudyContactEntryInfoTable contactInfoTable;
 
@@ -39,12 +39,12 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Select a contact to add to this study";
+        return Messages.SelectClinicContactDialog_description;
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return "Add a clinic contact to study";
+        return Messages.SelectClinicContactDialog_main_title;
     }
 
     @Override

@@ -20,11 +20,11 @@ import edu.ualberta.med.biobank.widgets.infotables.CollectionEventInfoTable;
 public class SelectPatientVisitPage extends BiobankWizardPage {
     public static final String PAGE_NAME = SelectPatientVisitPage.class
         .getCanonicalName();
-    private static final String PATIENT_VISIT_REQUIRED = "Please select a patient visit.";
+    private static final String PATIENT_VISIT_REQUIRED = Messages.SelectPatientVisitPage_visit_required_msg;
     private CollectionEventInfoTable visitsTable;
 
     public SelectPatientVisitPage() {
-        super(PAGE_NAME, "Select a patient visit", null);
+        super(PAGE_NAME, Messages.SelectPatientVisitPage_visit_description, null);
     }
 
     public void setCollectionEventList(List<CollectionEventWrapper> visits) {

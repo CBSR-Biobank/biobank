@@ -6,6 +6,10 @@ import java.beans.PropertyChangeSupport;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 
 public class PvAttrCustom {
+
+    public static final String VALUE_BIND_STRING = "value"; //$NON-NLS-1$
+    public static final String VALUE_MULTIPLE_SEPARATOR = ";"; //$NON-NLS-1$
+
     private Boolean isDefault;
     private String label;
     private EventAttrTypeEnum type;

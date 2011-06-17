@@ -15,6 +15,18 @@ public class Messages extends NLS {
     public static String ContactAddDialog_title_add;
     public static String ContactAddDialog_title_edit;
     public static String ContactAddDialog_title_label;
+    public static String SelectClinicContactDialog_description;
+    public static String SelectClinicContactDialog_dialog_title;
+    public static String SelectClinicContactDialog_main_title;
+    public static String SelectParentContainerDialog_description;
+    public static String SelectParentContainerDialog_dialog_title;
+    public static String SelectParentContainerDialog_main_title;
+    public static String SelectParentContainerDialog_parents_list_label;
+    public static String SelectParentContainerDialog_select_label;
+    public static String SelectParentContainerDialog_select_validation_error_msg;
+    public static String SelectStudyDialog_dialog_title;
+    public static String SelectStudyDialog_main_message;
+    public static String SelectStudyDialog_main_title;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

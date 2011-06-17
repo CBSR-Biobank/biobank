@@ -101,12 +101,6 @@ public class Messages extends NLS {
 
     public static String LinkFormPatientManagement_visit_validationMsg;
 
-    public static String SpecimenAssign_container_position_toomany_error_msg;
-    public static String SpecimenAssign_multiple_activitylog_pallet_checkLabelForProductBarcode;
-    public static String SpecimenAssign_multiple_activitylog_pallet_moveInfo;
-    public static String SpecimenAssign_multiple_activitylog_pallet_typeUsed;
-    public static String SpecimenAssign_multiple_dialog_checkPallet_otherPosition;
-    public static String SpecimenAssign_multiple_activitylog_pallet_moved;
     public static String SpecimenAssignEntryForm__barcode_exists_different_position_error_msg;
 
     public static String SpecimenAssignEntryForm__barcode_notPallet_error_msg;

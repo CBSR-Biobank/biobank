@@ -27,7 +27,7 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public class DecodePlateForm extends PlateForm {
-    public static final String ID = "edu.ualberta.med.biobank.forms.DecodePlateForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.DecodePlateForm"; //$NON-NLS-1$
 
     private ScanPalletWidget spw;
 
@@ -62,7 +62,7 @@ public class DecodePlateForm extends PlateForm {
         gd.grabExcessHorizontalSpace = true;
         plateSelectionWidget.setLayoutData(gd);
 
-        scanButton = toolkit.createButton(page, "Scan && Decode Plate",
+        scanButton = toolkit.createButton(page, Messages.DecodePlateForm_button_scan_decode_label,
             SWT.PUSH);
         scanButton
             .setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
@@ -95,14 +95,14 @@ public class DecodePlateForm extends PlateForm {
         plateToScan = plateSelectionWidget.getSelectedPlate();
 
         if (plateToScan == null) {
-            BgcPlugin.openAsyncError("Decode Plate Error", "No plate selected");
+            BgcPlugin.openAsyncError(Messages.DecodePlateForm_error_title, Messages.DecodePlateForm_noplate_error_msg);
             return;
         }
 
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) {
-                monitor.beginTask("Scanning and decoding...",
+                monitor.beginTask(Messages.DecodePlateForm_scanning_decoding,
                     IProgressMonitor.UNKNOWN);
                 try {
                     scanAndProcessResult(monitor);
@@ -126,7 +126,7 @@ public class DecodePlateForm extends PlateForm {
     protected void scanAndProcessResult(IProgressMonitor monitor)
         throws Exception {
         launchScan(monitor);
-        monitor.subTask("Decoding...");
+        monitor.subTask(Messages.DecodePlateForm_decoding);
 
         Display.getDefault().asyncExec(new Runnable() {
             @Override
@@ -159,7 +159,7 @@ public class DecodePlateForm extends PlateForm {
     }
 
     protected void launchScan(IProgressMonitor monitor) throws Exception {
-        monitor.subTask("Launching scan");
+        monitor.subTask(Messages.DecodePlateForm_launching);
 
         ScanCell[][] decodedCells = null;
         decodedCells = ScannerConfigPlugin.scan(plateToScan,

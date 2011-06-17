@@ -28,15 +28,15 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserInfoTable extends InfoTableWidget<User> {
     public static final int ROWS_PER_PAGE = 8;
-    private static final String[] HEADINGS = new String[] { "Login", "Email",
-        "First Name", "Last Name" };
-    private static final String LOADING_ROW = "loading...";
-    private static final String GROUPS_LOADING_ERROR = "Unable to load groups.";
-    private static final String USER_DELETE_ERROR = "Unable to delete user.";
-    private static final String CANNOT_UNLOCK_USER = "Cannot unlock user {0}.";
-    private static final String CONFIRM_DELETE_TITLE = "Confirm Deletion";
-    private static final String CONFIRM_DELETE_MESSAGE = "Are you certain you want to delete \"{0}\"?";
-    private static final String CONFIRM_SUICIDE_MESSAGE = "Are you certain you want to delete yourself as a user?";
+    private static final String[] HEADINGS = new String[] { Messages.UserInfoTable_login_label, Messages.UserInfoTable_email_label,
+        Messages.UserInfoTable_firstname_label, Messages.UserInfoTable_lastname_label };
+    private static final String LOADING_ROW = Messages.UserInfoTable_loading;
+    private static final String GROUPS_LOADING_ERROR = Messages.UserInfoTable_load_error_msg;
+    private static final String USER_DELETE_ERROR = Messages.UserInfoTable_delete_error_msg;
+    private static final String CANNOT_UNLOCK_USER = Messages.UserInfoTable_unlock_error_msg;
+    private static final String CONFIRM_DELETE_TITLE = Messages.UserInfoTable_confirm_delete_title;
+    private static final String CONFIRM_DELETE_MESSAGE = Messages.UserInfoTable_confirm_delete_msg;
+    private static final String CONFIRM_SUICIDE_MESSAGE = Messages.UserInfoTable_confirm_delete_suicide_msg;
 
     private MenuItem unlockMenuItem;
 
@@ -58,7 +58,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
         });
 
         unlockMenuItem = new MenuItem(menu, SWT.PUSH);
-        unlockMenuItem.setText("Unlock User");
+        unlockMenuItem.setText(Messages.UserInfoTable_unlock_label);
         unlockMenuItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -112,7 +112,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
 
         User user = (User) o;
         return StringUtils.join(Arrays.asList(user.getLogin(), user.getEmail(),
-            user.getFirstName(), user.getLastName()), "\t");
+            user.getFirstName(), user.getLastName()), "\t"); //$NON-NLS-1$
     }
 
     @Override
@@ -135,7 +135,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                     if (columnIndex == 0) {
                         return LOADING_ROW;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
 
                 switch (columnIndex) {
@@ -148,7 +148,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                 case 3:
                     return user.getLastName();
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };

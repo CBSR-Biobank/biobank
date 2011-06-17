@@ -27,9 +27,9 @@ import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class PatientEntryForm extends BiobankEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.PatientEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.PatientEntryForm"; //$NON-NLS-1$
 
-    private static final String CREATED_AT_BINDING = "patient-created-at-binding";
+    private static final String CREATED_AT_BINDING = "patient-created-at-binding"; //$NON-NLS-1$
 
     public static final String MSG_NEW_PATIENT_OK = Messages.PatientEntryForm_creation_msg;
 
@@ -49,7 +49,7 @@ public class PatientEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof PatientAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         patient = (PatientWrapper) getModelObject();
@@ -114,14 +114,16 @@ public class PatientEntryForm extends BiobankEntryForm {
             Messages.PatientEntryForm_field_pNumber_label, null, patient,
             PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
 
-        createdAtLabel = widgetCreator.createLabel(client, "Created At");
+        createdAtLabel = widgetCreator.createLabel(client,
+            Messages.PatientEntryForm_created_label);
         createdAtLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        createdAtValidator = new NotNullValidator("Created At should be set");
+        createdAtValidator = new NotNullValidator(
+            Messages.PatientEntryForm_created_validation_msg);
 
         createDateTimeWidget(client, createdAtLabel, patient.getCreatedAt(),
-            patient, "createdAt", createdAtValidator, SWT.DATE | SWT.TIME,
-            CREATED_AT_BINDING);
+            patient, PatientPeer.CREATED_AT.getName(), createdAtValidator,
+            SWT.DATE | SWT.TIME, CREATED_AT_BINDING);
     }
 
     @Override

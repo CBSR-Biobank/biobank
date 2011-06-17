@@ -214,7 +214,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         for (String field : defaultFields) {
             studyPvAttrCustom = new StudyPvAttrCustom();
             studyPvAttrCustom.setLabel(field);
-            studyPvAttrCustom.setType(EventAttrTypeEnum.DATE_TIME); //$NON-NLS-1$
+            studyPvAttrCustom.setType(EventAttrTypeEnum.DATE_TIME);
             studyPvAttrCustom.setIsDefault(true);
             studyPvAttrCustom.widget = new PvInfoWidget(client, SWT.NONE,
                 studyPvAttrCustom, true);
@@ -297,19 +297,19 @@ public class StudyEntryForm extends BiobankEntryForm {
                     study.deleteStudyEventAttr(studyPvAttrCustom.getLabel());
                 } catch (BiobankCheckException e) {
                     throw new UserUIException(
-                        "Cannot delete " //$NON-NLS-1$
-                            + label
-                            + " from study since it is already in use by patient visits.", //$NON-NLS-1$
-                        e);
+                        NLS.bind(
+                            Messages.StudyEntryForm_delete_error_msg,
+                            label), e);
                 }
             } else if (studyPvAttrCustom.widget.getSelected()) {
                 newPvInfoLabels.add(studyPvAttrCustom.getLabel());
                 String value = studyPvAttrCustom.widget.getValues();
                 if (studyPvAttrCustom.getType() == EventAttrTypeEnum.SELECT_SINGLE
-                    || studyPvAttrCustom.getType() == EventAttrTypeEnum.SELECT_MULTIPLE) { //$NON-NLS-1$
+                    || studyPvAttrCustom.getType() == EventAttrTypeEnum.SELECT_MULTIPLE) {
                     if (value.length() > 0) {
                         study.setStudyEventAttr(studyPvAttrCustom.getLabel(),
-                            studyPvAttrCustom.getType(), value.split(";")); //$NON-NLS-1$
+                            studyPvAttrCustom.getType(),
+                            value.split(PvAttrCustom.VALUE_MULTIPLE_SEPARATOR));
                     } else if (value.length() == 0) {
                         study.setStudyEventAttr(studyPvAttrCustom.getLabel(),
                             studyPvAttrCustom.getType(), null);

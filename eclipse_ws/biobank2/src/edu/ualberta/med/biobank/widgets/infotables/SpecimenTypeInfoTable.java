@@ -7,14 +7,14 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class SampleTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> {
+public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 10;
 
-    private static final String[] HEADINGS = new String[] { "Sample Type",
-        "Short Name" };
+    private static final String[] HEADINGS = new String[] { Messages.SpecimenTypeInfoTable_type_label,
+        Messages.SpecimenTypeInfoTable_shortname_label };
 
-    public SampleTypeInfoTable(Composite parent,
+    public SpecimenTypeInfoTable(Composite parent,
         List<SpecimenTypeWrapper> sampleTypeCollection) {
         super(parent, sampleTypeCollection, HEADINGS, PAGE_SIZE_ROWS);
     }
@@ -27,9 +27,9 @@ public class SampleTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> {
                 SpecimenTypeWrapper item = (SpecimenTypeWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.SpecimenTypeInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
@@ -37,7 +37,7 @@ public class SampleTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> {
                 case 1:
                     return item.getNameShort();
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };
@@ -48,7 +48,7 @@ public class SampleTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> {
         if (o == null)
             return null;
         SpecimenTypeWrapper type = (SpecimenTypeWrapper) o;
-        return type.getName() + "\t" + type.getNameShort();
+        return type.getName() + "\t" + type.getNameShort(); //$NON-NLS-1$
     }
 
     @Override

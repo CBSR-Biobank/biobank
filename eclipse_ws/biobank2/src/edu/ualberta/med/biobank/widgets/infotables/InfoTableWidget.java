@@ -12,6 +12,7 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -72,8 +73,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
      * .html for how to set row height.
      */
 
-    private static BgcLogger logger = BgcLogger
-        .getLogger(InfoTableWidget.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(InfoTableWidget.class
+        .getName());
 
     protected List<BiobankCollectionModel> model;
 
@@ -162,7 +163,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     protected BiobankCollectionModel getSelectionInternal() {
         Assert.isTrue(!tableViewer.getTable().isDisposed(),
-            "widget is disposed");
+            "widget is disposed"); //$NON-NLS-1$
         IStructuredSelection stSelection = (IStructuredSelection) tableViewer
             .getSelection();
 
@@ -281,7 +282,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
                 }
             });
         } catch (Exception e) {
-            logger.error("setCollection error", e);
+            logger.error("setCollection error", e); //$NON-NLS-1$
         }
     }
 
@@ -302,7 +303,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
     public void addClickListener(IDoubleClickListener listener) {
         doubleClickListeners.add(listener);
         editItem = new MenuItem(getMenu(), SWT.PUSH);
-        editItem.setText("Edit");
+        editItem.setText(Messages.InfoTableWidget_edit_label);
         editItem.addSelectionListener(new SelectionListener() {
 
             @Override
@@ -344,7 +345,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Add");
+        item.setText(Messages.InfoTableWidget_add_label);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -358,7 +359,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Edit");
+        item.setText(Messages.InfoTableWidget_edit_label);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -372,7 +373,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Delete");
+        item.setText(Messages.InfoTableWidget_delete_label);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -501,8 +502,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     @Override
     protected void setPageLabelText() {
-        pageLabel.setText("Page: " + (pageInfo.page + 1) + " of "
-            + pageInfo.pageTotal);
+        pageLabel.setText(NLS.bind(Messages.InfoTableWidget_pages_label, (pageInfo.page + 1),
+            +pageInfo.pageTotal));
     }
 
 }

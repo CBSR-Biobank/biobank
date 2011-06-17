@@ -29,12 +29,12 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         public String toString() {
             return StringUtils.join(new String[] { name, title, studies,
                 emailAddress, mobileNumber, pagerNumber, officeNumber,
-                faxNumber }, "\t");
+                faxNumber }, "\t"); //$NON-NLS-1$
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Contact Name",
-        "Title", "Studies", "Email", "Mobile #", "Pager #", "Office #", "Fax #" };
+    private static final String[] HEADINGS = new String[] { Messages.ContactInfoTable_name_label,
+        Messages.ContactInfoTable_title_label, Messages.ContactInfoTable_studies_label, Messages.ContactInfoTable_email_label, Messages.ContactInfoTable_mobile_label, Messages.ContactInfoTable_pager_label, Messages.ContactInfoTable_office_label, Messages.ContactInfoTable_fax_label };
 
     public ContactInfoTable(Composite parent, List<ContactWrapper> contacts) {
         super(parent, contacts, HEADINGS, PAGE_SIZE_ROWS);
@@ -48,9 +48,9 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.ContactInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
@@ -70,7 +70,7 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
                 case 7:
                     return item.faxNumber;
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };
@@ -91,7 +91,7 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
             int count = 0;
             for (StudyWrapper study : studies) {
                 if (count > 0) {
-                    sb.append(", ");
+                    sb.append(", "); //$NON-NLS-1$
                 }
                 sb.append(study.getNameShort());
                 ++count;

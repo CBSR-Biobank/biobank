@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -12,6 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -26,17 +28,17 @@ import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class ContainerEntryForm extends BiobankEntryForm {
-    public static final String ID = "edu.ualberta.med.biobank.forms.ContainerEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ContainerEntryForm"; //$NON-NLS-1$
 
-    public static final String MSG_STORAGE_CONTAINER_NEW_OK = "Creating a new storage container.";
+    public static final String MSG_STORAGE_CONTAINER_NEW_OK = Messages.ContainerEntryForm_new_ok_msg;
 
-    public static final String MSG_STORAGE_CONTAINER_OK = "Editing an existing storage container.";
+    public static final String MSG_STORAGE_CONTAINER_OK = Messages.ContainerEntryForm_edit_ok_msg;
 
-    public static final String MSG_CONTAINER_NAME_EMPTY = "Container must have a name";
+    public static final String MSG_CONTAINER_NAME_EMPTY = Messages.ContainerEntryForm_name_validation_msg;
 
-    public static final String MSG_CONTAINER_TYPE_EMPTY = "Container must have a container type";
+    public static final String MSG_CONTAINER_TYPE_EMPTY = Messages.ContainerEntryForm_type_validation_msg;
 
-    public static final String MSG_INVALID_POSITION = "Position is empty or not a valid number";
+    public static final String MSG_INVALID_POSITION = Messages.ContainerEntryForm_position_validation_msg;
 
     private ContainerAdapter containerAdapter;
 
@@ -57,18 +59,18 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof ContainerAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
         containerAdapter = (ContainerAdapter) adapter;
         container = (ContainerWrapper) getModelObject();
 
         String tabName;
         if (container.isNew()) {
-            tabName = "Container";
+            tabName = Messages.ContainerEntryForm_new_title;
             container.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else {
-            tabName = "Container " + container.getLabel();
+            tabName = NLS.bind(Messages.ContainerEntryForm_edit_title, container.getLabel());
             oldContainerLabel = container.getLabel();
         }
         setPartName(tabName);
@@ -76,7 +78,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Container");
+        form.setText(Messages.ContainerEntryForm_form_title);
 
         page.setLayout(new GridLayout(1, false));
         createContainerSection();
@@ -116,25 +118,27 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 .equals(container.getContainerType().getTopLevel()))) {
             // only allow edit to label on top level containers
             setFirstControl(createBoundWidgetWithLabel(client,
-                BgcBaseText.class, SWT.NONE, "Label", null, container, "label",
-                new NonEmptyStringValidator(MSG_CONTAINER_NAME_EMPTY)));
+                BgcBaseText.class, SWT.NONE,
+                Messages.ContainerEntryForm_label_label, null, container,
+                ContainerPeer.LABEL.getName(), new NonEmptyStringValidator(
+                    MSG_CONTAINER_NAME_EMPTY)));
         } else {
             BgcBaseText l = createReadOnlyLabelledField(client, SWT.NONE,
-                "Label");
+                Messages.ContainerEntryForm_label_label);
             setTextValue(l, container.getLabel());
         }
 
         Control c = createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.NONE, "Product Barcode", null, container, "productBarcode",
-            null);
+            SWT.NONE, Messages.ContainerEntryForm_barcode_label, null,
+            container, ContainerPeer.PRODUCT_BARCODE.getName(), null);
         if (getFirstControl() == null)
             setFirstControl(c);
 
         activityStatusComboViewer = createComboViewer(client,
-            "Activity Status",
+            Messages.ContainerEntryForm_status_label,
             ActivityStatusWrapper.getAllActivityStatuses(appService),
             container.getActivityStatus(),
-            "Container must have an activity status",
+            Messages.ContainerEntryForm_status_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -144,7 +148,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
             });
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            "Comments", null, container, "comment", null);
+            Messages.ContainerEntryForm_comments_label, null, container,
+            ContainerPeer.COMMENT.getName(), null);
 
         createContainerTypesSection(client);
 
@@ -167,19 +172,19 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (container.isNew() && containerTypes.size() == 1)
             currentType = containerTypes.get(0);
 
-        containerTypeComboViewer = createComboViewer(client, "Container Type",
-            containerTypes, currentType, MSG_CONTAINER_TYPE_EMPTY,
-            new ComboSelectionUpdate() {
+        containerTypeComboViewer = createComboViewer(client,
+            Messages.ContainerEntryForm_type_label, containerTypes,
+            currentType, MSG_CONTAINER_TYPE_EMPTY, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     ContainerTypeWrapper ct = (ContainerTypeWrapper) selectedObject;
                     container.setContainerType(ct);
                     if (tempWidget != null) {
-                        tempWidget.setText("");
+                        tempWidget.setText(""); //$NON-NLS-1$
                         if (ct != null && Boolean.TRUE.equals(ct.getTopLevel())) {
                             Double temp = ct.getDefaultTemperature();
                             if (temp == null) {
-                                tempWidget.setText("");
+                                tempWidget.setText(""); //$NON-NLS-1$
                             } else {
                                 tempWidget.setText(temp.toString());
                             }
@@ -188,9 +193,10 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 }
             });
         tempWidget = (BgcBaseText) createBoundWidgetWithLabel(client,
-            BgcBaseText.class, SWT.NONE, "Temperature (Celcius)", null,
-            container, "temperature", new DoubleNumberValidator(
-                "Default temperature is not a valid number"));
+            BgcBaseText.class, SWT.NONE,
+            Messages.ContainerEntryForm_temperature_label, null, container,
+            ContainerPeer.TEMPERATURE.getName(), new DoubleNumberValidator(
+                Messages.ContainerEntryForm_temperature_validation_msg));
         if (container.hasParentContainer())
             tempWidget.setEnabled(false);
 
@@ -221,10 +227,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
         doSave = true;
         if (container.hasChildren() && oldContainerLabel != null
             && !oldContainerLabel.equals(container.getLabel())) {
-            doSave = BgcPlugin
-                .openConfirm(
-                    "Renaming container",
-                    "This container has been renamed. Its children will also be renamed. Are you sure you want to continue ?");
+            doSave = BgcPlugin.openConfirm(
+                Messages.ContainerEntryForm_renaming_dialog_title,
+                Messages.ContainerEntryForm_renaming_dialog_msg);
         }
     }
 

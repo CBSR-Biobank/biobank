@@ -23,8 +23,8 @@ public class ClinicVisitInfoTable extends
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Visit #",
-        "Source Specimens", "Aliquoted Specimens" };
+    private static final String[] HEADINGS = new String[] { Messages.ClinicVisitInfoTable_nber_label,
+        Messages.ClinicVisitInfoTable_source_specs_label, Messages.ClinicVisitInfoTable_aliquoted_spec_label };
 
     public ClinicVisitInfoTable(Composite parent,
         List<CollectionEventWrapper> collection) {
@@ -39,9 +39,9 @@ public class ClinicVisitInfoTable extends
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.ClinicVisitInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
@@ -51,7 +51,7 @@ public class ClinicVisitInfoTable extends
                 case 2:
                     return item.numSpecimens.toString();
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };

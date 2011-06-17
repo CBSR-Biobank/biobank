@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 
 public class EditShippingMethodsHandler extends AbstractHandler {
-    public static final String ID = "edu.ualberta.med.biobank.commands.editShipmentMethods";
+    public static final String ID = "edu.ualberta.med.biobank.commands.editShipmentMethods"; //$NON-NLS-1$
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -28,7 +28,7 @@ public class EditShippingMethodsHandler extends AbstractHandler {
                 .openEditor(new FormInput(sessionAdapter),
                     ShippingMethodViewForm.ID, false, 0);
         } catch (Exception e) {
-            throw new ExecutionException("Could not execute handler.", e);
+            throw new ExecutionException(Messages.EditShippingMethodsHandler_handler_error_msg, e);
         }
 
         return null;
