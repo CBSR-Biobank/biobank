@@ -224,6 +224,15 @@
   </target>
 
   <!-- Eclipse -->
+  <target name="biobank-product-modify">
+    <tempfile property="tmp.file" destdir="${java.io.tmpdir}" prefix="biobank2.product" />
+    <xslt in="${eclipse.proj.dir}/biobank2.product"
+    out="${tmp.file}"
+    style="scripts/biobank-product.xsl">
+      <param name="version" expression="${java.client.version.num}" />
+    </xslt>
+    <copy file="${tmp.file}" tofile="${eclipse.proj.dir}/biobank2.product" overwrite="true"/>
+  </target>
   <target name="java-client-manifest">
     <manifest file="${eclipse.proj.dir}/META-INF/MANIFEST.MF" mode="update">
       <attribute name="Bundle-Version" value="${java.client.version.num}" />
