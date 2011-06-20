@@ -1,15 +1,12 @@
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -43,7 +40,6 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
     private TreeViewer tv;
     private RequestWrapper request;
     protected List<RequestTableGroup> groups;
-    private Boolean selecting = false;
 
     @SuppressWarnings("unused")
     public RequestSpecimensTreeTable(Composite parent, RequestWrapper request) {
@@ -58,28 +54,18 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
         gd.heightHint = 400;
         setLayoutData(gd);
 
-        tv = new TreeViewer(this, SWT.MULTI | SWT.BORDER);
+        tv = new TreeViewer(this, SWT.SINGLE | SWT.BORDER);
         Tree tree = tv.getTree();
         tree.setHeaderVisible(true);
         tree.setLinesVisible(true);
-        tv.addSelectionChangedListener(new ISelectionChangedListener() {
-
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                if (!selecting) {
-                    selecting = true;
-                    List<Node> nodes = getSelectionAdapters(((StructuredSelection) tv
-                        .getSelection()).toList());
-                    tv.setSelection(new StructuredSelection(nodes));
-                }
-                selecting = false;
-            }
-
-        });
 
         TreeColumn tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Inventory Id");
+        tc.setText("Location");
         tc.setWidth(300);
+
+        tc = new TreeColumn(tree, SWT.LEFT);
+        tc.setText("Inventory Id");
+        tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
         tc.setText("Type");
@@ -145,13 +131,16 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
                             .getLabelInternal();
                     return "";
                 } else if (element instanceof Node) {
-                    if (columnIndex < 3)
+                    if (columnIndex == 0) {
+                        return ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
+                            .getSpecimen()).getSpecimen().getPositionString();
+                    } else if (columnIndex < 4)
                         return ((TreeItemAdapter) element)
-                            .getColumnText(columnIndex);
-                    if (columnIndex == 3)
+                            .getColumnText(columnIndex - 1);
+                    else if (columnIndex == 4)
                         return ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
                             .getSpecimen()).getClaimedBy();
-                    else if (columnIndex == 4) {
+                    else if (columnIndex == 5) {
                         return RequestSpecimenState
                             .getState(
                                 ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
@@ -250,34 +239,27 @@ public class RequestSpecimensTreeTable extends BiobankWidget {
     }
 
     public List<RequestSpecimenWrapper> getSelectionWrappers() {
-        List<RequestSpecimenWrapper> wrappers = new ArrayList<RequestSpecimenWrapper>();
-        for (Node adapter : getSelectionAdapters(((StructuredSelection) tv
-            .getSelection()).toList())) {
-            if (adapter instanceof TreeItemAdapter) {
-                RequestSpecimenWrapper spec = (RequestSpecimenWrapper) ((TreeItemAdapter) adapter)
-                    .getSpecimen();
-                wrappers.add(spec);
-            }
-        }
-        return wrappers;
+        return getWrappers(getAdapterSelection());
     }
 
-    public List<Node> getSelectionAdapters(List<Node> sel) {
-        HashSet<Node> adapters = new HashSet<Node>();
-        for (Object o : sel) {
-            // depth first (dont add parent if no children)
-            List<Node> children = getSelectionAdapters(((Node) o).getChildren());
-            adapters.addAll(children);
-            if (o instanceof TreeItemAdapter) {
-                RequestSpecimenWrapper spec = (RequestSpecimenWrapper) ((TreeItemAdapter) o)
-                    .getSpecimen();
-                if (spec.getSpecimenState().equals(
-                    RequestSpecimenState.AVAILABLE_STATE))
-                    adapters.add((Node) o);
-            } else if (children.size() > 0)
-                adapters.add((Node) o);
+    public List<RequestSpecimenWrapper> getWrappers(Node parent) {
+        List<RequestSpecimenWrapper> list = new ArrayList<RequestSpecimenWrapper>();
+        if (parent instanceof TreeItemAdapter) {
+            RequestSpecimenWrapper spec = (RequestSpecimenWrapper) ((TreeItemAdapter) parent)
+                .getSpecimen();
+            list.add(spec);
+        } else {
+            for (Node child : parent.getChildren()) {
+                list.addAll(getWrappers(child));
+            }
         }
-        return new ArrayList<Node>(adapters);
+        return list;
+    }
+
+    private Node getAdapterSelection() {
+        Node o = (Node) ((StructuredSelection) tv.getSelection())
+            .getFirstElement();
+        return o.getParent() == null ? null : o;
     }
 
     public void refresh() {

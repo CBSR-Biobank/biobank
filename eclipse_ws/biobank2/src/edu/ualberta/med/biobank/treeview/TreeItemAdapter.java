@@ -45,8 +45,17 @@ public class TreeItemAdapter implements Node {
     }
 
     @Override
+    public boolean equals(Object item) {
+        if (!(item instanceof TreeItemAdapter))
+            return false;
+        else
+            return getSpecimen().getSpecimen().equals(
+                ((TreeItemAdapter) item).getSpecimen().getSpecimen());
+    }
+
+    @Override
     public void removeChild(Node o) {
         // TODO Auto-generated method stub
-        
+
     }
 }
