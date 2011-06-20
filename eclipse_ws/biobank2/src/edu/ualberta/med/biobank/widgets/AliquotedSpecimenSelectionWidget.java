@@ -328,8 +328,13 @@ public class AliquotedSpecimenSelectionWidget {
     }
 
     public void removeBindings() {
+        bothSelected.setValue(true);
+        if (oneRowBinding != null)
+            widgetCreator.removeBinding(oneRowBinding);
+        sourceSelected.setValue(true);
         if (sourceBinding != null)
             widgetCreator.removeBinding(sourceBinding);
+        resultSelected.setValue(true);
         if (resultBinding != null)
             widgetCreator.removeBinding(resultBinding);
     }
@@ -391,8 +396,8 @@ public class AliquotedSpecimenSelectionWidget {
     }
 
     public void deselectAll() {
-        cvSource.getCombo().deselectAll();
-        cvResult.getCombo().deselectAll();
+        cvSource.setSelection(null);
+        cvResult.setSelection(null);
     }
 
     public void showWidget(boolean enabled) {

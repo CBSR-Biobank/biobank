@@ -1,6 +1,6 @@
 requires.1.namespace = org.eclipse.equinox.p2.iu
 requires.1.name = biobank2.feature.core.feature.group
-requires.1.range = [1.0.0, 2.0.0)
+requires.1.range = [3.0.0, 4.0.0)
 instructions.configure=\
  addRepository(name:BioBank2,type:0,location:http${#58}//aicml-med.cs.ualberta.ca/CBSR/update);\
  addRepository(name:BioBank2,type:1,location:http${#58}//aicml-med.cs.ualberta.ca/CBSR/update);\
