@@ -2,7 +2,7 @@
 <feature
       id="biobank2.feature.platform"
       label="BioBank Platform Feature"
-      version="1.0.0">
+      version="3.0.0.rc3">
 
    <license url="http://www.example.com/license">
       [Enter License Description here.]

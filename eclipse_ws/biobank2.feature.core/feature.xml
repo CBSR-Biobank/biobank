@@ -2,7 +2,7 @@
 <feature
       id="biobank2.feature.core"
       label="BioBank Core Feature"
-      version="1.0.0"
+      version="3.0.0.rc3"
       provider-name="AICML"
       plugin="biobank">
 
