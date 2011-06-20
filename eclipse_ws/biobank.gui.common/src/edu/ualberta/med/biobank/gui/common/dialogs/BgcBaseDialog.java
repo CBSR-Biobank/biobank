@@ -114,7 +114,7 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
         } catch (final AccessDeniedException ade) {
             BgcPlugin.openAccessDeniedErrorMessage(ade);
         } catch (BiobankCheckException bce) {
-            BgcPlugin.openAsyncError("Save error", bce);
+            BgcPlugin.openAsyncError(Messages.BgcBaseDialog_save_error_title, bce);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

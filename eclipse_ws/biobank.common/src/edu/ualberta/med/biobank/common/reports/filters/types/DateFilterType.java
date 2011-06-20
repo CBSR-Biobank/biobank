@@ -19,10 +19,10 @@ import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 public class DateFilterType implements FilterType {
-    private static final String DATE_TOKEN = "{date}";
+    private static final String DATE_TOKEN = "{date}"; //$NON-NLS-1$
     // TODO: put SQL date format somewhere it can be shared
     private static final SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat(
-        "yyyy-MM-dd HH:mm:ss");
+        "yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
 
     @Override
     public void addCriteria(Criteria criteria, String aliasedProperty,
@@ -134,8 +134,8 @@ public class DateFilterType implements FilterType {
         try {
             return SQL_DATE_FORMAT.parse(string);
         } catch (ParseException e) {
-            throw new IllegalArgumentException("cannot parse date string '"
-                + string + "'");
+            throw new IllegalArgumentException("cannot parse date string '" //$NON-NLS-1$
+                + string + "'"); //$NON-NLS-1$
         }
     }
 
@@ -159,8 +159,8 @@ public class DateFilterType implements FilterType {
 
         String fieldSql = getDateFieldSql(op, DATE_TOKEN);
 
-        String sql = fieldSql.replace(DATE_TOKEN, sqlColumn) + " = "
-            + fieldSql.replace(DATE_TOKEN, "'" + dateString + "'");
+        String sql = fieldSql.replace(DATE_TOKEN, sqlColumn) + " = " //$NON-NLS-1$
+            + fieldSql.replace(DATE_TOKEN, "'" + dateString + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 
         return Restrictions.sqlRestriction(sql);
     }
@@ -171,19 +171,19 @@ public class DateFilterType implements FilterType {
         switch (op) {
         case THIS_DAY:
         case SAME_DAY_AS_ANY:
-            modifier = "DAY(" + token + ")";
+            modifier = "DAY(" + token + ")"; //$NON-NLS-1$ //$NON-NLS-2$
             break;
         case THIS_WEEK:
         case SAME_WEEK_AS_ANY:
-            modifier = "WEEK(" + token + ")";
+            modifier = "WEEK(" + token + ")"; //$NON-NLS-1$ //$NON-NLS-2$
             break;
         case THIS_MONTH:
         case SAME_MONTH_AS_ANY:
-            modifier = "MONTH(" + token + ")";
+            modifier = "MONTH(" + token + ")"; //$NON-NLS-1$ //$NON-NLS-2$
             break;
         case THIS_YEAR:
         case SAME_YEAR_AS_ANY:
-            modifier = "YEAR(" + token + ")";
+            modifier = "YEAR(" + token + ")"; //$NON-NLS-1$ //$NON-NLS-2$
             break;
         }
 
@@ -191,8 +191,8 @@ public class DateFilterType implements FilterType {
             // include year to distinguish the same day, week, or month from
             // two different years
             if (op != FilterOperator.THIS_YEAR) {
-                modifier = "CONCAT(" + modifier + ", CONCAT('-', YEAR(" + token
-                    + ")))";
+                modifier = "CONCAT(" + modifier + ", CONCAT('-', YEAR(" + token //$NON-NLS-1$ //$NON-NLS-2$
+                    + ")))"; //$NON-NLS-1$
             }
         }
 

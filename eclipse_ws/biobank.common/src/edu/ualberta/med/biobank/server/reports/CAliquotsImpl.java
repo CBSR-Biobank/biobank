@@ -20,7 +20,7 @@ public class CAliquotsImpl extends AbstractReport {
 
     public CAliquotsImpl(BiobankReport report) {
         // super(QUERY, report);
-        super("", report);
+        super("", report); //$NON-NLS-1$
     }
 
 }

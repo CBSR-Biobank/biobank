@@ -20,13 +20,13 @@ public class BiobankReport implements QueryCommand {
      */
     private static final long serialVersionUID = 1L;
     private static Map<String, ReportData> REPORTS = new TreeMap<String, ReportData>();
-    public static String editorPath = "edu.ualberta.med.biobank.editors.";
+    public static String editorPath = "edu.ualberta.med.biobank.editors."; //$NON-NLS-1$
 
     static {
         Properties props = new Properties();
         try {
             props.load(BiobankReport.class
-                .getResourceAsStream("reports.properties"));
+                .getResourceAsStream("reports.properties")); //$NON-NLS-1$
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -35,19 +35,19 @@ public class BiobankReport implements QueryCommand {
         // load map
         for (Map.Entry<Object, Object> prop : props.entrySet()) {
             String key = (String) prop.getKey();
-            String pieces[] = key.split("[.]");
+            String pieces[] = key.split("[.]"); //$NON-NLS-1$
             ReportData r;
             if (REPORTS.get(pieces[0]) == null)
                 r = new ReportData();
             else
                 r = REPORTS.get(pieces[0]);
-            if ("NAME".equals(pieces[1]))
+            if ("NAME".equals(pieces[1])) //$NON-NLS-1$
                 r.name = (String) prop.getValue();
-            else if ("DESCRIPTION".equals(pieces[1]))
+            else if ("DESCRIPTION".equals(pieces[1])) //$NON-NLS-1$
                 r.description = (String) prop.getValue();
-            else if ("EDITOR".equals(pieces[1]))
+            else if ("EDITOR".equals(pieces[1])) //$NON-NLS-1$
                 r.editorId = editorPath + (String) prop.getValue();
-            else if ("TYPE".equals(pieces[1]))
+            else if ("TYPE".equals(pieces[1])) //$NON-NLS-1$
                 r.type = ReportType.valueOf((String) prop.getValue());
             r.className = pieces[0];
             REPORTS.put(pieces[0], r);

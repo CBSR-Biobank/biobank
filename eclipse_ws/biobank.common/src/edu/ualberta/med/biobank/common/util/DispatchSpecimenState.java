@@ -5,8 +5,10 @@ package edu.ualberta.med.biobank.common.util;
  * anymore.
  */
 public enum DispatchSpecimenState implements ItemState {
-    NONE(0, "Ok"), RECEIVED(1, "Received"), MISSING(2, "Missing"), EXTRA(3,
-        "Extra");
+    NONE(0, Messages.getString("DispatchSpecimenState.ok_state")), RECEIVED(1, //$NON-NLS-1$
+        Messages.getString("DispatchSpecimenState.received_state")), MISSING(2, //$NON-NLS-1$
+        Messages.getString("DispatchSpecimenState.missing_state")), EXTRA(3, //$NON-NLS-1$
+        Messages.getString("DispatchSpecimenState.extra_state")); //$NON-NLS-1$
 
     private Integer id;
     private String label;

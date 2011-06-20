@@ -48,7 +48,7 @@ public class BgcLogger {
     public void addRcpLogStatus(int severity, String message, Throwable e) {
         ILog rcpLogger = BgcPlugin.getDefault().getLog();
         IStatus status = new Status(severity, BgcPlugin.PLUGIN_ID,
-            name + ": " + message, e);
+            name + ": " + message, e); //$NON-NLS-1$
         rcpLogger.log(status);
     }
 

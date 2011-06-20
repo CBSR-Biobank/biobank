@@ -106,7 +106,7 @@ public abstract class BgcFormBase extends EditorPart implements
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (Exception e) {
-            logger.error("BgcFormBase.createPartControl Error", e);
+            logger.error("BgcFormBase.createPartControl Error", e); //$NON-NLS-1$
         }
     }
 
@@ -158,8 +158,8 @@ public abstract class BgcFormBase extends EditorPart implements
         gd2.horizontalAlignment = SWT.FILL;
         gd2.verticalAlignment = SWT.FILL;
         book.setLayoutData(gd2);
-        page = book.createPage("page");
-        book.showPage("page");
+        page = book.createPage("page"); //$NON-NLS-1$
+        book.showPage("page"); //$NON-NLS-1$
 
         // start a new runnable so that database objects are populated in a
         // separate thread.
@@ -174,7 +174,7 @@ public abstract class BgcFormBase extends EditorPart implements
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
                     BgcPlugin.openError(
-                        "BioBankFormBase.createPartControl Error", e);
+                        "BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$
                 }
             }
         });

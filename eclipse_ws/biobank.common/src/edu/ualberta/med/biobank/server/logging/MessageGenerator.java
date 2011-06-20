@@ -27,9 +27,9 @@ public class MessageGenerator {
     private static void append(StringBuffer sb, String property, String value) {
         if (value != null) {
             if (sb.length() > 0) {
-                sb.append("&");
+                sb.append("&"); //$NON-NLS-1$
             }
-            sb.append(property).append("=").append(value);
+            sb.append(property).append("=").append(value); //$NON-NLS-1$
         }
     }
 }

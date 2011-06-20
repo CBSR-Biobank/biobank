@@ -30,7 +30,7 @@ public class ReportListProxy extends AbstractBiobankListProxy<Object> implements
     public void setAppService(ApplicationService as) {
         if (!(as instanceof BiobankApplicationService)) {
             throw new IllegalArgumentException(
-                "expecting BiobankApplicationService not ApplicationService");
+                "expecting BiobankApplicationService not ApplicationService"); //$NON-NLS-1$
         }
 
         super.setAppService(as);

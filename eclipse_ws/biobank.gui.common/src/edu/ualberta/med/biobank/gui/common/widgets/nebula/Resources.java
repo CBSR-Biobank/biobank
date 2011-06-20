@@ -49,8 +49,8 @@ class Resources {
         }
     };
 
-    public static final String ICON_CALENDAR = "calendar";
-    public static final String ICON_BULLET = "bullet";
+    public static final String ICON_CALENDAR = "calendar"; //$NON-NLS-1$
+    public static final String ICON_BULLET = "bullet"; //$NON-NLS-1$
 
     private static final String BUNDLE_NAME = Resources.class.getPackage()
         .getName() + ".messages"; //$NON-NLS-1$

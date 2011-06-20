@@ -16,7 +16,6 @@ public class Messages extends NLS {
     public static String AdapterBase_new_label;
     public static String AdapterBase_unknow;
     public static String AdapterBase_view_label;
-    public static String SpecimenAdapter_2;
     public static String SpecimenAdapter_specimen_label;
     static {
         // initialize resource bundle

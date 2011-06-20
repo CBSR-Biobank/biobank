@@ -14,9 +14,9 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 public class BiobankVersionUtil {
-    public static final String SERVER_VERSION_PROP_FILE = "version.properties";
+    public static final String SERVER_VERSION_PROP_FILE = "version.properties"; //$NON-NLS-1$
 
-    public static final String SERVER_VERSION_PROP_KEY = "server.version";
+    public static final String SERVER_VERSION_PROP_KEY = "server.version"; //$NON-NLS-1$
 
     public static SwVersion serverVersion = null;
 
@@ -31,72 +31,69 @@ public class BiobankVersionUtil {
             props.load(BiobankApplicationServiceImpl.class
                 .getResourceAsStream(SERVER_VERSION_PROP_FILE));
         } catch (FileNotFoundException e) {
-            log.error("file " + SERVER_VERSION_PROP_FILE + " not found.", e);
+            log.error("file " + SERVER_VERSION_PROP_FILE + " not found.", e); //$NON-NLS-1$ //$NON-NLS-2$
         } catch (IOException e) {
-            log.error("Problem with file " + SERVER_VERSION_PROP_FILE, e);
+            log.error("Problem with file " + SERVER_VERSION_PROP_FILE, e); //$NON-NLS-1$
         }
     }
 
     public static void checkVersion(String clientVersionStr)
         throws ApplicationException {
         if (props == null) {
-            log.error("server does not have a version");
+            log.error("server does not have a version"); //$NON-NLS-1$
             throw new ServerVersionInvalidException(
-                "The server version could not be determined.");
+                Messages
+                    .getString("BiobankVersionUtil.server_version_error_msg")); //$NON-NLS-1$
         }
 
         String serverVersionStr = props.getProperty(SERVER_VERSION_PROP_KEY);
 
         if (serverVersionStr == null) {
-            log.error("server does not have a version");
+            log.error("server does not have a version"); //$NON-NLS-1$
             throw new ServerVersionInvalidException(
-                "The server version could not be determined.");
+                Messages
+                    .getString("BiobankVersionUtil.server_version_error_msg")); //$NON-NLS-1$
         }
 
         try {
             serverVersion = new SwVersion(serverVersionStr);
 
             if (clientVersionStr == null) {
-                log.error("client does not have a version");
+                log.error("client does not have a version"); //$NON-NLS-1$
                 throw new ClientVersionInvalidException(
-                    "Client authentication failed. "
-                        + "The Java Client version is not compatible with the server and must be upgraded.");
+                    Messages.getString("BiobankVersionUtil.compatibility_error_msg")); //$NON-NLS-1$
             }
 
             try {
                 SwVersion clientVersion = new SwVersion(clientVersionStr);
 
-                log.info("check version: server_version/" + serverVersionStr
-                    + " client_version/" + clientVersionStr);
+                log.info("check version: server_version/" + serverVersionStr //$NON-NLS-1$
+                    + " client_version/" + clientVersionStr); //$NON-NLS-1$
 
                 if (clientVersion.getMajor() < serverVersion.getMajor()) {
                     throw new ServerVersionNewerException(
-                        "Client authentication failed. "
-                            + "The Java Client version is too old to connect to this server.");
+                        Messages.getString("BiobankVersionUtil.tooold_error_msg")); //$NON-NLS-1$
                 } else if (clientVersion.getMajor() > serverVersion.getMajor()) {
                     throw new ServerVersionOlderException(
-                        "Client authentication failed. "
-                            + "The Java Client version is too new to connect to this server.");
+                        Messages.getString("BiobankVersionUtil.toonew_error_msg")); //$NON-NLS-1$
                 } else {
                     if (clientVersion.getMinor() < serverVersion.getMinor()) {
                         throw new ServerVersionNewerException(
-                            "Client authentication failed. "
-                                + "The Java Client version is too old to connect to this server.");
+                            Messages.getString("BiobankVersionUtil.tooold_error_msg")); //$NON-NLS-1$
                     } else if (clientVersion.getMinor() > serverVersion
                         .getMinor()) {
                         throw new ServerVersionOlderException(
-                            "Client authentication failed. "
-                                + "The Java Client version is too new to connect to this server.");
+                            Messages.getString("BiobankVersionUtil.toonew_error_msg")); //$NON-NLS-1$
                     }
                 }
             } catch (VersionInvalidException e) {
                 throw new ClientVersionInvalidException(
-                    "Client authentication failed. "
-                        + "The Java Client version is not compatible with the server and must be upgraded.");
+                    Messages.getString("BiobankVersionUtil.compatibility_error_msg")); //$NON-NLS-1$
             }
         } catch (VersionInvalidException e) {
             throw new ServerVersionInvalidException(
-                "The server version could not be determined.");
+                Messages
+                    .getString("BiobankVersionUtil.server_version_error_msg")); //$NON-NLS-1$
         }
     }
 

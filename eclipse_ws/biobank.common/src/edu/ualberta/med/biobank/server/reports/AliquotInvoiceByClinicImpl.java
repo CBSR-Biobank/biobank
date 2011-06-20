@@ -21,7 +21,7 @@ public class AliquotInvoiceByClinicImpl extends AbstractReport {
 
     public AliquotInvoiceByClinicImpl(BiobankReport report) {
         // super(QUERY_STRING, report);
-        super("", report);
+        super("", report); //$NON-NLS-1$
     }
 
 }

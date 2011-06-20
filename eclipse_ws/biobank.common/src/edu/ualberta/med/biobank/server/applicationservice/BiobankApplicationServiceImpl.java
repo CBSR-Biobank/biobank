@@ -73,8 +73,8 @@ public class BiobankApplicationServiceImpl extends
      */
     @Override
     public void logActivity(Log log) throws Exception {
-        Logger logger = Logger.getLogger("Biobank.Activity");
-        logger.log(Level.toLevel("INFO"),
+        Logger logger = Logger.getLogger("Biobank.Activity"); //$NON-NLS-1$
+        logger.log(Level.toLevel("INFO"), //$NON-NLS-1$
             MessageGenerator.generateStringMessage(log));
     }
 

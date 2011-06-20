@@ -71,7 +71,7 @@ public class CDatePanel extends Composite {
         try {
             timezone = TimeZone.getDefault();
         } catch (Exception e) {
-            timezone = TimeZone.getTimeZone("GMT");
+            timezone = TimeZone.getTimeZone("GMT"); //$NON-NLS-1$
         }
         calendar = Calendar.getInstance(this.timezone, this.locale);
         calendar.setTime(new Date());
@@ -128,7 +128,7 @@ public class CDatePanel extends Composite {
         CDateTime cdt = picker.getControl();
         cdt.setBuilder(builder);
         cdt.setPainter(painter);
-        cdt.setPattern("MMMM d yyyy");
+        cdt.setPattern("MMMM d yyyy"); //$NON-NLS-1$
         cdt.setLocale(locale);
         cdt.setTimeZone(timezone);
         cdt.setScrollable(false);
@@ -159,7 +159,7 @@ public class CDatePanel extends Composite {
         });
 
         b = new VButton(header, SWT.PUSH | SWT.NO_FOCUS);
-        b.setText("Today");
+        b.setText("Today"); //$NON-NLS-1$
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
         b.addListener(SWT.Selection, new Listener() {
             @Override

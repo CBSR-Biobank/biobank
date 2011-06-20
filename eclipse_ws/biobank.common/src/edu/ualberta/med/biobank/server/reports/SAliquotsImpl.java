@@ -22,7 +22,7 @@ public class SAliquotsImpl extends AbstractReport {
     public SAliquotsImpl(BiobankReport report) {
         // super(QUERY, report);
 
-        super("", report);
+        super("", report); //$NON-NLS-1$
     }
 
 }

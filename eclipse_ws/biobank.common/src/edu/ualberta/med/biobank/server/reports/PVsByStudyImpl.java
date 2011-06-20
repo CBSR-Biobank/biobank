@@ -7,23 +7,23 @@ import edu.ualberta.med.biobank.model.ProcessingEvent;
 
 public class PVsByStudyImpl extends AbstractReport {
 
-    private static final String QUERY = "Select Alias.shipmentPatient.patient.study.nameShort, "
-        + " Year(Alias.dateProcessed), "
+    private static final String QUERY = "Select Alias.shipmentPatient.patient.study.nameShort, " //$NON-NLS-1$
+        + " Year(Alias.dateProcessed), " //$NON-NLS-1$
         + GROUPBY_DATE
-        + "(Alias.dateProcessed), count(*) from "
+        + "(Alias.dateProcessed), count(*) from " //$NON-NLS-1$
         + ProcessingEvent.class.getName()
-        + " as Alias where Alias.dateProcessed between ? and ?"
-        + " GROUP BY Alias.shipmentPatient.patient.study.nameShort, "
-        + "Year(Alias.dateProcessed), "
+        + " as Alias where Alias.dateProcessed between ? and ?" //$NON-NLS-1$
+        + " GROUP BY Alias.shipmentPatient.patient.study.nameShort, " //$NON-NLS-1$
+        + "Year(Alias.dateProcessed), " //$NON-NLS-1$
         + GROUPBY_DATE
-        + "(Alias.dateProcessed)";
+        + "(Alias.dateProcessed)"; //$NON-NLS-1$
 
     private DateRangeRowPostProcess dateRangePostProcess;
 
     public PVsByStudyImpl(BiobankReport report) {
         super(QUERY, report);
         dateRangePostProcess = new DateRangeRowPostProcess(report.getGroupBy()
-            .equals("Year"), 1);
+            .equals("Year"), 1); //$NON-NLS-1$
     }
 
     @Override

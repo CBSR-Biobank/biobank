@@ -24,10 +24,10 @@ public class JDBCLogExecutor implements Runnable {
     private String dbUser = null;
     private String dbPwd = null;
 
-    public static final String COMMA = ",";
+    public static final String COMMA = ","; //$NON-NLS-1$
 
     public static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(
-        "yyyy-MM-dd HH:mm:ss");
+        "yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
 
     /**
      * Constructor for JDBCExcecutor.
@@ -44,13 +44,13 @@ public class JDBCLogExecutor implements Runnable {
         if (this.props != null) {
 
             this.setDbDriverClass(LogSql.initString(this.props
-                .getProperty("hibernate.connection.driver_class")));
+                .getProperty("hibernate.connection.driver_class"))); //$NON-NLS-1$
             this.setDbPwd(LogSql.initString(this.props
-                .getProperty("hibernate.connection.password")));
+                .getProperty("hibernate.connection.password"))); //$NON-NLS-1$
             this.setDbUser(LogSql.initString(this.props
-                .getProperty("hibernate.connection.username")));
+                .getProperty("hibernate.connection.username"))); //$NON-NLS-1$
             this.setDbUrl(LogSql.initString(this.props
-                .getProperty("hibernate.connection.url")));
+                .getProperty("hibernate.connection.url"))); //$NON-NLS-1$
         }
     }
 

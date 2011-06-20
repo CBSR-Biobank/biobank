@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.server.scanprocess;
 
-import edu.ualberta.med.biobank.common.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
@@ -13,6 +12,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+import java.text.MessageFormat;
 import java.util.Map;
 
 /**
@@ -90,8 +90,9 @@ public class ShipmentReceiveProcess extends ServerProcess {
         if (foundSpecimen == null) {
             // not in db
             cell.setStatus(CellStatus.ERROR);
-            cell.setInformation(Messages.getString(
-                "DispatchReceiveScanDialog.cell.notInDb.msg", cell.getValue())); //$NON-NLS-1$
+            cell.setInformation(MessageFormat.format(Messages
+                .getString("DispatchReceiveScanDialog.cell.notInDb.msg"), cell //$NON-NLS-1$
+                .getValue()));
             cell.setTitle("!"); //$NON-NLS-1$
         } else {
             ItemState state = ((ShipmentProcessData) data)

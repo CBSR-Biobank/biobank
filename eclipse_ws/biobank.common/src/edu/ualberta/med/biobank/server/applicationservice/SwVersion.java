@@ -20,15 +20,15 @@ public class SwVersion {
         this.major = 0;
         this.minor = 0;
         this.service = 0;
-        this.qualifier = "";
+        this.qualifier = ""; //$NON-NLS-1$
     }
 
     public SwVersion(String versionString) throws VersionInvalidException {
-        String[] versionSplit = versionString.split("\\.");
+        String[] versionSplit = versionString.split("\\."); //$NON-NLS-1$
 
         if (versionSplit.length < 3 || versionSplit.length > 4) {
             throw new VersionInvalidException(
-                "The version string is formatted incorrectly.");
+                Messages.getString("SwVersion.version.format.error.msg")); //$NON-NLS-1$
         }
 
         try {
@@ -37,7 +37,7 @@ public class SwVersion {
             this.service = Integer.parseInt(versionSplit[2]);
         } catch (NumberFormatException e) {
             throw new VersionInvalidException(
-                "The version string is formatted incorrectly.");
+                Messages.getString("SwVersion.version.format.error.msg")); //$NON-NLS-1$
         }
         if (versionSplit.length == 4)
             this.qualifier = versionSplit[3];

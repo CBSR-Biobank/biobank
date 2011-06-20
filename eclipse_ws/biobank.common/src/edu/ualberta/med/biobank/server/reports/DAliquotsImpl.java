@@ -34,7 +34,7 @@ public class DAliquotsImpl extends AbstractReport {
         // dateRangePostProcess = new
         // DateRangeRowPostProcess(report.getGroupBy()
         // .equals("Year"), 2);
-        super("", report);
+        super("", report); //$NON-NLS-1$
     }
 
     @Override

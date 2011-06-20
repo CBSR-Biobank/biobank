@@ -41,11 +41,11 @@ public class FirstTimeProcessedFilterType implements FilterType {
             String entityOrClassName = cimpl.getEntityOrClassName();
 
             if (Patient.class.getName().equals(entityOrClassName)) {
-                patientIdAlias = criteria.getAlias() + ".id";
+                patientIdAlias = criteria.getAlias() + ".id"; //$NON-NLS-1$
             } else if (CollectionEvent.class.getName()
                 .equals(entityOrClassName)) {
-                String patientIdProperty = "patient.id";
-                ReportRunner.createAssociations(criteria, "patient");
+                String patientIdProperty = "patient.id"; //$NON-NLS-1$
+                ReportRunner.createAssociations(criteria, "patient"); //$NON-NLS-1$
                 patientIdAlias = ReportRunner
                     .getAliasedProperty(patientIdProperty);
             }
@@ -53,21 +53,21 @@ public class FirstTimeProcessedFilterType implements FilterType {
 
         if (patientIdAlias == null) {
             throw new IllegalArgumentException(
-                "Cannot determine path to patient id for the given Criteria");
+                "Cannot determine path to patient id for the given Criteria"); //$NON-NLS-1$
         }
 
         // There is a bug that prevents joins on DetachedCriteria, so a patch
         // may have to be applied, see
         // http://opensource.atlassian.com/projects/hibernate/browse/HHH-952
         DetachedCriteria firstTimeProcessed = DetachedCriteria
-            .forClass(Specimen.class, "s")
-            .createAlias("s.collectionEvent", "ce")
-            .createAlias("ce.patient", "p")
-            .createAlias("s.parentSpecimen", "ps")
-            .createAlias("ps.processingEvent", "pe")
-            .add(Property.forName("p.id").eqProperty(patientIdAlias));
+            .forClass(Specimen.class, "s") //$NON-NLS-1$
+            .createAlias("s.collectionEvent", "ce") //$NON-NLS-1$ //$NON-NLS-2$
+            .createAlias("ce.patient", "p") //$NON-NLS-1$ //$NON-NLS-2$
+            .createAlias("s.parentSpecimen", "ps") //$NON-NLS-1$ //$NON-NLS-2$
+            .createAlias("ps.processingEvent", "pe") //$NON-NLS-1$ //$NON-NLS-2$
+            .add(Property.forName("p.id").eqProperty(patientIdAlias)); //$NON-NLS-1$
         firstTimeProcessed
-            .setProjection(Property.forName("pe.createdAt").min());
+            .setProjection(Property.forName("pe.createdAt").min()); //$NON-NLS-1$
 
         criteria
             .add(Subqueries.propertyEq(aliasedProperty, firstTimeProcessed));

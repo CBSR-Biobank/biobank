@@ -17,7 +17,7 @@ public class AliquotsByPalletImpl extends AbstractReport {
 
     public AliquotsByPalletImpl(BiobankReport report) {
         // super(QUERY, report);
-        super("", report);
+        super("", report); //$NON-NLS-1$
     }
 
     // Use Collections.sort, so can't use RowPostProcess

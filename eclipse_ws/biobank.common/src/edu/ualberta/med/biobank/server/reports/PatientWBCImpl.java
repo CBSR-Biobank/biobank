@@ -32,7 +32,7 @@ public class PatientWBCImpl extends AbstractReport {
 
     public PatientWBCImpl(BiobankReport report) {
         // super(QUERY, report);
-        super("", report);
+        super("", report); //$NON-NLS-1$
     }
 
 }

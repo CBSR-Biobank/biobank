@@ -14,7 +14,7 @@ public class ReportTreeNode extends AbstractReportTreeNode {
             return getReport().getDescription();
         } catch (Exception e) {
         }
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     public BiobankReport getReport() {

@@ -34,7 +34,7 @@ public class InvoicingReportImpl extends AbstractReport {
         // List<Object> params = report.getParams();
         // params.addAll(params);
         // this.report.setParams(params);
-        super("", report);
+        super("", report); //$NON-NLS-1$
     }
 
     @Override
@@ -45,7 +45,7 @@ public class InvoicingReportImpl extends AbstractReport {
         for (Object ob : results) {
             Object[] castOb = (Object[]) ob;
             if (pvCount.contains((String) castOb[0] + (String) castOb[1]))
-                modifiedResults.add(new Object[] { "", "", "", castOb[3],
+                modifiedResults.add(new Object[] { "", "", "", castOb[3], //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     castOb[4] });
             else {
                 pvCount.add((String) castOb[0] + (String) castOb[1]);

@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.server.security;
 import gov.nih.nci.security.authentication.LockoutManager;
 import gov.nih.nci.system.security.acegi.authentication.CSMAuthenticationProvider;
 
+import java.text.MessageFormat;
+
 import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
@@ -24,8 +26,10 @@ public class BiobankAuthenticationProvider extends CSMAuthenticationProvider {
                 .isUserLockedOut(user);
             if (lockout) {
                 throw new BadCredentialsException(
-                    "At least 3 failed connection attempts. Login for '" + user
-                        + "' disabled for 30 min.");
+                    MessageFormat
+                        .format(
+                            Messages.getString("BiobankAuthenticationProvider.failed_connection_msg"), //$NON-NLS-1$
+                            user));
             }
             throw e;
         }

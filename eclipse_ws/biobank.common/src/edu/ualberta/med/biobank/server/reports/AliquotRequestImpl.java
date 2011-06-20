@@ -16,21 +16,21 @@ public class AliquotRequestImpl extends AbstractReport {
 
     // TODO: switch to CollectionEvent.visitNumber?
 
-    private static final String QUERY = "SELECT s"
-        + (" FROM " + Specimen.class.getName() + " s ")
-        + ("    inner join fetch s.collectionEvent ce")
-        + ("    inner join fetch ce.patient p")
-        + ("    inner join fetch s.topSpecimen ts")
-        + ("    inner join fetch s.specimenType st")
-        + ("    inner join fetch s.activityStatus a")
-        + " WHERE s.parentSpecimen is not null" // "aliquots" only
-        + ("    and s.specimenPosition.container.label not like '"
-            + SENT_SAMPLES_FREEZER_NAME + "'")
-        + "     and s.collectionEvent.patient.pnumber = ?"
-        + "     and datediff(s.topSpecimen.createdAt, ?) = 0"
-        + "     and s.specimenType.nameShort like ?"
-        + "     and s.activityStatus.name != 'Closed'"
-        + " ORDER BY s.activityStatus.name, RAND()";
+    private static final String QUERY = "SELECT s" //$NON-NLS-1$
+        + (" FROM " + Specimen.class.getName() + " s ") //$NON-NLS-1$ //$NON-NLS-2$
+        + ("    inner join fetch s.collectionEvent ce") //$NON-NLS-1$
+        + ("    inner join fetch ce.patient p") //$NON-NLS-1$
+        + ("    inner join fetch s.topSpecimen ts") //$NON-NLS-1$
+        + ("    inner join fetch s.specimenType st") //$NON-NLS-1$
+        + ("    inner join fetch s.activityStatus a") //$NON-NLS-1$
+        + " WHERE s.parentSpecimen is not null" // "aliquots" only //$NON-NLS-1$
+        + ("    and s.specimenPosition.container.label not like '" //$NON-NLS-1$
+            + SENT_SAMPLES_FREEZER_NAME + "'") //$NON-NLS-1$
+        + "     and s.collectionEvent.patient.pnumber = ?" //$NON-NLS-1$
+        + "     and datediff(s.topSpecimen.createdAt, ?) = 0" //$NON-NLS-1$
+        + "     and s.specimenType.nameShort like ?" //$NON-NLS-1$
+        + "     and s.activityStatus.name != 'Closed'" //$NON-NLS-1$
+        + " ORDER BY s.activityStatus.name, RAND()"; //$NON-NLS-1$
 
     public AliquotRequestImpl(BiobankReport report) {
         super(QUERY, report);
@@ -67,9 +67,9 @@ public class AliquotRequestImpl extends AbstractReport {
 
     public static Object[] getNotFoundRow(String pnumber, Date dateDrawn,
         String typeName, long maxResults, Integer numResultsFound) {
-        return new Object[] { pnumber, "",
+        return new Object[] { pnumber, "", //$NON-NLS-1$
             DateFormatter.formatAsDate(dateDrawn), typeName,
-            "NOT FOUND (" + (maxResults - numResultsFound) + ")", "" };
+            "NOT FOUND (" + (maxResults - numResultsFound) + ")", "" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     // Database calls are made so can't use RowPostProcess

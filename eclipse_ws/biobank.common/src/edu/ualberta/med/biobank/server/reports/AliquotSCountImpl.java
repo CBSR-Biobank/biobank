@@ -19,7 +19,7 @@ public class AliquotSCountImpl extends AbstractReport {
 
     public AliquotSCountImpl(BiobankReport report) {
         // super(QUERY, report);
-        super("", report);
+        super("", report); //$NON-NLS-1$
     }
 
 }

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.server.scanprocess;
 
-import edu.ualberta.med.biobank.common.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.scanprocess.data.AssignProcessData;
@@ -13,6 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -162,15 +162,15 @@ public class AssignProcess extends ServerProcess {
             .get(rcp);
         if (!Boolean.TRUE.equals(posHasMovedSpecimen)) {
             scanCell.setStatus(CellStatus.MISSING);
-            scanCell.setInformation(Messages.getString(
-                "ScanAssign.scanStatus.specimen.missing", //$NON-NLS-1$
+            scanCell.setInformation(MessageFormat.format(
+                Messages.getString("ScanAssign.scanStatus.specimen.missing"), //$NON-NLS-1$
                 missingSpecimen.getInventoryId()));
             scanCell.setTitle("?"); //$NON-NLS-1$
             // MISSING in {0}\: specimen {1} from visit {2} (patient {3})
             // missing
-            appendNewLog(Messages.getString(
-                "ScanAssign.activitylog.specimen.missing", position, //$NON-NLS-1$
-                missingSpecimen.getInventoryId(), missingSpecimen
+            appendNewLog(MessageFormat.format(Messages
+                .getString("ScanAssign.activitylog.specimen.missing"), //$NON-NLS-1$
+                position, missingSpecimen.getInventoryId(), missingSpecimen
                     .getCollectionEvent().getVisitNumber(), missingSpecimen
                     .getCollectionEvent().getPatient().getPnumber()));
             movedAndMissingSpecimensFromPallet.put(rcp, true);
@@ -187,9 +187,9 @@ public class AssignProcess extends ServerProcess {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages
             .getString("ScanAssign.scanStatus.specimen.notlinked"));//$NON-NLS-1$
-        appendNewLog(Messages.getString(
-            "ScanAssign.activitylog.specimen.notlinked", position, //$NON-NLS-1$
-            scanCell.getValue()));
+        appendNewLog(MessageFormat.format(
+            Messages.getString("ScanAssign.activitylog.specimen.notlinked"), //$NON-NLS-1$
+            position, scanCell.getValue()));
     }
 
     /**
@@ -202,12 +202,14 @@ public class AssignProcess extends ServerProcess {
         scanCell.setInformation(Messages
             .getString("ScanAssign.scanStatus.specimen.positionTakenError")); //$NON-NLS-1$
         scanCell.setTitle("!"); //$NON-NLS-1$
-        appendNewLog(Messages.getString(
-            "ScanAssign.activitylog.specimen.positionTaken", position, //$NON-NLS-1$
-            expectedSpecimen.getInventoryId(), expectedSpecimen
-                .getCollectionEvent().getPatient().getPnumber(),
-            foundSpecimen.getInventoryId(), foundSpecimen.getCollectionEvent()
-                .getPatient().getPnumber()));
+        appendNewLog(MessageFormat
+            .format(
+                Messages
+                    .getString("ScanAssign.activitylog.specimen.positionTaken"), //$NON-NLS-1$
+                position, expectedSpecimen.getInventoryId(), expectedSpecimen
+                    .getCollectionEvent().getPatient().getPnumber(),
+                foundSpecimen.getInventoryId(), foundSpecimen
+                    .getCollectionEvent().getPatient().getPnumber()));
     }
 
     /**
@@ -258,11 +260,12 @@ public class AssignProcess extends ServerProcess {
         scanCell.setStatus(CellStatus.MOVED);
         scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient()
             .getPnumber());
-        scanCell.setInformation(Messages.getString(
-            "ScanAssign.scanStatus.specimen.moved", expectedPosition)); //$NON-NLS-1$
+        scanCell.setInformation(MessageFormat.format(
+            Messages.getString("ScanAssign.scanStatus.specimen.moved"), //$NON-NLS-1$
+            expectedPosition));
 
-        appendNewLog(Messages.getString(
-            "ScanAssign.activitylog.specimen.moved", //$NON-NLS-1$
+        appendNewLog(MessageFormat.format(
+            Messages.getString("ScanAssign.activitylog.specimen.moved"), //$NON-NLS-1$
             position, scanCell.getValue(), expectedPosition));
     }
 
@@ -276,12 +279,13 @@ public class AssignProcess extends ServerProcess {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient()
             .getPnumber());
-        scanCell.setInformation(Messages.getString(
-            "ScanAssign.scanStatus.specimen.otherSite", siteName)); //$NON-NLS-1$
+        scanCell.setInformation(MessageFormat.format(
+            Messages.getString("ScanAssign.scanStatus.specimen.otherSite"), //$NON-NLS-1$
+            siteName));
 
-        appendNewLog(Messages.getString(
-            "ScanAssign.activitylog.specimen.otherSite", position, //$NON-NLS-1$
-            scanCell.getValue(), siteName, currentPosition));
+        appendNewLog(MessageFormat.format(
+            Messages.getString("ScanAssign.activitylog.specimen.otherSite"), //$NON-NLS-1$
+            position, scanCell.getValue(), siteName, currentPosition));
     }
 
     private void updateCellAsTypeError(String position, Cell scanCell,
@@ -292,13 +296,12 @@ public class AssignProcess extends ServerProcess {
         scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient()
             .getPnumber());
         scanCell.setStatus(CellStatus.ERROR);
-        scanCell
-            .setInformation(Messages
-                .getString(
-                    "ScanAssign.scanStatus.specimen.typeError", palletType, sampleType)); //$NON-NLS-1$
-        appendNewLog(Messages.getString(
-            "ScanAssign.activitylog.specimen.typeError", position, palletType, //$NON-NLS-1$
-            sampleType));
+        scanCell.setInformation(MessageFormat.format(
+            Messages.getString("ScanAssign.scanStatus.specimen.typeError"), //$NON-NLS-1$
+            palletType, sampleType));
+        appendNewLog(MessageFormat.format(
+            Messages.getString("ScanAssign.activitylog.specimen.typeError"), //$NON-NLS-1$
+            position, palletType, sampleType));
     }
 
     private void updateCellAsDispatchedError(String positionString,
@@ -308,8 +311,9 @@ public class AssignProcess extends ServerProcess {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages
             .getString("ScanAssign.scanStatus.specimen.dispatchedError")); //$NON-NLS-1$
-        appendNewLog(Messages.getString(
-            "ScanAssign.activitylog.specimen.dispatchedError", positionString)); //$NON-NLS-1$
+        appendNewLog(MessageFormat.format(Messages
+            .getString("ScanAssign.activitylog.specimen.dispatchedError"), //$NON-NLS-1$
+            positionString));
 
     }
 
