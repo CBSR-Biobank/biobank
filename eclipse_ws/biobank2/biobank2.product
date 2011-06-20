@@ -27,16 +27,13 @@ AICML: http://aicml.cs.ualberta.ca
 
    <windowImages/>
 
-   <splash
-      location="biobank" />
+   <splash location="biobank"/>
    <launcher name="BioBank">
       <linux icon="/biobank2/icons/biobank_launcher.xpm"/>
       <macosx icon="/biobank2/icons/biobank_launcher.icns"/>
       <solaris/>
       <win useIco="false">
-         <bmp
-            winSmallHigh="/biobank2/icons/biobank_launcher_16.bmp"
-            winMediumHigh="/biobank2/icons/biobank_launcher_32.bmp"/>
+         <bmp winSmallHigh="/biobank2/icons/biobank_launcher_16.bmp" winMediumHigh="/biobank2/icons/biobank_launcher_32.bmp"/>
       </win>
    </launcher>
 

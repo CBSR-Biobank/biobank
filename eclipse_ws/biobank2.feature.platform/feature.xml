@@ -1,22 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature
-      id="biobank2.feature.platform"
-      label="BioBank Platform Feature"
-      version="3.0.0.rc3">
+<feature id="biobank2.feature.platform" label="BioBank Platform Feature" version="3.0.0.rc3">
 
    <license url="http://www.example.com/license">
       [Enter License Description here.]
    </license>
 
-   <includes
-         id="org.eclipse.rcp"
-         version="0.0.0"/>
+   <includes id="org.eclipse.rcp" version="0.0.0"/>
 
-   <plugin
-         id="org.eclipse.equinox.p2.touchpoint.eclipse"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+   <plugin id="org.eclipse.equinox.p2.touchpoint.eclipse" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
 </feature>
