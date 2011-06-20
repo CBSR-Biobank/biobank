@@ -404,6 +404,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         widgetCreator.setBinding(INVENTORY_ID_BINDING, isSingleMode);
         if (isSingleMode) {
             singleTypesWidget.addBindings();
+            singleTypesWidget.deselectAll();
         } else {
             singleTypesWidget.removeBindings();
         }
@@ -578,7 +579,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     public void onReset() throws Exception {
         super.onReset();
-        singleTypesWidget.deselectAll();
+        if (isSingleMode())
+            singleTypesWidget.deselectAll();
         showOnlyPallet(true);
         form.layout(true, true);
     }

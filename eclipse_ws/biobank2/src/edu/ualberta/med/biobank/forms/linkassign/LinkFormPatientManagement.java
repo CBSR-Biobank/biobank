@@ -340,6 +340,8 @@ public class LinkFormPatientManagement {
             .getSelection();
         IStructuredSelection cEventSelection = (IStructuredSelection) viewerCollectionEvents
             .getSelection();
+        if (patientNumberText.isDisposed())
+            return false;
         return patientValidator.validate(patientNumberText.getText()).equals(
             Status.OK_STATUS)
             && pEventSelection.size() > 0 && cEventSelection.size() > 0;
