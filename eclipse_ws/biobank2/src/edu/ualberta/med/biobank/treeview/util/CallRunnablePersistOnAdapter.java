@@ -25,7 +25,7 @@ public abstract class CallRunnablePersistOnAdapter implements
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException,
         InterruptedException {
-        monitor.beginTask("Saving...", IProgressMonitor.UNKNOWN);
+        monitor.beginTask(Messages.CallRunnablePersistOnAdapter_saving, IProgressMonitor.UNKNOWN);
         try {
             adapter.getModelObject().persist();
             afterPersist();
@@ -57,7 +57,7 @@ public abstract class CallRunnablePersistOnAdapter implements
             });
             monitor.setCanceled(true);
         } catch (BiobankCheckException bce) {
-            BgcPlugin.openAsyncError("Save error", bce);
+            BgcPlugin.openAsyncError(Messages.CallRunnablePersistOnAdapter_save_error_title, bce);
             monitor.setCanceled(true);
             Display.getDefault().syncExec(new Runnable() {
                 @Override

@@ -44,6 +44,6 @@ public class TreeItemAdapter implements Node {
         case 4:
             return ((DispatchSpecimenWrapper) raw).getComment();
         }
-        return "";
+        return ""; //$NON-NLS-1$
     }
 }

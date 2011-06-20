@@ -17,16 +17,18 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class FTAReportEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.FTAReportEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.FTAReportEditor"; //$NON-NLS-1$
 
     private ComboViewer studyCombo;
     private DateTimeWidget afterDate;
 
     @Override
     protected void createOptionSection(Composite parent) throws Exception {
-        studyCombo = createStudyComboOption("Study", parent);
+        studyCombo = createStudyComboOption(
+            Messages.FTAReportEditor_study_label, parent);
         afterDate = widgetCreator.createDateTimeWidget(parent,
-            "After Date (Drawn)", null, null, null, SWT.DATE);
+            Messages.FTAReportEditor_drawn_after_label, null, null, null,
+            SWT.DATE);
     }
 
     @Override
@@ -57,15 +59,19 @@ public class FTAReportEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Patient Number", "Date Drawn", "Inventory Id",
-            "Sample Type", "Site", "Location" };
+        return new String[] { Messages.FTAReportEditor_pnumber_label,
+            Messages.FTAReportEditor_drawn_label,
+            Messages.FTAReportEditor_inventoryid_label,
+            Messages.FTAReportEditor_specType_label,
+            Messages.FTAReportEditor_site_label,
+            Messages.FTAReportEditor_location_label };
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> names = new ArrayList<String>();
-        names.add("Study");
-        names.add("After Date (Drawn)");
+        names.add(Messages.FTAReportEditor_study_label);
+        names.add(Messages.FTAReportEditor_drawn_after_label);
         return names;
     }
 

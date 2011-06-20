@@ -31,14 +31,14 @@ public class ReportsView extends ViewPart {
     private ReportTreeWidget specimenTree;
     private ReportTreeWidget clinicTree;
     private ReportTreeWidget patientTree;
-    private ReportTreeWidget sampleTypeTree;
+    private ReportTreeWidget specimenTypeTree;
     private ReportTreeWidget containerTree;
 
     private CTabItem clinicTab;
 
     private CTabItem patientTab;
 
-    private CTabItem sampleTypeTab;
+    private CTabItem specimenTypeTab;
 
     private CTabItem containerTab;
 
@@ -88,16 +88,16 @@ public class ReportsView extends ViewPart {
         AbstractReportTreeNode patientRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
         patientTree.setLayoutData(treeGd);
 
-        // Sample Types
-        sampleTypeTab = new CTabItem(top, SWT.NONE);
-        sampleTypeTab.setText(Messages.ReportsView_specTypes_tab_label);
-        Composite sampleTypeBody = new Composite(top, SWT.NONE);
-        sampleTypeBody.setLayout(treeLayout);
-        sampleTypeBody.setLayoutData(treeGd);
-        sampleTypeTab.setControl(sampleTypeBody);
-        sampleTypeTree = new ReportTreeWidget(sampleTypeBody);
-        AbstractReportTreeNode sampleTypeRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
-        sampleTypeTree.setLayoutData(treeGd);
+        // Specimen Types
+        specimenTypeTab = new CTabItem(top, SWT.NONE);
+        specimenTypeTab.setText(Messages.ReportsView_specTypes_tab_label);
+        Composite specimenTypeBody = new Composite(top, SWT.NONE);
+        specimenTypeBody.setLayout(treeLayout);
+        specimenTypeBody.setLayoutData(treeGd);
+        specimenTypeTab.setControl(specimenTypeBody);
+        specimenTypeTree = new ReportTreeWidget(specimenTypeBody);
+        AbstractReportTreeNode specimenTypeRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        specimenTypeTree.setLayoutData(treeGd);
 
         // Containers
         containerTab = new CTabItem(top, SWT.NONE);
@@ -111,7 +111,7 @@ public class ReportsView extends ViewPart {
         containerTree.setLayoutData(treeGd);
 
         initializeNewReports(specimenRoot, clinicRoot, patientRoot,
-            sampleTypeRoot, containerRoot);
+            specimenTypeRoot, containerRoot);
 
         specimenTree.setInput(specimenRoot);
         specimenTree.expandAll();
@@ -119,8 +119,8 @@ public class ReportsView extends ViewPart {
         clinicTree.expandAll();
         patientTree.setInput(patientRoot);
         patientTree.expandAll();
-        sampleTypeTree.setInput(sampleTypeRoot);
-        sampleTypeTree.expandAll();
+        specimenTypeTree.setInput(specimenTypeRoot);
+        specimenTypeTree.expandAll();
         containerTree.setInput(containerRoot);
         containerTree.expandAll();
 
@@ -128,13 +128,13 @@ public class ReportsView extends ViewPart {
 
     private void initializeNewReports(AbstractReportTreeNode specimens,
         AbstractReportTreeNode clinics, AbstractReportTreeNode patients,
-        AbstractReportTreeNode sampleTypes, AbstractReportTreeNode containers) {
+        AbstractReportTreeNode specimenTypes, AbstractReportTreeNode containers) {
         String[] names = BiobankReport.getReportNames();
         for (int i = 0; i < names.length; i++) {
             try {
                 ReportTreeNode child = new ReportTreeNode(
                     BiobankReport.getReportByName(names[i]));
-                addInTree(specimens, clinics, patients, sampleTypes,
+                addInTree(specimens, clinics, patients, specimenTypes,
                     containers, child);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -144,27 +144,34 @@ public class ReportsView extends ViewPart {
 
     private void addInTree(AbstractReportTreeNode specimens,
         AbstractReportTreeNode clinics, AbstractReportTreeNode patients,
-        AbstractReportTreeNode sampleTypes, AbstractReportTreeNode containers,
-        ReportTreeNode child) throws Exception {
-        if (child.getLabel().contains("Specimen Type")
-            || child.getLabel().contains("Invoicing")) {
-            sampleTypes.addChild(child);
-            child.setParent(sampleTypes);
-        } else if (child.getLabel().contains("Specimen")) {
+        AbstractReportTreeNode specimenTypes,
+        AbstractReportTreeNode containers, ReportTreeNode child)
+        throws Exception {
+        switch (child.getReport().getType()) {
+        case SPECIMEN_TYPE:
+            specimenTypes.addChild(child);
+            child.setParent(specimenTypes);
+            break;
+        case SPECIMEN:
             specimens.addChild(child);
             child.setParent(specimens);
-        } else if (child.getLabel().contains("Patient")) {
+            break;
+        case PATIENT:
             patients.addChild(child);
             child.setParent(patients);
-        } else if (child.getLabel().contains("Clinic")) {
+            break;
+        case CLINIC:
             clinics.addChild(child);
             child.setParent(clinics);
-        } else if (child.getLabel().contains("Container")) {
+            break;
+        case CONTAINER:
             containers.addChild(child);
             child.setParent(containers);
-        } else
-            throw new Exception(NLS.bind("Unable to place report node: {0}",
+            break;
+        default:
+            throw new Exception(NLS.bind("Unable to place report node: {0}", //$NON-NLS-1$
                 child.getLabel()));
+        }
     }
 
     @Override

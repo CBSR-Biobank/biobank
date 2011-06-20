@@ -25,7 +25,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class AliquotsByPalletEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.AliquotsByPalletEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.AliquotsByPalletEditor"; //$NON-NLS-1$
 
     private BgcBaseText palletLabel;
     private TopContainerListWidget topContainers;
@@ -43,10 +43,10 @@ public class AliquotsByPalletEditor extends ReportsEditor {
 
     @Override
     protected void createOptionSection(Composite parameterSection) {
-        palletLabel = createCustomText("Container Label", parameterSection);
+        palletLabel = createCustomText("Container Label", parameterSection); //$NON-NLS-1$
         topContainers = new TopContainerListWidget(parameterSection, toolkit);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), listStatus, "Top Container List Empty");
+            Boolean.class), listStatus, "Top Container List Empty"); //$NON-NLS-1$
         topContainers.addSelectionChangedListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -62,7 +62,7 @@ public class AliquotsByPalletEditor extends ReportsEditor {
     protected BgcBaseText createCustomText(String labelText, Composite parent) {
         final BgcBaseText widget = (BgcBaseText) widgetCreator
             .createLabelledWidget(parent, BgcBaseText.class, SWT.NONE,
-                labelText, "");
+                labelText, ""); //$NON-NLS-1$
         widget.addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -105,27 +105,27 @@ public class AliquotsByPalletEditor extends ReportsEditor {
             for (ContainerWrapper c : containers)
                 if (c.getContainerType().getSpecimenTypeCollection().size() > 0)
                     validContainers.add(c);
-            if (label.equals("") || validContainers.size() > 0)
+            if (label.equals("") || validContainers.size() > 0) //$NON-NLS-1$
                 filterList(label);
             else {
                 throw new ApplicationException();
             }
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Invalid label",
-                "No bottom-level container labelled " + label);
+            BgcPlugin.openAsyncError("Invalid label", //$NON-NLS-1$
+                "No bottom-level container labelled " + label); //$NON-NLS-1$
         }
     }
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Location", "Inventory ID", "Patient", "Type" };
+        return new String[] { "Location", "Inventory ID", "Patient", "Type" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> paramNames = new ArrayList<String>();
-        paramNames.add("Container Label");
-        paramNames.add("Top Containers");
+        paramNames.add("Container Label"); //$NON-NLS-1$
+        paramNames.add("Top Containers"); //$NON-NLS-1$
         return paramNames;
     }
 

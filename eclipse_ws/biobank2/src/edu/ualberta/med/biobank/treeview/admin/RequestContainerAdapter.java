@@ -33,9 +33,9 @@ public class RequestContainerAdapter implements Node {
     }
 
     public String getLabelInternal() {
-        return container.getLabel() + " ("
-            + container.getContainerType().getNameShort() + ")" + " ("
-            + getSpecimenCount() + ")";
+        return container.getLabel() + " (" //$NON-NLS-1$
+            + container.getContainerType().getNameShort() + ")" + " (" //$NON-NLS-1$ //$NON-NLS-2$
+            + getSpecimenCount() + ")"; //$NON-NLS-1$
     }
 
     private Integer getSpecimenCount() {

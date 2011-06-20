@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 
 public class PatientWBCEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.PatientWBCEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.PatientWBCEditor"; //$NON-NLS-1$
 
     @Override
     protected void createOptionSection(Composite parent) {
@@ -15,8 +15,8 @@ public class PatientWBCEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Study", "Clinic", "Patient", "Date",
-            "Sample Type", "Inventory ID", "Location" };
+        return new String[] { "Study", "Clinic", "Patient", "Date", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            "Sample Type", "Inventory ID", "Location" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     @Override

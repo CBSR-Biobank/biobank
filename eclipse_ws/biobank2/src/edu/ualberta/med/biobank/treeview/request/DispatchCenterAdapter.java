@@ -38,13 +38,13 @@ public class DispatchCenterAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         CenterWrapper<?> site = getWrapper();
-        Assert.isNotNull(site, "site is null");
+        Assert.isNotNull(site, "site is null"); //$NON-NLS-1$
         return site.getNameShort();
     }
 
     @Override
     public String getTooltipText() {
-        return getTooltipText("Repository Site");
+        return getTooltipText(Messages.DispatchCenterAdapter_site_label);
     }
 
     @Override

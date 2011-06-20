@@ -82,14 +82,14 @@ public abstract class AbstractContainerDisplay {
         RowColPos rowcol = new RowColPos();
         rowcol.row = indexRow;
         rowcol.col = indexCol;
-        String parentLabel = "";
+        String parentLabel = ""; //$NON-NLS-1$
         if (displayFullInfoString && container != null) {
             parentLabel = container.getLabel();
         }
         if (containerType != null) {
             return parentLabel + containerType.getPositionString(rowcol);
         }
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     @SuppressWarnings("unused")

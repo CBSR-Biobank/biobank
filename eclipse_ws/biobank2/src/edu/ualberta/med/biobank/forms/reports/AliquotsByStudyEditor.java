@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.widgets.TopContainerListWidget;
 
 public class AliquotsByStudyEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.AliquotsByStudyEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.AliquotsByStudyEditor"; //$NON-NLS-1$
     protected DateTimeWidget start;
     protected DateTimeWidget end;
     protected TopContainerListWidget topContainers;
@@ -26,7 +26,7 @@ public class AliquotsByStudyEditor extends ReportsEditor {
     protected void createOptionSection(Composite parent) {
         topContainers = new TopContainerListWidget(parent, toolkit);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), listStatus, "Top Container List Empty");
+            Boolean.class), listStatus, "Top Container List Empty"); //$NON-NLS-1$
         topContainers.addSelectionChangedListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -38,8 +38,8 @@ public class AliquotsByStudyEditor extends ReportsEditor {
             }
         });
         start = widgetCreator.createDateTimeWidget(parent,
-            "Start Date (Linked)", null, null, null, SWT.DATE);
-        end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
+            "Start Date (Linked)", null, null, null, SWT.DATE); //$NON-NLS-1$
+        end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)", //$NON-NLS-1$
             null, null, null, SWT.DATE);
 
     }
@@ -56,15 +56,15 @@ public class AliquotsByStudyEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Study", "Total" };
+        return new String[] { "Study", "Total" }; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> paramNames = new ArrayList<String>();
-        paramNames.add("Top Container Type");
-        paramNames.add("Start Date (Linked)");
-        paramNames.add("End Date (Linked)");
+        paramNames.add("Top Container Type"); //$NON-NLS-1$
+        paramNames.add("Start Date (Linked)"); //$NON-NLS-1$
+        paramNames.add("End Date (Linked)"); //$NON-NLS-1$
         return paramNames;
     }
 

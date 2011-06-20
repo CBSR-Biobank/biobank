@@ -10,15 +10,15 @@ import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 
 public class AliquotInvoiceByClinicEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.AliquotInvoiceByClinicEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.AliquotInvoiceByClinicEditor"; //$NON-NLS-1$
     protected DateTimeWidget start;
     protected DateTimeWidget end;
 
     @Override
     protected void createOptionSection(Composite parent) {
         start = widgetCreator.createDateTimeWidget(parent,
-            "Start Date (Linked)", null, null, null, SWT.DATE);
-        end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
+            "Start Date (Linked)", null, null, null, SWT.DATE); //$NON-NLS-1$
+        end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)", //$NON-NLS-1$
             null, null, null, SWT.DATE);
     }
 
@@ -40,15 +40,15 @@ public class AliquotInvoiceByClinicEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Inventory ID", "Clinic", "Patient Number",
-            "Link Date", "Sample Type" };
+        return new String[] { "Inventory ID", "Clinic", "Patient Number", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            "Link Date", "Sample Type" }; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> param = new ArrayList<String>();
-        param.add("Start Date (Linked)");
-        param.add("End Date (Linked)");
+        param.add("Start Date (Linked)"); //$NON-NLS-1$
+        param.add("End Date (Linked)"); //$NON-NLS-1$
         return param;
     }
 

@@ -182,7 +182,8 @@ public class ContainerDisplayWidget extends Canvas {
                 display = new GridContainerDisplay();
                 display.setStorageSize(3, 5);
             }
-        } else if (containerType.getName().equals("Drawer 36")) {
+        } else if (containerType.getName().equals(
+            Drawer36Display.CONTAINER_NAME)) {
             display = new Drawer36Display();
         } else {
             display = new GridContainerDisplay();

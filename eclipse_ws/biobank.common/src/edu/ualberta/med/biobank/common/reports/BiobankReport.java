@@ -41,12 +41,14 @@ public class BiobankReport implements QueryCommand {
                 r = new ReportData();
             else
                 r = REPORTS.get(pieces[0]);
-            if (pieces[1].equals("NAME"))
+            if ("NAME".equals(pieces[1]))
                 r.name = (String) prop.getValue();
-            else if (pieces[1].equals("DESCRIPTION"))
+            else if ("DESCRIPTION".equals(pieces[1]))
                 r.description = (String) prop.getValue();
-            else
+            else if ("EDITOR".equals(pieces[1]))
                 r.editorId = editorPath + (String) prop.getValue();
+            else if ("TYPE".equals(pieces[1]))
+                r.type = ReportType.valueOf((String) prop.getValue());
             r.className = pieces[0];
             REPORTS.put(pieces[0], r);
         }
@@ -64,12 +66,14 @@ public class BiobankReport implements QueryCommand {
     private String editorId;
     private String groupBy;
     private String className;
+    private ReportType type;
 
     public BiobankReport(ReportData data) {
         this.name = data.name;
         this.description = data.description;
         this.editorId = data.editorId;
         this.className = data.className;
+        this.type = data.type;
     }
 
     public String getName() {
@@ -78,6 +82,10 @@ public class BiobankReport implements QueryCommand {
 
     public String getDescription() {
         return description;
+    }
+
+    public ReportType getType() {
+        return type;
     }
 
     public String[] getColumnNames() {

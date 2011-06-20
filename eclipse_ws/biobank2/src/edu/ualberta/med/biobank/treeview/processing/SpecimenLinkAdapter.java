@@ -23,7 +23,7 @@ public class SpecimenLinkAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return "Specimen Link";
+        return Messages.SpecimenLinkAdapter_link_label;
     }
 
     @Override

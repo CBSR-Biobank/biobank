@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 
-public class AdapterTreeDragDropListener implements DropTargetListener,
+public class ContainerDragDropListener implements DropTargetListener,
     DragSourceListener {
 
     private TreeViewer treeViewer;
@@ -24,7 +24,7 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
     private ContainerWrapper srcContainer;
     private boolean dstLocationSelected;
 
-    public AdapterTreeDragDropListener(TreeViewer treeViewerI) {
+    public ContainerDragDropListener(TreeViewer treeViewerI) {
         this.treeViewer = treeViewerI;
         this.srcContainer = null;
         this.dstLocationSelected = false;
@@ -38,8 +38,8 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
         if (ts.getFirstElement() instanceof ContainerAdapter) {
             if (ts.size() != 1)
                 BgcPlugin
-                    .openError("Cannot move multiple container",
-                        "You cannot move multiple containers, please drag them one at a time.");
+                    .openError(Messages.ContainerDragDropListener_move_multiple_error_title,
+                        Messages.ContainerDragDropListener_move_multiple_error_msg);
 
             srcContainerAdapter = (ContainerAdapter) ts.getFirstElement();
             if (srcContainerAdapter != null)
@@ -82,7 +82,7 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
                         }
                     }
                 } catch (Exception ex) {
-                    BgcPlugin.openAsyncError("Error in drag", ex);
+                    BgcPlugin.openAsyncError(Messages.ContainerDragDropListener_drag_error_title, ex);
                 }
             }
         }
@@ -124,20 +124,20 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
                         && !dstContainer.isContainerFull()) {
 
                         // TODO implement the moving of containers here.
-                        System.out.println("Valid Drag Detected:");
-                        System.out.println(srcContainer + " --> "
+                        System.out.println("Valid Drag Detected:"); //$NON-NLS-1$
+                        System.out.println(srcContainer + " --> " //$NON-NLS-1$
                             + dstContainer);
                         srcContainerAdapter.moveContainer(dstContainer);
                         return;
                     } else {
                         BgcPlugin
                             .openError(
-                                "Invalid state",
-                                "ERROR: an unexpected state occured in TreeDragDropListener. Please report this.");
+                                Messages.ContainerDragDropListener_state_error_title,
+                                Messages.ContainerDragDropListener_state_error_msg);
 
                     }
                 } catch (Exception ex) {
-                    BgcPlugin.openAsyncError("Drop error", ex);
+                    BgcPlugin.openAsyncError(Messages.ContainerDragDropListener_drop_error_title, ex);
                 }
             }
         }
@@ -150,7 +150,6 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
 
     @Override
     public void dragStart(DragSourceEvent event) {
-
         ContainerWrapper container = getSelectedContainer();
         if (container != null && container.hasParentContainer()) {
             event.doit = true;

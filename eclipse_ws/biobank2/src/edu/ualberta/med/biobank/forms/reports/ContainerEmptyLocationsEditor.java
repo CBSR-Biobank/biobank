@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -16,16 +17,16 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.widgets.TopContainerListWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerEmptyLocationsEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.ContainerEmptyLocationsEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.ContainerEmptyLocationsEditor"; //$NON-NLS-1$
 
     private BgcBaseText containerLabel;
     private TopContainerListWidget topContainers;
@@ -43,10 +44,13 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
 
     @Override
     protected void createOptionSection(Composite parameterSection) {
-        containerLabel = createCustomText("Container Label", parameterSection);
+        containerLabel = createCustomText(
+            Messages.ContainerEmptyLocationsEditor_container_label_label,
+            parameterSection);
         topContainers = new TopContainerListWidget(parameterSection, toolkit);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), listStatus, "Top Container List Empty");
+            Boolean.class), listStatus,
+            Messages.ContainerEmptyLocationsEditor_top_cont_validation_msg);
         topContainers.addSelectionChangedListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -62,7 +66,7 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
     protected BgcBaseText createCustomText(String labelText, Composite parent) {
         final BgcBaseText widget = (BgcBaseText) widgetCreator
             .createLabelledWidget(parent, BgcBaseText.class, SWT.NONE,
-                labelText, "");
+                labelText, ""); //$NON-NLS-1$
         widget.addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -95,7 +99,7 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
 
     protected void validate(String label) {
         try {
-            if (label.equals("")
+            if (label.equals("") //$NON-NLS-1$
                 || ContainerWrapper.getContainersByLabel(
                     SessionManager.getAppService(), label).size() > 0)
                 filterList(label);
@@ -103,8 +107,9 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
                 throw new ApplicationException();
             }
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Invalid label",
-                "No container labelled " + label);
+            BgcPlugin.openAsyncError(
+                Messages.ContainerEmptyLocationsEditor_label_error_title,
+                NLS.bind(Messages.ContainerEmptyLocationsEditor_label_error_msg, label));
         }
 
     }
@@ -116,14 +121,17 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Location", "Pallet Type" };
+        return new String[] {
+            Messages.ContainerEmptyLocationsEditor_location_label,
+            Messages.ContainerEmptyLocationsEditor_type_label };
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> paramNames = new ArrayList<String>();
-        paramNames.add("Container Label");
-        paramNames.add("Top Containers");
+        paramNames
+            .add(Messages.ContainerEmptyLocationsEditor_container_label_label);
+        paramNames.add(Messages.ContainerEmptyLocationsEditor_top_label);
         return paramNames;
     }
 

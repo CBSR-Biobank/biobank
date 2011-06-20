@@ -21,13 +21,14 @@ import edu.ualberta.med.biobank.widgets.FileBrowser;
 
 public class AliquotRequestEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.AliquotRequestEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.AliquotRequestEditor"; //$NON-NLS-1$
 
     private FileBrowser csvSelector;
 
     @Override
     protected void createOptionSection(Composite parent) {
-        csvSelector = createFileBrowserOption("CSV File", parent);
+        csvSelector = createFileBrowserOption(
+            Messages.AliquotRequestEditor_browse_label, parent);
     }
 
     @Override
@@ -53,22 +54,22 @@ public class AliquotRequestEditor extends ReportsEditor {
             csvSelector.getFilePath()), CsvPreference.EXCEL_PREFERENCE);
 
         final CellProcessor[] processors = new CellProcessor[] {
-            new StrNotNullOrEmpty(), new ParseDate("yyyy-MM-dd"),
+            new StrNotNullOrEmpty(), new ParseDate("yyyy-MM-dd"), //$NON-NLS-1$
             new StrNotNullOrEmpty(), new LMinMax(1, Long.MAX_VALUE) };
 
         List<Object> requests = new ArrayList<Object>();
 
         try {
-            String[] header = new String[] { "pnumber", "dateDrawn",
-                "specimenTypeNameShort", "maxAliquots" };
+            String[] header = new String[] { "pnumber", "dateDrawn", //$NON-NLS-1$ //$NON-NLS-2$
+                "specimenTypeNameShort", "maxAliquots" }; //$NON-NLS-1$ //$NON-NLS-2$
             AliquotRequest request;
             while ((request = reader.read(AliquotRequest.class, header,
                 processors)) != null) {
                 requests.add(request);
             }
         } catch (SuperCSVException e) {
-            throw new Exception("Parse error at line " + reader.getLineNumber()
-                + "\n" + e.getCsvContext());
+            throw new Exception("Parse error at line " + reader.getLineNumber() //$NON-NLS-1$
+                + "\n" + e.getCsvContext()); //$NON-NLS-1$
         } finally {
             reader.close();
         }
@@ -77,14 +78,18 @@ public class AliquotRequestEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Patient", "Inventory ID", "Date Drawn", "Type",
-            "Location", "Activity Status" };
+        return new String[] { Messages.AliquotRequestEditor_patient_label,
+            Messages.AliquotRequestEditor_inventory_id_label,
+            Messages.AliquotRequestEditor_drawn_label,
+            Messages.AliquotRequestEditor_type_label,
+            Messages.AliquotRequestEditor_location_label,
+            Messages.AliquotRequestEditor_status_label };
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> paramName = new ArrayList<String>();
-        paramName.add("CSV File");
+        paramName.add(Messages.AliquotRequestEditor_browse_label);
         return paramName;
     }
 }

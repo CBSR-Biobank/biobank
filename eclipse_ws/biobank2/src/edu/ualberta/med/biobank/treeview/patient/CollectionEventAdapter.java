@@ -36,17 +36,17 @@ public class CollectionEventAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         CollectionEventWrapper cevent = getWrapper();
-        Assert.isNotNull(cevent, "collection event is null");
+        Assert.isNotNull(cevent, "collection event is null"); //$NON-NLS-1$
         StringBuilder name = new StringBuilder(cevent.getPatient().getPnumber())
-            .append(" - #").append(cevent.getVisitNumber());
+            .append(" - #").append(cevent.getVisitNumber()); //$NON-NLS-1$
 
         long count = -1;
         try {
             count = cevent.getSourceSpecimensCount(false);
         } catch (Exception e) {
-            logger.error("Problem counting specimens", e);
+            logger.error("Problem counting specimens", e); //$NON-NLS-1$
         }
-        return name.append(" [").append(count).append("]").toString();
+        return name.append(" [").append(count).append("]").toString(); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override
@@ -61,8 +61,8 @@ public class CollectionEventAdapter extends AdapterBase {
                             .getActiveActivityStatus(SessionManager
                                 .getAppService()));
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError("Error",
-                        "Unable to create collection event.");
+                    BgcPlugin.openAsyncError(Messages.CollectionEventAdapter_error_title,
+                        Messages.CollectionEventAdapter_create_error_msg);
                 }
             } else
                 tabName = NLS.bind(
@@ -73,14 +73,14 @@ public class CollectionEventAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Collection Event");
-        addViewMenu(menu, "Collection Event");
-        addDeleteMenu(menu, "Collection Event");
+        addEditMenu(menu, Messages.CollectionEventAdapter_cevent_label);
+        addViewMenu(menu, Messages.CollectionEventAdapter_cevent_label);
+        addDeleteMenu(menu, Messages.CollectionEventAdapter_cevent_label);
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this collection event?";
+        return Messages.CollectionEventAdapter_delete_confirm_msg;
     }
 
     @Override

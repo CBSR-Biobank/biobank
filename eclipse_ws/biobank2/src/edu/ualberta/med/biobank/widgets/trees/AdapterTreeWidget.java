@@ -28,7 +28,7 @@ import org.eclipse.ui.dialogs.FilteredTree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.listeners.AdapterTreeDragDropListener;
+import edu.ualberta.med.biobank.treeview.listeners.ContainerDragDropListener;
 import edu.ualberta.med.biobank.treeview.util.NodeContentProvider;
 import edu.ualberta.med.biobank.treeview.util.NodeLabelProvider;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
@@ -39,7 +39,7 @@ public class AdapterTreeWidget extends Composite {
 
     private TreeViewer treeViewer;
 
-    private AdapterTreeDragDropListener adapterTreeDragDropListener;
+    private ContainerDragDropListener adapterTreeDragDropListener;
 
     private Object mouseMoveLastElement = null;
 
@@ -80,7 +80,7 @@ public class AdapterTreeWidget extends Composite {
 
         /*----------------------------DND-----------------------------------*/
 
-        adapterTreeDragDropListener = new AdapterTreeDragDropListener(
+        adapterTreeDragDropListener = new ContainerDragDropListener(
             treeViewer);
 
         treeViewer.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY,

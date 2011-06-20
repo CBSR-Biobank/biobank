@@ -27,25 +27,25 @@ public class ClinicAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         ClinicWrapper wrapper = getWrapper();
-        Assert.isNotNull(wrapper, "client is null");
+        Assert.isNotNull(wrapper, "client is null"); //$NON-NLS-1$
         return wrapper.getNameShort();
     }
 
     @Override
     public String getTooltipText() {
-        return getTooltipText("Clinic");
+        return getTooltipText(Messages.ClinicAdapter_clinic_label);
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Clinic");
-        addViewMenu(menu, "Clinic");
-        addDeleteMenu(menu, "Clinic");
+        addEditMenu(menu, Messages.ClinicAdapter_clinic_label);
+        addViewMenu(menu, Messages.ClinicAdapter_clinic_label);
+        addDeleteMenu(menu, Messages.ClinicAdapter_clinic_label);
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this clinic?";
+        return Messages.ClinicAdapter_delete_confirm_msg;
     }
 
     @Override

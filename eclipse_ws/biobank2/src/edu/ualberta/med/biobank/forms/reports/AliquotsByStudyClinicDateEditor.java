@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.widgets.TopContainerListWidget;
 
 public class AliquotsByStudyClinicDateEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.AliquotsByStudyClinicDateEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.AliquotsByStudyClinicDateEditor"; //$NON-NLS-1$
     private ComboViewer dateRangeCombo;
     protected DateTimeWidget start;
     protected DateTimeWidget end;
@@ -31,22 +31,22 @@ public class AliquotsByStudyClinicDateEditor extends ReportsEditor {
     @Override
     protected String[] getColumnNames() {
         return new String[] {
-            "Study",
-            "Clinic",
+            "Study", //$NON-NLS-1$
+            "Clinic", //$NON-NLS-1$
             ((IStructuredSelection) dateRangeCombo.getSelection())
-                .getFirstElement().toString(), "Total" };
+                .getFirstElement().toString(), "Total" }; //$NON-NLS-1$
     }
 
     @Override
     protected void createOptionSection(Composite parent) {
         dateRangeCombo = widgetCreator
-            .createComboViewer(parent, "Group By",
+            .createComboViewer(parent, "Group By", //$NON-NLS-1$
                 Arrays.asList(DateGroup.values()), null,
                 new BiobankLabelProvider());
         dateRangeCombo.getCombo().select(0);
         topContainers = new TopContainerListWidget(parent, toolkit);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), listStatus, "Top Container List Empty");
+            Boolean.class), listStatus, "Top Container List Empty"); //$NON-NLS-1$
         topContainers.addSelectionChangedListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -58,8 +58,8 @@ public class AliquotsByStudyClinicDateEditor extends ReportsEditor {
             }
         });
         start = widgetCreator.createDateTimeWidget(parent,
-            "Start Date (Linked)", null, null, null, SWT.DATE);
-        end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
+            "Start Date (Linked)", null, null, null, SWT.DATE); //$NON-NLS-1$
+        end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)", //$NON-NLS-1$
             null, null, null, SWT.DATE);
 
     }
@@ -80,10 +80,10 @@ public class AliquotsByStudyClinicDateEditor extends ReportsEditor {
     @Override
     protected List<String> getParamNames() {
         List<String> param = new ArrayList<String>();
-        param.add("Group By");
-        param.add("Top Container");
-        param.add("Start Date (Linked)");
-        param.add("End Date (Linked)");
+        param.add("Group By"); //$NON-NLS-1$
+        param.add("Top Container"); //$NON-NLS-1$
+        param.add("Start Date (Linked)"); //$NON-NLS-1$
+        param.add("End Date (Linked)"); //$NON-NLS-1$
         return param;
     }
 

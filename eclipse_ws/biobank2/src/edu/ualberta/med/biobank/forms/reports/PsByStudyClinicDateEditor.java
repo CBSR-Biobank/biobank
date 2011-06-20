@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class PsByStudyClinicDateEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.PsByStudyClinicDateEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.PsByStudyClinicDateEditor"; //$NON-NLS-1$
     private ComboViewer dateRangeCombo;
     protected DateTimeWidget start;
     protected DateTimeWidget end;
@@ -23,22 +23,22 @@ public class PsByStudyClinicDateEditor extends ReportsEditor {
     @Override
     protected String[] getColumnNames() {
         return new String[] {
-            "Study",
-            "Clinic",
+            "Study", //$NON-NLS-1$
+            "Clinic", //$NON-NLS-1$
             ((IStructuredSelection) dateRangeCombo.getSelection())
-                .getFirstElement().toString(), "Total" };
+                .getFirstElement().toString(), "Total" }; //$NON-NLS-1$
     }
 
     @Override
     protected void createOptionSection(Composite parent) {
         dateRangeCombo = widgetCreator
-            .createComboViewer(parent, "Group By",
+            .createComboViewer(parent, "Group By", //$NON-NLS-1$
                 Arrays.asList(DateGroup.values()), null,
                 new BiobankLabelProvider());
         dateRangeCombo.getCombo().select(0);
         start = widgetCreator.createDateTimeWidget(parent,
-            "Start Date (Linked)", null, null, null, SWT.DATE);
-        end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
+            "Start Date (Linked)", null, null, null, SWT.DATE); //$NON-NLS-1$
+        end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)", //$NON-NLS-1$
             null, null, null, SWT.DATE);
     }
 
@@ -56,9 +56,9 @@ public class PsByStudyClinicDateEditor extends ReportsEditor {
     @Override
     protected List<String> getParamNames() {
         List<String> param = new ArrayList<String>();
-        param.add("Group By");
-        param.add("Start Date (Linked)");
-        param.add("End Date (Linked)");
+        param.add("Group By"); //$NON-NLS-1$
+        param.add("Start Date (Linked)"); //$NON-NLS-1$
+        param.add("End Date (Linked)"); //$NON-NLS-1$
         return param;
     }
 

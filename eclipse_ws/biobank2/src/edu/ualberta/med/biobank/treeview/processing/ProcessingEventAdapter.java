@@ -38,18 +38,18 @@ public class ProcessingEventAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         ProcessingEventWrapper pevent = getWrapper();
-        Assert.isNotNull(pevent, "processing event is null");
+        Assert.isNotNull(pevent, "processing event is null"); //$NON-NLS-1$
         String worksheet = pevent.getWorksheet();
         String name = pevent.getFormattedCreatedAt()
-            + (worksheet == null ? "" : " - #" + pevent.getWorksheet());
+            + (worksheet == null ? "" : " - #" + pevent.getWorksheet()); //$NON-NLS-1$ //$NON-NLS-2$
 
         long count = -1;
         try {
             count = pevent.getSpecimenCount(true);
         } catch (Exception e) {
-            logger.error("Problem counting specimens", e);
+            logger.error("Problem counting specimens", e); //$NON-NLS-1$
         }
-        return name + " [" + count + "]";
+        return name + " [" + count + "]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override
@@ -62,9 +62,9 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Processing Event");
-        addViewMenu(menu, "Processing Event");
-        addDeleteMenu(menu, "Processing Event");
+        addEditMenu(menu, Messages.ProcessingEventAdapter_pevent_label);
+        addViewMenu(menu, Messages.ProcessingEventAdapter_pevent_label);
+        addDeleteMenu(menu, Messages.ProcessingEventAdapter_pevent_label);
     }
 
     @Override
