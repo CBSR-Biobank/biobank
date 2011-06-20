@@ -145,6 +145,25 @@ activity_status_id,original_collection_event_id,pv_id)
         JOIN sample_type ON sample_type.id=aliquot.sample_type_id
         JOIN specimen_type ON specimen_type.name=sample_type.name;
 
+-- due to bug in v1.3.8 some patient visits were added without any source vessels,
+-- or the source vessels were somehow deleted after the patient visit was added
+--
+-- have to create pv souce vessels for these visits
+
+ALTER TABLE pv_source_vessel MODIFY COLUMN ID INT(11) NOT NULL auto_increment;
+
+set @sv_na = null;
+
+select id from source_vessel where name='N/A' into @sv_na;
+
+INSERT INTO pv_source_vessel (quantity,time_drawn,volume,patient_visit_id,source_vessel_id)
+       select 0,pv.date_drawn,0,pv.id,@sv_na
+       from patient_visit pv
+       left join pv_source_vessel pv_sv on pv_sv.patient_visit_id=pv.id
+       where pv_sv.id is null;
+
+ALTER TABLE pv_source_vessel MODIFY COLUMN ID INT(11) NOT NULL;
+
 -- add a source specimen for each patient visit
 --
 -- if the pvsv.time_drawn is null the specimen created at time is the date from
@@ -167,7 +186,7 @@ INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,
        join specimen_type on specimen_type.name=sv.name;
 
 -- initialize the current center on source specimens to be where they were
--- created, dispatches are handled in the next step
+-- shipped, dispatches are handled in the next step
 
 UPDATE specimen,patient_visit
        as pv, clinic_shipment_patient as csp,abstract_shipment as aship,
@@ -185,7 +204,7 @@ UPDATE specimen,patient_visit
 
 update specimen spc, aliquot aq,dispatch_shipment_aliquot dsa,abstract_shipment aship,
        site,center
-       set current_center_id=center.id
+       set spc.current_center_id=center.id
        where spc.inventory_id=aq.inventory_id
        and dsa.aliquot_id=aq.id
        and aship.id=dsa.dispatch_shipment_id
@@ -203,7 +222,8 @@ update specimen as spc
 
 update specimen as spc_a, specimen as spc_b
        set spc_a.parent_specimen_id=spc_b.id, spc_a.top_specimen_id=spc_b.id
-       where spc_a.pv_id=spc_b.pv_id and spc_b.pv_sv_id is not null and spc_a.pv_sv_id is null;
+       where spc_a.pv_id=spc_b.pv_id and spc_b.pv_sv_id is not null
+       and spc_a.pv_sv_id is null;
 
 ALTER TABLE specimen MODIFY COLUMN ID INT(11) NOT NULL;
 
@@ -236,9 +256,13 @@ CREATE TABLE shipment_info (
 create index WAYBILL_IDX on shipment_info(WAYBILL);
 create index RECEIVED_AT_IDX on shipment_info(RECEIVED_AT);
 
-INSERT INTO shipment_info (aship_id,received_at,packed_at,waybill,box_number,shipping_method_id)
-SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id FROM abstract_shipment
-WHERE discriminator='ClinicShipment';
+INSERT INTO shipment_info (aship_id,received_at,packed_at,waybill,box_number,
+       shipping_method_id)
+       SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id
+       FROM abstract_shipment
+       WHERE discriminator='ClinicShipment';
+
+-- some shipments do not have any patient visits, see below
 
 -- aship_type=0 for source specimens, aship_type=1 for aliquoted_specimens
 

@@ -9,8 +9,8 @@
     <arg value="-f" />
   </exec>
 
-  <property name="server.version.num" value="3.0.0.rc1" />
-  <property name="java.client.version.num" value="3.0.0.rc1" />
+  <property name="server.version.num" value="3.0.0.rc3" />
+  <property name="java.client.version.num" value="3.0.0.rc3" />
 
   <property environment="env" />
   <property name="host" value="aicml-med.cs.ualberta.ca" />
@@ -224,6 +224,44 @@
   </target>
 
   <!-- Eclipse -->
+  <target name="biobank-product-version-modify">
+    <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
+      prefix="biobank2.product" />
+    <xslt in="${eclipse.proj.dir}/biobank2.product" out="${tmp.file}"
+      style="scripts/biobank-product.xsl">
+      <param name="version" expression="${java.client.version.num}" />
+    </xslt>
+    <copy file="${tmp.file}" tofile="${eclipse.proj.dir}/biobank2.product"
+      overwrite="true"/>
+  </target>
+
+  <target name="biobank-feature-core-version-modify">
+    <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
+      prefix="biobank2.feature.core" />
+    <xslt in="${eclipse.workspace.dir}/biobank2.feature.core/feature.xml" out="${tmp.file}"
+      style="scripts/biobank-feature.xsl">
+      <param name="version" expression="${java.client.version.num}" />
+    </xslt>
+    <copy file="${tmp.file}" tofile="${eclipse.workspace.dir}/biobank2.feature.core/feature.xml"
+      overwrite="true"/>
+  </target>
+
+  <target name="biobank-feature-platform-version-modify">
+    <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
+    prefix="biobank2.feature.platform" />
+    <xslt in="${eclipse.workspace.dir}/biobank2.feature.platform/feature.xml" out="${tmp.file}"
+      style="scripts/biobank-feature.xsl">
+      <param name="version" expression="${java.client.version.num}" />
+    </xslt>
+    <copy file="${tmp.file}" tofile="${eclipse.workspace.dir}/biobank2.feature.platform/feature.xml"
+      overwrite="true"/>
+  </target>
+
+  <target name="biobank-version-modify">
+    <antcall target="biobank-product-version-modify" />
+    <antcall target="biobank-feature-core-version-modify" />
+    <antcall target="biobank-feature-platform-version-modify" />
+  </target>
   <target name="java-client-manifest">
     <manifest file="${eclipse.proj.dir}/META-INF/MANIFEST.MF" mode="update">
       <attribute name="Bundle-Version" value="${java.client.version.num}" />
@@ -239,7 +277,7 @@
     </propertyfile>
   </target>
   <target name="deploy-eclipse"
-          depends="sdk-files,java-client-manifest"
+          depends="sdk-files,java-client-manifest,biobank-version-modify"
           description="deploys the caCORE SDK beans to the eclipse project">
     <dependset>
       <srcfilelist dir="${cacore.sdk.dir}/system/lib"
@@ -1063,7 +1101,7 @@
   </target>
 
 
-  <target name="product" depends="eclipse.home.env,deploy" description="build the product">
+  <target name="product" depends="biobank-version-modify,eclipse.home.env,deploy" description="build the product">
   	<!-- buildDirectory is the folder where the plugins and products are found and build -->
     <property name="buildDirectory" value="${product.dir}/buildDirectory" />
     <delete dir="${buildDirectory}" />
@@ -1080,9 +1118,9 @@
     <copy todir="${buildDirectory}/plugins/sampleProcessingRobot">
       <fileset dir="${eclipse.workspace.dir}/sampleProcessingRobot" />
     </copy>
-    <!-- copy todir="${buildDirectory}/plugins/barcodeGenerator">
+    <copy todir="${buildDirectory}/plugins/barcodeGenerator">
       <fileset dir="${eclipse.workspace.dir}/barcodeGenerator" />
-    </copy -->
+    </copy>
     <copy todir="${buildDirectory}/plugins/biobank.gui.common">
       <fileset dir="${eclipse.workspace.dir}/biobank.gui.common" />
     </copy>

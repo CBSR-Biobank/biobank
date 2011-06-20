@@ -91,7 +91,8 @@ public class StudyViewForm extends BiobankViewForm {
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.getString("StudyViewForm.field.label.total.patients")); //$NON-NLS-1$
         visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("StudyViewForm.field.label.total.patientVisits")); //$NON-NLS-1$
+            Messages
+                .getString("StudyViewForm.field.label.total.collectionEvents")); //$NON-NLS-1$
 
         createClinicSection();
         createSourceSpecimenSection();

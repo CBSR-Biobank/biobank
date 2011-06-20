@@ -97,6 +97,12 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         addScannerPreferencesPropertyListener();
         palletScanManagement = new PalletScanManagement() {
             @Override
+            public boolean isScanTubeAloneMode() {
+                // FIXME: see issue #1230. always activate this mode
+                return true;
+            }
+
+            @Override
             protected void beforeThreadStart() {
                 currentPlateToScan = plateToScanValue.getValue().toString();
                 AbstractPalletSpecimenAdminForm.this.beforeScanThreadStart();
@@ -380,6 +386,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             setConfirmEnabled(true);
             setDirty(true);
         } else {
+            scanButton.setEnabled((Boolean) canLaunchScanValue.getValue()
+                && fieldsValid());
             setFormHeaderErrorMessage(status.getMessage(),
                 IMessageProvider.ERROR);
             cancelConfirmWidget.setConfirmEnabled(false);
@@ -437,8 +445,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void resetPlateToScan() {
-        plateToScanText.setText(""); //$NON-NLS-1$
-        plateToScanValue.setValue(""); //$NON-NLS-1$
+        plateToScanText.setText(plateToScanSessionString);
+        plateToScanValue.setValue(plateToScanSessionString);
     }
 
     protected void setBindings(boolean isSingleMode) {
@@ -513,10 +521,16 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                 }
             }
         });
+        // FIXME: see issue #1230. deactivate this button until the users say we
+        // can really remove it
+        scanTubeAloneSwitch.setVisible(false);
     }
 
-    protected void showScanTubeAloneSwitch(boolean show) {
-        widgetCreator.showWidget(scanTubeAloneSwitch, show);
+    protected void showScanTubeAloneSwitch(
+        @SuppressWarnings("unused") boolean show) {
+        // FIXME: see issue #1230. deactivate this button until the users say we
+        // can really remove it
+        // widgetCreator.showWidget(scanTubeAloneSwitch, show);
     }
 
     protected Map<RowColPos, PalletCell> getCells() {
@@ -528,6 +542,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         scanValidValue.setValue(true);
         palletScanManagement.onReset();
         enableFields(true);
+        resetPlateToScan();
     }
 
     protected void setUseScanner(boolean useScanner) {
@@ -581,7 +596,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
         }
         currentScanState = UICellStatus.valueOf(res.getProcessStatus().name());
-        setScanValid(!getCells().isEmpty()
+        setScanValid(getCells() != null && !getCells().isEmpty()
             && currentScanState != UICellStatus.ERROR);
     }
 

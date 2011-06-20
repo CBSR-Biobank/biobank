@@ -63,8 +63,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
         retrievePatientVisit();
         SessionManager.logLookup(cevent);
 
-        setPartName(Messages.getString("CollectionEventViewForm.title",
-            cevent.getVisitNumber()));
+        setPartName(Messages.getString("CollectionEventViewForm.title", cevent
+            .getPatient().getPnumber(), cevent.getVisitNumber()));
     }
 
     @Override
@@ -162,16 +162,16 @@ public class CollectionEventViewForm extends BiobankViewForm {
         Composite client = createSectionWithClient(Messages
             .getString("CollectionEventViewForm.aliquotedspecimens.title"));
         aliquotedSpecimenTable = new SpecimenInfoTable(client,
-            cevent.getAliquotedSpecimenCollection(true),
-            ColumnsShown.ALIQUOTS, 10);
+            cevent.getAliquotedSpecimenCollection(true), ColumnsShown.ALIQUOTS,
+            10);
         aliquotedSpecimenTable.adaptToToolkit(toolkit, true);
     }
 
     @Override
     public void reload() {
         retrievePatientVisit();
-        setPartName(Messages.getString("CollectionEventViewForm.title",
-            cevent.getVisitNumber()));
+        setPartName(Messages.getString("CollectionEventViewForm.title", cevent
+            .getPatient().getPnumber(), cevent.getVisitNumber()));
         form.setText(Messages.getString("CollectionEventViewForm.main.title",
             +cevent.getVisitNumber()));
         setCollectionEventValues();
