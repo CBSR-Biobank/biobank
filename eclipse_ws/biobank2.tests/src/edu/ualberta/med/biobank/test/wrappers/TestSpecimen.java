@@ -28,6 +28,9 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.InvalidOptionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -151,7 +154,7 @@ public class TestSpecimen extends TestDatabase {
         try {
             duplicate.persist();
             Assert.fail("same inventory id !");
-        } catch (DuplicateEntryException dee) {
+        } catch (DuplicatePropertySetException e) {
             Assert.assertTrue(true);
         }
         duplicate.setInventoryId("qqqq" + r.nextInt());
@@ -162,7 +165,7 @@ public class TestSpecimen extends TestDatabase {
             duplicate.persist();
             Assert
                 .fail("still can't save it with  the same inventoryId after a first add with anotehr inventoryId!");
-        } catch (DuplicateEntryException dee) {
+        } catch (DuplicatePropertySetException e) {
             Assert.assertTrue(true);
         }
     }
@@ -184,7 +187,7 @@ public class TestSpecimen extends TestDatabase {
         try {
             duplicate.persist();
             Assert.fail("same inventory id !");
-        } catch (DuplicateEntryException dee) {
+        } catch (DuplicatePropertySetException dee) {
             Assert.assertTrue(true);
         }
 
@@ -208,7 +211,7 @@ public class TestSpecimen extends TestDatabase {
             duplicate.persist();
             Assert
                 .fail("should not be allowed to add an specimen in a position that is not empty");
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankSessionException bce) {
             Assert.assertTrue(true);
         }
 
@@ -230,7 +233,7 @@ public class TestSpecimen extends TestDatabase {
         try {
             childSpc.persist();
             Assert.fail("Container can't hold this type !");
-        } catch (BiobankCheckException bce) {
+        } catch (InvalidOptionException e) {
             Assert.assertTrue(true);
         }
 

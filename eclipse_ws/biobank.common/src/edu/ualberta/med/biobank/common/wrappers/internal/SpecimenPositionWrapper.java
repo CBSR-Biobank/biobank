@@ -1,21 +1,17 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
-import java.util.Arrays;
-import java.util.List;
-
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.TaskList;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenPositionBaseWrapper;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {
 
@@ -73,35 +69,37 @@ public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {
         setContainer(parent);
     }
 
-    public static final String CHECK_POSITION_QRY = "from "
-        + SpecimenPosition.class.getName()
-        + " where "
-        + Property
-            .concatNames(SpecimenPositionPeer.CONTAINER, ContainerPeer.ID)
-        + "=? and " + SpecimenPositionPeer.ROW.getName() + "=? and "
-        + SpecimenPositionPeer.COL.getName() + "=?";
-
     @Override
     protected void checkObjectAtPosition() throws BiobankCheckException,
         ApplicationException {
-        ContainerWrapper parent = getParent();
-        if (parent != null) {
-            // do a hql query because parent might need a reload - but if we are
-            // in the middle of parent.persist, don't want to do that !
-            HQLCriteria criteria = new HQLCriteria(
-                CHECK_POSITION_QRY,
-                Arrays.asList(new Object[] { parent.getId(), getRow(), getCol() }));
-            List<SpecimenPosition> positions = appService.query(criteria);
-            if (positions.size() == 0) {
-                return;
-            }
-            SpecimenPositionWrapper specimenPosition = new SpecimenPositionWrapper(
-                appService, positions.get(0));
-            if (!specimenPosition.getSpecimen().equals(getSpecimen())) {
-                throw new BiobankCheckException("Position " + getRow() + ":"
-                    + getCol() + " in container " + getParent().toString()
-                    + " is not available.");
-            }
-        }
+        // TODO: DELETE ME!
+    }
+
+    @Override
+    protected TaskList getPersistTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(check().notNull(SpecimenPositionPeer.CONTAINER));
+
+        tasks.add(super.getPersistTasks());
+
+        tasks.add(new PostCheckContainerPositionAvailable<SpecimenPosition>(
+            this, SpecimenPositionPeer.CONTAINER));
+
+        tasks.add(new PostCheckContainerPositionInBounds<SpecimenPosition>(
+            this, SpecimenPositionPeer.CONTAINER));
+
+        return tasks;
+    }
+
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        WrapperTransaction.persist(this, appService);
+    }
+
+    @Override
+    public void delete() throws Exception {
+        WrapperTransaction.delete(this, appService);
     }
 }

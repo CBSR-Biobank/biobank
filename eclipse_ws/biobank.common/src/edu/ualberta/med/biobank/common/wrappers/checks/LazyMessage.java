@@ -10,12 +10,13 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.ProxyUtil;
 
 public class LazyMessage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String message;
-    private final LazyArg<?>[] lazyArgs;
+    private final LazyArg[] lazyArgs;
 
     /**
      * Replaces {n} with the corresponding argument value, like
@@ -25,7 +26,7 @@ public class LazyMessage implements Serializable {
      * @param message
      * @param lazyArgs
      */
-    public LazyMessage(String message, LazyArg<?>... lazyArgs) {
+    public LazyMessage(String message, LazyArg... lazyArgs) {
         this.message = message;
         this.lazyArgs = lazyArgs;
     }
@@ -33,7 +34,7 @@ public class LazyMessage implements Serializable {
     public String format(Session session) {
         List<String> args = new ArrayList<String>();
 
-        for (LazyArg<?> lazyArg : lazyArgs) {
+        for (LazyArg lazyArg : lazyArgs) {
             String arg = lazyArg.getValue(session);
             args.add(arg);
         }
@@ -42,26 +43,75 @@ public class LazyMessage implements Serializable {
         return result;
     }
 
-    public static class LazyArg<E> implements Serializable {
+    public static <T> LazyArg newArg(ModelWrapper<T> wrapper,
+        Property<?, ? super T> property) {
+        return new WrapperLazyArg(wrapper, property);
+    }
+
+    public static <T, U> LazyArg newArg(Class<T> modelClass,
+        Property<U, ? super T> idProperty, U id, Property<?, ? super T> property) {
+        return new ModelIdLazyArg(modelClass, idProperty, id, property);
+    }
+
+    public interface LazyArg extends Serializable {
+        public String getValue(Session session);
+    }
+
+    private static class ModelIdLazyArg implements LazyArg {
+        private static final long serialVersionUID = 1L;
+        private static final String SELECT_PROPERTY_HQL = "SELECT o.{0} FROM {1} o WHERE o.{2} = ?";
+
+        private final Class<?> modelClass;
+        private final Property<?, ?> idProperty;
+        private final Object id;
+        private final Property<?, ?> property;
+
+        <T, U> ModelIdLazyArg(Class<T> modelClass,
+            Property<U, ? super T> idProperty, U id,
+            Property<?, ? super T> property) {
+            this.modelClass = modelClass;
+            this.idProperty = idProperty;
+            this.id = id;
+            this.property = property;
+        }
+
+        @Override
+        public String getValue(Session session) {
+            String value = null;
+
+            String hql = MessageFormat.format(SELECT_PROPERTY_HQL,
+                property.getName(), modelClass.getName(), idProperty.getName());
+            Query query = session.createQuery(hql);
+            query.setParameter(0, id);
+
+            List<?> results = query.list();
+            for (Object result : results) {
+                value = result.toString();
+                break;
+            }
+
+            return value;
+        }
+    }
+
+    private static class WrapperLazyArg implements LazyArg {
         private static final long serialVersionUID = 1L;
         private static final String SELECT_PROPERTY_HQL = "SELECT o.{0} FROM {1} o WHERE o = ?";
 
-        private final E model;
-        private final Class<E> modelClass;
-        private final Property<?, ? super E> property;
+        private final Object model;
+        private final Class<?> modelClass;
+        private final Property<?, ?> property;
 
-        LazyArg(ModelWrapper<E> wrapper, Property<?, ? super E> property) {
-            this.model = wrapper.getWrappedObject();
+        <T> WrapperLazyArg(ModelWrapper<T> wrapper,
+            Property<?, ? super T> property) {
+            this.model = ProxyUtil.convertProxyToObject(wrapper
+                .getWrappedObject());
             this.modelClass = wrapper.getWrappedClass();
             this.property = property;
         }
 
-        public static <T> LazyArg<T> create(ModelWrapper<T> wrapper,
-            Property<?, ? super T> property) {
-            return new LazyArg<T>(wrapper, property);
-        }
-
-        String getValue(Session session) {
+        @Override
+        public String getValue(Session session) {
             String value = null;
 
             String hql = MessageFormat.format(SELECT_PROPERTY_HQL,

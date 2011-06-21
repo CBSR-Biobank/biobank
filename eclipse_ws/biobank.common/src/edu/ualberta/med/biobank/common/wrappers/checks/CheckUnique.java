@@ -50,14 +50,15 @@ public class CheckUnique<E> extends BiobankWrapperAction<E> {
 
         Serializable id = idProperty.get(model);
         if (id != null) {
-            // reassociate the model object with the given Session
-            // TODO: reassociate associations?
-            // session.lock(model, LockMode.NONE);
             criteria.add(Restrictions.not(Restrictions.eq(idProperty.getName(),
                 id)));
         }
 
         for (Property<?, ? super E> property : properties) {
+            // TODO: this is a problem if the associations are not initialized.
+            // Perhaps do a post-check through HQL? but a pre-check may be
+            // necessary if it is a database constraint. .: properties are okay
+            // with a pre-check. Associations with a post-check.
             String name = property.getName();
             Object value = property.get(model);
             criteria.add(Restrictions.eq(name, value));
@@ -71,6 +72,8 @@ public class CheckUnique<E> extends BiobankWrapperAction<E> {
             String values = Format.propertyValues(model, properties);
             String names = Format.propertyNames(properties);
 
+            // TODO: I don't think this message makes sense, it reports the
+            // existing duplicate as itself. Not very informative :-(
             String msg = MessageFormat.format(EXCEPTION_STRING, modelClass,
                 modelString, values, names);
 

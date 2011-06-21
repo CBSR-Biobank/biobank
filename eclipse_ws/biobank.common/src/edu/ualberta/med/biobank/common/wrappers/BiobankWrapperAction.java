@@ -17,8 +17,16 @@ public abstract class BiobankWrapperAction<E> extends SearchExampleQuery
     private final Class<E> modelClass;
 
     protected BiobankWrapperAction(ModelWrapper<E> wrapper) {
-        super(wrapper.getWrappedObject());
-        this.modelClass = wrapper.getWrappedClass();
+        this(wrapper.getWrappedObject(), wrapper.getWrappedClass());
+    }
+
+    protected BiobankWrapperAction(BiobankWrapperAction<E> action) {
+        this(action.getModel(), action.getModelClass());
+    }
+
+    protected BiobankWrapperAction(E wrappedObject, Class<E> modelClass) {
+        super(wrappedObject);
+        this.modelClass = modelClass;
     }
 
     /**

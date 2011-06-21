@@ -392,10 +392,10 @@ public class BaseWrapperBuilder extends BaseBuilder {
         // @formatter:off
         String method = "set" + CamelCase.toCamelCase(assocName, true);
         
-        String visibility = "public";
+        String visibility = "public ";
         if (isInternal) {
             method += "Internal";
-            visibility = "protected";
+            visibility = "";
         }
         
         String parameterType = assocClassName + "BaseWrapper" + genericString;
@@ -403,7 +403,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String property = getPeerProperty(mc, assoc);
         String inverse = isInternal ? "" : createWrappedPropertySetterInverse(mc, assoc);
         
-        String result = "    "+visibility+" void "+method+"("+parameterType+" "+parameterName+") {\n" +
+        String result = "    "+visibility+"void "+method+"("+parameterType+" "+parameterName+") {\n" +
                         inverse +
         		        "        setWrappedProperty("+property+", "+parameterName+");\n" +
         		        "    }\n\n";
@@ -533,13 +533,13 @@ public class BaseWrapperBuilder extends BaseBuilder {
                 .append("    @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
         }
 
-        String visibility = "public";
+        String visibility = "public ";
         String methodName = "addTo" + CamelCase.toCamelCase(assocName, true);
         String inverse = createCollectionSetterInverse(mc, assoc, true);
 
         if (isInternal) {
             inverse = "";
-            visibility = "protected";
+            visibility = "";
             methodName += "Internal";
         }
 
@@ -554,7 +554,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
         }          
         // @formatter:on
 
-        result.append("    ").append(visibility).append(" void ")
+        result.append("    ").append(visibility).append("void ")
             .append(methodName).append("(List<? extends ")
             .append(assocClassName).append("BaseWrapper> ").append(assocName)
             .append(") {\n").append(action).append(inverse).append("    }\n\n");
@@ -588,14 +588,14 @@ public class BaseWrapperBuilder extends BaseBuilder {
                 .append("   @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
         }
 
-        String visibility = "public";
+        String visibility = "public ";
         String methodName = "removeFrom"
             + CamelCase.toCamelCase(assocName, true);
         String inverse = createCollectionSetterInverse(mc, assoc, false);
 
         if (isInternal) {
             inverse = "";
-            visibility = "protected";
+            visibility = "";
             methodName += "Internal";
         }
 
@@ -610,7 +610,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
         }          
         // @formatter:on
 
-        result.append("    ").append(visibility).append(" void ")
+        result.append("    ").append(visibility).append("void ")
             .append(methodName).append("(List<? extends ")
             .append(assocClassName).append("BaseWrapper> ").append(assocName)
             .append(") {\n").append(action).append(inverse).append("    }\n\n");
@@ -644,18 +644,18 @@ public class BaseWrapperBuilder extends BaseBuilder {
                 .append("    @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
         }
 
-        String visibility = "public";
+        String visibility = "public ";
         String methodName = "removeFrom"
             + CamelCase.toCamelCase(assocName, true) + "WithCheck";
         String inverse = createCollectionSetterInverse(mc, assoc, false);
 
         if (isInternal) {
             inverse = "";
-            visibility = "protected";
+            visibility = "";
             methodName += "Internal";
         }
 
-        result.append("    ").append(visibility).append(" void ")
+        result.append("    ").append(visibility).append("void ")
             .append(methodName).append("(List<? extends ")
             .append(assocClassName).append("BaseWrapper> ").append(assocName)
             .append(") throws BiobankCheckException {\n")

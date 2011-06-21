@@ -19,7 +19,9 @@ import java.util.List;
  * @see WrapperTransaction
  * 
  */
-class TaskList {
+// TODO: only public because of the internal package for wrappers. What is that
+// package necessary?
+public class TaskList {
     private final LinkedList<QueryTask> queryTasks = new LinkedList<QueryTask>();
     private final List<PreQueryTask> preQueryTasks = new ArrayList<PreQueryTask>();
 

@@ -10,7 +10,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
-class WrapperCascader<E> {
+public class WrapperCascader<E> {
     private final ModelWrapper<E> wrapper;
 
     WrapperCascader(ModelWrapper<E> wrapper) {
@@ -31,7 +31,9 @@ class WrapperCascader<E> {
         } else {
             ModelWrapper<T> wrapperProperty = wrapper.getWrappedProperty(
                 property, null);
-            tasks.add(wrapperProperty.getDeleteTasks());
+            if (wrapperProperty != null) {
+                tasks.add(wrapperProperty.getDeleteTasks());
+            }
         }
 
         return tasks;
@@ -56,7 +58,9 @@ class WrapperCascader<E> {
             } else {
                 ModelWrapper<T> wrapperProperty = wrapper.getWrappedProperty(
                     property, null);
-                tasks.add(wrapperProperty.getPersistTasks());
+                if (wrapperProperty != null) {
+                    tasks.add(wrapperProperty.getPersistTasks());
+                }
             }
         }
 

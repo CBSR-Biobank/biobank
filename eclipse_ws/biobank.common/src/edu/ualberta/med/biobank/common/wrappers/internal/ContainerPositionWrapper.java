@@ -84,9 +84,4 @@ public class ContainerPositionWrapper extends ContainerPositionBaseWrapper {
             }
         }
     }
-
-    @Override
-    public void reload() throws Exception {
-        super.reload();
-    }
 }

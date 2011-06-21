@@ -442,21 +442,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return constructor.newInstance();
     }
 
-    public void loadAttributes() throws Exception {
-        Class<E> classType = getWrappedClass();
-        if (classType == null) {
-            throw new Exception("wrapped class is null");
-        }
-        Method[] methods = classType.getMethods();
-        for (Method method : methods) {
-            if (method.getName().startsWith("get")
-                && !method.getName().equals("getClass")
-                && !Collection.class.isAssignableFrom(method.getReturnType())) {
-                method.invoke(wrappedObject, (Object[]) null);
-            }
-        }
-    }
-
     private static final String CHECK_NO_DUPLICATES = "select count(o) from {0} "
         + "as o where {1}=? {2}";
 
@@ -1093,7 +1078,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         propertyCache.put(property, value);
     }
 
-    protected boolean isPropertyCached(Property<?, ?> property) {
+    protected boolean isPropertyCached(Property<?, ? super E> property) {
         return propertyCache.containsKey(property);
     }
 

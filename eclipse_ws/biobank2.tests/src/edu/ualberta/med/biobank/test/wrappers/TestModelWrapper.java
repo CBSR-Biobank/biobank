@@ -131,13 +131,6 @@ public class TestModelWrapper extends TestDatabase {
     }
 
     @Test
-    public void testLoadAttributes() throws Exception {
-        String name = "testLoadAttributes";
-        SiteWrapper wrapper = SiteHelper.addSite(name);
-        wrapper.loadAttributes();
-    }
-
-    @Test
     public void testEquals() throws Exception {
         TestSiteWrapper wrapper = new TestSiteWrapper(appService);
         SiteWrapper site = SiteHelper.addSite("testEquals");

@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -20,8 +22,10 @@ import edu.ualberta.med.biobank.common.util.TypeReference;
  */
 public class Property<T, W> implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final Pattern NAME_SPLITTER = Pattern.compile("\\.");
 
     private final String name;
+    private final List<String> splitNames;
     private final String propertyChangeName;
     private final TypeInfo typeInfo;
     private final Accessor<T, W> accessor;
@@ -29,6 +33,7 @@ public class Property<T, W> implements Serializable {
     private Property(String name, TypeReference<T> typeReference,
         Accessor<T, W> accessor) {
         this.name = name;
+        this.splitNames = Arrays.asList(NAME_SPLITTER.split(name));
         this.propertyChangeName = name;
         this.typeInfo = new TypeInfo(typeReference);
         this.accessor = accessor;
@@ -37,6 +42,7 @@ public class Property<T, W> implements Serializable {
     private Property(String name, String propertyChangeName, TypeInfo typeInfo,
         Accessor<T, W> accessor) {
         this.name = name;
+        this.splitNames = Arrays.asList(NAME_SPLITTER.split(name));
         this.propertyChangeName = propertyChangeName;
         this.typeInfo = typeInfo;
         this.accessor = accessor;
@@ -85,6 +91,12 @@ public class Property<T, W> implements Serializable {
     public <T2> Property<T2, W> to(final Property<T2, ? super T> property) {
         return wrap(property.name, property);
     }
+
+    // TODO: write an "ofEach" method that could return a PropertyCollection
+    // with get() and set() methods that return and take lists, respectively?
+    // Could also make a PropertyName object that provides methods to construct
+    // an at-compile-time checked list of properties?? COOOOOOOL! ;-) e.g.
+    // PropertyName.start(SpecimenPeer.ID).ofEach(SpecimenPeer.CHILD_SPECIMEN_COLLECTION)).get();
 
     public <T2> Property<T2, W> wrap(final Property<T2, ? super T> property) {
         return wrap(property.name, property);
@@ -135,6 +147,19 @@ public class Property<T, W> implements Serializable {
         }
 
         return wrappedProperties;
+    }
+
+    /**
+     * Returns a copy of a {@code List} of the component names that make up the
+     * name of this {@code Property}. For example, if a {@code Property} has a
+     * name of "specimen" then this method would return ("specimen"). However,
+     * if a {@code Property} has a name of "specimen.container.id" then this
+     * method would return the list ("specimen", "container", "id").
+     * 
+     * @return
+     */
+    public List<String> getNames() {
+        return new ArrayList<String>(splitNames);
     }
 
     public static String concatNames(Property<?, ?>... props) {

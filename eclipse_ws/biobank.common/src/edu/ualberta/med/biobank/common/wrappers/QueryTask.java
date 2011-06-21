@@ -10,7 +10,7 @@ import gov.nih.nci.system.query.SDKQueryResult;
  * @author jferland
  * 
  */
-interface QueryTask {
+public interface QueryTask {
     /**
      * 
      * @return a (non-null) {@code SDKQuery} to execute.

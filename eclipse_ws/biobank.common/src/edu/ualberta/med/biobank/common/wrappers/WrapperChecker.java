@@ -6,6 +6,8 @@ import java.util.Collection;
 import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.CheckFieldLimitsException;
+import edu.ualberta.med.biobank.common.wrappers.actions.IfProperty;
+import edu.ualberta.med.biobank.common.wrappers.actions.IfProperty.Is;
 import edu.ualberta.med.biobank.common.wrappers.checks.CheckCollectionIsEmpty;
 import edu.ualberta.med.biobank.common.wrappers.checks.CheckNotNull;
 import edu.ualberta.med.biobank.common.wrappers.checks.CheckNotUsed;
@@ -13,7 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.checks.CheckUnique;
 import edu.ualberta.med.biobank.common.wrappers.checks.LazyMessage;
 import edu.ualberta.med.biobank.common.wrappers.checks.PostCheckLegalOption;
 
-class WrapperChecker<E> {
+public class WrapperChecker<E> {
     private final ModelWrapper<E> wrapper;
 
     WrapperChecker(ModelWrapper<E> wrapper) {
@@ -78,6 +80,11 @@ class WrapperChecker<E> {
         Property<? super E, ? super T> property, String exceptionMessage) {
         return new CheckNotUsed<E>(wrapper, property, propertyClass,
             exceptionMessage);
+    }
+
+    public <T> IfProperty<E> ifProperty(Property<?, ? super E> property, Is is,
+        BiobankWrapperAction<E> action) {
+        return new IfProperty<E>(property, is, action);
     }
 
     public TaskList stringLengths() {

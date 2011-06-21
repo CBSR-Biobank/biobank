@@ -1143,4 +1143,22 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return getContainerType().isPallet96();
     }
 
+    /**
+     * Return the top {@code Container} of the top loaded {@code Container}.
+     * This will give the correct "in memory" answer of who the top
+     * {@code Container} is (whereas super.getTopContainer() will give the value
+     * from the underlying model).
+     */
+    @Override
+    public ContainerWrapper getTopContainer() {
+        // if parent is cached, return their top Container, otherwise get and
+        // return mine (from super).
+        if (isPropertyCached(ContainerPeer.POSITION)
+            && getPosition().isPropertyCached(
+                ContainerPositionPeer.PARENT_CONTAINER)) {
+            return getParentContainer().getTopContainer();
+        } else {
+            return super.getTopContainer();
+        }
+    }
 }
