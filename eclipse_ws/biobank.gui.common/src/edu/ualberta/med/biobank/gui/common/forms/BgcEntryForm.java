@@ -118,7 +118,6 @@ public class BgcEntryForm extends BgcFormBase implements IBgcEntryForm {
     public void cancel() {
         // override me
     }
-
     @Override
     public void reset() {
         setDirty(false);

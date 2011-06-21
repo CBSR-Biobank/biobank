@@ -19,7 +19,7 @@ public class BgcResetHandler extends AbstractHandler implements IHandler {
             public void run() {
                 ((BgcEntryForm) PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getActivePage()
-                    .getActiveEditor()).cancel();
+                    .getActiveEditor()).reset();
             }
         });
         return null;
