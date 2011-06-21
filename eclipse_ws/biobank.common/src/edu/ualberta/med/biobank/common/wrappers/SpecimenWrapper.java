@@ -75,9 +75,10 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     public void setParent(ContainerWrapper container) {
-        SpecimenPositionWrapper pos = getSpecimenPosition();
-        if (pos != null) {
-            pos.setParent(container);
+        if (container == null) {
+            setSpecimenPosition(null);
+        } else {
+            initSpecimenPosition().setParent(container);
         }
     }
 
@@ -101,13 +102,19 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
     public void setPosition(RowColPos rcp) {
         if (rcp == null) {
-            setParent(null);
+            setSpecimenPosition(null);
         } else {
-            SpecimenPositionWrapper pos = getSpecimenPosition();
-            if (pos != null) {
-                pos.setPosition(rcp);
-            }
+            initSpecimenPosition().setPosition(rcp);
         }
+    }
+
+    private SpecimenPositionWrapper initSpecimenPosition() {
+        SpecimenPositionWrapper specimenPosition = getSpecimenPosition();
+        if (specimenPosition == null) {
+            specimenPosition = new SpecimenPositionWrapper(appService);
+            setSpecimenPosition(specimenPosition);
+        }
+        return specimenPosition;
     }
 
     public String getPositionString() {
@@ -470,7 +477,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     public SpecimenWrapper getTopSpecimen() {
         // if parent is cached, return their top specimen, otherwise get and
         // return mine (from super).
-        if (isPropertyCached(SpecimenPeer.PARENT_SPECIMEN)) {
+        if (isPropertyCached(SpecimenPeer.PARENT_SPECIMEN)
+            && getParentSpecimen() != null) {
             return getParentSpecimen().getTopSpecimen();
         } else {
             return super.getTopSpecimen();

@@ -125,7 +125,7 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
             " WHERE pos." + AbstractPositionPeer.ROW.getName() + " = ?" +
             " AND pos." + AbstractPositionPeer.COL.getName() + " = ?" +
             " AND pos.{1} = (SELECT this.{1} FROM {0} this WHERE this = ?)" +
-            " AND o <> ?";
+            " AND pos <> ?";
         // @formatter:on
         private static final String UNAVAILABLE_POSITION_MSG = "Position {0}:{1} in container {2} is not available.";
 
@@ -208,6 +208,8 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
                 maxColProperty.getName(), getModelClass().getName());
 
             Query query = session.createQuery(hql);
+            query.setParameter(0, getModel());
+
             List<?> list = query.list();
 
             Integer maxRow = null, maxCol = null;

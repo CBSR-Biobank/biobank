@@ -31,6 +31,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.InvalidOptionException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -239,16 +240,6 @@ public class TestSpecimen extends TestDatabase {
 
         childSpc.setSpecimenType(oldSpecimenType);
         childSpc.persist();
-
-        ContainerWrapper container = new ContainerWrapper(appService);
-        SpecimenWrapper specimen = new SpecimenWrapper(appService);
-        specimen.setParent(container);
-        try {
-            specimen.persist();
-            Assert.fail("container has no container type");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
     }
 
     @Test
@@ -271,7 +262,7 @@ public class TestSpecimen extends TestDatabase {
         try {
             type1.delete();
             Assert.fail("cannot delete a type in use by a specimen");
-        } catch (BiobankCheckException bce) {
+        } catch (ModelIsUsedException e) {
             Assert.assertTrue(true);
         }
 
@@ -292,7 +283,7 @@ public class TestSpecimen extends TestDatabase {
         try {
             type2.delete();
             Assert.fail("cannot delete a type in use by a specimen");
-        } catch (BiobankCheckException bce) {
+        } catch (ModelIsUsedException e) {
             Assert.assertTrue(true);
         }
 
@@ -652,13 +643,17 @@ public class TestSpecimen extends TestDatabase {
         specimen.setInventoryId(Utils.getRandomString(5));
         specimen.persist();
 
-        pevent.addToSpecimenCollection(Arrays.asList(specimen));
+        pevent.addToSpecimenCollection(Arrays.asList(parentSpc));
         pevent.persist();
 
-        SpecimenHelper.newSpecimen(childSpc, childSpc.getSpecimenType(),
+        SpecimenWrapper s2 = SpecimenHelper.newSpecimen(childSpc,
+            childSpc.getSpecimenType(),
             ActivityStatusWrapper.ACTIVE_STATUS_STRING,
             childSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
             childSpc.getParentContainer(), 2, 4);
+        s2.setParent(null);
+        s2.setParentSpecimen(null);
+        s2.persist();
 
         try {
             Assert.assertTrue(DebugUtil.getRandomLinkedAliquotedSpecimens(
@@ -672,6 +667,11 @@ public class TestSpecimen extends TestDatabase {
             Assert.fail(e.getCause().getMessage());
         }
 
+        try {
+            s2.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /*
