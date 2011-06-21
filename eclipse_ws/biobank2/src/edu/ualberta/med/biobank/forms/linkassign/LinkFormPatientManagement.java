@@ -340,12 +340,15 @@ public class LinkFormPatientManagement {
             .getSelection();
         IStructuredSelection cEventSelection = (IStructuredSelection) viewerCollectionEvents
             .getSelection();
+        if (patientNumberText.isDisposed())
+            return false;
         return patientValidator.validate(patientNumberText.getText()).equals(
             Status.OK_STATUS)
             && pEventSelection.size() > 0 && cEventSelection.size() > 0;
     }
 
     public void setProcessingEventListFromPatient() {
+        currentPEventSelected = null;
         if (viewerProcessingEvents != null) {
             if (currentPatient != null) {
                 List<ProcessingEventWrapper> collection = null;
@@ -368,6 +371,7 @@ public class LinkFormPatientManagement {
                 if (collection != null && collection.size() == 1) {
                     viewerProcessingEvents
                         .setSelection(new StructuredSelection(collection.get(0)));
+                    currentPEventSelected = collection.get(0);
                 } else {
                     viewerProcessingEvents.getCombo().deselectAll();
                 }
@@ -378,9 +382,11 @@ public class LinkFormPatientManagement {
                 pEventText.setText(""); //$NON-NLS-1$
             }
         }
+        viewerProcessingEvents.getCombo().setFocus();
     }
 
     public void setCollectionEventListFromPEvent() {
+        currentCEventSelected = null;
         if (viewerCollectionEvents != null) {
             settingCollectionEvent = true;
             if (currentPEventSelected != null) {
@@ -396,6 +402,8 @@ public class LinkFormPatientManagement {
                 if (collection != null && collection.size() == 1) {
                     viewerCollectionEvents
                         .setSelection(new StructuredSelection(collection.get(0)));
+                    currentCEventSelected = collection.get(0);
+                    cEventComboCallback.selectionChanged();
                 } else {
                     viewerCollectionEvents.getCombo().deselectAll();
                 }
@@ -411,7 +419,7 @@ public class LinkFormPatientManagement {
     }
 
     protected List<SpecimenWrapper> getParentSpecimenForPEventAndCEvent() {
-        if (currentCEventSelected == null)
+        if (currentCEventSelected == null || currentPEventSelected == null)
             return Collections.emptyList();
         List<SpecimenWrapper> specs;
         try {

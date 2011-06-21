@@ -310,6 +310,7 @@ public abstract class AbstractLinkAssignEntryForm extends
         if (focusComposite != null)
             focusComposite.setFocus();
         page.layout(true, true);
+        book.reflow(true);
     }
 
     protected Composite getFocusedComposite(
