@@ -42,9 +42,9 @@ public class TestHibernateLocking extends TestDatabase {
 
             // TEST BEGINS
             SpecimenWrapper ob1 = SpecimenWrapper.getSpecimen(appService,
-                "aaaa", null);
+                "aaaa");
             SpecimenWrapper ob2 = SpecimenWrapper.getSpecimen(appService,
-                "aaaa", null);
+                "aaaa");
 
             DispatchSpecimenWrapper ds1 = new DispatchSpecimenWrapper(
                 appService);
@@ -66,7 +66,7 @@ public class TestHibernateLocking extends TestDatabase {
             e.printStackTrace();
             SpecimenWrapper ob;
             try {
-                ob = SpecimenWrapper.getSpecimen(appService, "aaaa", null);
+                ob = SpecimenWrapper.getSpecimen(appService, "aaaa");
                 System.out.println(ob.getCurrentCenter());
             } catch (BiobankCheckException e1) {
                 // TODO Auto-generated catch block

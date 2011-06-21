@@ -65,10 +65,12 @@ public class CollectionEventAdapter extends AdapterBase {
                     BgcPlugin.openAsyncError("Error",
                         "Unable to create collection event.");
                 }
-            } else
+            } else {
+                CollectionEventWrapper cevent = (CollectionEventWrapper) modelObject;
                 tabName = Messages.getString(
-                    "CollectionEventEntryForm.title.edit",
-                    ((CollectionEventWrapper) modelObject).getVisitNumber());
+                    "CollectionEventEntryForm.title.edit", cevent.getPatient()
+                        .getPnumber(), cevent.getVisitNumber());
+            }
         return tabName;
     }
 

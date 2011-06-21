@@ -183,11 +183,8 @@ public class BiobankSecurityUtil {
                 for (edu.ualberta.med.biobank.common.security.Group group : getSecurityGroups(true)) {
                     allGroups.put(group.getId(), group);
                 }
-                for (Object g : upm.getObjects(new GroupSearchCriteria(
-                    new Group()))) {
-                    Group serverGroup = (Group) g;
-                    for (Object u : upm.getUsers(serverGroup.getGroupId()
-                        .toString())) {
+                for (Long groupId : allGroups.keySet()) {
+                    for (Object u : upm.getUsers(groupId.toString())) {
                         User serverUser = (User) u;
                         if (!allUsers.containsKey(serverUser.getUserId())) {
                             list.add(createUser(upm, serverUser, allGroups));
@@ -202,7 +199,7 @@ public class BiobankSecurityUtil {
             }
         } else {
             throw new ApplicationException(
-                "Only Website Administrators can retrieve security users");
+                "Only Website Administrators can retrieve all security users");
         }
     }
 

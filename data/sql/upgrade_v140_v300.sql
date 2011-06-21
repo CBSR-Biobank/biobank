@@ -22,6 +22,29 @@ ALTER TABLE request
       ADD CONSTRAINT FK6C1A7E6F80AB67E FOREIGN KEY FK6C1A7E6F80AB67E (REQUESTER_ID) REFERENCES center (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 /*****************************************************
+ * Source specimens - set activity status to closed
+ ****************************************************/
+
+set @asclosed = null;
+
+select id from activity_status where name='Closed' into @asclosed;
+
+update specimen spc
+       set activity_status_id=@asclosed
+       where top_specimen_id=id;
+
+/*****************************************************
+ * Timezones
+ ****************************************************/
+
+update log set created_at = convert_tz(created_at, 'Canada/Mountain', 'GMT');
+update patient set created_at = convert_tz(created_at, 'Canada/Mountain', 'GMT');
+update processing_event set created_at = convert_tz(created_at, 'Canada/Mountain', 'GMT');
+update shipment_info set packed_at = convert_tz(packed_at, 'Canada/Mountain', 'GMT');
+update shipment_info set received_at = convert_tz(received_at, 'Canada/Mountain', 'GMT');
+update specimen set created_at = convert_tz(created_at, 'Canada/Mountain', 'GMT');
+
+/*****************************************************
  * Container
  ****************************************************/
 

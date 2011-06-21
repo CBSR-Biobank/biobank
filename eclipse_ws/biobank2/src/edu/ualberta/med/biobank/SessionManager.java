@@ -97,7 +97,7 @@ public class SessionManager {
         IWorkbench workbench = BiobankPlugin.getDefault().getWorkbench();
         IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
             .getActivePage();
-        updateVisibility(page);
+        updateVisibility(page, true);
     }
 
     public void deleteSession() throws Exception {
@@ -336,7 +336,7 @@ public class SessionManager {
         return getUser().isInSuperAdminMode();
     }
 
-    public static void updateVisibility(IWorkbenchPage page) {
+    public static void updateVisibility(IWorkbenchPage page, boolean login) {
         try {
             SessionManager sm = getInstance();
             if (sm.isConnected()) {
@@ -350,7 +350,9 @@ public class SessionManager {
         } catch (PartInitException e) {
             BgcPlugin.openAsyncError("Error displaying available actions", e);
         }
-        if (page.getViewReferences().length == 0)
+        // don't want to switch if was activated by an handler after login
+        // (display is weird otherwise)
+        if (login && page.getViewReferences().length == 0)
             try {
                 page.getWorkbenchWindow()
                     .getWorkbench()

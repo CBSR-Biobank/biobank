@@ -46,6 +46,8 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private BgcBaseText centerLabel;
 
+    private BgcBaseText originCenterLabel;
+
     private BgcBaseText patientField;
 
     @Override
@@ -101,9 +103,6 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             specimenTypes.add(specimen.getSpecimenType());
         }
 
-        centerLabel = createReadOnlyLabelledField(client, SWT.NONE, "Center");
-        setTextValue(centerLabel, specimen.getCenterString());
-
         specimenTypeComboViewer = createComboViewer(client, "Type",
             specimenTypes, specimen.getSpecimenType(),
             "Specimen must have a type", new ComboSelectionUpdate() {
@@ -133,7 +132,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         createReadOnlyLabelledField(client, SWT.NONE, "Study", specimen
             .getCollectionEvent().getPatient().getStudy().getNameShort());
 
-        Label label = widgetCreator.createLabel(client, "Patient Number");
+        Label label = widgetCreator.createLabel(client, "Patient");
 
         Composite c = new Composite(client, SWT.NONE);
         GridData gd = new GridData();
@@ -180,6 +179,14 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 }
             }
         });
+
+        originCenterLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Origin center");
+        setTextValue(originCenterLabel, specimen.getOriginInfo().getCenter()
+            .getNameShort());
+        centerLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Current center");
+        setTextValue(centerLabel, specimen.getCenterString());
 
         createReadOnlyLabelledField(client, SWT.NONE, "Position",
             specimen.getPositionString(true, false));

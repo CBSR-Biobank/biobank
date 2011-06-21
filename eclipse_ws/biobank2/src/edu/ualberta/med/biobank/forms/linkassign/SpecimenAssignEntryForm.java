@@ -171,6 +171,14 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
+    protected void setFirstControl(Mode mode) {
+        if (mode.isSingleMode())
+            setFirstControl(inventoryIdText);
+        else
+            setFirstControl(useScannerButton);
+    }
+
+    @Override
     protected String getOkMessage() {
         return Messages.getString("SpecimenAssign.okmessage"); //$NON-NLS-1$
     }
@@ -310,7 +318,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             "SpecimenAssign.single.activitylog.gettingInfoId", //$NON-NLS-1$
             singleSpecimen.getInventoryId()));
         SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(appService,
-            singleSpecimen.getInventoryId(), SessionManager.getUser());
+            singleSpecimen.getInventoryId());
         if (foundSpecimen == null) {
             throw new Exception(Messages.getString(
                 "SpecimenAssign.single.inventoryId.error", //$NON-NLS-1$
@@ -583,7 +591,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         createPalletTypesViewer(multipleOptionsFields);
 
         createPlateToScanField(multipleOptionsFields);
-        // showPlateToScanField(useScanner && !mode.isSingleMode());
 
         createScanButton(parent);
     }
@@ -794,6 +801,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected void defaultInitialisation() {
+        super.defaultInitialisation();
         useScannerButton.setSelection(useScanner);
         setUseScanner(useScanner);
     }

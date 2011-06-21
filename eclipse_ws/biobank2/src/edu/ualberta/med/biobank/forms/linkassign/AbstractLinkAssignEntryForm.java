@@ -133,16 +133,20 @@ public abstract class AbstractLinkAssignEntryForm extends
 
         toolkit.adapt(mainComposite);
 
-        defaultInitialisation();
-
         Mode mode = initialisationMode();
+        setFirstControl(mode);
         radioSingle.setSelection(mode == Mode.SINGLE_NO_POSITION);
         radioSinglePosition.setSelection(mode == Mode.SINGLE_POSITION);
         radioMultiple.setSelection(mode == Mode.MULTIPLE);
         showModeComposite(mode);
+        defaultInitialisation();
         widgetCreator.showWidget(radioSinglePosition, showSinglePosition());
         showOnlyPallet(true);
         form.layout(true, true);
+    }
+
+    protected void setFirstControl(@SuppressWarnings("unused") Mode mode) {
+
     }
 
     protected boolean showSinglePosition() {
@@ -150,6 +154,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     }
 
     protected void defaultInitialisation() {
+
     }
 
     protected void setNeedSinglePosition(
@@ -305,6 +310,7 @@ public abstract class AbstractLinkAssignEntryForm extends
         if (focusComposite != null)
             focusComposite.setFocus();
         page.layout(true, true);
+        book.reflow(true);
     }
 
     protected Composite getFocusedComposite(
@@ -499,8 +505,10 @@ public abstract class AbstractLinkAssignEntryForm extends
     protected void onReset() throws Exception {
         super.onReset();
         singleSpecimen.initObjectWith(new SpecimenWrapper(appService));
+        singleSpecimen.reset();
         setDirty(false);
         reset(true);
+        setFocus();
     }
 
     protected void reset(boolean resetAll) {

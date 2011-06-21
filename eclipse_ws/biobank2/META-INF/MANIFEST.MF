@@ -23,7 +23,7 @@ Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.eclipse.co
  e.equinox.p2.ui.sdk.scheduler;bundle-version="1.0.0",biobank.gui.comm
  on;bundle-version="1.0.0",sampleProcessingRobot;bundle-version="1.0.0
  ";resolution:=optional
-Bundle-Version: 3.0.0.rc1
+Bundle-Version: 3.0.0.rc3
 Bundle-Vendor: AICML
 Bundle-Localization: plugin
 Export-Package: edu.ualberta.med.biobank

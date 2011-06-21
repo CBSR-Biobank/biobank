@@ -259,13 +259,14 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 Date date;
                 if (currentInstance.radioDateReceived.getSelection()) {
                     text = "Received";
-                    date = (Date) originInfo.getShipmentInfo().getReceivedAt()
-                        .clone();
+                    date = originInfo.getShipmentInfo().getReceivedAt();
                 } else {
                     text = "Packed";
-                    date = (Date) originInfo.getShipmentInfo().getPackedAt()
-                        .clone();
+                    date = originInfo.getShipmentInfo().getPackedAt();
                 }
+                if (date == null)
+                    return null;
+                date = (Date) date.clone();
                 Calendar c = Calendar.getInstance();
                 c.setTime(date);
                 c.set(Calendar.SECOND, 0);
