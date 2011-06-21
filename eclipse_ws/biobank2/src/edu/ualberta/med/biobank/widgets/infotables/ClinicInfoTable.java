@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -30,8 +31,13 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         }
     }
 
-    private static final String[] HEADINGS = new String[] { Messages.ClinicInfoTable_name_label,
-        Messages.ClinicInfoTable_nameshort_label, Messages.ClinicInfoTable_study_count_label, Messages.ClinicInfoTable_status_label, Messages.ClinicInfoTable_patients_label, Messages.ClinicInfoTable_visits_label };
+    private static final String[] HEADINGS = new String[] {
+        Messages.ClinicInfoTable_name_label,
+        Messages.ClinicInfoTable_nameshort_label,
+        Messages.ClinicInfoTable_study_count_label,
+        Messages.ClinicInfoTable_status_label,
+        Messages.ClinicInfoTable_patients_label,
+        Messages.ClinicInfoTable_visits_label };
 
     public ClinicInfoTable(Composite parent, List<ClinicWrapper> collection) {
         super(parent, collection, HEADINGS, 10);
@@ -55,13 +61,13 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
                 case 1:
                     return item.clinicNameShort;
                 case 2:
-                    return item.studyCount.toString();
+                    return NumberFormatter.format(item.studyCount);
                 case 3:
                     return item.status;
                 case 4:
-                    return item.patientCount.toString();
+                    return NumberFormatter.format(item.patientCount);
                 case 5:
-                    return item.visitCount.toString();
+                    return NumberFormatter.format(item.visitCount);
                 default:
                     return ""; //$NON-NLS-1$
                 }

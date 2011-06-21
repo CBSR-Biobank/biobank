@@ -9,6 +9,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -37,8 +38,13 @@ public class ContainerTypeInfoTable extends
         }
     }
 
-    private static final String[] HEADINGS = new String[] { Messages.ContainerTypeInfoTable_name_label,
-        Messages.ContainerTypeInfoTable_nameshort_label, Messages.ContainerTypeInfoTable_capacity_label, Messages.ContainerTypeInfoTable_status_label, Messages.ContainerTypeInfoTable_use_label, Messages.ContainerTypeInfoTable_temperature_label };
+    private static final String[] HEADINGS = new String[] {
+        Messages.ContainerTypeInfoTable_name_label,
+        Messages.ContainerTypeInfoTable_nameshort_label,
+        Messages.ContainerTypeInfoTable_capacity_label,
+        Messages.ContainerTypeInfoTable_status_label,
+        Messages.ContainerTypeInfoTable_use_label,
+        Messages.ContainerTypeInfoTable_temperature_label };
 
     private SiteAdapter siteAdapter;
 
@@ -66,16 +72,13 @@ public class ContainerTypeInfoTable extends
                 case 1:
                     return item.nameShort;
                 case 2:
-                    return (item.capacity != null) ? item.capacity.toString()
-                        : null;
+                    return NumberFormatter.format(item.capacity);
                 case 3:
                     return item.status;
                 case 4:
-                    return (item.inUseCount != null) ? item.inUseCount
-                        .toString() : null;
+                    return NumberFormatter.format(item.inUseCount);
                 case 5:
-                    return (item.temperature != null) ? item.temperature
-                        .toString() : null;
+                    return NumberFormatter.format(item.temperature);
                 default:
                     return ""; //$NON-NLS-1$
                 }

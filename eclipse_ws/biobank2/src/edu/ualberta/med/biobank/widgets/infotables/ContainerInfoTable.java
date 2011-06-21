@@ -9,6 +9,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -35,8 +36,12 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
         }
     }
 
-    private static final String[] HEADINGS = new String[] { Messages.ContainerInfoTable_name_label,
-        Messages.ContainerInfoTable_type_label, Messages.ContainerInfoTable_status_label, Messages.ContainerInfoTable_barcode_label, Messages.ContainerInfoTable_temperature_label };
+    private static final String[] HEADINGS = new String[] {
+        Messages.ContainerInfoTable_name_label,
+        Messages.ContainerInfoTable_type_label,
+        Messages.ContainerInfoTable_status_label,
+        Messages.ContainerInfoTable_barcode_label,
+        Messages.ContainerInfoTable_temperature_label };
 
     private SiteAdapter siteAdapter;
 
@@ -69,10 +74,7 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
                 case 3:
                     return item.barcode;
                 case 4:
-                    if (item.temperature == null) {
-                        return ""; //$NON-NLS-1$
-                    }
-                    return item.temperature.toString();
+                    NumberFormatter.format(item.temperature);
                 default:
                     return ""; //$NON-NLS-1$
                 }

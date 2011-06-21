@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -24,8 +25,10 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         }
     }
 
-    private static final String[] HEADINGS = new String[] { Messages.ClinicStudyInfoTable_study_label,
-        Messages.ClinicStudyInfoTable_patient_count_label, Messages.ClinicStudyInfoTable_cvent_count_label };
+    private static final String[] HEADINGS = new String[] {
+        Messages.ClinicStudyInfoTable_study_label,
+        Messages.ClinicStudyInfoTable_patient_count_label,
+        Messages.ClinicStudyInfoTable_cvent_count_label };
 
     private ClinicWrapper clinic;
 
@@ -52,11 +55,9 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
                 case 0:
                     return item.studyShortName;
                 case 1:
-                    return (item.patientCount != null) ? item.patientCount
-                        .toString() : ""; //$NON-NLS-1$
+                    return NumberFormatter.format(item.patientCount);
                 case 2:
-                    return (item.visitCount != null) ? item.visitCount
-                        .toString() : ""; //$NON-NLS-1$
+                    return NumberFormatter.format(item.visitCount);
                 default:
                     return ""; //$NON-NLS-1$
                 }

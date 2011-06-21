@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -33,8 +34,12 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         }
     }
 
-    private static final String[] HEADINGS = new String[] { Messages.StudyContactInfoTable_clinic_label,
-        Messages.StudyContactInfoTable_patient_count_label, Messages.StudyContactInfoTable_cEvent_count_label, Messages.StudyContactInfoTable_contact_name_label, Messages.StudyContactInfoTable_contact_title_label };
+    private static final String[] HEADINGS = new String[] {
+        Messages.StudyContactInfoTable_clinic_label,
+        Messages.StudyContactInfoTable_patient_count_label,
+        Messages.StudyContactInfoTable_cEvent_count_label,
+        Messages.StudyContactInfoTable_contact_name_label,
+        Messages.StudyContactInfoTable_contact_title_label };
 
     private StudyWrapper study;
 
@@ -70,11 +75,9 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
                 case 0:
                     return item.clinicNameShort;
                 case 1:
-                    return (item.patientCount != null) ? item.patientCount
-                        .toString() : ""; //$NON-NLS-1$
+                    return NumberFormatter.format(item.patientCount);
                 case 2:
-                    return (item.ceventCount != null) ? item.ceventCount
-                        .toString() : ""; //$NON-NLS-1$
+                    return NumberFormatter.format(item.ceventCount);
                 case 3:
                     return item.contactName;
                 case 4:

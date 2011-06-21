@@ -121,8 +121,6 @@ public class Messages extends NLS {
 
     public static String SpecimenInfoTable_position_label;
 
-    public static String SpecimenInfoTable_quantiry_label;
-
     public static String SpecimenInfoTable_quantity_label;
 
     public static String SpecimenInfoTable_status_label;

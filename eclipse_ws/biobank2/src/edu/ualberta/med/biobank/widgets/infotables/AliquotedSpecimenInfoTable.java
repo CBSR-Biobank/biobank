@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -74,10 +75,9 @@ public class AliquotedSpecimenInfoTable extends
                 case 0:
                     return item.typeName;
                 case 1:
-                    return (item.volume != null) ? item.volume.toString() : ""; //$NON-NLS-1$
+                    return NumberFormatter.format(item.volume);
                 case 2:
-                    return (item.quantity != null) ? item.quantity.toString()
-                        : ""; //$NON-NLS-1$
+                    return NumberFormatter.format(item.quantity);
                 case 3:
                     return item.status;
                 default:

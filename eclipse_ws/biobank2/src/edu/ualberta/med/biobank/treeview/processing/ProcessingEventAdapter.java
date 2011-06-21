@@ -8,6 +8,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.forms.ProcessingEventEntryForm;
@@ -49,7 +50,7 @@ public class ProcessingEventAdapter extends AdapterBase {
         } catch (Exception e) {
             logger.error("Problem counting specimens", e); //$NON-NLS-1$
         }
-        return name + " [" + count + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+        return name + " [" + NumberFormatter.format(count) + "]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override

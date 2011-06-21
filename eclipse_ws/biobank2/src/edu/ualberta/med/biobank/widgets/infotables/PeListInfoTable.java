@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -27,8 +28,11 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
         }
     }
 
-    private static final String[] HEADINGS = new String[] { Messages.PeListInfoTable_start_label,
-        Messages.PeListInfoTable_study_label, Messages.PeListInfoTable_sources_label, Messages.PeListInfoTable_aliquoteds_label };
+    private static final String[] HEADINGS = new String[] {
+        Messages.PeListInfoTable_start_label,
+        Messages.PeListInfoTable_study_label,
+        Messages.PeListInfoTable_sources_label,
+        Messages.PeListInfoTable_aliquoteds_label };
 
     public PeListInfoTable(Composite parent, List<ProcessingEventWrapper> pvs) {
         super(parent, pvs, HEADINGS, PAGE_SIZE_ROWS);
@@ -52,9 +56,9 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
                 case 1:
                     return item.studyNameShort;
                 case 2:
-                    return item.numSVs.toString();
+                    return NumberFormatter.format(item.numSVs);
                 case 3:
-                    return item.numAliquots.toString();
+                    return NumberFormatter.format(item.numAliquots);
                 default:
                     return ""; //$NON-NLS-1$
                 }

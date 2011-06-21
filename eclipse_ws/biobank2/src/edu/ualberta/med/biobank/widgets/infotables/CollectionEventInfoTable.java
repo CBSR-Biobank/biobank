@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -55,9 +56,11 @@ public class CollectionEventInfoTable extends
                 case 0:
                     return info.visitNumber.toString();
                 case 1:
-                    return String.valueOf(info.sourceSpecimenCount);
+                    return NumberFormatter
+                        .format(info.sourceSpecimenCount);
                 case 2:
-                    return String.valueOf(info.aliquotedSpecimenCount);
+                    return NumberFormatter
+                        .format(info.aliquotedSpecimenCount);
                 case 3:
                     return info.comment;
 

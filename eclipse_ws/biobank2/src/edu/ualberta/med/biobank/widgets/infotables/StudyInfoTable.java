@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -27,8 +28,12 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         }
     }
 
-    private static final String[] HEADINGS = new String[] { Messages.StudyInfoTable_name_label,
-        Messages.StudyInfoTable_nameshort_label, Messages.StudyInfoTable_status_label, Messages.StudyInfoTable_patients_label, Messages.StudyInfoTable_visits_label };
+    private static final String[] HEADINGS = new String[] {
+        Messages.StudyInfoTable_name_label,
+        Messages.StudyInfoTable_nameshort_label,
+        Messages.StudyInfoTable_status_label,
+        Messages.StudyInfoTable_patients_label,
+        Messages.StudyInfoTable_visits_label };
 
     public StudyInfoTable(Composite parent, List<StudyWrapper> collection) {
         super(parent, collection, HEADINGS, 10);
@@ -54,11 +59,9 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
                 case 2:
                     return (info.status != null) ? info.status : ""; //$NON-NLS-1$
                 case 3:
-                    return (info.patientCount != null) ? info.patientCount
-                        .toString() : ""; //$NON-NLS-1$
+                    return NumberFormatter.format(info.patientCount);
                 case 4:
-                    return (info.visitCount != null) ? info.visitCount
-                        .toString() : ""; //$NON-NLS-1$
+                    return NumberFormatter.format(info.visitCount);
                 default:
                     return ""; //$NON-NLS-1$
                 }

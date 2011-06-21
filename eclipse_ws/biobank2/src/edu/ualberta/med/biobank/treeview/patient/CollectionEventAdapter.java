@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -46,7 +47,8 @@ public class CollectionEventAdapter extends AdapterBase {
         } catch (Exception e) {
             logger.error("Problem counting specimens", e); //$NON-NLS-1$
         }
-        return name.append(" [").append(count).append("]").toString(); //$NON-NLS-1$ //$NON-NLS-2$
+        return name.append(" [").append(NumberFormatter.format(count)) //$NON-NLS-1$ 
+            .append("]").toString(); //$NON-NLS-1$ 
     }
 
     @Override
@@ -61,7 +63,8 @@ public class CollectionEventAdapter extends AdapterBase {
                             .getActiveActivityStatus(SessionManager
                                 .getAppService()));
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError(Messages.CollectionEventAdapter_error_title,
+                    BgcPlugin.openAsyncError(
+                        Messages.CollectionEventAdapter_error_title,
                         Messages.CollectionEventAdapter_create_error_msg);
                 }
             } else
