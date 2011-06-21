@@ -24,8 +24,6 @@ public class Messages extends NLS {
 
     public static String LoginDialog_noWorkingCenter_error_msg;
 
-    public static String LoginDialog_openperspective_error_msg;
-
     public static String LoginDialog_password_label;
 
     public static String LoginDialog_password_validaton_msg;
@@ -37,8 +35,6 @@ public class Messages extends NLS {
     public static String LoginDialog_workingCenterSelection_error_msg;
 
     public static String LoginDialog_workingCenterSelection_error_title;
-
-    public static String LoginDialog_secure_connection_label;
 
     public static String LoginDialog_server_label;
 
@@ -53,8 +49,6 @@ public class Messages extends NLS {
     public static String LoginDialog_superAdmin_error_title;
 
     public static String LoginDialog_superAdmin_label;
-
-    public static String LoginDialog_user_error_msg;
 
     public static String LoginDialog_user_error_title;
 

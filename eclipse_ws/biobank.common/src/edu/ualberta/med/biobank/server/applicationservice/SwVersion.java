@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.VersionInvalidException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.VersionFormatInvalidException;
 
 /**
  * The following is as per http://wiki.eclipse.org/index.php/Version_Numbering
@@ -23,12 +23,11 @@ public class SwVersion {
         this.qualifier = ""; //$NON-NLS-1$
     }
 
-    public SwVersion(String versionString) throws VersionInvalidException {
+    public SwVersion(String versionString) throws VersionFormatInvalidException {
         String[] versionSplit = versionString.split("\\."); //$NON-NLS-1$
 
         if (versionSplit.length < 3 || versionSplit.length > 4) {
-            throw new VersionInvalidException(
-                Messages.getString("SwVersion.version.format.error.msg")); //$NON-NLS-1$
+            throw new VersionFormatInvalidException();
         }
 
         try {
@@ -36,8 +35,7 @@ public class SwVersion {
             this.minor = Integer.parseInt(versionSplit[1]);
             this.service = Integer.parseInt(versionSplit[2]);
         } catch (NumberFormatException e) {
-            throw new VersionInvalidException(
-                Messages.getString("SwVersion.version.format.error.msg")); //$NON-NLS-1$
+            throw new VersionFormatInvalidException();
         }
         if (versionSplit.length == 4)
             this.qualifier = versionSplit[3];

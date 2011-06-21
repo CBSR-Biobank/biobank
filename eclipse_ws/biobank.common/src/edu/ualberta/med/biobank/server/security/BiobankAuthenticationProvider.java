@@ -10,6 +10,10 @@ import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.acegisecurity.userdetails.UserDetails;
 
+/**
+ * Don't really need to translate this text since this message will only be
+ * displayed in stacktraces.
+ */
 public class BiobankAuthenticationProvider extends CSMAuthenticationProvider {
 
     @Override
@@ -28,7 +32,7 @@ public class BiobankAuthenticationProvider extends CSMAuthenticationProvider {
                 throw new BadCredentialsException(
                     MessageFormat
                         .format(
-                            Messages.getString("BiobankAuthenticationProvider.failed_connection_msg"), //$NON-NLS-1$
+                            "At least 3 failed connection attempts. Login for ''{0}'' disabled for 30 min.", //$NON-NLS-1$
                             user));
             }
             throw e;

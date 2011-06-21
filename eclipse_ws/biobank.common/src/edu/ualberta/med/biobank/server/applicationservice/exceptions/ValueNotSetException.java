@@ -5,7 +5,8 @@ import java.text.MessageFormat;
 public class ValueNotSetException extends BiobankServerException {
     private static final long serialVersionUID = 1L;
 
-    private static final String MSG_PATTERN = Messages.getString("ValueNotSetException.value_not_set_msg"); //$NON-NLS-1$
+    private static final String MSG_PATTERN = Messages
+        .getString("ValueNotSetException.value_not_set_msg"); //$NON-NLS-1$
 
     private String propertyName;
 
@@ -36,4 +37,10 @@ public class ValueNotSetException extends BiobankServerException {
     public String getObjectName() {
         return objectName;
     }
+
+    @Override
+    public String getMessage() {
+        return MessageFormat.format(MSG_PATTERN, propertyName, objectName);
+    }
+
 }

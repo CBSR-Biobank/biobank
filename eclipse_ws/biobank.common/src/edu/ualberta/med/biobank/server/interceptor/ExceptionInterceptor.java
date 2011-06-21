@@ -4,7 +4,6 @@ import java.sql.BatchUpdateException;
 
 import org.hibernate.PropertyValueException;
 import org.hibernate.validator.InvalidStateException;
-import org.hibernate.validator.InvalidValue;
 import org.springframework.aop.ThrowsAdvice;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -29,16 +28,7 @@ public class ExceptionInterceptor implements ThrowsAdvice {
      */
     public void afterThrowing(InvalidStateException ise)
         throws ValidationException {
-        StringBuffer message = new StringBuffer();
-        for (int i = 0; i < ise.getInvalidValues().length; i++) {
-            InvalidValue iv = ise.getInvalidValues()[i];
-            message.append(iv.getBeanClass().getSimpleName()).append(": ") //$NON-NLS-1$
-                .append(iv.getPropertyName()).append(" ") //$NON-NLS-1$
-                .append(iv.getMessage());
-            if (i != ise.getInvalidValues().length - 1)
-                message.append(". "); //$NON-NLS-1$
-        }
-        throw new ValidationException(message.toString(), ise);
+        throw new ValidationException(ise);
     }
 
     public void afterThrowing(ApplicationException ae)

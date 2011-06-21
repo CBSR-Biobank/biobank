@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ClientVersi
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionInvalidException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionNewerException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionOlderException;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.VersionInvalidException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.VersionFormatInvalidException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 import java.io.FileNotFoundException;
@@ -41,18 +41,14 @@ public class BiobankVersionUtil {
         throws ApplicationException {
         if (props == null) {
             log.error("server does not have a version"); //$NON-NLS-1$
-            throw new ServerVersionInvalidException(
-                Messages
-                    .getString("BiobankVersionUtil.server_version_error_msg")); //$NON-NLS-1$
+            throw new ServerVersionInvalidException();
         }
 
         String serverVersionStr = props.getProperty(SERVER_VERSION_PROP_KEY);
 
         if (serverVersionStr == null) {
             log.error("server does not have a version"); //$NON-NLS-1$
-            throw new ServerVersionInvalidException(
-                Messages
-                    .getString("BiobankVersionUtil.server_version_error_msg")); //$NON-NLS-1$
+            throw new ServerVersionInvalidException();
         }
 
         try {
@@ -60,8 +56,7 @@ public class BiobankVersionUtil {
 
             if (clientVersionStr == null) {
                 log.error("client does not have a version"); //$NON-NLS-1$
-                throw new ClientVersionInvalidException(
-                    Messages.getString("BiobankVersionUtil.compatibility_error_msg")); //$NON-NLS-1$
+                throw new ClientVersionInvalidException();
             }
 
             try {
@@ -71,29 +66,22 @@ public class BiobankVersionUtil {
                     + " client_version/" + clientVersionStr); //$NON-NLS-1$
 
                 if (clientVersion.getMajor() < serverVersion.getMajor()) {
-                    throw new ServerVersionNewerException(
-                        Messages.getString("BiobankVersionUtil.tooold_error_msg")); //$NON-NLS-1$
+                    throw new ServerVersionNewerException();
                 } else if (clientVersion.getMajor() > serverVersion.getMajor()) {
-                    throw new ServerVersionOlderException(
-                        Messages.getString("BiobankVersionUtil.toonew_error_msg")); //$NON-NLS-1$
+                    throw new ServerVersionOlderException();
                 } else {
                     if (clientVersion.getMinor() < serverVersion.getMinor()) {
-                        throw new ServerVersionNewerException(
-                            Messages.getString("BiobankVersionUtil.tooold_error_msg")); //$NON-NLS-1$
+                        throw new ServerVersionNewerException();
                     } else if (clientVersion.getMinor() > serverVersion
                         .getMinor()) {
-                        throw new ServerVersionOlderException(
-                            Messages.getString("BiobankVersionUtil.toonew_error_msg")); //$NON-NLS-1$
+                        throw new ServerVersionOlderException();
                     }
                 }
-            } catch (VersionInvalidException e) {
-                throw new ClientVersionInvalidException(
-                    Messages.getString("BiobankVersionUtil.compatibility_error_msg")); //$NON-NLS-1$
+            } catch (VersionFormatInvalidException e) {
+                throw new ClientVersionInvalidException();
             }
-        } catch (VersionInvalidException e) {
-            throw new ServerVersionInvalidException(
-                Messages
-                    .getString("BiobankVersionUtil.server_version_error_msg")); //$NON-NLS-1$
+        } catch (VersionFormatInvalidException e) {
+            throw new ServerVersionInvalidException();
         }
     }
 

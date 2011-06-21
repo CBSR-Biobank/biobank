@@ -171,8 +171,7 @@ public class LoginDialog extends TitleAreaDialog {
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
             Messages.LoginDialog_server_validation_msg);
         serverWidget = createWritableCombo(contents,
-            Messages.LoginDialog_server_label,
-            servers.toArray(new String[0]),
+            Messages.LoginDialog_server_label, servers.toArray(new String[0]),
             Authentication.SERVER_PROPERTY_NAME, lastServer, validator);
 
         NonEmptyStringValidator userNameValidator = null;
@@ -180,8 +179,7 @@ public class LoginDialog extends TitleAreaDialog {
         if (BiobankPlugin.getDefault().isDebugging()) {
             new Label(contents, SWT.NONE);
             secureConnectionButton = new Button(contents, SWT.CHECK);
-            secureConnectionButton
-                .setText(Messages.LoginDialog_secure_connection_label);
+            secureConnectionButton.setText("Use secure connection"); //$NON-NLS-1$
             secureConnectionButton.setSelection(lastServer
                 .contains(DEFAULT_SECURE_PORT));
 
@@ -201,8 +199,7 @@ public class LoginDialog extends TitleAreaDialog {
         }
 
         userNameWidget = createWritableCombo(contents,
-            Messages.LoginDialog_user_label,
-            userNames.toArray(new String[0]),
+            Messages.LoginDialog_user_label, userNames.toArray(new String[0]),
             Authentication.USERNAME_PROPERTY_NAME,
             pluginPrefs.get(LAST_USER_NAME, ""), userNameValidator); //$NON-NLS-1$
 
@@ -212,8 +209,7 @@ public class LoginDialog extends TitleAreaDialog {
 
         new Label(contents, SWT.NONE);
         superAdminWidget = new Button(contents, SWT.CHECK);
-        superAdminWidget
-            .setText(Messages.LoginDialog_superAdmin_label);
+        superAdminWidget.setText(Messages.LoginDialog_superAdmin_label);
 
         bindChangeListener();
 
@@ -315,11 +311,9 @@ public class LoginDialog extends TitleAreaDialog {
         try {
             new URL(DEFAULT_UNSECURE_PREFIX + serverWidget.getText());
         } catch (MalformedURLException e) {
-            MessageDialog
-                .openError(
-                    getShell(),
-                    Messages.LoginDialog_serverUrl_error_title,
-                    Messages.LoginDialog_serverUrl_error_msg);
+            MessageDialog.openError(getShell(),
+                Messages.LoginDialog_serverUrl_error_title,
+                Messages.LoginDialog_serverUrl_error_msg);
             return;
         }
 
@@ -335,7 +329,7 @@ public class LoginDialog extends TitleAreaDialog {
             if (userNameWidget.getText().equals("")) { //$NON-NLS-1$
                 MessageDialog.openError(getShell(),
                     Messages.LoginDialog_user_error_title,
-                    Messages.LoginDialog_user_error_msg);
+                    Messages.LoginDialog_user_validation_msg);
                 return;
             }
         }
@@ -355,9 +349,9 @@ public class LoginDialog extends TitleAreaDialog {
                 // super admin mode
                 sessionHelper.getUser().setInSuperAdminMode(true);
                 if (!sessionHelper.getUser().isInSuperAdminMode())
-                    BgcPlugin
-                        .openAsyncError(Messages.LoginDialog_superAdmin_error_title,
-                            Messages.LoginDialog_superAdmin_error_msg);
+                    BgcPlugin.openAsyncError(
+                        Messages.LoginDialog_superAdmin_error_title,
+                        Messages.LoginDialog_superAdmin_error_msg);
             }
             selectWorkingCenter(sessionHelper);
             if (sessionHelper.getUser().isInSuperAdminMode()
@@ -420,17 +414,15 @@ public class LoginDialog extends TitleAreaDialog {
             // }
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.LoginDialog_workingCenter_error_title,
-                e);
+                Messages.LoginDialog_workingCenter_error_title, e);
         }
         if (workingCenters != null) {
             if (workingCenters.size() == 0) {
                 if (!sessionHelper.getUser().isSuperAdministrator())
                     // cannot access the application.
-                    BgcPlugin
-                        .openAsyncError(
-                            Messages.LoginDialog_workingCenter_error_title,
-                            Messages.LoginDialog_noWorkingCenter_error_msg);
+                    BgcPlugin.openAsyncError(
+                        Messages.LoginDialog_workingCenter_error_title,
+                        Messages.LoginDialog_noWorkingCenter_error_msg);
             } else if (workingCenters.size() == 1
                 && !sessionHelper.getUser().isInSuperAdminMode())
                 sessionHelper.getUser().setCurrentWorkingCenter(
@@ -443,10 +435,9 @@ public class LoginDialog extends TitleAreaDialog {
             && !sessionHelper.getUser().isInSuperAdminMode())
             if (sessionHelper.getUser().isSuperAdministrator()) {
                 // connect in admin mode
-                BgcPlugin
-                    .openAsyncInformation(
-                        Messages.LoginDialog_workingCenter_admin_title,
-                        Messages.LoginDialog_noWorkingCenter_admin_msg);
+                BgcPlugin.openAsyncInformation(
+                    Messages.LoginDialog_workingCenter_admin_title,
+                    Messages.LoginDialog_noWorkingCenter_admin_msg);
                 // open the administration perspective if another
                 // perspective is open
                 sessionHelper.getUser().setInSuperAdminMode(true);
@@ -459,18 +450,15 @@ public class LoginDialog extends TitleAreaDialog {
                         workbench.showPerspective(MainPerspective.ID,
                             activeWindow);
                     } catch (WorkbenchException e) {
-                        BgcPlugin
-                            .openAsyncError(
-                                Messages.LoginDialog_openperspective_error_msg,
-                                e);
+                        BgcPlugin.openAsyncError(
+                            "Error while opening main perspective", e); //$NON-NLS-1$
                     }
                 }
             } else {
                 // can't connect without a working center
-                BgcPlugin
-                    .openAsyncError(
-                        Messages.LoginDialog_workingCenterSelection_error_title,
-                        Messages.LoginDialog_workingCenterSelection_error_msg);
+                BgcPlugin.openAsyncError(
+                    Messages.LoginDialog_workingCenterSelection_error_title,
+                    Messages.LoginDialog_workingCenterSelection_error_msg);
             }
     }
 
