@@ -1071,6 +1071,10 @@
     <copy todir="${buildDirectory}/plugins/biobank2">
       <fileset dir="${eclipse.workspace.dir}/biobank2" />
     </copy>
+  	<!-- TODO : copy all project containing .nl1. into the plugins folder -->
+  	<copy todir="${buildDirectory}/plugins/biobank.nl1.fr_CA">
+  	      <fileset dir="${eclipse.workspace.dir}/biobank.nl1.fr_CA" />
+  	</copy>
     <copy todir="${buildDirectory}/plugins/scannerConfig">
       <fileset dir="${eclipse.workspace.dir}/scannerConfig" />
     </copy>
@@ -1080,9 +1084,9 @@
     <copy todir="${buildDirectory}/plugins/sampleProcessingRobot">
       <fileset dir="${eclipse.workspace.dir}/sampleProcessingRobot" />
     </copy>
-    <!-- copy todir="${buildDirectory}/plugins/barcodeGenerator">
+    <copy todir="${buildDirectory}/plugins/barcodeGenerator">
       <fileset dir="${eclipse.workspace.dir}/barcodeGenerator" />
-    </copy -->
+    </copy>
     <copy todir="${buildDirectory}/plugins/biobank.gui.common">
       <fileset dir="${eclipse.workspace.dir}/biobank.gui.common" />
     </copy>
