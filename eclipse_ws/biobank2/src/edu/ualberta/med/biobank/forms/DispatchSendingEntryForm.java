@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
@@ -103,9 +104,10 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             ShippingMethodWrapper selectedShippingMethod = dispatch
                 .getShipmentInfo().getShippingMethod();
             shippingMethodViewer = widgetCreator.createComboViewer(client,
-                Messages.DispatchSendingEntryForm_shipMethod_label, ShippingMethodWrapper
-                    .getShippingMethods(SessionManager.getAppService()),
-                selectedShippingMethod, null, new ComboSelectionUpdate() {
+                Messages.DispatchSendingEntryForm_shipMethod_label,
+                ShippingMethodWrapper.getShippingMethods(SessionManager
+                    .getAppService()), selectedShippingMethod, null,
+                new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
                         dispatch.getShipmentInfo().setShippingMethod(
@@ -114,8 +116,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 }, new BiobankLabelProvider());
 
             createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-                Messages.DispatchSendingEntryForm_waybill_label, null, shipmentInfo,
-                ShipmentInfoPeer.WAYBILL.getName(), null);
+                Messages.DispatchSendingEntryForm_waybill_label, null,
+                shipmentInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
         }
 
         createBoundWidgetWithLabel(
@@ -138,7 +140,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 .getNameShort());
         } else {
             try {
-                destSiteComboViewer = createComboViewer(client, Messages.DispatchSendingEntryForm_receiver_label,
+                destSiteComboViewer = createComboViewer(client,
+                    Messages.DispatchSendingEntryForm_receiver_label,
                     CenterWrapper.getOtherCenters(appService, SessionManager
                         .getUser().getCurrentWorkingCenter()),
                     dispatch.getReceiverCenter(),
@@ -152,7 +155,10 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                         }
                     });
             } catch (ApplicationException e) {
-                BgcPlugin.openAsyncError(Messages.DispatchSendingEntryForm_error_title, Messages.DispatchSendingEntryForm_retrieve_centers_error_msg);
+                BgcPlugin
+                    .openAsyncError(
+                        Messages.DispatchSendingEntryForm_error_title,
+                        Messages.DispatchSendingEntryForm_retrieve_centers_error_msg);
             }
         }
     }
@@ -164,7 +170,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             composite.setLayout(new GridLayout(1, false));
             section.setClient(composite);
             if (dispatch.isInCreationState()) {
-                addSectionToolbar(section, Messages.DispatchSendingEntryForm_specimens_description,
+                addSectionToolbar(section,
+                    Messages.DispatchSendingEntryForm_specimens_description,
                     new SelectionAdapter() {
                         @Override
                         public void widgetSelected(SelectionEvent e) {
@@ -230,7 +237,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         try {
             CellProcessResult res = appService.processCellStatus(new Cell(-1,
                 -1, inventoryId, null), new ShipmentProcessData(null, dispatch,
-                true, true), SessionManager.getUser());
+                true, true), SessionManager.getUser(), Locale.getDefault());
             switch (res.getProcessStatus()) {
             case FILLED:
                 // ok
@@ -243,12 +250,15 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 reloadSpecimens();
                 break;
             case ERROR:
-                BgcPlugin.openAsyncError(Messages.DispatchSendingEntryForm_invalid_spec_error_title, res.getCell()
-                    .getInformation());
+                BgcPlugin.openAsyncError(
+                    Messages.DispatchSendingEntryForm_invalid_spec_error_title,
+                    res.getCell().getInformation());
                 break;
             }
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.DispatchSendingEntryForm_error_title, Messages.DispatchSendingEntryForm_adding_error_msg, e);
+            BgcPlugin.openAsyncError(
+                Messages.DispatchSendingEntryForm_error_title,
+                Messages.DispatchSendingEntryForm_adding_error_msg, e);
         }
     }
 

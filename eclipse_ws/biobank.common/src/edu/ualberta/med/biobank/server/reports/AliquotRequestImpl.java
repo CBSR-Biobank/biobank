@@ -67,7 +67,8 @@ public class AliquotRequestImpl extends AbstractReport {
 
     public static Object[] getNotFoundRow(String pnumber, Date dateDrawn,
         String typeName, long maxResults, Integer numResultsFound) {
-        return new Object[] { pnumber, "", //$NON-NLS-1$
+        return new Object[] { pnumber,
+            "", //$NON-NLS-1$
             DateFormatter.formatAsDate(dateDrawn), typeName,
             "NOT FOUND (" + (maxResults - numResultsFound) + ")", "" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }

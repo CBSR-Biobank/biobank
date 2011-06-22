@@ -13,13 +13,14 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.Map;
 
 public class DispatchCreateProcess extends ServerProcess {
 
     public DispatchCreateProcess(WritableApplicationService appService,
-        ShipmentProcessData data, User user) {
-        super(appService, data, user);
+        ShipmentProcessData data, User user, Locale locale) {
+        super(appService, data, user, locale);
     }
 
     /**
@@ -118,8 +119,8 @@ public class DispatchCreateProcess extends ServerProcess {
         String value = scanCell.getValue();
         if (value == null) { // no specimen scanned
             scanCell.setStatus(CellStatus.MISSING);
-            scanCell.setInformation(MessageFormat.format(
-                Messages.getString("ScanAssign.scanStatus.specimen.missing"), //$NON-NLS-1$
+            scanCell.setInformation(MessageFormat.format(Messages.getString(
+                "ScanAssign.scanStatus.specimen.missing", locale), //$NON-NLS-1$
                 expectedSpecimen.getInventoryId()));
             scanCell.setTitle("?"); //$NON-NLS-1$
         } else {
@@ -128,8 +129,8 @@ public class DispatchCreateProcess extends ServerProcess {
             if (foundSpecimen == null) {
                 // not in database
                 scanCell.setStatus(CellStatus.ERROR);
-                scanCell.setInformation(Messages
-                    .getString("ScanAssign.scanStatus.specimen.notlinked")); //$NON-NLS-1$
+                scanCell.setInformation(Messages.getString(
+                    "ScanAssign.scanStatus.specimen.notlinked", locale)); //$NON-NLS-1$
             } else {
                 if (expectedSpecimen != null
                     && !foundSpecimen.equals(expectedSpecimen)) {
@@ -137,7 +138,8 @@ public class DispatchCreateProcess extends ServerProcess {
                     scanCell.setStatus(CellStatus.ERROR);
                     scanCell
                         .setInformation(Messages
-                            .getString("ScanAssign.scanStatus.specimen.positionTakenError")); //$NON-NLS-1$
+                            .getString(
+                                "ScanAssign.scanStatus.specimen.positionTakenError", locale)); //$NON-NLS-1$
                     scanCell.setTitle("!"); //$NON-NLS-1$
                 } else {
                     scanCell.setSpecimenId(foundSpecimen.getId());
@@ -152,7 +154,8 @@ public class DispatchCreateProcess extends ServerProcess {
                             .getPatient().getPnumber());
                         scanCell
                             .setInformation(Messages
-                                .getString("DispatchProcess.create.specimen.anotherPallet")); //$NON-NLS-1$
+                                .getString(
+                                    "DispatchProcess.create.specimen.anotherPallet", locale)); //$NON-NLS-1$
                     }
                 }
             }
@@ -177,13 +180,13 @@ public class DispatchCreateProcess extends ServerProcess {
             cell.setInformation(""); //$NON-NLS-1$
         } else if (!specimen.isActive()) {
             cell.setStatus(CellStatus.ERROR);
-            cell.setInformation(MessageFormat.format(
-                Messages.getString("DispatchProcess.create.specimen.status"), //$NON-NLS-1$
+            cell.setInformation(MessageFormat.format(Messages.getString(
+                "DispatchProcess.create.specimen.status", locale), //$NON-NLS-1$
                 specimen.getInventoryId()));
         } else if (!specimen.getCurrentCenter().equals(sender)) {
             cell.setStatus(CellStatus.ERROR);
-            cell.setInformation(MessageFormat.format(Messages
-                .getString("DispatchProcess.create.specimen.currentCenter"), //$NON-NLS-1$
+            cell.setInformation(MessageFormat.format(Messages.getString(
+                "DispatchProcess.create.specimen.currentCenter", locale), //$NON-NLS-1$
                 specimen.getInventoryId(), specimen.getCurrentCenter()
                     .getNameShort(), sender.getNameShort()));
         } else {
@@ -193,14 +196,15 @@ public class DispatchCreateProcess extends ServerProcess {
                 && currentSpecimenIds.get(specimen.getId()) != null;
             if (checkAlreadyAdded && alreadyInShipment) {
                 cell.setStatus(CellStatus.ERROR);
-                cell.setInformation(MessageFormat.format(Messages
-                    .getString("DispatchProcess.create.specimen.alreadyAdded"), //$NON-NLS-1$
+                cell.setInformation(MessageFormat.format(Messages.getString(
+                    "DispatchProcess.create.specimen.alreadyAdded", locale), //$NON-NLS-1$
                     specimen.getInventoryId()));
             } else if (specimen.isUsedInDispatch()) {
                 cell.setStatus(CellStatus.ERROR);
                 cell.setInformation(MessageFormat.format(
                     Messages
-                        .getString("DispatchProcess.create.specime.inNotClosedDispatch"), //$NON-NLS-1$
+                        .getString(
+                            "DispatchProcess.create.specime.inNotClosedDispatch", locale), //$NON-NLS-1$
                     specimen.getInventoryId()));
             } else {
                 if (alreadyInShipment)

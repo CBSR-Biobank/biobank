@@ -25,6 +25,7 @@ import gov.nih.nci.system.dao.Response;
 import gov.nih.nci.system.util.ClassCache;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Level;
@@ -196,10 +197,11 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
-        ProcessData processData, boolean isRescanMode, User user)
+        ProcessData processData, boolean isRescanMode, User user, Locale locale)
         throws ApplicationException {
         try {
-            ServerProcess process = processData.getProcessInstance(this, user);
+            ServerProcess process = processData.getProcessInstance(this, user,
+                locale);
             return process.processScanResult(cells, isRescanMode);
         } catch (ApplicationException ae) {
             throw ae;
@@ -210,9 +212,11 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public CellProcessResult processCellStatus(Cell cell,
-        ProcessData processData, User user) throws ApplicationException {
+        ProcessData processData, User user, Locale locale)
+        throws ApplicationException {
         try {
-            ServerProcess process = processData.getProcessInstance(this, user);
+            ServerProcess process = processData.getProcessInstance(this, user,
+                locale);
             return process.processCellStatus(cell);
         } catch (ApplicationException ae) {
             throw ae;

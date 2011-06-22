@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.scanprocess.data;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -93,8 +94,8 @@ public class AssignProcessData extends ProcessWithPallet {
 
     @Override
     public ServerProcess getProcessInstance(
-        WritableApplicationService appService, User user) {
-        return new AssignProcess(appService, this, user);
+        WritableApplicationService appService, User user, Locale locale) {
+        return new AssignProcess(appService, this, user, locale);
     }
 
 }

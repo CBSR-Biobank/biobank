@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.dialogs.dispatch;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -170,7 +171,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             // server side call
             ScanProcessResult res = SessionManager.getAppService()
                 .processScanResult(serverCells, getProcessData(),
-                    isRescanMode(), SessionManager.getUser());
+                    isRescanMode(), SessionManager.getUser(),
+                    Locale.getDefault());
 
             if (cells != null) {
                 // for each cell, convert into a client side cell
@@ -443,9 +445,10 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     }
 
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-        CellProcessResult res = SessionManager.getAppService()
+        CellProcessResult res = SessionManager
+            .getAppService()
             .processCellStatus(cell.transformIntoServerCell(),
-                getProcessData(), SessionManager.getUser());
+                getProcessData(), SessionManager.getUser(), Locale.getDefault());
         cell.merge(SessionManager.getAppService(), res.getCell());
         if (res.getProcessStatus() == CellStatus.ERROR) {
             Button okButton = getButton(IDialogConstants.PROCEED_ID);

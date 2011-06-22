@@ -45,7 +45,10 @@ public class SampleTypeSUsageImpl extends AbstractReport {
     protected List<Object> specialPostProcess(List<Object> results) {
         List<Object> expandedResults = new ArrayList<Object>();
         for (Object ob : results) {
-            expandedResults.add(new Object[] { ob, Messages.getString("SampleTypeSUsageImpl.unused_label") }); //$NON-NLS-1$
+            expandedResults.add(new Object[] {
+                ob,
+                Messages.getString(
+                    "SampleTypeSUsageImpl.unused_label", report.getLocale()) }); //$NON-NLS-1$
         }
         return expandedResults;
     }

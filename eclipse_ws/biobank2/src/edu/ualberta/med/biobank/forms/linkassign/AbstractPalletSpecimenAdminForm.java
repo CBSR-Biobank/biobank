@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.forms.linkassign;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -132,9 +133,10 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
             @Override
             protected void afterScan() {
-                appendLog(NLS.bind(
-                    Messages.AbstractPalletSpecimenAdminForm_activitylog_scanRes_total, cells
-                        .keySet().size()));
+                appendLog(NLS
+                    .bind(
+                        Messages.AbstractPalletSpecimenAdminForm_activitylog_scanRes_total,
+                        cells.keySet().size()));
             }
 
             @Override
@@ -230,7 +232,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected void setRescanMode() {
         if (palletScanManagement.getSuccessfulScansCount() > 0) {
-            scanButton.setText(Messages.AbstractPalletSpecimenAdminForm_retryScan_label);
+            scanButton
+                .setText(Messages.AbstractPalletSpecimenAdminForm_retryScan_label);
             rescanMode = true;
             enableFields(false);
         }
@@ -257,12 +260,15 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         scanButton.setEnabled(false);
 
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
-            canLaunchScanValue, Messages.AbstractPalletSpecimenAdminForm_canLaunchScanValidationMsg);
-        addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
+            canLaunchScanValue,
+            Messages.AbstractPalletSpecimenAdminForm_canLaunchScanValidationMsg);
+        addBooleanBinding(
+            new WritableValue(Boolean.FALSE, Boolean.class),
             scanHasBeenLaunchedValue,
             Messages.AbstractPalletSpecimenAdminForm_scanHasBeenLaunchedValidationMsg);
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
-            scanValidValue, Messages.AbstractPalletSpecimenAdminForm_scanValidValidationMsg);
+            scanValidValue,
+            Messages.AbstractPalletSpecimenAdminForm_scanValidValidationMsg);
     }
 
     protected void launchScanAndProcessResult() {
@@ -281,7 +287,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void createProfileComboBox(Composite fieldsComposite) {
-        Label lbl = widgetCreator.createLabel(fieldsComposite, Messages.AbstractPalletSpecimenAdminForm_profile_label);
+        Label lbl = widgetCreator.createLabel(fieldsComposite,
+            Messages.AbstractPalletSpecimenAdminForm_profile_label);
         profilesCombo = widgetCreator
             .createComboViewer(
                 fieldsComposite,
@@ -317,8 +324,13 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         plateToScanLabel = widgetCreator.createLabel(fieldsComposite,
             Messages.AbstractPalletSpecimenAdminForm_plateToScan_label);
         plateToScanText = (BgcBaseText) widgetCreator
-            .createBoundWidget(fieldsComposite, BgcBaseText.class, SWT.NONE,
-                plateToScanLabel, new String[0], plateToScanValue,
+            .createBoundWidget(
+                fieldsComposite,
+                BgcBaseText.class,
+                SWT.NONE,
+                plateToScanLabel,
+                new String[0],
+                plateToScanValue,
                 new ScannerBarcodeValidator(
                     Messages.AbstractPalletSpecimenAdminForm_plateToScan_validationMsg),
                 PLATE_VALIDATOR);
@@ -455,13 +467,14 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected void postprocessScanTubeAlone(PalletCell palletCell)
         throws Exception {
-        appendLog(NLS.bind(Messages.AbstractPalletSpecimenAdminForm_activitylog_scanTubeAlone,
+        appendLog(NLS.bind(
+            Messages.AbstractPalletSpecimenAdminForm_activitylog_scanTubeAlone,
             palletCell.getValue(), ContainerLabelingSchemeWrapper
                 .rowColToSbs(palletCell.getRowColPos())));
         beforeScanTubeAlone();
         CellProcessResult res = appService.processCellStatus(
             palletCell.transformIntoServerCell(), getProcessData(),
-            SessionManager.getUser());
+            SessionManager.getUser(), Locale.getDefault());
         palletCell.merge(appService, res.getCell());
         appendLogs(res.getLogs());
         processCellResult(palletCell.getRowColPos(), palletCell);
@@ -549,7 +562,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         }
         // server side call
         ScanProcessResult res = appService.processScanResult(serverCells,
-            getProcessData(), isRescanMode(), SessionManager.getUser());
+            getProcessData(), isRescanMode(), SessionManager.getUser(),
+            Locale.getDefault());
         // print result logs
         appendLogs(res.getLogs());
 
@@ -558,9 +572,11 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             for (Entry<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> entry : res
                 .getCells().entrySet()) {
                 RowColPos rcp = entry.getKey();
-                monitor.subTask(NLS.bind(
-                    Messages.AbstractPalletSpecimenAdminForm_scan_monitor_position,
-                    ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
+                monitor
+                    .subTask(NLS
+                        .bind(
+                            Messages.AbstractPalletSpecimenAdminForm_scan_monitor_position,
+                            ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
                 PalletCell palletCell = cells.get(entry.getKey());
                 Cell servercell = entry.getValue();
                 if (palletCell == null) { // can happened if missing

@@ -17,6 +17,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -79,10 +80,11 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void stopQuery(QueryHandle qh) throws Exception;
 
     public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
-        ProcessData processData, boolean rescanMode, User user)
+        ProcessData processData, boolean rescanMode, User user, Locale locale)
         throws ApplicationException;
 
     public CellProcessResult processCellStatus(Cell cell,
-        ProcessData processData, User user) throws ApplicationException;
+        ProcessData processData, User user, Locale locale)
+        throws ApplicationException;
 
 }

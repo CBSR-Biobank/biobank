@@ -560,7 +560,7 @@
     </dependset>
     <mkdir dir="${eclipse.proj.dir.tools}/output-validators" />
     <copy includeemptydirs="false"
-          todir="${eclipse.proj.dir.tools}/output-validators">
+          todir="${eclipse.proj.dir.tools}/output-validators" overwrite="true">
       <fileset dir="${eclipse.proj.dir.tools}/src">
         <exclude name="**/*.launch" />
         <exclude name="**/*.java" />
@@ -686,7 +686,7 @@
           depends="sdk-files,prepare-webapp-orm,package-codegen-orm,modelextender">
     <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
-    <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output">
+    <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output" overwrite="true">
       <fileset dir="${eclipse.proj.dir.common}/src">
         <exclude name="**/*.launch" />
         <exclude name="**/*.java" />

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -28,8 +29,9 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind(Messages.DispatchReceivingEntryForm_form_title, dispatch
-            .getFormattedPackedAt(), dispatch.getSenderCenter().getNameShort()));
+        form.setText(NLS.bind(Messages.DispatchReceivingEntryForm_form_title,
+            dispatch.getFormattedPackedAt(), dispatch.getSenderCenter()
+                .getNameShort()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -98,7 +100,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         try {
             CellProcessResult res = appService.processCellStatus(new Cell(-1,
                 -1, inventoryId, null), new ShipmentProcessData(null, dispatch,
-                false, false), SessionManager.getUser());
+                false, false), SessionManager.getUser(), Locale.getDefault());
             SpecimenWrapper specimen = null;
             if (res.getCell().getSpecimenId() != null) {
                 specimen = new SpecimenWrapper(appService);
@@ -162,8 +164,8 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
     @Override
     protected String getTextForPartName() {
-        return NLS.bind(Messages.DispatchReceivingEntryForm_title, dispatch.getShipmentInfo()
-            .getPackedAt());
+        return NLS.bind(Messages.DispatchReceivingEntryForm_title, dispatch
+            .getShipmentInfo().getPackedAt());
     }
 
     @Override

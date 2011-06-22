@@ -66,9 +66,10 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         for (Object obj : results) {
             Object[] castObj = (Object[]) obj;
             if (lastStudy.compareTo((String) castObj[0]) != 0) {
-                totalledResults.add(new Object[] { lastStudy, Messages.getString("PatientVisitSummaryImpl.clinics_label"), //$NON-NLS-1$
-                    sums[0], sums[1], sums[2], sums[3], sums[4], sums[5],
-                    sums[6] });
+                totalledResults.add(new Object[] { lastStudy,
+                    Messages.getString("PatientVisitSummaryImpl.clinics_label", //$NON-NLS-1$
+                        report.getLocale()), sums[0], sums[1], sums[2],
+                    sums[3], sums[4], sums[5], sums[6] });
                 totalledResults.add(new Object[] { "", "", "", "", "", "", "", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
                     "", "" }); //$NON-NLS-1$ //$NON-NLS-2$
                 for (int i = 0; i < numSums; i++)
@@ -89,8 +90,10 @@ public class PatientVisitSummaryImpl extends AbstractReport {
                 ((BigInteger) castObj[8]).longValue() });
             lastStudy = (String) castObj[0];
         }
-        totalledResults.add(new Object[] { lastStudy, Messages.getString("PatientVisitSummaryImpl.clinics_label"), sums[0], //$NON-NLS-1$
-            sums[1], sums[2], sums[3], sums[4], sums[5], sums[6] });
+        totalledResults.add(new Object[] { lastStudy,
+            Messages.getString("PatientVisitSummaryImpl.clinics_label", //$NON-NLS-1$
+                report.getLocale()), sums[0], sums[1], sums[2], sums[3],
+            sums[4], sums[5], sums[6] });
         return totalledResults;
     }
 }

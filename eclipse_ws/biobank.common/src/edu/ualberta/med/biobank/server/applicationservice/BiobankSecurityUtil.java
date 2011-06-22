@@ -73,11 +73,11 @@ public class BiobankSecurityUtil {
             upm.modifyUser(user);
         } catch (ApplicationException ae) {
             log.error(
-                Messages.getString("BiobankSecurityUtil.pwd.modif.error.msg"), ae); //$NON-NLS-1$
+                "Error modifying password", ae); //$NON-NLS-1$
             throw ae;
         } catch (Exception ex) {
             log.error(
-                Messages.getString("BiobankSecurityUtil.pwd.modif.error.msg"), ex); //$NON-NLS-1$
+                "Error modifying password", ex); //$NON-NLS-1$
             throw new ApplicationException(ex);
         }
     }
@@ -100,8 +100,7 @@ public class BiobankSecurityUtil {
                 return list;
             } catch (Exception ex) {
                 log.error(
-                    Messages
-                        .getString("BiobankSecurityUtil.retrieve.groups.error.msg"), ex); //$NON-NLS-1$
+                    "Error retrieving security groups", ex); //$NON-NLS-1$
                 throw new ApplicationException(ex);
             }
         } else {
@@ -201,8 +200,7 @@ public class BiobankSecurityUtil {
                 return list;
             } catch (Exception ex) {
                 log.error(
-                    Messages
-                        .getString("BiobankSecurityUtil.retrieve.users.error.msg"), ex); //$NON-NLS-1$
+                    "Error retrieving security users", ex); //$NON-NLS-1$
                 throw new ApplicationException(ex);
             }
         } else {
@@ -333,12 +331,10 @@ public class BiobankSecurityUtil {
                         .getString("BiobankSecurityUtil.user.retrieve.error.msg")); //$NON-NLS-1$
             return createUser(upm, serverUser, null);
         } catch (ApplicationException ae) {
-            log.error(Messages
-                .getString("BiobankSecurityUtil.current.user.error.msg"), ae); //$NON-NLS-1$
+            log.error("Error getting current user", ae); //$NON-NLS-1$
             throw ae;
         } catch (Exception ex) {
-            log.error(Messages
-                .getString("BiobankSecurityUtil.current.user.error.msg"), ex); //$NON-NLS-1$
+            log.error("Error getting current user", ex); //$NON-NLS-1$
             throw new ApplicationException(ex.getMessage(), ex);
         }
     }

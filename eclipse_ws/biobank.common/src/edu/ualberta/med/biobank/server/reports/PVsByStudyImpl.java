@@ -15,8 +15,7 @@ public class PVsByStudyImpl extends AbstractReport {
         + " as Alias where Alias.dateProcessed between ? and ?" //$NON-NLS-1$
         + " GROUP BY Alias.shipmentPatient.patient.study.nameShort, " //$NON-NLS-1$
         + "Year(Alias.dateProcessed), " //$NON-NLS-1$
-        + GROUPBY_DATE
-        + "(Alias.dateProcessed)"; //$NON-NLS-1$
+        + GROUPBY_DATE + "(Alias.dateProcessed)"; //$NON-NLS-1$
 
     private DateRangeRowPostProcess dateRangePostProcess;
 

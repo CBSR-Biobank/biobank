@@ -59,7 +59,8 @@ public class QAAliquotsImpl extends AbstractReport {
             String inventoryId = specimen.getInventoryId();
             String specimenType = specimen.getSpecimenType().getNameShort();
 
-            String dateProcessed = Messages.getString("QAAliquotsImpl.nodate_processed"); //$NON-NLS-1$
+            String dateProcessed = Messages.getString(
+                "QAAliquotsImpl.nodate_processed", report.getLocale()); //$NON-NLS-1$
             Specimen parentSpecimen = specimen.getParentSpecimen();
             if (parentSpecimen != null) {
                 ProcessingEvent pe = parentSpecimen.getProcessingEvent();

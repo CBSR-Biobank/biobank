@@ -1,10 +1,10 @@
 package edu.ualberta.med.biobank.common.reports;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.TreeMap;
 
 import org.hibernate.Session;
@@ -15,26 +15,19 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class BiobankReport implements QueryCommand {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
     private static Map<String, ReportData> REPORTS = new TreeMap<String, ReportData>();
-    public static String editorPath = "edu.ualberta.med.biobank.editors."; //$NON-NLS-1$
+    public static final String EDITOR_PATH = "edu.ualberta.med.biobank.editors."; //$NON-NLS-1$
+    private static final String REPORTS_FILE_NAME = "reports"; //$NON-NLS-1$
 
     static {
-        Properties props = new Properties();
-        try {
-            props.load(BiobankReport.class
-                .getResourceAsStream("reports.properties")); //$NON-NLS-1$
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ResourceBundle rb = ResourceBundle.getBundle(BiobankReport.class
+            .getPackage().getName() + "." + REPORTS_FILE_NAME,
+            Locale.getDefault());
         // load map
-        for (Map.Entry<Object, Object> prop : props.entrySet()) {
-            String key = (String) prop.getKey();
+        Enumeration<String> keysEnum = rb.getKeys();
+        while (keysEnum.hasMoreElements()) {
+            String key = keysEnum.nextElement();
             String pieces[] = key.split("[.]"); //$NON-NLS-1$
             ReportData r;
             if (REPORTS.get(pieces[0]) == null)
@@ -42,13 +35,13 @@ public class BiobankReport implements QueryCommand {
             else
                 r = REPORTS.get(pieces[0]);
             if ("NAME".equals(pieces[1])) //$NON-NLS-1$
-                r.name = (String) prop.getValue();
+                r.name = rb.getString(key);
             else if ("DESCRIPTION".equals(pieces[1])) //$NON-NLS-1$
-                r.description = (String) prop.getValue();
+                r.description = rb.getString(key);
             else if ("EDITOR".equals(pieces[1])) //$NON-NLS-1$
-                r.editorId = editorPath + (String) prop.getValue();
+                r.editorId = EDITOR_PATH + rb.getString(key);
             else if ("TYPE".equals(pieces[1])) //$NON-NLS-1$
-                r.type = ReportType.valueOf((String) prop.getValue());
+                r.type = ReportType.valueOf(rb.getString(key));
             r.className = pieces[0];
             REPORTS.put(pieces[0], r);
         }
@@ -67,13 +60,15 @@ public class BiobankReport implements QueryCommand {
     private String groupBy;
     private String className;
     private ReportType type;
+    private Locale locale;
 
-    public BiobankReport(ReportData data) {
+    public BiobankReport(ReportData data, Locale locale) {
         this.name = data.name;
         this.description = data.description;
         this.editorId = data.editorId;
         this.className = data.className;
         this.type = data.type;
+        this.locale = locale;
     }
 
     public String getName() {
@@ -119,7 +114,8 @@ public class BiobankReport implements QueryCommand {
 
     public static BiobankReport getReportByName(String name) {
         ReportData data = REPORTS.get(name);
-        return new BiobankReport(data);
+        // suppose to be called on the client, so the locale is the correct one
+        return new BiobankReport(data, Locale.getDefault());
     }
 
     public void setParams(List<Object> params) {
@@ -157,4 +153,7 @@ public class BiobankReport implements QueryCommand {
         return ReportFactory.createReport(this).generate(appService);
     }
 
+    public Locale getLocale() {
+        return locale;
+    }
 }
