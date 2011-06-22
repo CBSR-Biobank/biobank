@@ -15,18 +15,23 @@ public abstract class BiobankWrapperAction<E> extends SearchExampleQuery
     private static final long serialVersionUID = 1L;
 
     private final Class<E> modelClass;
+    private final Property<? extends Integer, ? super E> idProperty;
 
     protected BiobankWrapperAction(ModelWrapper<E> wrapper) {
-        this(wrapper.getWrappedObject(), wrapper.getWrappedClass());
+        super(ProxyUtil.convertProxyToObject(wrapper.wrappedObject));
+        this.modelClass = wrapper.getWrappedClass();
+        this.idProperty = wrapper.getIdProperty();
     }
 
     protected BiobankWrapperAction(BiobankWrapperAction<E> action) {
-        this(action.getModel(), action.getModelClass());
+        this(action.getModel(), action.modelClass, action.idProperty);
     }
 
-    protected BiobankWrapperAction(E wrappedObject, Class<E> modelClass) {
-        super(wrappedObject);
+    protected BiobankWrapperAction(E model, Class<E> modelClass,
+        Property<? extends Integer, ? super E> idProperty) {
+        super(model);
         this.modelClass = modelClass;
+        this.idProperty = idProperty;
     }
 
     /**
@@ -52,5 +57,13 @@ public abstract class BiobankWrapperAction<E> extends SearchExampleQuery
 
     protected Class<E> getModelClass() {
         return modelClass;
+    }
+
+    protected Integer getModelId() {
+        return idProperty.get(getModel());
+    }
+
+    protected Property<? extends Integer, ? super E> getIdProperty() {
+        return idProperty;
     }
 }

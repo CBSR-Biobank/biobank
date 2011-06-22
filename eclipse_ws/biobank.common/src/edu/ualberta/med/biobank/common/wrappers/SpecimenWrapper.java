@@ -502,9 +502,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
         TaskList tasks = new TaskList();
 
-        BiobankWrapperAction<Specimen> checkLegalSampleType = check()
-            .legalOption(pathToLegalSpecimenTypeOptions,
-                SpecimenPeer.SPECIMEN_TYPE, badSampleTypeMsg);
+        BiobankSessionAction checkLegalSampleType = check().legalOption(
+            pathToLegalSpecimenTypeOptions, SpecimenPeer.SPECIMEN_TYPE,
+            badSampleTypeMsg);
 
         tasks.add(check().ifProperty(
             SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.ID),

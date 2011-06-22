@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers.checks;
 
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
@@ -20,7 +19,6 @@ public class CheckUnique<E> extends BiobankWrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_STRING = "There already exists a {0} ({1}) with property value(s) ({2}) for ({3}), respectively. These field(s) must be unique.";
 
-    private final Property<? extends Serializable, ? super E> idProperty;
     private final Collection<Property<?, ? super E>> properties;
     private final String modelString;
 
@@ -35,7 +33,6 @@ public class CheckUnique<E> extends BiobankWrapperAction<E> {
     public CheckUnique(ModelWrapper<E> wrapper,
         Collection<Property<?, ? super E>> properties) {
         super(wrapper);
-        this.idProperty = wrapper.getIdProperty();
         this.properties = properties;
         this.modelString = wrapper.toString();
     }
@@ -48,10 +45,10 @@ public class CheckUnique<E> extends BiobankWrapperAction<E> {
 
         E model = getModel();
 
-        Serializable id = idProperty.get(model);
+        Integer id = getModelId();
         if (id != null) {
-            criteria.add(Restrictions.not(Restrictions.eq(idProperty.getName(),
-                id)));
+            String idName = getIdProperty().getName();
+            criteria.add(Restrictions.not(Restrictions.eq(idName, id)));
         }
 
         for (Property<?, ? super E> property : properties) {

@@ -83,8 +83,8 @@ public class WrapperChecker<E> {
     }
 
     public <T> IfProperty<E> ifProperty(Property<?, ? super E> property, Is is,
-        BiobankWrapperAction<E> action) {
-        return new IfProperty<E>(property, is, action);
+        BiobankSessionAction action) {
+        return new IfProperty<E>(wrapper, property, is, action);
     }
 
     public TaskList stringLengths() {

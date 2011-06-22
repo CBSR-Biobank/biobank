@@ -2,21 +2,25 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.CacheMode;
+import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.CheckUnique;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.OriginInfo;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -64,63 +68,88 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         // }
     }
 
-    private static final String WAYBILL_UNIQUE_FOR_CLINIC_BASE_QRY = "from "
-        + Clinic.class.getName() + " as clinic join clinic."
-        + ClinicPeer.ORIGIN_INFO_COLLECTION.getName() + " as oi join oi."
-        + OriginInfoPeer.SHIPMENT_INFO.getName() + " as si where clinic."
-        + ClinicPeer.ID.getName() + "=? and si."
-        + ShipmentInfoPeer.WAYBILL.getName() + "=?";
+    private static class OriginInfoFromClinicPostCheck extends
+        BiobankWrapperAction<OriginInfo> {
+        private static final long serialVersionUID = 1L;
+        private static final Collection<Property<?, ? super OriginInfo>> UNIQUE_WAYBILL_PER_CENTER_PROPERTIES = new ArrayList<Property<?, ? super OriginInfo>>();
 
-    private boolean checkWaybillUniqueForClinic(ClinicWrapper clinic)
-        throws ApplicationException {
-        List<Object> params = new ArrayList<Object>();
-        params.add(clinic.getId());
-        params.add(getShipmentInfo().getWaybill());
-
-        StringBuilder qry = new StringBuilder(
-            WAYBILL_UNIQUE_FOR_CLINIC_BASE_QRY);
-        if (!isNew()) {
-            qry.append(" and oi.").append(OriginInfoPeer.ID.getName())
-                .append(" <> ?");
-            params.add(getId());
+        static {
+            UNIQUE_WAYBILL_PER_CENTER_PROPERTIES
+                .add(OriginInfoPeer.SHIPMENT_INFO.to(ShipmentInfoPeer.WAYBILL));
+            UNIQUE_WAYBILL_PER_CENTER_PROPERTIES.add(OriginInfoPeer.CENTER);
         }
-        HQLCriteria c = new HQLCriteria(qry.toString(), params);
 
-        List<Object> results = appService.query(c);
-        return results.size() == 0;
-    }
+        private final BiobankSessionAction checkUniqueWaybillPerCenter;
 
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        CenterWrapper<?> center = getCenter();
-        if (center == null) {
-            throw new BiobankCheckException("A Center should be set.");
+        protected OriginInfoFromClinicPostCheck(OriginInfoWrapper wrapper) {
+            super(wrapper);
+
+            this.checkUniqueWaybillPerCenter = new CheckUnique<OriginInfo>(
+                wrapper, UNIQUE_WAYBILL_PER_CENTER_PROPERTIES);
         }
-        checkAtLeastOneSpecimen();
 
-        if (center instanceof ClinicWrapper && getShipmentInfo() != null) {
-            ClinicWrapper clinic = (ClinicWrapper) center;
-            String waybill = getShipmentInfo().getWaybill();
+        @Override
+        public Object doAction(Session session) throws BiobankSessionException {
+            // COOL-BEANS?
+            // Query query = session.createQuery("");
+            // query.setCacheable(false);
+            // query.setCacheMode(CacheMode.IGNORE);
+
+            // TODO: if this works, then extend BiobankWrapperAction with
+            // BiobankWrapperCheck and then override a doCheck(Session session)
+            // method so that checks will never touch the cache! :-) Also,
+            // perhaps auto-supply or load a new re-attached version of the
+            // object for a post-check?
+            CacheMode oldCacheMode = session.getCacheMode();
+
+            try {
+                session.setCacheMode(CacheMode.IGNORE);
+                doChecks(session);
+            } finally {
+                session.setCacheMode(oldCacheMode);
+            }
+
+            return null;
+        }
+
+        private void doChecks(Session session) throws BiobankSessionException {
+            Object obj = session.load(getModelClass(), getModelId());
+            OriginInfo originInfo = (OriginInfo) obj;
+            Center center = originInfo.getCenter();
+
+            if (!(center instanceof Clinic)) {
+                return;
+            }
+            Clinic clinic = (Clinic) center;
+
+            ShipmentInfo shipmentInfo = originInfo.getShipmentInfo();
+            if (shipmentInfo == null) {
+                return;
+            }
+
+            String waybill = shipmentInfo.getWaybill();
 
             if (Boolean.TRUE.equals(clinic.getSendsShipments())) {
                 if (waybill == null || waybill.isEmpty()) {
-                    throw new BiobankCheckException(
+                    throw new BiobankSessionException(
                         "A waybill should be set on this shipment");
                 }
-                if (!checkWaybillUniqueForClinic(clinic)) {
-                    throw new BiobankCheckException("A shipment with waybill "
-                        + waybill + " already exist in clinic "
-                        + clinic.getNameShort());
-                }
+
+                checkUniqueWaybillPerCenter.doAction(session);
+                // TODO: replace above with appropriate exception String (as
+                // found below)
+                // if (!checkWaybillUniqueForClinic(clinic)) {
+                // throw new BiobankCheckException("A shipment with waybill "
+                // + waybill + " already exist in clinic "
+                // + clinic.getNameShort());
+                // }
             } else {
                 if (waybill != null) {
-                    throw new BiobankCheckException(
-                        "This clinic doesn't send shipments: waybill should not be set");
+                    throw new BiobankSessionException(
+                        "This clinic does not send shipments: waybill should not be set.");
                 }
             }
         }
-
     }
 
     public static List<OriginInfoWrapper> getTodayShipments(
@@ -223,5 +252,38 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         log.setDetails(StringUtils.join(detailsList, ", "));
         log.setType("Shipment");
         return log;
+    }
+
+    @Override
+    protected TaskList getPersistTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(check().notNull(OriginInfoPeer.CENTER));
+
+        tasks.add(super.getPersistTasks());
+
+        tasks.add(new OriginInfoFromClinicPostCheck(this));
+
+        return tasks;
+    }
+
+    @Override
+    protected TaskList getDeleteTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(super.getDeleteTasks());
+
+        return tasks;
+    }
+
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        WrapperTransaction.persist(this, appService);
+    }
+
+    @Override
+    public void delete() throws Exception {
+        WrapperTransaction.delete(this, appService);
     }
 }

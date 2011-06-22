@@ -6,7 +6,9 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.wrappers.BiobankSessionAction;
 import edu.ualberta.med.biobank.common.wrappers.BiobankWrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
@@ -16,7 +18,7 @@ public class IfProperty<E> extends BiobankWrapperAction<E> {
 
     private final Property<?, ? super E> property;
     private final Is is;
-    private final BiobankWrapperAction<E> action;
+    private final BiobankSessionAction action;
 
     public enum Is {
         // @formatter:off
@@ -35,8 +37,6 @@ public class IfProperty<E> extends BiobankWrapperAction<E> {
      * Perform the given {@code BiobankSessionAction} if the wrapped object's
      * {@code Property} is _something_.
      * 
-     * This object decorates another {@code BiobankWrapperAction}.
-     * 
      * @param wrapper
      * @param property should NOT be an association. If an association is
      *            wanted, then end with the id property of that association
@@ -44,23 +44,12 @@ public class IfProperty<E> extends BiobankWrapperAction<E> {
      * @param is
      * @param action
      */
-    public IfProperty(Property<?, ? super E> property, Is is,
-        BiobankWrapperAction<E> action) {
-        super(action);
+    public IfProperty(ModelWrapper<E> wrapper, Property<?, ? super E> property,
+        Is is, BiobankSessionAction action) {
+        super(wrapper);
         this.property = property;
         this.is = is;
         this.action = action;
-    }
-
-    /**
-     * If the example object is set on this {@code IfProperty} instance, then
-     * make sure that the wrapped {@code BiobankWrapperAction} is updated as
-     * well (important for when {@code BeanProxy} objects are replaced).
-     */
-    @Override
-    public void setExample(Object example) {
-        super.setExample(example);
-        action.setExample(example);
     }
 
     @Override
