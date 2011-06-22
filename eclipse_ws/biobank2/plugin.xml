@@ -190,6 +190,11 @@
             name="Reload">
       </command>
       <command
+            defaultHandler="edu.ualberta.med.biobank.handlers.CbsrHelp"
+            id="edu.ualberta.med.biobank.commands.cbsrHelp"
+            name="CBSR Help">
+      </command>
+      <command
             defaultHandler="edu.ualberta.med.biobank.handlers.SendErrorMailHandler"
             id="edu.ualberta.med.biobank.commands.sendErrorMail"
             name="Send Error Email">
