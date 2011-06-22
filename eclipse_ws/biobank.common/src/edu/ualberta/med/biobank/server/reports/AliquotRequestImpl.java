@@ -87,7 +87,8 @@ public class AliquotRequestImpl extends AbstractReport {
                 Date dateDrawn = specimen.getTopSpecimen().getCreatedAt();
                 String specimenType = specimen.getSpecimenType().getNameShort();
                 String positionString = specimen.getSpecimenPosition()
-                    .getPositionString();
+                    .getContainer().getLabel()
+                    + specimen.getSpecimenPosition().getPositionString();
                 String activityStatus = specimen.getActivityStatus().getName();
                 modifiedResults.add(new Object[] { pnumber, inventoryId,
                     dateDrawn, specimenType, positionString, activityStatus });
