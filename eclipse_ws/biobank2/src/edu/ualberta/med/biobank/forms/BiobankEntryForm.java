@@ -15,7 +15,6 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -87,8 +86,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     // The widget that is to get the focus when the form is created
     private Control firstControl;
 
-    public Action confirmAction;
-
     protected BgcEntryFormActions formActions;
 
     protected KeyListener keyListener = new KeyAdapter() {
@@ -134,7 +131,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     @Override
     public void doSave(IProgressMonitor monitor) {
         setDirty(false);
-        if (!confirmAction.isEnabled()) {
+        if (!formActions.getConfirmAction().isEnabled()) {
             monitor.setCanceled(true);
             setDirty(true);
             BgcPlugin.openAsyncError("Form state",
