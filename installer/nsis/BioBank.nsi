@@ -1,14 +1,14 @@
 ;NSIS Modern User Interface version 1.69
 ;Original templates by Joost Verburg
 ;Redesigned for BZFlag by blast007
-;Redesigned for BioBank2 by Thomas Polasek
+;Redesigned for BioBank by Thomas Polasek
 
 ; Uses UAC plug-in version 0.0.11d. Install from here: http://nsis.sourceforge.net/UAC_plug-in
 
 ;--------------------------------
-;BioBank2 Version Variables
+;BioBank Version Variables
 
-!define PRODUCT_NAME "BioBank2"
+!define PRODUCT_NAME "BioBank"
   !define VERSION_STR "2.0.1.a" 
   !define EXPORTED_PRODUCT_NAME "${PRODUCT_NAME}_v${VERSION_STR}_win32"
 
@@ -27,6 +27,7 @@
 !insertmacro GetParameters
 !include "WordFunc.nsh"
 !insertmacro VersionCompare
+!include "UAC.nsh"
 
 RequestExecutionLevel user
 
@@ -162,12 +163,10 @@ Section "!BioBank Core(Required)" BioBank
   ;Make it required
   SectionIn RO
   
-  ; quicklaunch shortcuts should be named BioBank2 and not BioBank
   IfFileExists "$QUICKLAUNCH\BioBank.lnk" 0 CHECK_DESKTOP_SHORTCUT
   Delete "$QUICKLAUNCH\BioBank.lnk"  
   
 CHECK_DESKTOP_SHORTCUT:  
-  ; shortcuts should be named BioBank2 and not BioBank
   IfFileExists "$DESKTOP\BioBank.lnk" 0 CHECK_PREV_INSTALL
   Delete "$DESKTOP\BioBank.lnk"
   
@@ -348,7 +347,7 @@ FunctionEnd
 ; Attempt to give the UAC plug-in a user process and an admin process.
 Function ElevateToAdmin
   UAC_Elevate:
-    UAC::RunElevated
+    !insertmacro UAC_RunElevated
     StrCmp 1223 $0 UAC_ElevationAborted ; UAC dialog aborted by user?
     StrCmp 0 $0 0 UAC_Err ; Error?
     StrCmp 1 $1 0 UAC_Success ;Are we the real deal or just the wrapper?

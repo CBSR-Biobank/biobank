@@ -38,6 +38,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     List<Action> helpMenuCustomActions = new ArrayList<Action>();
 
+    public static final String CBSR_HELP_ID = "edu.ualberta.med.biobank.commands.cbsrHelp";
+
     public static final String SEND_ERROR_EMAIL_ID = "edu.ualberta.med.biobank.commands.sendErrorMail";
 
     public static final String EXPORT_ERRORS_LOGS_ID = "edu.ualberta.med.biobank.commands.exportErrorsLogs";
@@ -50,6 +52,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     @Override
     protected void makeActions(IWorkbenchWindow window) {
+        createCustomAction(window, "CBSR Help", CBSR_HELP_ID, "cbsrHelp",
+            "Get technical support from CBSR");
+
         createCustomAction(window, "Keyboard Shortcuts...",
             "org.eclipse.ui.window.showKeyAssist", "shorcuts",
             "Show shorcuts for the current view");
