@@ -12,6 +12,7 @@ public class BiobankPerspectiveListener extends PerspectiveAdapter {
     @Override
     public void perspectiveOpened(IWorkbenchPage page,
         IPerspectiveDescriptor perspective) {
+        //
     }
 
     @Override

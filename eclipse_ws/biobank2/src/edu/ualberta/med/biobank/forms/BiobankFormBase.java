@@ -44,6 +44,7 @@ public abstract class BiobankFormBase extends BgcFormBase {
     protected AdapterBase adapter;
 
     public BiobankFormBase() {
+        //
     }
 
     @Override
@@ -67,10 +68,12 @@ public abstract class BiobankFormBase extends BgcFormBase {
 
     @Override
     public void doSave(IProgressMonitor monitor) {
+        // default does nothing
     }
 
     @Override
     public void doSaveAs() {
+        // default does nothing
     }
 
     @Override

@@ -94,7 +94,7 @@ public abstract class AbstractContainerDisplay {
 
     @SuppressWarnings("unused")
     public void setStorageSize(int rows, int columns) {
-
+        //
     }
 
     public Point getSizeToApply() {

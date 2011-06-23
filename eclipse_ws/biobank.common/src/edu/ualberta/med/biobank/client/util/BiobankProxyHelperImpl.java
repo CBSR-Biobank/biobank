@@ -149,6 +149,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                             Object child = convertToObject(map, childObject);
                             setterMethod.invoke(plainObject, child);
                         } catch (Exception e) {
+                            //
                         }
                     }
                 }

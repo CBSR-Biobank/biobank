@@ -8,9 +8,9 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
@@ -27,6 +27,7 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+        //
     }
 
     @Override

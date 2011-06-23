@@ -62,6 +62,7 @@ public class BiobankPartListener implements IPartListener {
 
     @Override
     public void partDeactivated(IWorkbenchPart part) {
+        //
     }
 
     @Override

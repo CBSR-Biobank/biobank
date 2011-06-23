@@ -71,28 +71,22 @@ public class BgcEntryForm extends BgcFormBase implements IBgcEntryForm {
 
     protected void addToolbarButtons() {
         formActions = new BgcEntryFormActions(this);
-        formActions
-            .addResetAction("edu.ualberta.med.biobank.gui.common.commands.reset");
-        formActions
-            .addCancelAction("edu.ualberta.med.biobank.gui.common.commands.cancel");
-        formActions
-            .addConfirmAction("edu.ualberta.med.biobank.gui.common.commands.confirm");
+        formActions.addResetAction(Actions.GUI_COMMON_RESET);
+        formActions.addCancelAction(Actions.GUI_COMMON_CANCEL);
+        formActions.addConfirmAction(Actions.GUI_COMMON_CONFIRM);
         form.updateToolBar();
     }
 
     protected void addConfirmAction() {
-        formActions
-            .addConfirmAction("edu.ualberta.med.biobank.gui.common.commands.confirm");
+        formActions.addConfirmAction(Actions.GUI_COMMON_CONFIRM);
     }
 
     protected void addResetAction() {
-        formActions
-            .addResetAction("edu.ualberta.med.biobank.gui.common.commands.reset");
+        formActions.addResetAction(Actions.GUI_COMMON_RESET);
     }
 
     protected void addCancelAction() {
-        formActions
-            .addCancelAction("edu.ualberta.med.biobank.gui.common.commands.cancel");
+        formActions.addCancelAction(Actions.GUI_COMMON_CANCEL);
     }
 
     protected void addPrintAction() {
@@ -118,6 +112,7 @@ public class BgcEntryForm extends BgcFormBase implements IBgcEntryForm {
     public void cancel() {
         // override me
     }
+
     @Override
     public void reset() {
         setDirty(false);

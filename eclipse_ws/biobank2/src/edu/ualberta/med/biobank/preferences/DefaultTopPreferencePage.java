@@ -63,6 +63,7 @@ public class DefaultTopPreferencePage extends PreferencePage implements
 
     @Override
     public void init(IWorkbench workbench) {
+        //
     }
 
     private void setSize(Composite composite) {

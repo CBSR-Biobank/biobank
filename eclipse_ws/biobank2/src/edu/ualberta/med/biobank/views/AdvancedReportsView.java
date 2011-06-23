@@ -55,6 +55,7 @@ public class AdvancedReportsView extends AbstractAdministrationView {
 
     @Override
     protected void internalSearch() {
+        //
     }
 
     @Override

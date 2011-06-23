@@ -109,10 +109,12 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
+                //
             }
 
             @Override
             public void dispose() {
+                //
             }
 
             @Override

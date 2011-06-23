@@ -208,12 +208,12 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void beforeScanThreadStart() {
-
+        // default does nothing
     }
 
     protected void afterScanAndProcess(
         @SuppressWarnings("unused") Integer rowToProcess) {
-
+        // default does nothing
     }
 
     @Override
@@ -366,7 +366,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected void createFakeOptions(
         @SuppressWarnings("unused") Composite fieldsComposite) {
-
+        // default does nothing
     }
 
     protected void createCancelConfirmWidget(Composite parent) {
@@ -487,7 +487,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void beforeScanTubeAlone() {
-
+        // default does nothing
     }
 
     protected boolean isScanTubeAloneMode() {

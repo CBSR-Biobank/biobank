@@ -6,8 +6,8 @@ import java.util.List;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
@@ -27,14 +27,10 @@ public class AliquotsByStudyClinicEditor extends ReportsEditor {
         topContainers = new TopContainerListWidget(parent, toolkit);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), listStatus, "Top Container List Empty");
-        topContainers.addSelectionChangedListener(new SelectionListener() {
+        topContainers.addSelectionChangedListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 listStatus.setValue(topContainers.getEnabled());
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
         start = widgetCreator.createDateTimeWidget(parent,

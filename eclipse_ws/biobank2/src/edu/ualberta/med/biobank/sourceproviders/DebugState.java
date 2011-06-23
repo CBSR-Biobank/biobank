@@ -29,6 +29,7 @@ public class DebugState extends AbstractSourceProvider {
 
     @Override
     public void dispose() {
+        //
     }
 
     public void setState(boolean state) {

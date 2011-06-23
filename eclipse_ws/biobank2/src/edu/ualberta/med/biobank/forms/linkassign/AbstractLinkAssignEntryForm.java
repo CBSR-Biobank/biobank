@@ -146,7 +146,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     }
 
     protected void setFirstControl(@SuppressWarnings("unused") Mode mode) {
-
+        // default does nothing
     }
 
     protected boolean showSinglePosition() {
@@ -154,12 +154,12 @@ public abstract class AbstractLinkAssignEntryForm extends
     }
 
     protected void defaultInitialisation() {
-
+        // default does nothing
     }
 
     protected void setNeedSinglePosition(
         @SuppressWarnings("unused") boolean position) {
-
+        // default does nothing
     }
 
     protected abstract Mode initialisationMode();
@@ -726,13 +726,11 @@ public abstract class AbstractLinkAssignEntryForm extends
                 } catch (RemoteConnectFailureException exp) {
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (BiobankCheckException bce) {
-                    BgcPlugin.openError(
-                        "Error while checking position", bce); //$NON-NLS-1$
+                    BgcPlugin.openError("Error while checking position", bce); //$NON-NLS-1$
                     appendLog("ERROR: " + bce.getMessage()); //$NON-NLS-1$
                     focusControl(inventoryIdField);
                 } catch (Exception e) {
-                    BgcPlugin.openError(
-                        "Error while checking position", e); //$NON-NLS-1$
+                    BgcPlugin.openError("Error while checking position", e); //$NON-NLS-1$
                     focusControl(positionField);
                 }
             }

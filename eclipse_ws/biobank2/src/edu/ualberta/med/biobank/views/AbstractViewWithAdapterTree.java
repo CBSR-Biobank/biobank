@@ -11,8 +11,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcSessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
@@ -29,16 +29,15 @@ public abstract class AbstractViewWithAdapterTree extends
         .getLogger(AbstractViewWithAdapterTree.class.getName());
 
     protected AbstractViewWithAdapterTree() {
-        BgcPlugin.getSessionStateSourceProvider()
-            .addSourceProviderListener(new ISourceProviderListener() {
+        BgcPlugin.getSessionStateSourceProvider().addSourceProviderListener(
+            new ISourceProviderListener() {
                 @Override
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
                     if (sourceName
                         .equals(BgcSessionState.SESSION_STATE_SOURCE_NAME)) {
                         if (sourceValue != null) {
-                            if (sourceValue
-                                .equals(BgcSessionState.LOGGED_IN))
+                            if (sourceValue.equals(BgcSessionState.LOGGED_IN))
                                 reload();
                             else if (sourceValue
                                 .equals(BgcSessionState.LOGGED_OUT))
@@ -51,6 +50,7 @@ public abstract class AbstractViewWithAdapterTree extends
                 @Override
                 public void sourceChanged(int sourcePriority,
                     Map sourceValuesByName) {
+                    //
                 }
             });
     }
@@ -76,7 +76,7 @@ public abstract class AbstractViewWithAdapterTree extends
     public abstract void reload();
 
     public void opened() {
-
+        // default does nothing
     }
 
     public abstract String getId();
