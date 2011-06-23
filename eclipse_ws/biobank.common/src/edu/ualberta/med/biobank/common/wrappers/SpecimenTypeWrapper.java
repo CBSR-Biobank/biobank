@@ -178,10 +178,10 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     public void checkNameAndShortNameUnique() throws ApplicationException,
         BiobankException {
         checkNoDuplicates(SpecimenType.class, SpecimenTypePeer.NAME.getName(),
-            getName(), "A sample type with name");
+            getName(), "A specimen type with name");
         checkNoDuplicates(SpecimenType.class,
             SpecimenTypePeer.NAME_SHORT.getName(), getNameShort(),
-            "A sample type with name short");
+            "A specimen type with name short");
     }
 
 }
