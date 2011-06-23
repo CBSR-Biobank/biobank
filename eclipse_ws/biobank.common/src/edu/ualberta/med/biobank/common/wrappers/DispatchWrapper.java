@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
@@ -12,9 +13,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.DispatchSpecimenPeer;
@@ -23,8 +22,11 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.IfPropertyThenAction.Is;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchSpecimenBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.UniquePropertiesOnSavedCheck;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Log;
@@ -33,6 +35,14 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DispatchWrapper extends DispatchBaseWrapper {
+    private static final Property<String, Dispatch> WAYBILL_PROPERTY = DispatchPeer.SHIPMENT_INFO
+        .to(ShipmentInfoPeer.WAYBILL);
+    private static final Collection<Property<?, ? super Dispatch>> UNIQUE_WAYBILL_PER_SENDER_PROPERTIES = new ArrayList<Property<?, ? super Dispatch>>();
+
+    static {
+        UNIQUE_WAYBILL_PER_SENDER_PROPERTIES.add(WAYBILL_PROPERTY);
+        UNIQUE_WAYBILL_PER_SENDER_PROPERTIES.add(DispatchPeer.SENDER_CENTER);
+    }
 
     private final Map<DispatchSpecimenState, List<DispatchSpecimenWrapper>> dispatchSpecimenMap = new HashMap<DispatchSpecimenState, List<DispatchSpecimenWrapper>>();
 
@@ -85,70 +95,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public Map<DispatchSpecimenState, List<DispatchSpecimenWrapper>> getMap() {
         return dispatchSpecimenMap;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        if (getSenderCenter() == null) {
-            throw new BiobankCheckException("Sender should be set");
-        }
-        if (getReceiverCenter() == null) {
-            throw new BiobankCheckException("Receiver should be set");
-        }
-
-        if (!checkWaybillUniqueForSender()) {
-            throw new BiobankCheckException("A dispatch with waybill "
-                + getShipmentInfo().getWaybill()
-                + " already exists for sending site "
-                + getSenderCenter().getNameShort());
-        }
-    }
-
-    @Override
-    protected void persistDependencies(Dispatch origObject) throws Exception {
-        for (DispatchSpecimenWrapper dds : deletedDispatchedSpecimens) {
-            if (!dds.isNew()) {
-                dds.delete();
-            }
-        }
-
-        // FIXME: temporary fix - this should be converted to a batch update
-        for (DispatchSpecimenWrapper rds : receivedDispatchedSpecimens) {
-            rds.getSpecimen().persist();
-        }
-    }
-
-    private static final String WAYBILL_UNIQUE_FOR_SENDER_QRY = "from "
-        + Dispatch.class.getName()
-        + " where "
-        + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
-        + "=? and "
-        + Property.concatNames(DispatchPeer.SHIPMENT_INFO,
-            ShipmentInfoPeer.WAYBILL) + "=?";
-
-    private boolean checkWaybillUniqueForSender() throws ApplicationException,
-        BiobankCheckException {
-        List<Object> params = new ArrayList<Object>();
-        CenterWrapper<?> sender = getSenderCenter();
-        if (sender == null) {
-            throw new BiobankCheckException("sender site cannot be null");
-        }
-        params.add(sender.getId());
-        if (getShipmentInfo() == null)
-            params.add("");
-        else
-            params.add(getShipmentInfo().getWaybill());
-
-        StringBuilder qry = new StringBuilder(WAYBILL_UNIQUE_FOR_SENDER_QRY);
-        if (!isNew()) {
-            qry.append(" and id <> ?");
-            params.add(getId());
-        }
-        HQLCriteria c = new HQLCriteria(qry.toString(), params);
-
-        List<Object> results = appService.query(c);
-        return results.size() == 0;
     }
 
     private List<DispatchSpecimenWrapper> getDispatchSpecimenCollectionWithState(
@@ -549,5 +495,43 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public boolean hasNewSpecimens() {
         return hasNewSpecimens;
+    }
+
+    @Override
+    protected TaskList getPersistTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(check().notNull(DispatchPeer.SENDER_CENTER));
+        tasks.add(check().notNull(DispatchPeer.RECEIVER_CENTER));
+
+        tasks.add(cascade().deleteRemoved(
+            DispatchPeer.DISPATCH_SPECIMEN_COLLECTION));
+        tasks.add(cascade().persistAdded(
+            DispatchPeer.DISPATCH_SPECIMEN_COLLECTION));
+
+        // TODO: probably remove the following:
+        // tasks.add(cascade().delete(deletedDispatchedSpecimens));
+        // tasks.add(cascade().persist(receivedDispatchedSpecimens));
+
+        tasks.add(super.getPersistTasks());
+
+        BiobankSessionAction checkUniqueWaybillPerSenderCenter = new UniquePropertiesOnSavedCheck<Dispatch>(
+            this, UNIQUE_WAYBILL_PER_SENDER_PROPERTIES);
+
+        tasks.add(check().ifProperty(WAYBILL_PROPERTY, Is.NOT_NULL,
+            checkUniqueWaybillPerSenderCenter));
+
+        return tasks;
+    }
+
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        WrapperTransaction.persist(this, appService);
+    }
+
+    @Override
+    public void delete() throws Exception {
+        WrapperTransaction.delete(this, appService);
     }
 }

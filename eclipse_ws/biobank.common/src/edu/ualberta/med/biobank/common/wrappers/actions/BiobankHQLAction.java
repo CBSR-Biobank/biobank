@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.wrappers;
+package edu.ualberta.med.biobank.common.wrappers.actions;
 
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import gov.nih.nci.system.query.hql.SearchHQLQuery;

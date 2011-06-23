@@ -1,5 +1,8 @@
-package edu.ualberta.med.biobank.common.wrappers;
+package edu.ualberta.med.biobank.common.wrappers.actions;
 
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.util.ProxyUtil;
 import gov.nih.nci.system.query.example.SearchExampleQuery;
 
 /**
@@ -18,7 +21,7 @@ public abstract class BiobankWrapperAction<E> extends SearchExampleQuery
     private final Property<? extends Integer, ? super E> idProperty;
 
     protected BiobankWrapperAction(ModelWrapper<E> wrapper) {
-        super(ProxyUtil.convertProxyToObject(wrapper.wrappedObject));
+        super(ProxyUtil.convertProxyToObject(wrapper.getWrappedObject()));
         this.modelClass = wrapper.getWrappedClass();
         this.idProperty = wrapper.getIdProperty();
     }

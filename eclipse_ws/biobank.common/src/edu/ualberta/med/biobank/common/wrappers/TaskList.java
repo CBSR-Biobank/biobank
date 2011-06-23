@@ -1,15 +1,17 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import gov.nih.nci.system.query.SDKQuery;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.wrappers.tasks.InactiveQueryTask;
+import edu.ualberta.med.biobank.common.wrappers.tasks.QueryTask;
+import gov.nih.nci.system.query.SDKQuery;
+
 /**
- * Manages several {@code List}-s of tasks, such as {@code QueryTask}-s and
- * {@code PreQueryTask}-s used by a {@code ModelWrapperTransaciton} to persist
- * or delete a {@code ModelWrapper<?>}.
+ * Manages several {@link List}-s of tasks, such as {@link QueryTask}-s and
+ * {@link PreQueryTask}-s used by a {@link ModelWrapperTransaciton} to persist
+ * or delete a {@link ModelWrapper<?>}.
  * 
  * @author jferland
  * 
@@ -26,7 +28,7 @@ public class TaskList {
     private final List<PreQueryTask> preQueryTasks = new ArrayList<PreQueryTask>();
 
     /**
-     * Add a {@code QueryTask} to the end of the {@code QueryTask} list.
+     * Add a {@link QueryTask} to the end of the {@link QueryTask} list.
      * 
      * @param task
      */
@@ -35,8 +37,8 @@ public class TaskList {
     }
 
     /**
-     * Wrap a {@code SDKQuery} in an actionless {@code QueryTask} (e.g.
-     * {@code InactiveQueryTask}) and add it to the end of the {@code QueryTask}
+     * Wrap a {@link SDKQuery} in an actionless {@link QueryTask} (e.g.
+     * {@link InactiveQueryTask}) and add it to the end of the {@link QueryTask}
      * list.
      * 
      * @param task
@@ -47,7 +49,7 @@ public class TaskList {
     }
 
     /**
-     * Add a {@code PreQueryTask} to the end of the {@code PreQueryTask} list.
+     * Add a {@link PreQueryTask} to the end of the {@link PreQueryTask} list.
      * 
      * @param task
      */
@@ -56,8 +58,8 @@ public class TaskList {
     }
 
     /**
-     * Adds all of the given {@code TaskList}'s internal lists into this
-     * {@code TaskList}.
+     * Adds all of the given {@link TaskList}'s internal lists into this
+     * {@link TaskList}.
      * 
      * @param list
      */

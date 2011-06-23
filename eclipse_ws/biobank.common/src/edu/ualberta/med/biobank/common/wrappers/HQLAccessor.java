@@ -13,7 +13,7 @@ class HQLAccessor {
     private static final String GET_COLLECTION_HQL = "SELECT e FROM {0} e WHERE e.{1} = ?";
 
     /**
-     * Get a {@code List} of {@code ModelWrapper}-s that wrap a collection of
+     * Get a {@link List} of {@link ModelWrapper}-s that wrap a collection of
      * 
      * @param <W1>
      * @param <M1>

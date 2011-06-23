@@ -1,18 +1,28 @@
 package edu.ualberta.med.biobank.common.wrappers.checks;
 
 import java.text.MessageFormat;
-import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.wrappers.BiobankWrapperAction;
+import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.actions.BiobankWrapperAction;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 
-public class CheckNotUsed<E> extends BiobankWrapperAction<E> {
+/**
+ * Check that the model object in a {@link ModelWrapper} is not used by a
+ * specific {@link Property}.
+ * 
+ * @author jferland
+ * 
+ * @param <E>
+ * @throws ModelIsUsedException if the wrapped object is used by the specific
+ *             {@link Property}.
+ */
+public class NotUsedCheck<E> extends BiobankWrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_MESSAGE = "{0} {1} is still in use by {2}.";
     private static final String COUNT_HQL = "SELECT count(m) FROM {0} m WHERE m.{1} = ?";
@@ -23,16 +33,14 @@ public class CheckNotUsed<E> extends BiobankWrapperAction<E> {
     private final String exceptionMessage;
 
     /**
-     * Check that the model object in the {@code ModelWrapper} is not used by
-     * the given {@code Property}.
      * 
      * @param wrapper to get the model object from
-     * @param property the property of another object that references the model
-     *            object
-     * @param exceptionMessage the message in the {@code ModelIsUsedException}
+     * @param property the {@link Property} of another object that references
+     *            the {@link ModelWrapper}'s model object
+     * @param exceptionMessage the message in the {@link ModelIsUsedException}
      *            thrown if this model object is used.
      */
-    public <T> CheckNotUsed(ModelWrapper<E> wrapper,
+    public <T> NotUsedCheck(ModelWrapper<E> wrapper,
         Property<? super E, ? super T> property, Class<T> propertyClass,
         String errorMessage) {
         super(wrapper);
@@ -49,10 +57,9 @@ public class CheckNotUsed<E> extends BiobankWrapperAction<E> {
         Query query = session.createQuery(hql);
         query.setParameter(0, getModel());
 
-        List<?> results = query.list();
-        Long count = CheckUtil.getCountFromResult(results);
+        Long count = HibernateUtil.getCountFromQuery(query);
 
-        if (count == null || count > 0) {
+        if (count > 0) {
             String message = getExceptionMessage();
             throw new ModelIsUsedException(message);
         }

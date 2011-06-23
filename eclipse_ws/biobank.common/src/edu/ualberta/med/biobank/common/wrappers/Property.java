@@ -57,8 +57,8 @@ public class Property<T, W> implements Serializable {
     }
 
     /**
-     * @return the {@code Class} of the elements in the {@code Collection}
-     *         returned by this class, otherwise the {@code Class} itself.
+     * @return the {@link Class} of the elements in the {@link Collection}
+     *         returned by this class, otherwise the {@link Class} itself.
      */
     public Class<?> getElementClass() {
         return typeInfo.elementClass;
@@ -103,13 +103,13 @@ public class Property<T, W> implements Serializable {
     }
 
     /**
-     * Creates a new <code>Property</code> by treating the <code>Property</code>
-     * of an association as a direct property.
+     * Creates a new {@link Property} by treating the {@link Property} of an
+     * association as a direct property.
      * 
      * @param <T2>
      * @param propertyChangeName a new name to use for the property when firing
-     *            a change event (should correspond to the
-     *            <code>ModelWrapper</code>'s method name)
+     *            a change event (should correspond to the {@link ModelWrapper}
+     *            's method name)
      * @param property
      * @return
      */
@@ -150,10 +150,10 @@ public class Property<T, W> implements Serializable {
     }
 
     /**
-     * Returns a copy of a {@code List} of the component names that make up the
-     * name of this {@code Property}. For example, if a {@code Property} has a
+     * Returns a copy of a {@link List} of the component names that make up the
+     * name of this {@link Property}. For example, if a {@link Property} has a
      * name of "specimen" then this method would return ("specimen"). However,
-     * if a {@code Property} has a name of "specimen.container.id" then this
+     * if a {@link Property} has a name of "specimen.container.id" then this
      * method would return the list ("specimen", "container", "id").
      * 
      * @return
@@ -213,7 +213,7 @@ public class Property<T, W> implements Serializable {
     };
 
     /**
-     * Because {@code TypeReference} is not necessarily {@code Serializable},
+     * Because {@link TypeReference} is not necessarily {@link Serializable},
      * this internal class is used to extract all the necessary information,
      * encapsulate it, and all it to be serialized.
      * 

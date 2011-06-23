@@ -6,14 +6,15 @@ import java.util.Collection;
 import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.CheckFieldLimitsException;
-import edu.ualberta.med.biobank.common.wrappers.actions.IfProperty;
-import edu.ualberta.med.biobank.common.wrappers.actions.IfProperty.Is;
-import edu.ualberta.med.biobank.common.wrappers.checks.CheckCollectionIsEmpty;
-import edu.ualberta.med.biobank.common.wrappers.checks.CheckNotNull;
-import edu.ualberta.med.biobank.common.wrappers.checks.CheckNotUsed;
-import edu.ualberta.med.biobank.common.wrappers.checks.CheckUnique;
-import edu.ualberta.med.biobank.common.wrappers.checks.LazyMessage;
-import edu.ualberta.med.biobank.common.wrappers.checks.PostCheckLegalOption;
+import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.IfPropertyThenAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.IfPropertyThenAction.Is;
+import edu.ualberta.med.biobank.common.wrappers.checks.CollectionIsEmptyCheck;
+import edu.ualberta.med.biobank.common.wrappers.checks.NotNullCheck;
+import edu.ualberta.med.biobank.common.wrappers.checks.NotUsedCheck;
+import edu.ualberta.med.biobank.common.wrappers.checks.UniquePropertiesCheck;
+import edu.ualberta.med.biobank.common.wrappers.checks.LegalOptionOnSavedCheck;
+import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage;
 
 public class WrapperChecker<E> {
     private final ModelWrapper<E> wrapper;
@@ -22,24 +23,24 @@ public class WrapperChecker<E> {
         this.wrapper = wrapper;
     }
 
-    public CheckUnique<E> unique(Property<?, ? super E> property) {
+    public UniquePropertiesCheck<E> unique(Property<?, ? super E> property) {
         Collection<Property<?, ? super E>> properties = new ArrayList<Property<?, ? super E>>();
         properties.add(property);
 
-        return new CheckUnique<E>(wrapper, properties);
+        return new UniquePropertiesCheck<E>(wrapper, properties);
     }
 
-    public CheckUnique<E> unique(Collection<Property<?, ? super E>> properties) {
+    public UniquePropertiesCheck<E> unique(Collection<Property<?, ? super E>> properties) {
 
         // make our own copy that is not exposed
         properties = new ArrayList<Property<?, ? super E>>(properties);
 
-        return new CheckUnique<E>(wrapper, properties);
+        return new UniquePropertiesCheck<E>(wrapper, properties);
     }
 
-    public CheckNotNull<E> notNull(Property<?, ? super E> property) {
+    public NotNullCheck<E> notNull(Property<?, ? super E> property) {
         // TODO: check on the client and on the server?
-        return new CheckNotNull<E>(wrapper, property);
+        return new NotNullCheck<E>(wrapper, property);
     }
 
     public TaskList uniqueAndNotNull(Property<?, ? super E> property) {
@@ -51,40 +52,40 @@ public class WrapperChecker<E> {
         return tasks;
     }
 
-    public CheckCollectionIsEmpty<E> empty(
+    public CollectionIsEmptyCheck<E> empty(
         Property<? extends Collection<?>, ? super E> property) {
-        return new CheckCollectionIsEmpty<E>(wrapper, property, null);
+        return new CollectionIsEmptyCheck<E>(wrapper, property, null);
     }
 
-    public CheckCollectionIsEmpty<E> empty(
+    public CollectionIsEmptyCheck<E> empty(
         Property<? extends Collection<?>, ? super E> property,
         String exceptionMessage) {
-        return new CheckCollectionIsEmpty<E>(wrapper, property,
+        return new CollectionIsEmptyCheck<E>(wrapper, property,
             exceptionMessage);
     }
 
-    public <T> PostCheckLegalOption<E> legalOption(
+    public <T> LegalOptionOnSavedCheck<E> legalOption(
         Property<? extends Collection<? extends T>, ? super E> legalOptions,
         Property<? extends T, ? super E> selectedOption,
         LazyMessage exceptionMessage) {
-        return new PostCheckLegalOption<E>(wrapper, legalOptions,
+        return new LegalOptionOnSavedCheck<E>(wrapper, legalOptions,
             selectedOption, exceptionMessage);
     }
 
-    public <T> CheckNotUsed<E> notUsedBy(Class<T> propertyClass,
+    public <T> NotUsedCheck<E> notUsedBy(Class<T> propertyClass,
         Property<? super E, ? super T> property) {
-        return new CheckNotUsed<E>(wrapper, property, propertyClass, null);
+        return new NotUsedCheck<E>(wrapper, property, propertyClass, null);
     }
 
-    public <T> CheckNotUsed<E> notUsedBy(Class<T> propertyClass,
+    public <T> NotUsedCheck<E> notUsedBy(Class<T> propertyClass,
         Property<? super E, ? super T> property, String exceptionMessage) {
-        return new CheckNotUsed<E>(wrapper, property, propertyClass,
+        return new NotUsedCheck<E>(wrapper, property, propertyClass,
             exceptionMessage);
     }
 
-    public <T> IfProperty<E> ifProperty(Property<?, ? super E> property, Is is,
+    public <T> IfPropertyThenAction<E> ifProperty(Property<?, ? super E> property, Is is,
         BiobankSessionAction action) {
-        return new IfProperty<E>(wrapper, property, is, action);
+        return new IfPropertyThenAction<E>(wrapper, property, is, action);
     }
 
     public TaskList stringLengths() {

@@ -1,11 +1,11 @@
-package edu.ualberta.med.biobank.common.wrappers;
+package edu.ualberta.med.biobank.common.wrappers.tasks;
 
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 
 /**
- * A bare-bones implementation of {@code QueryTask} that does nothing but hold
- * an {@code SDKQuery}.
+ * A bare-bones implementation of {@link QueryTask} that does nothing but hold
+ * an {@link SDKQuery}.
  * 
  * @author jferland
  * 

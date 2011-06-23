@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.wrappers;
+package edu.ualberta.med.biobank.common.wrappers.util;
 
 import org.springframework.aop.framework.Advised;
 

@@ -26,11 +26,11 @@ public class ElementQueue<E> {
     }
 
     /**
-     * Adds actions/ commands to remember to add the given {@code ModelWrapper}
-     * elements to the given collection {@code Property} when it is loaded.
+     * Adds actions/ commands to remember to add the given {@link ModelWrapper}
+     * elements to the given collection {@link Property} when it is loaded.
      * 
      * @param <W> wrapper class
-     * @param <M> model class wrapped by {@code W}
+     * @param <M> model class wrapped by {@link W}
      * @param property
      * @param elements
      */
@@ -45,11 +45,11 @@ public class ElementQueue<E> {
 
     /**
      * Adds actions/ commands to remember to remove the given
-     * {@code ModelWrapper} elements to the given collection {@code Property}
+     * {@link ModelWrapper} elements to the given collection {@link Property}
      * when it is loaded.
      * 
      * @param <W> wrapper class
-     * @param <M> model class wrapped by {@code W}
+     * @param <M> model class wrapped by {@link W}
      * @param property
      * @param wrappers
      */
@@ -63,13 +63,13 @@ public class ElementQueue<E> {
     }
 
     /**
-     * Flushes the {@code List} of {@code Action}-s for the given collection
-     * {@code Property} into the given {@code Collection}. That is, perform the
+     * Flushes the {@link List} of {@link Action}-s for the given collection
+     * {@link Property} into the given {@link Collection}. That is, perform the
      * queued up actions (e.g. add elements, delete elements) then clear the
      * action queue.
      * 
      * @param <W> wrapper class
-     * @param <M> model class wrapped by {@code W}
+     * @param <M> model class wrapped by {@link W}
      * @param property
      */
     public <W extends ModelWrapper<? extends M>, M> void flush(

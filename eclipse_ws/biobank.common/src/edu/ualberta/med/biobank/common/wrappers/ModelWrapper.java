@@ -152,13 +152,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
-     * Get a {@code TaskList} that will persist (i.e. insert or update) the
-     * wrapped model object. The {@code TaskList}-s might also check certain
+     * Get a {@link TaskList} that will persist (i.e. insert or update) the
+     * wrapped model object. The {@link TaskList}-s might also check certain
      * conditions on the client or server, as well as persist potential
      * dependent objects.
      * 
      * This method should be overridden as necessary to return a
-     * {@code TaskList} that properly persists the wrapped model object.
+     * {@link TaskList} that properly persists the wrapped model object.
      * 
      * @return
      */
@@ -172,12 +172,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
-     * Get a {@code TaskList} that will delete the wrapped model object. The
-     * {@code TaskList}-s might also check certain conditions on the client or
+     * Get a {@link TaskList} that will delete the wrapped model object. The
+     * {@link TaskList}-s might also check certain conditions on the client or
      * server, as well as affect potential dependent objects.
      * 
      * This method should be overridden as necessary to return a
-     * {@code TaskList} that properly deletes the wrapped model object.
+     * {@link TaskList} that properly deletes the wrapped model object.
      * 
      * @return
      */

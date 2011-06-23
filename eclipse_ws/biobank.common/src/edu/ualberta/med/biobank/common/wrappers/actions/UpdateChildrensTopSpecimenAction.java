@@ -8,7 +8,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.wrappers.BiobankWrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.model.Specimen;

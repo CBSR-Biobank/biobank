@@ -20,13 +20,14 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.actions.IfProperty.Is;
+import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.IfPropertyThenAction.Is;
 import edu.ualberta.med.biobank.common.wrappers.actions.UpdateChildrensTopSpecimenAction;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.LazyMessage;
-import edu.ualberta.med.biobank.common.wrappers.checks.LazyMessage.LazyArg;
 import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
-import edu.ualberta.med.biobank.common.wrappers.tasks.NullActionWrapperQueryTask;
+import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
+import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage;
+import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage.LazyArg;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -590,7 +591,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     private static class ResetTopSpecimenChangedQueryTask extends
-        NullActionWrapperQueryTask<Specimen, SpecimenWrapper> {
+        NoActionWrapperQueryTask<SpecimenWrapper> {
         public ResetTopSpecimenChangedQueryTask(SpecimenWrapper specimen) {
             super(specimen);
         }

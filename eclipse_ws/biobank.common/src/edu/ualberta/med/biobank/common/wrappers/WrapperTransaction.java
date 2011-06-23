@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.wrappers.actions.BiobankWrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.tasks.QueryTask;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;

@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Helper class to {@code ModelWrapper} to track the original set of collection
- * {@code Property}-s (if they're about to change) so that it can be easily
+ * Helper class to {@link ModelWrapper} to track the original set of collection
+ * {@link Property}-s (if they're about to change) so that it can be easily
  * determined later what the added and removed elements of the collection were,
- * if any. Tracks a single given {@code ModelWrapper}.
+ * if any. Tracks a single given {@link ModelWrapper}.
  * 
  * @author jferland
  * 
@@ -25,6 +25,9 @@ class ElementTracker<E> {
     private final Map<Property<? extends Collection<?>, ? super E>, Object> map = new HashMap<Property<? extends Collection<?>, ? super E>, Object>();
     private final ModelWrapper<E> wrapper;
 
+    /**
+     * @param wrapper the {@link ModelWrapper} to track
+     */
     public ElementTracker(ModelWrapper<E> wrapper) {
         this.wrapper = wrapper;
     }
@@ -44,8 +47,8 @@ class ElementTracker<E> {
     }
 
     /**
-     * Gets a {@code Set} of all collection {@code Property}-s that were changed
-     * through the associated {@code ModelWrapper}.
+     * Gets a {@link Set} of all collection {@link Property}-s that were changed
+     * through the associated {@link ModelWrapper}.
      * 
      * @param <T>
      * @param property
@@ -57,8 +60,8 @@ class ElementTracker<E> {
     }
 
     /**
-     * Gets a list of all {@code ModelWrapper}-ed elements that were added to
-     * the any tracked collection {@code Property}.
+     * Gets a list of all {@link ModelWrapper}-ed elements that were added to
+     * the any tracked collection {@link Property}.
      * 
      * @param <T>
      * @param property
@@ -75,8 +78,8 @@ class ElementTracker<E> {
     }
 
     /**
-     * Gets a list of {@code ModelWrapper}-ed elements that were added to the
-     * given collection {@code Property}.
+     * Gets a list of {@link ModelWrapper}-ed elements that were added to the
+     * given collection {@link Property}.
      * 
      * @param <T>
      * @param property
@@ -98,8 +101,8 @@ class ElementTracker<E> {
     }
 
     /**
-     * Gets a list of {@code ModelWrapper}-ed elements that were removed from
-     * the given collection {@code Property}.
+     * Gets a list of {@link ModelWrapper}-ed elements that were removed from
+     * the given collection {@link Property}.
      * 
      * @param <T>
      * @param property
@@ -121,7 +124,7 @@ class ElementTracker<E> {
     }
 
     /**
-     * Clears the tracked collection {@code Property} list.
+     * Clears the tracked collection {@link Property} list.
      */
     public void clear() {
         map.clear();

@@ -7,13 +7,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.CacheMode;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.CheckUnique;
+import edu.ualberta.med.biobank.common.wrappers.checks.BiobankWrapperOnSavedCheck;
+import edu.ualberta.med.biobank.common.wrappers.checks.UniquePropertiesCheck;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Log;
@@ -68,8 +69,8 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         // }
     }
 
-    private static class OriginInfoFromClinicPostCheck extends
-        BiobankWrapperAction<OriginInfo> {
+    private static class OriginInfoFromClinicCheckLoaded extends
+        BiobankWrapperOnSavedCheck<OriginInfo> {
         private static final long serialVersionUID = 1L;
         private static final Collection<Property<?, ? super OriginInfo>> UNIQUE_WAYBILL_PER_CENTER_PROPERTIES = new ArrayList<Property<?, ? super OriginInfo>>();
 
@@ -81,40 +82,16 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
         private final BiobankSessionAction checkUniqueWaybillPerCenter;
 
-        protected OriginInfoFromClinicPostCheck(OriginInfoWrapper wrapper) {
+        protected OriginInfoFromClinicCheckLoaded(OriginInfoWrapper wrapper) {
             super(wrapper);
 
-            this.checkUniqueWaybillPerCenter = new CheckUnique<OriginInfo>(
+            this.checkUniqueWaybillPerCenter = new UniquePropertiesCheck<OriginInfo>(
                 wrapper, UNIQUE_WAYBILL_PER_CENTER_PROPERTIES);
         }
 
         @Override
-        public Object doAction(Session session) throws BiobankSessionException {
-            // COOL-BEANS?
-            // Query query = session.createQuery("");
-            // query.setCacheable(false);
-            // query.setCacheMode(CacheMode.IGNORE);
-
-            // TODO: if this works, then extend BiobankWrapperAction with
-            // BiobankWrapperCheck and then override a doCheck(Session session)
-            // method so that checks will never touch the cache! :-) Also,
-            // perhaps auto-supply or load a new re-attached version of the
-            // object for a post-check?
-            CacheMode oldCacheMode = session.getCacheMode();
-
-            try {
-                session.setCacheMode(CacheMode.IGNORE);
-                doChecks(session);
-            } finally {
-                session.setCacheMode(oldCacheMode);
-            }
-
-            return null;
-        }
-
-        private void doChecks(Session session) throws BiobankSessionException {
-            Object obj = session.load(getModelClass(), getModelId());
-            OriginInfo originInfo = (OriginInfo) obj;
+        public void doCheckLoaded(Session session, OriginInfo originInfo)
+            throws BiobankSessionException {
             Center center = originInfo.getCenter();
 
             if (!(center instanceof Clinic)) {
@@ -262,7 +239,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
         tasks.add(super.getPersistTasks());
 
-        tasks.add(new OriginInfoFromClinicPostCheck(this));
+        tasks.add(new OriginInfoFromClinicCheckLoaded(this));
 
         return tasks;
     }

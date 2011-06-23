@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.wrappers.checks;
+package edu.ualberta.med.biobank.common.wrappers.util;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
@@ -10,7 +10,6 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ProxyUtil;
 
 public class LazyMessage implements Serializable {
     private static final long serialVersionUID = 1L;

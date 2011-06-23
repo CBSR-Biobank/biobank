@@ -2,18 +2,26 @@ package edu.ualberta.med.biobank.common.wrappers.checks;
 
 import java.text.MessageFormat;
 import java.util.Collection;
-import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.wrappers.BiobankWrapperAction;
+import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.actions.BiobankWrapperAction;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
 
-public class CheckCollectionIsEmpty<E> extends BiobankWrapperAction<E> {
+/**
+ * Check that the {@link Collection} {@link Property} of a {@link ModelWrapper}
+ * has a size of zero.
+ * 
+ * @author jferland
+ * 
+ * @param <E>
+ */
+public class CollectionIsEmptyCheck<E> extends BiobankWrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_MESSAGE = "{0} {1} has one or more {2}.";
     private static final String COUNT_HQL = "SELECT m.{0}.size FROM {1} m WHERE m = ?";
@@ -23,16 +31,13 @@ public class CheckCollectionIsEmpty<E> extends BiobankWrapperAction<E> {
     private final String exceptionMessage;
 
     /**
-     * Check that the {@code Collection} {@code Property} of the given
-     * {@code ModelWrapper} has a size of zero.
-     * 
      * @param wrapper to get the model object from
      * @param property the collection to ensure has size zero
      * @param exceptionMessage (optional) will override a default message
      *            generated if the collection is not empty. Set to null if you
      *            want to use the default message.
      */
-    public CheckCollectionIsEmpty(ModelWrapper<E> wrapper,
+    public CollectionIsEmptyCheck(ModelWrapper<E> wrapper,
         Property<? extends Collection<?>, ? super E> property,
         String exceptionMessage) {
         super(wrapper);
@@ -48,10 +53,9 @@ public class CheckCollectionIsEmpty<E> extends BiobankWrapperAction<E> {
         Query query = session.createQuery(hql);
         query.setParameter(0, getModel());
 
-        List<?> results = query.list();
-        Long count = CheckUtil.getCountFromResult(results);
+        Long count = HibernateUtil.getCountFromQuery(query);
 
-        if (count == null || count > 0) {
+        if (count > 0) {
             String message = getExceptionMessage();
             throw new CollectionNotEmptyException(message);
         }

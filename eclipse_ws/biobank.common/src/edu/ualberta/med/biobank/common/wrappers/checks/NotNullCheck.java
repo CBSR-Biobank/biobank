@@ -4,13 +4,21 @@ import java.text.MessageFormat;
 
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.wrappers.BiobankWrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.actions.BiobankWrapperAction;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropertyException;
 
-public class CheckNotNull<E> extends BiobankWrapperAction<E> {
+/**
+ * Check that a {@link Property} of the {@link ModelWrapper}'s wrapped object is
+ * not null.
+ * 
+ * @author jferland
+ * 
+ * @param <E>
+ */
+public class NotNullCheck<E> extends BiobankWrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_STRING = "The {0} of {1} {2} must be defined (cannot be null).";
 
@@ -18,13 +26,11 @@ public class CheckNotNull<E> extends BiobankWrapperAction<E> {
     private final String modelString;
 
     /**
-     * Check that the given {@code Property} of the {@code ModelWrapper}'s
-     * wrapped object is not null.
      * 
      * @param wrapper
      * @param property
      */
-    public CheckNotNull(ModelWrapper<E> wrapper, Property<?, ? super E> property) {
+    public NotNullCheck(ModelWrapper<E> wrapper, Property<?, ? super E> property) {
         super(wrapper);
         this.property = property;
         this.modelString = wrapper.toString();

@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.common.reports.QueryProcess;
-import edu.ualberta.med.biobank.common.wrappers.BiobankSessionAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
 import edu.ualberta.med.biobank.server.applicationservice.ReportData;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
