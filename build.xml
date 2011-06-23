@@ -957,6 +957,7 @@
           depends="clean-tests,clean-jars"
           description="deletes caCORE SDK directory and deletes jars from eclipse projects">
     <delete dir="${cacore.sdk.dir}" />
+    <delete dir="${buildDirectory}" />
   </target>
 
   <!-- JUnit -->
@@ -1159,6 +1160,9 @@
       <arg line="-DbuildDirectory=${product.dir}/buildDirectory" />
       <arg line="-DbaseLocation=${env.ECLIPSE_HOME}" />
       <arg line="-Djava.client.version.num=${java.client.version.num}" />
+
+	  <!-- uncomment line below to build a single executable product -->
+      <!-- arg line="-Dconfigs='linux, gtk, x86_64'" / -->
     </java>
     <antcall target="updateSiteMetadata" />
   </target>

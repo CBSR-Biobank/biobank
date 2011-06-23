@@ -44,15 +44,12 @@ public class BgcPlugin extends AbstractUIPlugin {
     public static final String IMG_FORM_BG = "formBg";
     public static final String IMG_FREEZER = "freezer";
     public static final String IMG_HOTEL = "hotel";
-    public static final String IMG_LOGIN = "login";
-    public static final String IMG_LOGOUT = "logout";
     public static final String IMG_MAIN_PERSPECTIVE = "mainPerspective";
     public static final String IMG_PALLET = "pallet";
     public static final String IMG_PATIENT = "patient";
-    public static final String IMG_PATIENT_VISIT = "patientVisit";
-    public static final String IMG_PRINTER = "patientVisit";
+    public static final String IMG_COLLECTION_EVENT = "collectionEvent";
+    public static final String IMG_PRINTER = "printer";
     public static final String IMG_RELOAD_FORM = "reloadForm";
-    public static final String IMG_REPORTS = "reports";
     public static final String IMG_RESET_FORM = "resetForm";
     public static final String IMG_RESULTSET_FIRST = "resultsetFirst";
     public static final String IMG_RESULTSET_LAST = "resultsetLast";
@@ -145,15 +142,12 @@ public class BgcPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_FORM_BG, "form_banner.bmp");
         registerImage(registry, IMG_FREEZER, "freezer.png");
         registerImage(registry, IMG_HOTEL, "hotel.png");
-        registerImage(registry, IMG_LOGIN, "computer.png");
-        registerImage(registry, IMG_LOGOUT, "computer_delete.png");
         registerImage(registry, IMG_MAIN_PERSPECTIVE, "mainPerspective.png");
         registerImage(registry, IMG_PALLET, "pallet.png");
         registerImage(registry, IMG_PATIENT, "patient.png");
-        registerImage(registry, IMG_PATIENT_VISIT, "patientVisit.png");
+        registerImage(registry, IMG_COLLECTION_EVENT, "collectionEvent.png");
         registerImage(registry, IMG_PRINTER, "printer.png");
         registerImage(registry, IMG_RELOAD_FORM, "reload.png");
-        registerImage(registry, IMG_REPORTS, "reports.png");
         registerImage(registry, IMG_RESET_FORM, "reset.png");
         registerImage(registry, IMG_RESULTSET_FIRST, "resultset_first.png");
         registerImage(registry, IMG_RESULTSET_LAST, "resultset_last.png");
@@ -214,6 +208,9 @@ public class BgcPlugin extends AbstractUIPlugin {
             if (url != null) {
                 ImageDescriptor desc = ImageDescriptor.createFromURL(url);
                 registry.put(key, desc);
+            } else {
+                logger.error("Could not get URL for image: key" + key
+                    + ", filname " + fileName);
             }
         } catch (Exception e) {
             logger.error("Error registering an image", e);
