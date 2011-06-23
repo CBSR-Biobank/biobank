@@ -89,7 +89,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
         classToImageKey.put(PatientAdapter.class.getName(),
             BgcPlugin.IMG_PATIENT);
         classToImageKey.put(CollectionEventAdapter.class.getName(),
-            BgcPlugin.IMG_PATIENT_VISIT);
+            BgcPlugin.IMG_COLLECTION_EVENT);
         classToImageKey.put(ShipmentAdapter.class.getName(),
             BgcPlugin.IMG_CLINIC_SHIPMENT);
         classToImageKey.put(AbstractSearchedNode.class.getName(),
