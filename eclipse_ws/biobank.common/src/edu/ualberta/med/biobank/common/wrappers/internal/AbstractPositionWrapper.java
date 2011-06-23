@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.TaskList;
-import edu.ualberta.med.biobank.common.wrappers.actions.BiobankWrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage;
 import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage.LazyArg;
 import edu.ualberta.med.biobank.model.AbstractPosition;
@@ -117,7 +117,7 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     }
 
     protected static class PostCheckContainerPositionAvailable<E extends AbstractPosition>
-        extends BiobankWrapperAction<E> {
+        extends WrapperAction<E> {
         private static final long serialVersionUID = 1L;
         // @formatter:off
         private static final String HQL = "SELECT pos.{1}." + ContainerPeer.ID.getName() +
@@ -181,7 +181,7 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     }
 
     protected static class PostCheckContainerPositionInBounds<E extends AbstractPosition>
-        extends BiobankWrapperAction<E> {
+        extends WrapperAction<E> {
         private static final long serialVersionUID = 1L;
         private static final String HQL = "SELECT o.{0}, o.{1} FROM {2} o WHERE o = ?";
         private static final String OUT_OF_BOUNDS_POSITION_MSG = "Position {0}:{1} is invalid. Row should be between 0 and {2} (exclusive) and Col should be between 0 and {3} (exclusive).";

@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
  * 
  * @param <E>
  */
-public class PropertyCountAction<E> extends BiobankWrapperAction<E> {
+public class PropertyCountOnSavedAction<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String PROPERTIES_EMPTY_ERRMSG = "No properties were given to count. At least one property is required.";
     private static final String HQL = "SELECT COUNT(*) FROM {0} o WHERE ({1}) = (SELECT {1} FROM {0} o2 WHERE o2 = ?)";
@@ -35,7 +35,7 @@ public class PropertyCountAction<E> extends BiobankWrapperAction<E> {
      * @param wrapper {@link ModelWrapper} which holds the model object
      * @param properties to ensure uniqueness on
      */
-    public PropertyCountAction(ModelWrapper<E> wrapper,
+    public PropertyCountOnSavedAction(ModelWrapper<E> wrapper,
         Collection<Property<?, ? super E>> properties) {
         super(wrapper);
 

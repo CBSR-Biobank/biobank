@@ -1,21 +1,29 @@
-package edu.ualberta.med.biobank.common.wrappers.checks;
+package edu.ualberta.med.biobank.common.wrappers.actions;
 
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
-// TODO: write description
-public abstract class BiobankWrapperOnSavedCheck<E> extends
-    BiobankWrapperCheck<E> {
+/**
+ * Perform
+ * 
+ * @author jferland
+ * 
+ * @param <E>
+ */
+// TODO: switch to decorating rather than tons of derived classes :-(
+public abstract class UncachedLoadWrapperAction<E> extends
+    UncachedWrapperAction<E> {
     private static final long serialVersionUID = 1L;
 
-    protected BiobankWrapperOnSavedCheck(ModelWrapper<E> wrapper) {
+    protected UncachedLoadWrapperAction(ModelWrapper<E> wrapper) {
         super(wrapper);
     }
 
     @Override
-    public final void doCheck(Session session) throws BiobankSessionException {
+    public final void doWithoutCache(Session session)
+        throws BiobankSessionException {
         // TODO: write a test that persists a model object, then does a
         // CheckLoad on it, then persists, etc. to check if hib throws
         // exceptions

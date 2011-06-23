@@ -7,8 +7,8 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.actions.BiobankWrapperAction;
-import edu.ualberta.med.biobank.common.wrappers.actions.PropertyCountAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.PropertyCountOnSavedAction;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 
@@ -22,23 +22,23 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePr
  * 
  * @param <E>
  */
-public class UniquePropertiesOnSavedCheck<E> extends BiobankWrapperAction<E> {
+public class UniqueOnSavedCheck<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_STRING = "There already exists a {0} with property value(s) ({1}) for ({2}), respectively. These field(s) must be unique.";
 
     private final Collection<Property<?, ? super E>> properties;
-    private final PropertyCountAction<E> countAction;
+    private final PropertyCountOnSavedAction<E> countAction;
 
     /**
      * 
      * @param wrapper {@link ModelWrapper} which holds the model object
      * @param properties to ensure uniqueness on
      */
-    public UniquePropertiesOnSavedCheck(ModelWrapper<E> wrapper,
+    public UniqueOnSavedCheck(ModelWrapper<E> wrapper,
         Collection<Property<?, ? super E>> properties) {
         super(wrapper);
         this.properties = properties;
-        this.countAction = new PropertyCountAction<E>(wrapper, properties);
+        this.countAction = new PropertyCountOnSavedAction<E>(wrapper, properties);
     }
 
     @Override

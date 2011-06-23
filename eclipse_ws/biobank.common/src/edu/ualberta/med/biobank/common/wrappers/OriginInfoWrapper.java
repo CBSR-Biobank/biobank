@@ -12,9 +12,9 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.UncachedLoadWrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.BiobankWrapperOnSavedCheck;
-import edu.ualberta.med.biobank.common.wrappers.checks.UniquePropertiesCheck;
+import edu.ualberta.med.biobank.common.wrappers.checks.UniqueCheck;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Log;
@@ -70,7 +70,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     }
 
     private static class OriginInfoFromClinicCheckLoaded extends
-        BiobankWrapperOnSavedCheck<OriginInfo> {
+        UncachedLoadWrapperAction<OriginInfo> {
         private static final long serialVersionUID = 1L;
         private static final Collection<Property<?, ? super OriginInfo>> UNIQUE_WAYBILL_PER_CENTER_PROPERTIES = new ArrayList<Property<?, ? super OriginInfo>>();
 
@@ -85,7 +85,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         protected OriginInfoFromClinicCheckLoaded(OriginInfoWrapper wrapper) {
             super(wrapper);
 
-            this.checkUniqueWaybillPerCenter = new UniquePropertiesCheck<OriginInfo>(
+            this.checkUniqueWaybillPerCenter = new UniqueCheck<OriginInfo>(
                 wrapper, UNIQUE_WAYBILL_PER_CENTER_PROPERTIES);
         }
 

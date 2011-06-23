@@ -10,7 +10,18 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
-public class IfPropertyThenAction<E> extends BiobankWrapperAction<E> {
+/**
+ * Perform a {@link BiobankSessionAction} if the wrapped object's
+ * {@link Property} is <em>something</em> ({@link Is}).
+ * <p>
+ * This class expects that the wrapped object <em>is saved</em> to work
+ * properly.
+ * 
+ * @author jferland
+ * 
+ * @param <E>
+ */
+public class IfPropertyOnSavedThenAction<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String HQL = "SELECT COUNT(*) FROM {0} m {1} WHERE m = ? {2}";
 
@@ -32,8 +43,6 @@ public class IfPropertyThenAction<E> extends BiobankWrapperAction<E> {
     }
 
     /**
-     * Perform the given {@link BiobankSessionAction} if the wrapped object's
-     * {@link Property} is _something_ ({@link Is}).
      * 
      * @param wrapper
      * @param property should NOT be an association. If an association is
@@ -42,7 +51,7 @@ public class IfPropertyThenAction<E> extends BiobankWrapperAction<E> {
      * @param is (e.g. should the {@link Property} be null or not null)
      * @param action what to do if the condition is true
      */
-    public IfPropertyThenAction(ModelWrapper<E> wrapper,
+    public IfPropertyOnSavedThenAction(ModelWrapper<E> wrapper,
         Property<?, ? super E> property, Is is, BiobankSessionAction action) {
         super(wrapper);
         this.property = property;

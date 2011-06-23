@@ -1,17 +1,24 @@
-package edu.ualberta.med.biobank.common.wrappers.checks;
+package edu.ualberta.med.biobank.common.wrappers.actions;
 
 import org.hibernate.CacheMode;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.actions.BiobankWrapperAction;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
-// TODO: write description
-public abstract class BiobankWrapperCheck<E> extends BiobankWrapperAction<E> {
+/**
+ * A {@link WrapperAction} that performs an action outside of (ignoring) the
+ * {@link Hibernate} cache. See {@link CacheMode}.
+ * 
+ * @author jferland
+ * 
+ * @param <E>
+ */
+public abstract class UncachedWrapperAction<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
 
-    protected BiobankWrapperCheck(ModelWrapper<E> wrapper) {
+    protected UncachedWrapperAction(ModelWrapper<E> wrapper) {
         super(wrapper);
     }
 
@@ -23,7 +30,7 @@ public abstract class BiobankWrapperCheck<E> extends BiobankWrapperAction<E> {
 
         try {
             session.setCacheMode(CacheMode.IGNORE);
-            doCheck(session);
+            doWithoutCache(session);
         } finally {
             session.setCacheMode(oldCacheMode);
         }
@@ -31,6 +38,6 @@ public abstract class BiobankWrapperCheck<E> extends BiobankWrapperAction<E> {
         return null;
     }
 
-    public abstract void doCheck(Session session)
+    public abstract void doWithoutCache(Session session)
         throws BiobankSessionException;
 }

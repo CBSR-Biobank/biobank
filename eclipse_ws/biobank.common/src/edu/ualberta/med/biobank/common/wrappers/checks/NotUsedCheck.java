@@ -8,7 +8,7 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.actions.BiobankWrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 
@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsed
  * @throws ModelIsUsedException if the wrapped object is used by the specific
  *             {@link Property}.
  */
-public class NotUsedCheck<E> extends BiobankWrapperAction<E> {
+public class NotUsedCheck<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_MESSAGE = "{0} {1} is still in use by {2}.";
     private static final String COUNT_HQL = "SELECT count(m) FROM {0} m WHERE m.{1} = ?";

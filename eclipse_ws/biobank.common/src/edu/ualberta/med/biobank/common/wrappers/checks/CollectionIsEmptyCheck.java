@@ -9,7 +9,7 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.actions.BiobankWrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
 
@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionN
  * 
  * @param <E>
  */
-public class CollectionIsEmptyCheck<E> extends BiobankWrapperAction<E> {
+public class CollectionIsEmptyCheck<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_MESSAGE = "{0} {1} has one or more {2}.";
     private static final String COUNT_HQL = "SELECT m.{0}.size FROM {1} m WHERE m = ?";

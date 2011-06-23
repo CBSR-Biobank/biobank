@@ -11,7 +11,7 @@ import org.hibernate.criterion.Restrictions;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.actions.BiobankWrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 
@@ -22,13 +22,13 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePr
  * <p>
  * This check is <em>intended for direct properties, not associations</em>. To
  * check uniqueness of properties through associations, see
- * {@link UniquePropertiesOnSavedCheck}.
+ * {@link UniqueOnSavedCheck}.
  * 
  * @author jferland
  * 
  * @param <E>
  */
-public class UniquePropertiesCheck<E> extends BiobankWrapperAction<E> {
+public class UniqueCheck<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_STRING = "There already exists a {0} with property value(s) ({1}) for ({2}), respectively. These field(s) must be unique.";
 
@@ -39,7 +39,7 @@ public class UniquePropertiesCheck<E> extends BiobankWrapperAction<E> {
      * @param wrapper {@link ModelWrapper} which holds the model object
      * @param properties to ensure uniqueness on
      */
-    public UniquePropertiesCheck(ModelWrapper<E> wrapper,
+    public UniqueCheck(ModelWrapper<E> wrapper,
         Collection<Property<?, ? super E>> properties) {
         super(wrapper);
         this.properties = properties;

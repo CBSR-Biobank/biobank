@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.wrappers.actions.BiobankWrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.tasks.QueryTask;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -217,7 +217,7 @@ public class WrapperTransaction {
          * 
          */
         @SuppressWarnings("rawtypes")
-        public static class ReturnAction extends BiobankWrapperAction {
+        public static class ReturnAction extends WrapperAction {
             private static final long serialVersionUID = 1L;
 
             private Object result;

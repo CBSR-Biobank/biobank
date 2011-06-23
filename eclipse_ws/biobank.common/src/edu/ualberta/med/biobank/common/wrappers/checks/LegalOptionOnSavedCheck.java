@@ -9,7 +9,7 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.actions.BiobankWrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.InvalidOptionException;
@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.InvalidOpti
  * 
  * @param <E>
  */
-public class LegalOptionOnSavedCheck<E> extends BiobankWrapperAction<E> {
+public class LegalOptionOnSavedCheck<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String COUNT_HQL = "SELECT COUNT(option) FROM {0} m JOIN m.{1} option WHERE m = ? AND m.{2} = option";
 

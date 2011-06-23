@@ -7,12 +7,12 @@ import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.CheckFieldLimitsException;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
-import edu.ualberta.med.biobank.common.wrappers.actions.IfPropertyThenAction;
-import edu.ualberta.med.biobank.common.wrappers.actions.IfPropertyThenAction.Is;
+import edu.ualberta.med.biobank.common.wrappers.actions.IfPropertyOnSavedThenAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.IfPropertyOnSavedThenAction.Is;
 import edu.ualberta.med.biobank.common.wrappers.checks.CollectionIsEmptyCheck;
 import edu.ualberta.med.biobank.common.wrappers.checks.NotNullCheck;
 import edu.ualberta.med.biobank.common.wrappers.checks.NotUsedCheck;
-import edu.ualberta.med.biobank.common.wrappers.checks.UniquePropertiesCheck;
+import edu.ualberta.med.biobank.common.wrappers.checks.UniqueCheck;
 import edu.ualberta.med.biobank.common.wrappers.checks.LegalOptionOnSavedCheck;
 import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage;
 
@@ -23,19 +23,19 @@ public class WrapperChecker<E> {
         this.wrapper = wrapper;
     }
 
-    public UniquePropertiesCheck<E> unique(Property<?, ? super E> property) {
+    public UniqueCheck<E> unique(Property<?, ? super E> property) {
         Collection<Property<?, ? super E>> properties = new ArrayList<Property<?, ? super E>>();
         properties.add(property);
 
-        return new UniquePropertiesCheck<E>(wrapper, properties);
+        return new UniqueCheck<E>(wrapper, properties);
     }
 
-    public UniquePropertiesCheck<E> unique(Collection<Property<?, ? super E>> properties) {
+    public UniqueCheck<E> unique(Collection<Property<?, ? super E>> properties) {
 
         // make our own copy that is not exposed
         properties = new ArrayList<Property<?, ? super E>>(properties);
 
-        return new UniquePropertiesCheck<E>(wrapper, properties);
+        return new UniqueCheck<E>(wrapper, properties);
     }
 
     public NotNullCheck<E> notNull(Property<?, ? super E> property) {
@@ -83,9 +83,9 @@ public class WrapperChecker<E> {
             exceptionMessage);
     }
 
-    public <T> IfPropertyThenAction<E> ifProperty(Property<?, ? super E> property, Is is,
+    public <T> IfPropertyOnSavedThenAction<E> ifProperty(Property<?, ? super E> property, Is is,
         BiobankSessionAction action) {
-        return new IfPropertyThenAction<E>(wrapper, property, is, action);
+        return new IfPropertyOnSavedThenAction<E>(wrapper, property, is, action);
     }
 
     public TaskList stringLengths() {

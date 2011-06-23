@@ -8,7 +8,7 @@ import org.hibernate.EntityMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.wrappers.actions.BiobankWrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.tasks.ClearCollectionQueryTask;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
@@ -250,7 +250,7 @@ public class WrapperCascader<E> {
     }
 
     private static class DeleteRemovedUnchecked<E> extends
-        BiobankWrapperAction<E> {
+        WrapperAction<E> {
         private static final long serialVersionUID = 1L;
 
         private final Property<?, ? super E> property;

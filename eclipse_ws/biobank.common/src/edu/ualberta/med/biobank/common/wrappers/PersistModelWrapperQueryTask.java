@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.wrappers.actions.BiobankWrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.common.wrappers.tasks.QueryTask;
@@ -52,7 +52,7 @@ public class PersistModelWrapperQueryTask<E> implements QueryTask {
      * 
      * @param <E>
      */
-    private static class PersistAction<E> extends BiobankWrapperAction<E> {
+    private static class PersistAction<E> extends WrapperAction<E> {
         private static final long serialVersionUID = 1L;
 
         public PersistAction(ModelWrapper<E> wrapper) {

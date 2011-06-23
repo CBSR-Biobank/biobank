@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
 public class UpdateChildrensTopSpecimenAction extends
-    BiobankWrapperAction<Specimen> {
+    WrapperAction<Specimen> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     private static final String UPDATE_CHILDREN_HQL =
