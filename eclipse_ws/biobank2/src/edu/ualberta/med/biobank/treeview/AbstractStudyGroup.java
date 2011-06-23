@@ -35,6 +35,7 @@ public abstract class AbstractStudyGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+        //
     }
 
     @Override

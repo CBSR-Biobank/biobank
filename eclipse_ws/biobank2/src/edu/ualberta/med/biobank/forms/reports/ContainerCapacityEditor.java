@@ -11,6 +11,7 @@ public class ContainerCapacityEditor extends ReportsEditor {
 
     @Override
     protected void createOptionSection(Composite parent) {
+        //
     }
 
     @Override
@@ -25,6 +26,7 @@ public class ContainerCapacityEditor extends ReportsEditor {
 
     @Override
     protected void initReport() throws Exception {
+        //
     }
 
     @Override

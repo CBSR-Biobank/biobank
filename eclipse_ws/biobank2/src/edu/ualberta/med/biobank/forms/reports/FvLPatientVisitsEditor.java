@@ -11,6 +11,7 @@ public class FvLPatientVisitsEditor extends ReportsEditor {
 
     @Override
     protected void createOptionSection(Composite parent) {
+        //
     }
 
     @Override
@@ -26,6 +27,7 @@ public class FvLPatientVisitsEditor extends ReportsEditor {
 
     @Override
     protected void initReport() throws Exception {
+        //
     }
 
     @Override

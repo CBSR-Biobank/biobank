@@ -99,6 +99,7 @@ public abstract class BgcFormBase extends EditorPart implements
     public void doSaveAs() {
     }
 
+    @Override
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
         setSite(editorSite);
@@ -278,7 +279,7 @@ public abstract class BgcFormBase extends EditorPart implements
     }
 
     public static void setTextValue(BgcBaseText label, String value) {
-        if (value != null && !label.isDisposed()) {
+        if ((value != null) && !label.isDisposed()) {
             label.setText(value);
         }
     }

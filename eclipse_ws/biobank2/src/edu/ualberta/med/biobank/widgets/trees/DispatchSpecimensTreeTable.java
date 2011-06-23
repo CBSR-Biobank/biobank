@@ -86,6 +86,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         ITreeContentProvider contentProvider = new ITreeContentProvider() {
             @Override
             public void dispose() {
+                //
             }
 
             @Override

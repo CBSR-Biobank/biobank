@@ -17,7 +17,6 @@ import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MenuItem;
@@ -72,8 +71,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
      * .html for how to set row height.
      */
 
-    private static BgcLogger logger = BgcLogger
-        .getLogger(InfoTableWidget.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(InfoTableWidget.class
+        .getName());
 
     protected List<BiobankCollectionModel> model;
 
@@ -303,8 +302,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         doubleClickListeners.add(listener);
         editItem = new MenuItem(getMenu(), SWT.PUSH);
         editItem.setText("Edit");
-        editItem.addSelectionListener(new SelectionListener() {
-
+        editItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 ModelWrapper<?> selection = (ModelWrapper<?>) InfoTableWidget.this
@@ -313,10 +311,6 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
                     AdapterBase adapter = AdapterFactory.getAdapter(selection);
                     adapter.openEntryForm();
                 }
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
     }

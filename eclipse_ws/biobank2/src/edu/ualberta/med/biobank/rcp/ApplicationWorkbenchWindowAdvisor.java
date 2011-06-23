@@ -23,8 +23,8 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcSessionState;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
@@ -137,6 +137,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                 @Override
                 public void sourceChanged(int sourcePriority,
                     @SuppressWarnings("rawtypes") Map sourceValuesByName) {
+                    //
                 }
             });
 

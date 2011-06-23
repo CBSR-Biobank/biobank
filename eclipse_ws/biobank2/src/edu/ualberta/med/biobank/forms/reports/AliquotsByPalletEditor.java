@@ -6,20 +6,20 @@ import java.util.List;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.widgets.TopContainerListWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -47,14 +47,10 @@ public class AliquotsByPalletEditor extends ReportsEditor {
         topContainers = new TopContainerListWidget(parameterSection, toolkit);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), listStatus, "Top Container List Empty");
-        topContainers.addSelectionChangedListener(new SelectionListener() {
+        topContainers.addSelectionChangedListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 listStatus.setValue(topContainers.getEnabled());
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
     }
@@ -63,11 +59,7 @@ public class AliquotsByPalletEditor extends ReportsEditor {
         final BgcBaseText widget = (BgcBaseText) widgetCreator
             .createLabelledWidget(parent, BgcBaseText.class, SWT.NONE,
                 labelText, "");
-        widget.addKeyListener(new KeyListener() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-            }
-
+        widget.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.keyCode == SWT.CR) {

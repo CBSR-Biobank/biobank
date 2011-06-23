@@ -235,6 +235,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
      */
     @SuppressWarnings("unused")
     protected void doAfterSave() throws Exception {
+        // default does nothing
     }
 
     @Override
