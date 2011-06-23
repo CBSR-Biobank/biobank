@@ -10,6 +10,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -53,6 +54,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
     private boolean doSave;
 
     protected List<ContainerTypeWrapper> containerTypes;
+
+    private boolean renamingChildren;
 
     @Override
     public void init() throws Exception {
@@ -219,8 +222,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     protected void doBeforeSave() throws Exception {
         doSave = true;
-        if (container.hasChildren() && oldContainerLabel != null
-            && !oldContainerLabel.equals(container.getLabel())) {
+        renamingChildren = container.hasChildren() && oldContainerLabel != null
+            && !oldContainerLabel.equals(container.getLabel());
+        if (renamingChildren) {
             doSave = BgcPlugin
                 .openConfirm(
                     "Renaming container",
@@ -233,6 +237,13 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (doSave) {
             container.persist();
             SessionManager.updateAllSimilarNodes(containerAdapter, true);
+            if (renamingChildren)
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        containerAdapter.rebuild();
+                    }
+                });
         } else {
             setDirty(true);
         }
