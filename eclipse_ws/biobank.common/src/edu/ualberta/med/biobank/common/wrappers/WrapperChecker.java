@@ -7,8 +7,8 @@ import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.CheckFieldLimitsException;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
-import edu.ualberta.med.biobank.common.wrappers.actions.IfPropertyOnSavedThenAction;
-import edu.ualberta.med.biobank.common.wrappers.actions.IfPropertyOnSavedThenAction.Is;
+import edu.ualberta.med.biobank.common.wrappers.actions.ConditionalAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.ConditionalAction.Is;
 import edu.ualberta.med.biobank.common.wrappers.checks.CollectionIsEmptyCheck;
 import edu.ualberta.med.biobank.common.wrappers.checks.NotNullCheck;
 import edu.ualberta.med.biobank.common.wrappers.checks.NotUsedCheck;
@@ -83,9 +83,9 @@ public class WrapperChecker<E> {
             exceptionMessage);
     }
 
-    public <T> IfPropertyOnSavedThenAction<E> ifProperty(Property<?, ? super E> property, Is is,
+    public <T> ConditionalAction<E> ifProperty(Property<?, ? super E> property, Is is,
         BiobankSessionAction action) {
-        return new IfPropertyOnSavedThenAction<E>(wrapper, property, is, action);
+        return new ConditionalAction<E>(wrapper, property, is, action);
     }
 
     public TaskList stringLengths() {

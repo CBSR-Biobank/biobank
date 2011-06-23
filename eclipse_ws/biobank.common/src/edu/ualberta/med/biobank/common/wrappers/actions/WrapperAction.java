@@ -13,8 +13,8 @@ import gov.nih.nci.system.query.example.SearchExampleQuery;
  * @author jferland
  * 
  */
-public abstract class WrapperAction<E> extends SearchExampleQuery
-    implements BiobankSessionAction {
+public abstract class WrapperAction<E> extends SearchExampleQuery implements
+    BiobankSessionAction {
     private static final long serialVersionUID = 1L;
 
     private final Class<E> modelClass;

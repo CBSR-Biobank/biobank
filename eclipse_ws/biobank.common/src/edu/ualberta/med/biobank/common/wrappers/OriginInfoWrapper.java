@@ -2,26 +2,18 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
-import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
-import edu.ualberta.med.biobank.common.wrappers.actions.UncachedLoadWrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.UniqueCheck;
-import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.common.wrappers.checks.OriginInfoFromClinicCheck;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.OriginInfo;
-import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -67,66 +59,6 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         // throw new BiobankCheckException(
         // "At least one specimen should be added to this Collection Event.");
         // }
-    }
-
-    private static class OriginInfoFromClinicCheckLoaded extends
-        UncachedLoadWrapperAction<OriginInfo> {
-        private static final long serialVersionUID = 1L;
-        private static final Collection<Property<?, ? super OriginInfo>> UNIQUE_WAYBILL_PER_CENTER_PROPERTIES = new ArrayList<Property<?, ? super OriginInfo>>();
-
-        static {
-            UNIQUE_WAYBILL_PER_CENTER_PROPERTIES
-                .add(OriginInfoPeer.SHIPMENT_INFO.to(ShipmentInfoPeer.WAYBILL));
-            UNIQUE_WAYBILL_PER_CENTER_PROPERTIES.add(OriginInfoPeer.CENTER);
-        }
-
-        private final BiobankSessionAction checkUniqueWaybillPerCenter;
-
-        protected OriginInfoFromClinicCheckLoaded(OriginInfoWrapper wrapper) {
-            super(wrapper);
-
-            this.checkUniqueWaybillPerCenter = new UniqueCheck<OriginInfo>(
-                wrapper, UNIQUE_WAYBILL_PER_CENTER_PROPERTIES);
-        }
-
-        @Override
-        public void doCheckLoaded(Session session, OriginInfo originInfo)
-            throws BiobankSessionException {
-            Center center = originInfo.getCenter();
-
-            if (!(center instanceof Clinic)) {
-                return;
-            }
-            Clinic clinic = (Clinic) center;
-
-            ShipmentInfo shipmentInfo = originInfo.getShipmentInfo();
-            if (shipmentInfo == null) {
-                return;
-            }
-
-            String waybill = shipmentInfo.getWaybill();
-
-            if (Boolean.TRUE.equals(clinic.getSendsShipments())) {
-                if (waybill == null || waybill.isEmpty()) {
-                    throw new BiobankSessionException(
-                        "A waybill should be set on this shipment");
-                }
-
-                checkUniqueWaybillPerCenter.doAction(session);
-                // TODO: replace above with appropriate exception String (as
-                // found below)
-                // if (!checkWaybillUniqueForClinic(clinic)) {
-                // throw new BiobankCheckException("A shipment with waybill "
-                // + waybill + " already exist in clinic "
-                // + clinic.getNameShort());
-                // }
-            } else {
-                if (waybill != null) {
-                    throw new BiobankSessionException(
-                        "This clinic does not send shipments: waybill should not be set.");
-                }
-            }
-        }
     }
 
     public static List<OriginInfoWrapper> getTodayShipments(
@@ -239,7 +171,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
         tasks.add(super.getPersistTasks());
 
-        tasks.add(new OriginInfoFromClinicCheckLoaded(this));
+        tasks.add(new OriginInfoFromClinicCheck(this));
 
         return tasks;
     }

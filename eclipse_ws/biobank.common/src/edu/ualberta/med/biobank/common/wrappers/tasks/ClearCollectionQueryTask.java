@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers.tasks;
 import java.util.Collection;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.actions.NoActionWrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.NullAction;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 
@@ -19,12 +19,12 @@ import gov.nih.nci.system.query.SDKQueryResult;
  */
 public class ClearCollectionQueryTask implements QueryTask {
     private final Collection<?> collectionToClear;
-    private final NoActionWrapperAction<?> noActionAction;
+    private final NullAction<?> noActionAction;
 
     public <T, U extends ModelWrapper<T>> ClearCollectionQueryTask(U wrapper,
         Collection<?> collectionToClear) {
         this.collectionToClear = collectionToClear;
-        this.noActionAction = new NoActionWrapperAction<T>(wrapper);
+        this.noActionAction = new NullAction<T>(wrapper);
     }
 
     @Override

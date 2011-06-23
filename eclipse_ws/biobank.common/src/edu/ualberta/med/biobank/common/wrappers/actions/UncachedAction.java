@@ -8,18 +8,26 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
 /**
- * A {@link WrapperAction} that performs an action outside of (ignoring) the
- * {@link Hibernate} cache. See {@link CacheMode}.
+ * Decorates a {@link BiobankSessionAction}. Performs the given
+ * {@link BiobankSessionAction} outside of (ignoring) the {@link Hibernate}
+ * cache. See {@link CacheMode}.
  * 
  * @author jferland
  * 
  * @param <E>
  */
-public abstract class UncachedWrapperAction<E> extends WrapperAction<E> {
+public final class UncachedAction<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
 
-    protected UncachedWrapperAction(ModelWrapper<E> wrapper) {
+    private final BiobankSessionAction action;
+
+    /**
+     * 
+     * @param action the action to perform outside of the cache
+     */
+    public UncachedAction(ModelWrapper<E> wrapper, BiobankSessionAction action) {
         super(wrapper);
+        this.action = action;
     }
 
     @Override
@@ -30,14 +38,11 @@ public abstract class UncachedWrapperAction<E> extends WrapperAction<E> {
 
         try {
             session.setCacheMode(CacheMode.IGNORE);
-            doWithoutCache(session);
+            action.doAction(session);
         } finally {
             session.setCacheMode(oldCacheMode);
         }
 
         return null;
     }
-
-    public abstract void doWithoutCache(Session session)
-        throws BiobankSessionException;
 }

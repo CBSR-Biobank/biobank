@@ -12,10 +12,10 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
  * 
  * @param <E>
  */
-public class NoActionWrapperAction<E> extends WrapperAction<E> {
+public class NullAction<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
 
-    public NoActionWrapperAction(ModelWrapper<E> wrapper) {
+    public NullAction(ModelWrapper<E> wrapper) {
         super(wrapper);
     }
 

@@ -6,37 +6,39 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
 /**
- * Perform
+ * Loads a new instance of the model object from persistence and calls {@code
+ * onLoaded({@link E} attachedObject)}.
  * 
  * @author jferland
  * 
  * @param <E>
  */
-// TODO: switch to decorating rather than tons of derived classes :-(
-public abstract class UncachedLoadWrapperAction<E> extends
-    UncachedWrapperAction<E> {
+public abstract class LoadAction<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
 
-    protected UncachedLoadWrapperAction(ModelWrapper<E> wrapper) {
+    protected LoadAction(ModelWrapper<E> wrapper) {
         super(wrapper);
     }
 
     @Override
-    public final void doWithoutCache(Session session)
+    public final Object doAction(Session session)
         throws BiobankSessionException {
         // TODO: write a test that persists a model object, then does a
         // CheckLoad on it, then persists, etc. to check if hib throws
         // exceptions
-        E loaded = loadSavedModel(session);
-        doCheckLoaded(session, loaded);
+
+        E freshObject = loadModel(session);
+        onLoad(session, freshObject);
+
+        return null;
     }
 
-    protected E loadSavedModel(Session session) {
+    protected E loadModel(Session session) {
         @SuppressWarnings("unchecked")
         E loaded = (E) session.load(getModelClass(), getModelId());
         return loaded;
     }
 
-    public abstract void doCheckLoaded(Session session, E loaded)
+    public abstract void onLoad(Session session, E freshObject)
         throws BiobankSessionException;
 }

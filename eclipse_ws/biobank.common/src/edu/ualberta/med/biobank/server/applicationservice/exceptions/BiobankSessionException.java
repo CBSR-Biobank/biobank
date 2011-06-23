@@ -8,4 +8,8 @@ public class BiobankSessionException extends DAOException {
     public BiobankSessionException(String message) {
         super(message);
     }
+
+    public BiobankSessionException(String message, Exception cause) {
+        super(message, cause);
+    }
 }

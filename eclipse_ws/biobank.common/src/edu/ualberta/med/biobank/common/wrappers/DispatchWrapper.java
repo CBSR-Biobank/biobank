@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
-import edu.ualberta.med.biobank.common.wrappers.actions.IfPropertyOnSavedThenAction.Is;
+import edu.ualberta.med.biobank.common.wrappers.actions.ConditionalAction.Is;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.UniqueOnSavedCheck;
