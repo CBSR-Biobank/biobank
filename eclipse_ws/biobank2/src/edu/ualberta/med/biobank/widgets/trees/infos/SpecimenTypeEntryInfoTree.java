@@ -13,8 +13,8 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.dialogs.SpecimenTypeDialog;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.trees.infos.listener.IInfoTreeAddItemListener;
 import edu.ualberta.med.biobank.widgets.trees.infos.listener.IInfoTreeDeleteItemListener;
@@ -146,8 +146,7 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                         specType.delete();
                         setCollection(selectedSpecimenTypes);
                     } catch (final RemoteConnectFailureException exp) {
-                        BgcPlugin
-                            .openRemoteConnectErrorMessage(exp);
+                        BgcPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
                         logger.error("BioBankFormBase.createPartControl Error",
                             e);
@@ -161,7 +160,8 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
         try {
             for (SpecimenTypeWrapper sv : selectedSpecimenTypes)
                 if (!sv.getId().equals(type.getId())
-                    && sv.getName().equals(type.getName()))
+                    && (sv.getName().equals(type.getName()) || sv
+                        .getNameShort().equals(type.getNameShort())))
                     throw new BiobankCheckException(
                         "That specimen type has already been added.");
         } catch (BiobankException bce) {
