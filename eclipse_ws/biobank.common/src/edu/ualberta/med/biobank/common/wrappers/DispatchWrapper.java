@@ -23,9 +23,11 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
-import edu.ualberta.med.biobank.common.wrappers.actions.ConditionalAction.Is;
+import edu.ualberta.med.biobank.common.wrappers.actions.IfAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.IfAction.Is;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchSpecimenBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.NotNullCheck;
 import edu.ualberta.med.biobank.common.wrappers.checks.UniqueOnSavedCheck;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
@@ -504,6 +506,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         tasks.add(check().notNull(DispatchPeer.SENDER_CENTER));
         tasks.add(check().notNull(DispatchPeer.RECEIVER_CENTER));
 
+        tasks.add(new NotNullCheck(this, DispatchPeer.SENDER_CENTER));
+
         tasks.add(cascade().deleteRemoved(
             DispatchPeer.DISPATCH_SPECIMEN_COLLECTION));
         tasks.add(cascade().persistAdded(
@@ -515,11 +519,14 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
         tasks.add(super.getPersistTasks());
 
-        BiobankSessionAction uniqueWaybill = new UniqueOnSavedCheck<Dispatch>(
+        BiobankSessionAction checkWaybill = new UniqueOnSavedCheck<Dispatch>(
             this, UNIQUE_WAYBILL_PER_SENDER_PROPERTIES);
 
+        tasks.add(new IfAction<Dispatch>(this, WAYBILL_PROPERTY, Is.NOT_NULL,
+            checkWaybill));
+
         tasks.add(check().ifProperty(WAYBILL_PROPERTY, Is.NOT_NULL,
-            uniqueWaybill));
+            checkWaybill));
 
         return tasks;
     }

@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
  * 
  * @param <E>
  */
-public class ConditionalAction<E> extends WrapperAction<E> {
+public class IfAction<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String HQL = "SELECT COUNT(*) FROM {0} m {1} WHERE m = ? {2}";
 
@@ -52,7 +52,7 @@ public class ConditionalAction<E> extends WrapperAction<E> {
      * @param is (e.g. should the {@link Property} be null or not null)
      * @param action what to do if the condition is true
      */
-    public ConditionalAction(ModelWrapper<E> wrapper,
+    public IfAction(ModelWrapper<E> wrapper,
         Property<?, ? super E> property, Is is, BiobankSessionAction action) {
         super(wrapper);
         this.property = property;
