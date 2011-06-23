@@ -142,6 +142,7 @@ public class LoggingForm extends BiobankViewForm {
 
     @Override
     public void reload() throws Exception {
+        //
     }
 
 }

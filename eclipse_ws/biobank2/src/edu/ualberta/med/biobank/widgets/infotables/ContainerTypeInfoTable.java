@@ -4,8 +4,8 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 
@@ -129,8 +129,7 @@ public class ContainerTypeInfoTable extends
         doubleClickListeners.add(listener);
         MenuItem mi = new MenuItem(getMenu(), SWT.PUSH);
         mi.setText("Edit");
-        mi.addSelectionListener(new SelectionListener() {
-
+        mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 ModelWrapper<?> selection = ContainerTypeInfoTable.this
@@ -140,10 +139,6 @@ public class ContainerTypeInfoTable extends
                     adapter.setParent(siteAdapter.getContainerTypesGroupNode());
                     adapter.openEntryForm();
                 }
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
     }

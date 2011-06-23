@@ -224,6 +224,7 @@ public class BgcPlugin extends AbstractUIPlugin {
      * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
      * )
      */
+    @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
@@ -236,6 +237,7 @@ public class BgcPlugin extends AbstractUIPlugin {
      * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
      * )
      */
+    @Override
     public void stop(BundleContext context) throws Exception {
         plugin = null;
         super.stop(context);
@@ -293,7 +295,7 @@ public class BgcPlugin extends AbstractUIPlugin {
     public static void openError(String title, String message, Exception e,
         String secondMessage) {
         String msg = message;
-        if (msg == null && e != null) {
+        if ((msg == null) && (e != null)) {
             msg = e.getMessage();
             if (((msg == null) || msg.isEmpty()) && (e.getCause() != null)) {
                 msg = e.getCause().getMessage();

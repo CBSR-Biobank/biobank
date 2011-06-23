@@ -38,7 +38,7 @@ public class IssueTrackerPreferencePage extends FieldEditorPreferencePage
 
     @Override
     public void init(IWorkbench workbench) {
-
+        //
     }
 
 }

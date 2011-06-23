@@ -10,6 +10,7 @@ public class AdapterBasePropertyTester extends PropertyTester {
     public static final String CAN_UPDATE = "canUpdate";
 
     public AdapterBasePropertyTester() {
+        //
     }
 
     @Override

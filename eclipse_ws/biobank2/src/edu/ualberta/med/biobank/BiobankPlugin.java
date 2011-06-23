@@ -145,6 +145,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
      * The constructor
      */
     public BiobankPlugin() {
+        //
     }
 
     /*

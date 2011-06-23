@@ -286,7 +286,7 @@
        </category>
        <command
              categoryId="org.eclipse.ui.category.edit"
-             id="edu.ualberta.med.biobank.commands.ProcessingEventAdd"
+             id="edu.ualberta.med.biobank.commands.processing.processingEventAdd"
              name="Add Processing Event">
        </command>
        <command
@@ -798,7 +798,7 @@
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ProcessingEventAddHandler"
-            commandId="edu.ualberta.med.biobank.commands.ProcessingEventAdd">
+            commandId="edu.ualberta.med.biobank.commands.processing.processingEventAdd">
          <activeWhen>
             <and>
                <reference
@@ -1038,6 +1038,12 @@
                   name="biobank.separator2"
                   visible="true">
             </separator>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.processing.processingEventAdd"
+                  icon="icons/processing_add.png"
+                  label="Add Processing Event"
+                  style="push">
+            </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.processing.link"
                   icon="icons/scanLink.png"
@@ -1298,7 +1304,7 @@
          <toolbar
                id="edu.ualberta.med.biobank.views.ProcessingView">
             <command
-                  commandId="edu.ualberta.med.biobank.commands.ProcessingEventAdd"
+                  commandId="edu.ualberta.med.biobank.commands.processing.processingEventAdd"
                   icon="icons/processing_add.png"
                   label="Add Processing Event"
                   style="push">
@@ -2239,6 +2245,12 @@
          schemeId="biobank.scheme"
          sequence="M3+D">
       </key>
+   <key
+         commandId="edu.ualberta.med.biobank.commands.processing.processingEventAdd"
+         contextId="edu.ualberta.med.biobank.perspective.processing"
+         schemeId="biobank.scheme"
+         sequence="M2+M3+P">
+   </key>
    </extension>
     <extension
          point="org.eclipse.ui.preferencePages">

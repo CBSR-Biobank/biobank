@@ -13,7 +13,4 @@ public class FormConstants {
         "Nunavut", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan",
         "Yukon" };
 
-    private FormConstants() {
-    }
-
 }

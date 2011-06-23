@@ -87,8 +87,8 @@ public class PalletScanManagement {
                 plateToScan);
             if (plateNum == -1) {
                 plateError();
-                BgcPlugin.openAsyncError("Scan error",
-                    "Plate with barcode " + plateToScan + " is not enabled");
+                BgcPlugin.openAsyncError("Scan error", "Plate with barcode "
+                    + plateToScan + " is not enabled");
                 return;
             } else {
                 ScanCell[][] scanCells = null;
@@ -171,8 +171,7 @@ public class PalletScanManagement {
                         try {
                             postprocessScanTubeAlone(cell);
                         } catch (Exception ex) {
-                            BgcPlugin.openAsyncError(
-                                "Scan tube error", ex);
+                            BgcPlugin.openAsyncError("Scan tube error", ex);
                         }
                     }
                 }
@@ -205,11 +204,11 @@ public class PalletScanManagement {
     }
 
     protected void beforeThreadStart() {
-
+        // default does nothing
     }
 
     protected void beforeScan() {
-
+        // default does nothing
     }
 
     @SuppressWarnings("unused")
@@ -219,33 +218,33 @@ public class PalletScanManagement {
 
     @SuppressWarnings("unused")
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
-
+        // default does nothing
     }
 
     @SuppressWarnings("unused")
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-
+        // default does nothing
     }
 
     protected void beforeScanMerge() {
-
+        // default does nothing
     }
 
     protected void afterScan() {
-
+        // default does nothing
     }
 
     protected void afterScanAndProcess() {
-
+        // default does nothing
     }
 
     protected void plateError() {
-
+        // default does nothing
     }
 
     protected void scanAndProcessError(
         @SuppressWarnings("unused") String errorMsg) {
-
+        // default does nothing
     }
 
     public Map<RowColPos, PalletCell> getCells() {

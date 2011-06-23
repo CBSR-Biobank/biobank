@@ -11,6 +11,7 @@ public class ContainerCell extends AbstractUICell {
     private ContainerWrapper container;
 
     public ContainerCell() {
+        //
     }
 
     public ContainerCell(Integer row, Integer col, ContainerWrapper container) {
