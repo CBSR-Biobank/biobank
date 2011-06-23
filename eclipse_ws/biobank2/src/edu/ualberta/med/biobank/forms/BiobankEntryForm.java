@@ -424,24 +424,22 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
 
     protected void addToolbarButtons() {
         formActions = new BgcEntryFormActions(this);
-        formActions.addResetAction("edu.ualberta.med.biobank.commands.reset");
-        formActions.addCancelAction("edu.ualberta.med.biobank.commands.cancel");
-        formActions
-            .addConfirmAction("edu.ualberta.med.biobank.commands.confirm");
+        formActions.addResetAction(Actions.BIOBANK_RESET);
+        formActions.addCancelAction(Actions.BIOBANK_CANCEL);
+        formActions.addConfirmAction(Actions.BIOBANK_CONFIRM);
         form.updateToolBar();
     }
 
     protected void addConfirmAction() {
-        formActions
-            .addConfirmAction("edu.ualberta.med.biobank.commands.confirm");
+        formActions.addConfirmAction(Actions.BIOBANK_CONFIRM);
     }
 
     protected void addResetAction() {
-        formActions.addResetAction("edu.ualberta.med.biobank.commands.reset");
+        formActions.addResetAction(Actions.BIOBANK_RESET);
     }
 
     protected void addCancelAction() {
-        formActions.addCancelAction("edu.ualberta.med.biobank.commands.cancel");
+        formActions.addCancelAction(Actions.BIOBANK_CANCEL);
     }
 
     protected void addPrintAction() {
