@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.wrappers;
+package edu.ualberta.med.biobank.common.wrappers.tasks;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 

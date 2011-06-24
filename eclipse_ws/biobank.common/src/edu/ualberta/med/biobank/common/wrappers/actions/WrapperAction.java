@@ -38,18 +38,13 @@ public abstract class WrapperAction<E> extends SearchExampleQuery implements
     }
 
     /**
-     * Overridden to ensure that examples are an instance of {@link E}. The
-     * "example" property is used to hold the model object because a public
-     * getter and setter are what CaCORE uses to proxy or unproxy properties of
-     * {@link Object}-s received from or sent to the server, respectively.
+     * This method should not be called anymore. It was used to unwrap model
+     * objects (from their CaCORE proxy) but we just do this upon instantiation.
      */
     @Override
+    @Deprecated
     public void setExample(Object example) {
-        if (!modelClass.isAssignableFrom(example.getClass())) {
-            throw new IllegalArgumentException();
-        }
-
-        super.setExample(example);
+        throw new UnsupportedOperationException();
     }
 
     protected E getModel() {

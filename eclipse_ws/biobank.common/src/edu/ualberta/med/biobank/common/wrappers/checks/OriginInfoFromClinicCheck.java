@@ -35,7 +35,9 @@ public class OriginInfoFromClinicCheck extends LoadAction<OriginInfo> {
 
     public OriginInfoFromClinicCheck(OriginInfoWrapper wrapper) {
         super(wrapper);
-        this.waybillCheck = new UniqueOnSavedCheck<OriginInfo>(wrapper,
+
+        // TODO: construct on server only if necessary?
+        this.waybillCheck = new UniqueCheck<OriginInfo>(wrapper,
             UNIQUE_WAYBILL);
     }
 

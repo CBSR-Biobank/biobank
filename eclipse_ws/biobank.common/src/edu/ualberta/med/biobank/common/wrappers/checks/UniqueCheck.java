@@ -3,26 +3,20 @@ package edu.ualberta.med.biobank.common.wrappers.checks;
 import java.text.MessageFormat;
 import java.util.Collection;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 
-import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.PropertyCountOnSavedAction;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 
 /**
  * Checks that the {@link Collection} of {@link Property}-s is unique for the
- * model object in the {@link ModelWrapper}, excluding the instance itself (if
- * it is already persisted).
- * <p>
- * This check is <em>intended for direct properties, not associations</em>. To
- * check uniqueness of properties through associations, see
- * {@link UniqueOnSavedCheck}.
+ * model object in the {@link ModelWrapper}, excluding the instance itself,
+ * which <em>must be saved (persistent)</em>.
+ * <em>This check should only be run on saved model objects (that have been saved to the database).</em>
  * 
  * @author jferland
  * 
@@ -33,6 +27,7 @@ public class UniqueCheck<E> extends WrapperAction<E> {
     private static final String EXCEPTION_STRING = "There already exists a {0} with property value(s) ({1}) for ({2}), respectively. These field(s) must be unique.";
 
     private final Collection<Property<?, ? super E>> properties;
+    private final PropertyCountOnSavedAction<E> countAction;
 
     /**
      * 
@@ -43,14 +38,14 @@ public class UniqueCheck<E> extends WrapperAction<E> {
         Collection<Property<?, ? super E>> properties) {
         super(wrapper);
         this.properties = properties;
+        this.countAction = new PropertyCountOnSavedAction<E>(wrapper, properties);
     }
 
     @Override
     public Object doAction(Session session) throws BiobankSessionException {
-        Criteria criteria = getCriteria(session);
-        Long count = HibernateUtil.getCountFromCriteria(criteria);
+        Long count = countAction.doAction(session);
 
-        if (count > 0) {
+        if (count > 1) {
             throwException();
         }
 
@@ -66,27 +61,5 @@ public class UniqueCheck<E> extends WrapperAction<E> {
             names);
 
         throw new DuplicatePropertySetException(msg);
-    }
-
-    private Criteria getCriteria(Session session) {
-        Criteria criteria = session.createCriteria(getModelClass());
-
-        criteria.setProjection(Projections.rowCount());
-
-        E model = getModel();
-
-        Integer id = getModelId();
-        if (id != null) {
-            String idName = getIdProperty().getName();
-            criteria.add(Restrictions.not(Restrictions.eq(idName, id)));
-        }
-
-        for (Property<?, ? super E> property : properties) {
-            String name = property.getName();
-            Object value = property.get(model);
-            criteria.add(Restrictions.eq(name, value));
-        }
-
-        return criteria;
     }
 }

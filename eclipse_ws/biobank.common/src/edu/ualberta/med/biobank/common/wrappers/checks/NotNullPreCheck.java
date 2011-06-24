@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropert
  * 
  * @param <E>
  */
-public class NotNullCheck<E> extends WrapperAction<E> {
+public class NotNullPreCheck<E> extends WrapperAction<E> implements PreCheck {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_STRING = "The {0} of {1} {2} must be defined (cannot be null).";
 
@@ -30,7 +30,7 @@ public class NotNullCheck<E> extends WrapperAction<E> {
      * @param wrapper
      * @param property
      */
-    public NotNullCheck(ModelWrapper<E> wrapper, Property<?, ? super E> property) {
+    public NotNullPreCheck(ModelWrapper<E> wrapper, Property<?, ? super E> property) {
         super(wrapper);
         this.property = property;
         this.modelString = wrapper.toString();

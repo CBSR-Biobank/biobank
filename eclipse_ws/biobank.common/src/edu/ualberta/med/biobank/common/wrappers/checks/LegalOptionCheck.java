@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.InvalidOpti
  * 
  * @param <E>
  */
-public class LegalOptionOnSavedCheck<E> extends WrapperAction<E> {
+public class LegalOptionCheck<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String COUNT_HQL = "SELECT COUNT(option) FROM {0} m JOIN m.{1} option WHERE m = ? AND m.{2} = option";
 
@@ -43,7 +43,7 @@ public class LegalOptionOnSavedCheck<E> extends WrapperAction<E> {
      *            the wrapped object
      * @param exceptionMessage message to display if the option is invalid
      */
-    public <T> LegalOptionOnSavedCheck(ModelWrapper<E> wrapper,
+    public <T> LegalOptionCheck(ModelWrapper<E> wrapper,
         Property<? extends Collection<? extends T>, ? super E> legalOptions,
         Property<? extends T, ? super E> selectedOption,
         LazyMessage exceptionMessage) {

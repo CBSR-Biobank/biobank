@@ -9,6 +9,8 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenPositionBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.ContainerPositionAvailableCheck;
+import edu.ualberta.med.biobank.common.wrappers.checks.ContainerPositionInBoundsCheck;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -83,11 +85,11 @@ public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {
 
         tasks.add(super.getPersistTasks());
 
-        tasks.add(new PostCheckContainerPositionAvailable<SpecimenPosition>(
-            this, SpecimenPositionPeer.CONTAINER));
+        tasks.add(new ContainerPositionAvailableCheck<SpecimenPosition>(this,
+            SpecimenPositionPeer.CONTAINER));
 
-        tasks.add(new PostCheckContainerPositionInBounds<SpecimenPosition>(
-            this, SpecimenPositionPeer.CONTAINER));
+        tasks.add(new ContainerPositionInBoundsCheck<SpecimenPosition>(this,
+            SpecimenPositionPeer.CONTAINER));
 
         return tasks;
     }

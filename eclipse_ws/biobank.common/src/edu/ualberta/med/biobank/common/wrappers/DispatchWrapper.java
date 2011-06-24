@@ -27,8 +27,8 @@ import edu.ualberta.med.biobank.common.wrappers.actions.IfAction;
 import edu.ualberta.med.biobank.common.wrappers.actions.IfAction.Is;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchSpecimenBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.NotNullCheck;
-import edu.ualberta.med.biobank.common.wrappers.checks.UniqueOnSavedCheck;
+import edu.ualberta.med.biobank.common.wrappers.checks.NotNullPreCheck;
+import edu.ualberta.med.biobank.common.wrappers.checks.UniqueCheck;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Log;
@@ -47,10 +47,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     private final Map<DispatchSpecimenState, List<DispatchSpecimenWrapper>> dispatchSpecimenMap = new HashMap<DispatchSpecimenState, List<DispatchSpecimenWrapper>>();
-
-    private List<DispatchSpecimenWrapper> deletedDispatchedSpecimens = new ArrayList<DispatchSpecimenWrapper>();
-
-    private List<DispatchSpecimenWrapper> receivedDispatchedSpecimens = new ArrayList<DispatchSpecimenWrapper>();
 
     private boolean hasNewSpecimens = false;
 
@@ -171,9 +167,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                     "Specimen does not belong to this sender.");
         }
         addToDispatchSpecimenCollection(newDispatchSpecimens);
-        // make sure previously deleted ones, that have been re-added, are
-        // no longer deleted
-        deletedDispatchedSpecimens.removeAll(newDispatchSpecimens);
         resetMap();
     }
 
@@ -197,7 +190,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         for (DispatchSpecimenWrapper dsa : getDispatchSpecimenCollection(false)) {
             if (spcs.contains(dsa.getSpecimen())) {
                 removeDispatchSpecimens.add(dsa);
-                deletedDispatchedSpecimens.add(dsa);
             }
         }
         removeFromDispatchSpecimenCollection(removeDispatchSpecimens);
@@ -217,7 +209,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         for (DispatchSpecimenWrapper dsa : currentDaList) {
             if (dsaList.contains(dsa)) {
                 removeDispatchSpecimens.add(dsa);
-                deletedDispatchedSpecimens.add(dsa);
             }
         }
         removeFromDispatchSpecimenCollection(removeDispatchSpecimens);
@@ -229,7 +220,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             if (specimensToReceive.contains(ds.getSpecimen())) {
                 ds.setDispatchSpecimenState(DispatchSpecimenState.RECEIVED);
                 ds.getSpecimen().setCurrentCenter(getReceiverCenter());
-                receivedDispatchedSpecimens.add(ds);
             }
         }
         resetMap();
@@ -360,8 +350,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     protected void resetInternalFields() {
         super.resetInternalFields();
         resetMap();
-        deletedDispatchedSpecimens.clear();
-        receivedDispatchedSpecimens.clear();
         hasNewSpecimens = false;
     }
 
@@ -506,26 +494,20 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         tasks.add(check().notNull(DispatchPeer.SENDER_CENTER));
         tasks.add(check().notNull(DispatchPeer.RECEIVER_CENTER));
 
-        tasks.add(new NotNullCheck(this, DispatchPeer.SENDER_CENTER));
+        tasks.add(new NotNullPreCheck<Dispatch>(this,
+            DispatchPeer.SENDER_CENTER));
 
         tasks.add(cascade().deleteRemoved(
             DispatchPeer.DISPATCH_SPECIMEN_COLLECTION));
         tasks.add(cascade().persistAdded(
             DispatchPeer.DISPATCH_SPECIMEN_COLLECTION));
 
-        // TODO: probably remove the following:
-        // tasks.add(cascade().delete(deletedDispatchedSpecimens));
-        // tasks.add(cascade().persist(receivedDispatchedSpecimens));
-
         tasks.add(super.getPersistTasks());
 
-        BiobankSessionAction checkWaybill = new UniqueOnSavedCheck<Dispatch>(
-            this, UNIQUE_WAYBILL_PER_SENDER_PROPERTIES);
+        BiobankSessionAction checkWaybill = new UniqueCheck<Dispatch>(this,
+            UNIQUE_WAYBILL_PER_SENDER_PROPERTIES);
 
         tasks.add(new IfAction<Dispatch>(this, WAYBILL_PROPERTY, Is.NOT_NULL,
-            checkWaybill));
-
-        tasks.add(check().ifProperty(WAYBILL_PROPERTY, Is.NOT_NULL,
             checkWaybill));
 
         return tasks;

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.tasks.InactiveQueryTask;
+import edu.ualberta.med.biobank.common.wrappers.tasks.PreQueryTask;
 import edu.ualberta.med.biobank.common.wrappers.tasks.QueryTask;
 import gov.nih.nci.system.query.SDKQuery;
 
