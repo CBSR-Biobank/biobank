@@ -167,6 +167,7 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
 
     @Override
     protected void addToolbarButtons() {
+        super.addToolbarButtons();
         addPrintAction();
         addResetAction();
         addConfirmAction();
