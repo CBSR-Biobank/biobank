@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin>
    <extension
-         id="biobank2"
+         id="biobank"
          point="org.eclipse.core.runtime.applications">
       <application>
          <run
@@ -19,7 +19,7 @@
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
-            application="biobank.biobank2"
+            application="biobank.biobank"
             name="BioBank2">
          <property
                name="appName"
