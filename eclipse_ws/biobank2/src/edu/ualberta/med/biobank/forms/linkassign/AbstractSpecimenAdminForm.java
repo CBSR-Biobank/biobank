@@ -165,15 +165,6 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
         this.printed = b;
     }
 
-    @Override
-    protected void addToolbarButtons() {
-        super.addToolbarButtons();
-        addPrintAction();
-        addResetAction();
-        addConfirmAction();
-        form.updateToolBar();
-    }
-
     public void setAfterKeyCancel() {
         afterKeyCancel = true;
     }
