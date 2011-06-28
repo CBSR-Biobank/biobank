@@ -9,13 +9,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
@@ -31,25 +31,25 @@ public class SiteViewForm extends AddressViewFormCommon {
     private ContainerTypeInfoTable containerTypesTable;
     private ContainerInfoTable topContainersTable;
 
-    private BiobankText nameLabel;
+    private BgcBaseText nameLabel;
 
-    private BiobankText nameShortLabel;
+    private BgcBaseText nameShortLabel;
 
-    private BiobankText studyCountLabel;
+    private BgcBaseText studyCountLabel;
 
-    private BiobankText containerTypeCountLabel;
+    private BgcBaseText containerTypeCountLabel;
 
-    private BiobankText topContainerCountLabel;
+    private BgcBaseText topContainerCountLabel;
 
-    private BiobankText patientCountLabel;
+    private BgcBaseText patientCountLabel;
 
-    private BiobankText patientVisitCountLabel;
+    private BgcBaseText patientVisitCountLabel;
 
-    private BiobankText specimenCountLabel;
+    private BgcBaseText specimenCountLabel;
 
-    private BiobankText activityStatusLabel;
+    private BgcBaseText activityStatusLabel;
 
-    private BiobankText commentLabel;
+    private BgcBaseText commentLabel;
 
     @Override
     public void init() {
@@ -189,7 +189,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         try {
             site.reload();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError(
+            BgcPlugin.openAsyncError(
                 Messages.getString("SiteViewForm.reload.error.msg"), e); //$NON-NLS-1$
         }
     }

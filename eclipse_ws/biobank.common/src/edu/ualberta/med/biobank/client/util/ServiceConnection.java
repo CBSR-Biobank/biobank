@@ -38,7 +38,7 @@ public class ServiceConnection {
     private static void setTrustStore() throws Exception {
         // export the keystore into a temporary file (can't use it from inside a
         // jar)
-        File tf = File.createTempFile("biobank2", ".keystore");
+        File tf = File.createTempFile("biobank", ".keystore");
         tf.deleteOnExit();
         byte buffer[] = new byte[0x1000];
         InputStream is = ServiceConnection.class

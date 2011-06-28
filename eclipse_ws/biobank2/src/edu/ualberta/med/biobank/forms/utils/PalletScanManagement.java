@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
@@ -51,10 +52,10 @@ public class PalletScanManagement {
                     processScanResult(monitor);
                     afterScanAndProcess();
                 } catch (RemoteConnectFailureException exp) {
-                    BiobankPlugin.openRemoteConnectErrorMessage(exp);
+                    BgcPlugin.openRemoteConnectErrorMessage(exp);
                     scanAndProcessError(null);
                 } catch (Exception e) {
-                    BiobankPlugin
+                    BgcPlugin
                         .openAsyncError(Messages
                             .getString("linkAssign.dialog.scanError.title"), //$NON-NLS-1$
                             e);
@@ -86,7 +87,7 @@ public class PalletScanManagement {
                 plateToScan);
             if (plateNum == -1) {
                 plateError();
-                BiobankPlugin.openAsyncError("Scan error",
+                BgcPlugin.openAsyncError("Scan error",
                     "Plate with barcode " + plateToScan + " is not enabled");
                 return;
             } else {
@@ -96,7 +97,7 @@ public class PalletScanManagement {
                     cells = PalletCell.convertArray(scanCells);
                     successfulScansCount++;
                 } catch (Exception ex) {
-                    BiobankPlugin
+                    BgcPlugin
                         .openAsyncError(
                             "Scan error", //$NON-NLS-1$
                             ex,
@@ -152,7 +153,7 @@ public class PalletScanManagement {
     }
 
     public void scanTubeAlone(MouseEvent e) {
-        if (scanTubeAloneMode) {
+        if (isScanTubeAloneMode()) {
             RowColPos rcp = ((ScanPalletWidget) e.widget)
                 .getPositionAtCoordinates(e.x, e.y);
             if (rcp != null) {
@@ -170,7 +171,8 @@ public class PalletScanManagement {
                         try {
                             postprocessScanTubeAlone(cell);
                         } catch (Exception ex) {
-                            BiobankPlugin.openAsyncError("Scan tube error", ex);
+                            BgcPlugin.openAsyncError(
+                                "Scan tube error", ex);
                         }
                     }
                 }
@@ -250,7 +252,7 @@ public class PalletScanManagement {
         return cells;
     }
 
-    public void reset() {
+    public void onReset() {
         successfulScansCount = 0;
         initCells();
     }

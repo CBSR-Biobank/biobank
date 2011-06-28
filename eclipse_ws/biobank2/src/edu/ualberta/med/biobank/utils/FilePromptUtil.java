@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.utils;
 import java.io.File;
 import java.text.MessageFormat;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class FilePromptUtil {
     private static final String CREATE_PATH_TITLE = "Create Path";
@@ -25,7 +25,7 @@ public class FilePromptUtil {
     // TODO: accept a list of checks to apply? Order matters.
     public static boolean isWritableDir(File dir) {
         if (!dir.exists()) {
-            boolean createPath = BiobankPlugin.openConfirm(CREATE_PATH_TITLE,
+            boolean createPath = BgcPlugin.openConfirm(CREATE_PATH_TITLE,
                 MessageFormat.format(CREATE_PATH_MESSAGE, dir));
 
             if (!createPath) {
@@ -33,20 +33,20 @@ public class FilePromptUtil {
             }
 
             if (!dir.mkdirs()) {
-                BiobankPlugin.openAsyncError(CREATE_PATH_ERROR_TITLE,
+                BgcPlugin.openAsyncError(CREATE_PATH_ERROR_TITLE,
                     MessageFormat.format(CREATE_PATH_ERROR_MESSAGE, dir));
                 return false;
             }
         }
 
         if (!dir.isDirectory()) {
-            BiobankPlugin.openAsyncError(CREATE_PATH_ERROR_TITLE,
+            BgcPlugin.openAsyncError(CREATE_PATH_ERROR_TITLE,
                 MessageFormat.format(PATH_NOT_DIRECTORY_MESSAGE, dir));
             return false;
         }
 
         if (!dir.canWrite()) {
-            BiobankPlugin.openAsyncError(PATH_ERROR_TITLE,
+            BgcPlugin.openAsyncError(PATH_ERROR_TITLE,
                 MessageFormat.format(PATH_CANNOT_WRITE_MESSAGE, dir));
             return false;
         }

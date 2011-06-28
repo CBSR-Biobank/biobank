@@ -20,20 +20,22 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 
 /**
- * The base class for all BioBank2 Java Client view forms. The forms are usually
+ * The base class for all BioBank Java Client view forms. The forms are usually
  * created when the user selects a node in the <code>SessionView</code> tree
  * view.
  */
 public abstract class BiobankViewForm extends BiobankFormBase {
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(BiobankViewForm.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(BiobankViewForm.class
+        .getName());
 
     protected String sessionName;
 
@@ -73,7 +75,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         addToolbarButtons();
         IContextService contextService = (IContextService) getSite()
             .getService(IContextService.class);
-        contextService.activateContext("biobank2.context.viewForm");
+        contextService.activateContext("biobank.context.viewForm");
     }
 
     @Override
@@ -95,9 +97,9 @@ public abstract class BiobankViewForm extends BiobankFormBase {
             if (value != null) {
                 Control widget = getWidget(label);
                 if ((fi.widgetClass == Combo.class)
-                    || (fi.widgetClass == BiobankText.class)
+                    || (fi.widgetClass == BgcBaseText.class)
                     || (fi.widgetClass == Label.class)) {
-                    ((BiobankText) widget).setText((String) value);
+                    ((BgcBaseText) widget).setText((String) value);
                 }
             }
         }
@@ -120,21 +122,18 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                 new CommandContributionItemParameter(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow(), "Edit",
                     "edu.ualberta.med.biobank.commands.edit", null,
-                    BiobankPlugin
-                        .getImageDescriptor(BiobankPlugin.IMG_EDIT_FORM), null,
-                    null, "Edit", "Edit", "Edit", SWT.NONE, "Edit", true));
+                    BiobankPlugin.getImageDescriptor(BgcPlugin.IMG_EDIT_FORM),
+                    null, null, "Edit", "Edit", "Edit", SWT.NONE, "Edit", true));
             form.getToolBarManager().add(edit);
         }
     }
 
     protected void addReloadAction() {
         CommandContributionItem reload = new CommandContributionItem(
-            new CommandContributionItemParameter(
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow(),
-                "Reload",
-                "edu.ualberta.med.biobank.commands.reloadViewForm",
-                null,
-                BiobankPlugin.getImageDescriptor(BiobankPlugin.IMG_RELOAD_FORM),
+            new CommandContributionItemParameter(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow(), "Reload",
+                "edu.ualberta.med.biobank.commands.reloadViewForm", null,
+                BiobankPlugin.getImageDescriptor(BgcPlugin.IMG_RELOAD_FORM),
                 null, null, "Reload", "Reload", "Reload", SWT.NONE, "Reload",
                 true));
         form.getToolBarManager().add(reload);

@@ -20,7 +20,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
@@ -36,7 +38,8 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.SpecimenHierarchy;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 
 /**
  * Create widgets to show types selection for specimens on a pallet: one label,
@@ -66,7 +69,7 @@ public class AliquotedSpecimenSelectionWidget {
     private Binding resultBinding;
 
     private Object nextWidget;
-    private WidgetCreator widgetCreator;
+    private BgcWidgetCreator widgetCreator;
     private boolean oneRow;
     private Label sourceLabel;
     private Label resultLabel;
@@ -74,7 +77,7 @@ public class AliquotedSpecimenSelectionWidget {
     private List<SpecimenTypeWrapper> sourceChildTypes = new ArrayList<SpecimenTypeWrapper>();
 
     public AliquotedSpecimenSelectionWidget(Composite parent, Character letter,
-        WidgetCreator widgetCreator, boolean oneRow) {
+        BgcWidgetCreator widgetCreator, boolean oneRow) {
         this.widgetCreator = widgetCreator;
         this.oneRow = oneRow;
         if (letter != null) {
@@ -83,14 +86,14 @@ public class AliquotedSpecimenSelectionWidget {
         }
         if (!oneRow) {
             sourceLabel = widgetCreator.createLabel(parent, "Source specimen");
-            sourceControlDecoration = BiobankWidget
+            sourceControlDecoration = BgcBaseWidget
                 .createDecorator(
                     sourceLabel,
                     Messages
                         .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
         }
         cvSource = widgetCreator.createComboViewerWithoutLabel(parent, null,
-            null);
+            null, new BiobankLabelProvider());
         setComboProperties(cvSource, widgetCreator.getToolkit(), 0);
         cvSource.setLabelProvider(new LabelProvider() {
             @Override
@@ -117,14 +120,14 @@ public class AliquotedSpecimenSelectionWidget {
         if (!oneRow) {
             resultLabel = widgetCreator.createLabel(parent,
                 "Aliquoted specimen type");
-            resultControlDecoration = BiobankWidget
+            resultControlDecoration = BgcBaseWidget
                 .createDecorator(
                     resultLabel,
                     Messages
                         .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
         }
         cvResult = widgetCreator.createComboViewerWithoutLabel(parent, null,
-            null);
+            null, new BiobankLabelProvider());
         setComboProperties(cvResult, widgetCreator.getToolkit(), 1);
         cvResult.setLabelProvider(new LabelProvider() {
             @Override
@@ -132,14 +135,13 @@ public class AliquotedSpecimenSelectionWidget {
                 return ((SpecimenTypeWrapper) element).getName();
             }
         });
-        // FIXME waiting for issue #1011 to be resolved
-        // cvResult.addFilter(new ViewerFilter() {
-        // @Override
-        // public boolean select(Viewer viewer, Object parentElement,
-        // Object element) {
-        // return sourceChildTypes.contains(element);
-        // }
-        // });
+        cvResult.addFilter(new ViewerFilter() {
+            @Override
+            public boolean select(Viewer viewer, Object parentElement,
+                Object element) {
+                return sourceChildTypes.contains(element);
+            }
+        });
         if (oneRow) {
             textNumber = widgetCreator.getToolkit().createLabel(parent, "",
                 SWT.BORDER);
@@ -148,7 +150,7 @@ public class AliquotedSpecimenSelectionWidget {
             gd.horizontalAlignment = SWT.LEFT;
             textNumber.setLayoutData(gd);
             setNumber(null);
-            rowControlDecoration = BiobankWidget
+            rowControlDecoration = BgcBaseWidget
                 .createDecorator(
                     textNumber,
                     Messages
@@ -326,8 +328,13 @@ public class AliquotedSpecimenSelectionWidget {
     }
 
     public void removeBindings() {
+        bothSelected.setValue(true);
+        if (oneRowBinding != null)
+            widgetCreator.removeBinding(oneRowBinding);
+        sourceSelected.setValue(true);
         if (sourceBinding != null)
             widgetCreator.removeBinding(sourceBinding);
+        resultSelected.setValue(true);
         if (resultBinding != null)
             widgetCreator.removeBinding(resultBinding);
     }
@@ -389,8 +396,8 @@ public class AliquotedSpecimenSelectionWidget {
     }
 
     public void deselectAll() {
-        cvSource.getCombo().deselectAll();
-        cvResult.getCombo().deselectAll();
+        cvSource.setSelection(null);
+        cvResult.setSelection(null);
     }
 
     public void showWidget(boolean enabled) {

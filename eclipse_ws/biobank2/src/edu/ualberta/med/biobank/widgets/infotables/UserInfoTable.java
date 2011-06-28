@@ -22,11 +22,12 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.dialogs.user.UserEditDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserInfoTable extends InfoTableWidget<User> {
-    public static final int ROWS_PER_PAGE = 10;
+    public static final int ROWS_PER_PAGE = 8;
     private static final String[] HEADINGS = new String[] { "Login", "Email",
         "First Name", "Last Name" };
     private static final String LOADING_ROW = "loading...";
@@ -69,7 +70,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                     selectedUser.setLockedOut(false);
                     reloadCollection(getCollection(), selectedUser);
                 } catch (ApplicationException e) {
-                    BiobankPlugin.openAsyncError(MessageFormat.format(
+                    BgcPlugin.openAsyncError(MessageFormat.format(
                         CANNOT_UNLOCK_USER, new Object[] { userName }), e);
                 }
             }
@@ -122,7 +123,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                 User user = (User) ((BiobankCollectionModel) element).o;
                 if (user != null && user.isLockedOut() && columnIndex == 0) {
                     return BiobankPlugin.getDefault().getImage(
-                        BiobankPlugin.IMG_LOCK);
+                        BgcPlugin.IMG_LOCK);
                 }
                 return null;
             }
@@ -161,7 +162,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
         try {
             groups = SessionManager.getAppService().getSecurityGroups(true);
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError(GROUPS_LOADING_ERROR, e);
+            BgcPlugin.openAsyncError(GROUPS_LOADING_ERROR, e);
             return Dialog.CANCEL;
         }
 
@@ -187,7 +188,8 @@ public class UserInfoTable extends InfoTableWidget<User> {
                     new Object[] { loginName });
             }
 
-            if (BiobankPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
+            if (BgcPlugin.openConfirm(CONFIRM_DELETE_TITLE,
+                message)) {
                 SessionManager.getAppService().deleteUser(loginName);
 
                 // remove the user from the collection
@@ -198,7 +200,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                 return true;
             }
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError(USER_DELETE_ERROR, e);
+            BgcPlugin.openAsyncError(USER_DELETE_ERROR, e);
         }
         return false;
     }

@@ -133,10 +133,11 @@ public class DebugUtil {
         else {
             specimens = new ArrayList<Specimen>();
             int i = 0;
-            while (i < maxSize) {
-                specimens.add(res.get(i));
-                i++;
-            }
+            if (res.size() > 0)
+                while (i < maxSize) {
+                    specimens.add(res.get(i));
+                    i++;
+                }
         }
         return ModelWrapper.wrapModelCollection(appService, specimens,
             SpecimenWrapper.class);

@@ -11,18 +11,18 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class ContainerEntryForm extends BiobankEntryForm {
@@ -42,7 +42,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private ContainerWrapper container;
 
-    private BiobankText tempWidget;
+    private BgcBaseText tempWidget;
 
     private ComboViewer containerTypeComboViewer;
 
@@ -116,15 +116,15 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 .equals(container.getContainerType().getTopLevel()))) {
             // only allow edit to label on top level containers
             setFirstControl(createBoundWidgetWithLabel(client,
-                BiobankText.class, SWT.NONE, "Label", null, container, "label",
+                BgcBaseText.class, SWT.NONE, "Label", null, container, "label",
                 new NonEmptyStringValidator(MSG_CONTAINER_NAME_EMPTY)));
         } else {
-            BiobankText l = createReadOnlyLabelledField(client, SWT.NONE,
+            BgcBaseText l = createReadOnlyLabelledField(client, SWT.NONE,
                 "Label");
             setTextValue(l, container.getLabel());
         }
 
-        Control c = createBoundWidgetWithLabel(client, BiobankText.class,
+        Control c = createBoundWidgetWithLabel(client, BgcBaseText.class,
             SWT.NONE, "Product Barcode", null, container, "productBarcode",
             null);
         if (getFirstControl() == null)
@@ -143,7 +143,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             "Comments", null, container, "comment", null);
 
         createContainerTypesSection(client);
@@ -187,8 +187,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     }
                 }
             });
-        tempWidget = (BiobankText) createBoundWidgetWithLabel(client,
-            BiobankText.class, SWT.NONE, "Temperature (Celcius)", null,
+        tempWidget = (BgcBaseText) createBoundWidgetWithLabel(client,
+            BgcBaseText.class, SWT.NONE, "Temperature (Celcius)", null,
             container, "temperature", new DoubleNumberValidator(
                 "Default temperature is not a valid number"));
         if (container.hasParentContainer())
@@ -221,7 +221,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         doSave = true;
         if (container.hasChildren() && oldContainerLabel != null
             && !oldContainerLabel.equals(container.getLabel())) {
-            doSave = BiobankPlugin
+            doSave = BgcPlugin
                 .openConfirm(
                     "Renaming container",
                     "This container has been renamed. Its children will also be renamed. Are you sure you want to continue ?");

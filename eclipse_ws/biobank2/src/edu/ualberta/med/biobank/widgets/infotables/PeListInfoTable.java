@@ -15,20 +15,20 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
 
     protected class TableRowData {
         ProcessingEventWrapper pe;
+        public String startDate;
         public String studyNameShort;
         public Long numSVs;
         public Long numAliquots;
 
         @Override
         public String toString() {
-            return StringUtils.join(
-                new String[] { studyNameShort, numSVs.toString(),
-                    numAliquots.toString() }, "\t");
+            return StringUtils.join(new String[] { startDate, studyNameShort,
+                numSVs.toString(), numAliquots.toString() }, "\t");
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Study",
-        "Source Specimens", "Aliquoted Specimens" };
+    private static final String[] HEADINGS = new String[] { "Start date",
+        "Study", "Source Specimens", "Aliquoted Specimens" };
 
     public PeListInfoTable(Composite parent, List<ProcessingEventWrapper> pvs) {
         super(parent, pvs, HEADINGS, PAGE_SIZE_ROWS);
@@ -48,10 +48,12 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
                 }
                 switch (columnIndex) {
                 case 0:
-                    return item.studyNameShort;
+                    return item.startDate;
                 case 1:
-                    return item.numSVs.toString();
+                    return item.studyNameShort;
                 case 2:
+                    return item.numSVs.toString();
+                case 3:
                     return item.numAliquots.toString();
                 default:
                     return "";
@@ -65,6 +67,7 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
         throws Exception {
         TableRowData info = new TableRowData();
         info.pe = pEvent;
+        info.startDate = pEvent.getFormattedCreatedAt();
         StudyWrapper study = pEvent.getSpecimenCollection(false).get(0)
             .getCollectionEvent().getPatient().getStudy();
         if (study != null) {

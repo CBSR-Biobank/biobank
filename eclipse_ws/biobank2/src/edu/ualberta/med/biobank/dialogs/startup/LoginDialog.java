@@ -49,13 +49,14 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.helpers.SessionHelper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.rcp.Application;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
-import edu.ualberta.med.biobank.validators.AbstractValidator;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 
 public class LoginDialog extends TitleAreaDialog {
 
@@ -83,7 +84,7 @@ public class LoginDialog extends TitleAreaDialog {
 
     private static final String DEFAULT_UNSECURE_PREFIX = "http://"; //$NON-NLS-1$
 
-    private static final BiobankLogger logger = BiobankLogger
+    private static final BgcLogger logger = BgcLogger
         .getLogger(LoginDialog.class.getName());
 
     public Preferences pluginPrefs = null;
@@ -142,8 +143,8 @@ public class LoginDialog extends TitleAreaDialog {
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
         setTitle(Messages.getString("LoginDialog.title")); //$NON-NLS-1$
-        setTitleImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_COMPUTER_KEY));
+        setTitleImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_LOGINWIZ));
         setMessage(Messages.getString("LoginDialog.description")); //$NON-NLS-1$
         return contents;
     }
@@ -355,7 +356,7 @@ public class LoginDialog extends TitleAreaDialog {
                 // super admin mode
                 sessionHelper.getUser().setInSuperAdminMode(true);
                 if (!sessionHelper.getUser().isInSuperAdminMode())
-                    BiobankPlugin
+                    BgcPlugin
                         .openAsyncError("Super administrator",
                             "You don't have rights to connect as super administrator");
             }
@@ -410,16 +411,16 @@ public class LoginDialog extends TitleAreaDialog {
     private void selectWorkingCenter(SessionHelper sessionHelper) {
         List<CenterWrapper<?>> workingCenters = null;
         try {
-            if (sessionHelper.getUser().isInSuperAdminMode()) {
-                // in super admin mode, can use all centers
-                workingCenters = CenterWrapper.getCenters(sessionHelper
-                    .getAppService());
-            } else {
-                workingCenters = sessionHelper.getUser().getWorkingCenters(
-                    sessionHelper.getAppService());
-            }
+            // if (sessionHelper.getUser().isInSuperAdminMode()) {
+            // // in super admin mode, can use all centers
+            // workingCenters = CenterWrapper.getCenters(sessionHelper
+            // .getAppService());
+            // } else {
+            workingCenters = sessionHelper.getUser().getWorkingCenters(
+                sessionHelper.getAppService());
+            // }
         } catch (Exception e) {
-            BiobankPlugin
+            BgcPlugin
                 .openAsyncError(Messages
                     .getString("LoginDialog.working.center.error.title"), e); //$NON-NLS-1$
         }
@@ -427,7 +428,7 @@ public class LoginDialog extends TitleAreaDialog {
             if (workingCenters.size() == 0) {
                 if (!sessionHelper.getUser().isSuperAdministrator())
                     // cannot access the application.
-                    BiobankPlugin
+                    BgcPlugin
                         .openAsyncError(
                             Messages
                                 .getString("LoginDialog.working.center.error.title"), //$NON-NLS-1$
@@ -445,7 +446,7 @@ public class LoginDialog extends TitleAreaDialog {
             && !sessionHelper.getUser().isInSuperAdminMode())
             if (sessionHelper.getUser().isSuperAdministrator()) {
                 // connect in admin mode
-                BiobankPlugin.openAsyncInformation(Messages
+                BgcPlugin.openAsyncInformation(Messages
                     .getString("LoginDialog.working.center.admin.title"), //$NON-NLS-1$
                     Messages
                         .getString("LoginDialog.no.working.center.admin.msg")); //$NON-NLS-1$
@@ -461,7 +462,7 @@ public class LoginDialog extends TitleAreaDialog {
                         workbench.showPerspective(MainPerspective.ID,
                             activeWindow);
                     } catch (WorkbenchException e) {
-                        BiobankPlugin
+                        BgcPlugin
                             .openAsyncError(
                                 Messages
                                     .getString("LoginDialog.perspective.open.error.msg"), //$NON-NLS-1$
@@ -470,7 +471,7 @@ public class LoginDialog extends TitleAreaDialog {
                 }
             } else {
                 // can't connect without a working center
-                BiobankPlugin
+                BgcPlugin
                     .openAsyncError(
                         Messages
                             .getString("LoginDialog.working.center.selection.error.title"), //$NON-NLS-1$

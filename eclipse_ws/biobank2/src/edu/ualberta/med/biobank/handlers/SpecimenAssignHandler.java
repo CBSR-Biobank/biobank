@@ -7,14 +7,14 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.SecurityFeature;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.forms.linkassign.SpecimenAssignEntryForm;
-import edu.ualberta.med.biobank.treeview.processing.AssignAdapter;
+import edu.ualberta.med.biobank.treeview.processing.SpecimenAssignAdapter;
 
 public class SpecimenAssignHandler extends LinkAssignCommonHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         openLinkAssignPerspective(SpecimenAssignEntryForm.ID,
-            new AssignAdapter(SessionManager.getInstance().getSession(), 0,
+            new SpecimenAssignAdapter(SessionManager.getInstance().getSession(), 0,
                 "Specimen Assign", false, false));
         return null;
     }

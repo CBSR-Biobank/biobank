@@ -23,8 +23,9 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.logs.ActivityLogAppender;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.logs.LogInfo;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
@@ -109,7 +110,7 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
     @Override
     public boolean print() {
         if (appender == null) {
-            BiobankPlugin.openError("Print error", "Can't print: log error.");
+            BgcPlugin.openError("Print error", "Can't print: log error.");
         }
         try {
             Map<String, Object> map = new HashMap<String, Object>();
@@ -130,7 +131,7 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
             SessionManager.log("print", null, printName);
             return true;
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Print error", e);
+            BgcPlugin.openAsyncError("Print error", e);
             printed = false;
             return false;
         }
@@ -158,7 +159,7 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
         this.finished = finished;
     }
 
-    public abstract BiobankLogger getErrorLogger();
+    public abstract BgcLogger getErrorLogger();
 
     public void setPrinted(boolean b) {
         this.printed = b;

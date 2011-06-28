@@ -5,21 +5,21 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class StudySourceSpecimenDialog extends PagedDialog {
 
@@ -78,13 +78,6 @@ public class StudySourceSpecimenDialog extends PagedDialog {
     }
 
     @Override
-    protected Image getTitleAreaImage() {
-        // FIXME should use another icon
-        return BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_COMPUTER_KEY);
-    }
-
-    @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite contents = new Composite(parent, SWT.NONE);
         contents.setLayout(new GridLayout(2, false));
@@ -100,7 +93,7 @@ public class StudySourceSpecimenDialog extends PagedDialog {
                     internalSourceSpecimen
                         .setSpecimenType((SpecimenTypeWrapper) selectedObject);
                 }
-            });
+            }, new BiobankLabelProvider());
 
         volume = (Button) createBoundWidgetWithLabel(contents, Button.class,
             SWT.BORDER,
@@ -126,7 +119,7 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         try {
             internalSourceSpecimen.reset();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error", e);
+            BgcPlugin.openAsyncError("Error", e);
         }
         typeName.getCombo().deselectAll();
         volume.setSelection(false);

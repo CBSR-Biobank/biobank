@@ -8,7 +8,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -63,7 +64,7 @@ public class InventoryIdValidator extends AbstractValidator {
                 } catch (DuplicateEntryException e) {
                     duplicate = true;
                 } catch (Exception e) {
-                    BiobankPlugin.openAsyncError("Error checking inventory id",
+                    BgcPlugin.openAsyncError("Error checking inventory id",
                         e);
                 }
             }

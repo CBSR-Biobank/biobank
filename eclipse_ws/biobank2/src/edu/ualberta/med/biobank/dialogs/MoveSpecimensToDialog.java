@@ -24,20 +24,21 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.BiobankWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Allows the user to choose a container to which specimens will be moved
  */
-public class MoveSpecimensToDialog extends BiobankDialog {
+public class MoveSpecimensToDialog extends BgcBaseDialog {
 
     private ContainerWrapper oldContainer;
 
@@ -45,7 +46,7 @@ public class MoveSpecimensToDialog extends BiobankDialog {
 
     private ListViewer lv;
 
-    private BiobankText newLabelText;
+    private BgcBaseText newLabelText;
 
     private ISWTObservableValue listObserveSelection;
 
@@ -90,8 +91,8 @@ public class MoveSpecimensToDialog extends BiobankDialog {
                 .setToolTipText("Only Website administrator can move specimens to another site");
         }
 
-        newLabelText = (BiobankText) createBoundWidgetWithLabel(contents,
-            BiobankText.class, SWT.FILL, "New Container Label", null, null,
+        newLabelText = (BgcBaseText) createBoundWidgetWithLabel(contents,
+            BgcBaseText.class, SWT.FILL, "New Container Label", null, null,
             null, null);
         newLabelText.addModifyListener(new ModifyListener() {
             @Override
@@ -139,7 +140,7 @@ public class MoveSpecimensToDialog extends BiobankDialog {
         String errorMessage = "A label should be selected";
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
             errorMessage);
-        validator.setControlDecoration(BiobankWidget.createDecorator(listLabel,
+        validator.setControlDecoration(BgcBaseWidget.createDecorator(listLabel,
             errorMessage));
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterGetValidator(validator);
@@ -159,7 +160,7 @@ public class MoveSpecimensToDialog extends BiobankDialog {
                     .getCurrentWorkingSite(), typesFromOlContainer,
                 oldContainer.getRowCapacity(), oldContainer.getColCapacity());
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError("Error",
+            BgcPlugin.openAsyncError("Error",
                 "Failed to retrieve empty containers.");
         }
         for (ContainerWrapper cont : conts) {
@@ -176,7 +177,7 @@ public class MoveSpecimensToDialog extends BiobankDialog {
 
     @Override
     public void okPressed() {
-        boolean sure = BiobankPlugin.openConfirm("Other site",
+        boolean sure = BgcPlugin.openConfirm("Other site",
             "You are about to move these specimens into a container that belongs "
                 + "to another site. Are you sure ?");
         if (sure)

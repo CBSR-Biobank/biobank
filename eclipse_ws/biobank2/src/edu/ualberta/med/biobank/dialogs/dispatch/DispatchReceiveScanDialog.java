@@ -6,7 +6,6 @@ import java.util.TreeMap;
 
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
@@ -16,6 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
@@ -36,7 +36,7 @@ public class DispatchReceiveScanDialog extends
     @Override
     protected void addExtraCells() {
         if (extras != null && extras.size() > 0) {
-            BiobankPlugin
+            BgcPlugin
                 .openAsyncInformation(
                     Messages
                         .getString("DispatchReceiveScanDialog.notInDispatch.error.title"), //$NON-NLS-1$
@@ -46,7 +46,7 @@ public class DispatchReceiveScanDialog extends
                 currentShipment.addSpecimens(extras,
                     DispatchSpecimenState.EXTRA);
             } catch (Exception e) {
-                BiobankPlugin
+                BgcPlugin
                     .openAsyncError(
                         Messages
                             .getString("DispatchReceiveScanDialog.flagging.error.title"), //$NON-NLS-1$
@@ -68,10 +68,11 @@ public class DispatchReceiveScanDialog extends
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
-        if (currentShipment.getSpecimenCollection(false).size() > 0) {
+        if (currentShipment.getDispatchSpecimenCollection(false).size() > 0) {
             int i = 0;
-            for (DispatchSpecimenWrapper dsa : (currentShipment)
-                .getDispatchSpecimenCollection(false)) {
+            do {
+                DispatchSpecimenWrapper dsa = currentShipment
+                    .getDispatchSpecimenCollection(false).get(i);
                 int row = i / 12;
                 int col = i % 12;
                 if (!DispatchSpecimenState.MISSING.isEquals(dsa.getState()))
@@ -79,11 +80,13 @@ public class DispatchReceiveScanDialog extends
                         new ScanCell(row, col, dsa.getSpecimen()
                             .getInventoryId())));
                 i++;
-            }
+            } while (i < (8 * 12 - 1)
+                && i < currentShipment.getDispatchSpecimenCollection(false)
+                    .size());
+
             palletScanned.put(new RowColPos(6, 6), new PalletCell(new ScanCell(
                 6, 6, "aaar")));
         }
         return palletScanned;
     }
-
 }

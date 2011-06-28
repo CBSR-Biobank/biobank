@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -18,12 +17,12 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.CollectionView;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class PatientEntryForm extends BiobankEntryForm {
@@ -81,7 +80,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         }
     }
 
-    private void createPatientSection() throws Exception {
+    private void createPatientSection() {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -89,8 +88,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        List<StudyWrapper> studies = new ArrayList<StudyWrapper>(
-            StudyWrapper.getAllStudies(appService));
+        List<StudyWrapper> studies = SessionManager.getUser()
+            .getCurrentWorkingCenter().getStudyCollection();
         StudyWrapper selectedStudy = null;
         if (patient.isNew()) {
             if (studies.size() == 1) {
@@ -113,7 +112,7 @@ public class PatientEntryForm extends BiobankEntryForm {
             });
         setFirstControl(studiesViewer.getControl());
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
             Messages.getString("PatientEntryForm.field.pNumber.label"), null,
             patient, PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
 

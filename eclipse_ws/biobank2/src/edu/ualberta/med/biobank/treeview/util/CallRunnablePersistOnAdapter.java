@@ -9,8 +9,8 @@ import org.eclipse.swt.widgets.Display;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public abstract class CallRunnablePersistOnAdapter implements
@@ -30,7 +30,7 @@ public abstract class CallRunnablePersistOnAdapter implements
             adapter.getModelObject().persist();
             afterPersist();
         } catch (final RemoteConnectFailureException exp) {
-            BiobankPlugin.openRemoteConnectErrorMessage(exp);
+            BgcPlugin.openRemoteConnectErrorMessage(exp);
             Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
@@ -39,7 +39,7 @@ public abstract class CallRunnablePersistOnAdapter implements
             });
             monitor.setCanceled(true);
         } catch (final RemoteAccessException exp) {
-            BiobankPlugin.openRemoteAccessErrorMessage(exp);
+            BgcPlugin.openRemoteAccessErrorMessage(exp);
             Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
@@ -48,7 +48,7 @@ public abstract class CallRunnablePersistOnAdapter implements
             });
             monitor.setCanceled(true);
         } catch (final AccessDeniedException ade) {
-            BiobankPlugin.openAccessDeniedErrorMessage(ade);
+            BgcPlugin.openAccessDeniedErrorMessage(ade);
             Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
@@ -57,7 +57,7 @@ public abstract class CallRunnablePersistOnAdapter implements
             });
             monitor.setCanceled(true);
         } catch (BiobankCheckException bce) {
-            BiobankPlugin.openAsyncError("Save error", bce);
+            BgcPlugin.openAsyncError("Save error", bce);
             monitor.setCanceled(true);
             Display.getDefault().syncExec(new Runnable() {
                 @Override

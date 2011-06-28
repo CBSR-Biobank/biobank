@@ -5,6 +5,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 
 public class ScannerBarcodeValidator extends AbstractValidator {
 

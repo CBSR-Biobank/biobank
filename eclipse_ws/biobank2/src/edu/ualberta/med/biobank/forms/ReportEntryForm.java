@@ -38,7 +38,6 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
@@ -51,7 +50,10 @@ import edu.ualberta.med.biobank.export.DataExporter;
 import edu.ualberta.med.biobank.export.PdfDataExporter;
 import edu.ualberta.med.biobank.export.PrintPdfDataExporter;
 import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
@@ -59,9 +61,7 @@ import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 import edu.ualberta.med.biobank.treeview.report.ReportAdapter;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.views.AdvancedReportsView;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ReportResultsTableWidget;
 import edu.ualberta.med.biobank.widgets.report.ChangeListener;
 import edu.ualberta.med.biobank.widgets.report.ColumnChangeEvent;
@@ -71,12 +71,12 @@ import edu.ualberta.med.biobank.widgets.report.FilterSelectWidget;
 
 public class ReportEntryForm extends BiobankEntryForm {
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(ReportEntryForm.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(ReportEntryForm.class
+        .getName());
 
     private static ImageDescriptor SAVE_AS_NEW_ACTION_IMAGE = ImageDescriptor
-        .createFromImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_SAVE_AS_NEW));
+        .createFromImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_SAVE_AS_NEW));
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ReportEntryForm";
 
@@ -201,11 +201,11 @@ public class ReportEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(container);
 
         setFirstControl(createBoundWidgetWithLabel(container,
-            BiobankText.class, SWT.NONE, "Name", null, report,
+            BgcBaseText.class, SWT.NONE, "Name", null, report,
             ReportWrapper.PROPERTY_NAME, new NonEmptyStringValidator(
                 "Name is required.")));
 
-        createBoundWidgetWithLabel(container, BiobankText.class, SWT.MULTI,
+        createBoundWidgetWithLabel(container, BgcBaseText.class, SWT.MULTI,
             "Description", null, report, ReportWrapper.PROPERTY_DESCRIPTION,
             null);
     }
@@ -329,7 +329,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                     appService.logActivity(logMessage);
 
                 } catch (Exception e) {
-                    BiobankPlugin.openAsyncError("Report Generation Error", e);
+                    BgcPlugin.openAsyncError("Report Generation Error", e);
                 }
                 monitor.done();
             }

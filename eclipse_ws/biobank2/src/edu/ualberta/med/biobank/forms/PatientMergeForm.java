@@ -18,15 +18,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
 import edu.ualberta.med.biobank.views.CollectionView;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicVisitInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -36,21 +36,19 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     public static final String MSG_PATIENT_NOT_VALID = "Select a second patient";
 
-    private PatientAdapter patient1Adapter;
-
     private PatientWrapper patient1;
 
     private PatientWrapper patient2;
 
-    private BiobankText study2Text;
+    private BgcBaseText study2Text;
 
     private ClinicVisitInfoTable patient2VisitsTable;
 
-    private BiobankText pnumber2Text;
+    private BgcBaseText pnumber2Text;
 
-    private BiobankText pnumber1Text;
+    private BgcBaseText pnumber1Text;
 
-    private BiobankText study1Text;
+    private BgcBaseText study1Text;
 
     private IObservableValue patientNotNullValue;
 
@@ -64,7 +62,6 @@ public class PatientMergeForm extends BiobankEntryForm {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        patient1Adapter = (PatientAdapter) adapter;
         patient1 = (PatientWrapper) getModelObject();
 
         String tabName = "Merging Patient " + patient1.getPnumber();
@@ -78,8 +75,8 @@ public class PatientMergeForm extends BiobankEntryForm {
     protected void createFormContent() throws Exception {
         form.setText("Merging into Patient " + patient1.getPnumber());
         page.setLayout(new GridLayout(1, false));
-        form.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_PATIENT));
+        form.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_PATIENT));
 
         toolkit.createLabel(
             page,
@@ -106,8 +103,8 @@ public class PatientMergeForm extends BiobankEntryForm {
         patientArea1.setLayoutData(patient1Data);
 
         Label arrow = toolkit.createLabel(client, "Arrow", SWT.IMAGE_BMP);
-        arrow.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_ARROW_LEFT2));
+        arrow.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ARROW_LEFT2));
 
         Composite patientArea2 = toolkit.createComposite(client);
         GridLayout patient2Layout = new GridLayout(2, false);
@@ -124,8 +121,8 @@ public class PatientMergeForm extends BiobankEntryForm {
             "Patient Number");
         pnumber1Text.setText(patient1.getPnumber());
 
-        pnumber2Text = (BiobankText) createLabelledWidget(patientArea2,
-            BiobankText.class, SWT.NONE, "Patient Number");
+        pnumber2Text = (BgcBaseText) createLabelledWidget(patientArea2,
+            BgcBaseText.class, SWT.NONE, "Patient Number");
         pnumber2Text.addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -182,13 +179,13 @@ public class PatientMergeForm extends BiobankEntryForm {
             patient2 = PatientWrapper.getPatient(
                 SessionManager.getAppService(), pnumber);
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError("Error retrieving patient", e);
+            BgcPlugin.openAsyncError("Error retrieving patient", e);
             patient2VisitsTable.setCollection(newContents);
             study2Text.setText("");
             return;
         }
         if (patient2 == null) {
-            BiobankPlugin.openAsyncError("Invalid Patient Number",
+            BgcPlugin.openAsyncError("Invalid Patient Number",
                 "Cannot find a patient with that pnumber");
             patient2VisitsTable.setCollection(newContents);
             study2Text.setText("");
@@ -196,7 +193,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         }
 
         if (patient2.equals(patient1)) {
-            BiobankPlugin.openAsyncError("Duplicate Patient Number",
+            BgcPlugin.openAsyncError("Duplicate Patient Number",
                 "Cannot merge a patient with himself");
             patient2VisitsTable.setCollection(newContents);
             return;
@@ -206,7 +203,7 @@ public class PatientMergeForm extends BiobankEntryForm {
 
         if (!patient2.getStudy().equals(patient1.getStudy())) {
             patient2VisitsTable.setCollection(newContents);
-            BiobankPlugin.openAsyncError("Invalid Patient Number",
+            BgcPlugin.openAsyncError("Invalid Patient Number",
                 "Patients from different studies cannot be merged");
         } else {
             patient2VisitsTable.setCollection(patient2
@@ -219,7 +216,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         try {
             patient1.merge(patient2);
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Merge failed.", e);
+            BgcPlugin.openAsyncError("Merge failed.", e);
         }
 
         Display.getDefault().syncExec(new Runnable() {
@@ -238,7 +235,7 @@ public class PatientMergeForm extends BiobankEntryForm {
     protected void doBeforeSave() throws Exception {
         canMerge = false;
         if (patient2 != null) {
-            if (BiobankPlugin
+            if (BgcPlugin
                 .openConfirm(
                     "Confirm Merge",
                     "Are you sure you want to merge patient "

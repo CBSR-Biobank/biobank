@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
@@ -16,11 +15,12 @@ import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
-import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
+import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class RequestTableGroup extends TableGroup<RequestWrapper> {
@@ -68,7 +68,7 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
         try {
             results = SessionManager.getAppService().query(query);
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error",
+            BgcPlugin.openAsyncError("Error",
                 "Unable to retrieve data from server", e);
         }
 

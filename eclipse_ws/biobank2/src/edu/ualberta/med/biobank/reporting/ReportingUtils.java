@@ -47,7 +47,7 @@ import ar.com.fdvs.dj.domain.constants.Border;
 import ar.com.fdvs.dj.domain.constants.Font;
 import ar.com.fdvs.dj.domain.constants.Transparency;
 import ar.com.fdvs.dj.domain.constants.VerticalAlign;
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.Holder;
 
@@ -245,7 +245,7 @@ public class ReportingUtils {
                             try {
                                 printViaPrinter(data, jasperPrint);
                             } catch (Exception e) {
-                                BiobankPlugin.openAsyncError(
+                                BgcPlugin.openAsyncError(
                                     "Printing Error",
                                     "Error: "
                                         + e.toString()

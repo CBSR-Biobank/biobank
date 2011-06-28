@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
@@ -38,7 +38,7 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    BiobankPlugin.openInformation("Extra specimens",
+                    BgcPlugin.openInformation("Extra specimens",
                         "Some of the specimens in this pallet were not supposed"
                             + " to be in this shipment.");
                 }
@@ -51,7 +51,7 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
         try {
             currentShipment.receiveSpecimens(specimens);
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error receiving request", e);
+            BgcPlugin.openAsyncError("Error receiving request", e);
         }
     }
 

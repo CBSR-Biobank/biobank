@@ -5,18 +5,24 @@ import java.text.MessageFormat;
 public class ValueNotSetException extends BiobankServerException {
     private static final long serialVersionUID = 1L;
 
-    private static final String MSG_PATTERN = "Value {0} has not been set.";
+    private static final String MSG_PATTERN = "Value ''{0}'' has not been set on ''{1}''.";
 
     private String propertyName;
 
-    public ValueNotSetException(String propertyName) {
-        super(MessageFormat.format(MSG_PATTERN, propertyName));
+    private String objectName;
+
+    public ValueNotSetException(String propertyName, String objectName) {
+        super(MessageFormat.format(MSG_PATTERN, propertyName, objectName));
         this.propertyName = propertyName;
+        this.objectName = objectName;
     }
 
-    public ValueNotSetException(String propertyName, Throwable cause) {
-        super(MessageFormat.format(MSG_PATTERN, propertyName), cause);
+    public ValueNotSetException(String propertyName, String objectName,
+        Throwable cause) {
+        super(MessageFormat.format(MSG_PATTERN, propertyName, objectName),
+            cause);
         this.propertyName = propertyName;
+        this.objectName = objectName;
     }
 
     public ValueNotSetException(Throwable cause) {
@@ -25,5 +31,9 @@ public class ValueNotSetException extends BiobankServerException {
 
     public String getPropertyName() {
         return propertyName;
+    }
+
+    public String getObjectName() {
+        return objectName;
     }
 }

@@ -12,24 +12,24 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
 public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(AbstractDispatchEntryForm.class.getName());
 
     protected DispatchWrapper dispatch;
 
-    protected BiobankEntryFormWidgetListener biobankListener = new BiobankEntryFormWidgetListener() {
+    protected BgcEntryFormWidgetListener biobankListener = new BgcEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
             reloadSpecimens();
@@ -71,7 +71,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
         toolkit.createLabel(addComposite, "Enter inventory ID to add:");
-        final BiobankText newSpecimenText = new BiobankText(addComposite,
+        final BgcBaseText newSpecimenText = new BgcBaseText(addComposite,
             SWT.NONE, toolkit);
         GridData gd = new GridData();
         gd.widthHint = 100;
@@ -88,8 +88,8 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             setFirstControl(newSpecimenText);
         }
         Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
-        addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_ADD));
+        addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -101,8 +101,8 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         toolkit.createLabel(addComposite, "or open scan dialog:");
         Button openScanButton = toolkit
             .createButton(addComposite, "", SWT.PUSH);
-        openScanButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
+        openScanButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

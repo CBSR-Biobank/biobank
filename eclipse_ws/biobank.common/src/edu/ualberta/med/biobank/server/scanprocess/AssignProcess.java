@@ -61,11 +61,6 @@ public class AssignProcess extends ServerProcess {
                 CellStatus newStatus = CellStatus.EMPTY;
                 if (cell != null) {
                     newStatus = cell.getStatus();
-                    // if (newStatus == null) {
-                    // System.out.println(ContainerLabelingSchemeWrapper
-                    // .rowColToSbs(new RowColPos(cell.getRow(), cell
-                    // .getCol())));
-                    // }
                 }
                 currentScanState = currentScanState.mergeWith(newStatus);
             }
@@ -105,9 +100,8 @@ public class AssignProcess extends ServerProcess {
             updateCellAsMissing(positionString, scanCell, expectedSpecimen,
                 movedAndMissingSpecimensFromPallet);
         } else {
-            // FIXME test what happen if don't have read rights on the site
             SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(
-                appService, value, user);
+                appService, value);
             if (foundSpecimen == null) {
                 updateCellAsNotLinked(positionString, scanCell);
             } else if (!foundSpecimen.getCurrentCenter().equals(
@@ -119,11 +113,6 @@ public class AssignProcess extends ServerProcess {
                     expectedSpecimen, foundSpecimen);
             } else {
                 scanCell.setSpecimenId(foundSpecimen.getId());
-                // System.out.println("expectedSpecimen="
-                // + expectedSpecimen
-                // + " in "
-                // + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(
-                // scanCell.getRow(), scanCell.getCol())));
                 if (expectedSpecimen != null) {
                     // specimen scanned is already registered at this
                     // position (everything is ok !)

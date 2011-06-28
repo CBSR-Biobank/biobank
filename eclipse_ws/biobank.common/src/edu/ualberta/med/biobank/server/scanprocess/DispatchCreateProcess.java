@@ -124,7 +124,7 @@ public class DispatchCreateProcess extends ServerProcess {
             scanCell.setTitle("?"); //$NON-NLS-1$
         } else {
             SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(
-                appService, value, user);
+                appService, value);
             if (foundSpecimen == null) {
                 // not in database
                 scanCell.setStatus(CellStatus.ERROR);

@@ -15,7 +15,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -25,6 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchViewForm;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
@@ -79,7 +79,8 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public boolean isDeletable() {
-        if (SessionManager.getUser().getCurrentWorkingCenter() != null)
+        if (SessionManager.getInstance().isConnected()
+            && SessionManager.getUser().getCurrentWorkingCenter() != null)
             return SessionManager.getUser().getCurrentWorkingCenter()
                 .equals(getWrapper().getSenderCenter())
                 && getWrapper().canDelete(SessionManager.getUser())
@@ -138,7 +139,8 @@ public class DispatchAdapter extends AdapterBase {
             }
             addEditMenu(menu, "Dispatch");
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error checking permissions", e);
+            BgcPlugin.openAsyncError("Error checking permissions",
+                e);
         }
     }
 
@@ -185,13 +187,13 @@ public class DispatchAdapter extends AdapterBase {
         try {
             getWrapper().persist();
         } catch (final RemoteConnectFailureException exp) {
-            BiobankPlugin.openRemoteConnectErrorMessage(exp);
+            BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (final RemoteAccessException exp) {
-            BiobankPlugin.openRemoteAccessErrorMessage(exp);
+            BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (final AccessDeniedException ade) {
-            BiobankPlugin.openAccessDeniedErrorMessage(ade);
+            BgcPlugin.openAccessDeniedErrorMessage(ade);
         } catch (Exception ex) {
-            BiobankPlugin.openAsyncError("Save error", ex);
+            BgcPlugin.openAsyncError("Save error", ex);
         }
         SpecimenTransitView.getCurrent().reload();
     }

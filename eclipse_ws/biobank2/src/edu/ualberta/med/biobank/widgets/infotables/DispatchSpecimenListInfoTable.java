@@ -10,10 +10,10 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public abstract class DispatchSpecimenListInfoTable extends
@@ -52,7 +52,7 @@ public abstract class DispatchSpecimenListInfoTable extends
                         List<DispatchSpecimenWrapper> dsaList = getSelectedItems();
                         if (dsaList.size() > 0) {
                             if (dsaList.size() == 1
-                                && !BiobankPlugin.openConfirm(
+                                && !BgcPlugin.openConfirm(
                                     "Remove Specimen",
                                     "Are you sure you want to remove specimen \""
                                         + dsaList.get(0).getSpecimen()
@@ -60,7 +60,7 @@ public abstract class DispatchSpecimenListInfoTable extends
                                         + "\" from this shipment ?"))
                                 return;
                             if (dsaList.size() > 1
-                                && !BiobankPlugin.openConfirm(
+                                && !BgcPlugin.openConfirm(
                                     "Remove Specimen",
                                     "Are you sure you want to remove these "
                                         + dsaList.size()
@@ -71,8 +71,8 @@ public abstract class DispatchSpecimenListInfoTable extends
                                 reloadCollection();
                                 notifyListeners();
                             } catch (Exception e) {
-                                BiobankPlugin
-                                    .openAsyncError("Delete failed", e);
+                                BgcPlugin.openAsyncError(
+                                    "Delete failed", e);
                             }
                         }
                     }

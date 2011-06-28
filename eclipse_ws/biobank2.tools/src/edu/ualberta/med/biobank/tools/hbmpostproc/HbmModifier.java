@@ -107,14 +107,14 @@ public class HbmModifier {
                     String attrName = stringAttrMatcher.group(1);
                     Attribute attr = columnTypeMap.get(attrName);
 
-                    if (attr == null) {
-                        throw new Exception("column not found in column map: "
-                            + attrName);
-                    }
+                    // attr could be null if data model type is not varchar but
+                    // class type is string
 
-                    alteredLine = fixStringAttributes(line, className, attr);
-                    alteredLine = addContraints(alteredLine, attrName,
-                        uniqueList, notNullList);
+                    if (attr != null) {
+                        alteredLine = fixStringAttributes(line, className, attr);
+                        alteredLine = addContraints(alteredLine, attrName,
+                            uniqueList, notNullList);
+                    }
                 } else if (attrMatcher.find()) {
                     String attrName = attrMatcher.group(1);
                     alteredLine = addContraints(alteredLine, attrName,

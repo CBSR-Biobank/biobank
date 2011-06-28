@@ -8,7 +8,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -56,7 +56,7 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
                 }
             }
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError(
+            BgcPlugin.openAsyncError(
                 "Unable to retrieve available contacts", e);
         }
     }
@@ -74,7 +74,7 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
             public void deleteItem(InfoTableEvent event) {
                 ContactWrapper contact = getSelection();
                 if (contact != null) {
-                    if (!BiobankPlugin.openConfirm(
+                    if (!BgcPlugin.openConfirm(
                         "Delete Contact",
                         "Are you sure you want to delete contact \""
                             + contact.getName() + "\"")) {

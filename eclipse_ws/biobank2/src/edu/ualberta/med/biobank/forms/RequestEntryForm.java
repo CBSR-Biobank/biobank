@@ -30,13 +30,14 @@ import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.RequestReceiveScanDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.RequestSpecimensTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.RequestDispatchInfoTable;
+import edu.ualberta.med.biobank.widgets.trees.RequestSpecimensTreeTable;
 
 public class RequestEntryForm extends BiobankViewForm {
 
@@ -44,7 +45,7 @@ public class RequestEntryForm extends BiobankViewForm {
     private RequestWrapper request;
     private RequestSpecimensTreeTable specimensTree;
     private RequestDispatchInfoTable dispatchTable;
-    private BiobankText newSpecimenText;
+    private BgcBaseText newSpecimenText;
     private Button addButton;
     private Button openScanButton;
 
@@ -66,19 +67,19 @@ public class RequestEntryForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        BiobankText orderNumberLabel = createReadOnlyLabelledField(client,
+        BgcBaseText orderNumberLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Request Number");
         setTextValue(orderNumberLabel, request.getId());
 
-        BiobankText studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
+        BgcBaseText studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Study");
         setTextValue(studyLabel, request.getStudy().getNameShort());
 
-        BiobankText researchGroupLabel = createReadOnlyLabelledField(client,
+        BgcBaseText researchGroupLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Research Group");
         setTextValue(researchGroupLabel, request.getStudy().getResearchGroup()
             .getNameShort());
-        BiobankText submittedLabel = createReadOnlyLabelledField(client,
+        BgcBaseText submittedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Date Submitted");
         setTextValue(submittedLabel,
             DateFormatter.formatAsDateTime(request.getSubmitted()));
@@ -113,10 +114,10 @@ public class RequestEntryForm extends BiobankViewForm {
         dispatchCreation.setLayout(new GridLayout(5, false));
         toolkit
             .createLabel(dispatchCreation, "Enter/Scan inventory ID to add:");
-        newSpecimenText = new BiobankText(dispatchCreation, SWT.NONE, toolkit);
+        newSpecimenText = new BgcBaseText(dispatchCreation, SWT.NONE, toolkit);
         addButton = toolkit.createButton(dispatchCreation, "", SWT.PUSH);
         addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_ADD));
+            .get(BgcPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -134,7 +135,7 @@ public class RequestEntryForm extends BiobankViewForm {
                         specimensTree.dispatch(specNode);
                     }
                 } catch (Exception e1) {
-                    BiobankPlugin.openAsyncError("Error", e1.getMessage());
+                    BgcPlugin.openAsyncError("Error", e1.getMessage());
                 }
                 newSpecimenText.setText("");
                 dispatchTable.reloadCollection(
@@ -146,7 +147,7 @@ public class RequestEntryForm extends BiobankViewForm {
         toolkit.createLabel(dispatchCreation, "Add Pallet:");
         openScanButton = toolkit.createButton(dispatchCreation, "", SWT.PUSH);
         openScanButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
+            .get(BgcPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -203,12 +204,12 @@ public class RequestEntryForm extends BiobankViewForm {
         boolean setAsFirstControl) {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
-        toolkit.createLabel(addComposite, "Enter/Scan inventory ID to pull:");
-        final BiobankText newSpecimenText = new BiobankText(addComposite,
+        toolkit.createLabel(addComposite, "Enter inventory ID to add:");
+        final BgcBaseText newSpecimenText = new BgcBaseText(addComposite,
             SWT.NONE, toolkit);
         Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
-        addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_ADD));
+        addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -239,7 +240,7 @@ public class RequestEntryForm extends BiobankViewForm {
                             "This specimen has been already been processed.");
 
                 } catch (Exception e1) {
-                    BiobankPlugin.openAsyncError("Error", e1.getMessage());
+                    BgcPlugin.openAsyncError("Error", e1.getMessage());
                 }
                 newSpecimenText.setFocus();
                 newSpecimenText.setText("");
@@ -288,7 +289,7 @@ public class RequestEntryForm extends BiobankViewForm {
                 request.getDispatchCollection(false), getDispatchSelection());
             SpecimenTransitView.reloadCurrent();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Unable to create dispatch", e);
+            BgcPlugin.openAsyncError("Unable to create dispatch", e);
         }
     }
 

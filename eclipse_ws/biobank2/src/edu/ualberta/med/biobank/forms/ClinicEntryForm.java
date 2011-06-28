@@ -18,13 +18,13 @@ import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ContactEntryInfoTable;
-import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -48,7 +48,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     protected Combo session;
 
-    private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
             setDirty(true);
@@ -105,12 +105,12 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
+        setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
             SWT.NONE, Messages.getString("label.name"), null, clinic, //$NON-NLS-1$
             ClinicPeer.NAME.getName(), new NonEmptyStringValidator(
                 MSG_NO_CLINIC_NAME)));
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
             Messages.getString("label.nameShort"), null, clinic, //$NON-NLS-1$
             ClinicPeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 MSG_NO_CLINIC_NAME));
@@ -134,7 +134,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             Messages.getString("label.comments"), null, clinic, //$NON-NLS-1$
             ClinicPeer.COMMENT.getName(), null);
     }

@@ -1101,31 +1101,32 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 .getPossibleLabelLength(appService);
             StringBuffer res = new StringBuffer();
 
-            // String binLabel = parentLabelsTested.get(i);
-            //                res.append(binLabel).append("(") //$NON-NLS-1$
-            //                    .append(fullLabel.replace(binLabel, "")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
-
             for (int i = 0; i < validLengths.size(); i++) {
                 Integer crop = validLengths.get(i);
-                if (i != 0) {
+                if (res.length() != 0)
                     res.append(", "); //$NON-NLS-1$
 
-                    if (crop < positionText.length())
-                        res.append(positionText.substring(0,
-                            positionText.length() - crop));
-                }
+                if (crop < positionText.length())
+                    res.append(positionText.substring(0, positionText.length()
+                        - crop));
             }
             String errorMsg;
             if (contType == null)
-                errorMsg = Messages
-                    .getString(
-                        "ContainerWrapper.getPossibleContainersFromPosition.error.notfound.msg", //$NON-NLS-1$
-                        positionText);
+                if (isContainerPosition)
+                    errorMsg = Messages
+                        .getString(
+                            "ContainerWrapper.getPossibleContainersFromPosition.error.notfound.msg", //$NON-NLS-1$
+                            res.toString());
+                else
+                    errorMsg = Messages
+                        .getString(
+                            "ContainerWrapper.getPossibleContainersFromPosition.error.notfoundSpecimenHolder.msg", //$NON-NLS-1$
+                            res.toString());
             else
                 errorMsg = Messages
                     .getString(
                         "ContainerWrapper.getPossibleContainersFromPosition.error.notfoundWithType.msg",//$NON-NLS-1$
-                        positionText, contType.getNameShort());
+                        contType.getNameShort(), res.toString());
 
             throw new BiobankException(errorMsg);
         }

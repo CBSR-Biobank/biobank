@@ -11,12 +11,12 @@ import org.eclipse.ui.part.ViewPart;
 import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.widgets.ReportTreeWidget;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.widgets.trees.ReportTreeWidget;
 
 public class ReportsView extends ViewPart {
 
-    public static BiobankLogger logger = BiobankLogger
+    public static BgcLogger logger = BgcLogger
         .getLogger(ReportsView.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.views.ReportsView";
@@ -145,13 +145,13 @@ public class ReportsView extends ViewPart {
         AbstractReportTreeNode clinics, AbstractReportTreeNode patients,
         AbstractReportTreeNode sampleTypes, AbstractReportTreeNode containers,
         ReportTreeNode child) throws Exception {
-        if (child.getLabel().contains("Specimen")) {
-            specimens.addChild(child);
-            child.setParent(specimens);
-        } else if (child.getLabel().contains("Specimen Type")
+        if (child.getLabel().contains("Specimen Type")
             || child.getLabel().contains("Invoicing")) {
             sampleTypes.addChild(child);
             child.setParent(sampleTypes);
+        } else if (child.getLabel().contains("Specimen")) {
+            specimens.addChild(child);
+            child.setParent(specimens);
         } else if (child.getLabel().contains("Patient")) {
             patients.addChild(child);
             child.setParent(patients);
@@ -162,7 +162,8 @@ public class ReportsView extends ViewPart {
             containers.addChild(child);
             child.setParent(containers);
         } else
-            throw new Exception("Unable to place report node.");
+            throw new Exception("Unable to place report node: "
+                + child.getLabel());
     }
 
     @Override

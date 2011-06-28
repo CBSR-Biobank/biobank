@@ -8,6 +8,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.security.SecurityFeature;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 
 public class ProcessingAdministrationHandler extends AbstractHandler implements
@@ -30,6 +32,11 @@ public class ProcessingAdministrationHandler extends AbstractHandler implements
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return SessionManager.getInstance().isConnected()
+            && SessionManager.getUser().canPerformActions(
+                SecurityFeature.ASSIGN, SecurityFeature.CLINIC_SHIPMENT,
+                SecurityFeature.COLLECTION_EVENT,
+                SecurityFeature.DISPATCH_REQUEST, SecurityFeature.LINK,
+                SecurityFeature.PROCESSING_EVENT);
     }
 }

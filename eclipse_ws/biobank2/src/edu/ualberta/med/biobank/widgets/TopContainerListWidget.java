@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -69,7 +69,7 @@ public class TopContainerListWidget {
             siteCombo.setInput(sites);
             siteCombo.getCombo().select(0);
         } catch (Exception e1) {
-            BiobankPlugin.openAsyncError("Failed to load sites", e1);
+            BgcPlugin.openAsyncError("Failed to load sites", e1);
         }
         siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
@@ -89,7 +89,7 @@ public class TopContainerListWidget {
                         } else
                             containers.addAll(s.getTopContainerCollection());
                     } catch (Exception e) {
-                        BiobankPlugin.openAsyncError(
+                        BgcPlugin.openAsyncError(
                             "Error retrieving containers", e);
                     }
                     topContainers.setInput(containers);

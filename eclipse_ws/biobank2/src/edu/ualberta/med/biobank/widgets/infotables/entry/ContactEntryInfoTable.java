@@ -7,11 +7,11 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.select.ContactAddDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
@@ -64,7 +64,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                     ContactWrapper contact = getSelection();
                     if (contact != null) {
                         if (!contact.deleteAllowed()) {
-                            BiobankPlugin
+                            BgcPlugin
                                 .openError(
                                     "Contact Delete Error",
                                     "Cannot delete contact \""
@@ -73,7 +73,8 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                             return;
                         }
 
-                        if (!BiobankPlugin.openConfirm("Delete Contact",
+                        if (!BgcPlugin.openConfirm(
+                            "Delete Contact",
                             "Are you sure you want to delete contact \""
                                 + contact.getName() + "\"")) {
                             return;
@@ -112,7 +113,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
             try {
                 contactWrapper.reload();
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Cancel error", e);
+                BgcPlugin.openAsyncError("Cancel error", e);
             }
             reloadCollection(selectedContacts, null);
         }

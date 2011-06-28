@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -32,20 +31,21 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 import edu.ualberta.med.biobank.widgets.infotables.entry.CEventSpecimenEntryInfoTable;
-import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -71,7 +71,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private List<FormPvCustomInfo> pvCustomInfoList;
 
-    private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
             setDirty(true);
@@ -81,7 +81,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     private ComboViewer activityStatusComboViewer;
 
     private CEventSpecimenEntryInfoTable specimensTable;
-    private BiobankText visitNumberText;
+    private BgcBaseText visitNumberText;
 
     private DateTimeWidget timeDrawnWidget;
 
@@ -105,6 +105,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 appService, cevent));
         } else {
             tabName = Messages.getString("CollectionEventEntryForm.title.edit",
+                cevent.getPatient().getPnumber(),
                 cevent.getVisitNumber());
         }
 
@@ -139,9 +140,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             Messages.getString("CollectionEventEntryForm.field.patient.label"),
             patient.getPnumber());
 
-        visitNumberText = (BiobankText) createBoundWidgetWithLabel(
+        visitNumberText = (BgcBaseText) createBoundWidgetWithLabel(
             client,
-            BiobankText.class,
+            BgcBaseText.class,
             SWT.NONE,
             Messages
                 .getString("CollectionEventEntryForm.field.visitNumber.label"),
@@ -181,7 +182,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
         createPvDataSection(client);
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             Messages.getString("label.comments"), null, cevent,
             CollectionEventPeer.COMMENT.getName(), null);
     }
@@ -213,7 +214,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                     }
                 });
         } catch (ApplicationException e) {
-            BiobankPlugin
+            BgcPlugin
                 .openAsyncError(
                     Messages
                         .getString("CollectionEventEntryForm.specimenstypes.error.msg"),
@@ -246,11 +247,11 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         FormPvCustomInfo pvCustomInfo) {
         Control control;
         if (EventAttrTypeEnum.NUMBER == pvCustomInfo.getType()) {
-            control = createBoundWidgetWithLabel(client, BiobankText.class,
+            control = createBoundWidgetWithLabel(client, BgcBaseText.class,
                 SWT.NONE, pvCustomInfo.getLabel(), null, pvCustomInfo, "value",
                 new DoubleNumberValidator("You should select a valid number"));
         } else if (EventAttrTypeEnum.TEXT == pvCustomInfo.getType()) {
-            control = createBoundWidgetWithLabel(client, BiobankText.class,
+            control = createBoundWidgetWithLabel(client, BgcBaseText.class,
                 SWT.NONE, pvCustomInfo.getLabel(), null, pvCustomInfo, "value",
                 null);
         } else if (EventAttrTypeEnum.DATE_TIME == pvCustomInfo.getType()) {
@@ -299,7 +300,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         if (patientAdapter != null)
             cevent.setPatient(patientAdapter.getWrapper());
         cevent.addToOriginalSpecimenCollection(specimensTable
-            .getAddedSpecimens());
+            .getAddedOrModifiedSpecimens());
         cevent.removeFromOriginalSpecimenCollection(specimensTable
             .getRemovedSpecimens());
         savePvCustomInfo();
@@ -310,13 +311,14 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         // FIXME need to use batchquery for OriginInfo + Collection Event
 
         // create the origin info to be used
-        if (specimensTable.getAddedSpecimens().size() > 0) {
+        if (specimensTable.getAddedOrModifiedSpecimens().size() > 0) {
             OriginInfoWrapper originInfo = new OriginInfoWrapper(
                 SessionManager.getAppService());
             originInfo.setCenter(SessionManager.getUser()
                 .getCurrentWorkingCenter());
             originInfo.persist();
-            for (SpecimenWrapper spec : specimensTable.getAddedSpecimens()) {
+            for (SpecimenWrapper spec : specimensTable
+                .getAddedOrModifiedSpecimens()) {
                 spec.setOriginInfo(originInfo);
             }
         }

@@ -14,31 +14,31 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.DateNode;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchCenterAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.OriginInfoSearchedNode;
-import edu.ualberta.med.biobank.treeview.request.DispatchCenterAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ClinicWithShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentTodayNode;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     public static final String ID = "edu.ualberta.med.biobank.views.SpecimenTransitView";
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(SpecimenTransitView.class.getName());
 
     private Button radioWaybill;
@@ -190,13 +190,13 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                     msg += " for date "
                         + DateFormatter.formatAsDate(dateWidget.getDate());
                 }
-                BiobankPlugin.openMessage("Dispatch not found", msg);
+                BgcPlugin.openMessage("Dispatch not found", msg);
             } else {
                 showSearchedObjectsInTree(searchedObject, true);
                 getTreeViewer().expandToLevel(searchedNode, 2);
             }
         } catch (Exception e) {
-            BiobankPlugin.openError("Search error", e);
+            BgcPlugin.openError("Search error", e);
         }
     }
 
@@ -244,7 +244,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             List<AdapterBase> nodeRes = rootNode.search(searchedObjects.get(0));
             nodeRes.get(0).performDoubleClick();
         } else
-            BiobankPlugin.openMessage("Shipments", searchedObjects.size()
+            BgcPlugin.openMessage("Shipments", searchedObjects.size()
                 + " found.");
     }
 
@@ -259,13 +259,14 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 Date date;
                 if (currentInstance.radioDateReceived.getSelection()) {
                     text = "Received";
-                    date = (Date) originInfo.getShipmentInfo().getReceivedAt()
-                        .clone();
+                    date = originInfo.getShipmentInfo().getReceivedAt();
                 } else {
                     text = "Packed";
-                    date = (Date) originInfo.getShipmentInfo().getPackedAt()
-                        .clone();
+                    date = originInfo.getShipmentInfo().getPackedAt();
                 }
+                if (date == null)
+                    return null;
+                date = (Date) date.clone();
                 Calendar c = Calendar.getInstance();
                 c.setTime(date);
                 c.set(Calendar.SECOND, 0);

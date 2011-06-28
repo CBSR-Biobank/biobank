@@ -22,7 +22,7 @@ DBNAME=$4
 skip_tables=( log_message object_attribute objectattributes )
 
 if [ -z "$DBNAME" ]; then
-    DBNAME=biobank2
+    DBNAME=biobank
 fi
 
 OPTS=
@@ -31,4 +31,4 @@ for (( i = 0; i < n; i++ )) do
         OPTS[$i]="--ignore-table=${DBNAME}.${skip_tables[$i]}"
 done
 
-$MYSQLDUMP --skip-extended-insert ${OPTS[*]} -h$HOST -u$USER -p$PWD $DBNAME | gzip > ${DBNAME}_`date +%Y%m%d`.sql.gz
+$MYSQLDUMP ${OPTS[*]} -h$HOST -u$USER -p$PWD $DBNAME | gzip > ${DBNAME}_`date +%Y%m%d`.sql.gz

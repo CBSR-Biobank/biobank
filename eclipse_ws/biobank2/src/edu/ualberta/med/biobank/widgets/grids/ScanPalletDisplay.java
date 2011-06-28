@@ -109,9 +109,12 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     protected String getTopTextForBox(
         Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
         int indexCol) {
-        String row = Character.valueOf((char) (indexRow + 'A')).toString();
-        String col = Integer.valueOf(indexCol + 1).toString();
-        return row + col;
+        if (containerType == null) {
+            String row = Character.valueOf((char) (indexRow + 'A')).toString();
+            String col = Integer.valueOf(indexCol + 1).toString();
+            return row + col;
+        }
+        return getDefaultTextForBox(cells, indexRow, indexCol);
     }
 
     @Override

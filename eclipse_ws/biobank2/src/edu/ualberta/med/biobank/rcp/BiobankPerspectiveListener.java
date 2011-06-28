@@ -21,7 +21,7 @@ public class BiobankPerspectiveListener extends PerspectiveAdapter {
             + perspective.getId());
         BindingContextHelper.activateContextInWorkbench(perspective.getId());
 
-        SessionManager.updateVisibility(page);
+        SessionManager.updateVisibility(page, false);
     }
 
     @Override

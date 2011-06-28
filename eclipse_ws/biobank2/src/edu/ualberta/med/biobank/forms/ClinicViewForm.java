@@ -9,11 +9,10 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.ClinicViewForm"; //$NON-NLS-1$
@@ -26,19 +25,19 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private ClinicStudyInfoTable studiesTable;
 
-    private BiobankText nameLabel;
+    private BgcBaseText nameLabel;
 
-    private BiobankText nameShortLabel;
+    private BgcBaseText nameShortLabel;
 
     private Button hasShipmentsButton;
 
-    private BiobankText activityStatusLabel;
+    private BgcBaseText activityStatusLabel;
 
-    private BiobankText commentLabel;
+    private BgcBaseText commentLabel;
 
-    private BiobankText patientTotal;
+    private BgcBaseText patientTotal;
 
-    private BiobankText ceventTotal;
+    private BgcBaseText ceventTotal;
 
     @Override
     protected void init() throws Exception {
@@ -113,7 +112,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(contactsTable);
     }
 
-    protected void createStudiesSection() throws ApplicationException {
+    protected void createStudiesSection() {
         Composite client = createSectionWithClient(Messages
             .getString("ClinicViewForm.studies.title")); //$NON-NLS-1$
 

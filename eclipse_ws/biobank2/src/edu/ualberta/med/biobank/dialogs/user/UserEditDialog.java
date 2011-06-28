@@ -18,25 +18,25 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.handlers.LogoutHandler;
-import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.EmptyStringValidator;
 import edu.ualberta.med.biobank.validators.MatchingTextValidator;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.OrValidator;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class UserEditDialog extends BiobankDialog {
+public class UserEditDialog extends BgcBaseDialog {
     public static final int CLOSE_PARENT_RETURN_CODE = 3;
     private static final String TITLE = "User";
     private static final int PASSWORD_LENGTH_MIN = 5;
@@ -107,20 +107,20 @@ public class UserEditDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        Control c = createBoundWidgetWithLabel(contents, BiobankText.class,
+        Control c = createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER, "Login", null, modifiedUser, "login",
             new NonEmptyStringValidator(MSG_LOGIN_REQUIRED));
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 250;
         c.setLayoutData(gd);
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             "Email", null, modifiedUser, "email", null);
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             "First Name", null, modifiedUser, "firstName", null);
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             "Last Name", null, modifiedUser, "lastName", null);
 
         createPasswordWidgets(contents);
@@ -139,7 +139,7 @@ public class UserEditDialog extends BiobankDialog {
             if (SessionManager.getUser().getId().equals(originalUser.getId())) {
                 // if the User is making changes to himself, logout
 
-                BiobankPlugin.openInformation(USER_PERSIST_TITLE,
+                BgcPlugin.openInformation(USER_PERSIST_TITLE,
                     USER_PERSIST_SELF_MESSAGE);
 
                 LogoutHandler lh = new LogoutHandler();
@@ -154,12 +154,12 @@ public class UserEditDialog extends BiobankDialog {
             close();
         } catch (ApplicationException e) {
             if (e.getMessage().contains("Duplicate entry")) {
-                BiobankPlugin.openAsyncError(
+                BgcPlugin.openAsyncError(
                     USER_PERSIST_ERROR_TITLE,
                     MessageFormat.format(MSG_LOGIN_UNIQUE,
                         modifiedUser.getLogin()));
             } else {
-                BiobankPlugin.openAsyncError(USER_PERSIST_ERROR_TITLE, e);
+                BgcPlugin.openAsyncError(USER_PERSIST_ERROR_TITLE, e);
             }
         }
     }
@@ -188,7 +188,7 @@ public class UserEditDialog extends BiobankDialog {
             "Available Groups", "Assigned Groups", 75);
         groupsWidget.setSelections(groupMap, userInGroupIds);
         groupsWidget
-            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
+            .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
                 @Override
                 public void selectionChanged(MultiSelectEvent event) {
                     List<Group> newGroups = new ArrayList<Group>();
@@ -198,7 +198,7 @@ public class UserEditDialog extends BiobankDialog {
                             Group group = allGroupsMap.get(id.longValue());
                             if (group != null
                                 && group.isSuperAdministratorGroup()) {
-                                if (!BiobankPlugin.openConfirm(
+                                if (!BgcPlugin.openConfirm(
                                     CONFIRM_DEMOTION_TITLE,
                                     CONFIRM_DEMOTION_MESSAGE)) {
                                     newGroups.add(group);
@@ -236,13 +236,13 @@ public class UserEditDialog extends BiobankDialog {
                 MSG_PASSWORD_REQUIRED);
         }
 
-        BiobankText password = (BiobankText) createBoundWidgetWithLabel(parent,
-            BiobankText.class, SWT.BORDER | SWT.PASSWORD, (isNewUser ? ""
+        BgcBaseText password = (BgcBaseText) createBoundWidgetWithLabel(parent,
+            BgcBaseText.class, SWT.BORDER | SWT.PASSWORD, (isNewUser ? ""
                 : "New ") + "Password", new String[0], modifiedUser,
             "password", passwordValidator);
 
-        BiobankText passwordRetyped = (BiobankText) createBoundWidgetWithLabel(
-            parent, BiobankText.class, SWT.BORDER | SWT.PASSWORD, "Re-Type "
+        BgcBaseText passwordRetyped = (BgcBaseText) createBoundWidgetWithLabel(
+            parent, BgcBaseText.class, SWT.BORDER | SWT.PASSWORD, "Re-Type "
                 + (isNewUser ? "" : "New ") + "Password", new String[0],
             modifiedUser, "password", new MatchingTextValidator(
                 MSG_PASSWORDS_MUST_MATCH, password));

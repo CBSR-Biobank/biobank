@@ -12,7 +12,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-public class SelectMultipleWidget extends BiobankWidget {
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
+
+public class SelectMultipleWidget extends BgcBaseWidget {
 
     private HashMap<String, Button> checkBoxes;
 

@@ -4,6 +4,8 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
+
 public class TelephoneNumberValidator extends AbstractValidator {
 
     public TelephoneNumberValidator(String message) {

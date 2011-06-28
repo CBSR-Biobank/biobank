@@ -11,7 +11,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -19,7 +20,6 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class ProcessingView extends AbstractAdministrationView {
 
@@ -153,13 +153,13 @@ public class ProcessingView extends AbstractAdministrationView {
                     msg += " for date "
                         + DateFormatter.formatAsDate(dateWidget.getDate());
                 }
-                BiobankPlugin.openMessage("Processing Event not found", msg);
+                BgcPlugin.openMessage("Processing Event not found", msg);
             } else {
                 showSearchedObjectsInTree(searchedObject, true);
                 getTreeViewer().expandToLevel(processingNode, 2);
             }
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Search error", e);
+            BgcPlugin.openAsyncError("Search error", e);
         }
     }
 

@@ -10,13 +10,13 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.linkassign.AbstractSpecimenAdminForm;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 
 public class BiobankPartListener implements IPartListener {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(BiobankPartListener.class.getName());
 
     @Override

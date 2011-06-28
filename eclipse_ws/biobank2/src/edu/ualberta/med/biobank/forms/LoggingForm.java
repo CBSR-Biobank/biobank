@@ -6,28 +6,28 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.peer.LogPeer;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.logs.LogQuery;
 import edu.ualberta.med.biobank.views.LoggingView;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.LoggingInfoTable;
 
 public class LoggingForm extends BiobankViewForm {
 
     public static String ID = "edu.ualberta.med.biobank.forms.LoggingForm";
 
-    private BiobankText userLabel;
-    private BiobankText typeLabel;
-    private BiobankText actionLabel;
-    private BiobankText patientNumLabel;
-    private BiobankText inventoryIDLabel;
-    private BiobankText locationLabel;
-    private BiobankText detailsLabel;
-    private BiobankText startDateLabel;
-    private BiobankText endDateLabel;
+    private BgcBaseText userLabel;
+    private BgcBaseText typeLabel;
+    private BgcBaseText actionLabel;
+    private BgcBaseText patientNumLabel;
+    private BgcBaseText inventoryIDLabel;
+    private BgcBaseText locationLabel;
+    private BgcBaseText detailsLabel;
+    private BgcBaseText startDateLabel;
+    private BgcBaseText endDateLabel;
 
-    private BiobankText centerLabel;
+    private BgcBaseText centerLabel;
 
     // private BiobankText containerTypeLabel;
     // private BiobankText containerLabelLabel;
@@ -46,8 +46,8 @@ public class LoggingForm extends BiobankViewForm {
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_LOGGING));
+        form.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_LOGGING));
 
         Composite client = toolkit.createComposite(page);
         client.setLayout(new GridLayout(2, false));

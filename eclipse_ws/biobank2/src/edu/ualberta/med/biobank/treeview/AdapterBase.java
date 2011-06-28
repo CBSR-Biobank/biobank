@@ -23,12 +23,12 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
@@ -43,8 +43,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  */
 public abstract class AdapterBase {
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(AdapterBase.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(AdapterBase.class
+        .getName());
 
     protected static final String BGR_LOADING_LABEL = "loading...";
 
@@ -213,7 +213,7 @@ public abstract class AdapterBase {
             ModelWrapper<?> childModelObject = child.getModelObject();
             if ((childModelObject != null)
                 && childModelObject.getClass().equals(wrapperClass)
-                && child.getId().equals(wrapperId))
+                && child.getId() != null && child.getId().equals(wrapperId))
                 return child;
         }
         return null;
@@ -380,7 +380,7 @@ public abstract class AdapterBase {
         try {
             loadChildrenSemaphore.acquire();
         } catch (InterruptedException e) {
-            BiobankPlugin.openAsyncError("Could not load children", e);
+            BgcPlugin.openAsyncError("Could not load children", e);
         }
 
         if (loadChildrenInBackground) {
@@ -404,7 +404,7 @@ public abstract class AdapterBase {
                 SessionManager.refreshTreeNode(AdapterBase.this);
             }
         } catch (final RemoteAccessException exp) {
-            BiobankPlugin.openRemoteAccessErrorMessage(exp);
+            BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
             String text = getClass().getName();
             if (modelObject != null) {
@@ -474,7 +474,7 @@ public abstract class AdapterBase {
                             });
                         }
                     } catch (final RemoteAccessException exp) {
-                        BiobankPlugin.openRemoteAccessErrorMessage(exp);
+                        BgcPlugin.openRemoteAccessErrorMessage(exp);
                     } catch (Exception e) {
                         String modelString = "'unknown'";
                         if (modelObject != null) {
@@ -696,7 +696,7 @@ public abstract class AdapterBase {
         }
         boolean doDelete = true;
         if (msg != null)
-            doDelete = BiobankPlugin.openConfirm("Confirm Delete", msg);
+            doDelete = BgcPlugin.openConfirm("Confirm Delete", msg);
         if (doDelete) {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
@@ -712,16 +712,21 @@ public abstract class AdapterBase {
                             modelObject.delete();
                             page.closeEditor(part, true);
                         } catch (Exception e) {
-                            BiobankPlugin.openAsyncError("Delete failed", e);
+                            BgcPlugin.openAsyncError("Delete failed", e);
                             getParent().addChild(AdapterBase.this);
                             return;
                         }
                         getParent().notifyListeners();
                         notifyListeners();
+                        additionalRefreshAfterDelete();
                     }
                 }
             });
         }
+    }
+
+    protected void additionalRefreshAfterDelete() {
+        // default does nothing
     }
 
     public boolean isDeletable() {
@@ -736,7 +741,8 @@ public abstract class AdapterBase {
     }
 
     public boolean isEditable() {
-        return editable && modelObject.canUpdate(SessionManager.getUser());
+        return editable && SessionManager.getInstance().isConnected()
+            && modelObject.canUpdate(SessionManager.getUser());
     }
 
     public void setEditable(boolean editable) {

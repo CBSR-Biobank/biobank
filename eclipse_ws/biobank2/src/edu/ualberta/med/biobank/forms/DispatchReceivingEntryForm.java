@@ -8,7 +8,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
@@ -17,8 +16,9 @@ import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DispatchSpecimensTreeTable;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
 public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
@@ -53,29 +53,29 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        BiobankText senderLabel = createReadOnlyLabelledField(client, SWT.NONE,
+        BgcBaseText senderLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Sender");
         setTextValue(senderLabel, dispatch.getSenderCenter().getName());
-        BiobankText receiverLabel = createReadOnlyLabelledField(client,
+        BgcBaseText receiverLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Receiver");
         setTextValue(receiverLabel, dispatch.getReceiverCenter().getName());
-        BiobankText departedLabel = createReadOnlyLabelledField(client,
+        BgcBaseText departedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Departed");
         setTextValue(departedLabel, dispatch.getFormattedPackedAt());
-        BiobankText shippingMethodLabel = createReadOnlyLabelledField(client,
+        BgcBaseText shippingMethodLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Shipping Method");
         setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
             .getShippingMethod() == null ? "" : dispatch.getShipmentInfo()
             .getShippingMethod().getName());
-        BiobankText waybillLabel = createReadOnlyLabelledField(client,
+        BgcBaseText waybillLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Waybill");
         setTextValue(waybillLabel, dispatch.getShipmentInfo().getWaybill());
-        BiobankText dateReceivedLabel = createReadOnlyLabelledField(client,
+        BgcBaseText dateReceivedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Date received");
         setTextValue(dateReceivedLabel, dispatch.getShipmentInfo()
             .getFormattedDateReceived());
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             "Comments", null, dispatch, DispatchPeer.COMMENT.getName(), null);
 
     }
@@ -86,7 +86,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             dispatch, dispatch.getReceiverCenter());
         dialog.open();
-        if (dispatch.hasNewSpecimens())
+        if (dispatch.hasNewSpecimens() || dispatch.hasSpecimenStatesChanged())
             setDirty(true);
         reloadSpecimens();
     }
@@ -111,17 +111,17 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                 setDirty(true);
                 break;
             case IN_SHIPMENT_RECEIVED:
-                BiobankPlugin.openInformation("Specimen already accepted",
+                BgcPlugin.openInformation("Specimen already accepted",
                     "Specimen with inventory id " + inventoryId
                         + " is already in received list.");
                 break;
             case EXTRA:
-                BiobankPlugin.openInformation("Specimen not found",
+                BgcPlugin.openInformation("Specimen not found",
                     "Specimen with inventory id " + inventoryId
                         + " has not been found in this dispatch."
                         + " It will be moved into the extra-pending list.");
                 if (specimen == null) {
-                    BiobankPlugin.openAsyncError("Problem with specimen",
+                    BgcPlugin.openAsyncError("Problem with specimen",
                         "Specimen is extra but object is null");
                     break;
                 }
@@ -131,12 +131,11 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                 setDirty(true);
                 break;
             default:
-                BiobankPlugin.openInformation("Problem with specimen", res
+                BgcPlugin.openInformation("Problem with specimen", res
                     .getCell().getInformation());
             }
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error",
-                "Error receiving the specimen", e);
+            BgcPlugin.openAsyncError("Error receiving the specimen", e);
         }
     }
 

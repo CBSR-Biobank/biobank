@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
 import edu.ualberta.med.biobank.dialogs.CEventSourceSpecimenDialog;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
@@ -52,15 +51,14 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
         if (add) {
             newListener = new NewListener() {
                 @Override
-                public void newAdded(ModelWrapper<?> spec) {
-                    ((SpecimenBaseWrapper) spec).setCollectionEvent(cEvent);
-                    ((SpecimenBaseWrapper) spec)
-                        .setOriginalCollectionEvent(cEvent);
-                    ((SpecimenBaseWrapper) spec)
-                        .setCurrentCenter(SessionManager.getUser()
-                            .getCurrentWorkingCenter());
-                    currentSpecimens.add((SpecimenWrapper) spec);
-                    addedSpecimens.add((SpecimenWrapper) spec);
+                public void newAdded(ModelWrapper<?> mw) {
+                    SpecimenWrapper spec = (SpecimenWrapper) mw;
+                    spec.setCollectionEvent(cEvent);
+                    spec.setOriginalCollectionEvent(cEvent);
+                    spec.setCurrentCenter(SessionManager.getUser()
+                        .getCurrentWorkingCenter());
+                    currentSpecimens.add(spec);
+                    addedorModifiedSpecimens.add(spec);
                     specimensAdded.setValue(true);
                     reloadCollection(currentSpecimens);
                     notifyListeners();
@@ -75,6 +73,7 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
             newListener, defaultTimeDrawn);
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
+            addedorModifiedSpecimens.add(specimen);
             reloadCollection(currentSpecimens);
             notifyListeners();
         }
@@ -124,7 +123,7 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
                         if (currentSpecimens.size() == 0) {
                             specimensAdded.setValue(false);
                         }
-                        addedSpecimens.remove(sw);
+                        addedorModifiedSpecimens.remove(sw);
                         removedSpecimens.add(sw);
                         notifyListeners();
                     }

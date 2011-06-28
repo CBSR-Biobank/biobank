@@ -9,6 +9,7 @@ import org.eclipse.swt.layout.GridLayout;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PeListInfoTable;
 
 public class PeListViewForm extends BiobankViewForm {
@@ -32,9 +33,8 @@ public class PeListViewForm extends BiobankViewForm {
     protected void createFormContent() throws Exception {
         form.setText("Processing Events");
         page.setLayout(new GridLayout(1, false));
-        // FIXME should we use this icon ?
-        form.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_BOX));
+        form.setImage(BiobankPlugin.getDefault().getImage(
+            new ProcessingEventAdapter(null, null)));
 
         processingEvents = new PeListInfoTable(page, pes);
         processingEvents.adaptToToolkit(toolkit, true);

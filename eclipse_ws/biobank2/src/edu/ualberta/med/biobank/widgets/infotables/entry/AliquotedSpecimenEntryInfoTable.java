@@ -1,7 +1,10 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -9,36 +12,28 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
-import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
 import edu.ualberta.med.biobank.dialogs.StudyAliquotedSpecimenDialog;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Displays the current aliquoted specimen collection and allows the user to add
  * additional aliquoted specimen to the collection.
  */
 public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable {
-
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(AliquotedSpecimenEntryInfoTable.class.getName());
-
-    private List<SpecimenTypeWrapper> allSpecimenTypes;
 
     private List<AliquotedSpecimenWrapper> selectedAliquotedSpecimen;
 
@@ -50,7 +45,6 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
 
     public AliquotedSpecimenEntryInfoTable(Composite parent, StudyWrapper study) {
         super(parent, null);
-        getSpecimenTypes();
         this.study = study;
         selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection(true);
         if (selectedAliquotedSpecimen == null) {
@@ -80,9 +74,9 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
 
     private void addOrEditAliquotedSpecimen(boolean add,
         final AliquotedSpecimenWrapper aliquotedSpecimen) {
-        List<SpecimenTypeWrapper> dialogSpecimenTypes = allSpecimenTypes;
+        final Collection<SpecimenTypeWrapper> availableSpecimenTypes = getAvailableSpecimenTypes();
         if (!add) {
-            dialogSpecimenTypes.add(aliquotedSpecimen.getSpecimenType());
+            availableSpecimenTypes.add(aliquotedSpecimen.getSpecimenType());
         }
         NewListener newListener = null;
         if (add) {
@@ -91,8 +85,8 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                 @Override
                 public void newAdded(ModelWrapper<?> spec) {
                     ((AliquotedSpecimenWrapper) spec).setStudy(study);
-                    allSpecimenTypes
-                        .remove(aliquotedSpecimen.getSpecimenType());
+                    availableSpecimenTypes.remove(aliquotedSpecimen
+                        .getSpecimenType());
                     selectedAliquotedSpecimen
                         .add((AliquotedSpecimenWrapper) spec);
                     addedOrModifiedAliquotedSpecimen
@@ -104,13 +98,23 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
         }
         StudyAliquotedSpecimenDialog dlg = new StudyAliquotedSpecimenDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            aliquotedSpecimen, newListener, allSpecimenTypes);
+            aliquotedSpecimen, newListener, availableSpecimenTypes);
 
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
             reloadCollection(selectedAliquotedSpecimen);
             notifyListeners();
         }
+    }
+
+    private Collection<SpecimenTypeWrapper> getAvailableSpecimenTypes() {
+        Set<SpecimenTypeWrapper> availableSpecimenTypes = new HashSet<SpecimenTypeWrapper>();
+        for (SourceSpecimenWrapper ssw : study
+            .getSourceSpecimenCollection(false)) {
+            availableSpecimenTypes.addAll(ssw.getSpecimenType()
+                .getChildSpecimenTypeCollection(false));
+        }
+        return availableSpecimenTypes;
     }
 
     private void addEditSupport() {
@@ -159,17 +163,6 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                     }
                 }
             });
-        }
-    }
-
-    private void getSpecimenTypes() {
-        try {
-            allSpecimenTypes = SpecimenTypeWrapper.getAllSpecimenTypes(
-                SessionManager.getAppService(), true);
-        } catch (final RemoteConnectFailureException exp) {
-            BiobankPlugin.openRemoteConnectErrorMessage(exp);
-        } catch (ApplicationException e) {
-            logger.error("getSpecimenTypes", e);
         }
     }
 

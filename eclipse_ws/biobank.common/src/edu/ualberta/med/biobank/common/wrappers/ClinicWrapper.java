@@ -80,8 +80,9 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         + Property.concatNames(ContactPeer.CLINIC, ClinicPeer.ID)
         + " = ? order by studies.nameShort";
 
+    @Override
     @SuppressWarnings("unchecked")
-    public List<StudyWrapper> getStudyCollection() throws ApplicationException {
+    public List<StudyWrapper> getStudyCollection() {
         List<StudyWrapper> studyCollection = (List<StudyWrapper>) cache
             .get(STUDY_COLLECTION_CACHE_KEY);
 
@@ -89,11 +90,16 @@ public class ClinicWrapper extends ClinicBaseWrapper {
             studyCollection = new ArrayList<StudyWrapper>();
             HQLCriteria c = new HQLCriteria(STUDY_COLLECTION_QUERY,
                 Arrays.asList(new Object[] { getId() }));
-            List<Study> collection = appService.query(c);
-            for (Study study : collection) {
-                studyCollection.add(new StudyWrapper(appService, study));
+            List<Study> collection;
+            try {
+                collection = appService.query(c);
+                for (Study study : collection) {
+                    studyCollection.add(new StudyWrapper(appService, study));
+                }
+                cache.put(STUDY_COLLECTION_CACHE_KEY, studyCollection);
+            } catch (ApplicationException e) {
+                throw new RuntimeException(e);
             }
-            cache.put(STUDY_COLLECTION_CACHE_KEY, studyCollection);
         }
         return studyCollection;
     }

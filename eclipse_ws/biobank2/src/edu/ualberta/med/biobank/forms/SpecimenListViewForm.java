@@ -9,6 +9,7 @@ import org.eclipse.swt.layout.GridLayout;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 
 public class SpecimenListViewForm extends BiobankViewForm {
@@ -33,7 +34,7 @@ public class SpecimenListViewForm extends BiobankViewForm {
         form.setText("Non active Specimens");
         page.setLayout(new GridLayout(1, false));
         form.setImage(BiobankPlugin.getDefault().getImage(
-            BiobankPlugin.IMG_SPECIMEN));
+            BgcPlugin.IMG_SPECIMEN));
 
         specimensWidget = new SpecimenInfoTable(page, speicmens,
             SpecimenInfoTable.ColumnsShown.ALL, 20);

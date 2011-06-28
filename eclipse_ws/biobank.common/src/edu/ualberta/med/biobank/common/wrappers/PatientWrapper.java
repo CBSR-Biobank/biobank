@@ -30,7 +30,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-@SuppressWarnings("unused")
 public class PatientWrapper extends PatientBaseWrapper {
 
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
@@ -82,28 +81,25 @@ public class PatientWrapper extends PatientBaseWrapper {
      * Search a patient in the site with the given number. Will return the
      * patient only if the current user has read access on a site that works
      * with this patient study
+     * 
+     * @throws Exception
      */
-    // FIXME not sure the result is still what is explain in the comments
     public static PatientWrapper getPatient(
         WritableApplicationService appService, String patientNumber, User user)
-        throws ApplicationException {
+        throws Exception {
         PatientWrapper patient = getPatient(appService, patientNumber);
         if (patient != null) {
-            boolean canRead = true;
-            // StudyWrapper study = patient.getStudy();
-            // List<SiteWrapper> sites = study.getSiteCollection(false);
-            // boolean canRead = false;
-            // for (SiteWrapper site : sites) {
-            // if (user.hasPrivilegeOnObject(Privilege.READ, null, Site.class,
-            // site.getId())) {
-            // canRead = true;
-            // break;
-            // }
-            // }
-            if (!canRead) {
-                throw new ApplicationException("Patient " + patientNumber
-                    + " exists but you don't have access to it."
-                    + " Check studies linked to the sites you can access.");
+            StudyWrapper study = patient.getStudy();
+            List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>(
+                study.getSiteCollection(false));
+            centers.addAll(study.getClinicCollection());
+            if (Collections.disjoint(centers,
+                user.getWorkingCenters(appService))) {
+                throw new ApplicationException(
+                    "Patient "
+                        + patientNumber
+                        + " exists but you don't have access to it."
+                        + " Check studies linked to the sites and clinics you can access.");
             }
         }
         return patient;
@@ -368,4 +364,23 @@ public class PatientWrapper extends PatientBaseWrapper {
         return (long) getCollectionEventCollection(false).size();
     }
 
+    /**
+     * return true if the user can delete this object
+     */
+    @Override
+    public boolean canDelete(User user) {
+        return super.canDelete(user)
+            && (getStudy() == null || user.getCurrentWorkingCenter()
+                .getStudyCollection().contains(getStudy()));
+    }
+
+    /**
+     * return true if the user can edit this object
+     */
+    @Override
+    public boolean canUpdate(User user) {
+        return super.canUpdate(user)
+            && (getStudy() == null || user.getCurrentWorkingCenter()
+                .getStudyCollection().contains(getStudy()));
+    }
 }

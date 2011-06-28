@@ -9,21 +9,20 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 /**
- * Allows the user to move a container and its contents to a new location
+ * Allows the user to select a parent container when more than one is available
  */
 
-public class SelectParentContainerDialog extends BiobankDialog {
+public class SelectParentContainerDialog extends BgcBaseDialog {
     private Collection<ContainerWrapper> containers;
     private ComboViewer comboViewer;
     protected ContainerWrapper selectedContainer;
@@ -37,7 +36,7 @@ public class SelectParentContainerDialog extends BiobankDialog {
 
     @Override
     protected String getDialogShellTitle() {
-        return "Select Parent Container";
+        return "Select parent container";
     }
 
     @Override
@@ -47,14 +46,7 @@ public class SelectParentContainerDialog extends BiobankDialog {
 
     @Override
     protected String getTitleAreaTitle() {
-        return "Multiple Parents are Possible";
-    }
-
-    @Override
-    protected Image getTitleAreaImage() {
-        // FIXME shoould use another icon
-        return BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_COMPUTER_KEY);
+        return "Multiple parent containers are possible";
     }
 
     @Override
@@ -65,7 +57,7 @@ public class SelectParentContainerDialog extends BiobankDialog {
 
         comboViewer = getWidgetCreator().createComboViewer(contents,
             "Select parent", containers, null,
-            "A container should be selected", null);
+            "A container should be selected", null, new BiobankLabelProvider());
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {

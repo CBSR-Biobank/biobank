@@ -1,0 +1,301 @@
+package edu.ualberta.med.biobank.widgets.trees;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
+import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
+import edu.ualberta.med.biobank.forms.utils.RequestTableGroup;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
+import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.RootNode;
+import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
+import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+
+public class RequestSpecimensTreeTable extends BgcBaseWidget {
+
+    private TreeViewer tv;
+    private RequestWrapper request;
+    protected List<RequestTableGroup> groups;
+
+    @SuppressWarnings("unused")
+    public RequestSpecimensTreeTable(Composite parent, RequestWrapper request) {
+        super(parent, SWT.NONE);
+
+        this.request = request;
+
+        setLayout(new GridLayout(1, false));
+        GridData gd = new GridData();
+        gd.horizontalAlignment = SWT.FILL;
+        gd.grabExcessHorizontalSpace = true;
+        gd.heightHint = 400;
+        setLayoutData(gd);
+
+        tv = new TreeViewer(this, SWT.SINGLE | SWT.BORDER);
+        Tree tree = tv.getTree();
+        tree.setHeaderVisible(true);
+        tree.setLinesVisible(true);
+
+        TreeColumn tc = new TreeColumn(tree, SWT.LEFT);
+        tc.setText("Location");
+        tc.setWidth(300);
+
+        tc = new TreeColumn(tree, SWT.LEFT);
+        tc.setText("Inventory Id");
+        tc.setWidth(100);
+
+        tc = new TreeColumn(tree, SWT.LEFT);
+        tc.setText("Type");
+        tc.setWidth(100);
+
+        tc = new TreeColumn(tree, SWT.LEFT);
+        tc.setText("Patient");
+        tc.setWidth(120);
+
+        tc = new TreeColumn(tree, SWT.LEFT);
+        tc.setText("Claimed By");
+        tc.setWidth(100);
+
+        tc = new TreeColumn(tree, SWT.LEFT);
+        tc.setText("State");
+        tc.setWidth(100);
+
+        ITreeContentProvider contentProvider = new ITreeContentProvider() {
+            @Override
+            public void dispose() {
+            }
+
+            @Override
+            public void inputChanged(Viewer viewer, Object oldInput,
+                Object newInput) {
+                groups = RequestTableGroup
+                    .getGroupsForRequest(RequestSpecimensTreeTable.this.request);
+            }
+
+            @Override
+            public Object[] getElements(Object inputElement) {
+                return groups.toArray();
+            }
+
+            @Override
+            public Object[] getChildren(Object parentElement) {
+                return ((Node) parentElement).getChildren().toArray();
+            }
+
+            @Override
+            public Object getParent(Object element) {
+                return ((Node) element).getParent();
+            }
+
+            @Override
+            public boolean hasChildren(Object element) {
+                return ((Node) element).getChildren() == null ? false
+                    : ((Node) element).getChildren().size() > 0;
+            }
+        };
+        tv.setContentProvider(contentProvider);
+
+        final BiobankLabelProvider labelProvider = new BiobankLabelProvider() {
+            @Override
+            public String getColumnText(Object element, int columnIndex) {
+                if (element instanceof RequestTableGroup) {
+                    if (columnIndex == 0)
+                        return ((RequestTableGroup) element).getTitle();
+                    return "";
+                } else if (element instanceof RequestContainerAdapter) {
+                    if (columnIndex == 0)
+                        return ((RequestContainerAdapter) element)
+                            .getLabelInternal();
+                    return "";
+                } else if (element instanceof Node) {
+                    if (columnIndex == 0) {
+                        return ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
+                            .getSpecimen()).getSpecimen().getPositionString();
+                    } else if (columnIndex < 4)
+                        return ((TreeItemAdapter) element)
+                            .getColumnText(columnIndex - 1);
+                    else if (columnIndex == 4)
+                        return ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
+                            .getSpecimen()).getClaimedBy();
+                    else if (columnIndex == 5) {
+                        return RequestSpecimenState
+                            .getState(
+                                ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
+                                    .getSpecimen()).getState()).getLabel();
+                    } else
+                        return "";
+                }
+                return "";
+            }
+        };
+        tv.setLabelProvider(labelProvider);
+        tv.setInput(new RootNode());
+
+        tv.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                Object o = ((IStructuredSelection) tv.getSelection())
+                    .getFirstElement();
+                if (o instanceof TreeItemAdapter) {
+                    ItemWrapper ra = ((TreeItemAdapter) o).getSpecimen();
+                    SessionManager.openViewForm(ra.getSpecimen());
+                }
+            }
+        });
+
+        final Menu menu = new Menu(this);
+        tv.getTree().setMenu(menu);
+
+        menu.addListener(SWT.Show, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                for (MenuItem menuItem : menu.getItems()) {
+                    menuItem.dispose();
+                }
+                Object node = ((StructuredSelection) tv.getSelection())
+                    .getFirstElement();
+                if (node != null && ((Node) node).getParent() != null) {
+                    addSetUnavailableMenu(menu);
+                    addClaimMenu(menu);
+                }
+            }
+        });
+        GridData gdtree = new GridData();
+        gdtree.grabExcessHorizontalSpace = true;
+        gdtree.horizontalAlignment = SWT.FILL;
+        gdtree.verticalAlignment = SWT.FILL;
+        gdtree.grabExcessVerticalSpace = true;
+        tv.getTree().setLayoutData(gdtree);
+
+    }
+
+    protected void addClaimMenu(Menu menu) {
+        MenuItem item;
+        item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Claim");
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                claim(getSelectionWrappers());
+                refresh();
+            }
+        });
+    }
+
+    protected void claim(List<RequestSpecimenWrapper> specs) {
+        try {
+            for (RequestSpecimenWrapper spec : specs) {
+                spec.setClaimedBy(SessionManager.getUser().getFirstName());
+                spec.persist();
+            }
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError("Failed to claim", e);
+        }
+    }
+
+    private void addSetUnavailableMenu(final Menu menu) {
+        MenuItem item;
+        item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Flag as unavailable");
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                for (RequestSpecimenWrapper spec : getSelectionWrappers()) {
+                    spec.setState(RequestSpecimenState.UNAVAILABLE_STATE
+                        .getId());
+                    try {
+                        spec.persist();
+                        spec.reload();
+                    } catch (Exception e) {
+                        BgcPlugin.openAsyncError("Save Error", e);
+                    }
+                }
+                refresh();
+            }
+        });
+    }
+
+    public List<RequestSpecimenWrapper> getSelectionWrappers() {
+        return getWrappers(getAdapterSelection());
+    }
+
+    public List<RequestSpecimenWrapper> getWrappers(Node parent) {
+        List<RequestSpecimenWrapper> list = new ArrayList<RequestSpecimenWrapper>();
+        if (parent instanceof TreeItemAdapter) {
+            RequestSpecimenWrapper spec = (RequestSpecimenWrapper) ((TreeItemAdapter) parent)
+                .getSpecimen();
+            list.add(spec);
+        } else {
+            for (Node child : parent.getChildren()) {
+                list.addAll(getWrappers(child));
+            }
+        }
+        return list;
+    }
+
+    private Node getAdapterSelection() {
+        Node o = (Node) ((StructuredSelection) tv.getSelection())
+            .getFirstElement();
+        return o.getParent() == null ? null : o;
+    }
+
+    public void refresh() {
+        tv.refresh(true);
+    }
+
+    public Node search(String text) {
+        return search(groups.get(0), text);
+    }
+
+    public Node search(Node startNode, String text) {
+        if (startNode instanceof TreeItemAdapter
+            && ((RequestSpecimenWrapper) ((TreeItemAdapter) startNode)
+                .getSpecimen()).getSpecimen().getInventoryId().equals(text))
+            return startNode;
+        else {
+            Node found = null;
+            List<Node> children = startNode.getChildren();
+            for (Node child : children) {
+                found = search(child, text);
+                if (found != null)
+                    return found;
+            }
+            return null;
+        }
+    }
+
+    public void pull(Node updateNode) {
+        groups.get(1).addChild(updateNode);
+        tv.refresh();
+    }
+
+    public void dispatch(Node specNode) {
+        groups.get(1).removeChild(specNode);
+        tv.refresh();
+    }
+}

@@ -141,7 +141,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                             setterMethodName,
                             new Class[] { method.getReturnType() });
                         setterMethod.invoke(plainObject, tempObjects);
-                    } else if (childObject instanceof Object) {
+                    } else {
                         try {
                             Method setterMethod = plainObject.getClass()
                                 .getMethod(setterMethodName,

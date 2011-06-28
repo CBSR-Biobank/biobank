@@ -12,6 +12,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
@@ -19,11 +20,13 @@ import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcSessionState;
+import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.PerspectiveSecurity;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
-import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
@@ -35,12 +38,12 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
 
-    public static final String BIOBANK2_CONTEXT_LOGGED_OUT = "biobank2.context.loggedOut";
+    public static final String BIOBANK2_CONTEXT_LOGGED_OUT = "biobank.context.loggedOut";
 
-    public static final String BIOBANK2_CONTEXT_LOGGED_IN = "biobank2.context.loggedIn";
+    public static final String BIOBANK2_CONTEXT_LOGGED_IN = "biobank.context.loggedIn";
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(SessionManager.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(SessionManager.class
+        .getName());
 
     private static SessionManager instance = null;
 
@@ -94,7 +97,7 @@ public class SessionManager {
         IWorkbench workbench = BiobankPlugin.getDefault().getWorkbench();
         IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
             .getActivePage();
-        updateVisibility(page);
+        updateVisibility(page, true);
     }
 
     public void deleteSession() throws Exception {
@@ -117,11 +120,6 @@ public class SessionManager {
     }
 
     private void updateSessionState() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow();
-        ISourceProviderService service = (ISourceProviderService) window
-            .getService(ISourceProviderService.class);
-
         // for key binding contexts:
         if (sessionAdapter == null) {
             BindingContextHelper
@@ -136,15 +134,19 @@ public class SessionManager {
         }
 
         // assign logged in state
-        SessionState sessionSourceProvider = (SessionState) service
-            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
-        sessionSourceProvider.setLoggedInState(sessionAdapter != null);
-        sessionSourceProvider.setSuperAdminMode(sessionAdapter != null
-            && sessionAdapter.getUser().isInSuperAdminMode());
-        sessionSourceProvider.setHasWorkingCenter(sessionAdapter != null
-            && sessionAdapter.getUser().getCurrentWorkingCenter() != null);
+        BgcSessionState guiCommonSessionState = BgcPlugin
+            .getSessionStateSourceProvider();
+        guiCommonSessionState.setLoggedInState(sessionAdapter != null);
+
+        BiobankPlugin.getSessionStateSourceProvider().setUser(
+            sessionAdapter == null ? null : sessionAdapter.getUser());
 
         // assign debug state
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+
         DebugState debugStateSourceProvider = (DebugState) service
             .getSourceProvider(DebugState.SESSION_STATE);
         debugStateSourceProvider.setState(BiobankPlugin.getDefault()
@@ -334,7 +336,7 @@ public class SessionManager {
         return getUser().isInSuperAdminMode();
     }
 
-    public static void updateVisibility(IWorkbenchPage page) {
+    public static void updateVisibility(IWorkbenchPage page, boolean login) {
         try {
             SessionManager sm = getInstance();
             if (sm.isConnected()) {
@@ -346,8 +348,19 @@ public class SessionManager {
                 }
             }
         } catch (PartInitException e) {
-            BiobankPlugin.openAsyncError("Error displaying available actions",
-                e);
+            BgcPlugin.openAsyncError("Error displaying available actions", e);
         }
+        // don't want to switch if was activated by an handler after login
+        // (display is weird otherwise)
+        if (login && page.getViewReferences().length == 0)
+            try {
+                page.getWorkbenchWindow()
+                    .getWorkbench()
+                    .showPerspective(MainPerspective.ID,
+                        page.getWorkbenchWindow());
+            } catch (WorkbenchException e) {
+                logger.error("Error opening main perspective", e);
+            }
+
     }
 }

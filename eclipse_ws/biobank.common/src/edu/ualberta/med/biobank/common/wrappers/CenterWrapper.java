@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -423,5 +424,9 @@ public abstract class CenterWrapper<E extends Center> extends
         else
             return wrapModelCollection(appService, requests,
                 RequestWrapper.class);
+    }
+
+    public List<StudyWrapper> getStudyCollection() {
+        return Collections.emptyList();
     }
 }
