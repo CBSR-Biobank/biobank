@@ -231,10 +231,15 @@ public class SessionAdapter extends AdapterBase {
     }
 
     public void addResearchGroup() {
-        ResearchMasterGroup g = getResearchGroupNode();
+        ResearchGroupMasterGroup g = getResearchGroupNode();
         if (g != null) {
             g.addResearchGroup();
         }
+    }
+
+    private ResearchGroupMasterGroup getResearchGroupNode() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

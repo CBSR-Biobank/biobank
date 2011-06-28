@@ -16,6 +16,11 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
         super(appService, rg);
     }
 
+    public ResearchGroupWrapper(WritableApplicationService appService) {
+        super(appService);
+        // TODO Auto-generated constructor stub
+    }
+
     public static Collection<? extends ModelWrapper<?>> getAllResearchGroups(
         BiobankApplicationService appService) {
         // TODO Auto-generated method stub
@@ -48,6 +53,11 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
 
     @Override
     public Long getPatientCount() throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Boolean getSendsShipments() {
         // TODO Auto-generated method stub
         return null;
     }

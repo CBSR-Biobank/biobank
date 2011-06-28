@@ -19,7 +19,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
 
     private ResearchGroupWrapper researchGroup;
 
-    private ResearchGroupStudyInfoTable studiesTable;
+    // private ResearchGroupStudyInfoTable studiesTable;
 
     private BgcBaseText nameLabel;
 

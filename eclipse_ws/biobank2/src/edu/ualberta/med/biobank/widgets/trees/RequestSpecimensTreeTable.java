@@ -43,7 +43,6 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
     private RequestWrapper request;
     protected List<RequestTableGroup> groups;
 
-    @SuppressWarnings("unused")
     public RequestSpecimensTreeTable(Composite parent, RequestWrapper request) {
         super(parent, SWT.NONE);
 
