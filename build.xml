@@ -234,6 +234,29 @@
     <copy file="${tmp.file}" tofile="${eclipse.proj.dir}/biobank2.product"
       overwrite="true"/>
   </target>
+  <!--
+<target name="hbm-class-sort">   
+ <taskdef resource="net/sf/antcontrib/antlib.xml">
+      <classpath>
+        <pathelement location="${product.dir}/ant-contrib/ant-contrib-1.0b3.jar" />
+      </classpath>
+    </taskdef>
+<for param="file">
+  <path>
+    <fileset dir="${cacore.sdk.dir}/output/biobank/src/edu/ualberta/med/biobank/model" 
+             includes="*.hbm.xml"/>
+  </path>
+  <sequential>
+   <tempfile property="tmp.file" destdir="${java.io.tmpdir}" prefix="@{file}" />
+    <xslt in="@{file}"
+          out="${tmp.file}"
+          style="scripts/hbm-class-sort.xsl"/>
+    <copy file="${tmp.file}" tofile="@{file}" overwrite="true"/>
+  </sequential>
+</for>
+</target>
+-->
+
 
   <target name="biobank-feature-core-version-modify">
     <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
