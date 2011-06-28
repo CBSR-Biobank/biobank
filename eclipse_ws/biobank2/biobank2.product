@@ -1,0 +1,61 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="BioBank2" uid="biobank.product" id="biobank.product" application="biobank.biobank" version="1.4.0.rc6" useFeatures="true" includeLaunchers="false">
+
+   <aboutInfo>
+      <image path="/biobank2/icons/about.png"/>
+      <text>
+         BioBank2 Java Client
+Version {0}
+
+Developed for the Canadian BioSample Repository by AICML .
+
+Canadian BioSample Repository: http://www.biosample.ca
+AICML: http://aicml.cs.ualberta.ca
+      </text>
+   </aboutInfo>
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+      <programArgs>-data @user.home/biobank2</programArgs>
+      <vmArgs>-Dosgi.requiredJavaVersion=1.6 -XX:MaxPermSize=256m -Xms40m -Xmx512m</vmArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
+   </launcherArgs>
+
+   <windowImages/>
+
+   <splash
+      location="biobank2" />
+   <launcher name="BioBank2">
+      <linux icon="/biobank2/icons/biobank_launcher.xpm"/>
+      <macosx icon="/biobank2/icons/biobank_launcher.icns"/>
+      <solaris/>
+      <win useIco="false">
+         <bmp
+            winSmallHigh="/biobank2/icons/biobank_launcher_16.bmp"
+            winMediumHigh="/biobank2/icons/biobank_launcher_32.bmp"/>
+      </win>
+   </launcher>
+
+   <vm>
+      <linux include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/OSGi%Minimum-1.0</linux>
+      <macos include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/OSGi%Minimum-1.0</macos>
+      <solaris include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/OSGi%Minimum-1.0</solaris>
+      <windows include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/OSGi%Minimum-1.0</windows>
+   </vm>
+
+   <plugins>
+   </plugins>
+
+   <features>
+      <feature id="biobank2.feature.core"/>
+      <feature id="biobank2.feature.platform"/>
+   </features>
+
+
+</product>
+
