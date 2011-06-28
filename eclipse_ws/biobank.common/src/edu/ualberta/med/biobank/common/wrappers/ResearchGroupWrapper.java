@@ -1,10 +1,8 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.wrappers.base.ResearchGroupBaseWrapper;
-import edu.ualberta.med.biobank.model.ResearchGroup;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import java.util.Collection;
+
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
 public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
 
@@ -13,27 +11,20 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
         super(appService, rg);
     }
 
-    @Override
-    public long getCollectionEventCount() throws ApplicationException,
-        BiobankException {
-        return -1;
+    public static Collection<? extends ModelWrapper<?>> getAllResearchGroups(
+        BiobankApplicationService appService) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    @Override
-    public long getCollectionEventCountForStudy(StudyWrapper study)
-        throws ApplicationException, BiobankException {
-        return -1;
+    public static int getCount(BiobankApplicationService appService) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
-    @Override
-    public long getPatientCountForStudy(StudyWrapper study)
-        throws ApplicationException, BiobankException {
-        return -1;
-    }
+    public void reload() {
+        // TODO Auto-generated method stub
 
-    @Override
-    public Long getPatientCount() throws Exception {
-        return (long) -1;
     }
 
 }

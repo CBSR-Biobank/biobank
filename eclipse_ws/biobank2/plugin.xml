@@ -299,6 +299,11 @@
              id="edu.ualberta.med.biobank.commands.processing.link"
              name="Specimen Link">
        </command>
+       <command
+             categoryId="org.eclipse.ui.category.edit"
+             id="edu.ualberta.med.biobank.commands.researchGroupAdd"
+             name="Add Research Group">
+       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -853,6 +858,20 @@
             </reference>
          </enabledWhen>
       </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ResearchGroupAddHandler"
+            commandId="edu.ualberta.med.biobank.commands.researchGroupAdd">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank.mainPerspectiveSelected">
+               </reference>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -907,6 +926,19 @@
                      icon="icons/clinics_add.png"
                      id="edu.ualberta.med.biobank.menu.clinicAdd"
                      label="Add Clinic"
+                     style="push">
+                  <visibleWhen
+                        checkEnabled="false">
+                     <reference
+                           definitionId="biobank.isSuperAdminMode">
+                     </reference>
+                  </visibleWhen>
+               </command>
+               <command
+                     commandId="edu.ualberta.med.biobank.commands.researchGroupAdd"
+                     icon="icons/rg_add.png"
+                     id="edu.ualberta.med.biobank.menu.researchGroupAdd"
+                     label="Add ResearchGroup"
                      style="push">
                   <visibleWhen
                         checkEnabled="false">
@@ -1243,6 +1275,18 @@
                   commandId="edu.ualberta.med.biobank.commands.clinicAdd"
                   icon="icons/clinics_add.png"
                   label="Add Clinic"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank.isSuperAdminMode">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.researchGroupAdd"
+                  icon="icons/rg_add.png"
+                  label="Add Research Group"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
