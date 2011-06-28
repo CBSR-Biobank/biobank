@@ -131,7 +131,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         form.setText(Messages.getString("ClinicViewForm.title", //$NON-NLS-1$
             clinic.getName()));
         setClinicValues();
-        setAdressValues(clinic);
+        setAddressValues(clinic);
         contactsTable.setCollection(clinic.getContactCollection(true));
         studiesTable.setCollection(clinic.getStudyCollection());
     }

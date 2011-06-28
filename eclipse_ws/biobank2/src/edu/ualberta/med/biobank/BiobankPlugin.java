@@ -34,6 +34,8 @@ import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeGroup;
+import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
+import edu.ualberta.med.biobank.treeview.admin.ResearchGroupMasterGroup;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteGroup;
@@ -123,6 +125,10 @@ public class BiobankPlugin extends AbstractUIPlugin {
             BgcPlugin.IMG_PROCESSING_EVENT);
         classToImageKey.put(ProcessingEventGroup.class.getName(),
             BgcPlugin.IMG_PROCESSING);
+        classToImageKey.put(ResearchGroupAdapter.class.getName(),
+            BgcPlugin.IMG_RESEARCH_GROUP);
+        classToImageKey.put(ResearchGroupMasterGroup.class.getName(),
+            BgcPlugin.IMG_RESEARCH_GROUPS);
     };
 
     private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] {
