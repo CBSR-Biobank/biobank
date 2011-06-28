@@ -5,12 +5,12 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.peer.ResearchGroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"; //$NON-NLS-1$
@@ -107,12 +108,13 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             ResearchGroupPeer.NAME_SHORT.getName(),
             new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 
-        createBoundWidgetWithLabel(
-            client,
-            Button.class,
-            SWT.CHECK,
-            Messages.getString("researchGroup.field.label.sendsShipments"), null, //$NON-NLS-1$
-            researchGroup, ResearchGroupPeer.SENDS_SHIPMENTS.getName(), null);
+        // FIXME: ResearchGroupPeer.SENDS_SHIPMENTS is not defined
+        // createBoundWidgetWithLabel(
+        // client,
+        // Button.class,
+        // SWT.CHECK,
+        //            Messages.getString("researchGroup.field.label.sendsShipments"), null, //$NON-NLS-1$
+        // researchGroup, ResearchGroupPeer.SENDS_SHIPMENTS.getName(), null);
         toolkit.paintBordersFor(client);
 
         activityStatusComboViewer = createComboViewer(

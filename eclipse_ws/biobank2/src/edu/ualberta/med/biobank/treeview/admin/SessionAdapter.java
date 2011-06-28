@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SessionAdapter extends AdapterBase {
 

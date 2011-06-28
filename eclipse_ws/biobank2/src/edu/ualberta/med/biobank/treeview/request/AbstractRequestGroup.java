@@ -48,11 +48,6 @@ public abstract class AbstractRequestGroup extends AdapterBase {
     }
 
     @Override
-    public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-
-    }
-
-    @Override
     protected int getWrapperChildCount() throws Exception {
         return getWrapperChildren() == null ? 0 : getWrapperChildren().size();
     }

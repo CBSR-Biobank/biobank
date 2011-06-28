@@ -98,6 +98,7 @@ public class BgcPlugin extends AbstractUIPlugin {
     public static final String IMG_CHECK = "check";
     public static final String IMG_UNCHECK = "uncheck";
     public static final String IMG_RESEARCH_GROUP = "research_group";
+    public static final String IMG_RESEARCH_GROUPS = "research_groups";
 
     private static BgcLogger logger = BgcLogger.getLogger(BgcPlugin.class
         .getName());

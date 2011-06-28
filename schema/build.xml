@@ -2,7 +2,7 @@
 <project name="schema" basedir="." default="schemaexport">
 
 <!--
-  Generates the schema for the model specified in ../data_model/biobank.uml.
+  Generates the schema for the model specified in ../model/biobank.uml.
 
   See http://www.hibernate.org/hib_docs/reference/en/html/toolsetguide.html
   for more information.
