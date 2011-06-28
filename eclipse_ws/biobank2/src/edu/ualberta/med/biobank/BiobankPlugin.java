@@ -39,6 +39,7 @@ import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteGroup;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchCenterAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.InCreationDispatchGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.IncomingNode;
 import edu.ualberta.med.biobank.treeview.dispatch.OutgoingNode;
@@ -50,10 +51,8 @@ import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
-import edu.ualberta.med.biobank.treeview.request.ApprovedRequestNode;
-import edu.ualberta.med.biobank.treeview.request.DispatchCenterAdapter;
+import edu.ualberta.med.biobank.treeview.request.ReceivingRequestGroup;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
-import edu.ualberta.med.biobank.treeview.request.RequestSiteAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
@@ -114,10 +113,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
             BgcPlugin.IMG_DISPATCH_SHIPMENT);
         classToImageKey.put(DispatchCenterAdapter.class.getName(),
             BgcPlugin.IMG_SITE);
-        classToImageKey.put(RequestSiteAdapter.class.getName(),
-            BgcPlugin.IMG_SITE);
-        classToImageKey.put(ApprovedRequestNode.class.getName(),
-            BgcPlugin.IMG_REQUEST);
+        classToImageKey.put(ReceivingRequestGroup.class.getName(),
+            BgcPlugin.IMG_REQUEST_SHIPPED);
         classToImageKey.put(RequestAdapter.class.getName(),
             BgcPlugin.IMG_REQUEST);
         classToImageKey.put(SpecimenAdapter.class.getName(),

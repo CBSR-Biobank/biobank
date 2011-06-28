@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.forms.utils.TableGroup;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
-import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
+import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankClipboard;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -131,8 +131,14 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                             .getLabelInternal();
                     return "";
                 } else if (element instanceof TreeItemAdapter) {
-                    return ((TreeItemAdapter) element)
-                        .getColumnText(columnIndex);
+                    if (columnIndex < 3)
+                        return ((TreeItemAdapter) element)
+                            .getColumnText(columnIndex);
+                    if (columnIndex == 4)
+                        return ((DispatchSpecimenWrapper) ((TreeItemAdapter) element)
+                            .getSpecimen()).getComment();
+                    else
+                        return "";
                 }
                 return "";
             }

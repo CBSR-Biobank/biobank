@@ -26,7 +26,12 @@ public class BiobankCollectionModel implements Node {
     }
 
     @Override
-    public Object getParent() {
+    public Node getParent() {
         return parent;
+    }
+
+    @Override
+    public void removeChild(Node o) {
+
     }
 }

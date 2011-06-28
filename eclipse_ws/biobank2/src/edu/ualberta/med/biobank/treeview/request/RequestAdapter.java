@@ -2,22 +2,17 @@ package edu.ualberta.med.biobank.treeview.request;
 
 import java.util.Collection;
 
-import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
-import org.springframework.remoting.RemoteAccessException;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.RequestEntryForm;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.views.RequestAdministrationView;
 
 public class RequestAdapter extends AdapterBase {
 
@@ -51,16 +46,6 @@ public class RequestAdapter extends AdapterBase {
         return getTooltipText("Request");
     }
 
-    public void persistAndRebuild() {
-        try {
-            persistRequest();
-        } catch (Exception e1) {
-            BgcPlugin.openAsyncError("Unable to save", e1);
-        }
-        getParent().getParent().rebuild();
-        openViewForm();
-    }
-
     @Override
     public boolean isDeletable() {
         return false;
@@ -69,21 +54,6 @@ public class RequestAdapter extends AdapterBase {
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addViewMenu(menu, "Request");
-    }
-
-    private void persistRequest() {
-        try {
-            getWrapper().persist();
-        } catch (final RemoteConnectFailureException exp) {
-            BgcPlugin.openRemoteConnectErrorMessage(exp);
-        } catch (final RemoteAccessException exp) {
-            BgcPlugin.openRemoteAccessErrorMessage(exp);
-        } catch (final AccessDeniedException ade) {
-            BgcPlugin.openAccessDeniedErrorMessage(ade);
-        } catch (Exception ex) {
-            BgcPlugin.openAsyncError("Save error", ex);
-        }
-        RequestAdministrationView.getCurrent().reload();
     }
 
     @Override

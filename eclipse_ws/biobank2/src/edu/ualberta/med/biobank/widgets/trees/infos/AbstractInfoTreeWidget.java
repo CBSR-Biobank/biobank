@@ -152,8 +152,13 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
             }
 
             @Override
-            public Object getParent() {
+            public Node getParent() {
                 return null;
+            }
+
+            @Override
+            public void removeChild(Node o) {
+                root.removeChild(o);
             }
         };
         treeViewer.setInput(root);

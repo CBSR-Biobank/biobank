@@ -10,12 +10,14 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.request.ReceivingRequestGroup;
 
 public class IncomingNode extends AdapterBase {
 
     private ReceivingInTransitDispatchGroup receivedTransitNode;
     private ReceivingNoErrorsDispatchGroup receivingNode;
     private ReceivingWithErrorsDispatchGroup receivingWithErrorsNode;
+    private ReceivingRequestGroup requestNode;
 
     public IncomingNode(AdapterBase parent, int id, CenterWrapper<?> center) {
         super(parent, id, "Incoming", true, false);
@@ -32,6 +34,10 @@ public class IncomingNode extends AdapterBase {
             center);
         receivingWithErrorsNode.setParent(this);
         addChild(receivingWithErrorsNode);
+
+        requestNode = new ReceivingRequestGroup(this, 3, center);
+        requestNode.setParent(this);
+        addChild(requestNode);
 
     }
 

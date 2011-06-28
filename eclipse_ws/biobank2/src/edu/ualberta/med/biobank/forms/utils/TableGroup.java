@@ -14,7 +14,7 @@ public abstract class TableGroup<T extends ModelWrapper<?>> implements Node {
     protected String alternateLabel;
     protected List<Node> tops;
     protected static final Pattern p = Pattern.compile("/");
-    protected Object parent = null;
+    protected Node parent = null;
 
     protected TableGroup(ItemState state, T request) {
         this(state, null, request);
@@ -23,7 +23,11 @@ public abstract class TableGroup<T extends ModelWrapper<?>> implements Node {
     protected TableGroup(ItemState state, String alternateLabel, T request) {
         this.state = state;
         this.alternateLabel = alternateLabel;
-        createAdapterTree(state.getId(), request);
+        try {
+            createAdapterTree(state, request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -38,7 +42,8 @@ public abstract class TableGroup<T extends ModelWrapper<?>> implements Node {
             + " (" + numSpecimens + ")";
     }
 
-    protected abstract void createAdapterTree(Integer state, T request);
+    protected abstract void createAdapterTree(ItemState state, T request)
+        throws Exception;
 
     @Override
     public List<Node> getChildren() {
@@ -46,7 +51,7 @@ public abstract class TableGroup<T extends ModelWrapper<?>> implements Node {
     }
 
     @Override
-    public Object getParent() {
+    public Node getParent() {
         return parent;
     }
 }
