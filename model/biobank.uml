@@ -185,7 +185,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Jun 28 09:43:28 MDT 2011'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Jun 28 10:04:00 MDT 2011'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.26.2(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -55381,6 +55381,199 @@
               y="320" />
       <lineto x="88"
               y="392" />
+    </path>
+  </group>
+  <group name="Fig19"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[256, 432, 84, 86]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       href="-127--128-23-33-4051ea67:11d689a8b56:-8000:0000000000000F32"
+       fill="1"
+       fillcolor="white"
+       stroke="1"
+       strokecolor="black"
+  >
+    <private>
+    </private>
+    
+    <rectangle name="Fig19.0"
+      x="256"
+      y="432"
+      width="84"
+      height="86"
+      fill="1"
+      fillcolor="white"
+      stroke="0"
+      strokecolor="0 255 255"
+    />
+    <group name="Fig19.1"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[256, 432, 84, 0]"
+         href="-127--128-23-33-4051ea67:11d689a8b56:-8000:0000000000000F32"
+         fill="1"
+         fillcolor="white"
+         stroke="1"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig19.1.0"
+        x="256"
+        y="432"
+        width="84"
+        height="0"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      />
+    </group>
+    <text name="Fig19.2"
+      x="256"
+      y="432"
+      width="84"
+      height="22"
+      fill="1"
+      fillcolor="white"
+      stroke="0"
+      strokecolor="red"
+      textcolor="black"
+      font="Arial"
+      italic="false"
+      bold="false"
+      textsize="12"
+      justification="Center"
+    >EventAttrType</text>
+    <group name="Fig19.3"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[257, 494, 83, 23]"
+         fill="1"
+         fillcolor="white"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig19.3.0"
+        x="257"
+        y="494"
+        width="83"
+        height="23"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig19.3.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="257"
+                y="494" />
+        <lineto x="340"
+                y="494" />
+      </path>
+    </group>
+    <group name="Fig19.4"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[257, 455, 83, 38]"
+         fill="1"
+         fillcolor="white"
+         stroke="0"
+         strokecolor="black"
+    >
+      <private>
+      </private>
+      
+      <rectangle name="Fig19.4.0"
+        x="257"
+        y="455"
+        width="83"
+        height="38"
+        fill="1"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+      />
+      <path name="Fig19.4.1"
+        description="org.argouml.uml.diagram.ui.FigEditableCompartment$FigSeperator"
+        fill="1"
+        fillcolor="white"
+        stroke="1"
+        strokecolor="black"
+      >
+        <moveto x="257"
+                y="455" />
+        <lineto x="340"
+                y="455" />
+      </path>
+      <text name="Fig19.4.2"
+        x="257"
+        y="456"
+        width="63"
+        height="15"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="false"
+        bold="false"
+        textsize="12"
+        justification="Left"
+      >id : Integer</text>
+      <text name="Fig19.4.3"
+        x="257"
+        y="471"
+        width="77"
+        height="21"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="false"
+        bold="false"
+        textsize="12"
+        justification="Left"
+      >name : String</text>
+    </group>
+    <rectangle name="Fig19.5"
+      x="256"
+      y="432"
+      width="84"
+      height="86"
+      fill="0"
+      fillcolor="white"
+      stroke="1"
+      strokecolor="black"
+    />
+  </group>
+  <group name="Fig20"
+       description="org.argouml.uml.diagram.ui.FigAssociation"
+       href="127-0-1-1-2db3b6f1:1255582a1a7:-8000:00000000000015C1"
+       stroke="1"
+       strokecolor="black"
+  >
+    <private>
+      sourcePortFig="Fig17"
+      destPortFig="Fig19"
+      sourceFigNode="Fig17"
+      destFigNode="Fig19"
+    </private>
+    <path name="Fig20.0"
+      description="org.tigris.gef.presentation.FigPoly"
+      fill="0"
+      fillcolor="white"
+      stroke="1"
+      strokecolor="black"
+    >
+      <moveto x="174"
+              y="508" />
+      <lineto x="256"
+              y="508" />
     </path>
   </group>
 </pgml>
