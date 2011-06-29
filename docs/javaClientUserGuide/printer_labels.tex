@@ -8,17 +8,17 @@ the moment the only labels that can be printed are the \emph{CBSR Patient
 \section{Patient Labels}
 \label{sec:printer_labels}
 
-Figure \ref{fig:cbsr_patient_label} shows what a CBSR Patient Label looks
+Figure \ref{fig:cbsr_patient_label_sheet} shows what a CBSR Patient Label looks
 like. It is a letter sized, 8$\frac{1}{2}$'' x 11'', sheet that feeds into any
 printer.
 
-    \begin{figure}[H]
-      \centering
-      \scalebox{0.35}
-      { \includegraphics*{screenshots/printer_labels/01_cbsr_patient_label_form} }
-      \caption{CBSR Patient Label form.}
-      \label{fig:cbsr_patient_label}
-    \end{figure}
+\begin{figure}[H]
+  \centering
+  \scalebox{0.35}
+	   { \includegraphics*{screenshots/printer_labels/01_cbsr_patient_label_sheet} }
+	   \caption{CBSR Patient Label sheet.}
+	   \label{fig:cbsr_patient_label_sheet}
+\end{figure}
 
 The regions highlighted in orange are:
 \begin{enumerate}
@@ -33,8 +33,61 @@ The regions highlighted in orange are:
 
 \subsection{Patient Label Information}
 
-\section{Advanced Usage}
+To print one of these lables, some information must first be entered. Select
+\texttt{Printer Labels} $\to$ \texttt{Patient Labels} from the main menu.
+
+\begin{figure}[H]
+  \centering
+  \scalebox{0.35}
+	   { \includegraphics*{screenshots/printer_labels/02_patient_labels_menu_item} }
+	   \caption{Patient Labels menu item.}
+	   \label{fig:patient_labels_menu_item}
+\end{figure}
+
+Figure \ref{fig:patient_label_form} shows the form that is displayed.
+
+\begin{figure}[H]
+  \centering
+  \scalebox{0.35}
+	   { \includegraphics*{screenshots/printer_labels/03_patient_label_form} }
+	   \caption{Patient Label entry form.}
+	   \label{fig:patient_label_form}
+\end{figure}
+
+
+\begin{description}
+\item[Title] This is the string that will be printed in the label sheet's title
+  area. See area \textbf{1} in figure \ref{fig:cbsr_patient_label_sheet}.
+\item[Logo] This allows you to select a graphic logo to be printed on the
+  sheet. Press the \fbox{Browse} button to select the graphic file from your
+  computer.
+\item[Template] This is the template that specifies the position and dimension information for where to
+ print the information on the sheet. See section \ref{sec:label_templates} for
+ more information  on templates.
+\item[Intended Printer] this is the printer the template was created for. You
+  may have more than one template to select from. Each template is meant for a
+  specific printer.
+\item[Printer] This pull down menu allows you to select the printer to use when
+  printing the sheets. This menu displays the printers that have been
+  configured on your computer.
+\end{description}
 
 \subsection{Label Templates}
+\label{sec:label_templates}
+
+The label template \emph{Patient with Source Specimen Label Template} is
+already configured on the server for everyone to use. This default template
+tells the software how to align the information on the label sheet.  It is
+possible, for your printer, that when using template may not print the
+information is not aligned properly. You can create a new template by copying
+the default template and adjust the settings for your printer.
+
+The following section describes the settings for the label printer.
+
+\section{Advanced Usage}
 
 \subsection{Jasper Templates}
+
+%%% Local Variables:
+%%% compile-command: "make -k"
+%%% End:
