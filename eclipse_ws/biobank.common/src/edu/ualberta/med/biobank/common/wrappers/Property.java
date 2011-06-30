@@ -12,44 +12,97 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.util.TypeReference;
+import edu.ualberta.med.biobank.common.wrappers.property.GetterInterceptor;
+import edu.ualberta.med.biobank.common.wrappers.property.PropertyLink;
 
 /**
  * 
  * @author jferland
  * 
- * @param <T> the type of the Property
- * @param <W> the type that has the Property
+ * @param <P> the type of this {@link Property}
+ * @param <M> the type of the model that has this {@link Property}
  */
-public class Property<T, W> implements Serializable {
+public class Property<P, M> implements Serializable {
     private static final long serialVersionUID = 1L;
+
     private static final Pattern NAME_SPLITTER = Pattern.compile("\\.");
 
     private final String name;
     private final List<String> splitNames;
     private final String propertyChangeName;
+    private final Class<M> modelClass;
     private final TypeInfo typeInfo;
-    private final Accessor<T, W> accessor;
+    private final Accessor<P, M> accessor;
+    private final PropertyLink<P, ?, M> link;
 
-    private Property(String name, TypeReference<T> typeReference,
-        Accessor<T, W> accessor) {
+    private Property(String name, Class<M> modelClass,
+        TypeReference<P> typeReference, Accessor<P, M> accessor) {
         this.name = name;
         this.splitNames = Arrays.asList(NAME_SPLITTER.split(name));
         this.propertyChangeName = name;
+        this.modelClass = modelClass;
         this.typeInfo = new TypeInfo(typeReference);
+        this.link = null;
         this.accessor = accessor;
     }
 
-    private Property(String name, String propertyChangeName, TypeInfo typeInfo,
-        Accessor<T, W> accessor) {
+    private Property(String name, String propertyChangeName,
+        Class<M> modelClass, TypeInfo typeInfo, PropertyLink<P, ?, M> link) {
         this.name = name;
         this.splitNames = Arrays.asList(NAME_SPLITTER.split(name));
         this.propertyChangeName = propertyChangeName;
+        this.modelClass = modelClass;
         this.typeInfo = typeInfo;
-        this.accessor = accessor;
+        this.link = link;
+        this.accessor = link;
     }
 
     public String getName() {
         return name;
+    }
+
+    private static <P, A, M> P get(PropertyLink<P, A, M> link, M model,
+        GetterInterceptor getter) {
+        P value = null;
+
+        Property<A, M> fromProperty = link.getFrom();
+        A from = fromProperty.get(model, getter);
+
+        if (from != null) {
+            Property<P, ? super A> toProperty = link.getTo();
+            value = toProperty.get(from, getter);
+        }
+
+        return value;
+    }
+
+    public P get(M model, GetterInterceptor getter) {
+        P value = null;
+
+        if (link != null) {
+            value = get(link, model, getter);
+        } else {
+            value = getter.get(this, model);
+        }
+
+        return value;
+    }
+
+    private static <P, A, M> void set(PropertyLink<P, A, M> link, M model,
+        P value, GetterInterceptor getter) {
+        Property<A, M> fromProperty = link.getFrom();
+        A from = fromProperty.get(model, getter);
+
+        Property<P, ? super A> toProperty = link.getTo();
+        toProperty.set(from, value, getter);
+    }
+
+    public void set(M model, P value, GetterInterceptor getter) {
+        if (link != null) {
+            set(link, model, value, getter);
+        } else {
+            set(model, value);
+        }
     }
 
     public String getPropertyChangeName() {
@@ -68,27 +121,32 @@ public class Property<T, W> implements Serializable {
         return typeInfo.isCollection;
     }
 
-    public T get(W model) {
+    public Class<M> getModelClass() {
+        return modelClass;
+    }
+
+    public P get(M model) {
         return accessor.get(model);
     }
 
-    public void set(W model, T value) {
+    public void set(M model, P value) {
         accessor.set(model, value);
     }
 
     /**
      * An alias for the {@code wrap()} method. Behaves exactly the same, but
      * with a shorter method name for use such as
-     * {@code
+     * 
+     * <pre>
      *      Property cThroughA = A.to(B.to(C))
      *      C c = cThroughA.get(a);
-     * }
+     * </pre>
      * 
      * @param <T2>
      * @param property
-     * @return
+     * @returnAssociationAccessor
      */
-    public <T2> Property<T2, W> to(final Property<T2, ? super T> property) {
+    public <T2> Property<T2, M> to(final Property<T2, ? super P> property) {
         return wrap(property.name, property);
     }
 
@@ -98,7 +156,7 @@ public class Property<T, W> implements Serializable {
     // an at-compile-time checked list of properties?? COOOOOOOL! ;-) e.g.
     // PropertyName.start(SpecimenPeer.ID).ofEach(SpecimenPeer.CHILD_SPECIMEN_COLLECTION)).get();
 
-    public <T2> Property<T2, W> wrap(final Property<T2, ? super T> property) {
+    public <T2> Property<T2, M> wrap(final Property<T2, ? super P> property) {
         return wrap(property.name, property);
     }
 
@@ -106,43 +164,27 @@ public class Property<T, W> implements Serializable {
      * Creates a new {@link Property} by treating the {@link Property} of an
      * association as a direct property.
      * 
-     * @param <T2>
+     * @param <A>
      * @param propertyChangeName a new name to use for the property when firing
      *            a change event (should correspond to the {@link ModelWrapper}
      *            's method name)
      * @param property
      * @return
      */
-    public <T2> Property<T2, W> wrap(String propertyChangeName,
-        final Property<T2, ? super T> property) {
-        Accessor<T2, W> accessor = new Accessor<T2, W>() {
-            private static final long serialVersionUID = 1L;
+    public <A> Property<A, M> wrap(String propertyChangeName,
+        final Property<A, ? super P> property) {
+        PropertyLink<A, ?, M> link = new PropertyLink<A, P, M>(this, property);
 
-            @Override
-            public T2 get(W model) {
-                T association = Property.this.accessor.get(model);
-                return association == null ? null : property.get(association);
-            }
-
-            @Override
-            public void set(W model, T2 value) {
-                T association = Property.this.accessor.get(model);
-                if (association != null) {
-                    property.set(association, value);
-                }
-            }
-        };
-
-        return new Property<T2, W>(concatNames(this, property),
-            propertyChangeName, property.typeInfo, accessor);
+        return new Property<A, M>(concatNames(this, property),
+            propertyChangeName, modelClass, property.typeInfo, link);
     }
 
-    public Collection<Property<?, W>> wrap(
-        Collection<Property<?, ? super T>> properties) {
-        List<Property<?, W>> wrappedProperties = new ArrayList<Property<?, W>>();
+    public Collection<Property<?, M>> wrap(
+        Collection<Property<?, ? super P>> properties) {
+        List<Property<?, M>> wrappedProperties = new ArrayList<Property<?, M>>();
 
-        for (Property<?, ? super T> property : properties) {
-            Property<?, W> wrappedProperty = wrap(property.name, property);
+        for (Property<?, ? super P> property : properties) {
+            Property<?, M> wrappedProperty = wrap(property.name, property);
             wrappedProperties.add(wrappedProperty);
         }
 
@@ -171,9 +213,9 @@ public class Property<T, W> implements Serializable {
         return StringUtils.join(propNames, '.');
     }
 
-    public static <T, W> Property<T, W> create(String name,
-        TypeReference<T> type, Accessor<T, W> accessor) {
-        return new Property<T, W>(name, type, accessor);
+    public static <P, M> Property<P, M> create(String name,
+        Class<M> modelClass, TypeReference<P> type, Accessor<P, M> accessor) {
+        return new Property<P, M>(name, modelClass, type, accessor);
     }
 
     @Override
@@ -206,10 +248,10 @@ public class Property<T, W> implements Serializable {
         return name + "(" + typeInfo.toString + ")";
     }
 
-    public interface Accessor<T, W> extends Serializable {
-        public T get(W model);
+    public interface Accessor<P, M> extends Serializable {
+        public P get(M model);
 
-        public void set(W model, T value);
+        public void set(M model, P value);
     };
 
     /**

@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.common.util;
 
 import java.io.Serializable;
 
+import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
+
 public class RowColPos implements Comparable<RowColPos>, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -14,13 +16,17 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
     public Integer col;
 
     public RowColPos() {
-
     }
 
     public RowColPos(Integer row, Integer col) {
         super();
         this.row = row;
         this.col = col;
+    }
+
+    public RowColPos(AbstractPositionWrapper<?> pos) {
+        this.row = pos.getRow();
+        this.col = pos.getCol();
     }
 
     public boolean equals(Integer row, Integer col) {

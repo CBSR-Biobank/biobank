@@ -1,19 +1,17 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
-import java.util.Arrays;
-import java.util.List;
-
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.TaskList;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
+import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.IfAction.Is;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerPositionBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.ContainerPositionAvailableCheck;
+import edu.ualberta.med.biobank.common.wrappers.checks.ContainerPositionInBoundsCheck;
 import edu.ualberta.med.biobank.model.ContainerPosition;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerPositionWrapper extends ContainerPositionBaseWrapper {
 
@@ -51,37 +49,37 @@ public class ContainerPositionWrapper extends ContainerPositionBaseWrapper {
         setParentContainer(parent);
     }
 
-    public static final String OBJECT_AT_POSITION_QRY = "from "
-        + ContainerPosition.class.getName()
-        + " where "
-        + Property.concatNames(ContainerPositionPeer.PARENT_CONTAINER,
-            ContainerPeer.ID) + "=? and " + ContainerPositionPeer.ROW.getName()
-        + "=? and " + ContainerPositionPeer.COL.getName() + "=?";
+    @Override
+    protected TaskList getPersistTasks() {
+        TaskList tasks = new TaskList();
+
+        tasks.add(check().notNull(ContainerPositionPeer.CONTAINER));
+
+        tasks.add(super.getPersistTasks());
+
+        BiobankSessionAction checkPosition = new ContainerPositionAvailableCheck<ContainerPosition>(
+            this, ContainerPositionPeer.PARENT_CONTAINER);
+
+        tasks.add(check().ifProperty(ContainerPositionPeer.PARENT_CONTAINER,
+            Is.NOT_NULL, checkPosition));
+
+        BiobankSessionAction checkBounds = new ContainerPositionInBoundsCheck<ContainerPosition>(
+            this, ContainerPositionPeer.PARENT_CONTAINER);
+
+        tasks.add(check().ifProperty(ContainerPositionPeer.PARENT_CONTAINER,
+            Is.NOT_NULL, checkBounds));
+
+        return tasks;
+    }
+
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        WrapperTransaction.persist(this, appService);
+    }
 
     @Override
-    protected void checkObjectAtPosition() throws ApplicationException,
-        BiobankCheckException {
-        ContainerWrapper parent = getParent();
-        if (parent != null) {
-            // do a hql query because parent might need a reload - but if we are
-            // in the middle of parent.persist, don't want to do that !
-            HQLCriteria criteria = new HQLCriteria(
-                OBJECT_AT_POSITION_QRY,
-                Arrays.asList(new Object[] { parent.getId(), getRow(), getCol() }));
-            List<ContainerPosition> positions = appService.query(criteria);
-            if (positions.size() == 0) {
-                return;
-            }
-            ContainerPositionWrapper childPosition = new ContainerPositionWrapper(
-                appService, positions.get(0));
-            if (!childPosition.getContainer().equals(getContainer())) {
-                throw new BiobankCheckException("Position "
-                    + childPosition.getContainer().getLabel() + " (" + getRow()
-                    + ":" + getCol() + ") in container "
-                    + getParent().toString()
-                    + " is not available in container "
-                    + parent.getFullInfoLabel());
-            }
-        }
+    public void delete() throws Exception {
+        WrapperTransaction.delete(this, appService);
     }
 }

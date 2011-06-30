@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -12,7 +11,6 @@ import edu.ualberta.med.biobank.common.wrappers.base.SpecimenPositionBaseWrapper
 import edu.ualberta.med.biobank.common.wrappers.checks.ContainerPositionAvailableCheck;
 import edu.ualberta.med.biobank.common.wrappers.checks.ContainerPositionInBoundsCheck;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {
@@ -69,12 +67,6 @@ public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {
     @Override
     public void setParent(ContainerWrapper parent) {
         setContainer(parent);
-    }
-
-    @Override
-    protected void checkObjectAtPosition() throws BiobankCheckException,
-        ApplicationException {
-        // TODO: DELETE ME!
     }
 
     @Override

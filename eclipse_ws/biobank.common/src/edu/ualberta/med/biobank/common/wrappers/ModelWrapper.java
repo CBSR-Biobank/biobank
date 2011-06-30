@@ -59,7 +59,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private final ElementTracker<E> elementTracker = new ElementTracker<E>(this);
     private final ElementQueue<E> elementQueue = new ElementQueue<E>(this);
     private final WrapperCascader<E> cascader = new WrapperCascader<E>(this);
-    private final WrapperChecker<E> checker = new WrapperChecker<E>(this);
+    private final WrapperChecker<E> preChecker = new WrapperChecker<E>(this);
 
     public ModelWrapper(WritableApplicationService appService, E wrappedObject) {
         this.appService = appService;
@@ -156,9 +156,18 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * wrapped model object. The {@link TaskList}-s might also check certain
      * conditions on the client or server, as well as persist potential
      * dependent objects.
-     * 
+     * <p>
      * This method should be overridden as necessary to return a
      * {@link TaskList} that properly persists the wrapped model object.
+     * <p>
+     * <strong>IMPORTANT.</strong> Checks can also be added to the
+     * {@link TaskList}. However, in general, checks should be performed using
+     * HQL <em>after</em> the object is persisted (and related objects are
+     * cascaded) so that the database's state can be verified. This is opposed
+     * to checking the in-memory model objects, since it cannot be easily
+     * determined which will or have actually been persisted. Checks can be done
+     * on the in-memory model objects (before persisting) before the database
+     * throws an error, but it is often difficult to know what values to check.
      * 
      * @return
      */
@@ -1144,6 +1153,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     protected WrapperChecker<E> check() {
-        return checker;
+        return preChecker;
     }
 }

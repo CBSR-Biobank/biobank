@@ -7,6 +7,8 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.property.GetterInterceptor;
+import edu.ualberta.med.biobank.common.wrappers.property.LazyLoaderInterceptor;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropertyException;
 
@@ -30,7 +32,8 @@ public class NotNullPreCheck<E> extends WrapperAction<E> implements PreCheck {
      * @param wrapper
      * @param property
      */
-    public NotNullPreCheck(ModelWrapper<E> wrapper, Property<?, ? super E> property) {
+    public NotNullPreCheck(ModelWrapper<E> wrapper,
+        Property<?, ? super E> property) {
         super(wrapper);
         this.property = property;
         this.modelString = wrapper.toString();
@@ -39,7 +42,10 @@ public class NotNullPreCheck<E> extends WrapperAction<E> implements PreCheck {
     @Override
     public Object doAction(Session session) throws BiobankSessionException {
         E model = getModel();
-        Object value = property.get(model);
+
+        GetterInterceptor lazyLoad = new LazyLoaderInterceptor(session, 1);
+
+        Object value = property.get(model, lazyLoad);
 
         if (value == null) {
             String propertyName = Format.propertyName(property);

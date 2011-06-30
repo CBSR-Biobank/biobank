@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+
 /**
  * Meant to hold a combination of a {@link Property} and a specific (model)
  * {@link Object} that the property acts on.

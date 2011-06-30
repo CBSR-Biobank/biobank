@@ -847,15 +847,15 @@ public class TestContainer extends TestDatabase {
             specimen = SpecimenHelper.newSpecimen(st);
             ce.addToAllSpecimenCollection(Arrays.asList(specimen));
             if (selectedSampleTypes.contains(st)) {
-                Assert.assertTrue(childL3.canHoldSpecimen(specimen));
+                Assert.assertTrue(childL3.canHoldSpecimenType(specimen));
             } else {
-                Assert.assertTrue(!childL3.canHoldSpecimen(specimen));
+                Assert.assertTrue(!childL3.canHoldSpecimenType(specimen));
             }
         }
 
         specimen = SpecimenHelper.newSpecimen((SpecimenTypeWrapper) null);
         try {
-            childL3.canHoldSpecimen(specimen);
+            childL3.canHoldSpecimenType(specimen);
             Assert
                 .fail("should not be allowed to add aliquot with null sample type");
         } catch (BiobankCheckException e) {

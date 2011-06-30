@@ -527,7 +527,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                 for (SpecimenWrapper child : children) {
                     child.setTopSpecimenInternal(topSpecimen, false);
 
-                    // Save children whether their are new or not, because the
+                    // Save children whether they're are new or not, because the
                     // children's children could be already persistent and need
                     // to be updated (but would then need their parent to be
                     // persisted first).

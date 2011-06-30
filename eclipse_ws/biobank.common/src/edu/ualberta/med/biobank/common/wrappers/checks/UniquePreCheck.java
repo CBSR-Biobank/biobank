@@ -1,17 +1,20 @@
 package edu.ualberta.med.biobank.common.wrappers.checks;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.property.GetterInterceptor;
+import edu.ualberta.med.biobank.common.wrappers.property.LazyLoaderInterceptor;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 
@@ -26,6 +29,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePr
  */
 public class UniquePreCheck<E> extends WrapperAction<E> implements PreCheck {
     private static final long serialVersionUID = 1L;
+    private static final String HQL = "SELECT COUNT(*) FROM {0} o WHERE ({1}) = {2} {3}";
     private static final String EXCEPTION_STRING = "There already exists a {0} with property value(s) ({1}) for ({2}), respectively. These field(s) must be unique.";
 
     private final Collection<Property<?, ? super E>> properties;
@@ -43,8 +47,8 @@ public class UniquePreCheck<E> extends WrapperAction<E> implements PreCheck {
 
     @Override
     public Object doAction(Session session) throws BiobankSessionException {
-        Criteria criteria = getCriteria(session);
-        Long count = HibernateUtil.getCountFromCriteria(criteria);
+        Query query = getQuery(session);
+        Long count = HibernateUtil.getCountFromQuery(query);
 
         if (count > 0) {
             throwException();
@@ -64,25 +68,44 @@ public class UniquePreCheck<E> extends WrapperAction<E> implements PreCheck {
         throw new DuplicatePropertySetException(msg);
     }
 
-    private Criteria getCriteria(Session session) {
-        Criteria criteria = session.createCriteria(getModelClass());
+    private Query getQuery(Session session) {
+        String modelName = getModelClass().getName();
+        String props = StringUtil.join(properties, ", ");
+        String values = StringUtil.join(getValues(session), ", ");
 
-        criteria.setProjection(Projections.rowCount());
+        String notSelfCondition = getNotSelfCondition();
 
-        E model = getModel();
+        String hql = MessageFormat.format(HQL, modelName, props, values,
+            notSelfCondition);
+
+        Query query = session.createQuery(hql);
+
+        return query;
+    }
+
+    private String getNotSelfCondition() {
+        String idCheck = "";
 
         Integer id = getModelId();
         if (id != null) {
             String idName = getIdProperty().getName();
-            criteria.add(Restrictions.not(Restrictions.eq(idName, id)));
+            idCheck = " AND " + idName + " <> " + id;
         }
+
+        return idCheck;
+    }
+
+    private List<Object> getValues(Session session) {
+        List<Object> values = new ArrayList<Object>();
+        E model = getModel();
+
+        GetterInterceptor lazyLoad = new LazyLoaderInterceptor(session, 1);
 
         for (Property<?, ? super E> property : properties) {
-            String name = property.getName();
-            Object value = property.get(model);
-            criteria.add(Restrictions.eq(name, value));
+            Object value = property.get(model, lazyLoad);
+            values.add(value);
         }
 
-        return criteria;
+        return values;
     }
 }

@@ -21,6 +21,8 @@ import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.base.PatientBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.CollectionIsEmptyCheck;
+import edu.ualberta.med.biobank.common.wrappers.checks.NotUsedCheck;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
@@ -344,13 +346,15 @@ public class PatientWrapper extends PatientBaseWrapper {
         TaskList tasks = new TaskList();
 
         String hasCollectionEventsMsg = HAS_COLLECTION_EVENTS_MSG;
-        tasks.add(check().empty(PatientPeer.COLLECTION_EVENT_COLLECTION,
-            hasCollectionEventsMsg));
+        tasks.add(new CollectionIsEmptyCheck<Patient>(this,
+            PatientPeer.COLLECTION_EVENT_COLLECTION, hasCollectionEventsMsg));
 
         String hasSpecimensMsg = MessageFormat.format(HAS_SPECIMENS_MSG,
             getPnumber());
-        check().notUsedBy(Specimen.class,
-            SpecimenPeer.COLLECTION_EVENT.to(CollectionEventPeer.PATIENT));
+        tasks
+            .add(new NotUsedCheck<Patient>(this, Specimen.class,
+                SpecimenPeer.COLLECTION_EVENT.to(CollectionEventPeer.PATIENT),
+                null));
 
         tasks.add(super.getDeleteTasks());
 
