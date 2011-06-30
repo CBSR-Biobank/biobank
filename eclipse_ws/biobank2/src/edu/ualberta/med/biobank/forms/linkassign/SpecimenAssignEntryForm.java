@@ -803,7 +803,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected void defaultInitialisation() {
         super.defaultInitialisation();
         useScannerButton.setSelection(useScanner);
-        setUseScanner(useScanner);
+        setUseScanner(!mode.isSingleMode() && useScanner);
     }
 
     @Override
