@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
-import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.TaskList;
@@ -22,36 +20,6 @@ public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {
 
     public SpecimenPositionWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    public void setRow(Integer row) {
-        Integer oldRow = getRow();
-        super.setRow(row);
-        if (row == null || !row.equals(oldRow)) {
-            updatePositionString();
-        }
-    }
-
-    @Override
-    public void setCol(Integer col) {
-        Integer oldCol = getCol();
-        super.setCol(col);
-        if (col == null || !col.equals(oldCol)) {
-            updatePositionString();
-        }
-    }
-
-    private void updatePositionString() {
-        ContainerWrapper container = getContainer();
-        if (container != null && getRow() != null && getCol() != null) {
-            ContainerTypeWrapper containerType = container.getContainerType();
-            if (containerType != null) {
-                String positionString = containerType
-                    .getPositionString(new RowColPos(getRow(), getCol()));
-                setPositionString(positionString);
-            }
-        }
     }
 
     @Override

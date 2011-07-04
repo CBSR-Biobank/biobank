@@ -6,15 +6,16 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.peer.AbstractPositionPeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.TaskList;
+import edu.ualberta.med.biobank.common.wrappers.base.AbstractPositionBaseWrapper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractPositionWrapper<E extends AbstractPosition>
-    extends ModelWrapper<E> {
+    extends AbstractPositionBaseWrapper<E> {
     public AbstractPositionWrapper(WritableApplicationService appService,
         E wrappedObject) {
         super(appService, wrappedObject);
@@ -24,20 +25,22 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
         super(appService);
     }
 
-    public Integer getRow() {
-        return getProperty(AbstractPositionPeer.ROW);
-    }
-
+    @Override
     public void setRow(Integer row) {
-        setProperty(AbstractPositionPeer.ROW, row);
+        Integer oldRow = getRow();
+        super.setRow(row);
+        if (row == null || !row.equals(oldRow)) {
+            updatePositionString();
+        }
     }
 
-    public Integer getCol() {
-        return getProperty(AbstractPositionPeer.COL);
-    }
-
+    @Override
     public void setCol(Integer col) {
-        setProperty(AbstractPositionPeer.COL, col);
+        Integer oldCol = getCol();
+        super.setCol(col);
+        if (col == null || !col.equals(oldCol)) {
+            updatePositionString();
+        }
     }
 
     public RowColPos getPosition() {
@@ -70,5 +73,17 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
         tasks.add(super.getPersistTasks());
 
         return tasks;
+    }
+
+    private void updatePositionString() {
+        ContainerWrapper container = getParent();
+        if (container != null && getRow() != null && getCol() != null) {
+            ContainerTypeWrapper containerType = container.getContainerType();
+            if (containerType != null) {
+                String positionString = containerType
+                    .getPositionString(new RowColPos(getRow(), getCol()));
+                setPositionString(positionString);
+            }
+        }
     }
 }
