@@ -40,7 +40,8 @@ public class AliquotedSpecimenInfoTable extends
 
     public AliquotedSpecimenInfoTable(Composite parent,
         List<AliquotedSpecimenWrapper> sampleStorageCollection) {
-        super(parent, sampleStorageCollection, HEADINGS, PAGE_SIZE_ROWS);
+        super(parent, sampleStorageCollection, HEADINGS, PAGE_SIZE_ROWS,
+            AliquotedSpecimenWrapper.class);
     }
 
     @Override

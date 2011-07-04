@@ -15,7 +15,8 @@ public class ActivityStatusInfoTable extends
 
     public ActivityStatusInfoTable(Composite parent,
         List<ActivityStatusWrapper> activityStatusCollection) {
-        super(parent, activityStatusCollection, HEADINGS, 10);
+        super(parent, activityStatusCollection, HEADINGS, 10,
+            ActivityStatusWrapper.class);
     }
 
     @Override

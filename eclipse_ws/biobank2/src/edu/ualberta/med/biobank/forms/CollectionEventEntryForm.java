@@ -32,8 +32,8 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
@@ -105,8 +105,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 appService, cevent));
         } else {
             tabName = Messages.getString("CollectionEventEntryForm.title.edit",
-                cevent.getPatient().getPnumber(),
-                cevent.getVisitNumber());
+                cevent.getPatient().getPnumber(), cevent.getVisitNumber());
         }
 
         setPartName(tabName);
@@ -194,13 +193,13 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             cevent.getOriginalSpecimenCollection(true),
             ColumnsShown.SOURCE_SPECIMENS);
         specimensTable.adaptToToolkit(toolkit, true);
+        specimensTable.addClickListener(collectionDoubleClickListener);
         specimensTable.addSelectionChangedListener(listener);
 
         try {
             final List<SpecimenTypeWrapper> allSpecimenTypes = SpecimenTypeWrapper
                 .getAllSpecimenTypes(SessionManager.getAppService(), true);
-            specimensTable.addEditSupport(cevent.getPatient().getStudy()
-                .getSourceSpecimenCollection(true), allSpecimenTypes);
+            specimensTable.addDeleteSupport();
             addSectionToolbar(section,
                 Messages
                     .getString("CollectionEventEntryForm.specimens.add.title"),

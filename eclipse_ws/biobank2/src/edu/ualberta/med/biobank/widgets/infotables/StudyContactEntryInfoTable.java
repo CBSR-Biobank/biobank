@@ -37,7 +37,8 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
 
     public StudyContactEntryInfoTable(Composite parent,
         List<ContactWrapper> contactCollection) {
-        super(parent, contactCollection, HEADINGS, PAGE_SIZE_ROWS);
+        super(parent, contactCollection, HEADINGS, PAGE_SIZE_ROWS,
+            ContactWrapper.class);
     }
 
     @Override

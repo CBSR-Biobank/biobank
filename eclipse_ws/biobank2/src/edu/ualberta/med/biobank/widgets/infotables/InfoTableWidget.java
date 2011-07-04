@@ -86,15 +86,19 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     private MenuItem editItem;
 
+    private final Class<T> wrapperClass;
+
     public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings) {
+        String[] headings, Class<T> wrapperClass) {
         super(parent, collection, headings, null, 5);
+        this.wrapperClass = wrapperClass;
         addTableClickListener();
     }
 
     public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int rowsPerPage) {
+        String[] headings, int rowsPerPage, Class<T> wrapperClass) {
         super(parent, collection, headings, null, rowsPerPage);
+        this.wrapperClass = wrapperClass;
         addTableClickListener();
     }
 
@@ -300,19 +304,22 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     public void addClickListener(IDoubleClickListener listener) {
         doubleClickListeners.add(listener);
-        editItem = new MenuItem(getMenu(), SWT.PUSH);
-        editItem.setText("Edit");
-        editItem.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ModelWrapper<?> selection = (ModelWrapper<?>) InfoTableWidget.this
-                    .getSelection();
-                if (selection != null) {
-                    AdapterBase adapter = AdapterFactory.getAdapter(selection);
-                    adapter.openEntryForm();
+        if (SessionManager.canUpdate(wrapperClass)) {
+            editItem = new MenuItem(getMenu(), SWT.PUSH);
+            editItem.setText("Edit");
+            editItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    ModelWrapper<?> selection = (ModelWrapper<?>) InfoTableWidget.this
+                        .getSelection();
+                    if (selection != null) {
+                        AdapterBase adapter = AdapterFactory
+                            .getAdapter(selection);
+                        adapter.openEntryForm();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public void doubleClick() {

@@ -154,7 +154,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         List<SpecimenWrapper> specimenCollection, ColumnsShown columnsShown,
         int rowsPerPage) {
         super(parent, specimenCollection, columnsShown.getheadings(),
-            rowsPerPage);
+            rowsPerPage, SpecimenWrapper.class);
         this.currentColumnsShowns = columnsShown;
     }
 
