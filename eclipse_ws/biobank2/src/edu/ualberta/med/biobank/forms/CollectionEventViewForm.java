@@ -177,6 +177,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
         setCollectionEventValues();
         sourceSpecimenTable.setCollection(cevent
             .getOriginalSpecimenCollection(true));
+        aliquotedSpecimenTable.setCollection(cevent
+            .getAliquotedSpecimenCollection(true));
     }
 
     private void retrievePatientVisit() {
