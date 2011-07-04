@@ -27,7 +27,7 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
     private static final String CONFIRM_DELETE_MESSAGE = "Are you certain you want to delete \"{0}\"?";
 
     public GroupInfoTable(Composite parent, List<Group> collection) {
-        super(parent, collection, HEADINGS, ROWS_PER_PAGE);
+        super(parent, collection, HEADINGS, ROWS_PER_PAGE, Group.class);
 
         addEditItemListener(new IInfoTableEditItemListener() {
             @Override

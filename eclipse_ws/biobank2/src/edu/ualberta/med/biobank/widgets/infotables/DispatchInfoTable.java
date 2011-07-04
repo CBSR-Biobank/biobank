@@ -40,7 +40,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     private boolean editMode = false;
 
     public DispatchInfoTable(Composite parent, SpecimenWrapper a) {
-        super(parent, null, HEADINGS, 15);
+        super(parent, null, HEADINGS, 15, DispatchWrapper.class);
         this.a = a;
         setCollection(a.getDispatches());
     }

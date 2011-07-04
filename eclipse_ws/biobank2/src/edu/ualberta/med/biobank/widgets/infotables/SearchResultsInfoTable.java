@@ -12,12 +12,12 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
 
     public SearchResultsInfoTable(Composite parent, List<Object> collection,
         String[] headings, int rows) {
-        super(parent, collection, headings, rows);
+        super(parent, collection, headings, rows, Object.class);
     }
 
     public SearchResultsInfoTable(Composite parent, List<Object> collection,
         String[] headings) {
-        super(parent, collection, headings);
+        super(parent, collection, headings, Object.class);
     }
 
     @Override

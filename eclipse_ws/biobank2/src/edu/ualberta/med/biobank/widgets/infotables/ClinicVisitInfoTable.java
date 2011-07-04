@@ -28,7 +28,7 @@ public class ClinicVisitInfoTable extends
 
     public ClinicVisitInfoTable(Composite parent,
         List<CollectionEventWrapper> collection) {
-        super(parent, collection, HEADINGS);
+        super(parent, collection, HEADINGS, CollectionEventWrapper.class);
     }
 
     @Override

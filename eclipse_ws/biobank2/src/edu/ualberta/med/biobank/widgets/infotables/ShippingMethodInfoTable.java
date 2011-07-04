@@ -15,7 +15,8 @@ public class ShippingMethodInfoTable extends
 
     public ShippingMethodInfoTable(Composite parent,
         List<ShippingMethodWrapper> sampleStorageCollection) {
-        super(parent, sampleStorageCollection, HEADINGS, 10);
+        super(parent, sampleStorageCollection, HEADINGS, 10,
+            ShippingMethodWrapper.class);
     }
 
     @Override

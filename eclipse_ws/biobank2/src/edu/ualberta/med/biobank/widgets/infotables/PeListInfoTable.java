@@ -31,7 +31,8 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
         "Study", "Source Specimens", "Aliquoted Specimens" };
 
     public PeListInfoTable(Composite parent, List<ProcessingEventWrapper> pvs) {
-        super(parent, pvs, HEADINGS, PAGE_SIZE_ROWS);
+        super(parent, pvs, HEADINGS, PAGE_SIZE_ROWS,
+            ProcessingEventWrapper.class);
     }
 
     @Override

@@ -44,7 +44,7 @@ public class ContainerTypeInfoTable extends
 
     public ContainerTypeInfoTable(Composite parent, SiteAdapter site) {
         super(parent, site.getWrapper().getContainerTypeCollection(), HEADINGS,
-            10);
+            10, ContainerTypeWrapper.class);
         siteAdapter = site;
     }
 

@@ -144,7 +144,7 @@ public class BgcWidgetCreator {
         label = createLabel(composite, fieldLabel);
         int gridDataStyle = GridData.VERTICAL_ALIGN_CENTER;
         if (widgetClass.equals(BgcBaseText.class)
-            && (widgetOptions & SWT.MULTI) != 0) {
+            && ((widgetOptions & SWT.MULTI) != 0)) {
             gridDataStyle = GridData.VERTICAL_ALIGN_BEGINNING;
         }
         label.setLayoutData(new GridData(gridDataStyle));
@@ -206,6 +206,10 @@ public class BgcWidgetCreator {
         return button;
     }
 
+    public void addBindingToMap(String bindingKey, Binding binding) {
+        bindings.put(bindingKey, binding);
+    }
+
     private Combo createCombo(Composite composite, int options,
         String[] widgetValues, final IObservableValue modelObservableValue,
         UpdateValueStrategy uvs, String bindingKey) {
@@ -231,7 +235,7 @@ public class BgcWidgetCreator {
         final IValueChangeListener changeListener = new IValueChangeListener() {
             @Override
             public void handleValueChange(ValueChangeEvent event) {
-                if (event.getObservableValue().getValue() == null
+                if ((event.getObservableValue().getValue() == null)
                     || event.getObservableValue().getValue().toString()
                         .isEmpty()) {
                     combo.deselectAll();
@@ -429,7 +433,7 @@ public class BgcWidgetCreator {
         }
 
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        if (dbc != null && fieldLabel != null) {
+        if ((dbc != null) && (fieldLabel != null)) {
             NonEmptyStringValidator validator = new NonEmptyStringValidator(
                 errorMessage);
             validator.setControlDecoration(BgcBaseWidget.createDecorator(
@@ -582,7 +586,7 @@ public class BgcWidgetCreator {
             uvs.setAfterConvertValidator(new IValidator() {
                 @Override
                 public IStatus validate(Object value) {
-                    if (value instanceof Boolean && !(Boolean) value) {
+                    if ((value instanceof Boolean) && !(Boolean) value) {
                         if (statusType == IStatus.WARNING) {
                             return ValidationStatus.warning(errorMsg);
                         }

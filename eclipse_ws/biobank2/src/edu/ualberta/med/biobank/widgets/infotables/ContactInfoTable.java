@@ -37,7 +37,7 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         "Title", "Studies", "Email", "Mobile #", "Pager #", "Office #", "Fax #" };
 
     public ContactInfoTable(Composite parent, List<ContactWrapper> contacts) {
-        super(parent, contacts, HEADINGS, PAGE_SIZE_ROWS);
+        super(parent, contacts, HEADINGS, PAGE_SIZE_ROWS, ContactWrapper.class);
     }
 
     @Override

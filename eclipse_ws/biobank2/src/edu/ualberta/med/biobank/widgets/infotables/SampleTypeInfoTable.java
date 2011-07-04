@@ -16,7 +16,8 @@ public class SampleTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> {
 
     public SampleTypeInfoTable(Composite parent,
         List<SpecimenTypeWrapper> sampleTypeCollection) {
-        super(parent, sampleTypeCollection, HEADINGS, PAGE_SIZE_ROWS);
+        super(parent, sampleTypeCollection, HEADINGS, PAGE_SIZE_ROWS,
+            SpecimenTypeWrapper.class);
     }
 
     @Override
