@@ -261,8 +261,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 if (inventoryIdModified)
                     try {
                         retrieveSingleSpecimenData();
-                        if (!((Boolean) foundSpecNull.getValue()))
-                            foundSpecNull.setValue(true);
                     } catch (Exception ex) {
                         BgcPlugin.openError("Specimen error", ex); //$NON-NLS-1$
                         focusControl(inventoryIdText);
