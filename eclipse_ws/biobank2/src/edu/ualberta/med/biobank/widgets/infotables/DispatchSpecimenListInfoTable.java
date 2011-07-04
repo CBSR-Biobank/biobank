@@ -41,7 +41,7 @@ public abstract class DispatchSpecimenListInfoTable extends
 
     public DispatchSpecimenListInfoTable(Composite parent,
         final DispatchWrapper shipment, boolean editMode) {
-        super(parent, null, HEADINGS, 15);
+        super(parent, null, HEADINGS, 15, DispatchSpecimenWrapper.class);
         setCollection(getInternalDispatchSpecimens());
         this.editMode = editMode;
         if (editMode) {
@@ -52,16 +52,14 @@ public abstract class DispatchSpecimenListInfoTable extends
                         List<DispatchSpecimenWrapper> dsaList = getSelectedItems();
                         if (dsaList.size() > 0) {
                             if (dsaList.size() == 1
-                                && !BgcPlugin.openConfirm(
-                                    "Remove Specimen",
+                                && !BgcPlugin.openConfirm("Remove Specimen",
                                     "Are you sure you want to remove specimen \""
                                         + dsaList.get(0).getSpecimen()
                                             .getInventoryId()
                                         + "\" from this shipment ?"))
                                 return;
                             if (dsaList.size() > 1
-                                && !BgcPlugin.openConfirm(
-                                    "Remove Specimen",
+                                && !BgcPlugin.openConfirm("Remove Specimen",
                                     "Are you sure you want to remove these "
                                         + dsaList.size()
                                         + " specimens from this shipment ?"))
@@ -71,8 +69,7 @@ public abstract class DispatchSpecimenListInfoTable extends
                                 reloadCollection();
                                 notifyListeners();
                             } catch (Exception e) {
-                                BgcPlugin.openAsyncError(
-                                    "Delete failed", e);
+                                BgcPlugin.openAsyncError("Delete failed", e);
                             }
                         }
                     }

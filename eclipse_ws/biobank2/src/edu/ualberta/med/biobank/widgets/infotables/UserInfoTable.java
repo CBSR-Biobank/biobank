@@ -41,7 +41,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
     private MenuItem unlockMenuItem;
 
     public UserInfoTable(Composite parent, List<User> collection) {
-        super(parent, collection, HEADINGS, ROWS_PER_PAGE);
+        super(parent, collection, HEADINGS, ROWS_PER_PAGE, User.class);
 
         addEditItemListener(new IInfoTableEditItemListener() {
             @Override
@@ -188,8 +188,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                     new Object[] { loginName });
             }
 
-            if (BgcPlugin.openConfirm(CONFIRM_DELETE_TITLE,
-                message)) {
+            if (BgcPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
                 SessionManager.getAppService().deleteUser(loginName);
 
                 // remove the user from the collection

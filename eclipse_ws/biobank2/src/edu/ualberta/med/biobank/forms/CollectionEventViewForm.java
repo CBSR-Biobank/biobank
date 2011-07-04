@@ -155,6 +155,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
             cevent.getOriginalSpecimenCollection(true),
             ColumnsShown.SOURCE_SPECIMENS, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
+        sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
     }
 
     private void createAliquotedSpecimensSection() {
@@ -165,6 +166,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
             cevent.getAliquotedSpecimenCollection(true), ColumnsShown.ALIQUOTS,
             10);
         aliquotedSpecimenTable.adaptToToolkit(toolkit, true);
+        aliquotedSpecimenTable.addClickListener(collectionDoubleClickListener);
     }
 
     @Override
