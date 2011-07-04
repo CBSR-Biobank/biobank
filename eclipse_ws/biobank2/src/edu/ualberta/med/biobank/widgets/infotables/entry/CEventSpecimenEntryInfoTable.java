@@ -20,7 +20,9 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.CEventSourceSpecimenDialog;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 
 public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
@@ -77,7 +79,29 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
         }
     }
 
-    public void addDeleteSupport() {
+    public void addEditSupport(
+        final List<SourceSpecimenWrapper> studySourceTypes,
+        final List<SpecimenTypeWrapper> allSpecimenTypes) {
+        if (SessionManager.canCreate(SpecimenWrapper.class)) {
+            addAddItemListener(new IInfoTableAddItemListener() {
+                @Override
+                public void addItem(InfoTableEvent event) {
+                    addOrEditSpecimen(true, null, studySourceTypes,
+                        allSpecimenTypes, null, null);
+                }
+            });
+        }
+        if (SessionManager.canUpdate(SpecimenWrapper.class)) {
+            addEditItemListener(new IInfoTableEditItemListener() {
+                @Override
+                public void editItem(InfoTableEvent event) {
+                    SpecimenWrapper sw = getSelection();
+                    if (sw != null)
+                        addOrEditSpecimen(false, sw, studySourceTypes,
+                            allSpecimenTypes, null, null);
+                }
+            });
+        }
         if (SessionManager.canDelete(SpecimenWrapper.class)) {
             addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override

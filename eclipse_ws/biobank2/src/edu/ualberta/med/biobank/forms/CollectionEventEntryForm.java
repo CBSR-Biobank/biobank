@@ -193,13 +193,13 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             cevent.getOriginalSpecimenCollection(true),
             ColumnsShown.SOURCE_SPECIMENS);
         specimensTable.adaptToToolkit(toolkit, true);
-        specimensTable.addClickListener(collectionDoubleClickListener);
         specimensTable.addSelectionChangedListener(listener);
 
         try {
             final List<SpecimenTypeWrapper> allSpecimenTypes = SpecimenTypeWrapper
                 .getAllSpecimenTypes(SessionManager.getAppService(), true);
-            specimensTable.addDeleteSupport();
+            specimensTable.addEditSupport(cevent.getPatient().getStudy()
+                .getSourceSpecimenCollection(true), allSpecimenTypes);
             addSectionToolbar(section,
                 Messages
                     .getString("CollectionEventEntryForm.specimens.add.title"),
