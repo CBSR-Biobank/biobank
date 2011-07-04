@@ -53,7 +53,7 @@ Figure \ref{fig:patient_label_form} shows the form that is displayed.
 
 \begin{figure}[H]
   \centering
-  \scalebox{0.35}
+  \scalebox{0.45}
 	   { \includegraphics*{screenshots/printer_labels/03_patient_label_form} }
 	   \caption{Patient Label entry form.}
 	   \label{fig:patient_label_form}
@@ -131,9 +131,15 @@ left of each patient label. In the example shown in figure
 \label{sec:label_templates}
 
 Select \texttt{Printer Labels} $\to$ \texttt{Label Templates} from the main
-menu to see this form.
+menu to see the form shown in figure \ref{fig:label_templates_form}.
 
-\missingfigure{Label Templates form}
+\begin{figure}[H]
+  \centering
+  \scalebox{0.45}
+	   { \includegraphics*{screenshots/printer_labels/05_label_templates_form} }
+	   \caption{Label templates form.}
+	   \label{fig:label_templates_form}
+\end{figure}
 
 The label template \emph{Patient with Source Specimen Label Template} is
 already configured on the server for all users. This default template
@@ -145,9 +151,9 @@ template and adjusting the settings for your printer.
 You may need to define templates for each printer that your computer can
 access. To copy a template select the template you want to copy and press the
 \fbox{Copy} button. You can also create a fresh template by pressing the
-\fbox{New} button. You may also want to delete an old template that is no
-longer in use. This can be done by selecting the template to be deleted and
-pressing the \fbox{Delete} button.
+\fbox{New} button. In the future, you may want to delete an old template that
+is no longer in use. This can be done by selecting the template to be deleted
+and pressing the \fbox{Delete} button.
 
 The settings for a template are:
 \begin{description}
@@ -161,7 +167,7 @@ by default on the server. For more information see section \ref{sec:jasper_templ
 \end{description}
 
 Each item on the sheet has a \textbf{horizontal offset},
-\textbf{vertical offset}, \textbf{width }, and \textbf{height}. All
+\textbf{vertical offset}, \textbf{width} and \textbf{height}. All
 measurements are in millimetres. The \textbf{Patient Info} group corresponds to
 section \textbf{3} in figure \ref{fig:cbsr_patient_label_sheet}. The
 \textbf{Barcodes} group corresponds to the 32 patient labels. The labels are
@@ -172,10 +178,11 @@ for all 32 labels. In addition, each label can control the position of the same
 3 items individually. If values are entered here they are added to the values
 in the general group. To move something to the left then use a negative value.
 
-For example if the general barcode settings are the ones shown in figure
-\ref{X}, and the settings for barcode 001 are changed to those shown in figure
-\ref{X}, then the patient barcode is printed at position XX from the top left
-corner of the first label.
+For example if the general barcode settings are the ones shown in the
+\textbf{General} node in the tree in figure \ref{fig:label_templates_form}, and
+the settings for barcode 001 are changed to those shown in figure
+\ref{fig:label_templates_form}, then the patient barcode is printed at position
+XX from the top left corner of the first label.
 
 \missingfigure{General Barcode}
 \missingfigure{Barcode 1}
