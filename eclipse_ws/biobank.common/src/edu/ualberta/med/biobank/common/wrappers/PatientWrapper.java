@@ -351,10 +351,8 @@ public class PatientWrapper extends PatientBaseWrapper {
 
         String hasSpecimensMsg = MessageFormat.format(HAS_SPECIMENS_MSG,
             getPnumber());
-        tasks
-            .add(new NotUsedCheck<Patient>(this, Specimen.class,
-                SpecimenPeer.COLLECTION_EVENT.to(CollectionEventPeer.PATIENT),
-                null));
+        tasks.add(new NotUsedCheck<Patient>(this, SpecimenPeer.COLLECTION_EVENT
+            .to(CollectionEventPeer.PATIENT), Specimen.class, hasSpecimensMsg));
 
         tasks.add(super.getDeleteTasks());
 

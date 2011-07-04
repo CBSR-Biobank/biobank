@@ -465,7 +465,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         } else {
             topSpecimenChanged = true;
         }
-
     }
 
     /**
@@ -588,6 +587,11 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     @Override
     public void delete() throws Exception {
         WrapperTransaction.delete(this, appService);
+    }
+
+    @Override
+    protected void resetInternalFields() {
+        topSpecimenChanged = false;
     }
 
     private static class ResetTopSpecimenChangedQueryTask extends

@@ -10,8 +10,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.commons.lang.StringUtils;
-
 import edu.ualberta.med.biobank.common.Messages;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -24,6 +22,9 @@ import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.common.wrappers.actions.UpdateContainerChildrenAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.UpdateContainerPathAction;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.ContainerPersistChecks;
 import edu.ualberta.med.biobank.common.wrappers.checks.NotNullPreCheck;
@@ -32,15 +33,19 @@ import edu.ualberta.med.biobank.common.wrappers.checks.UniquePreCheck;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends ContainerBaseWrapper {
+    public static final String PATH_DELIMITER = "/";
+
     private static final String OUT_OF_BOUNDS_POSITION_MSG = "Position {0} is invalid. Row should be between 0 and {1} (exclusive) and column should be between 0 and {2} (exclusive).";
     private static final String HAS_SPECIMENS_MSG = "Unable to delete container {0}. All specimens must be removed first.";
     private static final String HAS_CHILD_CONTAINERS_MSG = "Unable to delete container {0}. All subcontainers must be removed first.";
@@ -68,6 +73,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     private Map<RowColPos, SpecimenWrapper> specimens;
     private Map<RowColPos, ContainerWrapper> children;
 
+    private boolean updateChildren = false;
+
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
         super(appService, wrappedObject);
@@ -86,53 +93,68 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return newObject;
     }
 
+    /**
+     * Return the top {@code Container} of the top loaded {@code Container}.
+     * This will give the correct "in memory" answer of who the top
+     * {@code Container} is (whereas super.getTopContainer() will give the value
+     * from the underlying model).
+     */
     @Override
-    protected void persistDependencies(Container origObject) throws Exception {
-        ContainerWrapper parent = getParentContainer();
-        boolean labelChanged = false;
-        if (parent == null) {
-            if ((origObject != null) && (getLabel() != null)
-                && !getLabel().equals(origObject.getLabel())) {
-                labelChanged = true;
-            }
-        } else {
-            if (isNew()) {
-                labelChanged = true;
-            } else {
-                if (origObject != null && origObject.getPosition() != null) {
-                    // check the parent is the same
-                    if (origObject.getPosition().getParentContainer() != null) {
-                        if (!origObject.getPosition().getParentContainer()
-                            .getId().equals(parent.getId())) {
-                            labelChanged = true;
-                        }
-                    }
-                    // check the position is the same
-                    if (!new RowColPos(origObject.getPosition().getRow(),
-                        origObject.getPosition().getCol())
-                        .equals(getPositionAsRowCol())) {
-                        labelChanged = true;
-                    }
-                }
-                // check the parent label is the same
-                if (getLabel() == null
-                    || !getLabel().startsWith(parent.getLabel())) {
-                    labelChanged = true;
-                }
-            }
-            if (labelChanged) {
-                // the label need to be modified
-                String label = parent.getLabel() + getPositionString();
-                setLabel(label);
-
-                // TODO: IMPORTANT TO CHECK THAT THE LABEL IS UNIQUE FOR THE
-                // TYPE!!!!!!!
-                // checkLabelUniqueForType();
+    public ContainerWrapper getTopContainer() {
+        // if parent is cached, return their top Container, otherwise get and
+        // return mine (from super).
+        if (isPropertyCached(ContainerPeer.POSITION) && getPosition() != null) {
+            if (getPosition().isPropertyCached(
+                ContainerPositionPeer.PARENT_CONTAINER)
+                && getParentContainer() != null) {
+                return getParentContainer().getTopContainer();
             }
         }
-        persistChildren(labelChanged);
-        setPath();
-        setTopContainer();
+        return super.getTopContainer();
+    }
+
+    /**
+     * @return the path, including this {@link Container}'s id.
+     * @throws BiobankRuntimeException if this or any parent is new (does not
+     *             have an id) as the path is then undefined.
+     */
+    @Override
+    public String getPath() {
+        if (isNew()) {
+            throw new BiobankRuntimeException(
+                "container is not in database yet: no ID");
+        }
+
+        if (isPropertyCached(ContainerPeer.POSITION) && getPosition() != null) {
+            if (getPosition().isPropertyCached(
+                ContainerPositionPeer.PARENT_CONTAINER)
+                && getParentContainer() != null) {
+                return getParentContainer().getPath() + PATH_DELIMITER
+                    + getId();
+            }
+        }
+
+        return super.getPath();
+    }
+
+    @Override
+    public String getLabel() {
+        if (isPropertyCached(ContainerPeer.POSITION) && getPosition() != null) {
+            if (getPosition().isPropertyCached(
+                ContainerPositionPeer.PARENT_CONTAINER)
+                && getParentContainer() != null) {
+                return getParentContainer().getLabel() + getPositionString();
+            }
+        }
+
+        return super.getLabel();
+    }
+
+    @Override
+    public void setLabel(String label) {
+        super.setLabel(label);
+
+        updateChildren = true;
     }
 
     public String getPositionString() {
@@ -179,73 +201,46 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         throw new BiobankRuntimeException("cannot set path on container");
     }
 
-    private void setPath() throws BiobankCheckException {
-        StringBuffer path = new StringBuffer("");
-        ContainerWrapper parent = getParentContainer();
-        if (parent != null) {
-            boolean top = parent.getContainerType().getTopLevel();
-            String parentPath = parent.getPath();
-            if (!top && (parentPath == null)) {
-                throw new BiobankCheckException(
-                    "parent container does not have a path");
-            }
-            path.append(parentPath);
-        }
-        super.setPath(path.toString());
-    }
-
-    @Override
-    public void setTopContainer(ContainerBaseWrapper c) {
-        throw new BiobankRuntimeException("cannot set path on container");
-    }
-
-    private void setTopContainer() throws BiobankCheckException {
-        ContainerTypeWrapper ctype = getContainerType();
-        if (ctype == null) {
-            throw new RuntimeException("container type needs to be set");
-        }
-
-        ContainerWrapper top = this;
-        if (!getContainerType().getTopLevel()) {
-            while (top != null && top.getParentContainer() != null) {
-                top = top.getParentContainer();
-            }
-
-            if (top == null) {
-                throw new BiobankCheckException("no top container");
-            }
-        }
-        super.setTopContainer(top);
-    }
-
     public void setParent(ContainerWrapper container) {
         if (container == null) {
             setPosition(null);
         } else {
             initPosition().setParent(container);
         }
+
+        ContainerWrapper topContainer = container == null ? this : container
+            .getTopContainer();
+        setTopContainerInternal(topContainer, true);
+    }
+
+    @Override
+    @Deprecated
+    public void setTopContainer(ContainerBaseWrapper container) {
+        throw new UnsupportedOperationException(
+            "Not allowed to directly set the top Container. Set the parent Container instead.");
+    }
+
+    public void setTopContainerInternal(ContainerWrapper container,
+        boolean checkDatabase) {
+        super.setTopContainer(container);
+
+        // this is overly cautious, assuming that whenever the top Container is
+        // set that it is changed. Could be improved to check if the value has
+        // actually changed, but would probably require lazy loading.
+
+        if (!isNew() && checkDatabase) {
+            // TODO: actually check the database. Get the current
+            // topSpecimen through an HQL query and compare it against the
+            // one set.
+            updateChildren = true;
+            // TODO: may want to set to false if set back to the original?
+        } else {
+            updateChildren = true;
+        }
     }
 
     public boolean hasParentContainer() {
         return getParentContainer() != null;
-    }
-
-    private void persistChildren(boolean labelChanged) throws Exception {
-        Collection<ContainerWrapper> childrenToUpdate = null;
-        if (labelChanged) {
-            Map<RowColPos, ContainerWrapper> map = getChildren();
-            if (map != null) {
-                childrenToUpdate = map.values();
-            }
-        } else {
-            childrenToUpdate = addedChildren;
-        }
-        if (childrenToUpdate != null) {
-            for (ContainerWrapper container : childrenToUpdate) {
-                container.setParent(this);
-                container.persist();
-            }
-        }
     }
 
     public Integer getRowCapacity() {
@@ -532,7 +527,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             params.add(site.getWrappedObject());
             StringBuilder parentQuery = new StringBuilder(
                 POSSIBLE_PARENTS_BASE_QRY).append(
-                StringUtils.join(validParents, ',')).append(")");
+                StringUtil.join(validParents, ",")).append(")");
             if (type != null) {
                 parentQuery.append(" and ct.id=?");
                 params.add(type.getId());
@@ -607,7 +602,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         }
         String qry = new StringBuilder(
             EMPTY_CONTAINERS_HOLDING_SPECIMEN_TYPE_BASE_QRY)
-            .append(StringUtils.join(typeIds, ',')).append("))").toString();
+            .append(StringUtil.join(typeIds, ",")).append("))").toString();
         HQLCriteria criteria = new HQLCriteria(qry, Arrays.asList(new Object[] {
             siteWrapper.getId(), minRowCapacity, minColCapacity }));
         List<Container> containers = appService.query(criteria);
@@ -748,6 +743,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 }
             }
         }
+        // TODO: instead of reloading, remove children after they're deleted?
+        // TODO: delete as a transaction instead of individually?
         reload();
         return oneChildrenDeleted;
     }
@@ -780,6 +777,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     protected void resetInternalFields() {
         specimens = null;
         children = null;
+        updateChildren = false;
         addedChildren.clear();
         addedSpecimens.clear();
     }
@@ -877,19 +875,25 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         tasks.add(new UniquePreCheck<Container>(this, UNIQUE_LABEL_PROPS));
         tasks.add(new UniquePreCheck<Container>(this, UNIQUE_BARCODE_PROPS));
 
-        tasks.add(cascade().persist(addedSpecimens));
-        tasks.add(cascade().persist(addedChildren));
-
         tasks.add(super.getPersistTasks());
 
         tasks.add(cascade().persist(ContainerPeer.POSITION));
+
+        // Need to update the path property after this Container and its
+        // position have been saved to ensure that the path is calculated based
+        // on persistent (non-new) objects.
+        tasks.add(new UpdateContainerPathAction(this));
+
+        // TODO: should this be replaced with cascade().persistAdded()??
+        tasks.add(cascade().persist(addedSpecimens));
+        tasks.add(cascade().persist(addedChildren));
+
+        tasks.add(updateChildren());
 
         tasks.add(new UniqueCheck<Container>(this, UNIQUE_LABEL_PROPS));
         tasks.add(new UniqueCheck<Container>(this, UNIQUE_BARCODE_PROPS));
 
         tasks.add(new ContainerPersistChecks(this));
-
-        tasks.add(updateChildrensTopSpecimen());
 
         return tasks;
     }
@@ -927,41 +931,48 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     /**
-     * Return the top {@code Container} of the top loaded {@code Container}.
-     * This will give the correct "in memory" answer of who the top
-     * {@code Container} is (whereas super.getTopContainer() will give the value
-     * from the underlying model).
+     * For updating children {@link Container}'s: (1) label, (2) path, and (3)
+     * top {@link Container} whenever the parent or label is changed.
+     * <p>
+     * 
+     * @return
      */
-    @Override
-    public ContainerWrapper getTopContainer() {
-        // if parent is cached, return their top Container, otherwise get and
-        // return mine (from super).
-        if (isPropertyCached(ContainerPeer.POSITION) && getPosition() != null) {
-            if (getPosition().isPropertyCached(
-                ContainerPositionPeer.PARENT_CONTAINER)
-                && getParentContainer() != null) {
-                return getParentContainer().getTopContainer();
+    private TaskList updateChildren() {
+        TaskList tasks = new TaskList();
+
+        if (updateChildren) {
+            ContainerWrapper topContainer = getTopContainer();
+            if (isPropertyCached(ContainerPeer.CHILD_POSITION_COLLECTION)) {
+                // if the children have already been loaded, then update their
+                // top Container so that they update their children, etc. so
+                // that the entire subtree is consistent.
+                List<ContainerPositionWrapper> positions = getChildPositionCollection(false);
+                for (ContainerPositionWrapper position : positions) {
+                    ContainerWrapper child = position.getContainer();
+
+                    child.setTopContainerInternal(topContainer, false);
+
+                    // getLabel() returns the in-memory version, but the
+                    // underlying value (e.g. super.getLabel()) needs to be
+                    // updated for persisting.
+                    child.setLabel(child.getLabel());
+
+                    // Save children whether they're are new or not, because the
+                    // children's children could be already persistent and need
+                    // to be updated (but would then need their parent to be
+                    // persisted first).
+                    tasks.add(child.getPersistTasks());
+                }
+            } else {
+                // Use HQL to update all descendants of this Container because
+                // they are not loaded and loading them would be unnecessary.
+                tasks.add(new UpdateContainerChildrenAction(this));
             }
-        }
-        return super.getTopContainer();
-    }
 
-    @Override
-    public String getPath() {
-        if (isNew()) {
-            throw new BiobankRuntimeException(
-                "container is not in database yet: no ID");
+            tasks.add(new ResetUpdateChildrenFlagQueryTask(this));
         }
 
-        if (isPropertyCached(ContainerPeer.POSITION) && getPosition() != null) {
-            if (getPosition().isPropertyCached(
-                ContainerPositionPeer.PARENT_CONTAINER)
-                && getParentContainer() != null) {
-                return getParentContainer().getPath() + "/" + getId();
-            }
-        }
-
-        return super.getPath();
+        return tasks;
     }
 
     private void checkPositionValid(RowColPos pos) throws BiobankCheckException {
@@ -971,6 +982,18 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             String msg = MessageFormat.format(OUT_OF_BOUNDS_POSITION_MSG, pos,
                 maxRow, maxCol);
             throw new BiobankCheckException(msg);
+        }
+    }
+
+    private static class ResetUpdateChildrenFlagQueryTask extends
+        NoActionWrapperQueryTask<ContainerWrapper> {
+        public ResetUpdateChildrenFlagQueryTask(ContainerWrapper container) {
+            super(container);
+        }
+
+        @Override
+        public void afterExecute(SDKQueryResult result) {
+            getWrapper().updateChildren = false;
         }
     }
 }

@@ -7,32 +7,45 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
-public class UpdateChildrensTopSpecimenAction extends WrapperAction<Specimen> {
+public class UpdateContainerChildrenAction extends WrapperAction<Container> {
     private static final long serialVersionUID = 1L;
+    private static final Property<String, Container> POSITION_STRING = ContainerPeer.POSITION
+        .to(ContainerPositionPeer.POSITION_STRING);
+    private static final Property<Container, Container> PARENT_CONTAINER = ContainerPeer.POSITION
+        .to(ContainerPositionPeer.PARENT_CONTAINER);
+    private static final Property<Integer, Container> PARENT_CONTAINER_ID = PARENT_CONTAINER
+        .to(ContainerPeer.ID);
+    private static final Property<String, Container> PARENT_CONTAINER_PATH = PARENT_CONTAINER
+        .to(ContainerPeer.PATH);
+    private static final Property<String, Container> PARENT_CONTAINER_LABEL = PARENT_CONTAINER
+        .to(ContainerPeer.LABEL);
     // @formatter:off
+    private static final String UPDATE_PATH_HQL = 
+        "CONCAT(IF(LENGTH(" + PARENT_CONTAINER_PATH.getName() + ") > 0, " + PARENT_CONTAINER_PATH.getName() + ", ''), " + PARENT_CONTAINER_ID.getName() + ")";
     private static final String UPDATE_CHILDREN_HQL =
-        "UPDATE "+Specimen.class.getName()+" s " +
-        "SET s."+SpecimenPeer.TOP_SPECIMEN.getName()+" = ? " +
-        "WHERE s."+SpecimenPeer.PARENT_SPECIMEN.to(SpecimenPeer.ID).getName()+" IN ({0})";
+        "\\nUPDATE " + Container.class.getName() + " o" +
+        "\\n SET o." + ContainerPeer.TOP_CONTAINER.getName() + " = ? " +
+        "\\n    ,o." + ContainerPeer.LABEL.getName() + " = CONCAT(o." + PARENT_CONTAINER_LABEL.getName() + ", o." + POSITION_STRING.getName() + ")" +
+        "\\n    ,o." + ContainerPeer.PATH.getName() + " = " + UPDATE_PATH_HQL +
+        "\\n WHERE o." + PARENT_CONTAINER_ID.getName() + " IN ({0})";
     private static final String SELECT_CHILDREN_HQL = 
-        "SELECT s."+Property.concatNames(SpecimenPeer.CHILD_SPECIMEN_COLLECTION, SpecimenPeer.ID)+" " +
-        "FROM "+Specimen.class.getName()+" s " +
-        "WHERE s."+SpecimenPeer.ID.getName()+" IN ({0})";
+        "\\nSELECT o." + ContainerPeer.ID.getName() +
+        "\\n FROM " + Container.class.getName() + " o" +
+        "\\n WHERE o." + PARENT_CONTAINER_ID.getName() + " IN ({0})";
     // @formatter:on
 
-    private final Specimen topSpecimen;
+    private final Container topContainer;
 
-    public UpdateChildrensTopSpecimenAction(SpecimenWrapper wrapper) {
+    public UpdateContainerChildrenAction(ContainerWrapper wrapper) {
         super(wrapper);
-        SpecimenWrapper topSpecimen = wrapper.getTopSpecimen();
-        this.topSpecimen = topSpecimen != null ? topSpecimen.getWrappedObject()
-            : null;
+        this.topContainer = wrapper.getTopContainer().getWrappedObject();
     }
 
     @Override
@@ -53,7 +66,7 @@ public class UpdateChildrensTopSpecimenAction extends WrapperAction<Specimen> {
         String paramString = getParamString(ids.size());
         String hql = MessageFormat.format(UPDATE_CHILDREN_HQL, paramString);
         Query query = session.createQuery(hql);
-        query.setParameter(0, topSpecimen);
+        query.setParameter(0, topContainer);
 
         int position = 1;
         for (Integer id : ids) {
