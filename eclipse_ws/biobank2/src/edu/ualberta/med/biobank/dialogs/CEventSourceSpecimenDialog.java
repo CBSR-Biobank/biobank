@@ -198,6 +198,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             SpecimenPeer.COMMENT.getName(), null);
         gd = (GridData) commentWidget.getLayoutData();
         gd.horizontalSpan = 2;
+        gd.widthHint = 400;
 
         quantityLabel = widgetCreator.createLabel(contents, Messages
             .getString("CEventSourceSpecimenDialog.field.quantity.label")); //$NON-NLS-1$
