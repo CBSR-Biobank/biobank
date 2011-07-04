@@ -10,7 +10,7 @@ the moment only \emph{CBSR Patient Labels} are supported.
  Each patient label contains a 1D barcode for the patient number and a unique
  2D Data Matrix barcode for the specimen ID. Each specimen ID is unique amongst
  any patient labels printed in the past and in the future. Also, the specimen
- ID is unique across patients such that two patients will ever have the
+ ID is unique across patients such that two patients will never have the
  same specimen ID.
 
 Figure \ref{fig:cbsr_patient_label_sheet} shows a blank CBSR Patient Label
@@ -33,7 +33,7 @@ The regions highlighted in orange are:
   \item Patient information section. Up to 3 custom fields can be printed in
     this region.
   \item The individual patient labels that contain a 1D barcode for the patient
-    number and a 2D barcode for the specimen ID.
+    number and a 2D barcode for the specimen ID. There are 32 labels in total.
 \end{enumerate}
 
 \subsection{Patient Label Information}
@@ -63,11 +63,11 @@ In the \textbf{branding section}, the following information should be entered.
 
 \begin{description}
 \item[Title] This is the string that will be printed in the label sheet's title
-  area. See area \textbf{1} in figure \ref{fig:cbsr_patient_label_sheet}. This
+  area. See area \textbf{1} in figure \ref{fig:cbsr_patient_label_sheet}. This field
   is optional.
 \item[Logo] This allows you to select a graphic logo to be printed on the
   sheet. Press the \fbox{Browse} button to select the graphic file from your
-  computer. This is optional.
+  computer. This field is optional.
 \item[Template] This is the template that specifies the position and dimension
   information for where to print information on the sheet. See section
   \ref{sec:label_templates} for more information on templates. The template
@@ -115,17 +115,28 @@ entered into the form in figure \ref{fig:patient_label_form}.
 
 \begin{figure}[H]
   \centering
-  \scalebox{0.2}
+  \scalebox{0.6}
 	   { \includegraphics*{screenshots/printer_labels/04_printed_patient_labels_top} }
 	   \caption{Top portion of printed patient label sheet.}
 	   \label{fig:printed_sheet_top}
 \end{figure}
 
-The \textbf{Additional Configuration} section is for text to print in the top
-left of each patient label. In the example shown in figure
-\ref{fig:patient_label_form} the text \emph{Sp Type} will be printed.
+The \textbf{Additional Configuration} section is for text to print under the
+barcodes on each patient label. In the example shown in figure
+\ref{fig:patient_label_form} the text \emph{Sp. Type} with underscore
+characters will be printed as shown in \ref{fig:sp_type_single_label}.
 
-\missingfigure{individual patient label}
+\begin{figure}[H]
+  \centering
+  \scalebox{1.0}
+	   { \includegraphics*{screenshots/printer_labels/05_single_label} }
+	   \caption{Text printed on each label.}
+	   \label{fig:sp_type_single_label}
+\end{figure}
+
+To print a sheet of labels you can press the \textbf{Print} button at the top
+left of the form. Alternatively, instead of printing a sheet you can export the
+sheet to a PDF file by pressing the \fbox{Export to PDF} button.
 
 \subsection{Label Templates}
 \label{sec:label_templates}
@@ -136,7 +147,7 @@ menu to see the form shown in figure \ref{fig:label_templates_form}.
 \begin{figure}[H]
   \centering
   \scalebox{0.45}
-	   { \includegraphics*{screenshots/printer_labels/05_label_templates_form} }
+	   { \includegraphics*{screenshots/printer_labels/06_label_templates_form} }
 	   \caption{Label templates form.}
 	   \label{fig:label_templates_form}
 \end{figure}
@@ -153,7 +164,8 @@ access. To copy a template select the template you want to copy and press the
 \fbox{Copy} button. You can also create a fresh template by pressing the
 \fbox{New} button. In the future, you may want to delete an old template that
 is no longer in use. This can be done by selecting the template to be deleted
-and pressing the \fbox{Delete} button.
+and pressing the \fbox{Delete} button. To save your settings to the template
+you can press the \textbf{Confirm} button at the top left of the form.
 
 The settings for a template are:
 \begin{description}
@@ -166,26 +178,26 @@ by default on the server. For more information see section \ref{sec:jasper_templ
 \item[Configuration] Allows for adjustments to the positions for the items to be printed.
 \end{description}
 
-Each item on the sheet has a \textbf{horizontal offset},
-\textbf{vertical offset}, \textbf{width} and \textbf{height}. All
-measurements are in millimetres. The \textbf{Patient Info} group corresponds to
-section \textbf{3} in figure \ref{fig:cbsr_patient_label_sheet}. The
-\textbf{Barcodes} group corresponds to the 32 patient labels. The labels are
-numbered starting at the top left and ending at the bottom right. Under this
-group there is a \textbf{General} node that controls the position of the
-patient 1D barcode, the specimen ID 2D barcode, and the custom text position
-for all 32 labels. In addition, each label can control the position of the same
-3 items individually. If values are entered here they are added to the values
-in the general group. To move something to the left then use a negative value.
+Each 1D and 2D barcode item on the sheet has a \textbf{horizontal offset},
+\textbf{vertical offset}, \textbf{width} and \textbf{height}. All measurements
+are in millimetres. The \textbf{Patient Info} group corresponds to section
+\textbf{3} in figure \ref{fig:cbsr_patient_label_sheet}. The \textbf{Barcodes}
+group corresponds to the 32 patient labels. The labels are numbered starting at
+the top left and ending at the bottom right. Under this group there is a
+\textbf{General} node that controls the position of the patient 1D barcode, the
+specimen ID 2D barcode, and the custom text position for all 32 labels. In
+addition, each label can control the position of the same 3 items
+individually. If values are entered here they are added to the values in the
+general group. To move something to the left then use a negative value.
 
 For example if the general barcode settings are the ones shown in the
 \textbf{General} node in the tree in figure \ref{fig:label_templates_form}, and
 the settings for barcode 001 are changed to those shown in figure
-\ref{fig:label_templates_form}, then the patient barcode is printed at position
-XX from the top left corner of the first label.
+\ref{fig:label_templates_form}, then the patient barcode is printed 10 mm from
+the left edge and 7 mm from the top edge.
 
-\missingfigure{General Barcode}
-\missingfigure{Barcode 1}
+Note that width and height is only applicable to 1D and 2D barcodes. For items
+with the text \textbf{Text} in the name the widht and the height are ignored.
 
 \section{Advanced Usage - Jasper Templates}
 \label{sec:jasper_templates}
