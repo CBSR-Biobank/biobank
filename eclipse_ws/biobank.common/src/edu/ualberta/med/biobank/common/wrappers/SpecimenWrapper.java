@@ -140,7 +140,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         RowColPos rcp = parentContainer.getContainerType()
             .getRowColFromPositionString(
                 positionString.replaceFirst(parentContainer.getLabel(), ""));
-        if ((rcp.row > -1) && (rcp.col > -1)) {
+        if ((rcp.getRow() > -1) && (rcp.getCol() > -1)) {
             setPosition(rcp);
         } else {
             throw new Exception("Position " + positionString + " not valid");
@@ -169,7 +169,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         RowColPos position = getPosition();
         if (position != null) {
             HQLCriteria criteria = new HQLCriteria(POSITION_FREE_QRY,
-                Arrays.asList(new Object[] { position.row, position.col,
+                Arrays.asList(new Object[] { position.getRow(), position.getCol(),
                     parentContainer.getWrappedObject() }));
 
             List<Specimen> samples = appService.query(criteria);
@@ -315,9 +315,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                 assert false;
             }
             if (rcp != null) {
-                if ((rcp.row > -1) && (rcp.col > -1)) {
-                    SpecimenWrapper Specimen = container.getSpecimen(rcp.row,
-                        rcp.col);
+                if ((rcp.getRow() > -1) && (rcp.getCol() > -1)) {
+                    SpecimenWrapper Specimen = container.getSpecimen(rcp.getRow(),
+                        rcp.getCol());
                     if (Specimen != null) {
                         Specimens.add(Specimen);
                     }

@@ -282,7 +282,8 @@ public class ContainerLabelingSchemeWrapper extends
      * standard. 2:1 will return C2.
      */
     public static String rowColToSbs(RowColPos rcp) {
-        return "" + SBS_ROW_LABELLING_PATTERN.charAt(rcp.row) + (rcp.col + 1);
+        return "" + SBS_ROW_LABELLING_PATTERN.charAt(rcp.getRow())
+            + (rcp.getCol() + 1);
     }
 
     /**
@@ -290,7 +291,8 @@ public class ContainerLabelingSchemeWrapper extends
      * standard. 2:1 will return C2.
      */
     private static String rowColtoCbsrSbs(RowColPos rcp) {
-        return "" + BOX81_LABELLING_PATTERN.charAt(rcp.row) + (rcp.col + 1);
+        return "" + BOX81_LABELLING_PATTERN.charAt(rcp.getRow())
+            + (rcp.getCol() + 1);
     }
 
     /**
@@ -330,9 +332,9 @@ public class ContainerLabelingSchemeWrapper extends
                 + ". Max value is " + maxValue + ". (Max row: " + rowCap
                 + ". Max col: " + colCap + ".)");
         }
-        RowColPos rowColPos = new RowColPos();
-        rowColPos.row = pos % rowCap;
-        rowColPos.col = pos / rowCap;
+        Integer row = pos % rowCap;
+        Integer col = pos / rowCap;
+        RowColPos rowColPos = new RowColPos(row, col);
         return rowColPos;
 
     }
@@ -372,9 +374,9 @@ public class ContainerLabelingSchemeWrapper extends
                 + ". Max value is " + maxValue + ". (Max row: " + rowCap
                 + ". Max col: " + colCap + ".)");
         }
-        RowColPos rowColPos = new RowColPos();
-        rowColPos.row = pos % rowCap;
-        rowColPos.col = pos / rowCap;
+        Integer row = pos % rowCap;
+        Integer col = pos / rowCap;
+        RowColPos rowColPos = new RowColPos(row, col);
         return rowColPos;
 
     }
@@ -400,9 +402,9 @@ public class ContainerLabelingSchemeWrapper extends
         try {
             int pos = Integer.parseInt(label) - 1;
             // has remove 1 because the two char numeric starts at 1
-            RowColPos rowColPos = new RowColPos();
-            rowColPos.row = pos % totalRows;
-            rowColPos.col = pos / totalRows;
+            Integer row = pos % totalRows;
+            Integer col = pos / totalRows;
+            RowColPos rowColPos = new RowColPos(row, col);
             return rowColPos;
         } catch (NumberFormatException nbe) {
             throw new Exception(errorMsg);
@@ -421,11 +423,11 @@ public class ContainerLabelingSchemeWrapper extends
         int pos1, pos2, index;
         int lettersLength = CBSR_2_CHAR_LABELLING_PATTERN.length();
         if (totalRows == 1) {
-            index = rcp.col;
+            index = rcp.getCol();
         } else if (totalCols == 1) {
-            index = rcp.row;
+            index = rcp.getRow();
         } else {
-            index = totalRows * rcp.col + rcp.row;
+            index = totalRows * rcp.getCol() + rcp.getRow();
         }
 
         pos1 = index / lettersLength;
@@ -450,11 +452,11 @@ public class ContainerLabelingSchemeWrapper extends
         int pos1, pos2, index;
         int lettersLength = TWO_CHAR_LABELLING_PATTERN.length();
         if (totalRows == 1) {
-            index = rcp.col;
+            index = rcp.getCol();
         } else if (totalCols == 1) {
-            index = rcp.row;
+            index = rcp.getRow();
         } else {
-            index = totalRows * rcp.col + rcp.row;
+            index = totalRows * rcp.getCol() + rcp.getRow();
         }
 
         pos1 = index / lettersLength;
@@ -471,14 +473,15 @@ public class ContainerLabelingSchemeWrapper extends
      * Convert a position in row*column to two char numeric.
      */
     public static String rowColToTwoCharNumeric(RowColPos rcp, int totalRows) {
-        return String.format("%02d", rcp.row + totalRows * rcp.col + 1);
+        return String.format("%02d", rcp.getRow() + totalRows * rcp.getCol()
+            + 1);
     }
 
     /**
      * Convert a position in row*column to Dewar labelling (AA, BB, CC...).
      */
     public static String rowColToDewar(RowColPos rcp, Integer colCapacity) {
-        int pos = rcp.col + (colCapacity * rcp.row);
+        int pos = rcp.getCol() + (colCapacity * rcp.getRow());
         String letter = String.valueOf(CBSR_2_CHAR_LABELLING_PATTERN
             .charAt(pos));
         return letter + letter;
@@ -509,9 +512,9 @@ public class ContainerLabelingSchemeWrapper extends
         }
         // letters are double (BB). need only one
         int letterPosition = SBS_ROW_LABELLING_PATTERN.indexOf(label.charAt(0));
-        RowColPos rowColPos = new RowColPos();
-        rowColPos.row = letterPosition / totalCol;
-        rowColPos.col = letterPosition % totalCol;
+        Integer row = letterPosition / totalCol;
+        Integer col = letterPosition % totalCol;
+        RowColPos rowColPos = new RowColPos(row, col);
         return rowColPos;
     }
 

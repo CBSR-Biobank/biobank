@@ -1123,9 +1123,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
             for (RowColPos pos : currentMultipleContainer.getSpecimens()
                 .keySet()) {
-                if (pos.row != 0 && pos.col != 2) {
+                if (pos.getRow() != 0 && pos.getCol() != 2) {
                     palletScanned.put(pos,
-                        new PalletCell(new ScanCell(pos.row, pos.col,
+                        new PalletCell(new ScanCell(pos.getRow(), pos.getCol(),
                             currentMultipleContainer.getSpecimens().get(pos)
                                 .getInventoryId())));
                 }

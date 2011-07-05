@@ -216,9 +216,7 @@ public class ContainerDisplayWidget extends Canvas {
      * the cell position and the containerType.
      */
     protected String getDefaultTextForBox(int indexRow, int indexCol) {
-        RowColPos rowcol = new RowColPos();
-        rowcol.row = indexRow;
-        rowcol.col = indexCol;
+        RowColPos rowcol = new RowColPos(indexRow, indexCol);
         String parentLabel = "";
         if (displayFullInfoString && container != null) {
             parentLabel = container.getLabel();

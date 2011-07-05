@@ -48,8 +48,8 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     }
 
     public void setPosition(RowColPos rcp) {
-        setRow(rcp.row);
-        setCol(rcp.col);
+        setRow(rcp.getRow());
+        setCol(rcp.getCol());
     }
 
     public abstract ContainerWrapper getParent();

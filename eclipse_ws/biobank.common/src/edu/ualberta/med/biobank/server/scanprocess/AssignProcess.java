@@ -48,7 +48,7 @@ public class AssignProcess extends ServerProcess {
                         .getExpectedSpecimen(appService, row, col);
                     if (expectedSpecimen != null) {
                         if (cell == null) {
-                            cell = new Cell(rcp.row, rcp.col, null, null);
+                            cell = new Cell(rcp.getRow(), rcp.getCol(), null, null);
                             cells.put(rcp, cell);
                         }
                         cell.setExpectedSpecimenId(expectedSpecimen.getId());

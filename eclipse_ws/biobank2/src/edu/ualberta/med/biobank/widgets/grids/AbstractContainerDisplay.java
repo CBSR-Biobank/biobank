@@ -79,9 +79,7 @@ public abstract class AbstractContainerDisplay {
     protected String getDefaultTextForBox(
         @SuppressWarnings("unused") Map<RowColPos, ? extends AbstractUICell> cells,
         int indexRow, int indexCol) {
-        RowColPos rowcol = new RowColPos();
-        rowcol.row = indexRow;
-        rowcol.col = indexCol;
+        RowColPos rowcol = new RowColPos(indexRow, indexCol);
         String parentLabel = "";
         if (displayFullInfoString && container != null) {
             parentLabel = container.getLabel();

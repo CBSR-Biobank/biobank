@@ -222,7 +222,7 @@ public class DispatchCreateScanDialog extends
             for (SpecimenWrapper specimen : currentPallet.getSpecimens()
                 .values()) {
                 PalletCell cell = new PalletCell(new ScanCell(
-                    specimen.getPosition().row, specimen.getPosition().col,
+                    specimen.getPosition().getRow(), specimen.getPosition().getCol(),
                     specimen.getInventoryId()));
                 map.put(specimen.getPosition(), cell);
             }

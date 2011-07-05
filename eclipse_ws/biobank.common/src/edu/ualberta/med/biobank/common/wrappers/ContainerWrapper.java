@@ -278,14 +278,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         ContainerTypeWrapper type = getContainerType();
         RowColPos rcp = type.getRowColFromPositionString(position);
         if (rcp != null) {
-            if (rcp.row >= type.getRowCapacity()
-                || rcp.col >= type.getColCapacity()) {
+            if (rcp.getRow() >= type.getRowCapacity()
+                || rcp.getCol() >= type.getColCapacity()) {
                 throw new Exception("Can't use position " + position
                     + " in container " + getFullInfoLabel()
                     + ". Reason: capacity = " + type.getRowCapacity() + "*"
                     + type.getColCapacity());
             }
-            if (rcp.row < 0 || rcp.col < 0) {
+            if (rcp.getRow() < 0 || rcp.getCol() < 0) {
                 throw new Exception("Position \"" + position
                     + "\" is invalid for this container " + getFullInfoLabel());
             }
@@ -460,7 +460,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public void addChild(String positionString, ContainerWrapper child)
         throws Exception {
         RowColPos rowColPos = getPositionFromLabelingScheme(positionString);
-        addChild(rowColPos.row, rowColPos.col, child);
+        addChild(rowColPos.getRow(), rowColPos.getCol(), child);
     }
 
     /**
@@ -481,7 +481,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public void moveSpecimens(ContainerWrapper destination) throws Exception {
         Map<RowColPos, SpecimenWrapper> aliquots = getSpecimens();
         for (Entry<RowColPos, SpecimenWrapper> e : aliquots.entrySet()) {
-            destination.addSpecimen(e.getKey().row, e.getKey().col,
+            destination.addSpecimen(e.getKey().getRow(), e.getKey().getCol(),
                 e.getValue());
         }
         destination.persist();
@@ -707,7 +707,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             }
         } else {
             for (RowColPos rcp : positions) {
-                initPositionIfEmpty(type, rcp.row, rcp.col);
+                initPositionIfEmpty(type, rcp.getRow(), rcp.getCol());
             }
         }
         reload();
@@ -993,7 +993,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     private void checkPositionValid(RowColPos pos) throws BiobankCheckException {
         int maxRow = getRowCapacity();
         int maxCol = getColCapacity();
-        if (pos.row >= maxRow || pos.col >= maxCol) {
+        if (pos.getRow() >= maxRow || pos.getCol() >= maxCol) {
             String msg = MessageFormat.format(OUT_OF_BOUNDS_POSITION_MSG, pos,
                 maxRow, maxCol);
             throw new BiobankCheckException(msg);

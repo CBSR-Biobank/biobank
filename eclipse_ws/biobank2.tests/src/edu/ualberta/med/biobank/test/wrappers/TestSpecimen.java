@@ -206,7 +206,7 @@ public class TestSpecimen extends TestDatabase {
             childSpc.getSpecimenType(),
             ActivityStatusWrapper.ACTIVE_STATUS_STRING,
             parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
-            childSpc.getParentContainer(), pos.row, pos.col);
+            childSpc.getParentContainer(), pos.getRow(), pos.getCol());
 
         try {
             duplicate.persist();
@@ -313,7 +313,7 @@ public class TestSpecimen extends TestDatabase {
         Assert
             .assertTrue(childSpc.getPositionString(false, false).equals("A1"));
         RowColPos pos = childSpc.getPosition();
-        Assert.assertTrue((pos.col == 0) && (pos.row == 0));
+        Assert.assertTrue((pos.getCol() == 0) && (pos.getRow() == 0));
 
         childSpc.setSpecimenPositionFromString("C2",
             childSpc.getParentContainer());
@@ -321,7 +321,7 @@ public class TestSpecimen extends TestDatabase {
         Assert
             .assertTrue(childSpc.getPositionString(false, false).equals("C2"));
         pos = childSpc.getPosition();
-        Assert.assertTrue((pos.col == 1) && (pos.row == 2));
+        Assert.assertTrue((pos.getCol() == 1) && (pos.getRow() == 2));
 
         try {
             childSpc.setSpecimenPositionFromString("79",
@@ -351,20 +351,18 @@ public class TestSpecimen extends TestDatabase {
 
     @Test
     public void testGetSetPosition() throws Exception {
-        RowColPos position = new RowColPos();
-        position.row = 1;
-        position.col = 3;
+        RowColPos position = new RowColPos(1, 3);
         childSpc.setPosition(position);
         RowColPos newPosition = childSpc.getPosition();
-        Assert.assertEquals(position.row, newPosition.row);
-        Assert.assertEquals(position.col, newPosition.col);
+        Assert.assertEquals(position.getRow(), newPosition.getRow());
+        Assert.assertEquals(position.getCol(), newPosition.getCol());
 
         // ensure position remains after persist
         childSpc.persist();
         childSpc.reload();
         newPosition = childSpc.getPosition();
-        Assert.assertEquals(position.row, newPosition.row);
-        Assert.assertEquals(position.col, newPosition.col);
+        Assert.assertEquals(position.getRow(), newPosition.getRow());
+        Assert.assertEquals(position.getCol(), newPosition.getCol());
 
         // test setting position to null
         childSpc.setPosition(null);

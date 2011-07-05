@@ -12,14 +12,10 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
 
     public static Integer PALLET_96_COL_MAX = 12;
 
-    public Integer row;
-    public Integer col;
-
-    public RowColPos() {
-    }
+    private final Integer row;
+    private final Integer col;
 
     public RowColPos(Integer row, Integer col) {
-        super();
         this.row = row;
         this.col = col;
     }
@@ -29,8 +25,16 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
         this.col = pos.getCol();
     }
 
+    public Integer getRow() {
+        return row;
+    }
+
+    public Integer getCol() {
+        return col;
+    }
+
     public boolean equals(Integer row, Integer col) {
-        return (this.row.equals(row) && this.col.equals(col));
+        return (row.equals(row) && col.equals(col));
     }
 
     @Override
@@ -68,5 +72,4 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
         }
         return row - pos.row;
     }
-
 }

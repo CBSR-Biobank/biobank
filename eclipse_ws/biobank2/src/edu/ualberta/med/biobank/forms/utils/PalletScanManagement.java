@@ -160,8 +160,8 @@ public class PalletScanManagement {
                     String value = scanTubeAloneDialog(rcp);
                     if (value != null && !value.isEmpty()) {
                         if (cell == null) {
-                            cell = new PalletCell(new ScanCell(rcp.row,
-                                rcp.col, value));
+                            cell = new PalletCell(new ScanCell(rcp.getRow(),
+                                rcp.getCol(), value));
                             cells.put(rcp, cell);
                         } else {
                             cell.setValue(value);
@@ -284,7 +284,7 @@ public class PalletScanManagement {
             for (Entry<RowColPos, SpecimenWrapper> entry : container
                 .getSpecimens().entrySet()) {
                 RowColPos rcp = entry.getKey();
-                PalletCell cell = new PalletCell(new ScanCell(rcp.row, rcp.col,
+                PalletCell cell = new PalletCell(new ScanCell(rcp.getRow(), rcp.getCol(),
                     entry.getValue().getInventoryId()));
                 cell.setSpecimen(entry.getValue());
                 cell.setStatus(UICellStatus.FILLED);

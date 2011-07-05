@@ -278,9 +278,9 @@ public class TestProcessingEvent extends TestDatabase {
             // System.out.println("getting aliquot from: " + pos.row + ", "
             // + pos.col);
             Assert.assertNotNull(pos);
-            Assert.assertNotNull(pos.col);
-            Assert.assertNotNull(pos.row);
-            Assert.assertEquals(spc, spcMap.get(pos.row + pos.col * rows));
+            Assert.assertNotNull(pos.getCol());
+            Assert.assertNotNull(pos.getRow());
+            Assert.assertEquals(spc, spcMap.get(pos.getRow() + pos.getCol() * rows));
         }
 
         // delete all samples now (children before parents)

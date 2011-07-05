@@ -234,7 +234,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                                     .getCells();
                                 if (cells != null) {
                                     for (RowColPos rcp : cells.keySet()) {
-                                        if (rcp.row == indexRow) {
+                                        if (rcp.getRow() == indexRow) {
                                             PalletCell cell = cells.get(rcp);
                                             if (PalletCell.hasValue(cell)) {
                                                 setHierarchyToCell(cell,
@@ -702,10 +702,10 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      */
     @Override
     protected void processCellResult(final RowColPos rcp, PalletCell cell) {
-        Integer typesRowsCount = typesRows.get(rcp.row);
+        Integer typesRowsCount = typesRows.get(rcp.getRow());
         if (typesRowsCount == null) {
             typesRowsCount = 0;
-            specimenTypesWidgets.get(rcp.row).resetValues(!isRescanMode(),
+            specimenTypesWidgets.get(rcp.getRow()).resetValues(!isRescanMode(),
                 true, true);
         }
         SpecimenHierarchy selection = preSelections.get(cell.getRow());
@@ -713,7 +713,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             setHierarchyToCell(cell, selection);
         if (PalletCell.hasValue(cell)) {
             typesRowsCount++;
-            typesRows.put(rcp.row, typesRowsCount);
+            typesRows.put(rcp.getRow(), typesRowsCount);
         }
     }
 

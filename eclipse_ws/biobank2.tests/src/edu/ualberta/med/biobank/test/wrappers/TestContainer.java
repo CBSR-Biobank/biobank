@@ -689,8 +689,8 @@ public class TestContainer extends TestDatabase {
                 // + " row/" + result.row + " col/" + result.col);
 
                 Assert.assertNotNull(result);
-                Assert.assertEquals(row, result.row.intValue());
-                Assert.assertEquals(col, result.col.intValue());
+                Assert.assertEquals(row, result.getRow().intValue());
+                Assert.assertEquals(col, result.getCol().intValue());
             }
         }
 
@@ -944,10 +944,10 @@ public class TestContainer extends TestDatabase {
         Assert.assertEquals(samplesTypesMap.size(), spcs.size());
         for (RowColPos pos : spcs.keySet()) {
             SpecimenWrapper spc = spcs.get(pos);
-            Assert.assertTrue((pos.row >= 0)
-                && (pos.row < CONTAINER_CHILD_L3_ROWS));
-            Assert.assertTrue((pos.col >= 0)
-                && (pos.col < CONTAINER_CHILD_L3_COLS));
+            Assert.assertTrue((pos.getRow() >= 0)
+                && (pos.getRow() < CONTAINER_CHILD_L3_ROWS));
+            Assert.assertTrue((pos.getCol() >= 0)
+                && (pos.getCol() < CONTAINER_CHILD_L3_COLS));
             Assert
                 .assertEquals(samplesTypesMap.get(pos), spc.getSpecimenType());
         }
