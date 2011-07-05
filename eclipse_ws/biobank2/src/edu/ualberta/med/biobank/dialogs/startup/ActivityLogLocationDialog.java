@@ -4,8 +4,8 @@ import java.io.File;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -17,11 +17,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.utils.FilePromptUtil;
 
-public class ActivityLogLocationDialog extends BiobankDialog {
+public class ActivityLogLocationDialog extends BgcBaseDialog {
 
     private Text activityLogDirText;
 
@@ -61,18 +61,13 @@ public class ActivityLogLocationDialog extends BiobankDialog {
         activityLogDirBtn = new Button(contents, SWT.CHECK);
         activityLogDirBtn.setText("Save activity logs to files");
         activityLogDirBtn.setSelection(true);
-        activityLogDirBtn.addSelectionListener(new SelectionListener() {
-
+        activityLogDirBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
 
                 boolean saveActivityLogs = activityLogDirBtn.getSelection();
                 activityLogDirText.setEditable(saveActivityLogs);
                 browseBtn.setEnabled(saveActivityLogs);
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
         createFileLocationSelector(contents, "Folder");
@@ -98,8 +93,7 @@ public class ActivityLogLocationDialog extends BiobankDialog {
 
         browseBtn = new Button(fileSelectionComposite, SWT.BUTTON1);
         browseBtn.setText("  Browse...  ");
-        browseBtn.addSelectionListener(new SelectionListener() {
-
+        browseBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 DirectoryDialog fd = new DirectoryDialog(fileSelectionComposite
@@ -114,10 +108,6 @@ public class ActivityLogLocationDialog extends BiobankDialog {
                 } else {
                     activityLogDirText.setText("");
                 }
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
     }

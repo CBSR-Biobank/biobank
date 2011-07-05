@@ -8,9 +8,9 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 
@@ -18,23 +18,23 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ProcessingEventViewForm"; //$NON-NLS-1$
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(ProcessingEventViewForm.class.getName());
 
     private ProcessingEventAdapter pEventAdapter;
     private ProcessingEventWrapper pEvent;
 
-    private BiobankText centerLabel;
+    private BgcBaseText centerLabel;
 
-    private BiobankText worksheetLabel;
+    private BgcBaseText worksheetLabel;
 
-    private BiobankText dateCreationLabel;
+    private BgcBaseText dateCreationLabel;
 
-    private BiobankText commentLabel;
+    private BgcBaseText commentLabel;
 
     private SpecimenInfoTable sourceSpecimenTable;
 
-    private BiobankText activityLabel;
+    private BgcBaseText activityLabel;
 
     @Override
     public void init() throws Exception {

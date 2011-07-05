@@ -25,7 +25,7 @@ public abstract class AbstractClinicGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-
+        //
     }
 
     @Override

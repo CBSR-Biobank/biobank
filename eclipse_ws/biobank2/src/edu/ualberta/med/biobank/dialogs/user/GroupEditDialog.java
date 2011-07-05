@@ -19,15 +19,15 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankSecurityUtil;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class GroupEditDialog extends BiobankDialog {
+public class GroupEditDialog extends BgcBaseDialog {
     public static final int CLOSE_PARENT_RETURN_CODE = 3;
     private final String currentTitle;
     private final String titleAreaMessage;
@@ -80,7 +80,7 @@ public class GroupEditDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             Messages.getString("GroupEditDialog.property.title.name"), null, //$NON-NLS-1$ 
             modifiedGroup, "name", new NonEmptyStringValidator( //$NON-NLS-1$
                 MSG_NAME_REQUIRED));
@@ -157,7 +157,7 @@ public class GroupEditDialog extends BiobankDialog {
                 allCenters = CenterWrapper.getCenters(SessionManager
                     .getAppService());
             } catch (Exception e) {
-                BiobankGuiCommonPlugin
+                BgcPlugin
                     .openAsyncError(
                         Messages
                             .getString("GroupEditDialog.msg.error.retrieve.centers"), e); //$NON-NLS-1$
@@ -185,11 +185,11 @@ public class GroupEditDialog extends BiobankDialog {
             close();
         } catch (ApplicationException e) {
             if (e.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
-                BiobankGuiCommonPlugin.openAsyncError(
+                BgcPlugin.openAsyncError(
                     GROUP_PERSIST_ERROR_TITLE,
                     Messages.getString("GroupEditDialog.msg.error.name.used")); //$NON-NLS-1$
             } else {
-                BiobankGuiCommonPlugin.openAsyncError(
+                BgcPlugin.openAsyncError(
                     GROUP_PERSIST_ERROR_TITLE, e);
             }
         }

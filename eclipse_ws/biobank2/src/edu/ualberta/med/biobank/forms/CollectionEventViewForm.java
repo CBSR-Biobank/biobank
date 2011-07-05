@@ -14,10 +14,10 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 
@@ -25,31 +25,31 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventViewForm";
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(CollectionEventViewForm.class.getName());
 
     private CollectionEventAdapter ceventAdapter;
 
     private CollectionEventWrapper cevent;
 
-    private BiobankText studyLabel;
+    private BgcBaseText studyLabel;
 
     private List<FormPvCustomInfo> pvCustomInfoList;
 
-    private BiobankText patientLabel;
+    private BgcBaseText patientLabel;
 
-    private BiobankText visitNumberLabel;
+    private BgcBaseText visitNumberLabel;
 
-    private BiobankText commentLabel;
+    private BgcBaseText commentLabel;
 
     private SpecimenInfoTable sourceSpecimenTable;
 
-    private BiobankText activityStatusLabel;
+    private BgcBaseText activityStatusLabel;
 
     private SpecimenInfoTable aliquotedSpecimenTable;
 
     private static class FormPvCustomInfo extends PvAttrCustom {
-        BiobankText widget;
+        BgcBaseText widget;
     }
 
     @Override
@@ -155,6 +155,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
             cevent.getOriginalSpecimenCollection(true),
             ColumnsShown.SOURCE_SPECIMENS, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
+        sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
     }
 
     private void createAliquotedSpecimensSection() {
@@ -165,6 +166,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
             cevent.getAliquotedSpecimenCollection(true), ColumnsShown.ALIQUOTS,
             10);
         aliquotedSpecimenTable.adaptToToolkit(toolkit, true);
+        aliquotedSpecimenTable.addClickListener(collectionDoubleClickListener);
     }
 
     @Override
@@ -177,6 +179,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
         setCollectionEventValues();
         sourceSpecimenTable.setCollection(cevent
             .getOriginalSpecimenCollection(true));
+        aliquotedSpecimenTable.setCollection(cevent
+            .getAliquotedSpecimenCollection(true));
     }
 
     private void retrievePatientVisit() {

@@ -14,7 +14,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.dialogs.user.GroupEditDialog;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -27,7 +27,7 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
     private static final String CONFIRM_DELETE_MESSAGE = "Are you certain you want to delete \"{0}\"?";
 
     public GroupInfoTable(Composite parent, List<Group> collection) {
-        super(parent, collection, HEADINGS, ROWS_PER_PAGE);
+        super(parent, collection, HEADINGS, ROWS_PER_PAGE, Group.class);
 
         addEditItemListener(new IInfoTableEditItemListener() {
             @Override
@@ -118,8 +118,7 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
             String message = MessageFormat.format(CONFIRM_DELETE_MESSAGE,
                 new Object[] { name });
 
-            if (BiobankGuiCommonPlugin.openConfirm(CONFIRM_DELETE_TITLE,
-                message)) {
+            if (BgcPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
                 SessionManager.getAppService().deleteGroup(group);
                 // remove the user from the collection
                 getCollection().remove(group);
@@ -128,7 +127,7 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
                 return true;
             }
         } catch (ApplicationException e) {
-            BiobankGuiCommonPlugin.openAsyncError(GROUP_DELETE_ERROR, e);
+            BgcPlugin.openAsyncError(GROUP_DELETE_ERROR, e);
         }
         return false;
     }

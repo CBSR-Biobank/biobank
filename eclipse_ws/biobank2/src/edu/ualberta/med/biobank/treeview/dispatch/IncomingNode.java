@@ -47,7 +47,7 @@ public class IncomingNode extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-
+        //
     }
 
     @Override

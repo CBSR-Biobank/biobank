@@ -31,7 +31,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         "Short Name", "Status", "Patients", "Patient Visits" };
 
     public StudyInfoTable(Composite parent, List<StudyWrapper> collection) {
-        super(parent, collection, HEADINGS, 10);
+        super(parent, collection, HEADINGS, 10, StudyWrapper.class);
     }
 
     @Override

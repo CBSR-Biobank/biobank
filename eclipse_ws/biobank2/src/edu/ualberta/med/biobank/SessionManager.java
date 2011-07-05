@@ -20,9 +20,9 @@ import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
-import edu.ualberta.med.biobank.gui.common.GuiCommonSessionState;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcSessionState;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.PerspectiveSecurity;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -42,8 +42,8 @@ public class SessionManager {
 
     public static final String BIOBANK2_CONTEXT_LOGGED_IN = "biobank.context.loggedIn";
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(SessionManager.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(SessionManager.class
+        .getName());
 
     private static SessionManager instance = null;
 
@@ -134,7 +134,7 @@ public class SessionManager {
         }
 
         // assign logged in state
-        GuiCommonSessionState guiCommonSessionState = BiobankGuiCommonPlugin
+        BgcSessionState guiCommonSessionState = BgcPlugin
             .getSessionStateSourceProvider();
         guiCommonSessionState.setLoggedInState(sessionAdapter != null);
 
@@ -348,8 +348,7 @@ public class SessionManager {
                 }
             }
         } catch (PartInitException e) {
-            BiobankGuiCommonPlugin.openAsyncError(
-                "Error displaying available actions", e);
+            BgcPlugin.openAsyncError("Error displaying available actions", e);
         }
         // don't want to switch if was activated by an handler after login
         // (display is weird otherwise)

@@ -42,14 +42,15 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.utils.EMailDescriptor;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
-public class SendErrorMessageDialog extends BiobankDialog {
+public class SendErrorMessageDialog extends BgcBaseDialog {
 
     private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
 
@@ -79,8 +80,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
 
     @Override
     protected Image getTitleAreaImage() {
-        return BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_EMAIL_BANNER);
+        return BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_EMAIL_BANNER);
     }
 
     @Override
@@ -94,12 +95,12 @@ public class SendErrorMessageDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.NONE,
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.NONE,
             "Title", new String[0], email, "title",
             new NonEmptyStringValidator("Please enter a title"));
 
-        BiobankText descText = (BiobankText) createBoundWidgetWithLabel(
-            contents, BiobankText.class, SWT.MULTI, "Description",
+        BgcBaseText descText = (BgcBaseText) createBoundWidgetWithLabel(
+            contents, BgcBaseText.class, SWT.MULTI, "Description",
             new String[0], email, "description", new NonEmptyStringValidator(
                 "Please enter at least a very small comment"));
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -120,8 +121,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
         attachmentsComposite.setLayoutData(gd);
 
         Button addButton = new Button(contents, SWT.PUSH);
-        addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_ADD));
+        addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ADD));
         addButton.setToolTipText("Add attachment");
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -174,7 +175,7 @@ public class SendErrorMessageDialog extends BiobankDialog {
     // });
     // Button removeButton = new Button(attachmentLine, SWT.PUSH);
     // removeButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-    // .get(BioBankPlugin.IMG_DELETE));
+    // .get(BgcPlugin.IMG_DELETE));
     // removeButton.setToolTipText("Remove this attachment");
     // removeButton.addSelectionListener(new SelectionAdapter() {
     // @Override
@@ -197,7 +198,7 @@ public class SendErrorMessageDialog extends BiobankDialog {
         try {
             sendMail();
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError("Error sending mail", e);
+            BgcPlugin.openAsyncError("Error sending mail", e);
         }
         super.okPressed();
     }
@@ -247,14 +248,14 @@ public class SendErrorMessageDialog extends BiobankDialog {
                     Transport.send(getEmailMessage(session));
                     monitor.done();
                 } catch (AuthenticationFailedException afe) {
-                    BiobankGuiCommonPlugin.openAsyncError(
-                        "Authentification Error", "Wrong authentification for "
+                    BgcPlugin.openAsyncError(
+                        "Authentification Error",
+                        "Wrong authentification for "
                             + email.getServerUsername());
                     monitor.setCanceled(true);
                     return;
                 } catch (Exception e) {
-                    BiobankGuiCommonPlugin.openAsyncError(
-                        "Error in sending email", e);
+                    BgcPlugin.openAsyncError("Error in sending email", e);
                     monitor.setCanceled(true);
                     return;
                 }
@@ -315,9 +316,9 @@ public class SendErrorMessageDialog extends BiobankDialog {
         }
     }
 
-    private class AttachmentComposite extends BiobankWidget {
+    private class AttachmentComposite extends BgcBaseWidget {
 
-        private BiobankText attachmentText;
+        private BgcBaseText attachmentText;
 
         private Button browseButton;
 
@@ -338,8 +339,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
             gd.grabExcessHorizontalSpace = true;
             setLayoutData(gd);
 
-            attachmentText = (BiobankText) widgetCreator.createWidget(this,
-                BiobankText.class, SWT.READ_ONLY, null);
+            attachmentText = (BgcBaseText) widgetCreator.createWidget(this,
+                BgcBaseText.class, SWT.READ_ONLY, null);
             browseButton = new Button(this, SWT.PUSH);
             browseButton.setText("Browse");
             browseButton.addSelectionListener(new SelectionAdapter() {
@@ -355,8 +356,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
                 }
             });
             removeButton = new Button(this, SWT.PUSH);
-            removeButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-                .get(BiobankPlugin.IMG_DELETE));
+            removeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+                .get(BgcPlugin.IMG_DELETE));
             removeButton.setToolTipText("Remove this attachment");
             removeButton.addSelectionListener(new SelectionAdapter() {
                 @Override

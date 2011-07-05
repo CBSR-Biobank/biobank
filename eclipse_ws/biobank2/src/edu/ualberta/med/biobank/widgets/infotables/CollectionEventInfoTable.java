@@ -39,7 +39,7 @@ public class CollectionEventInfoTable extends
 
     public CollectionEventInfoTable(Composite parent,
         List<CollectionEventWrapper> collection) {
-        super(parent, collection, HEADINGS, 10);
+        super(parent, collection, HEADINGS, 10, CollectionEventWrapper.class);
     }
 
     @Override

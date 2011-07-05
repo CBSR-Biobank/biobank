@@ -11,8 +11,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class FTAReportEditor extends ReportsEditor {
@@ -44,7 +44,7 @@ public class FTAReportEditor extends ReportsEditor {
         studyWrappers = StudyWrapper.getAllStudies(SessionManager
             .getAppService());
         ComboViewer combo = widgetCreator.createComboViewer(parent, labelText,
-            studyWrappers, null);
+            studyWrappers, null, new BiobankLabelProvider());
         combo.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {

@@ -22,12 +22,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDragListener;
 import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDropListener;
 
-public class MultiSelectWidget extends BiobankWidget {
+public class MultiSelectWidget extends BgcBaseWidget {
 
     private TreeViewer selTree;
 
@@ -65,12 +65,12 @@ public class MultiSelectWidget extends BiobankWidget {
         moveComposite.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
             false, true));
         moveRightButton = new Button(moveComposite, SWT.PUSH);
-        moveRightButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_ARROW_RIGHT));
+        moveRightButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ARROW_RIGHT));
         moveRightButton.setToolTipText("Move to selected");
         moveLeftButton = new Button(moveComposite, SWT.PUSH);
-        moveLeftButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_ARROW_LEFT));
+        moveLeftButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ARROW_LEFT));
         moveLeftButton.setToolTipText("Remove from selected");
 
         selTree = createLabelledTree(this, rightLabel);

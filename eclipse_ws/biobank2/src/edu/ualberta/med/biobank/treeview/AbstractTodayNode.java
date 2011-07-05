@@ -8,15 +8,15 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     AdapterBase {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(AbstractTodayNode.class.getName());
 
     private List<E> currentTodayElements;
@@ -27,6 +27,7 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+        //
     }
 
     @Override
@@ -99,7 +100,7 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
                 }
             }
         } catch (final RemoteAccessException exp) {
-            BiobankGuiCommonPlugin.openRemoteAccessErrorMessage(exp);
+            BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
             logger.error("Error while getting " + getLabel(), e);
         }

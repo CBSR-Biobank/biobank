@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -134,16 +134,16 @@ public class ContainerAdapter extends AdapterBase {
                             // newContainer.persist();
                             newContainer.reload();
                             monitor.done();
-                            BiobankGuiCommonPlugin.openAsyncInformation(
+                            BgcPlugin.openAsyncInformation(
                                 "Specimens moved", newContainer.getSpecimens()
                                     .size()
                                     + " specimens are now in "
                                     + newContainer.getFullInfoLabel() + ".");
                         } catch (Exception e) {
-                            BiobankGuiCommonPlugin.openAsyncError("Move problem", e);
+                            BgcPlugin.openAsyncError("Move problem", e);
                         }
                         monitor.done();
-                        BiobankGuiCommonPlugin.openAsyncInformation(
+                        BgcPlugin.openAsyncInformation(
                             "Specimens moved",
                             newContainer.getSpecimens().size()
                                 + " specimens are now in "
@@ -159,7 +159,7 @@ public class ContainerAdapter extends AdapterBase {
                 getContainer().reload();
                 SessionManager.openViewForm(getContainer());
             } catch (Exception e) {
-                BiobankGuiCommonPlugin.openError("Problem while moving specimens", e);
+                BgcPlugin.openError("Problem while moving specimens", e);
             }
         }
     }
@@ -198,7 +198,7 @@ public class ContainerAdapter extends AdapterBase {
                     oldParent.performExpand();
                 }
             } catch (Exception e) {
-                BiobankGuiCommonPlugin.openError("Problem while moving container", e);
+                BgcPlugin.openError("Problem while moving container", e);
             }
         }
     }
@@ -214,7 +214,7 @@ public class ContainerAdapter extends AdapterBase {
         List<ContainerWrapper> newParentContainers = container
             .getPossibleParents(newLabel);
         if (newParentContainers.size() == 0) {
-            BiobankGuiCommonPlugin.openError("Move Error",
+            BgcPlugin.openError("Move Error",
                 "A parent container with child \"" + newLabel
                     + "\" does not exist.");
             return false;
@@ -235,7 +235,7 @@ public class ContainerAdapter extends AdapterBase {
 
         ContainerWrapper currentChild = newParent.getChildByLabel(newLabel);
         if (currentChild != null) {
-            BiobankGuiCommonPlugin.openError("Move Error", "Container position \""
+            BgcPlugin.openError("Move Error", "Container position \""
                 + newLabel
                 + "\" is not empty. Please choose a different location.");
             return false;
@@ -254,10 +254,10 @@ public class ContainerAdapter extends AdapterBase {
                 try {
                     container.persist();
                 } catch (Exception e) {
-                    BiobankGuiCommonPlugin.openAsyncError("Move problem", e);
+                    BgcPlugin.openAsyncError("Move problem", e);
                 }
                 monitor.done();
-                BiobankGuiCommonPlugin.openAsyncInformation("Container moved",
+                BgcPlugin.openAsyncInformation("Container moved",
                     "The container " + oldLabel + " has been moved to "
                         + container.getLabel());
             }

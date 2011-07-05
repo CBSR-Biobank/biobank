@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.RequestEntryForm;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.RequestAdministrationView;
 
@@ -55,7 +55,7 @@ public class RequestAdapter extends AdapterBase {
         try {
             persistRequest();
         } catch (Exception e1) {
-            BiobankGuiCommonPlugin.openAsyncError("Unable to save", e1);
+            BgcPlugin.openAsyncError("Unable to save", e1);
         }
         getParent().getParent().rebuild();
         openViewForm();
@@ -75,13 +75,13 @@ public class RequestAdapter extends AdapterBase {
         try {
             getWrapper().persist();
         } catch (final RemoteConnectFailureException exp) {
-            BiobankGuiCommonPlugin.openRemoteConnectErrorMessage(exp);
+            BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (final RemoteAccessException exp) {
-            BiobankGuiCommonPlugin.openRemoteAccessErrorMessage(exp);
+            BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (final AccessDeniedException ade) {
-            BiobankGuiCommonPlugin.openAccessDeniedErrorMessage(ade);
+            BgcPlugin.openAccessDeniedErrorMessage(ade);
         } catch (Exception ex) {
-            BiobankGuiCommonPlugin.openAsyncError("Save error", ex);
+            BgcPlugin.openAsyncError("Save error", ex);
         }
         RequestAdministrationView.getCurrent().reload();
     }

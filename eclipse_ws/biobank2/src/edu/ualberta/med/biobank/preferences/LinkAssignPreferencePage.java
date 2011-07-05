@@ -53,6 +53,7 @@ public class LinkAssignPreferencePage extends FieldEditorPreferencePage
      */
     @Override
     public void init(IWorkbench workbench) {
+        //
     }
 
     @Override

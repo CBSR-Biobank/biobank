@@ -24,16 +24,16 @@ import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.GuiCommonSessionState;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcSessionState;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.utils.SearchType;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class SearchView extends ViewPart {
 
     public static final String ID = "edu.ualberta.med.biobank.views.SearchView";
 
-    private BiobankText searchText;
+    private BgcBaseText searchText;
     private ComboViewer searchTypeCombo;
 
     private Button searchButton;
@@ -44,7 +44,7 @@ public class SearchView extends ViewPart {
     public void createPartControl(Composite parent) {
         parent.setLayout(new GridLayout(2, false));
         // listen to login state
-        GuiCommonSessionState sessionSourceProvider = BiobankGuiCommonPlugin
+        BgcSessionState sessionSourceProvider = BgcPlugin
             .getSessionStateSourceProvider();
         sessionSourceProvider
             .addSourceProviderListener(new ISourceProviderListener() {
@@ -58,9 +58,9 @@ public class SearchView extends ViewPart {
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
                     if (sourceName
-                        .equals(GuiCommonSessionState.SESSION_STATE_SOURCE_NAME)) {
+                        .equals(BgcSessionState.SESSION_STATE_SOURCE_NAME)) {
                         loggedIn = sourceValue
-                            .equals(GuiCommonSessionState.LOGGED_IN);
+                            .equals(BgcSessionState.LOGGED_IN);
                         setEnabled();
                     }
                 }
@@ -90,7 +90,7 @@ public class SearchView extends ViewPart {
                 }
             });
 
-        searchText = new BiobankText(parent, SWT.NONE);
+        searchText = new BgcBaseText(parent, SWT.NONE);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;
@@ -114,8 +114,8 @@ public class SearchView extends ViewPart {
         });
 
         loggedIn = sessionSourceProvider.getCurrentState()
-            .get(GuiCommonSessionState.SESSION_STATE_SOURCE_NAME)
-            .equals(GuiCommonSessionState.LOGGED_IN);
+            .get(BgcSessionState.SESSION_STATE_SOURCE_NAME)
+            .equals(BgcSessionState.LOGGED_IN);
         setEnabled();
 
     }
@@ -145,11 +145,11 @@ public class SearchView extends ViewPart {
                     if (res != null && res.size() > 0) {
                         type.processResults(res);
                     } else {
-                        BiobankGuiCommonPlugin.openInformation("Search Result",
+                        BgcPlugin.openInformation("Search Result",
                             "no result");
                     }
                 } catch (Exception ex) {
-                    BiobankGuiCommonPlugin.openAsyncError("Search error", ex);
+                    BgcPlugin.openAsyncError("Search error", ex);
                 }
             }
         });

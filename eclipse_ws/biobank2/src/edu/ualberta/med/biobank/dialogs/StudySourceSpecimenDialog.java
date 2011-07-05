@@ -11,14 +11,15 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class StudySourceSpecimenDialog extends PagedDialog {
 
@@ -92,7 +93,7 @@ public class StudySourceSpecimenDialog extends PagedDialog {
                     internalSourceSpecimen
                         .setSpecimenType((SpecimenTypeWrapper) selectedObject);
                 }
-            });
+            }, new BiobankLabelProvider());
 
         volume = (Button) createBoundWidgetWithLabel(contents, Button.class,
             SWT.BORDER,
@@ -118,7 +119,7 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         try {
             internalSourceSpecimen.reset();
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError("Error", e);
+            BgcPlugin.openAsyncError("Error", e);
         }
         typeName.getCombo().deselectAll();
         volume.setSelection(false);

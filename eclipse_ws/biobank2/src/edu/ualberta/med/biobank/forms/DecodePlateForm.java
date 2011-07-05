@@ -16,9 +16,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
@@ -90,14 +90,14 @@ public class DecodePlateForm extends PlateForm {
 
     @Override
     public void reload() throws Exception {
+        //
     }
 
     protected void scanAndProcessResult() {
         plateToScan = plateSelectionWidget.getSelectedPlate();
 
         if (plateToScan == null) {
-            BiobankGuiCommonPlugin.openAsyncError("Decode Plate Error",
-                "No plate selected");
+            BgcPlugin.openAsyncError("Decode Plate Error", "No plate selected");
             return;
         }
 
@@ -109,9 +109,9 @@ public class DecodePlateForm extends PlateForm {
                 try {
                     scanAndProcessResult(monitor);
                 } catch (RemoteConnectFailureException exp) {
-                    BiobankGuiCommonPlugin.openRemoteConnectErrorMessage(exp);
+                    BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
-                    BiobankGuiCommonPlugin.openAsyncError(Messages
+                    BgcPlugin.openAsyncError(Messages
                         .getString("DecodePlate.dialog.scanError.title"), //$NON-NLS-1$
                         e);
                 }

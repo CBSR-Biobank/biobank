@@ -9,14 +9,14 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.RootNode;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.trees.AdapterTreeWidget;
 
 public abstract class AbstractAdministrationView extends
     AbstractViewWithAdapterTree {
 
-    protected BiobankText treeText;
+    protected BgcBaseText treeText;
 
     private Composite searchComposite;
 
@@ -43,7 +43,7 @@ public abstract class AbstractAdministrationView extends
 
         createTreeTextOptions(searchComposite);
 
-        treeText = new BiobankText(searchComposite, SWT.SINGLE);
+        treeText = new BgcBaseText(searchComposite, SWT.SINGLE);
         treeText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {

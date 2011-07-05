@@ -14,13 +14,13 @@ import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class CollectionEventAdapter extends AdapterBase {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(CollectionEventAdapter.class.getName());
 
     public CollectionEventAdapter(AdapterBase parent,
@@ -62,7 +62,7 @@ public class CollectionEventAdapter extends AdapterBase {
                             .getActiveActivityStatus(SessionManager
                                 .getAppService()));
                 } catch (Exception e) {
-                    BiobankGuiCommonPlugin.openAsyncError("Error",
+                    BgcPlugin.openAsyncError("Error",
                         "Unable to create collection event.");
                 }
             } else {

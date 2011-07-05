@@ -132,7 +132,7 @@ public class BiobankSecurityUtil {
             biobankGroup.addProtectionElementPrivilege(type, id, privileges);
             if ((type.equals(Site.class.getName())
                 || type.equals(Clinic.class.getName()) || type
-                .equals(ResearchGroup.class.getName())) && id != null) {
+                    .equals(ResearchGroup.class.getName())) && id != null) {
                 if (privileges
                     .contains(edu.ualberta.med.biobank.common.security.Privilege.UPDATE)) {
                     biobankGroup.getWorkingCenterIds().add(new Integer(id));

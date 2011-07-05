@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public abstract class DispatchSpecimenListInfoTable extends
@@ -41,7 +41,7 @@ public abstract class DispatchSpecimenListInfoTable extends
 
     public DispatchSpecimenListInfoTable(Composite parent,
         final DispatchWrapper shipment, boolean editMode) {
-        super(parent, null, HEADINGS, 15);
+        super(parent, null, HEADINGS, 15, DispatchSpecimenWrapper.class);
         setCollection(getInternalDispatchSpecimens());
         this.editMode = editMode;
         if (editMode) {
@@ -52,16 +52,14 @@ public abstract class DispatchSpecimenListInfoTable extends
                         List<DispatchSpecimenWrapper> dsaList = getSelectedItems();
                         if (dsaList.size() > 0) {
                             if (dsaList.size() == 1
-                                && !BiobankGuiCommonPlugin.openConfirm(
-                                    "Remove Specimen",
+                                && !BgcPlugin.openConfirm("Remove Specimen",
                                     "Are you sure you want to remove specimen \""
                                         + dsaList.get(0).getSpecimen()
                                             .getInventoryId()
                                         + "\" from this shipment ?"))
                                 return;
                             if (dsaList.size() > 1
-                                && !BiobankGuiCommonPlugin.openConfirm(
-                                    "Remove Specimen",
+                                && !BgcPlugin.openConfirm("Remove Specimen",
                                     "Are you sure you want to remove these "
                                         + dsaList.size()
                                         + " specimens from this shipment ?"))
@@ -71,8 +69,7 @@ public abstract class DispatchSpecimenListInfoTable extends
                                 reloadCollection();
                                 notifyListeners();
                             } catch (Exception e) {
-                                BiobankGuiCommonPlugin.openAsyncError(
-                                    "Delete failed", e);
+                                BgcPlugin.openAsyncError("Delete failed", e);
                             }
                         }
                     }

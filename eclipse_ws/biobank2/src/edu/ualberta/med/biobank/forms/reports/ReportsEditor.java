@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
@@ -42,7 +41,7 @@ import edu.ualberta.med.biobank.common.util.HQLCriteriaListProxy;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
@@ -122,8 +121,8 @@ public abstract class ReportsEditor extends BiobankFormBase {
         });
 
         printButton = toolkit.createButton(buttonSection, "Print", SWT.NONE);
-        printButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_PRINTER));
+        printButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_PRINTER));
         printButton.setEnabled(false);
         printButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -131,7 +130,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 try {
                     printTable(false, false);
                 } catch (Exception ex) {
-                    BiobankGuiCommonPlugin.openAsyncError(
+                    BgcPlugin.openAsyncError(
                         "Error while printing the results", ex);
                 }
             }
@@ -146,7 +145,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 try {
                     printTable(false, true);
                 } catch (Exception ex) {
-                    BiobankGuiCommonPlugin.openAsyncError(
+                    BgcPlugin.openAsyncError(
                         "Error while exporting the results", ex);
                 }
             }
@@ -161,7 +160,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 try {
                     printTable(true, false);
                 } catch (Exception ex) {
-                    BiobankGuiCommonPlugin.openAsyncError(
+                    BgcPlugin.openAsyncError(
                         "Error while exporting the results", ex);
                 }
             }
@@ -207,8 +206,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
         try {
             initReport();
         } catch (Exception e1) {
-            BiobankGuiCommonPlugin.openAsyncError("Failed to load parameters",
-                e1);
+            BgcPlugin.openAsyncError("Failed to load parameters", e1);
         }
 
         try {
@@ -226,8 +224,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                                 reportData = appService.startQuery(query);
                             } catch (Exception e) {
                                 reportData = new ArrayList<Object>();
-                                BiobankGuiCommonPlugin.openAsyncError(
-                                    "Query Error", e);
+                                BgcPlugin.openAsyncError("Query Error", e);
                             }
                         }
                     };
@@ -239,8 +236,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                             try {
                                 appService.stopQuery(query);
                             } catch (Exception e) {
-                                BiobankGuiCommonPlugin.openAsyncError(
-                                    "Stop Failed", e);
+                                BgcPlugin.openAsyncError("Stop Failed", e);
                             }
                             reportData = new ArrayList<Object>();
                             break;
@@ -255,7 +251,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 };
             });
         } catch (Exception e1) {
-            BiobankGuiCommonPlugin.openAsyncError("Failed to load query", e1);
+            BgcPlugin.openAsyncError("Failed to load query", e1);
         }
 
         if (reportData instanceof HQLCriteriaListProxy)
@@ -320,7 +316,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
         try {
             bw = new PrintWriter(new FileWriter(path));
         } catch (IOException e) {
-            BiobankGuiCommonPlugin.openAsyncError("Error writing to CSV.", e);
+            BgcPlugin.openAsyncError("Error writing to CSV.", e);
             return;
         }
         // write title
@@ -388,8 +384,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 path = runExportDialog(report.getName().replaceAll(" ", "_")
                     + "_" + DateFormatter.formatAsDate(new Date()), filterExt);
                 if (path == null) {
-                    BiobankGuiCommonPlugin.openAsyncError(
-                        "Exporting canceled.",
+                    BgcPlugin.openAsyncError("Exporting canceled.",
                         "Select a valid path and try again.");
                     return;
                 }
@@ -427,8 +422,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                                 path, exportPDF);
                         }
                     } catch (Exception e) {
-                        BiobankGuiCommonPlugin.openAsyncError(
-                            "Error exporting results", e);
+                        BgcPlugin.openAsyncError("Error exporting results", e);
                         return;
                     }
                 }
@@ -451,27 +445,26 @@ public abstract class ReportsEditor extends BiobankFormBase {
                         report.getName(), stringParams, columnInfo, listData),
                         path);
             } catch (Exception e) {
-                BiobankGuiCommonPlugin.openAsyncError("Error saving to PDF", e);
+                BgcPlugin.openAsyncError("Error saving to PDF", e);
                 return;
             }
             try {
                 SessionManager.log("exportPDF", report.getName(), "report");
             } catch (Exception e) {
-                BiobankGuiCommonPlugin
-                    .openAsyncError("Error logging export", e);
+                BgcPlugin.openAsyncError("Error logging export", e);
             }
         } else {
             try {
                 ReportingUtils.printReport(ReportingUtils.createDynamicReport(
                     report.getName(), stringParams, columnInfo, listData));
             } catch (Exception e) {
-                BiobankGuiCommonPlugin.openAsyncError("Printer Error", e);
+                BgcPlugin.openAsyncError("Printer Error", e);
                 return;
             }
             try {
                 SessionManager.log("print", report.getName(), "report");
             } catch (Exception e) {
-                BiobankGuiCommonPlugin.openAsyncError("Error logging print", e);
+                BgcPlugin.openAsyncError("Error logging print", e);
             }
         }
     }

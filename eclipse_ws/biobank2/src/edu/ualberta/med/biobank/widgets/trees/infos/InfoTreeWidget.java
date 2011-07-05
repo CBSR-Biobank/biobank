@@ -16,7 +16,6 @@ import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MenuItem;
@@ -25,7 +24,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
@@ -78,8 +77,8 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
      * .html for how to set row height.
      */
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(InfoTreeWidget.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(InfoTreeWidget.class
+        .getName());
 
     protected List<Node> model;
 
@@ -309,8 +308,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         doubleClickListeners.add(listener);
         editItem = new MenuItem(getMenu(), SWT.PUSH);
         editItem.setText("Edit");
-        editItem.addSelectionListener(new SelectionListener() {
-
+        editItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 ModelWrapper<?> selection = (ModelWrapper<?>) InfoTreeWidget.this
@@ -319,10 +317,6 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
                     AdapterBase adapter = AdapterFactory.getAdapter(selection);
                     adapter.openEntryForm();
                 }
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
     }

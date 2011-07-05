@@ -6,12 +6,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
 /**
  * Allows the user to move a container and its contents to a new location
  */
-public class SaveReportDialog extends BiobankDialog {
+public class SaveReportDialog extends BgcBaseDialog {
 
     private String fileName;
 
@@ -39,7 +40,7 @@ public class SaveReportDialog extends BiobankDialog {
         Composite contents = new Composite(parent, SWT.NONE);
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.FILL,
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.FILL,
             "Name", null, this, "fileName", null);
     }
 

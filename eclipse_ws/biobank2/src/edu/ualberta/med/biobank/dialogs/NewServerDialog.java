@@ -6,14 +6,15 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
-public class NewServerDialog extends BiobankDialog {
+public class NewServerDialog extends BgcBaseDialog {
 
     private static final String TITLE = "New Server";
 
-    protected BiobankText textBox;
+    protected BgcBaseText textBox;
 
     protected String text;
 
@@ -40,8 +41,8 @@ public class NewServerDialog extends BiobankDialog {
         area.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
             "Server field cannot be empty");
-        textBox = (BiobankText) createBoundWidgetWithLabel(area,
-            BiobankText.class, SWT.NONE, "Address", new String[0], this,
+        textBox = (BgcBaseText) createBoundWidgetWithLabel(area,
+            BgcBaseText.class, SWT.NONE, "Address", new String[0], this,
             "text", validator);
         GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;

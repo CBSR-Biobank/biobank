@@ -14,11 +14,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
-public class SpecimenTypeDialog extends BiobankDialog {
+public class SpecimenTypeDialog extends BgcBaseDialog {
 
     private static final String TITLE = "Specimen Type ";
 
@@ -77,11 +78,11 @@ public class SpecimenTypeDialog extends BiobankDialog {
         content.setLayout(new GridLayout(2, false));
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
+        createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
             "Name", null, specimenType, "name", new NonEmptyStringValidator(
                 MSG_NO_ST_NAME));
 
-        createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
+        createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
             "Short Name", null, specimenType, "nameShort",
             new NonEmptyStringValidator(MSG_NO_ST_SNAME));
 

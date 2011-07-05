@@ -29,6 +29,7 @@ public class ConfirmState extends AbstractSourceProvider {
 
     @Override
     public void dispose() {
+        //
     }
 
     public void setState(boolean state) {

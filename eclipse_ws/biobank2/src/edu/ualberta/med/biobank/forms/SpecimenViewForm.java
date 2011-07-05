@@ -13,15 +13,15 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchInfoTable;
 
 public class SpecimenViewForm extends BiobankViewForm {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(SpecimenViewForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenViewForm";
@@ -30,29 +30,29 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private SpecimenWrapper specimen;
 
-    private BiobankText centerLabel;
+    private BgcBaseText centerLabel;
 
-    private BiobankText originCenterLabel;
+    private BgcBaseText originCenterLabel;
 
-    private BiobankText sampleTypeLabel;
+    private BgcBaseText sampleTypeLabel;
 
-    private BiobankText createdDateLabel;
+    private BgcBaseText createdDateLabel;
 
-    private BiobankText volumeLabel;
+    private BgcBaseText volumeLabel;
 
-    private BiobankText studyLabel;
+    private BgcBaseText studyLabel;
 
-    private BiobankText patientLabel;
+    private BgcBaseText patientLabel;
 
-    private BiobankText activityStatusLabel;
+    private BgcBaseText activityStatusLabel;
 
-    private BiobankText commentLabel;
+    private BgcBaseText commentLabel;
 
-    private BiobankText positionLabel;
+    private BgcBaseText positionLabel;
 
     private DispatchInfoTable dispatchInfoTable;
 
-    private BiobankText collectionLabel;
+    private BgcBaseText collectionLabel;
 
     @Override
     public void init() throws Exception {

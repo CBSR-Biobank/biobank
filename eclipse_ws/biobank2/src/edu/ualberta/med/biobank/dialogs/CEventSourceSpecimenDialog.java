@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
@@ -27,13 +26,15 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.InventoryIdValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CEventSourceSpecimenDialog extends PagedDialog {
@@ -55,8 +56,8 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
     private DateTimeWidget timeDrawnWidget;
     private Label timeDrawnLabel;
     private Label quantityLabel;
-    private BiobankText inventoryIdWidget;
-    private BiobankText quantityText;
+    private BgcBaseText inventoryIdWidget;
+    private BgcBaseText quantityText;
     private DoubleNumberValidator quantityTextValidator;
     private ComboViewer activityStatusComboViewer;
 
@@ -112,7 +113,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             allActivityStatus = ActivityStatusWrapper
                 .getAllActivityStatuses(SessionManager.getAppService());
         } catch (ApplicationException e) {
-            BiobankGuiCommonPlugin.openAsyncError(Messages
+            BgcPlugin.openAsyncError(Messages
                 .getString("CEventSourceSpecimenDialog.activity.error.msg"), e); //$NON-NLS-1$
         }
     }
@@ -142,9 +143,9 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         contents.setLayout(new GridLayout(3, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        inventoryIdWidget = (BiobankText) createBoundWidgetWithLabel(
+        inventoryIdWidget = (BgcBaseText) createBoundWidgetWithLabel(
             contents,
-            BiobankText.class,
+            BgcBaseText.class,
             SWT.NONE,
             Messages.getString("SourceSpecimen.field.inventoryId.label"), //$NON-NLS-1$
             null,
@@ -187,16 +188,17 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
                     internalSpecimen
                         .setActivityStatus((ActivityStatusWrapper) selectedObject);
                 }
-            });
+            }, new BiobankLabelProvider());
         gd = (GridData) activityStatusComboViewer.getControl().getLayoutData();
         gd.horizontalSpan = 2;
 
-        BiobankText commentWidget = (BiobankText) createBoundWidgetWithLabel(
-            contents, BiobankText.class, SWT.NONE,
+        BgcBaseText commentWidget = (BgcBaseText) createBoundWidgetWithLabel(
+            contents, BgcBaseText.class, SWT.MULTI,
             Messages.getString("label.comments"), null, internalSpecimen, //$NON-NLS-1$
             SpecimenPeer.COMMENT.getName(), null);
         gd = (GridData) commentWidget.getLayoutData();
         gd.horizontalSpan = 2;
+        gd.widthHint = 400;
 
         quantityLabel = widgetCreator.createLabel(contents, Messages
             .getString("CEventSourceSpecimenDialog.field.quantity.label")); //$NON-NLS-1$
@@ -205,8 +207,8 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         quantityTextValidator = new DoubleNumberValidator(
             Messages
                 .getString("CEventSourceSpecimenDialog.field.quantity.validation.msg")); //$NON-NLS-1$
-        quantityText = (BiobankText) createBoundWidget(contents,
-            BiobankText.class, SWT.BORDER, quantityLabel, new String[0],
+        quantityText = (BgcBaseText) createBoundWidget(contents,
+            BgcBaseText.class, SWT.BORDER, quantityLabel, new String[0],
             internalSpecimen, SpecimenPeer.QUANTITY.getName(),
             quantityTextValidator);
         gd = (GridData) quantityText.getLayoutData();
@@ -248,7 +250,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
                         }
                         updateWidgetVisibilityAndValues();
                     }
-                });
+                }, new BiobankLabelProvider());
         if (!useStudyOnlySourceSpecimens) {
             specimenTypeComboViewer.setInput(allSpecimenTypes);
             specimenTypeComboViewer.setSelection(new StructuredSelection(type));
@@ -319,7 +321,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         try {
             internalSpecimen.reset();
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError("Error", e);
+            BgcPlugin.openAsyncError("Error", e);
         }
         inventoryIdWidget.setText(""); //$NON-NLS-1$
         inventoryIdWidget.setFocus();

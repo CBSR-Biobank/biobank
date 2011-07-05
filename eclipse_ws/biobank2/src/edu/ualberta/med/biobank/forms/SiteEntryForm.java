@@ -16,13 +16,13 @@ import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
-import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -45,7 +45,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private StudyAddInfoTable studiesTable;
 
-    private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
             setDirty(true);
@@ -97,14 +97,14 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
+        setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
             SWT.NONE, Messages.getString("label.name"), //$NON-NLS-1$
             null, site, SitePeer.NAME.getName(), new NonEmptyStringValidator(
                 Messages.getString("SiteEntryForm.field.name.validation.msg")))); //$NON-NLS-1$
 
         createBoundWidgetWithLabel(
             client,
-            BiobankText.class,
+            BgcBaseText.class,
             SWT.NONE,
             Messages.getString("label.nameShort"), //$NON-NLS-1$
             null,
@@ -126,7 +126,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             Messages.getString("label.comments"), null, site, //$NON-NLS-1$
             SitePeer.COMMENT.getName(), null);
     }

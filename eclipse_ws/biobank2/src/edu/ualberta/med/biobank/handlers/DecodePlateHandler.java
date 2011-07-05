@@ -9,11 +9,11 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.forms.DecodePlateForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 
 public class DecodePlateHandler extends AbstractHandler implements IHandler {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(DecodePlateHandler.class.getName());
 
     @Override

@@ -10,7 +10,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class CbsrHelp extends AbstractHandler {
 
@@ -24,11 +24,9 @@ public class CbsrHelp extends AbstractHandler {
                 .createBrowser(null);
             browser.openURL(new URL(CBSR_HELP_URL));
         } catch (PartInitException e) {
-            BiobankGuiCommonPlugin.openAsyncError("Could not open web browser",
-                e);
+            BgcPlugin.openAsyncError("Could not open web browser", e);
         } catch (MalformedURLException e) {
-            BiobankGuiCommonPlugin.openAsyncError(
-                "Could not open web browser URL", e);
+            BgcPlugin.openAsyncError("Could not open web browser URL", e);
         }
         return null;
     }

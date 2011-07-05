@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.TraverseEvent;
@@ -29,11 +30,11 @@ import edu.ualberta.med.biobank.common.peer.LogPeer;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.forms.LoggingForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.GuiCommonSessionState;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcSessionState;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.logs.LogQuery;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class LoggingView extends ViewPart {
@@ -46,7 +47,7 @@ public class LoggingView extends ViewPart {
         CENTER, USER, TYPE, ACTION
     }
 
-    private BiobankText patientNumTextInput, inventoryIdTextInput,
+    private BgcBaseText patientNumTextInput, inventoryIdTextInput,
         detailsTextInput, locationTextInput;
 
     private Combo centerCombo, userCombo, typeCombo, actionCombo;
@@ -68,20 +69,17 @@ public class LoggingView extends ViewPart {
         }
     };
 
-    private final KeyListener enterListener = new KeyListener() {
+    private final KeyListener enterListener = new KeyAdapter() {
         @Override
         public void keyPressed(KeyEvent e) {
             if (e.keyCode == SWT.CR) {
                 searchDatabase();
             }
         }
-
-        @Override
-        public void keyReleased(KeyEvent e) {
-        }
     };
 
     public LoggingView() {
+        //
     }
 
     @Override
@@ -147,7 +145,7 @@ public class LoggingView extends ViewPart {
         label.setAlignment(SWT.LEFT);
         label.setBackground(colorWhite);
 
-        patientNumTextInput = new BiobankText(parent, SWT.SINGLE | SWT.BORDER);
+        patientNumTextInput = new BgcBaseText(parent, SWT.SINGLE | SWT.BORDER);
         patientNumTextInput.setVisible(true);
         patientNumTextInput
             .setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -159,7 +157,7 @@ public class LoggingView extends ViewPart {
         label.setAlignment(SWT.LEFT);
         label.setBackground(colorWhite);
 
-        inventoryIdTextInput = new BiobankText(parent, SWT.SINGLE | SWT.BORDER);
+        inventoryIdTextInput = new BgcBaseText(parent, SWT.SINGLE | SWT.BORDER);
         inventoryIdTextInput.setVisible(true);
         inventoryIdTextInput.setLayoutData(new GridData(
             GridData.FILL_HORIZONTAL));
@@ -171,7 +169,7 @@ public class LoggingView extends ViewPart {
         label.setAlignment(SWT.LEFT);
         label.setBackground(colorWhite);
 
-        locationTextInput = new BiobankText(parent, SWT.SINGLE | SWT.BORDER);
+        locationTextInput = new BgcBaseText(parent, SWT.SINGLE | SWT.BORDER);
         locationTextInput.setVisible(true);
         locationTextInput.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         locationTextInput.addListener(SWT.Verify, alphaNumericListener);
@@ -206,7 +204,7 @@ public class LoggingView extends ViewPart {
         label.setAlignment(SWT.LEFT);
         label.setBackground(colorWhite);
 
-        detailsTextInput = new BiobankText(parent, SWT.SINGLE | SWT.BORDER);
+        detailsTextInput = new BgcBaseText(parent, SWT.SINGLE | SWT.BORDER);
         detailsTextInput.setVisible(true);
         detailsTextInput.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         detailsTextInput.addKeyListener(enterListener);
@@ -301,9 +299,9 @@ public class LoggingView extends ViewPart {
             @Override
             public void sourceChanged(int sourcePriority, String sourceName,
                 Object sourceValue) {
-                if (sourceValue.equals(GuiCommonSessionState.LOGGED_OUT)) {
+                if (sourceValue.equals(BgcSessionState.LOGGED_OUT)) {
                     setEnableAllFields(false);
-                } else if (sourceValue.equals(GuiCommonSessionState.LOGGED_IN)) {
+                } else if (sourceValue.equals(BgcSessionState.LOGGED_IN)) {
                     loadComboFields();
                     setEnableAllFields(true);
                 }
@@ -312,25 +310,26 @@ public class LoggingView extends ViewPart {
             @SuppressWarnings("rawtypes")
             @Override
             public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
-
+                //
             }
         };
 
-        BiobankGuiCommonPlugin.getSessionStateSourceProvider()
-            .addSourceProviderListener(siteStateListener);
+        BgcPlugin.getSessionStateSourceProvider().addSourceProviderListener(
+            siteStateListener);
     }
 
     @Override
     public void dispose() {
         super.dispose();
         if (siteStateListener != null) {
-            BiobankGuiCommonPlugin.getSessionStateSourceProvider()
+            BgcPlugin.getSessionStateSourceProvider()
                 .removeSourceProviderListener(siteStateListener);
         }
     }
 
     @Override
     public void setFocus() {
+        //
     }
 
     private void setEnableAllFields(boolean enabled) {
@@ -379,7 +378,7 @@ public class LoggingView extends ViewPart {
         if (startDateWidget.getDate() != null
             && endDateWidget.getDate() != null
             && startDateWidget.getDate().after(endDateWidget.getDate())) {
-            BiobankGuiCommonPlugin.openAsyncError("Error",
+            BgcPlugin.openAsyncError("Error",
                 "Error: start date cannot be ahead end date.");
             return;
         }
@@ -428,7 +427,7 @@ public class LoggingView extends ViewPart {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, LoggingForm.ID);
         } catch (Exception ex) {
-            BiobankGuiCommonPlugin.openAsyncError("Error",
+            BgcPlugin.openAsyncError("Error",
                 "There was an error opening: LoggingForm.", ex);
         }
     }
@@ -473,7 +472,7 @@ public class LoggingView extends ViewPart {
             return result.toArray(new String[0]);
 
         } catch (ApplicationException ex) {
-            BiobankGuiCommonPlugin.openAsyncError("Error",
+            BgcPlugin.openAsyncError("Error",
                 "There was an error loading combo values.", ex);
         }
         return null;

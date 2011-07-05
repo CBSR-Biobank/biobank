@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.PeListViewForm;
 import edu.ualberta.med.biobank.forms.SpecimenListViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
@@ -138,8 +138,8 @@ public enum SearchType {
         }
     };
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(SearchType.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(SearchType.class
+        .getName());
 
     private String label;
 

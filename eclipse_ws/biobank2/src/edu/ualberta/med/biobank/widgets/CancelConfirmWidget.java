@@ -12,14 +12,16 @@ import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.forms.linkassign.AbstractSpecimenAdminForm;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 
-public class CancelConfirmWidget extends BiobankWidget {
+public class CancelConfirmWidget extends BgcBaseWidget {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(CancelConfirmWidget.class.getName());
 
-    private BiobankText confirmCancelText;
+    private BgcBaseText confirmCancelText;
 
     private Button confirmButton;
 
@@ -44,7 +46,7 @@ public class CancelConfirmWidget extends BiobankWidget {
 
     private void createContents() {
         form.getToolkit().createLabel(this, "Cancel/Confirm:");
-        confirmCancelText = new BiobankText(this, SWT.NONE, form.getToolkit());
+        confirmCancelText = new BgcBaseText(this, SWT.NONE, form.getToolkit());
         confirmCancelText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         GridData gd = new GridData();
         gd.widthHint = 100;

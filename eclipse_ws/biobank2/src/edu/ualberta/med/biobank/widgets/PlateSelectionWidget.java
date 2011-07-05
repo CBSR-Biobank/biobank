@@ -16,9 +16,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
-public class PlateSelectionWidget extends BiobankWidget {
+public class PlateSelectionWidget extends BgcBaseWidget {
 
     private Map<Integer, Button> plateButtons;
 

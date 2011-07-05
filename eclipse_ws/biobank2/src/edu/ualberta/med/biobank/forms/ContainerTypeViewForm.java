@@ -16,8 +16,8 @@ import org.eclipse.swt.widgets.Label;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 
 public class ContainerTypeViewForm extends BiobankViewForm {
@@ -27,25 +27,25 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private ContainerTypeWrapper containerType;
 
-    private BiobankText siteLabel;
+    private BgcBaseText siteLabel;
 
-    private BiobankText nameLabel;
+    private BgcBaseText nameLabel;
 
-    private BiobankText nameShortLabel;
+    private BgcBaseText nameShortLabel;
 
     private Button isTopLevelButton;
 
-    private BiobankText rowCapacityLabel;
+    private BgcBaseText rowCapacityLabel;
 
-    private BiobankText colCapacityLabel;
+    private BgcBaseText colCapacityLabel;
 
-    private BiobankText defaultTempLabel;
+    private BgcBaseText defaultTempLabel;
 
-    private BiobankText numSchemeLabel;
+    private BgcBaseText numSchemeLabel;
 
-    private BiobankText activityStatusLabel;
+    private BgcBaseText activityStatusLabel;
 
-    private BiobankText commentLabel;
+    private BgcBaseText commentLabel;
 
     private ListViewer sampleTypesViewer;
 

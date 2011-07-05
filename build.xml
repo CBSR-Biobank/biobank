@@ -9,8 +9,8 @@
     <arg value="-f" />
   </exec>
 
-  <property name="server.version.num" value="3.0.0" />
-  <property name="java.client.version.num" value="3.0.0" />
+  <property name="server.version.num" value="3.0.1" />
+  <property name="java.client.version.num" value="3.0.1" />
 
   <property environment="env" />
   <property name="host" value="aicml-med.cs.ualberta.ca" />
@@ -42,7 +42,7 @@
   <property name="req.jars.dir" value="jars" />
   <property name="lib-sources.dir" value="lib-sources" />
   <property name="biobank.gui.common.jar.files"
-            value="commons-beanutils-1.8.0.jar,commons-digester-1.7.jar,commons-javaflow-20060411.jar,iText-2.1.7.jar,jasperreports-4.0.2.jar,jdt-compiler-3.1.1.jar" />
+            value="commons-beanutils-1.8.0.jar,commons-io-1.4.jar,commons-digester-1.7.jar,commons-javaflow-20060411.jar,iText-2.1.7.jar,jasperreports-4.0.1.jar,jdt-compiler-3.1.1.jar" />
   <property name="biobank.jar.files"
             value="DynamicJasper-3.0.14.jar,gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
   <property name="biobank.common.jar.files"
@@ -234,6 +234,29 @@
     <copy file="${tmp.file}" tofile="${eclipse.proj.dir}/biobank2.product"
       overwrite="true"/>
   </target>
+  <!--
+<target name="hbm-class-sort">
+ <taskdef resource="net/sf/antcontrib/antlib.xml">
+      <classpath>
+        <pathelement location="${product.dir}/ant-contrib/ant-contrib-1.0b3.jar" />
+      </classpath>
+    </taskdef>
+<for param="file">
+  <path>
+    <fileset dir="${cacore.sdk.dir}/output/biobank/src/edu/ualberta/med/biobank/model"
+             includes="*.hbm.xml"/>
+  </path>
+  <sequential>
+   <tempfile property="tmp.file" destdir="${java.io.tmpdir}" prefix="@{file}" />
+    <xslt in="@{file}"
+          out="${tmp.file}"
+          style="scripts/hbm-class-sort.xsl"/>
+    <copy file="${tmp.file}" tofile="@{file}" overwrite="true"/>
+  </sequential>
+</for>
+</target>
+-->
+
 
   <target name="biobank-feature-core-version-modify">
     <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
@@ -262,7 +285,6 @@
     <antcall target="biobank-feature-core-version-modify" />
     <antcall target="biobank-feature-platform-version-modify" />
   </target>
-
   <target name="java-client-manifest">
     <manifest file="${eclipse.proj.dir}/META-INF/MANIFEST.MF" mode="update">
       <attribute name="Bundle-Version" value="${java.client.version.num}" />
@@ -929,6 +951,7 @@
   <target name="clean-jars" description="deletes jars from eclipse projects">
     <delete>
       <fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
+      <fileset dir="${eclipse.proj.dir.gui.common}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
     </delete>
   </target>
@@ -958,6 +981,7 @@
           depends="clean-tests,clean-jars"
           description="deletes caCORE SDK directory and deletes jars from eclipse projects">
     <delete dir="${cacore.sdk.dir}" />
+    <delete dir="${buildDirectory}" />
   </target>
 
   <!-- JUnit -->
@@ -1119,9 +1143,9 @@
     <copy todir="${buildDirectory}/plugins/sampleProcessingRobot">
       <fileset dir="${eclipse.workspace.dir}/sampleProcessingRobot" />
     </copy>
-    <!-- copy todir="${buildDirectory}/plugins/barcodeGenerator">
+    <copy todir="${buildDirectory}/plugins/barcodeGenerator">
       <fileset dir="${eclipse.workspace.dir}/barcodeGenerator" />
-    </copy -->
+    </copy>
     <copy todir="${buildDirectory}/plugins/biobank.gui.common">
       <fileset dir="${eclipse.workspace.dir}/biobank.gui.common" />
     </copy>
@@ -1160,6 +1184,9 @@
       <arg line="-DbuildDirectory=${product.dir}/buildDirectory" />
       <arg line="-DbaseLocation=${env.ECLIPSE_HOME}" />
       <arg line="-Djava.client.version.num=${java.client.version.num}" />
+
+	  <!-- uncomment line below to build a single executable product -->
+      <!-- arg line="-Dconfigs='linux, gtk, x86_64'" / -->
     </java>
     <antcall target="updateSiteMetadata" />
   </target>

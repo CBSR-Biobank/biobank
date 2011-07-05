@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
@@ -32,12 +31,13 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -111,16 +111,16 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                         dispatch.getShipmentInfo().setShippingMethod(
                             (ShippingMethodWrapper) selectedObject);
                     }
-                });
+                }, new BiobankLabelProvider());
 
-            createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+            createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
                 "Waybill", null, shipmentInfo,
                 ShipmentInfoPeer.WAYBILL.getName(), null);
         }
 
         createBoundWidgetWithLabel(
             client,
-            BiobankText.class,
+            BgcBaseText.class,
             SWT.MULTI,
             "Comments",
             null,
@@ -132,7 +132,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     private void createReceiverCombo(Composite client) {
         if (dispatch.isInTransitState()) {
-            BiobankText receiverLabel = createReadOnlyLabelledField(client,
+            BgcBaseText receiverLabel = createReadOnlyLabelledField(client,
                 SWT.NONE, "Receiver");
             setTextValue(receiverLabel, dispatch.getReceiverCenter()
                 .getNameShort());
@@ -152,8 +152,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                         }
                     });
             } catch (ApplicationException e) {
-                BiobankGuiCommonPlugin.openAsyncError("Error",
-                    "Unable to retrieve Centers");
+                BgcPlugin.openAsyncError("Error", "Unable to retrieve Centers");
             }
         }
     }
@@ -171,7 +170,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                         public void widgetSelected(SelectionEvent e) {
                             openScanDialog();
                         }
-                    }, null, BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN);
+                    }, null, BgcPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN);
 
                 createSpecimensSelectionActions(composite, false);
                 createSpecimensNonProcessedSection(true);
@@ -245,13 +244,12 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 setDirty(true);
                 break;
             case ERROR:
-                BiobankGuiCommonPlugin.openAsyncError("Invalid specimen", res
-                    .getCell().getInformation());
+                BgcPlugin.openAsyncError("Invalid specimen", res.getCell()
+                    .getInformation());
                 break;
             }
         } catch (Exception e) {
-            BiobankGuiCommonPlugin.openAsyncError("Error",
-                "Error adding the specimen", e);
+            BgcPlugin.openAsyncError("Error", "Error adding the specimen", e);
         }
     }
 

@@ -10,7 +10,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ActivityStatusEntryInfoTable;
 
 public class ActivityStatusViewForm extends BiobankFormBase {
@@ -60,7 +60,7 @@ public class ActivityStatusViewForm extends BiobankFormBase {
         if (!SessionManager.canUpdate(ActivityStatusWrapper.class)
             && !SessionManager.canCreate(ActivityStatusWrapper.class)
             && !SessionManager.canDelete(ActivityStatusWrapper.class)) {
-            BiobankGuiCommonPlugin.openAccessDeniedErrorMessage();
+            BgcPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 "Cannot access  Activity Status editor. Access Denied.");
         }

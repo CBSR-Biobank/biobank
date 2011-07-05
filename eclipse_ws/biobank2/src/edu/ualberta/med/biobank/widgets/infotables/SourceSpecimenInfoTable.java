@@ -38,7 +38,8 @@ public class SourceSpecimenInfoTable extends
 
     public SourceSpecimenInfoTable(Composite parent,
         List<SourceSpecimenWrapper> collection) {
-        super(parent, collection, HEADINGS, PAGE_SIZE_ROWS);
+        super(parent, collection, HEADINGS, PAGE_SIZE_ROWS,
+            SourceSpecimenWrapper.class);
     }
 
     @Override

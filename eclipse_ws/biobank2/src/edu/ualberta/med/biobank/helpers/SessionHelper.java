@@ -10,8 +10,8 @@ import org.springframework.remoting.RemoteAccessException;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ClientVersionInvalidException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionInvalidException;
@@ -21,7 +21,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SessionHelper implements Runnable {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(SessionHelper.class.getName());
 
     private String serverUrl;
@@ -72,13 +72,13 @@ public class SessionHelper implements Runnable {
             user = appService.getCurrentUser();
         } catch (ApplicationException exp) {
             if (exp instanceof ServerVersionInvalidException) {
-                BiobankGuiCommonPlugin
+                BgcPlugin
                     .openError(
                         "Server Version Error",
                         "The server you are connecting to does not have a version. Cannot authenticate.",
                         exp);
             } else if (exp instanceof ServerVersionNewerException) {
-                if (BiobankGuiCommonPlugin.openConfirm("Server Version Error",
+                if (BgcPlugin.openConfirm("Server Version Error",
                     "Cannot connect to this server because the Java Client version is too old.\n"
                         + "Would you like to download the latest version?")) {
                     try {
@@ -92,31 +92,31 @@ public class SessionHelper implements Runnable {
                             exp);
                 }
             } else if (exp instanceof ServerVersionOlderException) {
-                BiobankGuiCommonPlugin
+                BgcPlugin
                     .openError(
                         "Server Version Error",
                         "Cannot connect to this server because the Java Client version is too new.",
                         exp);
             } else if (exp instanceof ClientVersionInvalidException) {
-                BiobankGuiCommonPlugin
+                BgcPlugin
                     .openError(
                         "Client Version Error",
                         "Cannot connect to this server because the Java Client version is invalid.",
                         exp);
             } else if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAuthenticationException) {
-                BiobankGuiCommonPlugin
+                BgcPlugin
                     .openAsyncError(
                         "Login Failed",
                         "Bad credentials. Warning: You will be locked out after 3 failed login attempts.",
                         exp);
             } else if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAccessException) {
-                BiobankGuiCommonPlugin.openAsyncError("Login Failed",
+                BgcPlugin.openAsyncError("Login Failed",
                     "Error contacting server.", exp);
             }
         } catch (Exception exp) {
-            BiobankGuiCommonPlugin.openAsyncError("Login Failed", exp);
+            BgcPlugin.openAsyncError("Login Failed", exp);
         }
     }
 

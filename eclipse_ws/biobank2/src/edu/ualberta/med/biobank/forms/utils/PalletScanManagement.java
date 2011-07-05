@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
@@ -52,10 +52,10 @@ public class PalletScanManagement {
                     processScanResult(monitor);
                     afterScanAndProcess();
                 } catch (RemoteConnectFailureException exp) {
-                    BiobankGuiCommonPlugin.openRemoteConnectErrorMessage(exp);
+                    BgcPlugin.openRemoteConnectErrorMessage(exp);
                     scanAndProcessError(null);
                 } catch (Exception e) {
-                    BiobankGuiCommonPlugin
+                    BgcPlugin
                         .openAsyncError(Messages
                             .getString("linkAssign.dialog.scanError.title"), //$NON-NLS-1$
                             e);
@@ -87,8 +87,8 @@ public class PalletScanManagement {
                 plateToScan);
             if (plateNum == -1) {
                 plateError();
-                BiobankGuiCommonPlugin.openAsyncError("Scan error",
-                    "Plate with barcode " + plateToScan + " is not enabled");
+                BgcPlugin.openAsyncError("Scan error", "Plate with barcode "
+                    + plateToScan + " is not enabled");
                 return;
             } else {
                 ScanCell[][] scanCells = null;
@@ -97,7 +97,7 @@ public class PalletScanManagement {
                     cells = PalletCell.convertArray(scanCells);
                     successfulScansCount++;
                 } catch (Exception ex) {
-                    BiobankGuiCommonPlugin
+                    BgcPlugin
                         .openAsyncError(
                             "Scan error", //$NON-NLS-1$
                             ex,
@@ -171,8 +171,7 @@ public class PalletScanManagement {
                         try {
                             postprocessScanTubeAlone(cell);
                         } catch (Exception ex) {
-                            BiobankGuiCommonPlugin.openAsyncError(
-                                "Scan tube error", ex);
+                            BgcPlugin.openAsyncError("Scan tube error", ex);
                         }
                     }
                 }
@@ -205,11 +204,11 @@ public class PalletScanManagement {
     }
 
     protected void beforeThreadStart() {
-
+        // default does nothing
     }
 
     protected void beforeScan() {
-
+        // default does nothing
     }
 
     @SuppressWarnings("unused")
@@ -219,33 +218,33 @@ public class PalletScanManagement {
 
     @SuppressWarnings("unused")
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
-
+        // default does nothing
     }
 
     @SuppressWarnings("unused")
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-
+        // default does nothing
     }
 
     protected void beforeScanMerge() {
-
+        // default does nothing
     }
 
     protected void afterScan() {
-
+        // default does nothing
     }
 
     protected void afterScanAndProcess() {
-
+        // default does nothing
     }
 
     protected void plateError() {
-
+        // default does nothing
     }
 
     protected void scanAndProcessError(
         @SuppressWarnings("unused") String errorMsg) {
-
+        // default does nothing
     }
 
     public Map<RowColPos, PalletCell> getCells() {

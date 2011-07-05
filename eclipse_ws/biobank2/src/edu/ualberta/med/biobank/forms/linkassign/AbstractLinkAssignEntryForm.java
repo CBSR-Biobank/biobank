@@ -31,8 +31,8 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
-import edu.ualberta.med.biobank.gui.common.BiobankGuiCommonPlugin;
-import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
@@ -146,7 +146,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     }
 
     protected void setFirstControl(@SuppressWarnings("unused") Mode mode) {
-
+        // default does nothing
     }
 
     protected boolean showSinglePosition() {
@@ -154,12 +154,12 @@ public abstract class AbstractLinkAssignEntryForm extends
     }
 
     protected void defaultInitialisation() {
-
+        // default does nothing
     }
 
     protected void setNeedSinglePosition(
         @SuppressWarnings("unused") boolean position) {
-
+        // default does nothing
     }
 
     protected abstract Mode initialisationMode();
@@ -602,7 +602,7 @@ public abstract class AbstractLinkAssignEntryForm extends
      * @param isContainerPosition if true, the position is a full container
      *            position, if false, it is a full specimen position
      */
-    protected void initContainersFromPosition(BiobankText positionText,
+    protected void initContainersFromPosition(BgcBaseText positionText,
         boolean isContainerPosition, ContainerTypeWrapper type) {
         parentContainers = null;
         try {
@@ -623,7 +623,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                     for (ContainerWrapper cont : foundContainers) {
                         sb.append(cont.getFullInfoLabel());
                     }
-                    BiobankGuiCommonPlugin
+                    BgcPlugin
                         .openError(
                             Messages
                                 .getString("SpecimenAssign.single.checkParent.error.toomany.title"), //$NON-NLS-1$
@@ -636,7 +636,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                     initParentContainers(dlg.getSelectedContainer());
             }
         } catch (BiobankException be) {
-            BiobankGuiCommonPlugin
+            BgcPlugin
                 .openError(
                     Messages
                         .getString("SpecimenAssign.container.init.position.error.title"), //$NON-NLS-1$
@@ -646,7 +646,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                 be.getMessage()));
             focusControl(positionText);
         } catch (Exception ex) {
-            BiobankGuiCommonPlugin
+            BgcPlugin
                 .openError(
                     Messages
                         .getString("SpecimenAssign.container.init.position.error.title"), //$NON-NLS-1$
@@ -683,8 +683,8 @@ public abstract class AbstractLinkAssignEntryForm extends
     /**
      * Single assign. Check can really add to the position
      */
-    protected void checkPositionAndSpecimen(final BiobankText inventoryIdField,
-        final BiobankText positionField) {
+    protected void checkPositionAndSpecimen(final BgcBaseText inventoryIdField,
+        final BgcBaseText positionField) {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
@@ -707,7 +707,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                         canSaveSingleSpecimen.setValue(true);
                         cancelConfirmWidget.setFocus();
                     } else {
-                        BiobankGuiCommonPlugin.openError(
+                        BgcPlugin.openError(
                             Messages
                                 .getString("SpecimenAssign.single.position.error.msg"), //$NON-NLS-1$
                             Messages
@@ -724,15 +724,13 @@ public abstract class AbstractLinkAssignEntryForm extends
                     }
                     setDirty(true);
                 } catch (RemoteConnectFailureException exp) {
-                    BiobankGuiCommonPlugin.openRemoteConnectErrorMessage(exp);
+                    BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (BiobankCheckException bce) {
-                    BiobankGuiCommonPlugin.openError(
-                        "Error while checking position", bce); //$NON-NLS-1$
+                    BgcPlugin.openError("Error while checking position", bce); //$NON-NLS-1$
                     appendLog("ERROR: " + bce.getMessage()); //$NON-NLS-1$
                     focusControl(inventoryIdField);
                 } catch (Exception e) {
-                    BiobankGuiCommonPlugin.openError(
-                        "Error while checking position", e); //$NON-NLS-1$
+                    BgcPlugin.openError("Error while checking position", e); //$NON-NLS-1$
                     focusControl(positionField);
                 }
             }

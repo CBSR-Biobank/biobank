@@ -9,11 +9,11 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.forms.ScanPlateForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.gui.common.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 
 public class ScanPlateHandler extends AbstractHandler implements IHandler {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(ScanPlateHandler.class.getName());
 
     @Override
@@ -27,5 +27,4 @@ public class ScanPlateHandler extends AbstractHandler implements IHandler {
             return null;
         }
     }
-
 }

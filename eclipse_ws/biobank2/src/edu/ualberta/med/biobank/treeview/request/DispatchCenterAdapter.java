@@ -49,6 +49,7 @@ public class DispatchCenterAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+        //
     }
 
     @Override
@@ -105,7 +106,7 @@ public class DispatchCenterAdapter extends AdapterBase {
 
     @Override
     public void performDoubleClick() {
-
+        //
     }
 
 }

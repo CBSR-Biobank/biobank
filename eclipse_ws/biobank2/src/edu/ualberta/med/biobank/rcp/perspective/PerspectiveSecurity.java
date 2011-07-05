@@ -40,17 +40,23 @@ public class PerspectiveSecurity {
             IWorkbenchPart activePart = page.getActivePart();
             boolean usePreviousActivePart = false;
 
-            // hide it. then show it if needed (to be sure the order is still
-            // the same)
-            for (IViewReference ref : page.getViewReferences()) {
-                page.hideView(ref);
-            }
-            for (Entry<String, List<SecurityFeature>> entry : map.entrySet()) {
-                boolean show = user.canPerformActions(entry.getValue());
-                if (show) {
-                    page.showView(entry.getKey());
-                    if (entry.getKey().equals(activePart.getClass().getName()))
-                        usePreviousActivePart = true;
+            if (activePart != null) {
+
+                // hide it. then show it if needed (to be sure the order is
+                // still
+                // the same)
+                for (IViewReference ref : page.getViewReferences()) {
+                    page.hideView(ref);
+                }
+                for (Entry<String, List<SecurityFeature>> entry : map
+                    .entrySet()) {
+                    boolean show = user.canPerformActions(entry.getValue());
+                    if (show) {
+                        page.showView(entry.getKey());
+                        if (entry.getKey().equals(
+                            activePart.getClass().getName()))
+                            usePreviousActivePart = true;
+                    }
                 }
             }
 
