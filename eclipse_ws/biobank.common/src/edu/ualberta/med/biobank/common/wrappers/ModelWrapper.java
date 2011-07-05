@@ -1067,6 +1067,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             Method getter = modelKlazz.getMethod("get"
                 + capitalizeFirstLetter(property.getName()));
 
+            // TODO: whenever a property is set, the old value is retrieved from
+            // the database (or memory if already loaded) to send the
+            // information for the change to listeners. This should be changed
+            // to either (1) only get if there are listeners or (2) remember all
+            // old values so they can be removed (see cascade().persistAdded()).
             @SuppressWarnings("unchecked")
             T oldValue = (T) getter.invoke(model);
 

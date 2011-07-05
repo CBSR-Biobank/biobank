@@ -69,6 +69,8 @@ public class ContainerPositionWrapper extends ContainerPositionBaseWrapper {
         tasks.add(check().ifProperty(ContainerPositionPeer.PARENT_CONTAINER,
             Is.NOT_NULL, checkBounds));
 
+        tasks.add(cascade().persist(ContainerPositionPeer.CONTAINER));
+
         return tasks;
     }
 

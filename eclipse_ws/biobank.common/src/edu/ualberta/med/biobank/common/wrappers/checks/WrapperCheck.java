@@ -30,6 +30,9 @@ public abstract class WrapperCheck<E> extends WrapperAction<E> {
         try {
             session.setCacheMode(CacheMode.IGNORE);
             doCheck(session);
+
+            // session.flush();
+            // session.clear();
         } finally {
             session.setCacheMode(oldCacheMode);
         }

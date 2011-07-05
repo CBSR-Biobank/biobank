@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
  * Helper class to {@link ModelWrapper} to track the original set of collection
  * {@link Property}-s (if they're about to change) so that it can be easily
@@ -96,6 +95,13 @@ class ElementTracker<E> {
 
             addedElements.addAll(newValues);
             addedElements.removeAll(originalValues);
+        } else {
+            // the property getter (on the wrapper) was never called if the map
+            // is missing the property; however, there might still be added
+            // elements in the ElementQueue.
+            Collection<ModelWrapper<T>> queued = wrapper.getElementQueue()
+                .getAdded(property);
+            addedElements.addAll(queued);
         }
 
         return addedElements;
@@ -119,6 +125,13 @@ class ElementTracker<E> {
 
             removedElements.addAll(originalValues);
             removedElements.removeAll(newValues);
+        } else {
+            // the property getter (on the wrapper) was never called if the map
+            // is missing the property; however, there might still be removed
+            // elements in the ElementQueue.
+            Collection<ModelWrapper<T>> queued = wrapper.getElementQueue()
+                .getRemoved(property);
+            removedElements.addAll(queued);
         }
 
         return removedElements;

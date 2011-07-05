@@ -19,6 +19,7 @@ public abstract class LoadCheck<E> extends WrapperCheck<E> {
     protected E loadModel(Session session) {
         @SuppressWarnings("unchecked")
         E loaded = (E) session.load(getModelClass(), getModelId());
+        // session.setReadOnly(loaded, true);
         return loaded;
     }
 

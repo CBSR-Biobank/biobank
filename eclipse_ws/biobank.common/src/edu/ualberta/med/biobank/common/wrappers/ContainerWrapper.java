@@ -49,6 +49,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ContainerWrapper extends ContainerBaseWrapper {
     public static final String PATH_DELIMITER = "/";
 
+    private static final String CHILD_POSITION_CONFLICT_MSG = "Position {0} of container {1} already contains container {2} when trying to add container {3}.";
     private static final String OUT_OF_BOUNDS_POSITION_MSG = "Position {0} is invalid. Row should be between 0 and {1} (exclusive) and column should be between 0 and {2} (exclusive).";
     private static final String HAS_SPECIMENS_MSG = "Unable to delete container {0}. All specimens must be removed first.";
     private static final String HAS_CHILD_CONTAINERS_MSG = "Unable to delete container {0}. All subcontainers must be removed first.";
@@ -70,9 +71,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         UNIQUE_BARCODE_PROPS.add(ContainerPeer.SITE.to(SitePeer.ID));
         UNIQUE_BARCODE_PROPS.add(ContainerPeer.PRODUCT_BARCODE);
     }
-
-    private List<ContainerWrapper> addedChildren = new ArrayList<ContainerWrapper>();
-    private List<SpecimenWrapper> addedSpecimens = new ArrayList<SpecimenWrapper>();
 
     private Map<RowColPos, SpecimenWrapper> specimens;
     private Map<RowColPos, ContainerWrapper> children;
@@ -342,7 +340,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
         getSpecimens().put(rowColPos, specimen);
 
-        addedSpecimens.add(specimen);
+        addToSpecimenPositionCollection(Arrays.asList(specimen
+            .getSpecimenPosition()));
     }
 
     /**
@@ -382,7 +381,15 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             for (ContainerPositionWrapper position : positions) {
                 ContainerWrapper container = position.getContainer();
                 RowColPos rowColPos = new RowColPos(position);
-                children.put(rowColPos, container);
+
+                ContainerWrapper previous = children.put(rowColPos, container);
+                if (previous != null && !previous.equals(container)) {
+                    // this shouldn't ever happen, but just in case
+                    String msg = MessageFormat.format(
+                        CHILD_POSITION_CONFLICT_MSG, rowColPos, this, previous,
+                        container);
+                    throw new BiobankRuntimeException(msg);
+                }
             }
 
             this.children = children;
@@ -440,7 +447,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
         getChildren().put(rowColPos, child);
 
-        addedChildren.add(child);
+        addToChildPositionCollection(Arrays.asList(child.getPosition()));
     }
 
     /**
@@ -784,8 +791,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         specimens = null;
         children = null;
         updateChildren = false;
-        addedChildren.clear();
-        addedSpecimens.clear();
     }
 
     /**
@@ -926,9 +931,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         // on persistent (non-new) objects.
         tasks.add(new UpdateContainerPathAction(this));
 
-        // TODO: should this be replaced with cascade().persistAdded()??
-        tasks.add(cascade().persist(addedSpecimens));
-        tasks.add(cascade().persist(addedChildren));
+        tasks.add(cascade().persistAdded(
+            ContainerPeer.SPECIMEN_POSITION_COLLECTION));
+        tasks.add(cascade().persistAdded(
+            ContainerPeer.CHILD_POSITION_COLLECTION));
 
         tasks.add(updateChildren());
 
@@ -954,7 +960,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         tasks.add(check().empty(ContainerPeer.CHILD_POSITION_COLLECTION,
             hasChildrenMsg));
 
-        tasks.add(cascade().delete(ContainerPeer.POSITION));
+        // Count on Hibernate to delete-cascade this object. We can't because
+        // there's a two-way foreign key constraint. So we could, but it's
+        // really confusing.
+        // tasks.add(cascade().delete(ContainerPeer.POSITION));
 
         tasks.add(super.getDeleteTasks());
 

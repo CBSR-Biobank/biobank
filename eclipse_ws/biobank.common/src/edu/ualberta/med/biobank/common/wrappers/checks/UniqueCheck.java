@@ -7,7 +7,6 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.actions.PropertyCountAction;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
@@ -22,7 +21,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePr
  * 
  * @param <E>
  */
-public class UniqueCheck<E> extends WrapperAction<E> {
+public class UniqueCheck<E> extends WrapperCheck<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_STRING = "There already exists a {0} with property value(s) ({1}) for ({2}), respectively. These field(s) must be unique.";
 
@@ -42,14 +41,12 @@ public class UniqueCheck<E> extends WrapperAction<E> {
     }
 
     @Override
-    public Object doAction(Session session) throws BiobankSessionException {
+    public void doCheck(Session session) throws BiobankSessionException {
         Long count = countAction.doAction(session);
 
         if (count > 1) {
             throwException();
         }
-
-        return null;
     }
 
     private void throwException() throws DuplicatePropertySetException {

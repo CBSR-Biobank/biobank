@@ -8,7 +8,6 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 
@@ -22,7 +21,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsed
  * @throws ModelIsUsedException if the wrapped object is used by the specific
  *             {@link Property}.
  */
-public class NotUsedCheck<E> extends WrapperAction<E> {
+public class NotUsedCheck<E> extends WrapperCheck<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_MESSAGE = "{0} {1} is still in use by {2}.";
     private static final String COUNT_HQL = "SELECT count(m) FROM {0} m WHERE m.{1} = ?";
@@ -51,7 +50,7 @@ public class NotUsedCheck<E> extends WrapperAction<E> {
     }
 
     @Override
-    public Object doAction(Session session) throws BiobankSessionException {
+    public void doCheck(Session session) throws BiobankSessionException {
         String hql = MessageFormat.format(COUNT_HQL, propertyClass.getName(),
             property.getName());
         Query query = session.createQuery(hql);
@@ -63,8 +62,6 @@ public class NotUsedCheck<E> extends WrapperAction<E> {
             String message = getExceptionMessage();
             throw new ModelIsUsedException(message);
         }
-
-        return null;
     }
 
     private String getExceptionMessage() {

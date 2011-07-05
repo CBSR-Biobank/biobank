@@ -56,14 +56,18 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
     }
 
     protected Response query(@SuppressWarnings("unused") Request request,
-        BiobankSessionAction sessionAction)
-        throws BiobankSessionException {
+        BiobankSessionAction sessionAction) throws BiobankSessionException {
 
-        Response response = new Response();
+        Session session = getSession();
 
-        Object actionResult = sessionAction.doAction(getSession());
+        Object actionResult = sessionAction.doAction(session);
+
+        session.flush();
+        session.clear();
+
         SDKQueryResult queryResult = new SDKQueryResult(actionResult);
 
+        Response response = new Response();
         response.setResponse(queryResult);
 
         return response;

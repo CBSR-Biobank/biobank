@@ -140,8 +140,7 @@ public class TestContainer extends TestDatabase {
         if (level >= 1) {
             childL1 = ContainerHelper.newContainer(null,
                 TestCommon.getNewBarcode(r), parent, site,
-                containerTypeMap.get("ChildCtL1"));
-            parent.addChild(0, 0, childL1);
+                containerTypeMap.get("ChildCtL1"), 0, 0);
             parent.persist();
             parent.reload();
             childL1.reload();
@@ -152,8 +151,7 @@ public class TestContainer extends TestDatabase {
             if (level >= 2) {
                 childL2 = ContainerHelper.newContainer(null,
                     TestCommon.getNewBarcode(r), childL1, site,
-                    containerTypeMap.get("ChildCtL2"));
-                childL1.addChild(0, 0, childL2);
+                    containerTypeMap.get("ChildCtL2"), 0, 0);
                 childL1.persist();
                 childL1.reload();
                 childL2.reload();
@@ -164,8 +162,7 @@ public class TestContainer extends TestDatabase {
                 if (level >= 3) {
                     childL3 = ContainerHelper.newContainer(null,
                         TestCommon.getNewBarcode(r), childL2, site,
-                        containerTypeMap.get("ChildCtL3"));
-                    childL2.addChild(0, 0, childL3);
+                        containerTypeMap.get("ChildCtL3"), 0, 0);
                     childL2.persist();
                     childL2.reload();
                     childL3.reload();
@@ -176,8 +173,7 @@ public class TestContainer extends TestDatabase {
                     if (level >= 4) {
                         childL4 = ContainerHelper.newContainer(null,
                             TestCommon.getNewBarcode(r), childL3, site,
-                            containerTypeMap.get("ChildCtL4"));
-                        childL3.addChild(0, 0, childL4);
+                            containerTypeMap.get("ChildCtL4"), 0, 0);
                         childL3.persist();
                         childL3.reload();
                         childL4.reload();
@@ -354,13 +350,18 @@ public class TestContainer extends TestDatabase {
         String label = "ABCDEF";
         ContainerWrapper top, child;
 
-        top = containerMap.get("Top");
-        child = ContainerHelper.addContainer(label, "uvwxyz", top, site,
-            containerTypeMap.get("ChildCtL1"), 0, 0);
-        child.reload();
-        // label should be assigned correct value by wrapper
-        Assert.assertTrue(child.getLabel().equals(
-            top.getLabel() + child.getPositionString()));
+        try {
+            top = containerMap.get("Top");
+            child = ContainerHelper.addContainer(label, "uvwxyz", top, site,
+                containerTypeMap.get("ChildCtL1"), 0, 0);
+            child.reload();
+            // label should be assigned correct value by wrapper
+            Assert.assertTrue(child.getLabel().equals(
+                top.getLabel() + child.getPositionString()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Test

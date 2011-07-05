@@ -6,7 +6,6 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.property.GetterInterceptor;
 import edu.ualberta.med.biobank.common.wrappers.property.LazyLoaderInterceptor;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
@@ -20,7 +19,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropert
  * 
  * @param <E>
  */
-public class NotNullPreCheck<E> extends WrapperAction<E> implements PreCheck {
+public class NotNullPreCheck<E> extends WrapperCheck<E> implements PreCheck {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_STRING = "The {0} of {1} {2} must be defined (cannot be null).";
 
@@ -40,7 +39,7 @@ public class NotNullPreCheck<E> extends WrapperAction<E> implements PreCheck {
     }
 
     @Override
-    public Object doAction(Session session) throws BiobankSessionException {
+    public void doCheck(Session session) throws BiobankSessionException {
         E model = getModel();
 
         GetterInterceptor lazyLoad = new LazyLoaderInterceptor(session, 1);
@@ -56,7 +55,5 @@ public class NotNullPreCheck<E> extends WrapperAction<E> implements PreCheck {
 
             throw new NullPropertyException(msg);
         }
-
-        return null;
     }
 }

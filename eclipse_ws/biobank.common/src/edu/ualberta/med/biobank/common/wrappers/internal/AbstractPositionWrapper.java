@@ -42,6 +42,9 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     }
 
     public RowColPos getPosition() {
+        if (position == null && getRow() != null && getCol() != null) {
+            position = new RowColPos(getRow(), getCol());
+        }
         return position;
     }
 
@@ -66,6 +69,10 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     public abstract ContainerWrapper getParent();
 
     public void setParent(ContainerWrapper parent, RowColPos position) {
+        if (parent == null) {
+            throw new IllegalArgumentException(
+                "Parent container cannot be set null.");
+        }
         setParent(parent);
         setPosition(position);
     }

@@ -51,6 +51,8 @@ public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {
         tasks.add(new ContainerPositionInBoundsCheck<SpecimenPosition>(this,
             SpecimenPositionPeer.CONTAINER));
 
+        tasks.add(cascade().persist(SpecimenPositionPeer.SPECIMEN));
+
         return tasks;
     }
 

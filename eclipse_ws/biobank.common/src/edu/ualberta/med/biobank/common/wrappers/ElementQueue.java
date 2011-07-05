@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  * For Queue-ing up modifications to collections so that the modifications can
  * be applied only if and when a collection property is accessed through a
@@ -94,6 +93,48 @@ public class ElementQueue<E> {
         }
 
         map.remove(property);
+    }
+
+    public <T> Collection<ModelWrapper<T>> getAdded(
+        Property<? extends Collection<? extends T>, ? super E> property) {
+        Collection<ModelWrapper<T>> added = new ArrayList<ModelWrapper<T>>();
+
+        List<Action> actions = getActions(property);
+        for (Action action : actions) {
+            @SuppressWarnings("unchecked")
+            ModelWrapper<T> wrapper = (ModelWrapper<T>) action.wrapper;
+
+            if (action.type == Action.Type.ADD) {
+                // remove then add in case the element already exists
+                added.remove(wrapper);
+                added.add(wrapper);
+            } else if (action.type == Action.Type.REMOVE) {
+                added.remove(wrapper);
+            }
+        }
+
+        return added;
+    }
+
+    public <T> Collection<ModelWrapper<T>> getRemoved(
+        Property<? extends Collection<? extends T>, ? super E> property) {
+        Collection<ModelWrapper<T>> removed = new ArrayList<ModelWrapper<T>>();
+
+        List<Action> actions = getActions(property);
+        for (Action action : actions) {
+            @SuppressWarnings("unchecked")
+            ModelWrapper<T> wrapper = (ModelWrapper<T>) action.wrapper;
+
+            if (action.type == Action.Type.ADD) {
+                removed.remove(wrapper);
+            } else if (action.type == Action.Type.REMOVE) {
+                // remove then add in case the element already exists
+                removed.remove(wrapper);
+                removed.add(wrapper);
+            }
+        }
+
+        return removed;
     }
 
     /**

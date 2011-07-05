@@ -40,7 +40,7 @@ public class UpdateContainerPathAction extends WrapperAction<Container> {
         Container container = getModel();
 
         ContainerPeer.PATH.set(container, path);
-        session.saveOrUpdate(container);
+        session.update(container);
 
         return null;
     }
