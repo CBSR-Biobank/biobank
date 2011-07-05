@@ -58,7 +58,7 @@ public class UpdateContainerPathAction extends WrapperAction<Container> {
             String parentPath = (String) result[0];
             Integer parentId = (Integer) result[1];
 
-            if (parentPath != null) {
+            if (parentPath != null && !parentPath.isEmpty()) {
                 path.append(parentPath);
                 path.append(PATH_DELIMITER);
             }

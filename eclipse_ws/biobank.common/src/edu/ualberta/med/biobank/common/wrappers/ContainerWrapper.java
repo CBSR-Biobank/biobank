@@ -138,13 +138,16 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             // the persisted path is actually the parent path, although this
             // method returns the parent path plus its id.
             parentPath = super.getPath();
+            if (parentPath == null) {
+                parentPath = "";
+            }
         }
 
-        if (parentPath == null) {
-            parentPath = "";
+        if (!parentPath.isEmpty()) {
+            parentPath += PATH_DELIMITER;
         }
 
-        return parentPath + PATH_DELIMITER + getId();
+        return parentPath + getId();
     }
 
     @Override

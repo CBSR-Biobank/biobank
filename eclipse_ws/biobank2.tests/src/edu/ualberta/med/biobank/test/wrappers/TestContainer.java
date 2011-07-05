@@ -1277,7 +1277,7 @@ public class TestContainer extends TestDatabase {
             ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r),
                 altTop, site, childType, 0, 0);
             Assert.fail("Parent should be in the same site");
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankSessionException e) {
             Assert.assertTrue(true);
         }
 
