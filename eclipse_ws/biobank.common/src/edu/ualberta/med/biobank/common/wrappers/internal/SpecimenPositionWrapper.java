@@ -33,7 +33,7 @@ public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {
     }
 
     @Override
-    public void setParent(ContainerWrapper parent) {
+    protected void setParent(ContainerWrapper parent) {
         setContainer(parent);
     }
 

@@ -75,10 +75,7 @@ public class SpecimenHelper extends DbHelper {
             activityStatus, cevent, pevent);
 
         if (container != null) {
-            specimen.setParent(container);
-        }
-        if ((row != null) && (col != null)) {
-            specimen.setPosition(new RowColPos(row, col));
+            specimen.setParent(container, new RowColPos(row, col));
         }
 
         return specimen;
@@ -201,7 +198,6 @@ public class SpecimenHelper extends DbHelper {
             SpecimenWrapper childSpc = SpecimenHelper.addSpecimen(parentSpc,
                 DbHelper.chooseRandomlyInList(spcTypes), ce, pe, container,
                 posOffset / colCap, posOffset % colCap);
-            childSpc.setParent(container);
             spcs.add(childSpc);
         }
 

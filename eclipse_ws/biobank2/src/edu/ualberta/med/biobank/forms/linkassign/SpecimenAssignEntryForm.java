@@ -887,8 +887,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                             .getStatus() == UICellStatus.MOVED)) {
                         SpecimenWrapper specimen = cell.getSpecimen();
                         if (specimen != null) {
-                            specimen.setPosition(rcp);
-                            specimen.setParent(currentMultipleContainer);
+                            specimen.setParent(currentMultipleContainer, rcp);
                             specimen.persist();
                             String posStr = specimen.getPositionString(true,
                                 false);

@@ -389,7 +389,6 @@ public class TestContainer extends TestDatabase {
 
         ContainerWrapper container = ContainerHelper.newContainer("02",
             TestCommon.getNewBarcode(r), null, site, type);
-        container.setPositionAsRowCol(new RowColPos(0, 0));
 
         // should have a parent
         try {
@@ -401,7 +400,7 @@ public class TestContainer extends TestDatabase {
         }
 
         ContainerWrapper parent = containerMap.get("Top");
-        container.setParent(parent);
+        container.setParent(parent, new RowColPos(0, 0));
         try {
             container.persist();
             Assert.fail("Parent does not accept this container type");
@@ -422,7 +421,7 @@ public class TestContainer extends TestDatabase {
 
         ContainerWrapper container = ContainerHelper.newContainer("02",
             TestCommon.getNewBarcode(r), parent, site, type);
-        container.setPositionAsRowCol(new RowColPos(10, 10));
+        container.setParent(parent, new RowColPos(10, 10));
         try {
             container.persist();
             Assert.fail("position not ok in parent container");
@@ -430,18 +429,17 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        container.setPositionAsRowCol(new RowColPos(0, 0));
+        container.setParent(parent, new RowColPos(0, 0));
         container.persist();
 
         ContainerWrapper container2 = ContainerHelper.newContainer(null,
             TestCommon.getNewBarcode(r), null, site, type);
-        container2.setPositionAsRowCol(new RowColPos(0, 0));
-        container2.setParent(parent);
+        container2.setParent(parent, new RowColPos(0, 0));
         container2.setContainerType(type);
         try {
             container2.persist();
             Assert.fail("position not available");
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankSessionException e) {
             Assert.assertTrue(true);
         }
     }
@@ -509,12 +507,6 @@ public class TestContainer extends TestDatabase {
         container.reload();
     }
 
-    @Test(expected = BiobankSessionException.class)
-    public void testSetPositionOnTopLevel() throws Exception {
-        ContainerHelper.addContainer("05", "uvwxyz", null, site,
-            containerTypeMap.get("TopCT"), 0, 0);
-    }
-
     @Test
     public void testSetPositionOnChild() throws Exception {
         ContainerWrapper top, child;
@@ -526,7 +518,7 @@ public class TestContainer extends TestDatabase {
             containerTypeMap.get("ChildCtL1"), 0, 0);
 
         // set position to null
-        child.setPositionAsRowCol(null);
+        child.setParent(null, null);
         try {
             child.persist();
             Assert.fail("should not be allowed to set an null position");
@@ -546,8 +538,8 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        child.setPositionAsRowCol(new RowColPos(top.getRowCapacity() + 1, top
-            .getColCapacity() + 1));
+        child.setParent(top,
+            new RowColPos(top.getRowCapacity() + 1, top.getColCapacity() + 1));
         try {
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");
@@ -555,7 +547,7 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        child.setPositionAsRowCol(new RowColPos(-1, -1));
+        child.setParent(top, new RowColPos(-1, -1));
         try {
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");

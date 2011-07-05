@@ -25,36 +25,52 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
         super(appService);
     }
 
+    private RowColPos position = null;
+
     @Override
+    @Deprecated
     public void setRow(Integer row) {
-        Integer oldRow = getRow();
-        super.setRow(row);
-        if (row == null || !row.equals(oldRow)) {
-            updatePositionString();
-        }
+        throw new UnsupportedOperationException(
+            "Use setPosition() instead of setRow().");
     }
 
     @Override
+    @Deprecated
     public void setCol(Integer col) {
-        Integer oldCol = getCol();
-        super.setCol(col);
-        if (col == null || !col.equals(oldCol)) {
-            updatePositionString();
-        }
+        throw new UnsupportedOperationException(
+            "Use setPosition() instead of setCol().");
     }
 
     public RowColPos getPosition() {
-        return new RowColPos(getRow(), getCol());
+        return position;
     }
 
-    public void setPosition(RowColPos rcp) {
-        setRow(rcp.getRow());
-        setCol(rcp.getCol());
+    private void setPosition(RowColPos newPosition) {
+        if (newPosition == null) {
+            throw new IllegalArgumentException(
+                "Position cannot be set to null.");
+        }
+
+        RowColPos oldPosition = getPosition();
+
+        super.setRow(newPosition.getRow());
+        super.setCol(newPosition.getCol());
+
+        position = newPosition;
+
+        if (!position.equals(oldPosition)) {
+            updatePositionString();
+        }
     }
 
     public abstract ContainerWrapper getParent();
 
-    public abstract void setParent(ContainerWrapper parent);
+    public void setParent(ContainerWrapper parent, RowColPos position) {
+        setParent(parent);
+        setPosition(position);
+    }
+
+    protected abstract void setParent(ContainerWrapper parent);
 
     @Override
     protected List<Property<?, ? super E>> getProperties() {

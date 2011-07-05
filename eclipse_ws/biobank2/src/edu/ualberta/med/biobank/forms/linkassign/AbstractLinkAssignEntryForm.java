@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -666,13 +667,18 @@ public abstract class AbstractLinkAssignEntryForm extends
                         displaySinglePositions(false);
                         return;
                     }
+
+                    ContainerWrapper container = parentContainers.get(0);
+
                     appendLog(Messages
                         .getString(
                             "SpecimenAssign.single.activitylog.checkingPosition", positionString)); //$NON-NLS-1$
-                    singleSpecimen.setSpecimenPositionFromString(
-                        positionString, parentContainers.get(0));
-                    if (singleSpecimen.isPositionFree(parentContainers.get(0))) {
-                        singleSpecimen.setParent(parentContainers.get(0));
+
+                    RowColPos position = container.getContainerType()
+                        .getRowColFromPositionString(positionString);
+
+                    if (container.isPositionFree(position)) {
+                        singleSpecimen.setParent(container, position);
                         displaySinglePositions(true);
                         canSaveSingleSpecimen.setValue(true);
                         cancelConfirmWidget.setFocus();
@@ -683,12 +689,11 @@ public abstract class AbstractLinkAssignEntryForm extends
                             Messages
                                 .getString(
                                     "SpecimenAssign.single.checkStatus.error", positionString, //$NON-NLS-1$
-                                    parentContainers.get(0).getLabel()));
+                                    container.getLabel()));
                         appendLog(Messages
                             .getString(
                                 "SpecimenAssign.single.activitylog.checkPosition.error", //$NON-NLS-1$
-                                positionString, parentContainers.get(0)
-                                    .getLabel()));
+                                positionString, container.getLabel()));
                         focusControl(positionField);
                         return;
                     }

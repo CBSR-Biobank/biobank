@@ -75,11 +75,11 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return pos == null ? null : pos.getParent();
     }
 
-    public void setParent(ContainerWrapper container) {
+    public void setParent(ContainerWrapper container, RowColPos position) {
         if (container == null) {
             setSpecimenPosition(null);
         } else {
-            initSpecimenPosition().setParent(container);
+            getOrCreatePosition().setParent(container, position);
         }
     }
 
@@ -101,15 +101,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return pos == null ? null : pos.getPosition();
     }
 
-    public void setPosition(RowColPos rcp) {
-        if (rcp == null) {
-            setSpecimenPosition(null);
-        } else {
-            initSpecimenPosition().setPosition(rcp);
-        }
-    }
-
-    private SpecimenPositionWrapper initSpecimenPosition() {
+    private SpecimenPositionWrapper getOrCreatePosition() {
         SpecimenPositionWrapper specimenPosition = getSpecimenPosition();
         if (specimenPosition == null) {
             specimenPosition = new SpecimenPositionWrapper(appService);
@@ -135,49 +127,16 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     /**
      * Set the position in the given container using the positionString
      */
-    public void setSpecimenPositionFromString(String positionString,
+    public void setParentFromPositionString(String positionString,
         ContainerWrapper parentContainer) throws Exception {
         RowColPos rcp = parentContainer.getContainerType()
             .getRowColFromPositionString(
                 positionString.replaceFirst(parentContainer.getLabel(), ""));
         if ((rcp.getRow() > -1) && (rcp.getCol() > -1)) {
-            setPosition(rcp);
+            setParent(parentContainer, rcp);
         } else {
             throw new Exception("Position " + positionString + " not valid");
         }
-    }
-
-    private static final String POSITION_FREE_QRY = "from "
-        + Specimen.class.getName()
-        + " where "
-        + Property.concatNames(SpecimenPeer.SPECIMEN_POSITION,
-            SpecimenPositionPeer.ROW)
-        + "=? and "
-        + Property.concatNames(SpecimenPeer.SPECIMEN_POSITION,
-            SpecimenPositionPeer.COL)
-        + "=? and "
-        + Property.concatNames(SpecimenPeer.SPECIMEN_POSITION,
-            SpecimenPositionPeer.CONTAINER) + "=?";
-
-    /**
-     * Method used to check if the current position of this Specimen is
-     * available on the container. Return true if the position is free, false
-     * otherwise
-     */
-    public boolean isPositionFree(ContainerWrapper parentContainer)
-        throws ApplicationException {
-        RowColPos position = getPosition();
-        if (position != null) {
-            HQLCriteria criteria = new HQLCriteria(POSITION_FREE_QRY,
-                Arrays.asList(new Object[] { position.getRow(), position.getCol(),
-                    parentContainer.getWrappedObject() }));
-
-            List<Specimen> samples = appService.query(criteria);
-            if (samples.size() > 0) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public String getPositionString(boolean fullString,
@@ -316,8 +275,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             }
             if (rcp != null) {
                 if ((rcp.getRow() > -1) && (rcp.getCol() > -1)) {
-                    SpecimenWrapper Specimen = container.getSpecimen(rcp.getRow(),
-                        rcp.getCol());
+                    SpecimenWrapper Specimen = container.getSpecimen(
+                        rcp.getRow(), rcp.getCol());
                     if (Specimen != null) {
                         Specimens.add(Specimen);
                     }

@@ -34,7 +34,7 @@ public class ContainerHelper extends DbHelper {
         }
         container.setProductBarcode(barcode);
         if ((parent != null) && !parent.isNew()) {
-            container.setParent(parent);
+            container.setParent(parent, new RowColPos(0, 0));
         }
         container.setSite(site);
         container.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
@@ -64,7 +64,7 @@ public class ContainerHelper extends DbHelper {
         Integer row, Integer col) throws Exception {
         ContainerWrapper container = newContainer(label, barcode, parent, site,
             type);
-        container.setPositionAsRowCol(new RowColPos(row, col));
+        container.setParent(parent, new RowColPos(row, col));
         return container;
     }
 
@@ -130,8 +130,7 @@ public class ContainerHelper extends DbHelper {
         }
         ContainerWrapper container = addContainer(label, name, null, site, type);
         if (label == null) {
-            container.setParent(parent);
-            container.setPositionAsRowCol(new RowColPos(0, 0));
+            container.setParent(parent, new RowColPos(0, 0));
         }
         container.persist();
         return container;

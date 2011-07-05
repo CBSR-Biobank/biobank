@@ -18,11 +18,17 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
     public RowColPos(Integer row, Integer col) {
         this.row = row;
         this.col = col;
+
+        if (row == null || col == null) {
+            throw new IllegalArgumentException(
+                "Neither the row nor column of a position can be null");
+        }
     }
 
+    // TODO: this should be a convenience method outside of this class.
+    // RowColPos shouldn't know about AbstractPositionWrapper -JMF
     public RowColPos(AbstractPositionWrapper<?> pos) {
-        this.row = pos.getRow();
-        this.col = pos.getCol();
+        this(pos.getRow(), pos.getCol());
     }
 
     public Integer getRow() {

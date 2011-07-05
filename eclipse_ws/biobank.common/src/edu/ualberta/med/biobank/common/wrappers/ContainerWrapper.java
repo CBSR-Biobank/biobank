@@ -19,6 +19,8 @@ import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -37,6 +39,7 @@ import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -186,15 +189,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return pos == null ? null : pos.getPosition();
     }
 
-    public void setPositionAsRowCol(RowColPos rcp) {
-        if (rcp == null) {
-            setPosition(null);
-        } else {
-            initPosition().setPosition(rcp);
-        }
-    }
-
-    private ContainerPositionWrapper initPosition() {
+    private ContainerPositionWrapper getOrCreatePosition() {
         ContainerPositionWrapper position = getPosition();
         if (position == null) {
             position = new ContainerPositionWrapper(appService);
@@ -214,11 +209,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         throw new BiobankRuntimeException("cannot set path on container");
     }
 
-    public void setParent(ContainerWrapper container) {
+    public void setParent(ContainerWrapper container, RowColPos position) {
         if (container == null) {
             setPosition(null);
         } else {
-            initPosition().setParent(container);
+            getOrCreatePosition().setParent(container, position);
         }
 
         ContainerWrapper topContainer = container == null ? this : container
@@ -343,8 +338,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             throw new BiobankCheckException(msg);
         }
 
-        specimen.setPosition(rowColPos);
-        specimen.setParent(this);
+        specimen.setParent(this, rowColPos);
 
         getSpecimens().put(rowColPos, specimen);
 
@@ -384,7 +378,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         if (children == null) {
             Map<RowColPos, ContainerWrapper> children = new TreeMap<RowColPos, ContainerWrapper>();
 
-            for (ContainerPositionWrapper position : getChildPositionCollection(false)) {
+            List<ContainerPositionWrapper> positions = getChildPositionCollection(false);
+            for (ContainerPositionWrapper position : positions) {
                 ContainerWrapper container = position.getContainer();
                 RowColPos rowColPos = new RowColPos(position);
                 children.put(rowColPos, container);
@@ -441,8 +436,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             throw new BiobankCheckException(msg);
         }
 
-        child.setPositionAsRowCol(rowColPos);
-        child.setParent(this);
+        child.setParent(this, rowColPos);
 
         getChildren().put(rowColPos, child);
 
@@ -725,8 +719,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             newContainer.setContainerType(type);
             newContainer.setSite(getSite());
             newContainer.setTemperature(getTemperature());
-            newContainer.setPositionAsRowCol(new RowColPos(i, j));
-            newContainer.setParent(this);
+            newContainer.setParent(this, new RowColPos(i, j));
             newContainer.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
             newContainer.persist();
@@ -875,6 +868,39 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     public boolean isPallet96() {
         return getContainerType().isPallet96();
+    }
+
+    private static final String POSITION_FREE_QRY = "from "
+        + Specimen.class.getName()
+        + " where "
+        + SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.ROW).getName()
+        + "=? and "
+        + SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.COL).getName()
+        + "=? and "
+        + SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.CONTAINER)
+            .getName() + "=?";
+
+    /**
+     * Method used to check if the current position of this Specimen is
+     * available on the container. Return true if the position is free, false
+     * otherwise
+     */
+    public boolean isPositionFree(RowColPos position)
+        throws ApplicationException {
+        if (position != null) {
+            if (!isPropertyCached(ContainerPeer.CHILD_POSITION_COLLECTION)) {
+                HQLCriteria criteria = new HQLCriteria(POSITION_FREE_QRY,
+                    Arrays.asList(new Object[] { position.getRow(),
+                        position.getCol(), getWrappedObject() }));
+
+                // TODO: select a count instead?
+                List<Specimen> samples = appService.query(criteria);
+                return samples.isEmpty();
+            } else {
+                return !getChildren().containsKey(position);
+            }
+        }
+        return true;
     }
 
     @Override

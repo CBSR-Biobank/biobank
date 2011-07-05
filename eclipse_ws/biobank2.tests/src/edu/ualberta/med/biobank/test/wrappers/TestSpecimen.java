@@ -216,7 +216,8 @@ public class TestSpecimen extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        duplicate.setPosition(new RowColPos(2, 3));
+        duplicate
+            .setParent(duplicate.getParentContainer(), new RowColPos(2, 3));
         duplicate.persist();
 
         duplicate.setInventoryId(Utils.getRandomString(5));
@@ -307,7 +308,7 @@ public class TestSpecimen extends TestDatabase {
 
     @Test
     public void testSetSpecimenPositionFromString() throws Exception {
-        childSpc.setSpecimenPositionFromString("A1",
+        childSpc.setParentFromPositionString("A1",
             childSpc.getParentContainer());
         childSpc.persist();
         Assert
@@ -315,7 +316,7 @@ public class TestSpecimen extends TestDatabase {
         RowColPos pos = childSpc.getPosition();
         Assert.assertTrue((pos.getCol() == 0) && (pos.getRow() == 0));
 
-        childSpc.setSpecimenPositionFromString("C2",
+        childSpc.setParentFromPositionString("C2",
             childSpc.getParentContainer());
         childSpc.persist();
         Assert
@@ -324,7 +325,7 @@ public class TestSpecimen extends TestDatabase {
         Assert.assertTrue((pos.getCol() == 1) && (pos.getRow() == 2));
 
         try {
-            childSpc.setSpecimenPositionFromString("79",
+            childSpc.setParentFromPositionString("79",
                 childSpc.getParentContainer());
             Assert.fail("invalid position");
         } catch (Exception bce) {
@@ -337,7 +338,7 @@ public class TestSpecimen extends TestDatabase {
 
     @Test
     public void testGetPositionString() throws Exception {
-        childSpc.setSpecimenPositionFromString("A1",
+        childSpc.setParentFromPositionString("A1",
             childSpc.getParentContainer());
         Assert
             .assertTrue(childSpc.getPositionString(false, false).equals("A1"));
@@ -352,7 +353,7 @@ public class TestSpecimen extends TestDatabase {
     @Test
     public void testGetSetPosition() throws Exception {
         RowColPos position = new RowColPos(1, 3);
-        childSpc.setPosition(position);
+        childSpc.setParent(childSpc.getParentContainer(), position);
         RowColPos newPosition = childSpc.getPosition();
         Assert.assertEquals(position.getRow(), newPosition.getRow());
         Assert.assertEquals(position.getCol(), newPosition.getCol());
@@ -365,7 +366,7 @@ public class TestSpecimen extends TestDatabase {
         Assert.assertEquals(position.getCol(), newPosition.getCol());
 
         // test setting position to null
-        childSpc.setPosition(null);
+        childSpc.setParent(null, null);
         childSpc.persist();
         childSpc.reload();
         Assert.assertEquals(null, childSpc.getPosition());
@@ -384,7 +385,7 @@ public class TestSpecimen extends TestDatabase {
         ContainerWrapper parent = ContainerHelper.addContainer(
             "newcontainerParent", "ccNew", null, site, type);
 
-        childSpc.setParent(parent);
+        childSpc.setParent(parent, childSpc.getPosition());
         childSpc.persist();
         // check to make sure gone from old parent
         oldParent.reload();
@@ -611,13 +612,8 @@ public class TestSpecimen extends TestDatabase {
     public void testCheckPosition() throws BiobankCheckException, Exception {
         ContainerWrapper container = childSpc.getParentContainer();
 
-        SpecimenWrapper specimen2 = new SpecimenWrapper(appService);
-        specimen2.setPosition(childSpc.getPosition());
-
-        Assert.assertFalse(specimen2.isPositionFree(container));
-
-        specimen2.setPosition(new RowColPos(2, 3));
-        Assert.assertTrue(specimen2.isPositionFree(container));
+        Assert.assertFalse(container.isPositionFree(childSpc.getPosition()));
+        Assert.assertTrue(container.isPositionFree(new RowColPos(2, 3)));
     }
 
     @Test
@@ -649,7 +645,7 @@ public class TestSpecimen extends TestDatabase {
             ActivityStatusWrapper.ACTIVE_STATUS_STRING,
             childSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
             childSpc.getParentContainer(), 2, 4);
-        s2.setParent(null);
+        s2.setParent(null, null);
         s2.setParentSpecimen(null);
         s2.persist();
 

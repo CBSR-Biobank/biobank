@@ -45,7 +45,7 @@ public class ContainerPositionWrapper extends ContainerPositionBaseWrapper {
     }
 
     @Override
-    public void setParent(ContainerWrapper parent) {
+    protected void setParent(ContainerWrapper parent) {
         setParentContainer(parent);
     }
 
