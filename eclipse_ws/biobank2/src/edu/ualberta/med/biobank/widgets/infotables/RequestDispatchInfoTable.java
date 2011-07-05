@@ -16,7 +16,7 @@ public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
     public RequestDispatchInfoTable(Composite parent,
         List<DispatchWrapper> dispatchCollection) {
-        super(parent, dispatchCollection, HEADINGS, 10);
+        super(parent, dispatchCollection, HEADINGS, 10, DispatchWrapper.class);
     }
 
     @Override
