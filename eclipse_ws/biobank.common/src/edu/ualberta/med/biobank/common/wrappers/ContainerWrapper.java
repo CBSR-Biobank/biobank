@@ -58,12 +58,13 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     static {
         UNIQUE_LABEL_PROPS = new ArrayList<Property<?, ? super Container>>();
-        UNIQUE_LABEL_PROPS.add(ContainerPeer.SITE);
+        UNIQUE_LABEL_PROPS.add(ContainerPeer.SITE.to(SitePeer.ID));
         UNIQUE_LABEL_PROPS.add(ContainerPeer.LABEL);
-        UNIQUE_LABEL_PROPS.add(ContainerPeer.CONTAINER_TYPE);
+        UNIQUE_LABEL_PROPS.add(ContainerPeer.CONTAINER_TYPE
+            .to(ContainerTypePeer.ID));
 
         UNIQUE_BARCODE_PROPS = new ArrayList<Property<?, ? super Container>>();
-        UNIQUE_BARCODE_PROPS.add(ContainerPeer.SITE);
+        UNIQUE_BARCODE_PROPS.add(ContainerPeer.SITE.to(SitePeer.ID));
         UNIQUE_BARCODE_PROPS.add(ContainerPeer.PRODUCT_BARCODE);
     }
 
@@ -89,7 +90,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         Container newObject = super.getNewObject();
         // by default, any newly created Container will have a null parent, so
         // its top is itself.
-        newObject.setTopContainer(wrappedObject);
+        newObject.setTopContainer(newObject);
         return newObject;
     }
 
@@ -125,16 +126,25 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 "container is not in database yet: no ID");
         }
 
+        String parentPath = "";
+
         if (isPropertyCached(ContainerPeer.POSITION) && getPosition() != null) {
             if (getPosition().isPropertyCached(
                 ContainerPositionPeer.PARENT_CONTAINER)
                 && getParentContainer() != null) {
-                return getParentContainer().getPath() + PATH_DELIMITER
-                    + getId();
+                parentPath = getParentContainer().getPath();
             }
+        } else {
+            // the persisted path is actually the parent path, although this
+            // method returns the parent path plus its id.
+            parentPath = super.getPath();
         }
 
-        return super.getPath();
+        if (parentPath == null) {
+            parentPath = "";
+        }
+
+        return parentPath + PATH_DELIMITER + getId();
     }
 
     @Override
@@ -868,12 +878,15 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     protected TaskList getPersistTasks() {
         TaskList tasks = new TaskList();
 
+        tasks.add(new NotNullPreCheck<Container>(this, ContainerPeer.LABEL));
         tasks.add(new NotNullPreCheck<Container>(this, ContainerPeer.SITE));
         tasks.add(new NotNullPreCheck<Container>(this,
             ContainerPeer.CONTAINER_TYPE));
 
         tasks.add(new UniquePreCheck<Container>(this, UNIQUE_LABEL_PROPS));
         tasks.add(new UniquePreCheck<Container>(this, UNIQUE_BARCODE_PROPS));
+
+        tasks.add(cascade().deleteRemovedUnchecked(ContainerPeer.POSITION));
 
         tasks.add(super.getPersistTasks());
 
@@ -941,6 +954,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         TaskList tasks = new TaskList();
 
         if (updateChildren) {
+            // getLabel() returns the in-memory version, but the underlying
+            // value (e.g. super.getLabel()) needs to be updated for persisting.
+            setLabel(getLabel());
+
             ContainerWrapper topContainer = getTopContainer();
             if (isPropertyCached(ContainerPeer.CHILD_POSITION_COLLECTION)) {
                 // if the children have already been loaded, then update their
@@ -951,11 +968,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                     ContainerWrapper child = position.getContainer();
 
                     child.setTopContainerInternal(topContainer, false);
-
-                    // getLabel() returns the in-memory version, but the
-                    // underlying value (e.g. super.getLabel()) needs to be
-                    // updated for persisting.
-                    child.setLabel(child.getLabel());
 
                     // Save children whether they're are new or not, because the
                     // children's children could be already persistent and need

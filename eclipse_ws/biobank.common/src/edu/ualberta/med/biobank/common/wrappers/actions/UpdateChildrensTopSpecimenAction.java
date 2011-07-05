@@ -10,6 +10,7 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.util.ProxyUtil;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
@@ -30,9 +31,8 @@ public class UpdateChildrensTopSpecimenAction extends WrapperAction<Specimen> {
 
     public UpdateChildrensTopSpecimenAction(SpecimenWrapper wrapper) {
         super(wrapper);
-        SpecimenWrapper topSpecimen = wrapper.getTopSpecimen();
-        this.topSpecimen = topSpecimen != null ? topSpecimen.getWrappedObject()
-            : null;
+        this.topSpecimen = (Specimen) ProxyUtil.convertProxyToObject(wrapper
+            .getTopSpecimen().getWrappedObject());
     }
 
     @Override

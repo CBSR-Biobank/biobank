@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
 public class ContainerPersistChecks extends LoadCheck<Container> {
     private static final long serialVersionUID = 1L;
 
-    private static final String PARENT_NOT_ALLOWED_MSG = "Container {0} is a top-level container and is not allowed to have a parent.";
+    private static final String POSITION_NOT_ALLOWED_MSG = "Container {0} is a top-level container and is not allowed to have a parent or position.";
     private static final String MISSING_PARENT_MSG = "Container {0} does not have a parent container.";
     private static final String BAD_CONTAINER_TYPE_MSG = "Container {0} does not allow inserts of container type {1}.";
     private static final String MISSING_POSITION_MSG = "Child container {0} must have a position.";
@@ -54,12 +54,13 @@ public class ContainerPersistChecks extends LoadCheck<Container> {
 
     private void checkParent(Container container)
         throws BiobankSessionException {
+        boolean hasPosition = hasPosition(container);
         boolean hasParent = hasParent(container);
         boolean isTopLevel = isTopLevel(container);
 
-        if (hasParent && isTopLevel) {
+        if (isTopLevel && (hasPosition || hasParent)) {
             String label = container.getLabel();
-            String msg = MessageFormat.format(PARENT_NOT_ALLOWED_MSG, label);
+            String msg = MessageFormat.format(POSITION_NOT_ALLOWED_MSG, label);
             throw new BiobankSessionException(msg);
         }
 

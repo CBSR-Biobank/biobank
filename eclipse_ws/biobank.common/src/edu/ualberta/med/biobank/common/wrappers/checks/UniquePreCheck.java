@@ -99,9 +99,8 @@ public class UniquePreCheck<E> extends WrapperAction<E> implements PreCheck {
         List<Object> values = new ArrayList<Object>();
         E model = getModel();
 
-        GetterInterceptor lazyLoad = new LazyLoaderInterceptor(session, 1);
-
         for (Property<?, ? super E> property : properties) {
+            GetterInterceptor lazyLoad = new LazyLoaderInterceptor(session, 1);
             Object value = property.get(model, lazyLoad);
             values.add(value);
         }

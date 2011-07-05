@@ -56,7 +56,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         Specimen newObject = super.getNewObject();
         // by default, any newly created Specimen will have a null parent, so
         // its top is itself.
-        newObject.setTopSpecimen(wrappedObject);
+        newObject.setTopSpecimen(newObject);
         return newObject;
     }
 

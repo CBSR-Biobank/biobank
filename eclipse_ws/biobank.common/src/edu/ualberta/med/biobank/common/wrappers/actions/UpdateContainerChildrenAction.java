@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers.actions;
 
-import java.text.MessageFormat;
-import java.util.Arrays;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -11,11 +11,13 @@ import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.util.ProxyUtil;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
 public class UpdateContainerChildrenAction extends WrapperAction<Container> {
     private static final long serialVersionUID = 1L;
+    private static final String PATH_DELIMITER = ContainerWrapper.PATH_DELIMITER;
     private static final Property<String, Container> POSITION_STRING = ContainerPeer.POSITION
         .to(ContainerPositionPeer.POSITION_STRING);
     private static final Property<Container, Container> PARENT_CONTAINER = ContainerPeer.POSITION
@@ -27,85 +29,115 @@ public class UpdateContainerChildrenAction extends WrapperAction<Container> {
     private static final Property<String, Container> PARENT_CONTAINER_LABEL = PARENT_CONTAINER
         .to(ContainerPeer.LABEL);
     // @formatter:off
-    private static final String UPDATE_PATH_HQL = 
-        "CONCAT(IF(LENGTH(" + PARENT_CONTAINER_PATH.getName() + ") > 0, " + PARENT_CONTAINER_PATH.getName() + ", ''), " + PARENT_CONTAINER_ID.getName() + ")";
-    private static final String UPDATE_CHILDREN_HQL =
-        "\\nUPDATE " + Container.class.getName() + " o" +
-        "\\n SET o." + ContainerPeer.TOP_CONTAINER.getName() + " = ? " +
-        "\\n    ,o." + ContainerPeer.LABEL.getName() + " = CONCAT(o." + PARENT_CONTAINER_LABEL.getName() + ", o." + POSITION_STRING.getName() + ")" +
-        "\\n    ,o." + ContainerPeer.PATH.getName() + " = " + UPDATE_PATH_HQL +
-        "\\n WHERE o." + PARENT_CONTAINER_ID.getName() + " IN ({0})";
+    private static final String UPDATE_HQL =
+        "\nUPDATE " + Container.class.getName() + " o" +
+        "\n SET o." + ContainerPeer.TOP_CONTAINER.getName() + " = ? " +
+        "\n    ,o." + ContainerPeer.LABEL.getName() + " = ?" +
+        "\n    ,o." + ContainerPeer.PATH.getName() + " = ?" +
+        "\n WHERE o." + ContainerPeer.ID.getName() + " = ?";
     private static final String SELECT_CHILDREN_HQL = 
-        "\\nSELECT o." + ContainerPeer.ID.getName() +
-        "\\n FROM " + Container.class.getName() + " o" +
-        "\\n WHERE o." + PARENT_CONTAINER_ID.getName() + " IN ({0})";
+        "\nSELECT o." + ContainerPeer.ID.getName() +
+        "\n      ,o." + PARENT_CONTAINER_LABEL.getName() +
+        "\n      ,o." + POSITION_STRING.getName() +
+        "\n      ,o." + PARENT_CONTAINER_PATH.getName() +
+        "\n FROM " + Container.class.getName() + " o" +
+        "\n WHERE o." + PARENT_CONTAINER_ID.getName() + " = ?";
     // @formatter:on
 
     private final Container topContainer;
 
     public UpdateContainerChildrenAction(ContainerWrapper wrapper) {
         super(wrapper);
-        this.topContainer = wrapper.getTopContainer().getWrappedObject();
+        this.topContainer = (Container) ProxyUtil.convertProxyToObject(wrapper
+            .getTopContainer().getWrappedObject());
     }
 
     @Override
     public Object doAction(Session session) throws BiobankSessionException {
-        List<Integer> ids = Arrays.asList(getModel().getId());
-
-        updateChildren(session, ids);
+        Integer id = getModel().getId();
+        updateChildren(session, id);
 
         return null;
     }
 
-    private void updateChildren(Session session, List<Integer> ids)
+    private void updateChildren(Session session, Integer parentId)
         throws BiobankSessionException {
-        if (ids.isEmpty()) {
-            return;
+
+        List<ContainerInfo> children = getChildren(session, parentId);
+
+        for (ContainerInfo child : children) {
+            Integer id = child.getId();
+
+            Query query = session.createQuery(UPDATE_HQL);
+            query.setParameter(0, topContainer);
+            query.setParameter(1, child.getLabel());
+            query.setParameter(2, child.getPath());
+            query.setParameter(3, id);
+
+            query.executeUpdate();
+
+            updateChildren(session, id);
         }
-
-        String paramString = getParamString(ids.size());
-        String hql = MessageFormat.format(UPDATE_CHILDREN_HQL, paramString);
-        Query query = session.createQuery(hql);
-        query.setParameter(0, topContainer);
-
-        int position = 1;
-        for (Integer id : ids) {
-            query.setParameter(position++, id);
-        }
-
-        query.executeUpdate();
-
-        List<Integer> childIds = selectChildren(session, ids);
-
-        updateChildren(session, childIds);
     }
 
-    private List<Integer> selectChildren(Session session, List<Integer> ids) {
-        String paramString = getParamString(ids.size());
-        String hql = MessageFormat.format(SELECT_CHILDREN_HQL, paramString);
-        Query query = session.createQuery(hql);
+    private List<ContainerInfo> getChildren(Session session, Integer parentId) {
+        Query query = session.createQuery(SELECT_CHILDREN_HQL);
+        query.setParameter(0, parentId);
 
-        int position = 0;
-        for (Integer id : ids) {
-            query.setParameter(position++, id);
-        }
+        List<ContainerInfo> children = new ArrayList<ContainerInfo>();
 
         @SuppressWarnings("unchecked")
-        List<Integer> childIds = query.list();
+        List<Object[]> results = query.list();
 
-        return childIds;
-    }
+        for (Object[] result : results) {
+            Integer id = (Integer) result[0];
+            String parentLabel = (String) result[1];
+            String positionString = (String) result[2];
+            String parentPath = (String) result[3];
 
-    private static String getParamString(int numParams) {
-        StringBuilder buffer = new StringBuilder(numParams * 2);
-
-        for (int i = 0; i < numParams; i++) {
-            buffer.append("?");
-            if (i < numParams - 1) {
-                buffer.append(", ");
-            }
+            ContainerInfo containerInfo = new ContainerInfo(id, parentLabel,
+                positionString, parentPath, parentId);
+            children.add(containerInfo);
         }
 
-        return buffer.toString();
+        return children;
+    }
+
+    private static final class ContainerInfo implements Serializable {
+        private static final long serialVersionUID = 1L;
+        private final Integer id;
+        private final String label, path;
+
+        public ContainerInfo(Integer id, String parentLabel,
+            String positionString, String parentPath, Integer parentId) {
+            this.id = id;
+            this.label = parentLabel + positionString;
+            this.path = getPath(parentPath, parentId);
+        }
+
+        public Integer getId() {
+            return id;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        private static String getPath(String parentPath, Integer parentId) {
+            StringBuilder path = new StringBuilder();
+
+            if (parentPath != null && !parentPath.isEmpty()) {
+                path.append(parentPath);
+                path.append(PATH_DELIMITER);
+            }
+
+            path.append(parentId);
+
+            return path.toString();
+        }
     }
 }

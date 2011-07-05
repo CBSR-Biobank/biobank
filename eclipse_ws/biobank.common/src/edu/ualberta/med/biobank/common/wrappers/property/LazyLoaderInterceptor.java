@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers.property;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -9,7 +10,10 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.wrappers.Property;
 
-public class LazyLoaderInterceptor implements GetterInterceptor {
+// TODO: this class is pretty bad because it requires a new interceptor to be used with each property get. should try and use some sort of tracking information.
+public class LazyLoaderInterceptor implements GetterInterceptor, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private static final String HQL = "SELECT o.{0} FROM {1} o WHERE o = ?";
 
     private final Session session;

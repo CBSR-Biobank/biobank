@@ -17,7 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankRuntimeException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -35,6 +34,8 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropertyException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -298,7 +299,7 @@ public class TestContainer extends TestDatabase {
             ContainerHelper.addContainer("05", null, null, site, null);
             Assert
                 .fail("should not be allowed to add container with no container type");
-        } catch (BiobankException e) {
+        } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
 
@@ -309,11 +310,12 @@ public class TestContainer extends TestDatabase {
         Assert.assertEquals(null, container.getColCapacity());
     }
 
-    @Test(expected = BiobankCheckException.class)
+    @Test(expected = BiobankSessionException.class)
     public void createTopLevelNoParent() throws Exception {
         ContainerWrapper top = containerMap.get("Top");
-        ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r), top,
-            site, containerTypeMap.get("TopCT"), 0, 0);
+        ContainerHelper.addContainer(TestCommon.getNewBarcode(r),
+            TestCommon.getNewBarcode(r), top, site,
+            containerTypeMap.get("TopCT"), 0, 0);
     }
 
     @Test
@@ -357,7 +359,8 @@ public class TestContainer extends TestDatabase {
             containerTypeMap.get("ChildCtL1"), 0, 0);
         child.reload();
         // label should be assigned correct value by wrapper
-        Assert.assertFalse(child.getLabel().equals(label));
+        Assert.assertTrue(child.getLabel().equals(
+            top.getLabel() + child.getPositionString()));
     }
 
     @Test
@@ -393,7 +396,7 @@ public class TestContainer extends TestDatabase {
             container.persist();
             Assert
                 .fail("this container type is not top level. A parent is needed");
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankSessionException bce) {
             Assert.assertTrue(true);
         }
 
@@ -402,7 +405,7 @@ public class TestContainer extends TestDatabase {
         try {
             container.persist();
             Assert.fail("Parent does not accept this container type");
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankSessionException e) {
             Assert.assertTrue(true);
         }
 
@@ -423,7 +426,7 @@ public class TestContainer extends TestDatabase {
         try {
             container.persist();
             Assert.fail("position not ok in parent container");
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankSessionException bce) {
             Assert.assertTrue(true);
         }
 
@@ -448,8 +451,8 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper top, child;
 
         top = containerMap.get("Top");
-        child = ContainerHelper.newContainer(null, "uvwxyz", top, site,
-            containerTypeMap.get("ChildCtL1"), 0, 0);
+        child = ContainerHelper.newContainer(TestCommon.getNewBarcode(r),
+            "uvwxyz", top, site, containerTypeMap.get("ChildCtL1"), 0, 0);
 
         try {
             child.getPath();
@@ -506,7 +509,7 @@ public class TestContainer extends TestDatabase {
         container.reload();
     }
 
-    @Test(expected = BiobankCheckException.class)
+    @Test(expected = BiobankSessionException.class)
     public void testSetPositionOnTopLevel() throws Exception {
         ContainerHelper.addContainer("05", "uvwxyz", null, site,
             containerTypeMap.get("TopCT"), 0, 0);
@@ -518,16 +521,16 @@ public class TestContainer extends TestDatabase {
 
         top = containerMap.get("Top");
 
-        child = ContainerHelper.addContainer(null, "uvwxyz",
-            containerMap.get("Top"), site, containerTypeMap.get("ChildCtL1"),
-            0, 0);
+        child = ContainerHelper.addContainer(TestCommon.getNewBarcode(r),
+            "uvwxyz", containerMap.get("Top"), site,
+            containerTypeMap.get("ChildCtL1"), 0, 0);
 
         // set position to null
         child.setPositionAsRowCol(null);
         try {
             child.persist();
             Assert.fail("should not be allowed to set an null position");
-        } catch (BiobankCheckException e) {
+        } catch (BiobankSessionException e) {
             Assert.assertTrue(true);
         }
 
@@ -566,8 +569,8 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper top;
 
         top = containerMap.get("Top");
-        ContainerHelper.addContainer(null, "uvwxyz", top, site,
-            containerTypeMap.get("ChildCtL1"), 0, 0);
+        ContainerHelper.addContainer(TestCommon.getNewBarcode(r), "uvwxyz",
+            top, site, containerTypeMap.get("ChildCtL1"), 0, 0);
 
         try {
             ContainerHelper.addContainer(null, "uvwxyz", top, site,
