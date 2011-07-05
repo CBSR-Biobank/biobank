@@ -217,10 +217,11 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
                 int realSize = ((AbstractBiobankListProxy<?>) collection)
                     .getRealSize();
                 if (realSize != -1)
-                    pageInfo.pageTotal = realSize / pageInfo.rowsPerPage + 1;
+                    pageInfo.pageTotal = (realSize - 1) / pageInfo.rowsPerPage
+                        + 1;
             } else
-                pageInfo.pageTotal = collection.size() / pageInfo.rowsPerPage
-                    + 1;
+                pageInfo.pageTotal = (collection.size() - 1)
+                    / pageInfo.rowsPerPage + 1;
         }
     }
 

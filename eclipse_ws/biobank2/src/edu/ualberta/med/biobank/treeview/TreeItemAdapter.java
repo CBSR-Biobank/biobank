@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 
 public class TreeItemAdapter implements Node {
@@ -21,7 +20,7 @@ public class TreeItemAdapter implements Node {
     }
 
     @Override
-    public Object getParent() {
+    public Node getParent() {
         return parent;
     }
 
@@ -41,9 +40,22 @@ public class TreeItemAdapter implements Node {
                 .getPnumber();
         case 3:
             return raw.getSpecimen().getActivityStatus().getName();
-        case 4:
-            return ((DispatchSpecimenWrapper) raw).getComment();
         }
         return "";
+    }
+
+    @Override
+    public boolean equals(Object item) {
+        if (!(item instanceof TreeItemAdapter))
+            return false;
+        else
+            return getSpecimen().getSpecimen().equals(
+                ((TreeItemAdapter) item).getSpecimen().getSpecimen());
+    }
+
+    @Override
+    public void removeChild(Node o) {
+        // TODO Auto-generated method stub
+
     }
 }

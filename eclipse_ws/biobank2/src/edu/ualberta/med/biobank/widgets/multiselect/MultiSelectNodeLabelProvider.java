@@ -6,31 +6,34 @@ import org.eclipse.swt.graphics.Image;
 
 public class MultiSelectNodeLabelProvider implements ILabelProvider {
 
-	@Override
-	public Image getImage(Object element) {
-		return null;
-	}
+    @Override
+    public Image getImage(Object element) {
+        return null;
+    }
 
-	@Override
-	public String getText(Object element) {
-		return ((MultiSelectNode) element).getName();
-	}
+    @Override
+    public String getText(Object element) {
+        return ((MultiSelectNode) element).getName();
+    }
 
-	@Override
-	public void addListener(ILabelProviderListener listener) {				
-	}
+    @Override
+    public void addListener(ILabelProviderListener listener) {
+        //
+    }
 
-	@Override
-	public void dispose() {				
-	}
+    @Override
+    public void dispose() {
+        //
+    }
 
-	@Override
-	public boolean isLabelProperty(Object element, String property) {
-		return false;
-	}
+    @Override
+    public boolean isLabelProperty(Object element, String property) {
+        return false;
+    }
 
-	@Override
-	public void removeListener(ILabelProviderListener listener) {				
-	}
+    @Override
+    public void removeListener(ILabelProviderListener listener) {
+        //
+    }
 
 }

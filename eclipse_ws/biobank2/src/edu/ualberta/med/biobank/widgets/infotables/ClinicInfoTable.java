@@ -34,7 +34,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         "Short name", "Study Count", "Status", "Patients", "Patient Visits" };
 
     public ClinicInfoTable(Composite parent, List<ClinicWrapper> collection) {
-        super(parent, collection, HEADINGS, 10);
+        super(parent, collection, HEADINGS, 10, ClinicWrapper.class);
     }
 
     @Override

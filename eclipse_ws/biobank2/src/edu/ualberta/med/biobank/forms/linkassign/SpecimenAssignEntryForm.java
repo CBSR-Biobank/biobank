@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.databinding.Binding;
+import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -94,6 +97,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected boolean positionTextModified;
     private BgcBaseText singleTypeText;
     private BgcBaseText singleCollectionDateText;
+    private WritableValue foundSpecNull = new WritableValue(Boolean.TRUE,
+        Boolean.class);
 
     // for multiple specimens assign
     private ContainerWrapper currentMultipleContainer;
@@ -246,16 +251,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         widgetCreator.showWidget(cabinetCheckButton, cbsrCenter);
 
         // inventoryID
-        inventoryIdText = (BgcBaseText) createBoundWidgetWithLabel(
-            fieldsComposite,
-            BgcBaseText.class,
-            SWT.NONE,
-            Messages.getString("SpecimenAssign.single.inventoryId.label"), new String[0], //$NON-NLS-1$
-            singleSpecimen,
-            "inventoryId", //$NON-NLS-1$
-            new NonEmptyStringValidator(Messages
-                .getString("SpecimenAssign.single.inventoryId.validator.msg")), //$NON-NLS-1$
-            INVENTORY_ID_BINDING);
+        inventoryIdText = (BgcBaseText) createLabelledWidget(fieldsComposite,
+            BgcBaseText.class, SWT.NONE,
+            Messages.getString("SpecimenAssign.single.inventoryId.label"), "");
         inventoryIdText.addKeyListener(textFieldKeyListener);
         inventoryIdText.addFocusListener(new FocusAdapter() {
             @Override
@@ -264,8 +262,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     try {
                         retrieveSingleSpecimenData();
                     } catch (Exception ex) {
-                        BgcPlugin.openError("Move - specimen error", ex); //$NON-NLS-1$
+                        BgcPlugin.openError("Specimen error", ex); //$NON-NLS-1$
                         focusControl(inventoryIdText);
+
                     }
                 inventoryIdModified = false;
             }
@@ -278,7 +277,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 canSaveSingleSpecimen.setValue(false);
             }
         });
-
         singleTypeText = (BgcBaseText) createLabelledWidget(fieldsComposite,
             BgcBaseText.class, SWT.NONE,
             Messages.getString("SpecimenAssign.single.type.label"));
@@ -289,6 +287,25 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             Messages.getString("SpecimenAssign.single.collection.date.label"));
         singleCollectionDateText.setEnabled(false);
 
+        IValidator inventoryValidator = new AbstractValidator(
+            Messages
+                .getString("SpecimenAssign.single.exists.id.validation.msg")) { //$NON-NLS-1$
+            @Override
+            public IStatus validate(Object value) {
+                showDecoration();
+                if ((Boolean) foundSpecNull.getValue())
+                    return ValidationStatus
+                        .error(Messages
+                            .getString("SpecimenAssign.single.exists.id.validation.msg"));
+                else
+                    return ValidationStatus.ok();
+            }
+        };
+        UpdateValueStrategy uvs = new UpdateValueStrategy();
+        uvs.setAfterGetValidator(inventoryValidator);
+        Binding inventoryIdBinding = widgetCreator.bindValue(foundSpecNull,
+            new WritableValue(Boolean.TRUE, Boolean.class), uvs, null);
+        widgetCreator.addBindingToMap(INVENTORY_ID_BINDING, inventoryIdBinding);
         createSinglePositionFields(fieldsComposite);
     }
 
@@ -319,11 +336,13 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             singleSpecimen.getInventoryId()));
         SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(appService,
             singleSpecimen.getInventoryId());
+        foundSpecNull.setValue(foundSpecimen == null);
         if (foundSpecimen == null) {
             throw new Exception(Messages.getString(
                 "SpecimenAssign.single.inventoryId.error", //$NON-NLS-1$
                 singleSpecimen.getInventoryId()));
         }
+
         singleSpecimen.initObjectWith(foundSpecimen);
         if (singleSpecimen.isUsedInDispatch()) {
             throw new Exception(
@@ -449,6 +468,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      * Single assign: show or hide old positions fields
      */
     private void displayOldSingleFields(boolean displayOld) {
+        widgetCreator.setBinding(OLD_SINGLE_POSITION_BINDING, displayOld);
         widgetCreator.showWidget(oldSinglePositionLabel, displayOld);
         widgetCreator.showWidget(oldSinglePositionText, displayOld);
         widgetCreator.showWidget(oldSinglePositionCheckLabel, displayOld);
@@ -803,7 +823,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected void defaultInitialisation() {
         super.defaultInitialisation();
         useScannerButton.setSelection(useScanner);
-        setUseScanner(useScanner);
+        setUseScanner(!mode.isSingleMode() && useScanner);
     }
 
     @Override

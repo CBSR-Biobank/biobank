@@ -66,6 +66,7 @@ public class DateTimeFilterValueWidget implements FilterValueWidget {
                         Date date = SQL_DATETIME_FORMAT.parse(value.getValue());
                         setDate(date);
                     } catch (ParseException e) {
+                        //
                     }
                 }
                 break;
@@ -103,6 +104,7 @@ public class DateTimeFilterValueWidget implements FilterValueWidget {
         try {
             date = SQL_DATETIME_FORMAT.parse(value.getValue());
         } catch (ParseException e) {
+            //
         }
 
         if (date != null) {

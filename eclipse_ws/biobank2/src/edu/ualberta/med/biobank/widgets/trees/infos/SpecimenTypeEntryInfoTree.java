@@ -13,8 +13,8 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.dialogs.SpecimenTypeDialog;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.trees.infos.listener.IInfoTreeAddItemListener;
 import edu.ualberta.med.biobank.widgets.trees.infos.listener.IInfoTreeDeleteItemListener;
@@ -69,24 +69,24 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
         addOrEditSpecimenType(true, newST, addMessage);
     }
 
-    private boolean addOrEditSpecimenType(boolean add,
+    private void addOrEditSpecimenType(boolean add,
         SpecimenTypeWrapper specimenType, String message) {
         SpecimenTypeDialog dlg = new SpecimenTypeDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
             specimenType, message, selectedSpecimenTypes);
         if (dlg.open() == Dialog.OK) {
             if (addEditOk(specimenType)) {
-                if (add) {
-                    // only add to the collection when adding and not editing
-                    selectedSpecimenTypes.add(specimenType);
-                }
                 try {
                     specimenType.persist();
+                    if (add) {
+                        // only add to the collection when adding and not
+                        // editing
+                        selectedSpecimenTypes.add(specimenType);
+                    }
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError("Save Failed", e);
                 }
                 reloadCollection(selectedSpecimenTypes);
-                return true;
             } else {
                 try {
                     specimenType.reload();
@@ -96,7 +96,6 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                 reloadCollection(selectedSpecimenTypes);
             }
         }
-        return false;
     }
 
     private void addEditSupport() {
@@ -146,8 +145,7 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                         specType.delete();
                         setCollection(selectedSpecimenTypes);
                     } catch (final RemoteConnectFailureException exp) {
-                        BgcPlugin
-                            .openRemoteConnectErrorMessage(exp);
+                        BgcPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
                         logger.error("BioBankFormBase.createPartControl Error",
                             e);
@@ -161,7 +159,8 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
         try {
             for (SpecimenTypeWrapper sv : selectedSpecimenTypes)
                 if (!sv.getId().equals(type.getId())
-                    && sv.getName().equals(type.getName()))
+                    && (sv.getName().equals(type.getName()) || sv
+                        .getNameShort().equals(type.getNameShort())))
                     throw new BiobankCheckException(
                         "That specimen type has already been added.");
         } catch (BiobankException bce) {

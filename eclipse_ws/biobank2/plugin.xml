@@ -20,7 +20,7 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="biobank.biobank"
-            name="BioBank">
+            name="BioBank2">
          <property
                name="appName"
                value="BioBank">
@@ -286,7 +286,7 @@
        </category>
        <command
              categoryId="org.eclipse.ui.category.edit"
-             id="edu.ualberta.med.biobank.commands.ProcessingEventAdd"
+             id="edu.ualberta.med.biobank.commands.processing.processingEventAdd"
              name="Add Processing Event">
        </command>
        <command
@@ -298,6 +298,11 @@
              categoryId="org.eclipse.ui.category.window"
              id="edu.ualberta.med.biobank.commands.processing.link"
              name="Specimen Link">
+       </command>
+       <command
+             categoryId="org.eclipse.ui.category.edit"
+             id="edu.ualberta.med.biobank.commands.researchGroupAdd"
+             name="Add Research Group">
        </command>
    </extension>
    <extension
@@ -798,7 +803,7 @@
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ProcessingEventAddHandler"
-            commandId="edu.ualberta.med.biobank.commands.ProcessingEventAdd">
+            commandId="edu.ualberta.med.biobank.commands.processing.processingEventAdd">
          <activeWhen>
             <and>
                <reference
@@ -852,6 +857,20 @@
                   definitionId="biobank.processingPerspectiveSelected">
             </reference>
          </enabledWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ResearchGroupAddHandler"
+            commandId="edu.ualberta.med.biobank.commands.researchGroupAdd">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank.mainPerspectiveSelected">
+               </reference>
+            </and>
+         </activeWhen>
       </handler>
    </extension>
    <extension
@@ -907,6 +926,19 @@
                      icon="icons/clinics_add.png"
                      id="edu.ualberta.med.biobank.menu.clinicAdd"
                      label="Add Clinic"
+                     style="push">
+                  <visibleWhen
+                        checkEnabled="false">
+                     <reference
+                           definitionId="biobank.isSuperAdminMode">
+                     </reference>
+                  </visibleWhen>
+               </command>
+               <command
+                     commandId="edu.ualberta.med.biobank.commands.researchGroupAdd"
+                     icon="icons/rg_add.png"
+                     id="edu.ualberta.med.biobank.menu.researchGroupAdd"
+                     label="Add ResearchGroup"
                      style="push">
                   <visibleWhen
                         checkEnabled="false">
@@ -1038,6 +1070,12 @@
                   name="biobank.separator2"
                   visible="true">
             </separator>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.processing.processingEventAdd"
+                  icon="icons/processing_add.png"
+                  label="Add Processing Event"
+                  style="push">
+            </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.processing.link"
                   icon="icons/scanLink.png"
@@ -1246,6 +1284,18 @@
                </visibleWhen>
             </command>
             <command
+                  commandId="edu.ualberta.med.biobank.commands.researchGroupAdd"
+                  icon="icons/rg_add.png"
+                  label="Add Research Group"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank.isSuperAdminMode">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.containerTypeAdd"
                   icon="icons/containerTypes_add.png"
                   label="Add Container Type"
@@ -1298,7 +1348,7 @@
          <toolbar
                id="edu.ualberta.med.biobank.views.ProcessingView">
             <command
-                  commandId="edu.ualberta.med.biobank.commands.ProcessingEventAdd"
+                  commandId="edu.ualberta.med.biobank.commands.processing.processingEventAdd"
                   icon="icons/processing_add.png"
                   label="Add Processing Event"
                   style="push">
@@ -2239,6 +2289,12 @@
          schemeId="biobank.scheme"
          sequence="M3+D">
       </key>
+   <key
+         commandId="edu.ualberta.med.biobank.commands.processing.processingEventAdd"
+         contextId="edu.ualberta.med.biobank.perspective.processing"
+         schemeId="biobank.scheme"
+         sequence="M2+M3+P">
+   </key>
    </extension>
     <extension
          point="org.eclipse.ui.preferencePages">

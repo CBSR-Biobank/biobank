@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="BioBank" uid="biobank.product" id="biobank.product" application="biobank.biobank" version="3.0.0" useFeatures="true" includeLaunchers="false">
+<product name="BioBank" uid="biobank.product" id="biobank.product" application="biobank.biobank" version="3.0.2.rc1" useFeatures="true" includeLaunchers="false">
 
    <aboutInfo>
       <image path="/biobank2/icons/about.png"/>
@@ -37,7 +37,6 @@ AICML: http://aicml.cs.ualberta.ca
       </win>
    </launcher>
 
-
    <vm>
       <linux include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/OSGi%Minimum-1.0</linux>
       <macos include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/OSGi%Minimum-1.0</macos>
@@ -53,5 +52,8 @@ AICML: http://aicml.cs.ualberta.ca
       <feature id="biobank2.feature.platform"/>
    </features>
 
+   <configurations>
+      <plugin id="biobank.gui.common" autoStart="true" startLevel="0"/>
+   </configurations>
 
 </product>

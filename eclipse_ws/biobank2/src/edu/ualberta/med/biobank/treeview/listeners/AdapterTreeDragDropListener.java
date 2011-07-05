@@ -92,14 +92,17 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
 
     @Override
     public void dragEnter(DropTargetEvent event) {
+        //
     }
 
     @Override
     public void dragLeave(DropTargetEvent event) {
+        //
     }
 
     @Override
     public void dragOperationChanged(DropTargetEvent event) {
+        //
     }
 
     @Override
@@ -146,6 +149,7 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
 
     @Override
     public void dropAccept(DropTargetEvent event) {
+        //
     }
 
     @Override

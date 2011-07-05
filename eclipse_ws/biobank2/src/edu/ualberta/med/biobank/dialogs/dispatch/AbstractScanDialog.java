@@ -145,7 +145,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     }
 
     protected void beforeScanThreadStart() {
-
+        // default does nothing
     }
 
     protected boolean isRescanMode() {
@@ -278,6 +278,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
     @SuppressWarnings("unused")
     protected void createCustomDialogPreContents(Composite parent) {
+        // default does nothing
     }
 
     protected abstract List<UICellStatus> getPalletCellStatus();

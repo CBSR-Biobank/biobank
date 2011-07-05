@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.TraverseEvent;
@@ -68,20 +69,17 @@ public class LoggingView extends ViewPart {
         }
     };
 
-    private final KeyListener enterListener = new KeyListener() {
+    private final KeyListener enterListener = new KeyAdapter() {
         @Override
         public void keyPressed(KeyEvent e) {
             if (e.keyCode == SWT.CR) {
                 searchDatabase();
             }
         }
-
-        @Override
-        public void keyReleased(KeyEvent e) {
-        }
     };
 
     public LoggingView() {
+        //
     }
 
     @Override
@@ -312,7 +310,7 @@ public class LoggingView extends ViewPart {
             @SuppressWarnings("rawtypes")
             @Override
             public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
-
+                //
             }
         };
 
@@ -331,6 +329,7 @@ public class LoggingView extends ViewPart {
 
     @Override
     public void setFocus() {
+        //
     }
 
     private void setEnableAllFields(boolean enabled) {

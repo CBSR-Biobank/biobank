@@ -112,6 +112,7 @@ public class AdapterTreeWidget extends Composite {
         treeViewer.addTreeListener(new ITreeViewerListener() {
             @Override
             public void treeCollapsed(TreeExpansionEvent e) {
+                //
             }
 
             @Override

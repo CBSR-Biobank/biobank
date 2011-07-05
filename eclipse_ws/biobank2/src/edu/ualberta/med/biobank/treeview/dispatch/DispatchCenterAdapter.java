@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview.request;
+package edu.ualberta.med.biobank.treeview.dispatch;
 
 import java.util.Collection;
 import java.util.List;
@@ -8,34 +8,34 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class RequestSiteAdapter extends AdapterBase {
+public class DispatchCenterAdapter extends AdapterBase {
 
-    private ApprovedRequestNode approvedNode;
+    private OutgoingNode out;
+    private IncomingNode inc;
 
-    public RequestSiteAdapter(AdapterBase parent, SiteWrapper site) {
-        super(parent, site, false);
-        createNodes(site);
+    public DispatchCenterAdapter(AdapterBase parent, CenterWrapper<?> center) {
+        super(parent, center, false);
+        out = new OutgoingNode(this, 0, center);
+        out.setParent(this);
+        this.addChild(out);
+
+        inc = new IncomingNode(this, 1, center);
+        inc.setParent(this);
+        this.addChild(inc);
     }
 
-    private void createNodes(SiteWrapper site) {
-        approvedNode = new ApprovedRequestNode(this, 0, site);
-        approvedNode.setParent(this);
-        this.addChild(approvedNode);
-    }
-
-    public SiteWrapper getWrapper() {
-        return (SiteWrapper) modelObject;
+    public CenterWrapper<?> getWrapper() {
+        return (CenterWrapper<?>) modelObject;
     }
 
     @Override
     protected String getLabelInternal() {
-        SiteWrapper site = getWrapper();
+        CenterWrapper<?> site = getWrapper();
         Assert.isNotNull(site, "site is null");
         return site.getNameShort();
     }
@@ -66,12 +66,12 @@ public class RequestSiteAdapter extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode() {
-        return new RequestAdapter(this, null);
+        return null;
     }
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        return new RequestAdapter(this, (RequestWrapper) child);
+        return null;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class RequestSiteAdapter extends AdapterBase {
 
     @Override
     protected int getWrapperChildCount() {
-        return getWrapperChildren().size();
+        return 0;
     }
 
     @Override
@@ -95,14 +95,15 @@ public class RequestSiteAdapter extends AdapterBase {
     }
 
     @Override
-    public void performDoubleClick() {
-
-    }
-
-    @Override
     public void rebuild() {
         for (AdapterBase adaper : getChildren()) {
             adaper.rebuild();
         }
     }
+
+    @Override
+    public void performDoubleClick() {
+
+    }
+
 }

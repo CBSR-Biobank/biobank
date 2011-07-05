@@ -15,7 +15,6 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -87,8 +86,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     // The widget that is to get the focus when the form is created
     private Control firstControl;
 
-    public Action confirmAction;
-
     protected BgcEntryFormActions formActions;
 
     protected KeyListener keyListener = new KeyAdapter() {
@@ -134,7 +131,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     @Override
     public void doSave(IProgressMonitor monitor) {
         setDirty(false);
-        if (!confirmAction.isEnabled()) {
+        if (!formActions.getConfirmAction().isEnabled()) {
             monitor.setCanceled(true);
             setDirty(true);
             BgcPlugin.openAsyncError("Form state",
@@ -238,6 +235,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
      */
     @SuppressWarnings("unused")
     protected void doAfterSave() throws Exception {
+        // default does nothing
     }
 
     @Override
@@ -426,24 +424,22 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
 
     protected void addToolbarButtons() {
         formActions = new BgcEntryFormActions(this);
-        formActions.addResetAction("edu.ualberta.med.biobank.commands.reset");
-        formActions.addCancelAction("edu.ualberta.med.biobank.commands.cancel");
-        formActions
-            .addConfirmAction("edu.ualberta.med.biobank.commands.confirm");
+        formActions.addResetAction(Actions.BIOBANK_RESET);
+        formActions.addCancelAction(Actions.BIOBANK_CANCEL);
+        formActions.addConfirmAction(Actions.BIOBANK_CONFIRM);
         form.updateToolBar();
     }
 
     protected void addConfirmAction() {
-        formActions
-            .addConfirmAction("edu.ualberta.med.biobank.commands.confirm");
+        formActions.addConfirmAction(Actions.BIOBANK_CONFIRM);
     }
 
     protected void addResetAction() {
-        formActions.addResetAction("edu.ualberta.med.biobank.commands.reset");
+        formActions.addResetAction(Actions.BIOBANK_RESET);
     }
 
     protected void addCancelAction() {
-        formActions.addCancelAction("edu.ualberta.med.biobank.commands.cancel");
+        formActions.addCancelAction(Actions.BIOBANK_CANCEL);
     }
 
     protected void addPrintAction() {

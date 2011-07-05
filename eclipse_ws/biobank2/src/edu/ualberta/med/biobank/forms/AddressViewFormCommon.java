@@ -24,10 +24,10 @@ public abstract class AddressViewFormCommon extends BiobankViewForm {
             addWidget(widgetName, createReadOnlyLabelledField(parent, SWT.NONE,
                 field.label));
         }
-        setAdressValues(wrapperObject);
+        setAddressValues(wrapperObject);
     }
 
-    protected void setAdressValues(ModelWrapper<?> wrapperObject) {
+    protected void setAddressValues(ModelWrapper<?> wrapperObject) {
         setWidgetValues(AddressEntryFormCommon.ADDRESS_FIELDS, wrapperObject);
     }
 

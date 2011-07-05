@@ -14,12 +14,12 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
@@ -34,6 +34,8 @@ public class SessionAdapter extends AdapterBase {
     public static final int SITES_NODE_ID = 1;
 
     public static final int STUDIES_NODE_ID = 2;
+
+    public static final int RESEARCH_GROUPS_BASE_NODE_ID = 3;
 
     private BiobankApplicationService appService;
 
@@ -130,6 +132,12 @@ public class SessionAdapter extends AdapterBase {
         return (ClinicMasterGroup) adapter;
     }
 
+    private ResearchGroupMasterGroup getResearchGroupGroupNode() {
+        AdapterBase adapter = getChild(RESEARCH_GROUPS_BASE_NODE_ID);
+        Assert.isNotNull(adapter);
+        return (ResearchGroupMasterGroup) adapter;
+    }
+
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
@@ -197,8 +205,7 @@ public class SessionAdapter extends AdapterBase {
         try {
             return ClinicWrapper.getAllClinics(appService);
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(
-                "Unable to load clinics from database", e);
+            BgcPlugin.openAsyncError("Unable to load clinics from database", e);
         }
         return null;
     }
@@ -221,6 +228,18 @@ public class SessionAdapter extends AdapterBase {
         SiteGroup s = getSitesGroupNode();
         if (s != null)
             s.addSite();
+    }
+
+    public void addResearchGroup() {
+        ResearchGroupMasterGroup g = getResearchGroupNode();
+        if (g != null) {
+            g.addResearchGroup();
+        }
+    }
+
+    private ResearchGroupMasterGroup getResearchGroupNode() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
