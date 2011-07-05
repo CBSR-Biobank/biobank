@@ -149,7 +149,6 @@ public class AliquotedSpecimenSelectionWidget {
             gd.widthHint = 20;
             gd.horizontalAlignment = SWT.LEFT;
             textNumber.setLayoutData(gd);
-            setNumber(null);
             rowControlDecoration = BgcBaseWidget
                 .createDecorator(
                     textNumber,
