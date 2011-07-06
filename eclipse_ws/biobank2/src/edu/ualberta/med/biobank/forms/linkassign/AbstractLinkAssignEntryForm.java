@@ -774,4 +774,9 @@ public abstract class AbstractLinkAssignEntryForm extends
         }
     }
 
+    @Override
+    protected void refreshPalletDisplay() {
+        palletWidget.redraw();
+    }
+
 }

@@ -276,11 +276,12 @@ public class PalletCell extends AbstractUICell {
             getStatus() == null ? null : CellStatus.valueOf(getStatus().name()));
         serverCell.setExpectedSpecimenId(getExpectedSpecimen() == null ? null
             : getExpectedSpecimen().getId());
+        if (getStatus() != null)
+            serverCell.setStatus(CellStatus.valueOf(getStatus().name()));
         serverCell.setInformation(getInformation());
         serverCell.setSpecimenId(getSpecimen() == null ? null : getSpecimen()
             .getId());
         serverCell.setTitle(getTitle());
         return serverCell;
     }
-
 }

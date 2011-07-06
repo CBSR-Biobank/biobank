@@ -102,6 +102,7 @@ public class Sleak {
         shell.open();
     }
 
+    @SuppressWarnings("unused")
     void refreshLabel() {
         int colors = 0, cursors = 0, fonts = 0, gcs = 0, images = 0, regions = 0;
         for (int i = 0; i < objects.length; i++) {
