@@ -5,12 +5,19 @@
   Overall build file
   use command "ant -projecthelp" to display the targets.
   -->
+
+<!--
+  Local Variables:
+  compile-command: "export JBOSS_HOME=$HOME/apps/jboss-4.0.5.GA"
+  End:
+-->
+
   <exec executable="hostname" outputproperty="host.name">
     <arg value="-f" />
   </exec>
 
-  <property name="server.version.num" value="3.0.1" />
-  <property name="java.client.version.num" value="3.0.1" />
+  <property name="server.version.num" value="3.0.2" />
+  <property name="java.client.version.num" value="3.0.2" />
 
   <property environment="env" />
   <property name="host" value="aicml-med.cs.ualberta.ca" />
