@@ -149,7 +149,6 @@ public class AliquotedSpecimenSelectionWidget {
             gd.widthHint = 20;
             gd.horizontalAlignment = SWT.LEFT;
             textNumber.setLayoutData(gd);
-            setNumber(null);
             rowControlDecoration = BgcBaseWidget
                 .createDecorator(
                     textNumber,
@@ -388,6 +387,15 @@ public class AliquotedSpecimenSelectionWidget {
             return new SpecimenHierarchy(getSourceSelection(),
                 getResultTypeSelection());
         return null;
+    }
+
+    public void setSelection(SpecimenHierarchy previousSelection) {
+        if (previousSelection != null) {
+            cvSource.setSelection(new StructuredSelection(previousSelection
+                .getParentSpecimen()));
+            cvResult.setSelection(new StructuredSelection(previousSelection
+                .getAliquotedSpecimenType()));
+        }
     }
 
     public void setEnabled(boolean enabled) {

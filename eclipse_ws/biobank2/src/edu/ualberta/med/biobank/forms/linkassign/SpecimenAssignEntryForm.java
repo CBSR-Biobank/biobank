@@ -1007,6 +1007,14 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     private void saveSingleSpecimen() throws Exception {
         singleSpecimen.persist();
+        appendLog(Messages.getString(
+            "SpecimenAssign.single.activitylog.specimen.assigned", //$NON-NLS-1$ 
+            singleSpecimen.getPositionString(true, false), singleSpecimen
+                .getCurrentCenter().getNameShort(), singleSpecimen
+                .getInventoryId(), singleSpecimen.getSpecimenType().getName(),
+            singleSpecimen.getSpecimenType().getNameShort(), singleSpecimen
+                .getCollectionEvent().getPatient().getPnumber(), singleSpecimen
+                .getCollectionEvent().getVisitNumber()));
     }
 
     @Override
