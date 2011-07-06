@@ -50,12 +50,10 @@ public class ContainerPositionWrapper extends ContainerPositionBaseWrapper {
     }
 
     @Override
-    protected TaskList getPersistTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(ContainerPositionPeer.CONTAINER));
 
-        tasks.add(super.getPersistTasks());
+        super.addPersistTasks(tasks);
 
         BiobankSessionAction checkPosition = new ContainerPositionAvailableCheck<ContainerPosition>(
             this, ContainerPositionPeer.PARENT_CONTAINER);
@@ -69,9 +67,7 @@ public class ContainerPositionWrapper extends ContainerPositionBaseWrapper {
         tasks.add(check().ifProperty(ContainerPositionPeer.PARENT_CONTAINER,
             Is.NOT_NULL, checkBounds));
 
-        tasks.add(cascade().persist(ContainerPositionPeer.CONTAINER));
-
-        return tasks;
+        tasks.persist(this, ContainerPositionPeer.CONTAINER);
     }
 
     // TODO: remove this override when all persist()-s are like this!

@@ -331,20 +331,14 @@ public class PatientWrapper extends PatientBaseWrapper {
     }
 
     @Override
-    protected TaskList getPersistTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().uniqueAndNotNull(PatientPeer.PNUMBER));
 
-        tasks.add(super.getPersistTasks());
-
-        return tasks;
+        super.addPersistTasks(tasks);
     }
 
     @Override
-    protected TaskList getDeleteTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addDeleteTasks(TaskList tasks) {
         String hasCollectionEventsMsg = HAS_COLLECTION_EVENTS_MSG;
         tasks.add(new CollectionIsEmptyCheck<Patient>(this,
             PatientPeer.COLLECTION_EVENT_COLLECTION, hasCollectionEventsMsg));
@@ -354,9 +348,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         tasks.add(new NotUsedCheck<Patient>(this, SpecimenPeer.COLLECTION_EVENT
             .to(CollectionEventPeer.PATIENT), Specimen.class, hasSpecimensMsg));
 
-        tasks.add(super.getDeleteTasks());
-
-        return tasks;
+        super.addDeleteTasks(tasks);
     }
 
     // TODO: remove this override when all persist()-s are like this!

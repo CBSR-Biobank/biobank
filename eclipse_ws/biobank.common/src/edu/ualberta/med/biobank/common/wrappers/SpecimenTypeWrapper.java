@@ -112,28 +112,20 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     }
 
     @Override
-    protected TaskList getPersistTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().uniqueAndNotNull(SpecimenTypePeer.NAME));
         tasks.add(check().uniqueAndNotNull(SpecimenTypePeer.NAME_SHORT));
 
-        tasks.add(super.getPersistTasks());
-
-        return tasks;
+        super.addPersistTasks(tasks);
     }
 
     @Override
-    protected TaskList getDeleteTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addDeleteTasks(TaskList tasks) {
         String isUsedMsg = MessageFormat.format(HAS_SPECIMENS_MSG, getName());
         tasks.add(check().notUsedBy(Specimen.class, SpecimenPeer.SPECIMEN_TYPE,
             isUsedMsg));
 
-        tasks.add(super.getDeleteTasks());
-
-        return tasks;
+        super.addDeleteTasks(tasks);
     }
 
     // TODO: remove this override when all persist()-s are like this!

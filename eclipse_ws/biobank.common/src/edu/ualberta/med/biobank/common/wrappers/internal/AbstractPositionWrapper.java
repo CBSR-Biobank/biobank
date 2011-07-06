@@ -87,15 +87,11 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     }
 
     @Override
-    protected TaskList getPersistTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(AbstractPositionPeer.ROW));
         tasks.add(check().notNull(AbstractPositionPeer.COL));
 
-        tasks.add(super.getPersistTasks());
-
-        return tasks;
+        super.addPersistTasks(tasks);
     }
 
     private void updatePositionString() {

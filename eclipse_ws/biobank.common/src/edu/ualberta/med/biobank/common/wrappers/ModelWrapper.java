@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
 import edu.ualberta.med.biobank.common.wrappers.util.ModelWrapperHelper;
+import edu.ualberta.med.biobank.common.wrappers.util.ProxyUtil;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -36,6 +37,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -152,13 +154,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
-     * Get a {@link TaskList} that will persist (i.e. insert or update) the
-     * wrapped model object. The {@link TaskList}-s might also check certain
-     * conditions on the client or server, as well as persist potential
+     * Add tasks to the given {@link TaskList} that will persist (i.e. insert or
+     * update) the wrapped model object. The {@link TaskList}-s might also check
+     * certain conditions on the client or server, as well as persist potential
      * dependent objects.
      * <p>
-     * This method should be overridden as necessary to return a
-     * {@link TaskList} that properly persists the wrapped model object.
+     * This method should be overridden as necessary to add to the
+     * {@link TaskList} so the wrapped model object is properly persisted.
      * <p>
      * <strong>IMPORTANT.</strong> Checks can also be added to the
      * {@link TaskList}. However, in general, checks should be performed using
@@ -169,33 +171,25 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * on the in-memory model objects (before persisting) before the database
      * throws an error, but it is often difficult to know what values to check.
      * 
-     * @return
+     * @param tasks where to add the tasks
      */
-    protected TaskList getPersistTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addPersistTasks(TaskList tasks) {
         tasks.add(new PersistModelWrapperQueryTask<E>(this));
         tasks.add(check().stringLengths());
-
-        return tasks;
     }
 
     /**
-     * Get a {@link TaskList} that will delete the wrapped model object. The
-     * {@link TaskList}-s might also check certain conditions on the client or
-     * server, as well as affect potential dependent objects.
+     * Add tasks to the given {@link TaskList} that will delete the wrapped
+     * model object. The {@link TaskList}-s might also check certain conditions
+     * on the client or server, as well as persist potential dependent objects.
+     * <p>
+     * This method should be overridden as necessary to add to the
+     * {@link TaskList} so the wrapped model object is properly deleted.
      * 
-     * This method should be overridden as necessary to return a
-     * {@link TaskList} that properly deletes the wrapped model object.
-     * 
-     * @return
+     * @param tasks where to add the tasks
      */
-    protected TaskList getDeleteTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addDeleteTasks(TaskList tasks) {
         tasks.add(new DeleteModelWrapperQueryTask<E>(this));
-
-        return tasks;
     }
 
     /**
@@ -677,6 +671,44 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return this.getId().compareTo(arg0.getId());
     }
 
+    IdentityHashMap<Object, ModelWrapper<?>> wrappersMap = new IdentityHashMap<Object, ModelWrapper<?>>();
+
+    private <W extends ModelWrapper<? extends M>, M> W wrapModelSmarter(
+        M model, Class<W> wrapperKlazz) throws Exception {
+
+        @SuppressWarnings("unchecked")
+        M unproxiedModel = (M) ProxyUtil.convertProxyToObject(model);
+
+        // several proxies exist for the exact same model object? okay...
+        @SuppressWarnings("unchecked")
+        W wrapper = (W) wrappersMap.get(unproxiedModel);
+
+        if (wrapper == null) {
+            wrapper = wrapModel(appService, model, wrapperKlazz);
+            wrapper.wrappersMap = wrappersMap;
+            wrappersMap.put(unproxiedModel, wrapper);
+        }
+
+        return wrapper;
+    }
+
+    private <W extends ModelWrapper<? extends R>, R, M> List<W> wrapModelCollectionSmarter(
+        List<? extends R> modelCollection, Class<W> wrapperKlazz) {
+        List<W> wrappers = new ArrayList<W>();
+
+        if (modelCollection != null) {
+            for (R element : modelCollection) {
+                try {
+                    W wrapper = wrapModelSmarter(element, wrapperKlazz);
+                    wrappers.add(wrapper);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return wrappers;
+    }
+
     @SuppressWarnings("unchecked")
     public static <W extends ModelWrapper<? extends M>, M> W wrapModel(
         WritableApplicationService appService, M model, Class<W> wrapperKlazz)
@@ -808,8 +840,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
             if (raw != null) {
                 try {
-                    W tmp = ModelWrapper.wrapModel(appService, raw,
-                        wrapperKlazz);
+                    W tmp = wrapModelSmarter(raw, wrapperKlazz);
                     wrapper = tmp;
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -886,7 +917,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 }
             }
 
-            wrappers = wrapModelCollection(appService, list, wrapperKlazz);
+            wrappers = wrapModelCollectionSmarter(list, wrapperKlazz);
             modelWrapper.cacheProperty(property, wrappers);
             modelWrapper.elementQueue.flush(property);
         }

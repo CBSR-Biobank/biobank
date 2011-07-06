@@ -488,29 +488,24 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     @Override
-    protected TaskList getPersistTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(DispatchPeer.SENDER_CENTER));
         tasks.add(check().notNull(DispatchPeer.RECEIVER_CENTER));
 
         tasks.add(new NotNullPreCheck<Dispatch>(this,
             DispatchPeer.SENDER_CENTER));
 
-        tasks.add(cascade().deleteRemoved(
-            DispatchPeer.DISPATCH_SPECIMEN_COLLECTION));
-        tasks.add(cascade().persistAdded(
-            DispatchPeer.DISPATCH_SPECIMEN_COLLECTION));
+        tasks.deleteRemoved(this, DispatchPeer.DISPATCH_SPECIMEN_COLLECTION);
 
-        tasks.add(super.getPersistTasks());
+        super.addPersistTasks(tasks);
+
+        tasks.persistAdded(this, DispatchPeer.DISPATCH_SPECIMEN_COLLECTION);
 
         BiobankSessionAction checkWaybill = new UniqueCheck<Dispatch>(this,
             UNIQUE_WAYBILL_PER_SENDER_PROPERTIES);
 
         tasks.add(new IfAction<Dispatch>(this, WAYBILL_PROPERTY, Is.NOT_NULL,
             checkWaybill));
-
-        return tasks;
     }
 
     // TODO: remove this override when all persist()-s are like this!

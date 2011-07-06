@@ -4,6 +4,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.tasks.PreQueryTask;
 import edu.ualberta.med.biobank.common.wrappers.tasks.QueryTask;
+import edu.ualberta.med.biobank.common.wrappers.tasks.RebindableWrapperQueryTask;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -12,10 +13,12 @@ import gov.nih.nci.system.query.SDKQueryResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.hibernate.Session;
 
@@ -64,28 +67,21 @@ public class WrapperTransaction {
         // don't build the TaskList until now because it may depend on the state
         // of the wrappers, which may have been changed before now, but after
         // being added to our list of actions.
-        TaskList allTasks = new TaskList();
+        TaskList tasks = new TaskList();
 
         for (Action action : actions) {
-            TaskList tasks = new TaskList();
-
             switch (action.type) {
             case PERSIST:
-                tasks = action.wrapper.getPersistTasks();
+                action.wrapper.addPersistTasks(tasks);
                 break;
             case DELETE:
-                tasks = action.wrapper.getDeleteTasks();
+                action.wrapper.addDeleteTasks(tasks);
             }
-
-            tasks.add(new RebindWrappersQueryTask(action.wrapper));
-
-            allTasks.add(tasks);
         }
 
-        // TODO: add on a task to re-attach ModelWrapper-s to their wrapped
-        // objects AND IF SO, DO NOT clear the property cache of wrappers.
+        addRebindTask(tasks);
 
-        execute(allTasks);
+        execute(tasks);
     }
 
     public static void persist(ModelWrapper<?> wrapper,
@@ -102,6 +98,19 @@ public class WrapperTransaction {
         WrapperTransaction tx = new WrapperTransaction(appService);
         tx.delete(wrapper);
         tx.commit();
+    }
+
+    private void addRebindTask(TaskList tasks) {
+        Set<ModelWrapper<?>> wrappers = new HashSet<ModelWrapper<?>>();
+        for (QueryTask task : tasks.getQueryTasks()) {
+            if (task instanceof RebindableWrapperQueryTask) {
+                ModelWrapper<?> wrapper = ((RebindableWrapperQueryTask) task)
+                    .getWrapperToRebind();
+                wrappers.add(wrapper);
+            }
+        }
+
+        tasks.add(new RebindWrappersQueryTask(wrappers));
     }
 
     /**
@@ -147,17 +156,18 @@ public class WrapperTransaction {
     // TODO: move out!
     public static class RebindWrappersQueryTask implements QueryTask {
         private final ModelWrapper<?> wrapper;
-        private final List<ModelWrapper<?>> cachedWrappers = new ArrayList<ModelWrapper<?>>();
-        private final List<Object> wrappedObjects = new ArrayList<Object>();
+        private final List<ModelWrapper<?>> wrappersToRebind = new ArrayList<ModelWrapper<?>>();
+        private final List<Object> oldModels = new ArrayList<Object>();
 
-        public RebindWrappersQueryTask(ModelWrapper<?> wrapper) {
-            this.wrapper = wrapper;
-            init();
+        public RebindWrappersQueryTask(Set<ModelWrapper<?>> wrappers) {
+            // arbitrarily pick the first wrapper to use for security checks
+            this.wrapper = wrappers.iterator().next();
+            init(wrappers);
         }
 
         @Override
         public SDKQuery getSDKQuery() {
-            return new ReturnAction(wrapper, wrappedObjects);
+            return new ReturnAction(wrapper, oldModels);
         }
 
         @Override
@@ -165,9 +175,15 @@ public class WrapperTransaction {
             // TODO: If we reattach here, no need to do so in Delete or
             // Persist!! :-)
             @SuppressWarnings("unchecked")
-            List<Object> newObjects = (List<Object>) result.getObjectResult();
-            for (int i = 0, n = cachedWrappers.size(); i < n; i++) {
-                setWrappedObject(cachedWrappers.get(i), newObjects.get(i));
+            List<Object> newModels = (List<Object>) result.getObjectResult();
+
+            updateWrappedObjects(newModels);
+            updateWrapperMap(newModels);
+        }
+
+        private void updateWrappedObjects(List<Object> newModels) {
+            for (int i = 0, n = wrappersToRebind.size(); i < n; i++) {
+                setWrappedObject(wrappersToRebind.get(i), newModels.get(i));
                 // TODO: only thing that may have changed is the id, notify
                 // listeners?
                 // TODO: direct properties may have changed, but not
@@ -176,18 +192,36 @@ public class WrapperTransaction {
             }
         }
 
+        private void updateWrapperMap(List<Object> newModels) {
+            // TODO:
+            // TODO: NEED NEED NEED to clean up the ModelWrapper.wrappersMap
+            // because it will contain model objects (as keys) that no longer
+            // exist.
+            // TODO:
+            // TODO: this is unnecessarily slow, mostly because almost all of
+            // the given wrappers will share the same wrapeprsMap. Could be
+            // optimized.
+            for (ModelWrapper<?> wrapper : wrappersToRebind) {
+                for (int i = 0, n = oldModels.size(); i < n; i++) {
+                }
+            }
+        }
+
         private static <E> void setWrappedObject(ModelWrapper<E> wrapper,
             Object object) {
             wrapper.wrappedObject = wrapper.getWrappedClass().cast(object);
         }
 
-        private void init() {
+        private void init(Collection<ModelWrapper<?>> wrappers) {
             Map<ModelWrapper<?>, Object> map = new IdentityHashMap<ModelWrapper<?>, Object>();
-            readCache(wrapper, map);
+
+            for (ModelWrapper<?> wrapper : wrappers) {
+                readCache(wrapper, map);
+            }
 
             for (Entry<ModelWrapper<?>, Object> entry : map.entrySet()) {
-                cachedWrappers.add(entry.getKey());
-                wrappedObjects.add(entry.getValue());
+                wrappersToRebind.add(entry.getKey());
+                oldModels.add(entry.getValue());
             }
         }
 

@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
-import edu.ualberta.med.biobank.common.wrappers.tasks.QueryTask;
+import edu.ualberta.med.biobank.common.wrappers.tasks.RebindableWrapperQueryTask;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
@@ -19,7 +19,7 @@ import org.hibernate.Session;
  * @author jferland
  * 
  */
-public class PersistModelWrapperQueryTask<E> implements QueryTask {
+public class PersistModelWrapperQueryTask<E> implements RebindableWrapperQueryTask {
     private final ModelWrapper<E> modelWrapper;
 
     public PersistModelWrapperQueryTask(ModelWrapper<E> modelWrapper) {
@@ -42,6 +42,11 @@ public class PersistModelWrapperQueryTask<E> implements QueryTask {
 
         WrapperEvent event = new WrapperEvent(eventType, modelWrapper);
         modelWrapper.notifyListeners(event);
+    }
+
+    @Override
+    public ModelWrapper<?> getWrapperToRebind() {
+        return modelWrapper;
     }
 
     /**

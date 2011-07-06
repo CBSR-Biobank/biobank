@@ -217,25 +217,17 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     @Override
-    protected TaskList getPersistTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().uniqueAndNotNull(ProcessingEventPeer.WORKSHEET));
 
-        tasks.add(super.getPersistTasks());
+        super.addPersistTasks(tasks);
 
-        tasks.add(cascade().persistAdded(
-            ProcessingEventPeer.SPECIMEN_COLLECTION));
-
-        return tasks;
+        tasks.persistAdded(this, ProcessingEventPeer.SPECIMEN_COLLECTION);
     }
 
     @Override
-    protected TaskList getDeleteTasks() {
-        TaskList tasks = new TaskList();
-
-        tasks.add(cascade().persistRemoved(
-            ProcessingEventPeer.SPECIMEN_COLLECTION));
+    protected void addDeleteTasks(TaskList tasks) {
+        tasks.persistRemoved(this, ProcessingEventPeer.SPECIMEN_COLLECTION);
 
         String hasDerivedSpecimensMsg = MessageFormat.format(
             HAS_DERIVED_SPECIMENS_MSG, getWorksheet(), getFormattedCreatedAt());
@@ -246,9 +238,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         tasks.add(check().notUsedBy(Specimen.class,
             SpecimenPeer.PROCESSING_EVENT));
 
-        tasks.add(super.getDeleteTasks());
-
-        return tasks;
+        super.addDeleteTasks(tasks);
     }
 
     // TODO: remove this override when all persist()-s are like this!

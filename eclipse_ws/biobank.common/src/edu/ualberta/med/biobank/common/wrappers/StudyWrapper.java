@@ -390,43 +390,30 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     @Override
-    protected TaskList getPersistTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().uniqueAndNotNull(StudyPeer.NAME));
         tasks.add(check().uniqueAndNotNull(StudyPeer.NAME_SHORT));
 
-        tasks.add(cascade()
-            .deleteRemoved(StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
-        tasks
-            .add(cascade().deleteRemoved(StudyPeer.SOURCE_SPECIMEN_COLLECTION));
-        tasks.add(cascade().deleteRemoved(
-            StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
+        tasks.deleteRemoved(this, StudyPeer.STUDY_EVENT_ATTR_COLLECTION);
+        tasks.deleteRemoved(this, StudyPeer.SOURCE_SPECIMEN_COLLECTION);
+        tasks.deleteRemoved(this, StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION);
 
-        tasks.add(super.getPersistTasks());
+        super.addPersistTasks(tasks);
 
-        tasks
-            .add(cascade().persistAdded(StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
-        tasks.add(cascade().persistAdded(StudyPeer.SOURCE_SPECIMEN_COLLECTION));
-        tasks.add(cascade().persistAdded(
-            StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
-
-        return tasks;
+        tasks.persistAdded(this, StudyPeer.STUDY_EVENT_ATTR_COLLECTION);
+        tasks.persistAdded(this, StudyPeer.SOURCE_SPECIMEN_COLLECTION);
+        tasks.persistAdded(this, StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION);
     }
 
     @Override
-    protected TaskList getDeleteTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addDeleteTasks(TaskList tasks) {
         tasks.add(check().empty(StudyPeer.PATIENT_COLLECTION));
 
-        tasks.add(cascade().delete(StudyPeer.STUDY_EVENT_ATTR_COLLECTION));
-        tasks.add(cascade().delete(StudyPeer.SOURCE_SPECIMEN_COLLECTION));
-        tasks.add(cascade().delete(StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION));
+        tasks.delete(this, StudyPeer.STUDY_EVENT_ATTR_COLLECTION);
+        tasks.delete(this, StudyPeer.SOURCE_SPECIMEN_COLLECTION);
+        tasks.delete(this, StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION);
 
-        tasks.add(super.getDeleteTasks());
-
-        return tasks;
+        super.addDeleteTasks(tasks);
     }
 
     // TODO: remove this override when all persist()-s are like this!

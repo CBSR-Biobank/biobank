@@ -164,25 +164,17 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     }
 
     @Override
-    protected TaskList getPersistTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(OriginInfoPeer.CENTER));
 
-        tasks.add(super.getPersistTasks());
+        super.addPersistTasks(tasks);
 
         tasks.add(new OriginInfoFromClinicCheck(this));
-
-        return tasks;
     }
 
     @Override
-    protected TaskList getDeleteTasks() {
-        TaskList tasks = new TaskList();
-
-        tasks.add(super.getDeleteTasks());
-
-        return tasks;
+    protected void addDeleteTasks(TaskList tasks) {
+        super.addDeleteTasks(tasks);
     }
 
     // TODO: remove this override when all persist()-s are like this!

@@ -298,30 +298,22 @@ public class SiteWrapper extends SiteBaseWrapper {
     }
 
     @Override
-    protected TaskList getPersistTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addPersistTasks(TaskList tasks) {
         // TODO: move to center?
         tasks.add(check().uniqueAndNotNull(SitePeer.NAME));
         tasks.add(check().uniqueAndNotNull(SitePeer.NAME_SHORT));
 
-        tasks.add(super.getPersistTasks());
-
-        return tasks;
+        super.addPersistTasks(tasks);
     }
 
     @Override
-    protected TaskList getDeleteTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addDeleteTasks(TaskList tasks) {
         String errMsg = MessageFormat.format(EXISTING_CHILDREN_MSG, getName());
         tasks.add(check().empty(SitePeer.CONTAINER_COLLECTION, errMsg));
         tasks.add(check().empty(SitePeer.CONTAINER_TYPE_COLLECTION, errMsg));
         tasks.add(check().empty(SitePeer.PROCESSING_EVENT_COLLECTION, errMsg));
 
-        tasks.add(super.getDeleteTasks());
-
-        return tasks;
+        super.addDeleteTasks(tasks);
     }
 
     // TODO: remove this override when all persist()-s are like this!

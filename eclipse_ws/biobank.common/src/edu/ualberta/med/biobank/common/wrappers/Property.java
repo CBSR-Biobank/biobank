@@ -226,6 +226,7 @@ public class Property<P, M> implements Serializable {
         return result;
     }
 
+    // TODO: include model class or type info for equality check?
     @Override
     public boolean equals(Object obj) {
         if (this == obj)

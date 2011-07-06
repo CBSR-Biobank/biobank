@@ -38,12 +38,10 @@ public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {
     }
 
     @Override
-    protected TaskList getPersistTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().notNull(SpecimenPositionPeer.CONTAINER));
 
-        tasks.add(super.getPersistTasks());
+        super.addPersistTasks(tasks);
 
         tasks.add(new ContainerPositionAvailableCheck<SpecimenPosition>(this,
             SpecimenPositionPeer.CONTAINER));
@@ -51,9 +49,7 @@ public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {
         tasks.add(new ContainerPositionInBoundsCheck<SpecimenPosition>(this,
             SpecimenPositionPeer.CONTAINER));
 
-        tasks.add(cascade().persist(SpecimenPositionPeer.SPECIMEN));
-
-        return tasks;
+        tasks.persist(this, SpecimenPositionPeer.SPECIMEN);
     }
 
     // TODO: remove this override when all persist()-s are like this!

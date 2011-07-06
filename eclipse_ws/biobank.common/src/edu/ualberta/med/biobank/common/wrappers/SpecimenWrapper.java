@@ -472,9 +472,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return tasks;
     }
 
-    private TaskList updateChildrensTopSpecimen() {
-        TaskList tasks = new TaskList();
-
+    private void addTasksToUpdateChildren(TaskList tasks) {
         if (topSpecimenChanged) {
             SpecimenWrapper topSpecimen = getTopSpecimen();
             if (isPropertyCached(SpecimenPeer.CHILD_SPECIMEN_COLLECTION)) {
@@ -489,7 +487,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                     // children's children could be already persistent and need
                     // to be updated (but would then need their parent to be
                     // persisted first).
-                    tasks.add(child.getPersistTasks());
+                    child.addPersistTasks(tasks);
                 }
             } else {
                 // Use HQL to update all descendants of this Specimen because
@@ -499,42 +497,31 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
             tasks.add(new ResetTopSpecimenChangedQueryTask(this));
         }
-
-        return tasks;
     }
 
     @Override
-    protected TaskList getPersistTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().uniqueAndNotNull(SpecimenPeer.INVENTORY_ID));
         tasks.add(check().notNull(SpecimenPeer.SPECIMEN_TYPE));
 
-        tasks.add(cascade().deleteRemovedUnchecked(
-            SpecimenPeer.SPECIMEN_POSITION));
+        tasks.deleteRemovedUnchecked(this, SpecimenPeer.SPECIMEN_POSITION);
 
-        tasks.add(super.getPersistTasks());
+        super.addPersistTasks(tasks);
 
-        tasks.add(cascade().persist(SpecimenPeer.SPECIMEN_POSITION));
+        tasks.persist(this, SpecimenPeer.SPECIMEN_POSITION);
 
         tasks.add(postCheckLegalSampleType());
 
-        tasks.add(updateChildrensTopSpecimen());
-
-        return tasks;
+        addTasksToUpdateChildren(tasks);
     }
 
     @Override
-    protected TaskList getDeleteTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addDeleteTasks(TaskList tasks) {
         tasks.add(check().empty(SpecimenPeer.CHILD_SPECIMEN_COLLECTION));
 
-        tasks.add(cascade().delete(SpecimenPeer.SPECIMEN_POSITION));
+        tasks.delete(this, SpecimenPeer.SPECIMEN_POSITION);
 
-        tasks.add(super.getDeleteTasks());
-
-        return tasks;
+        super.addDeleteTasks(tasks);
     }
 
     // TODO: remove this override when all persist()-s are like this!

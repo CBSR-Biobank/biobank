@@ -55,14 +55,9 @@ public class GlobalEventAttrWrapper extends GlobalEventAttrBaseWrapper {
     }
 
     @Override
-    protected TaskList getDeleteTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addDeleteTasks(TaskList tasks) {
         // FIXME if used by any study then it cannot be deleted
-
-        tasks.add(super.getDeleteTasks());
-
-        return tasks;
+        super.addDeleteTasks(tasks);
     }
 
     // TODO: remove this override when all persist()-s are like this!

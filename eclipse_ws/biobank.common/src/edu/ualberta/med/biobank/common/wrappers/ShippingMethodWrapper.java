@@ -98,26 +98,18 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
     }
 
     @Override
-    protected TaskList getPersistTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addPersistTasks(TaskList tasks) {
         tasks.add(check().uniqueAndNotNull(ShippingMethodPeer.NAME));
 
-        tasks.add(super.getPersistTasks());
-
-        return tasks;
+        super.addPersistTasks(tasks);
     }
 
     @Override
-    protected TaskList getDeleteTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addDeleteTasks(TaskList tasks) {
         tasks.add(check().notUsedBy(ShipmentInfo.class,
             ShipmentInfoPeer.SHIPPING_METHOD));
 
-        tasks.add(super.getDeleteTasks());
-
-        return tasks;
+        super.addDeleteTasks(tasks);
     }
 
     // TODO: remove this override when all persist()-s are like this!

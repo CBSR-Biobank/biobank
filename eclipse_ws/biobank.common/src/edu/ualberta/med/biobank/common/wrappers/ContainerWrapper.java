@@ -909,9 +909,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     @Override
-    protected TaskList getPersistTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addPersistTasks(TaskList tasks) {
         tasks.add(new NotNullPreCheck<Container>(this, ContainerPeer.LABEL));
         tasks.add(new NotNullPreCheck<Container>(this, ContainerPeer.SITE));
         tasks.add(new NotNullPreCheck<Container>(this,
@@ -920,36 +918,30 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         tasks.add(new UniquePreCheck<Container>(this, UNIQUE_LABEL_PROPS));
         tasks.add(new UniquePreCheck<Container>(this, UNIQUE_BARCODE_PROPS));
 
-        tasks.add(cascade().deleteRemovedUnchecked(ContainerPeer.POSITION));
+        tasks.deleteRemovedUnchecked(this, ContainerPeer.POSITION);
 
-        tasks.add(super.getPersistTasks());
+        super.addPersistTasks(tasks);
 
-        tasks.add(cascade().persist(ContainerPeer.POSITION));
+        tasks.persist(this, ContainerPeer.POSITION);
 
         // Need to update the path property after this Container and its
         // position have been saved to ensure that the path is calculated based
         // on persistent (non-new) objects.
         tasks.add(new UpdateContainerPathAction(this));
 
-        tasks.add(cascade().persistAdded(
-            ContainerPeer.SPECIMEN_POSITION_COLLECTION));
-        tasks.add(cascade().persistAdded(
-            ContainerPeer.CHILD_POSITION_COLLECTION));
+        tasks.persistAdded(this, ContainerPeer.SPECIMEN_POSITION_COLLECTION);
+        tasks.persistAdded(this, ContainerPeer.CHILD_POSITION_COLLECTION);
 
-        tasks.add(updateChildren());
+        addTasksToUpdateChildren(tasks);
 
         tasks.add(new UniqueCheck<Container>(this, UNIQUE_LABEL_PROPS));
         tasks.add(new UniqueCheck<Container>(this, UNIQUE_BARCODE_PROPS));
 
         tasks.add(new ContainerPersistChecks(this));
-
-        return tasks;
     }
 
     @Override
-    protected TaskList getDeleteTasks() {
-        TaskList tasks = new TaskList();
-
+    protected void addDeleteTasks(TaskList tasks) {
         String hasSpecimensMsg = MessageFormat.format(HAS_SPECIMENS_MSG,
             getLabel());
         tasks.add(check().empty(ContainerPeer.SPECIMEN_POSITION_COLLECTION,
@@ -965,9 +957,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         // really confusing.
         // tasks.add(cascade().delete(ContainerPeer.POSITION));
 
-        tasks.add(super.getDeleteTasks());
-
-        return tasks;
+        super.addDeleteTasks(tasks);
     }
 
     // TODO: remove this override when all persist()-s are like this!
@@ -988,9 +978,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * 
      * @return
      */
-    private TaskList updateChildren() {
-        TaskList tasks = new TaskList();
-
+    private void addTasksToUpdateChildren(TaskList tasks) {
         if (updateChildren) {
             // getLabel() returns the in-memory version, but the underlying
             // value (e.g. super.getLabel()) needs to be updated for persisting.
@@ -1011,7 +999,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                     // children's children could be already persistent and need
                     // to be updated (but would then need their parent to be
                     // persisted first).
-                    tasks.add(child.getPersistTasks());
+                    child.addPersistTasks(tasks);
                 }
             } else {
                 // Use HQL to update all descendants of this Container because
@@ -1021,8 +1009,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
             tasks.add(new ResetUpdateChildrenFlagQueryTask(this));
         }
-
-        return tasks;
     }
 
     private void checkPositionValid(RowColPos pos) throws BiobankCheckException {
