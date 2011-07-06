@@ -389,6 +389,15 @@ public class AliquotedSpecimenSelectionWidget {
         return null;
     }
 
+    public void setSelection(SpecimenHierarchy previousSelection) {
+        if (previousSelection != null) {
+            cvSource.setSelection(new StructuredSelection(previousSelection
+                .getParentSpecimen()));
+            cvResult.setSelection(new StructuredSelection(previousSelection
+                .getAliquotedSpecimenType()));
+        }
+    }
+
     public void setEnabled(boolean enabled) {
         cvSource.getControl().setEnabled(enabled);
         cvResult.getControl().setEnabled(enabled);

@@ -34,7 +34,7 @@ public class PalletScanManagement {
     private int scansCount = 0;
     private boolean useScanner = true;
 
-    private boolean scanTubeAloneMode = false;
+    private boolean scanTubeAloneMode = true;
 
     public void launchScanAndProcessResult(final String plateToScan) {
         launchScanAndProcessResult(plateToScan,
@@ -116,6 +116,7 @@ public class PalletScanManagement {
         if (rescanMode && oldCells != null) {
             // rescan: merge previous scan with new in case the scanner
             // wasn't able to scan well
+            boolean rescanDifferent = false;
             for (Entry<RowColPos, PalletCell> entry : oldCells.entrySet()) {
                 RowColPos rcp = entry.getKey();
                 PalletCell oldScannedCell = entry.getValue();
@@ -127,10 +128,13 @@ public class PalletScanManagement {
                         && !oldScannedCell.getValue().equals(
                             newScannedCell.getValue())) {
                         // Different values at same position
-                            cells = oldCells;
-                            throw new Exception(
-                                "Scan Aborted: previously scanned specimens has been replaced. "
-                                    + "If this is not a re-scan, reset and start again.");
+                        oldScannedCell.setInformation((oldScannedCell
+                            .getInformation() != null ? oldScannedCell
+                            .getInformation() : "")
+                            + " Rescanned value is different");
+                        oldScannedCell.setStatus(CellStatus.ERROR);
+                        rescanDifferent = true;
+
                     } else if (!PalletCell.hasValue(newScannedCell)) {
                         // previous position has value - new has none
                         PalletCell newPosition = cellValues.get(oldScannedCell
@@ -146,6 +150,9 @@ public class PalletScanManagement {
                     cells.put(rcp, oldScannedCell);
                 }
             }
+            if (rescanDifferent)
+                throw new Exception(
+                    "Scan error: Previously scanned specimens has been replaced. Please cancel and start again.");
         }
         afterSuccessfulScan();
     }
@@ -267,7 +274,8 @@ public class PalletScanManagement {
     }
 
     public void toggleScanTubeAloneMode() {
-        scanTubeAloneMode = !scanTubeAloneMode;
+        // might want to remove this toggle thing if users don't ask for it back
+        // scanTubeAloneMode = !scanTubeAloneMode;
     }
 
     public boolean isScanTubeAloneMode() {

@@ -260,7 +260,10 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected void launchScanAndProcessResult() {
         palletScanManagement.launchScanAndProcessResult(plateToScanValue
             .getValue().toString(), getProfile(), isRescanMode());
+        refreshPalletDisplay();
     }
+
+    protected abstract void refreshPalletDisplay();
 
     protected String getProfile() {
         if (profilesCombo == null

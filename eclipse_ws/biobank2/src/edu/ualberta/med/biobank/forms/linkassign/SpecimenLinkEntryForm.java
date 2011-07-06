@@ -443,8 +443,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             for (int row = 0; row < specimenTypesWidgets.size(); row++) {
                 AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets
                     .get(row);
+                // if rescan, want to keep previous selection
+                SpecimenHierarchy previousSelection = widget.getSelection();
                 widget.setSourceSpecimens(availableSourceSpecimens);
                 widget.setResultTypes(studiesAliquotedTypes);
+                widget.setSelection(previousSelection);
             }
     }
 
