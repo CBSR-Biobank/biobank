@@ -50,43 +50,39 @@ SPC_INSERT_QRY
     res = @dbh.query(BIOBANK2_QRY)
     pvsvs = Array.new
     res.each_hash do |row|
+      invalid_date = false
       begin
         created_at = Time.parse(row['created_at']).utc.strftime("%Y-%m-%d %T")
       rescue ArgumentError
         created_at = row['created_at']
+        invalid_date = false
       end
 
       pvsvs << {
         'study' => row['study'],
         'pnumber' => row['pnumber'],
+        'specimen_type_name' => row['name'],
+        'quantity' => row['quantity'].to_i,
         'created_at_unformatted' => row['created_at'],
         'created_at' => created_at,
-        'specimen_type_name' => row['name'],
-        'quantity' => row['quantity'].to_i }
+        'invalid_date' => invalid_date
+      }
     end
     res.free
     #pp pvsvs
 
     @dbh2 = Mysql.real_connect('localhost', "dummy", "ozzy498", "biobank")
-
-#    @dbh2.query("ALTER TABLE specimen MODIFY COLUMN ID INT(11) NOT NULL auto_increment")
+    #print "ALTER TABLE specimen MODIFY COLUMN ID INT(11) NOT NULL auto_increment;\n"
 
     pvsvs.each do |pvsv|
       qry = BIOBANK_QRY.gsub("{study_name}", pvsv['study']);
       qry = qry.gsub("{pnumber}", pvsv['pnumber']);
       qry = qry.gsub("{specimen_type_name}", pvsv['specimen_type_name']);
 
-      begin
-        created_at = Time.parse(pvsv['created_at'])
-      rescue ArgumentError
-        created_at = Time.parse("1970-01-01")
-      end
-
-      x = created_at <=> Time.parse("1970-01-01")
-      if x <= 0
-        qry = qry.gsub("{created_at}", pvsv['created_at']);
-      else
+      if pvsv['invalid_date']
         qry = qry.gsub("{created_at}", pvsv['created_at_unformatted']);
+      else
+        qry = qry.gsub("{created_at}", pvsv['created_at']);
       end
 
       #print qry, "\n"
@@ -125,8 +121,7 @@ SPC_INSERT_QRY
           end
           qry << values.join(",")
           qry << ")"
-          #print qry, "\n";
-          #@dbh2.query(qry)
+          #print qry, ";\n";
         end
       else
         raise "#{res.num_rows}: nothing to be done for #{pvsv['pnumber']}, specimen type #{ pvsv['specimen_type_name']} with date #{pvsv['created_at']} \n"
@@ -134,7 +129,7 @@ SPC_INSERT_QRY
       res.free
     end
 
-#    @dbh2.query("ALTER TABLE specimen MODIFY COLUMN ID INT(11) NOT NULL")
+#    print "ALTER TABLE specimen MODIFY COLUMN ID INT(11) NOT NULL;\n"
   end
 end
 
