@@ -315,4 +315,25 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
             && (getCenter() == null || user.getCurrentWorkingCenter().equals(
                 getCenter()));
     }
+
+    public static String PE_BY_PATIENT_STRING = "select s."
+        + SpecimenPeer.PROCESSING_EVENT.getName()
+        + " from "
+        + Specimen.class.getName()
+        + " s where s."
+        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
+            CollectionEventPeer.PATIENT, PatientPeer.PNUMBER)
+        + " = ? order by s."
+        + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
+            ProcessingEventPeer.CREATED_AT);
+
+    public static List<ProcessingEventWrapper> getProcessingEventsByPatient(
+        BiobankApplicationService appService, String pnum)
+        throws ApplicationException {
+        HQLCriteria c = new HQLCriteria(PE_BY_PATIENT_STRING,
+            Arrays.asList(pnum));
+        List<ProcessingEvent> res = appService.query(c);
+        return wrapModelCollection(appService, res,
+            ProcessingEventWrapper.class);
+    }
 }
