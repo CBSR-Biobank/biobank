@@ -85,7 +85,7 @@ SPC_INSERT_QRY
         qry = qry.gsub("{created_at}", pvsv['created_at']);
       end
 
-      #print qry, "\n"
+      print qry, "\n"
       res = @dbh2.query(qry)
       if (res.num_rows < 1)
         print "no result for: ",
@@ -114,7 +114,7 @@ SPC_INSERT_QRY
           qry = String.new
           qry << SPC_INSERT_BASE_QRY
           qry << "('#{row['INVENTORY_ID']}-#{i+1}',"
-          if x <= 0
+          if pvsv['invalid_date']
             qry << "'#{row['CREATED_AT']}',"
           else
             qry << "'#{pvsv['created_at_unformatted']}',"
