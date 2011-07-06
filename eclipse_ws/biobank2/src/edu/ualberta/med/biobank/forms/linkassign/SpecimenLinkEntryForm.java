@@ -435,11 +435,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                     filteredSpecs.add(spec);
             availableSourceSpecimens = filteredSpecs;
         }
-        if (isSingleMode()) {
-            // for single
-            singleTypesWidget.setSourceSpecimens(availableSourceSpecimens);
-            singleTypesWidget.setResultTypes(studiesAliquotedTypes);
-        } else
+
+        // for single
+        singleTypesWidget.setSourceSpecimens(availableSourceSpecimens);
+        singleTypesWidget.setResultTypes(studiesAliquotedTypes);
+        if (!isSingleMode())
             for (int row = 0; row < specimenTypesWidgets.size(); row++) {
                 AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets
                     .get(row);

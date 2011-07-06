@@ -111,6 +111,7 @@ public class PalletScanManagement {
         } else {
             cells = getFakeScanCells();
             scansCount++;
+            afterScanBeforeMerge();
         }
         Map<String, PalletCell> cellValues = getValuesMap(cells);
         if (rescanMode && oldCells != null) {
