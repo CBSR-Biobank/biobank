@@ -763,15 +763,25 @@
                <reference
                      definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
-               <reference
-                     definitionId="biobank.isSuperAdminMode">
-               </reference>
+               <or>
+                  <reference
+                        definitionId="biobank.isSuperAdminMode">
+                  </reference>
+                  <reference
+                        definitionId="biobank2.isCurrentCenterAdmin">
+                  </reference>
+               </or>
             </and>
          </activeWhen>
          <enabledWhen>
-            <reference
-                  definitionId="biobank.isSuperAdminMode">
-            </reference>
+            <or>
+               <reference
+                     definitionId="biobank.isSuperAdminMode">
+               </reference>
+               <reference
+                     definitionId="biobank2.isCurrentCenterAdmin">
+               </reference>
+            </or>
          </enabledWhen>
       </handler>
       <handler
@@ -1001,9 +1011,14 @@
                       style="push">
                    <visibleWhen
                          checkEnabled="false">
-                      <reference
-                            definitionId="biobank.isSuperAdminMode">
-                      </reference>
+                      <or>
+                         <reference
+                               definitionId="biobank.isSuperAdminMode">
+                         </reference>
+                         <reference
+                               definitionId="biobank2.isCurrentCenterAdmin">
+                         </reference>
+                      </or>
                    </visibleWhen>
                 </command>
                 <command
@@ -2531,6 +2546,15 @@
                      property="biobank.canUpdate">
                </test>
             </iterate>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.isCurrentCenterAdmin">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.isCurrentCenterAdmin">
+            <equals
+                  value="true">
+            </equals>
          </with>
       </definition>       
    </extension>

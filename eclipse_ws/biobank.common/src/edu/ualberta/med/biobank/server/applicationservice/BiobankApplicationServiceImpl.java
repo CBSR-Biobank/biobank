@@ -139,24 +139,32 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public List<Group> getSecurityGroups(boolean includeSuperAdmin)
+    public List<Group> getSecurityGroups(User currentUser,
+        boolean includeSuperAdmin) throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        return BiobankSecurityUtil.getSecurityGroups(currentUser,
+            includeSuperAdmin);
+    }
+
+    @Override
+    public List<User> getSecurityUsers(User currentUser)
         throws ApplicationException {
-        return BiobankSecurityUtil.getSecurityGroups(includeSuperAdmin);
+        currentUser.initCurrentWorkingCenter(this);
+        return BiobankSecurityUtil.getSecurityUsers(currentUser);
     }
 
     @Override
-    public List<User> getSecurityUsers() throws ApplicationException {
-        return BiobankSecurityUtil.getSecurityUsers();
+    public User persistUser(User currentUser, User userToPersist)
+        throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        return BiobankSecurityUtil.persistUser(currentUser, userToPersist);
     }
 
     @Override
-    public User persistUser(User user) throws ApplicationException {
-        return BiobankSecurityUtil.persistUser(user);
-    }
-
-    @Override
-    public void deleteUser(String login) throws ApplicationException {
-        BiobankSecurityUtil.deleteUser(login);
+    public void deleteUser(User currentUser, String loginToDelete)
+        throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        BiobankSecurityUtil.deleteUser(currentUser, loginToDelete);
     }
 
     @Override
@@ -175,20 +183,24 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public void unlockUser(String userName) throws ApplicationException {
-        BiobankSecurityUtil.unlockUser(userName);
+    public void unlockUser(User currentUser, String userNameToUnlock)
+        throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        BiobankSecurityUtil.unlockUser(currentUser, userNameToUnlock);
     }
 
     @Override
-    public List<ProtectionGroupPrivilege> getSecurityGlobalFeatures()
-        throws ApplicationException {
-        return BiobankSecurityUtil.getSecurityGlobalFeatures();
+    public List<ProtectionGroupPrivilege> getSecurityGlobalFeatures(
+        User currentUser) throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        return BiobankSecurityUtil.getSecurityGlobalFeatures(currentUser);
     }
 
     @Override
-    public List<ProtectionGroupPrivilege> getSecurityCenterFeatures()
-        throws ApplicationException {
-        return BiobankSecurityUtil.getSecurityCenterFeatures();
+    public List<ProtectionGroupPrivilege> getSecurityCenterFeatures(
+        User currentUser) throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        return BiobankSecurityUtil.getSecurityCenterFeatures(currentUser);
     }
 
     @Override

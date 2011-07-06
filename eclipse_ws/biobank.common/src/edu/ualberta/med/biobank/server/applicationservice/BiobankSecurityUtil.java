@@ -80,8 +80,9 @@ public class BiobankSecurityUtil {
     }
 
     public static List<edu.ualberta.med.biobank.common.security.Group> getSecurityGroups(
+        edu.ualberta.med.biobank.common.security.User currentUser,
         boolean includeSuperAdmin) throws ApplicationException {
-        if (isSuperAdministrator()) {
+        if (canPerformCenterAdminAction(currentUser)) {
             try {
                 UserProvisioningManager upm = SecurityServiceProvider
                     .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
@@ -91,8 +92,17 @@ public class BiobankSecurityUtil {
                     Group g = (Group) object;
                     if (includeSuperAdmin
                         || !edu.ualberta.med.biobank.common.security.Group.GROUP_SUPER_ADMIN_ID
-                            .equals(g.getGroupId()))
-                        list.add(createGroup(upm, (Group) object));
+                            .equals(g.getGroupId())) {
+                        edu.ualberta.med.biobank.common.security.Group createGroup = createGroup(
+                            upm, (Group) object);
+                        // If is only center admin (not super admin), then
+                        // return only groups of the same center
+                        if (currentUser == null
+                            || currentUser.isSuperAdministrator()
+                            || createGroup.getWorkingCenterIds().contains(
+                                currentUser.getCurrentWorkingCenter().getId()))
+                            list.add(createGroup);
+                    }
                 }
                 return list;
             } catch (Exception ex) {
@@ -101,7 +111,7 @@ public class BiobankSecurityUtil {
             }
         } else {
             throw new ApplicationException(
-                "Only Website Administrators can retrieve security groups");
+                "Only Website Administrators or Administrators of current center can retrieve security groups");
         }
     }
 
@@ -170,9 +180,10 @@ public class BiobankSecurityUtil {
         return biobankGroup;
     }
 
-    public static List<edu.ualberta.med.biobank.common.security.User> getSecurityUsers()
+    public static List<edu.ualberta.med.biobank.common.security.User> getSecurityUsers(
+        edu.ualberta.med.biobank.common.security.User currentUser)
         throws ApplicationException {
-        if (isSuperAdministrator()) {
+        if (canPerformCenterAdminAction(currentUser)) {
             try {
                 UserProvisioningManager upm = SecurityServiceProvider
                     .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
@@ -180,14 +191,25 @@ public class BiobankSecurityUtil {
                 List<edu.ualberta.med.biobank.common.security.User> list = new ArrayList<edu.ualberta.med.biobank.common.security.User>();
                 Map<Long, User> allUsers = new HashMap<Long, User>();
                 Map<Long, edu.ualberta.med.biobank.common.security.Group> allGroups = new HashMap<Long, edu.ualberta.med.biobank.common.security.Group>();
-                for (edu.ualberta.med.biobank.common.security.Group group : getSecurityGroups(true)) {
+                for (edu.ualberta.med.biobank.common.security.Group group : getSecurityGroups(
+                    currentUser, true)) {
                     allGroups.put(group.getId(), group);
                 }
                 for (Long groupId : allGroups.keySet()) {
                     for (Object u : upm.getUsers(groupId.toString())) {
                         User serverUser = (User) u;
                         if (!allUsers.containsKey(serverUser.getUserId())) {
-                            list.add(createUser(upm, serverUser, allGroups));
+                            edu.ualberta.med.biobank.common.security.User newUser = createUser(
+                                upm, serverUser, allGroups);
+                            // If is only center admin (not super admin), then
+                            // return only users of the same center
+                            if (currentUser == null
+                                || currentUser.isSuperAdministrator()
+                                || newUser.getWorkingCenterIds().contains(
+                                    currentUser.getCurrentWorkingCenter()
+                                        .getId())) {
+                                list.add(newUser);
+                            }
                             allUsers.put(serverUser.getUserId(), serverUser);
                         }
                     }
@@ -199,45 +221,46 @@ public class BiobankSecurityUtil {
             }
         } else {
             throw new ApplicationException(
-                "Only Website Administrators can retrieve all security users");
+                "Only Website Administrators or Administrators of current center can retrieve all security users");
         }
     }
 
     public static edu.ualberta.med.biobank.common.security.User persistUser(
-        edu.ualberta.med.biobank.common.security.User user)
+        edu.ualberta.med.biobank.common.security.User currentUser,
+        edu.ualberta.med.biobank.common.security.User newUser)
         throws ApplicationException {
-        if (isSuperAdministrator()) {
+        if (canPerformCenterAdminAction(currentUser)) {
             try {
                 UserProvisioningManager upm = SecurityServiceProvider
                     .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
-                if (user.getLogin() == null) {
+                if (newUser.getLogin() == null) {
                     throw new ApplicationException("Login should be set");
                 }
 
                 User serverUser = null;
-                if (user.getId() != null) {
-                    serverUser = upm.getUserById(user.getId().toString());
+                if (newUser.getId() != null) {
+                    serverUser = upm.getUserById(newUser.getId().toString());
                 }
                 if (serverUser == null) {
                     serverUser = new User();
                 }
 
-                serverUser.setLoginName(user.getLogin());
-                serverUser.setFirstName(user.getFirstName());
-                serverUser.setLastName(user.getLastName());
-                serverUser.setEmailId(user.getEmail());
+                serverUser.setLoginName(newUser.getLogin());
+                serverUser.setFirstName(newUser.getFirstName());
+                serverUser.setLastName(newUser.getLastName());
+                serverUser.setEmailId(newUser.getEmail());
 
-                String password = user.getPassword();
+                String password = newUser.getPassword();
                 if (password != null && !password.isEmpty()) {
                     serverUser.setPassword(password);
                 }
 
-                if (user.passwordChangeRequired()) {
+                if (newUser.passwordChangeRequired()) {
                     serverUser.setStartDate(new Date());
                 }
 
                 Set<Group> groups = new HashSet<Group>();
-                for (edu.ualberta.med.biobank.common.security.Group groupDto : user
+                for (edu.ualberta.med.biobank.common.security.Group groupDto : newUser
                     .getGroups()) {
                     Group g = upm.getGroupById(groupDto.getId().toString());
                     if (g == null) {
@@ -257,8 +280,8 @@ public class BiobankSecurityUtil {
                     upm.modifyUser(serverUser);
                 }
                 serverUser = upm.getUser(serverUser.getLoginName());
-                user.setId(serverUser.getUserId());
-                return user;
+                newUser.setId(serverUser.getUserId());
+                return newUser;
             } catch (ApplicationException ae) {
                 log.error("Error persisting security user", ae);
                 throw ae;
@@ -268,24 +291,26 @@ public class BiobankSecurityUtil {
             }
         } else {
             throw new ApplicationException(
-                "Only Website Administrators can add/modify users");
+                "Only Website Administrators or Administrators of current center can add/modify users");
         }
     }
 
-    public static void deleteUser(String login) throws ApplicationException {
-        if (isSuperAdministrator()) {
+    public static void deleteUser(
+        edu.ualberta.med.biobank.common.security.User currentUser,
+        String loginToDelete) throws ApplicationException {
+        if (canPerformCenterAdminAction(currentUser)) {
             try {
                 UserProvisioningManager upm = SecurityServiceProvider
                     .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
                 String currentLogin = SecurityContextHolder.getContext()
                     .getAuthentication().getName();
-                if (currentLogin.equals(login)) {
+                if (currentLogin.equals(loginToDelete)) {
                     throw new ApplicationException("User cannot delete himself");
                 }
-                User serverUser = upm.getUser(login);
+                User serverUser = upm.getUser(loginToDelete);
                 if (serverUser == null) {
-                    throw new ApplicationException("Security user " + login
-                        + " not found.");
+                    throw new ApplicationException("Security user "
+                        + loginToDelete + " not found.");
                 }
                 upm.removeUser(serverUser.getUserId().toString());
             } catch (ApplicationException ae) {
@@ -297,7 +322,7 @@ public class BiobankSecurityUtil {
             }
         } else {
             throw new ApplicationException(
-                "Only Website Administrators can delete users");
+                "Only Website Administrators or Administrators of current center can delete users");
         }
     }
 
@@ -355,9 +380,11 @@ public class BiobankSecurityUtil {
         return userDTO;
     }
 
-    public static void unlockUser(String userName) throws ApplicationException {
-        if (isSuperAdministrator()) {
-            LockoutManager.getInstance().unLockUser(userName);
+    public static void unlockUser(
+        edu.ualberta.med.biobank.common.security.User currentUser,
+        String userNameToUnlock) throws ApplicationException {
+        if (canPerformCenterAdminAction(currentUser)) {
+            LockoutManager.getInstance().unLockUser(userNameToUnlock);
         }
     }
 
@@ -437,7 +464,7 @@ public class BiobankSecurityUtil {
             }
         } else {
             throw new ApplicationException(
-                "Only Website Administrators can add/modify groups");
+                "Only Website Administrators or Administrators of current center can add/modify groups");
         }
     }
 
@@ -545,23 +572,26 @@ public class BiobankSecurityUtil {
             }
         } else {
             throw new ApplicationException(
-                "Only Website Administrators can delete groups");
+                "Only Website Administrators or Administrators of current center can delete groups");
         }
     }
 
-    public static List<ProtectionGroupPrivilege> getSecurityGlobalFeatures()
+    public static List<ProtectionGroupPrivilege> getSecurityGlobalFeatures(
+        edu.ualberta.med.biobank.common.security.User currentUser)
         throws ApplicationException {
-        return getSecurityFeatures(GLOBAL_FEATURE_START_NAME);
+        return getSecurityFeatures(currentUser, GLOBAL_FEATURE_START_NAME);
     }
 
-    public static List<ProtectionGroupPrivilege> getSecurityCenterFeatures()
+    public static List<ProtectionGroupPrivilege> getSecurityCenterFeatures(
+        edu.ualberta.med.biobank.common.security.User currentUser)
         throws ApplicationException {
-        return getSecurityFeatures(CENTER_FEATURE_START_NAME);
+        return getSecurityFeatures(currentUser, CENTER_FEATURE_START_NAME);
     }
 
     private static List<ProtectionGroupPrivilege> getSecurityFeatures(
+        edu.ualberta.med.biobank.common.security.User currentUser,
         String protectionGroupNameStart) throws ApplicationException {
-        if (isSuperAdministrator()) {
+        if (canPerformCenterAdminAction(currentUser)) {
             try {
                 UserProvisioningManager upm = SecurityServiceProvider
                     .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
@@ -585,6 +615,15 @@ public class BiobankSecurityUtil {
             throw new ApplicationException(
                 "Only super administrators can retrieve security features");
         }
+    }
+
+    private static boolean canPerformCenterAdminAction(
+        edu.ualberta.med.biobank.common.security.User currentUser)
+        throws ApplicationException {
+        if (currentUser == null)
+            return isSuperAdministrator();
+        return currentUser.isAdministratorForCurrentCenter()
+            || currentUser.isSuperAdministrator();
     }
 
     private static boolean isSuperAdministrator() throws ApplicationException {

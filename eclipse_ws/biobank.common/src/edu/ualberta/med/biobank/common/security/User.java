@@ -306,7 +306,7 @@ public class User implements Serializable, NotAProxy {
         return workingCenters;
     }
 
-    private List<Integer> getWorkingCenterIds() {
+    public List<Integer> getWorkingCenterIds() {
         if (workingCenterIds == null) {
             workingCenterIds = new ArrayList<Integer>();
             for (Group group : getGroups()) {
