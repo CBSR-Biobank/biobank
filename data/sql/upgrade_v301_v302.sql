@@ -31,3 +31,9 @@ INSERT INTO entity_filter VALUES (29, 1, 'Source Specimen Source Center', 30, 0)
 INSERT INTO entity_filter VALUES (30, 3, 'Time Drawn', 31, 0);
 
 -- end bug#1279 fix
+
+
+-- fix for issue #1285
+update report,csm_user
+set report.user_id=csm_user.user_id
+where csm_user.login_name='miniaci';
