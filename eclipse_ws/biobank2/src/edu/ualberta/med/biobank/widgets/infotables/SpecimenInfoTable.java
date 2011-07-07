@@ -107,8 +107,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             }
         },
         ALIQUOTS(new String[] { "Inventory ID", "Type", "Position",
-            "Time created", "Quantity (ml)", "Activity status", "Study",
-            "Patient #", "Origin Center", "Current Center" }) {
+            "Time created", "Worksheet", "Quantity (ml)", "Activity status",
+            "Origin Center", "Current Center" }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -121,16 +121,14 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 3:
                     return row.createdAt;
                 case 4:
-                    return row.quantity;
+                    return row.worksheet;
                 case 5:
-                    return row.activityStatus;
+                    return row.quantity;
                 case 6:
-                    return row.studyName;
+                    return row.activityStatus;
                 case 7:
-                    return row.patient;
-                case 8:
                     return row.originCenter;
-                case 9:
+                case 8:
                     return row.center;
                 default:
                     return "";
@@ -164,6 +162,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
     }
 
     protected static class TableRowData {
+        public String worksheet;
         public SpecimenWrapper specimen;
         public String inventoryId;
         public String type;
@@ -253,6 +252,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         }
 
         info.createdAt = specimen.getFormattedCreatedAt();
+        info.worksheet = specimen.getParentSpecimen() == null ? "" : specimen
+            .getParentSpecimen().getProcessingEvent().getWorksheet();
         Double quantity = specimen.getQuantity();
         info.quantity = (quantity == null) ? "" : quantity.toString();
         info.position = specimen.getPositionString();
