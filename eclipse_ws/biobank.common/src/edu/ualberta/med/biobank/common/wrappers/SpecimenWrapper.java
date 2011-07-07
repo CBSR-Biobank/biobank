@@ -516,6 +516,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
      */
     public String getCollectionInfo() {
         return getTopSpecimen().getFormattedCreatedAt() + " in "
-            + getTopSpecimen().getOriginInfo().getCenter().getNameShort();
+            + getTopSpecimen().getOriginInfo().getCenter().getNameShort()
+            + " (visit #" + getCollectionEvent().getVisitNumber() + ")";
     }
 }

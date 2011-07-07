@@ -126,4 +126,12 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
         params.add(topContainers.getSelectedContainerNames());
         return params;
     }
+
+    @Override
+    protected void onReset() throws Exception {
+        containerLabel.setText("");
+        topContainers.reset();
+        validate("");
+        super.onReset();
+    }
 }
