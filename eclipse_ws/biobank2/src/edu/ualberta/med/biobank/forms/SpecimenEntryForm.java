@@ -191,6 +191,16 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         createReadOnlyLabelledField(client, SWT.NONE, "Position",
             specimen.getPositionString(true, false));
 
+        createReadOnlyLabelledField(client, SWT.NONE, "Collection",
+            specimen.getCollectionInfo());
+        createReadOnlyLabelledField(client, SWT.NONE, "Parent Processed",
+            (specimen.getParentSpecimen().equals(specimen) ? "" : specimen
+                .getParentSpecimen().getProcessingEvent()
+                .getFormattedCreatedAt()));
+        createReadOnlyLabelledField(client, SWT.NONE, "Processed",
+            specimen.getProcessingEvent() == null ? "" : specimen
+                .getProcessingEvent().getFormattedCreatedAt());
+
         activityStatusComboViewer = createComboViewer(client,
             "Activity Status",
             ActivityStatusWrapper.getAllActivityStatuses(appService),
