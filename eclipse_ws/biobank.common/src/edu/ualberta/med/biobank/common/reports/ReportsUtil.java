@@ -17,18 +17,31 @@ public class ReportsUtil {
 
     public static String getId(String aliasedPropertyString) {
         AliasedProperty aliasedProperty = getAliasedProperty(aliasedPropertyString);
-        return aliasedProperty.alias + PROPERTY_DELIMITER + "id";
+        if (aliasedProperty != null) {
+            return aliasedProperty.alias + PROPERTY_DELIMITER + "id";
+        }
+        return null;
     }
 
     public static Disjunction idIsNullOr(String aliasedProperty) {
         Disjunction or = Restrictions.disjunction();
-        or.add(Restrictions.isNull(getId(aliasedProperty)));
+
+        String id = getId(aliasedProperty);
+        if (id != null) {
+            or.add(Restrictions.isNull(id));
+        }
+
         return or;
     }
 
     public static Criterion isNotSet(String aliasedProperty) {
+
         Disjunction or = Restrictions.disjunction();
-        or.add(Restrictions.isNull(getId(aliasedProperty)));
+
+        String id = getId(aliasedProperty);
+        if (id != null) {
+            or.add(Restrictions.isNull(getId(aliasedProperty)));
+        }
         or.add(Restrictions.isNull(aliasedProperty));
         return or;
     }

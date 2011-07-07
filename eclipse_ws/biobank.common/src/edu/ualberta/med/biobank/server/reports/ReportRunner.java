@@ -183,6 +183,10 @@ public class ReportRunner {
                 Collection<ReportFilterValue> rfvCollection = reportFilter
                     .getReportFilterValueCollection();
 
+                if (rfvCollection == null) {
+                    rfvCollection = new HashSet<ReportFilterValue>();
+                }
+
                 FilterOperator op = null;
 
                 if (reportFilter.getOperator() != null) {
