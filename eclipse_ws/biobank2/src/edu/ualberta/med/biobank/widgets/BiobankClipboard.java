@@ -44,7 +44,7 @@ public class BiobankClipboard {
                             row.add("");
                         }
                     }
-                    selectedRows.add(StringUtils.join(row, ","));
+                    selectedRows.add(StringUtils.join(row, '\t'));
                 }
                 if (selectedRows.size() > 0) {
                     StringBuilder sb = new StringBuilder();
@@ -62,5 +62,4 @@ public class BiobankClipboard {
             }
         });
     }
-
 }

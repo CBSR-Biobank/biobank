@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -15,6 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
@@ -52,9 +54,60 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                     return "";
                 }
             }
+
+            @Override
+            public Image getColumnImage(TableRowData row, int columnIndex) {
+                if (columnIndex == 9
+                    && ActivityStatusWrapper.FLAGGED_STATUS_STRING
+                        .equals(row.activityStatus))
+                    return BgcPlugin.getDefault().getImageRegistry()
+                        .get(BgcPlugin.IMG_ERROR);
+                return null;
+            }
         },
-        SOURCE_SPECIMENS(new String[] { "Inventory ID", "Type", "Time drawn",
-            "Quantity (ml)", "Activity status", "Study", "Patient #",
+        SOURCE_SPECIMENS(new String[] { "Inventory ID", "Type", "Position",
+            "Time drawn", "Quantity (ml)", "Activity status", "Study",
+            "Patient #", "Origin Center", "Current Center" }) {
+            @Override
+            public String getColumnValue(TableRowData row, int columnIndex) {
+                switch (columnIndex) {
+                case 0:
+                    return row.inventoryId;
+                case 1:
+                    return row.type;
+                case 2:
+                    return row.position;
+                case 3:
+                    return row.createdAt;
+                case 4:
+                    return row.quantity;
+                case 5:
+                    return row.activityStatus;
+                case 6:
+                    return row.studyName;
+                case 7:
+                    return row.patient;
+                case 8:
+                    return row.originCenter;
+                case 9:
+                    return row.center;
+                default:
+                    return "";
+                }
+            }
+
+            @Override
+            public Image getColumnImage(TableRowData row, int columnIndex) {
+                if (columnIndex == 3
+                    && ActivityStatusWrapper.FLAGGED_STATUS_STRING
+                        .equals(row.activityStatus))
+                    return BgcPlugin.getDefault().getImageRegistry()
+                        .get(BgcPlugin.IMG_ERROR);
+                return null;
+            }
+        },
+        ALIQUOTS(new String[] { "Inventory ID", "Type", "Position",
+            "Time created", "Worksheet", "Quantity (ml)", "Activity status",
             "Origin Center", "Current Center" }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
@@ -64,15 +117,15 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 1:
                     return row.type;
                 case 2:
-                    return row.createdAt;
+                    return row.position;
                 case 3:
-                    return row.quantity;
+                    return row.createdAt;
                 case 4:
-                    return row.activityStatus;
+                    return row.worksheet;
                 case 5:
-                    return row.studyName;
+                    return row.quantity;
                 case 6:
-                    return row.patient;
+                    return row.activityStatus;
                 case 7:
                     return row.originCenter;
                 case 8:
@@ -81,34 +134,15 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                     return "";
                 }
             }
-        },
-        ALIQUOTS(new String[] { "Inventory ID", "Type", "Time created",
-            "Quantity (ml)", "Activity status", "Study", "Patient #",
-            "Origin Center", "Current Center" }) {
+
             @Override
-            public String getColumnValue(TableRowData row, int columnIndex) {
-                switch (columnIndex) {
-                case 0:
-                    return row.inventoryId;
-                case 1:
-                    return row.type;
-                case 2:
-                    return row.createdAt;
-                case 3:
-                    return row.quantity;
-                case 4:
-                    return row.activityStatus;
-                case 5:
-                    return row.studyName;
-                case 6:
-                    return row.patient;
-                case 7:
-                    return row.originCenter;
-                case 8:
-                    return row.center;
-                default:
-                    return "";
-                }
+            public Image getColumnImage(TableRowData row, int columnIndex) {
+                if (columnIndex == 4
+                    && ActivityStatusWrapper.FLAGGED_STATUS_STRING
+                        .equals(row.activityStatus))
+                    return BgcPlugin.getDefault().getImageRegistry()
+                        .get(BgcPlugin.IMG_ERROR);
+                return null;
             }
         };
 
@@ -123,9 +157,12 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         }
 
         public abstract String getColumnValue(TableRowData row, int columnIndex);
+
+        public abstract Image getColumnImage(TableRowData row, int columnIndex);
     }
 
     protected static class TableRowData {
+        public String worksheet;
         public SpecimenWrapper specimen;
         public String inventoryId;
         public String type;
@@ -161,6 +198,15 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
     @Override
     protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
+            @Override
+            public Image getColumnImage(Object element, int columnIndex) {
+                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                if (info == null) {
+                    return null;
+                }
+                return currentColumnsShowns.getColumnImage(info, columnIndex);
+            }
+
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
@@ -206,6 +252,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         }
 
         info.createdAt = specimen.getFormattedCreatedAt();
+        info.worksheet = specimen.getParentSpecimen() == null ? "" : specimen
+            .getParentSpecimen().getProcessingEvent().getWorksheet();
         Double quantity = specimen.getQuantity();
         info.quantity = (quantity == null) ? "" : quantity.toString();
         info.position = specimen.getPositionString();

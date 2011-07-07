@@ -50,15 +50,15 @@ and st.name='{specimen_type_name}'
 BIOBANK_QRY_END
 
   SPC_INSERT_BASE_QRY = <<SPC_INSERT_QRY
-insert into  specimen (inventory_id,created_at,quantity,activity_status_id,
+insert into  specimen (inventory_id,created_at,top_specimen_id,quantity,activity_status_id,
 collection_event_id,original_collection_event_id,processing_event_id,
-specimen_type_id,parent_specimen_id,top_specimen_id,origin_info_id,
+specimen_type_id,parent_specimen_id,origin_info_id,
 current_center_id) values
 SPC_INSERT_QRY
 
   FIELDS = [ 'QUANTITY', 'ACTIVITY_STATUS_ID', 'COLLECTION_EVENT_ID',
              'ORIGINAL_COLLECTION_EVENT_ID', 'PROCESSING_EVENT_ID',
-             'SPECIMEN_TYPE_ID', 'PARENT_SPECIMEN_ID', 'TOP_SPECIMEN_ID',
+             'SPECIMEN_TYPE_ID', 'PARENT_SPECIMEN_ID',
              'ORIGIN_INFO_ID', 'CURRENT_CENTER_ID' ]
 
   def initialize
@@ -155,11 +155,11 @@ SPC_INSERT_QRY
           qry = String.new
           qry << SPC_INSERT_BASE_QRY
           qry << "('#{row['INVENTORY_ID']}-#{i+1}',"
-          if pvsv['invalid_date']
-            qry << "'#{row['CREATED_AT']}',"
-          else
-            qry << "'#{pvsv['created_at_unformatted']}',"
-          end
+          qry << "'#{row['CREATED_AT']}',"
+
+          # assign top_specimen_id
+          qry << "NULL,"
+
           qry << values.join(",")
           qry << ")"
           #print qry, ";\n";
@@ -171,7 +171,11 @@ SPC_INSERT_QRY
       res.free
     end
 
-    @dbh2.query("ALTER TABLE specimen MODIFY COLUMN ID INT(11) NOT NULL") if (Choice.choices[:sql])
+    if (Choice.choices[:sql])
+      # set top specimen on all specimens with NULL for top_specimen
+      @dbh2.query("update specimen set top_specimen_id=id where top_specimen_id is null")
+      @dbh2.query("ALTER TABLE specimen MODIFY COLUMN ID INT(11) NOT NULL")
+    end
   end
 end
 

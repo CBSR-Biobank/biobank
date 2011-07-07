@@ -37,6 +37,8 @@ public class ProcessingView extends AbstractAdministrationView {
 
     private Button radioDateProcessed;
 
+    private Button radioPatient;
+
     public ProcessingView() {
         super();
         currentInstance = this;
@@ -73,16 +75,16 @@ public class ProcessingView extends AbstractAdministrationView {
                 }
             }
         });
-        // radioDateSent = new Button(composite, SWT.RADIO);
-        // radioDateSent.setText("Packed At");
-        // radioDateSent.addSelectionListener(new SelectionAdapter() {
-        // @Override
-        // public void widgetSelected(SelectionEvent e) {
-        // if (radioDateSent.getSelection()) {
-        // showTextOnly(false);
-        // }
-        // }
-        // });
+        radioPatient = new Button(composite, SWT.RADIO);
+        radioPatient.setText("Patient");
+        radioPatient.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (radioPatient.getSelection()) {
+                    showTextOnly(true);
+                }
+            }
+        });
 
         radioDateProcessed = new Button(composite, SWT.RADIO);
         radioDateProcessed.setText("Date Processed");
@@ -149,6 +151,8 @@ public class ProcessingView extends AbstractAdministrationView {
                 String msg = "No Processing Events found";
                 if (radioWorksheet.getSelection()) {
                     msg += " for worksheet " + treeText.getText();
+                } else if (radioPatient.getSelection()) {
+                    msg += " for patient " + treeText.getText();
                 } else {
                     msg += " for date "
                         + DateFormatter.formatAsDate(dateWidget.getDate());
@@ -169,6 +173,10 @@ public class ProcessingView extends AbstractAdministrationView {
             processingEvents = ProcessingEventWrapper
                 .getProcessingEventsWithWorksheet(
                     SessionManager.getAppService(), treeText.getText().trim());
+        } else if (radioPatient.getSelection()) {
+            processingEvents = ProcessingEventWrapper
+                .getProcessingEventsByPatient(SessionManager.getAppService(),
+                    treeText.getText().trim());
         } else
             processingEvents = ProcessingEventWrapper
                 .getProcessingEventsWithDate(SessionManager.getAppService(),
@@ -201,7 +209,7 @@ public class ProcessingView extends AbstractAdministrationView {
             List<AdapterBase> nodeRes = rootNode.search(searchedObjects.get(0));
             nodeRes.get(0).performDoubleClick();
         } else
-            BgcPlugin.openMessage("Shipments", searchedObjects.size()
+            BgcPlugin.openMessage("Processing Events", searchedObjects.size()
                 + " found.");
     }
 
