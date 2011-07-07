@@ -54,6 +54,12 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private BgcBaseText collectionLabel;
 
+    private BgcBaseText aliquotedLabel;
+
+    private BgcBaseText processedLabel;
+
+    private BgcBaseText childrenLabel;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof SpecimenAdapter),
@@ -121,6 +127,12 @@ public class SpecimenViewForm extends BiobankViewForm {
             "Position");
         collectionLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Collection");
+        aliquotedLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Parent Processed");
+        processedLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Processed");
+        childrenLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Children #");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
         commentLabel = createReadOnlyLabelledField(client,
@@ -185,6 +197,13 @@ public class SpecimenViewForm extends BiobankViewForm {
             .getPnumber());
         setTextValue(positionLabel, specimen.getPositionString(true, false));
         setTextValue(collectionLabel, specimen.getCollectionInfo());
+        setTextValue(aliquotedLabel, (specimen.getTopSpecimen()
+            .equals(specimen) ? "" : specimen.getParentSpecimen()
+            .getProcessingEvent().getFormattedCreatedAt()));
+        setTextValue(processedLabel, specimen.getProcessingEvent() == null ? ""
+            : specimen.getProcessingEvent().getFormattedCreatedAt());
+        setTextValue(childrenLabel, specimen.getChildSpecimenCollection(false)
+            .size());
         setTextValue(activityStatusLabel, specimen.getActivityStatus());
         setTextValue(commentLabel, specimen.getComment());
 

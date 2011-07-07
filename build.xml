@@ -49,9 +49,9 @@
   <property name="req.jars.dir" value="jars" />
   <property name="lib-sources.dir" value="lib-sources" />
   <property name="biobank.gui.common.jar.files"
-            value="commons-beanutils-1.8.0.jar,commons-io-1.4.jar,commons-digester-1.7.jar,commons-javaflow-20060411.jar,iText-2.1.7.jar,jasperreports-4.0.1.jar,jdt-compiler-3.1.1.jar" />
+            value="commons-beanutils-1.8.0.jar,commons-io-1.4.jar,commons-digester-1.7.jar,commons-javaflow-20060411.jar,iText-2.1.7.jar,jasperreports-4.0.1.jar,jdt-compiler-3.1.1.jar,DynamicJasper-3.0.14.jar" />
   <property name="biobank.jar.files"
-            value="DynamicJasper-3.0.14.jar,gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
+            value="gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
   <property name="biobank.common.jar.files"
             value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar" />
   <property name="biobank.tools.jar.files"

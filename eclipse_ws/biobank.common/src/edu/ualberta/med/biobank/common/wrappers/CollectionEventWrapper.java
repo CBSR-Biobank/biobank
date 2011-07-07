@@ -586,4 +586,11 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
                 .getCurrentWorkingCenter().getStudyCollection()
                 .contains(getPatient().getStudy()));
     }
+
+    public Date getMinSourceSpecimenDate() {
+        Date min = new Date();
+        for (SpecimenWrapper spec : getOriginalSpecimenCollection(false))
+            min = min.before(spec.getCreatedAt()) ? min : spec.getCreatedAt();
+        return min;
+    }
 }

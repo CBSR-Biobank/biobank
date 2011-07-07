@@ -349,8 +349,13 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     @Override
     public int compareTo(ModelWrapper<Specimen> o) {
         if (o instanceof SpecimenWrapper) {
-            return getInventoryId().compareTo(
-                ((SpecimenWrapper) o).getInventoryId());
+            String s1 = getPositionString(true, true);
+            String s2 = ((SpecimenWrapper) o).getPositionString(true, true);
+            if (s1 == null || s2 == null)
+                getInventoryId().compareTo(
+                    ((SpecimenWrapper) o).getInventoryId());
+            else
+                return s1.compareTo(s2);
         }
         return 0;
     }
@@ -511,6 +516,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
      */
     public String getCollectionInfo() {
         return getTopSpecimen().getFormattedCreatedAt() + " in "
-            + getTopSpecimen().getOriginInfo().getCenter().getNameShort();
+            + getTopSpecimen().getOriginInfo().getCenter().getNameShort()
+            + " (visit #" + getCollectionEvent().getVisitNumber() + ")";
     }
 }
