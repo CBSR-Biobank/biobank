@@ -165,7 +165,7 @@ public class SessionManager {
 
     public static void updateAdapterTreeNode(final AdapterBase node) {
         final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
-        if (view != null) {
+        if ((view != null) && (node != null)) {
             view.getTreeViewer().update(node, null);
         }
     }

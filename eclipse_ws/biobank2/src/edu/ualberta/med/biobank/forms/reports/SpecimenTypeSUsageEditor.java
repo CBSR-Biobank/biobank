@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
-public class SampleTypeSUsageEditor extends ReportsEditor {
+public class SpecimenTypeSUsageEditor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.SampleTypeSUsageEditor";
 

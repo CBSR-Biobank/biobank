@@ -24,12 +24,12 @@ public class FileBrowser extends BgcBaseWidget {
 
     public FileBrowser(Composite parent, int style) {
         super(parent, style);
-        setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        setLayout(new GridLayout(2, true));
-        GridData data = new GridData(GridData.FILL_BOTH);
+        setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+        setLayout(new GridLayout(2, false));
+        GridData gd = new GridData(GridData.FILL_BOTH);
         textfield = new BgcBaseText(this, SWT.NONE);
         textfield.setEditable(false);
-        textfield.setLayoutData(data);
+        textfield.setLayoutData(gd);
         browse = new Button(this, style);
         browse.setText("Browse");
         browse.addSelectionListener(new SelectionAdapter() {
@@ -79,6 +79,10 @@ public class FileBrowser extends BgcBaseWidget {
 
     public String getFilePath() {
         return textfield.getText();
+    }
+
+    public void reset() {
+        textfield.setText("");
     }
 
 }

@@ -16,10 +16,10 @@ import org.supercsv.io.CsvBeanReader;
 import org.supercsv.io.ICsvBeanReader;
 import org.supercsv.prefs.CsvPreference;
 
-import edu.ualberta.med.biobank.server.reports.AliquotRequest;
+import edu.ualberta.med.biobank.server.reports.SpecimenRequest;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
 
-public class AliquotRequestEditor extends ReportsEditor {
+public class SpecimenRequestEditor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.AliquotRequestEditor";
 
@@ -61,8 +61,8 @@ public class AliquotRequestEditor extends ReportsEditor {
         try {
             String[] header = new String[] { "pnumber", "dateDrawn",
                 "specimenTypeNameShort", "maxAliquots" };
-            AliquotRequest request;
-            while ((request = reader.read(AliquotRequest.class, header,
+            SpecimenRequest request;
+            while ((request = reader.read(SpecimenRequest.class, header,
                 processors)) != null) {
                 requests.add(request);
             }

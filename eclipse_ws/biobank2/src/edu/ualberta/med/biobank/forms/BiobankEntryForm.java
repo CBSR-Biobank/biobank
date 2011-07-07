@@ -15,6 +15,7 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -390,8 +391,13 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
             .getService(ISourceProviderService.class);
         ConfirmState confirmSourceProvider = (ConfirmState) service
             .getSourceProvider(ConfirmState.SESSION_STATE);
-        confirmSourceProvider.setState(enabled);
-        formActions.getConfirmAction().setEnabled(enabled);
+        if (confirmSourceProvider != null) {
+            confirmSourceProvider.setState(enabled);
+            Action confirmAction = formActions.getConfirmAction();
+            if (confirmAction != null) {
+                confirmAction.setEnabled(enabled);
+            }
+        }
         form.getToolBarManager().update(true);
     }
 
@@ -444,6 +450,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
 
     protected void addPrintAction() {
         formActions.addPrintAction();
+    }
+
+    protected void setEnablePrintAction(boolean enable) {
+        formActions.setEnablePrintAction(enable);
     }
 
     @Override

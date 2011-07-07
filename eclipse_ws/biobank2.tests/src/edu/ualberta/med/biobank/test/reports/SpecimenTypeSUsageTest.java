@@ -14,9 +14,10 @@ import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 
-public class SampleTypeSUsageTest extends AbstractReportTest {
+public class SpecimenTypeSUsageTest extends AbstractReportTest {
     private static final Comparator<AliquotedSpecimenWrapper> ORDER_SS_BY_SAMPLE_TYPE_NAME_SHORT = new Comparator<AliquotedSpecimenWrapper>() {
-        public int compare(AliquotedSpecimenWrapper lhs, AliquotedSpecimenWrapper rhs) {
+        public int compare(AliquotedSpecimenWrapper lhs,
+            AliquotedSpecimenWrapper rhs) {
             int cmp = compareStrings(lhs.getSpecimenType().getNameShort(), rhs
                 .getSpecimenType().getNameShort());
 
@@ -51,9 +52,9 @@ public class SampleTypeSUsageTest extends AbstractReportTest {
 
         for (AliquotedSpecimenWrapper ss : allSampleStorages) {
             sampleTypeIdsInSs.add(ss.getSpecimenType().getId());
-            expectedResults
-                .add(new Object[] { ss.getSpecimenType().getNameShort(),
-                    ss.getStudy().getNameShort() });
+            expectedResults.add(new Object[] {
+                ss.getSpecimenType().getNameShort(),
+                ss.getStudy().getNameShort() });
         }
 
         // add sample types not in any study

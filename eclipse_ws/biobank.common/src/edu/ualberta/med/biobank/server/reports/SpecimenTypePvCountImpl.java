@@ -7,7 +7,7 @@ import edu.ualberta.med.biobank.model.SpecimenPosition;
 /**
  * needs one parameters = study.nameShort
  */
-public class SampleTypePvCountImpl extends AbstractReport {
+public class SpecimenTypePvCountImpl extends AbstractReport {
     private static final String QUERY = "SELECT ce.patient.pnumber,"
         + "     min(s.parentSpecimen.processingEvent.createdAt) as first_date_processed,"
         + "     min(s.topSpecimen.createdAt) as first_date_drawn, s.specimenType.name, count(*)"
@@ -23,7 +23,7 @@ public class SampleTypePvCountImpl extends AbstractReport {
         + " GROUP BY ce, s.specimenType "
         + " ORDER BY ce.patient.pnumber, min(s.parentSpecimen.processingEvent.createdAt)";
 
-    public SampleTypePvCountImpl(BiobankReport report) {
+    public SpecimenTypePvCountImpl(BiobankReport report) {
         super(QUERY, report);
     }
 }

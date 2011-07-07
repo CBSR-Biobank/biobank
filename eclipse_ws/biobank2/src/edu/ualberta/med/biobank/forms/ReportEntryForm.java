@@ -104,6 +104,8 @@ public class ReportEntryForm extends BiobankEntryForm {
     private List<Object> results;
     private ReportResultsTableWidget<Object> resultsTable;
 
+    private PrintPdfDataExporter printPdfDataExporter;
+
     @Override
     protected void doAfterSave() {
         AdvancedReportsView.getCurrent().reload();
@@ -224,8 +226,7 @@ public class ReportEntryForm extends BiobankEntryForm {
     }
 
     private Control createGenerateButton(Composite parent) {
-        generateButton = new Button(parent, SWT.NONE);
-        generateButton.setText("Generate");
+        generateButton = toolkit.createButton(parent, "Generate", SWT.NONE);
         generateButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -301,7 +302,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                             resultsTable = new ReportResultsTableWidget<Object>(
                                 resultsContainer, null, getHeaders());
 
-                            toolkit.adapt(resultsTable);
+                            resultsTable.adaptToToolkit(toolkit, true);
 
                             resultsTable.setCollection(results);
 
@@ -327,6 +328,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                     Log logMessage = new Log();
                     logMessage.action = "report";
                     appService.logActivity(logMessage);
+                    addPrintAction();
 
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError("Report Generation Error", e);
@@ -357,15 +359,16 @@ public class ReportEntryForm extends BiobankEntryForm {
         // TODO: printPDF and PdfExporter-s
         createExporterButton(container, new CsvDataExporter());
         createExporterButton(container, new PdfDataExporter());
-        createExporterButton(container, new PrintPdfDataExporter());
+        printPdfDataExporter = new PrintPdfDataExporter();
+        createExporterButton(container, printPdfDataExporter);
 
         return container;
     }
 
     private void createExporterButton(Composite parent,
         final DataExporter exporter) {
-        Button button = new Button(parent, SWT.NONE);
-        button.setText(exporter.getName());
+        Button button = toolkit.createButton(parent, exporter.getName(),
+            SWT.NONE);
         button.setEnabled(false);
         button.addListener(SWT.Selection, new Listener() {
             @Override
@@ -375,6 +378,12 @@ public class ReportEntryForm extends BiobankEntryForm {
         });
 
         exportButtons.add(button);
+    }
+
+    @Override
+    public boolean print() {
+        export(printPdfDataExporter);
+        return true;
     }
 
     private void openViewForm(ISelection selection) {

@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class SampleTypePvCountEditor extends ReportsEditor {
+public class SpecimenTypePvCountEditor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.AliquotCountEditor";
 

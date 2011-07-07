@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
-public class SampleTypePvCountTest extends AbstractReportTest {
+public class SpecimenTypePvCountTest extends AbstractReportTest {
     private static final Mapper<SpecimenWrapper, List<Object>, Long> GROUP_BY_PV_AND_SAMPLE_TYPE = new Mapper<SpecimenWrapper, List<Object>, Long>() {
         public List<Object> getKey(SpecimenWrapper aliquot) {
             ProcessingEventWrapper pevent = aliquot.getProcessingEvent();
