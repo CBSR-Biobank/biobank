@@ -361,6 +361,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     @Override
     protected void onReset() throws Exception {
         cevent.reset();
+        cevent.setPatient(patient);
 
         if (cevent.isNew()) {
             cevent.setActivityStatus(ActivityStatusWrapper
@@ -370,7 +371,6 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         }
 
         patient.reset();
-        cevent.setPatient(patient);
 
         GuiUtil.reset(activityStatusComboViewer, cevent.getActivityStatus());
 

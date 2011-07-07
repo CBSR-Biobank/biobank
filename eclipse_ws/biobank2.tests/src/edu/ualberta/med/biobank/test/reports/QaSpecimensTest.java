@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 
-public class QAAliquotsTest extends AbstractReportTest {
+public class QaSpecimensTest extends AbstractReportTest {
     // cheap way to get all results
     private static final Integer NUM_RESULTS = new Integer(Integer.MAX_VALUE);
 

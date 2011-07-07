@@ -93,10 +93,10 @@ public abstract class AbstractLinkAssignEntryForm extends
     protected void init() throws Exception {
         super.init();
         singleSpecimen = new SpecimenWrapper(appService);
-        canSaveSingleBinding = widgetCreator.addBooleanBinding(
-            new WritableValue(Boolean.FALSE, Boolean.class),
-            canSaveSingleSpecimen,
-            "Cannot save specimen because of previous errors");
+        canSaveSingleBinding = widgetCreator
+            .addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
+                canSaveSingleSpecimen,
+                "Please fill in the fields and hit enter or tab or resolve previous errors");
     }
 
     protected abstract String getFormTitle();

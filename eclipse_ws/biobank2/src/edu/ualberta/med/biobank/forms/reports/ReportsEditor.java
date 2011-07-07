@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -38,15 +39,17 @@ import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.util.HQLCriteriaListProxy;
-import edu.ualberta.med.biobank.forms.BiobankFormBase;
+import edu.ualberta.med.biobank.forms.Actions;
+import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.forms.BgcEntryFormActions;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 
-public abstract class ReportsEditor extends BiobankFormBase {
+public abstract class ReportsEditor extends BiobankEntryForm {
 
     // Report
     protected ReportTreeNode node;
@@ -89,16 +92,23 @@ public abstract class ReportsEditor extends BiobankFormBase {
 
     @Override
     protected void createFormContent() throws Exception {
-        GridLayout formLayout = new GridLayout();
-        formLayout.marginWidth = 0;
-        page.setLayout(formLayout);
+        form.setText(report.getName());
+        page.setLayout(new GridLayout(1, false));
 
-        form.setText(report.getDescription());
+        Composite topSection = toolkit.createComposite(page, SWT.NONE);
+        topSection.setLayout(new GridLayout(1, false));
+        Label l = toolkit.createLabel(topSection, report.getDescription(),
+            SWT.WRAP);
+        GridData gd = new GridData(GridData.FILL, GridData.FILL, true, true);
+        // FIXME: see https://bugs.eclipse.org/bugs/show_bug.cgi?id=265389
+        // once this gets fixed we can remove the width hint
+        gd.widthHint = 400;
+        l.setLayoutData(gd);
 
         if (parameterSection != null)
             parameterSection.dispose();
 
-        parameterSection = toolkit.createComposite(page, SWT.NONE);
+        parameterSection = toolkit.createComposite(topSection, SWT.NONE);
         GridData pgd = new GridData();
         GridLayout pgl = new GridLayout(2, false);
         pgd.grabExcessHorizontalSpace = true;
@@ -119,6 +129,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 generate();
             }
         });
+        setFirstControl(generateButton);
 
         printButton = toolkit.createButton(buttonSection, "Print", SWT.NONE);
         printButton.setImage(BgcPlugin.getDefault().getImageRegistry()
@@ -277,15 +288,27 @@ public abstract class ReportsEditor extends BiobankFormBase {
             exportPDFButton.setEnabled(false);
             printButton.setToolTipText("Results exceed 1000 rows");
             exportPDFButton.setToolTipText("Results exceed 1000 rows");
+            setEnablePrintAction(false);
         } else {
             printButton.setToolTipText("Print");
             exportPDFButton.setToolTipText("Export PDF");
+            setEnablePrintAction(true);
         }
         reportTable = new ReportTableWidget<Object>(page, reportData,
             getColumnNames());
         reportTable.adaptToToolkit(toolkit, true);
         page.layout(true, true);
         book.reflow(true);
+    }
+
+    @Override
+    public boolean print() {
+        try {
+            printTable(false, false);
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError("Error while printing", e);
+        }
+        return true;
     }
 
     private void createEmptyReportTable() {
@@ -525,6 +548,42 @@ public abstract class ReportsEditor extends BiobankFormBase {
             return (c.getTime());
         } else
             return processedDate;
+    }
+
+    @Override
+    protected void addToolbarButtons() {
+        formActions = new BgcEntryFormActions(this);
+        formActions.addResetAction(Actions.BIOBANK_RESET);
+        formActions.addCancelAction(Actions.BIOBANK_CANCEL);
+        formActions.addPrintAction();
+        form.updateToolBar();
+        setEnablePrintAction(false);
+    }
+
+    @Override
+    protected void saveForm() throws Exception {
+        //
+    }
+
+    @Override
+    protected String getOkMessage() {
+        return "";
+    }
+
+    @Override
+    protected void onReset() throws Exception {
+        createEmptyReportTable();
+    }
+
+    @Override
+    public void cancel() {
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+            .closeEditor(this, false);
+    }
+
+    @Override
+    public String getNextOpenedFormID() {
+        return ID;
     }
 
 }

@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class QAAliquotsImpl extends AbstractReport {
+public class QaSpecimensImpl extends AbstractReport {
 
     // @formatter:off
     private static final String QUERY = 
@@ -33,7 +33,7 @@ public class QAAliquotsImpl extends AbstractReport {
 
     private int numResults;
 
-    public QAAliquotsImpl(BiobankReport report) {
+    public QaSpecimensImpl(BiobankReport report) {
         super(QUERY, report);
         numResults = (Integer) report.getParams().remove(
             report.getParams().size() - 1);

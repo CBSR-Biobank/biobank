@@ -14,10 +14,10 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.server.reports.AliquotRequest;
-import edu.ualberta.med.biobank.server.reports.AliquotRequestImpl;
+import edu.ualberta.med.biobank.server.reports.SpecimenRequest;
+import edu.ualberta.med.biobank.server.reports.SpecimenRequestImpl;
 
-public class AliquotRequestTest extends AbstractReportTest {
+public class SpecimenRequestTest extends AbstractReportTest {
     private static final Integer ALIQUOT_LIMIT = new Integer(5);
 
     @Test
@@ -59,7 +59,7 @@ public class AliquotRequestTest extends AbstractReportTest {
         List<Object> params = new ArrayList<Object>();
         addParams(params, aliquot, ALIQUOT_LIMIT);
 
-        ((AliquotRequest) params.get(0)).setDateDrawn(calendar.getTime());
+        ((SpecimenRequest) params.get(0)).setDateDrawn(calendar.getTime());
 
         checkResults(params);
     }
@@ -70,7 +70,7 @@ public class AliquotRequestTest extends AbstractReportTest {
         List<Object> params = getReport().getParams();
 
         for (Object o : params) {
-            AliquotRequest request = (AliquotRequest) o;
+            SpecimenRequest request = (SpecimenRequest) o;
             final String pnumber = request.getPnumber();
             final String typeName = request.getSpecimenTypeNameShort();
             Date dateDrawn = request.getDateDrawn();
@@ -104,7 +104,7 @@ public class AliquotRequestTest extends AbstractReportTest {
             }
 
             if (filteredAliquots.size() < maxResults) {
-                expectedResults.add(AliquotRequestImpl.getNotFoundRow(pnumber,
+                expectedResults.add(SpecimenRequestImpl.getNotFoundRow(pnumber,
                     dateDrawn, typeName, maxResults, filteredAliquots.size()));
             }
         }
@@ -125,7 +125,7 @@ public class AliquotRequestTest extends AbstractReportTest {
     private static void addParams(List<Object> params, SpecimenWrapper aliquot,
         Integer limit) {
 
-        AliquotRequest request = new AliquotRequest();
+        SpecimenRequest request = new SpecimenRequest();
         request.setPnumber(aliquot.getCollectionEvent().getPatient()
             .getPnumber());
         request.setDateDrawn(aliquot.getParentSpecimen().getCreatedAt());

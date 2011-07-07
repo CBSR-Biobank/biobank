@@ -10,7 +10,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SampleTypeSUsageImpl extends AbstractReport {
+public class SpecimenTypeSUsageImpl extends AbstractReport {
 
     private final static String USED_SPECIMEN_TYPES_QUERY = "SELECT alqs.specimenType.nameShort,"
         + "     alqs.study.nameShort"
@@ -23,7 +23,7 @@ public class SampleTypeSUsageImpl extends AbstractReport {
         + ("    FROM " + AliquotedSpecimen.class.getName() + " ss") + ")"
         + "ORDER BY st.nameShort";
 
-    public SampleTypeSUsageImpl(BiobankReport report) {
+    public SpecimenTypeSUsageImpl(BiobankReport report) {
         super("", report);
     }
 
