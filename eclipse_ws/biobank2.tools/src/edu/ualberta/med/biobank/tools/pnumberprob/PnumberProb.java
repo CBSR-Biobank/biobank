@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 public class PnumberProb {
 
-    private static String USAGE = "Usage: pnumberprob PNUMBER";
+    private static String USAGE = "Usage: pnumberprob PNUMBER1 PNUMBER2 ... PNUMBERn";
 
     private boolean verbose = false;
 
@@ -61,30 +61,34 @@ public class PnumberProb {
         }
 
         String[] args = parser.getRemainingArgs();
-        if (args.length != 1) {
+        if (args.length < 1) {
             System.out.println("Error: invalid arguments\n" + USAGE);
             System.exit(-1);
         }
 
-        String pnumber = args[0];
-        String pnumberRegEx = pnumber.replace("x", "\\.");
-        Pattern pattern = Pattern.compile(pnumberRegEx);
+        for (String pnumber : args) {
 
-        Map<String, Double> results = new TreeMap<String, Double>();
-        for (String key : pnumberProbMap.keySet()) {
-            if (pattern.matcher(key).matches()) {
-                results.put(key, pnumberProbMap.get(key));
+            String pnumberRegEx = pnumber.replace("x", ".");
+            Pattern pattern = Pattern.compile(pnumberRegEx);
+
+            Map<Double, String> results = new TreeMap<Double, String>();
+            for (String key : pnumberProbMap.keySet()) {
+                if (pattern.matcher(key).matches()) {
+                    results.put(pnumberProbMap.get(key), key);
+                }
             }
-        }
 
-        if (results.isEmpty()) {
-            System.out.println("no results for this patient number");
-            System.exit(-1);
-        }
+            if (results.isEmpty()) {
+                System.out.println("no results for this patient number");
+                System.exit(-1);
+            }
 
-        System.out.println("the probabilities are:");
-        for (String key : results.keySet()) {
-            System.out.println("\t" + key + "\t" + results.get(key));
+            System.out.println("the probabilities for " + pnumber
+                + " are (starting at lowest):");
+            for (Double key : results.keySet()) {
+                System.out.println("\t" + results.get(key) + "\t" + key);
+            }
+            System.out.println();
         }
     }
 
