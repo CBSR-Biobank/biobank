@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -61,6 +62,9 @@ public abstract class ReportsEditor extends BiobankFormBase {
 
     // Table Data
     private List<Object> reportData;
+
+    // Warning label
+    private Label warning;
 
     // Buttons
     private Button generateButton;
@@ -110,6 +114,15 @@ public abstract class ReportsEditor extends BiobankFormBase {
         gl.numColumns = 4;
         buttonSection.setLayout(gl);
         toolkit.adapt(buttonSection);
+
+        warning = toolkit
+            .createLabel(
+                buttonSection,
+                "Printing/PDFs disabled. Results exceed 1000 rows. Please export to CSV or refine your search.");
+        GridData wgd = new GridData();
+        wgd.horizontalSpan = 4;
+        warning.setVisible(false);
+        warning.setLayoutData(wgd);
 
         generateButton = toolkit.createButton(buttonSection, "Generate",
             SWT.NONE);
@@ -277,9 +290,11 @@ public abstract class ReportsEditor extends BiobankFormBase {
             exportPDFButton.setEnabled(false);
             printButton.setToolTipText("Results exceed 1000 rows");
             exportPDFButton.setToolTipText("Results exceed 1000 rows");
+            warning.setVisible(true);
         } else {
             printButton.setToolTipText("Print");
             exportPDFButton.setToolTipText("Export PDF");
+            warning.setVisible(false);
         }
         reportTable = new ReportTableWidget<Object>(page, reportData,
             getColumnNames());
