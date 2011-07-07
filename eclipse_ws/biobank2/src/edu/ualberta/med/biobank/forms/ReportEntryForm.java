@@ -360,12 +360,14 @@ public class ReportEntryForm extends BiobankEntryForm {
         createExporterButton(container, new CsvDataExporter());
         createExporterButton(container, new PdfDataExporter());
         printPdfDataExporter = new PrintPdfDataExporter();
-        createExporterButton(container, printPdfDataExporter);
-
+        Button printButton = createExporterButton(container,
+            printPdfDataExporter);
+        printButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_PRINTER));
         return container;
     }
 
-    private void createExporterButton(Composite parent,
+    private Button createExporterButton(Composite parent,
         final DataExporter exporter) {
         Button button = toolkit.createButton(parent, exporter.getName(),
             SWT.NONE);
@@ -378,6 +380,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         });
 
         exportButtons.add(button);
+        return button;
     }
 
     @Override
@@ -733,6 +736,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     @Override
     protected void onReset() throws Exception {
+        emptyResultsContainer();
         report.reset();
     }
 }
