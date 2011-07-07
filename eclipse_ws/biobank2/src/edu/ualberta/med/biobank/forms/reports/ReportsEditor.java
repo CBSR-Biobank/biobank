@@ -97,6 +97,8 @@ public abstract class ReportsEditor extends BiobankEntryForm {
 
         Composite topSection = toolkit.createComposite(page, SWT.NONE);
         topSection.setLayout(new GridLayout(1, false));
+        topSection.setLayoutData(new GridData(GridData.FILL, GridData.FILL,
+            true, false));
         Label l = toolkit.createLabel(topSection, report.getDescription(),
             SWT.WRAP);
         GridData gd = new GridData(GridData.FILL, GridData.FILL, true, true);
@@ -109,11 +111,16 @@ public abstract class ReportsEditor extends BiobankEntryForm {
             parameterSection.dispose();
 
         parameterSection = toolkit.createComposite(topSection, SWT.NONE);
-        GridData pgd = new GridData();
-        GridLayout pgl = new GridLayout(2, false);
-        pgd.grabExcessHorizontalSpace = true;
-        parameterSection.setLayout(pgl);
-        parameterSection.setLayoutData(pgd);
+        GridLayout layout = new GridLayout(2, false);
+        layout.marginTop = 0;
+        layout.marginBottom = 0;
+        layout.marginLeft = 0;
+        layout.marginRight = 0;
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        parameterSection.setLayout(layout);
+        parameterSection.setLayoutData(new GridData(GridData.FILL,
+            GridData.FILL, true, false));
 
         buttonSection = toolkit.createComposite(page, SWT.NONE);
         GridLayout gl = new GridLayout();
@@ -573,6 +580,11 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     @Override
     protected void onReset() throws Exception {
         createEmptyReportTable();
+        setEnablePrintAction(false);
+
+        printButton.setEnabled(false);
+        exportPDFButton.setEnabled(false);
+        exportCSVButton.setEnabled(false);
     }
 
     @Override

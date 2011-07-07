@@ -12,6 +12,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -22,14 +23,16 @@ public class FileBrowser extends BgcBaseWidget {
     private Button browse;
     private String text;
 
-    public FileBrowser(Composite parent, int style) {
+    public FileBrowser(Composite parent, String label, int style) {
         super(parent, style);
-        setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-        setLayout(new GridLayout(2, false));
-        GridData gd = new GridData(GridData.FILL_BOTH);
+        setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+        setLayout(new GridLayout(3, false));
+        Label l = new Label(this, SWT.NONE);
+        l.setText(label + ":");
         textfield = new BgcBaseText(this, SWT.NONE);
         textfield.setEditable(false);
-        textfield.setLayoutData(gd);
+        textfield.setLayoutData(new GridData(GridData.FILL, GridData.FILL,
+            true, false));
         browse = new Button(this, style);
         browse.setText("Browse");
         browse.addSelectionListener(new SelectionAdapter() {

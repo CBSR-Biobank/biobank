@@ -26,13 +26,14 @@ public class QaSpecimensEditor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.QAAliquotsEditor";
 
-    DateTimeWidget start;
-    DateTimeWidget end;
-    ComboViewer sampleType;
-    IObservableValue numAliquots;
+    private DateTimeWidget start;
+    private DateTimeWidget end;
+    private ComboViewer sampleType;
+    private IObservableValue numAliquots;
     private IObservableValue listStatus = new WritableValue(Boolean.TRUE,
         Boolean.class);
-    TopContainerListWidget topContainers;
+    private TopContainerListWidget topContainers;
+    private BgcBaseText numSpecimensText;
 
     @Override
     protected void createOptionSection(Composite parent) throws Exception {
@@ -54,7 +55,7 @@ public class QaSpecimensEditor extends ReportsEditor {
             }
         });
         sampleType = createSampleTypeComboOption("Sample Type", parent);
-        createValidatedIntegerText("# Aliquots", parent);
+        numSpecimensText = createValidatedIntegerText("# Specimens", parent);
     }
 
     @Override
@@ -125,6 +126,16 @@ public class QaSpecimensEditor extends ReportsEditor {
         paramNames.add("Sample Type");
         paramNames.add("# Aliquots");
         return paramNames;
+    }
+
+    @Override
+    protected void onReset() throws Exception {
+        start.setDate(null);
+        end.setDate(null);
+        topContainers.reset();
+        sampleType.getCombo().select(0);
+        numSpecimensText.setText("");
+        super.onReset();
     }
 
 }

@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.supercsv.cellprocessor.ParseDate;
 import org.supercsv.cellprocessor.constraint.LMinMax;
@@ -27,7 +29,11 @@ public class SpecimenRequestEditor extends ReportsEditor {
 
     @Override
     protected void createOptionSection(Composite parent) {
-        csvSelector = createFileBrowserOption("CSV File", parent);
+        parent.setLayout(new GridLayout(1, false));
+        parent.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true,
+            false));
+        csvSelector = new FileBrowser(parent, "CSV File", SWT.NONE);
+        csvSelector.adaptToToolkit(toolkit, true);
     }
 
     @Override
@@ -38,14 +44,6 @@ public class SpecimenRequestEditor extends ReportsEditor {
     @Override
     protected List<Object> getPrintParams() {
         return Arrays.asList(new Object[] { csvSelector.getFilePath() });
-    }
-
-    protected FileBrowser createFileBrowserOption(String fieldLabel,
-        Composite parent) {
-        widgetCreator.createLabel(parent, fieldLabel);
-        FileBrowser widget = new FileBrowser(parent, SWT.NONE);
-        toolkit.adapt(widget, true, true);
-        return widget;
     }
 
     protected List<Object> parseCSV() throws Exception {
@@ -86,5 +84,11 @@ public class SpecimenRequestEditor extends ReportsEditor {
         List<String> paramName = new ArrayList<String>();
         paramName.add("CSV File");
         return paramName;
+    }
+
+    @Override
+    protected void onReset() throws Exception {
+        csvSelector.reset();
+        super.onReset();
     }
 }
