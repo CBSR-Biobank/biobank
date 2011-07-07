@@ -65,9 +65,9 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 return null;
             }
         },
-        SOURCE_SPECIMENS(new String[] { "Inventory ID", "Type", "Time drawn",
-            "Quantity (ml)", "Activity status", "Study", "Patient #",
-            "Origin Center", "Current Center" }) {
+        SOURCE_SPECIMENS(new String[] { "Inventory ID", "Type", "Position",
+            "Time drawn", "Quantity (ml)", "Activity status", "Study",
+            "Patient #", "Origin Center", "Current Center" }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -76,18 +76,20 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 1:
                     return row.type;
                 case 2:
-                    return row.createdAt;
+                    return row.position;
                 case 3:
-                    return row.quantity;
+                    return row.createdAt;
                 case 4:
-                    return row.activityStatus;
+                    return row.quantity;
                 case 5:
-                    return row.studyName;
+                    return row.activityStatus;
                 case 6:
-                    return row.patient;
+                    return row.studyName;
                 case 7:
-                    return row.originCenter;
+                    return row.patient;
                 case 8:
+                    return row.originCenter;
+                case 9:
                     return row.center;
                 default:
                     return "";
@@ -104,9 +106,9 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 return null;
             }
         },
-        ALIQUOTS(new String[] { "Inventory ID", "Type", "Time created",
-            "Quantity (ml)", "Activity status", "Study", "Patient #",
-            "Origin Center", "Current Center" }) {
+        ALIQUOTS(new String[] { "Inventory ID", "Type", "Position",
+            "Time created", "Quantity (ml)", "Activity status", "Study",
+            "Patient #", "Origin Center", "Current Center" }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -115,18 +117,20 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 1:
                     return row.type;
                 case 2:
-                    return row.createdAt;
+                    return row.position;
                 case 3:
-                    return row.quantity;
+                    return row.createdAt;
                 case 4:
-                    return row.activityStatus;
+                    return row.quantity;
                 case 5:
-                    return row.studyName;
+                    return row.activityStatus;
                 case 6:
-                    return row.patient;
+                    return row.studyName;
                 case 7:
-                    return row.originCenter;
+                    return row.patient;
                 case 8:
+                    return row.originCenter;
+                case 9:
                     return row.center;
                 default:
                     return "";
