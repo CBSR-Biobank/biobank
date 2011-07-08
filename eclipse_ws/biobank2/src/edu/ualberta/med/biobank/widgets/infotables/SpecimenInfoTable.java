@@ -67,7 +67,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         },
         SOURCE_SPECIMENS(new String[] { "Inventory ID", "Type", "Position",
             "Time drawn", "Quantity (ml)", "Activity status", "Study",
-            "Patient #", "Origin Center", "Current Center" }) {
+            "Patient #", "Origin Center", "Current Center", "Comment" }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -91,6 +91,9 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                     return row.originCenter;
                 case 9:
                     return row.center;
+                case 10:
+                    return (row.comment == null || row.comment.equals("")) ? "N"
+                        : "Y";
                 default:
                     return "";
                 }
@@ -98,7 +101,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
 
             @Override
             public Image getColumnImage(TableRowData row, int columnIndex) {
-                if (columnIndex == 3
+                if (columnIndex == 5
                     && ActivityStatusWrapper.FLAGGED_STATUS_STRING
                         .equals(row.activityStatus))
                     return BgcPlugin.getDefault().getImageRegistry()
@@ -108,7 +111,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         },
         ALIQUOTS(new String[] { "Inventory ID", "Type", "Position",
             "Time created", "Worksheet", "Quantity (ml)", "Activity status",
-            "Origin Center", "Current Center" }) {
+            "Origin Center", "Current Center", "Comment" }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -130,6 +133,9 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                     return row.originCenter;
                 case 8:
                     return row.center;
+                case 9:
+                    return (row.comment == null || row.comment.equals("")) ? "N"
+                        : "Y";
                 default:
                     return "";
                 }
@@ -137,7 +143,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
 
             @Override
             public Image getColumnImage(TableRowData row, int columnIndex) {
-                if (columnIndex == 4
+                if (columnIndex == 6
                     && ActivityStatusWrapper.FLAGGED_STATUS_STRING
                         .equals(row.activityStatus))
                     return BgcPlugin.getDefault().getImageRegistry()

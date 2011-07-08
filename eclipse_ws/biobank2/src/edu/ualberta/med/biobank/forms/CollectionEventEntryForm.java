@@ -360,6 +360,14 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     }
 
     @Override
+    public void reset() {
+        super.reset();
+        if (cevent.isNew())
+            // because we set the visit number and the activity status default
+            setDirty(true);
+    }
+
+    @Override
     protected void onReset() throws Exception {
         cevent.reset();
         cevent.setPatient(patient);
@@ -367,8 +375,13 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         if (cevent.isNew()) {
             cevent.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
-            cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
-                appService, cevent));
+            Integer next = CollectionEventWrapper.getNextVisitNumber(
+                appService, cevent);
+            cevent.setVisitNumber(next);
+            // FIXME for some reasons, the text is not set to the correct number
+            // unless we do it ourself or call setVisitNumber a second time with
+            // a different value (!!??!!) see issues #1306 and #1304
+            visitNumberText.setText(next.toString());
         }
 
         patient.reset();
