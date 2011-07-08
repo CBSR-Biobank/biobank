@@ -216,7 +216,6 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         isSourceSpcButton.setSelection(isSourceSpc);
 
         if (!isSourceSpc) {
-
             createReadOnlyLabelledField(client, SWT.NONE,
                 "Source Inventory ID", specimen.getTopSpecimen()
                     .getInventoryId());

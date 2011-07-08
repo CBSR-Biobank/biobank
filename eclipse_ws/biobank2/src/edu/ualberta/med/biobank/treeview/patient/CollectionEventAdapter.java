@@ -38,9 +38,6 @@ public class CollectionEventAdapter extends AdapterBase {
     protected String getLabelInternal() {
         CollectionEventWrapper cevent = getWrapper();
         Assert.isNotNull(cevent, "collection event is null");
-        StringBuilder name = new StringBuilder(
-            DateFormatter.formatAsDateTime(cevent.getMinSourceSpecimenDate()))
-            .append(" - #").append(cevent.getVisitNumber());
 
         long count = -1;
         try {
@@ -48,7 +45,14 @@ public class CollectionEventAdapter extends AdapterBase {
         } catch (Exception e) {
             logger.error("Problem counting specimens", e);
         }
-        return name.append(" [").append(count).append("]").toString();
+
+        return new StringBuilder("#")
+            .append(cevent.getVisitNumber())
+            .append(" - ")
+            .append(
+                DateFormatter.formatAsDateTime(cevent
+                    .getMinSourceSpecimenDate())).append(" [").append(count)
+            .append("]").toString();
     }
 
     @Override
