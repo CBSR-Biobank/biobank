@@ -7,9 +7,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -50,10 +52,19 @@ public class SpecimenOriginSelectDialog extends BgcBaseDialog {
         GridLayout layout = new GridLayout(2, false);
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        Label l = new Label(contents, SWT.WRAP);
+        GridData gd = new GridData(GridData.FILL, SWT.TOP, true, true, 2, 1);
+        gd.widthHint = 400;
+        l.setLayoutData(gd);
+        l.setText(Messages.getString("SpecimenOriginSelectDialog.details")); //$NON-NLS-1$
+
         List<Object> objectList = new ArrayList<Object>(centers);
-        widgetCreator.createComboViewer(contents,
+        widgetCreator.createComboViewer(
+            contents,
             Messages.getString("SpecimenOriginSelectDialog.centers.label"), //$NON-NLS-1$
-            objectList, null, null, new ComboSelectionUpdate() {
+            objectList, SessionManager.getUser().getCurrentWorkingCenter(),
+            null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     if (selectedObject instanceof CenterWrapper<?>)
