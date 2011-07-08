@@ -2586,24 +2586,29 @@
             	  mnemonic="%Update.command.mnemonic"
                   id="edu.ualberta.med.biobank.menu.update">
             </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.command.install"
+                  mnemonic="%Install.command.mnemonic"
+                  id="edu.ualberta.med.biobank.menu.install">
+            </command>                     
             <separator
-                  name="edu.ualberta.med.biobank.menu.update.separator"
+                  name="edu.ualberta.med.biobank.menu.update.separatorA"
                   visible="true">
             </separator>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.cbsrHelp"
+                  label="%CbsrHelp.command"
+                  id="edu.ualberta.med.biobank.menu.cbsrHelp">
+            </command>
+            <separator
+                  name="edu.ualberta.med.biobank.menu.update.separatorB"
+                  visible="true">
+            </separator>  
             <command
                   commandId="org.eclipse.ui.help.aboutAction"
                   label="%About.command"
                   mnemonic="%About.command.mnemonic"
                   style="push">
-            </command>
-                        
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:help?after=edu.ualberta.med.biobank.menu.update">
-            <command
-                  commandId="edu.ualberta.med.biobank.command.install"
-            	  mnemonic="%Install.command.mnemonic"
-                  id="edu.ualberta.med.biobank.menu.install">
             </command>
       </menuContribution>
    </extension>
