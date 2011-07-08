@@ -206,6 +206,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {
+                        form.setFocus();
                         specimensTable.addOrEditSpecimen(true, null, cevent
                             .getPatient().getStudy()
                             .getSourceSpecimenCollection(true),
