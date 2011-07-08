@@ -519,4 +519,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             + getTopSpecimen().getOriginInfo().getCenter().getNameShort()
             + " (visit #" + getCollectionEvent().getVisitNumber() + ")";
     }
+
+    public boolean hasUnknownImportType() {
+        return getSpecimenType() != null && getSpecimenType().isUnknownImport();
+    }
 }

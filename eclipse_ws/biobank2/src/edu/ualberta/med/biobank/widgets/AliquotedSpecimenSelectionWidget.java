@@ -139,7 +139,9 @@ public class AliquotedSpecimenSelectionWidget {
             @Override
             public boolean select(Viewer viewer, Object parentElement,
                 Object element) {
-                return sourceChildTypes.contains(element);
+                return (getSourceSelection() != null && getSourceSelection()
+                    .hasUnknownImportType())
+                    || sourceChildTypes.contains(element);
             }
         });
         if (oneRow) {
