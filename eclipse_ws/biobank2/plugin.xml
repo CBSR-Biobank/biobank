@@ -323,14 +323,13 @@
 		<handler
             class="edu.ualberta.med.biobank.handlers.CancelHandler"
             commandId="edu.ualberta.med.biobank.commands.cancel">
-     <activeWhen>
-        <with
-              variable="activeEditor">
-           <instanceof
-                 value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
-           </instanceof>
-        </with>
-     </activeWhen>
+         <enabledWhen>
+           <and>
+               <reference
+                     definitionId="edu.ualberta.med.biobank.form.instanceof.BiobankEntryForm">
+               </reference>
+            </and>
+         </enabledWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ConfirmHandler"
@@ -352,14 +351,13 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.ResetHandler"
             commandId="edu.ualberta.med.biobank.commands.reset">
-         <activeWhen>
-            <with
-                  variable="activeEditor">
-               <instanceof
-                     value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
-               </instanceof>
-            </with>
-         </activeWhen>
+         <enabledWhen>
+           <and>
+               <reference
+                     definitionId="edu.ualberta.med.biobank.form.instanceof.BiobankEntryForm">
+               </reference>
+            </and>
+         </enabledWhen>
       </handler>         
       <handler
             class="edu.ualberta.med.biobank.handlers.PrintHandler"
@@ -2345,6 +2343,14 @@
                   value="edu.ualberta.med.biobank.perspective.processing">
             </equals>
          </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.form.instanceof.BiobankEntryForm">
+        <with
+              variable="activeEditor">
+           <instanceof
+                 value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
+           </instanceof>
+        </with>
       </definition>
       <definition
             id="biobank.sampleManagementPerspectiveSelected">
