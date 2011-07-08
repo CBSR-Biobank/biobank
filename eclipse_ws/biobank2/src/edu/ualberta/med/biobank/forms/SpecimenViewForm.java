@@ -6,12 +6,14 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -52,13 +54,17 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private DispatchInfoTable dispatchInfoTable;
 
-    private BgcBaseText collectionLabel;
+    private BgcBaseText ceventLabel;
 
-    private BgcBaseText aliquotedLabel;
+    private BgcBaseText sourceInvIdLabel;
 
-    private BgcBaseText processedLabel;
+    private BgcBaseText sourcePeventLabel;
+
+    private BgcBaseText peventLabel;
 
     private BgcBaseText childrenLabel;
+
+    private Button isSourceSpcButton;
 
     @Override
     public void init() throws Exception {
@@ -125,12 +131,27 @@ public class SpecimenViewForm extends BiobankViewForm {
             "Current center");
         positionLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Position");
-        collectionLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Collection");
-        aliquotedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Parent Processed");
-        processedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Processed");
+
+        isSourceSpcButton = (Button) createLabelledWidget(client, Button.class,
+            SWT.NONE, "Source Specimen");
+
+        if (!specimen.getTopSpecimen().equals(specimen)) {
+            sourceInvIdLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Source Inventory ID");
+        }
+
+        ceventLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Collection Event");
+
+        if (!specimen.getTopSpecimen().equals(specimen)) {
+            sourcePeventLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Source Processing Event");
+        }
+
+        if (specimen.getProcessingEvent() != null) {
+            peventLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Processing Event");
+        }
         childrenLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Children #");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
@@ -196,12 +217,35 @@ public class SpecimenViewForm extends BiobankViewForm {
         setTextValue(patientLabel, specimen.getCollectionEvent().getPatient()
             .getPnumber());
         setTextValue(positionLabel, specimen.getPositionString(true, false));
-        setTextValue(collectionLabel, specimen.getCollectionInfo());
-        setTextValue(aliquotedLabel, (specimen.getTopSpecimen()
-            .equals(specimen) ? "" : specimen.getParentSpecimen()
-            .getProcessingEvent().getFormattedCreatedAt()));
-        setTextValue(processedLabel, specimen.getProcessingEvent() == null ? ""
-            : specimen.getProcessingEvent().getFormattedCreatedAt());
+        setTextValue(ceventLabel, specimen.getCollectionInfo());
+
+        boolean isSourceSpc = specimen.getTopSpecimen().equals(specimen);
+
+        setCheckBoxValue(isSourceSpcButton, isSourceSpc);
+
+        if (!isSourceSpc) {
+            setTextValue(sourceInvIdLabel, specimen.getTopSpecimen()
+                .getInventoryId());
+
+            ProcessingEventWrapper topPevent = specimen.getTopSpecimen()
+                .getProcessingEvent();
+
+            setTextValue(
+                sourcePeventLabel,
+                new StringBuilder(topPevent.getFormattedCreatedAt())
+                    .append(" (worksheet: ").append(topPevent.getWorksheet())
+                    .append(")").toString());
+        }
+
+        ProcessingEventWrapper pevent = specimen.getProcessingEvent();
+        if (pevent != null) {
+            setTextValue(
+                peventLabel,
+                new StringBuilder(pevent.getFormattedCreatedAt())
+                    .append(" (worksheet: ").append(pevent.getWorksheet())
+                    .append(")").toString());
+        }
+
         setTextValue(childrenLabel, specimen.getChildSpecimenCollection(false)
             .size());
         setTextValue(activityStatusLabel, specimen.getActivityStatus());
