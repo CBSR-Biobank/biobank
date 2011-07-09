@@ -53,14 +53,9 @@ fi
 
 DUMPFILE="/tmp/$SCRIPT.$RANDOM.sql"
 
-ant dbcreate
-scripts/dump_csm_schema.sh -ecsm_user -ecsm_user_group -ecsm_group -H$DBHOST -u$DBUSER -p$DBPWD -o$DUMPFILE
 echo "extracting old database..."
 mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop biobank
 mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD create biobank
 gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
 echo "upgrading database..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v301_v302.sql
-echo "setting global security..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < $DUMPFILE
-
