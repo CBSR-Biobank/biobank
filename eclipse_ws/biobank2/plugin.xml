@@ -324,11 +324,9 @@
             class="edu.ualberta.med.biobank.handlers.CancelHandler"
             commandId="edu.ualberta.med.biobank.commands.cancel">
          <enabledWhen>
-           <and>
                <reference
                      definitionId="edu.ualberta.med.biobank.form.instanceof.BiobankEntryForm">
                </reference>
-            </and>
          </enabledWhen>
       </handler>
       <handler
@@ -336,12 +334,9 @@
             commandId="edu.ualberta.med.biobank.commands.confirm">
          <activeWhen>
             <and>
-               <with
-                     variable="activeEditor">
-                  <instanceof
-                        value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
-                  </instanceof>
-               </with>
+               <reference
+                     definitionId="edu.ualberta.med.biobank.form.instanceof.BiobankEntryForm">
+               </reference>
                <reference
                      definitionId="biobank.confirmEnabled">
                </reference>
@@ -351,13 +346,11 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.ResetHandler"
             commandId="edu.ualberta.med.biobank.commands.reset">
-         <enabledWhen>
-           <and>
+         <activeWhen>
                <reference
                      definitionId="edu.ualberta.med.biobank.form.instanceof.BiobankEntryForm">
                </reference>
-            </and>
-         </enabledWhen>
+         </activeWhen>
       </handler>         
       <handler
             class="edu.ualberta.med.biobank.handlers.PrintHandler"
