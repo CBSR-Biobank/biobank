@@ -22,7 +22,6 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.Actions;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -89,8 +88,8 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
     protected void addToolbarButtons() {
         formActions = new BgcEntryFormActions(this);
         addPrintAction();
-        formActions.addResetAction(Actions.BIOBANK_RESET);
-        formActions.addConfirmAction(Actions.BIOBANK_CONFIRM);
+        addResetAction();
+        addConfirmAction();
         form.updateToolBar();
     }
 
