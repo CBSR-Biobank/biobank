@@ -16,8 +16,8 @@
     <arg value="-f" />
   </exec>
 
-  <property name="server.version.num" value="3.0.2" />
-  <property name="java.client.version.num" value="3.0.2" />
+  <property name="server.version.num" value="3.0.2.a" />
+  <property name="java.client.version.num" value="3.0.2.a" />
 
   <property environment="env" />
   <property name="host" value="aicml-med.cs.ualberta.ca" />
