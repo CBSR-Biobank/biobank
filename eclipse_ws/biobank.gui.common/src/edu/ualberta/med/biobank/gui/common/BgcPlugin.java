@@ -99,6 +99,7 @@ public class BgcPlugin extends AbstractUIPlugin {
     public static final String IMG_UNCHECK = "uncheck";
     public static final String IMG_RESEARCH_GROUP = "research_group";
     public static final String IMG_RESEARCH_GROUPS = "research_groups";
+    public static final String IMG_ERROR = "error";
 
     private static BgcLogger logger = BgcLogger.getLogger(BgcPlugin.class
         .getName());
@@ -201,6 +202,7 @@ public class BgcPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_CHECK, "checked.gif");
         registerImage(registry, IMG_UNCHECK, "unchecked.gif");
         registerImage(registry, IMG_RESEARCH_GROUP, "research_group.png");
+        registerImage(registry, IMG_ERROR, "error.png");
     }
 
     public void registerImage(ImageRegistry registry, String key,

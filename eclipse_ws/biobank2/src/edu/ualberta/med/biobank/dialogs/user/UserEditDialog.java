@@ -18,16 +18,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.security.Group;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.Group;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.handlers.LogoutHandler;
 import edu.ualberta.med.biobank.validators.EmptyStringValidator;
 import edu.ualberta.med.biobank.validators.MatchingTextValidator;
@@ -134,7 +134,7 @@ public class UserEditDialog extends BgcBaseDialog {
         // is an error the entered information is not lost
         try {
             originalUser.copy(SessionManager.getAppService().persistUser(
-                modifiedUser));
+                SessionManager.getUser(), modifiedUser));
 
             if (SessionManager.getUser().getId().equals(originalUser.getId())) {
                 // if the User is making changes to himself, logout

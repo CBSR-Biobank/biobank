@@ -95,7 +95,7 @@ public class ServerMsgStatusItem extends ContributionItem {
 
         label.setText(this.text);
 
-        if ((text != null) && !text.equals("aicml-med.cs.ualberta.ca")) {
+        if ((text != null) && !text.endsWith("@cbsr.med.ualberta.ca")) {
             label.setBackground(PlatformUI.getWorkbench().getDisplay()
                 .getSystemColor(SWT.COLOR_YELLOW));
         }

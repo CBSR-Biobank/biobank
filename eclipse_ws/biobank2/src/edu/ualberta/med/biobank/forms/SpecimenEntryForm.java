@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -49,6 +50,10 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     private BgcBaseText originCenterLabel;
 
     private BgcBaseText patientField;
+
+    private BgcBaseText ceventText;
+
+    private BgcBaseText commentText;
 
     @Override
     protected void init() throws Exception {
@@ -173,12 +178,24 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                             .getCollectionEvent());
                     }
                     specimen.setCollectionEvent(wizard.getCollectionEvent());
+                    String comment = specimen.getComment();
+                    if (comment == null)
+                        comment = "";
+                    else
+                        comment += "\n";
+                    comment += "Patient/Collection Event modification: "
+                        + wizard.getComment();
+                    specimen.setComment(comment);
                     patientField.setText(specimen.getCollectionEvent()
                         .getPatient().getPnumber());
+                    ceventText.setText(specimen.getCollectionInfo());
+                    commentText.setText(comment);
                     setDirty(true); // so changes can be saved
                 }
             }
         });
+        editPatientButton.setEnabled(specimen.getTopSpecimen().equals(specimen)
+            && specimen.getChildSpecimenCollection(false).size() == 0);
 
         originCenterLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Origin center");
@@ -190,6 +207,48 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         createReadOnlyLabelledField(client, SWT.NONE, "Position",
             specimen.getPositionString(true, false));
+
+        boolean isSourceSpc = specimen.getTopSpecimen().equals(specimen);
+
+        Button isSourceSpcButton = (Button) createLabelledWidget(client,
+            Button.class, SWT.NONE, "Source Specimen");
+        isSourceSpcButton.setEnabled(false);
+        isSourceSpcButton.setSelection(isSourceSpc);
+
+        if (!isSourceSpc) {
+            createReadOnlyLabelledField(client, SWT.NONE,
+                "Source Inventory ID", specimen.getTopSpecimen()
+                    .getInventoryId());
+        }
+
+        ceventText = createReadOnlyLabelledField(client, SWT.NONE,
+            "Collection Event", specimen.getCollectionInfo());
+
+        if (!isSourceSpc) {
+            ProcessingEventWrapper topPevent = specimen.getTopSpecimen()
+                .getProcessingEvent();
+            createReadOnlyLabelledField(
+                client,
+                SWT.NONE,
+                "Source Processing Event",
+                new StringBuilder(topPevent.getFormattedCreatedAt())
+                    .append(" (worksheet: ").append(topPevent.getWorksheet())
+                    .append(")").toString());
+        }
+
+        ProcessingEventWrapper pevent = specimen.getProcessingEvent();
+        if (pevent != null) {
+            createReadOnlyLabelledField(
+                client,
+                SWT.NONE,
+                "Processing Event",
+                new StringBuilder(pevent.getFormattedCreatedAt())
+                    .append(" (worksheet: ").append(pevent.getWorksheet())
+                    .append(")").toString());
+        }
+
+        createReadOnlyLabelledField(client, SWT.NONE, "Children #",
+            String.valueOf(specimen.getChildSpecimenCollection(false).size()));
 
         activityStatusComboViewer = createComboViewer(client,
             "Activity Status",
@@ -204,8 +263,9 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 }
             });
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.WRAP
-            | SWT.MULTI, "Comments", null, specimen, "comment", null);
+        commentText = (BgcBaseText) createBoundWidgetWithLabel(client,
+            BgcBaseText.class, SWT.WRAP | SWT.MULTI, "Comments", null,
+            specimen, "comment", null);
 
         setFirstControl(specimenTypeComboViewer.getControl());
     }

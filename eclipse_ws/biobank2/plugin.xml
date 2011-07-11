@@ -328,26 +328,20 @@
 		<handler
             class="edu.ualberta.med.biobank.handlers.CancelHandler"
             commandId="edu.ualberta.med.biobank.commands.cancel">
-     <activeWhen>
-        <with
-              variable="activeEditor">
-           <instanceof
-                 value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
-           </instanceof>
-        </with>
-     </activeWhen>
+         <enabledWhen>
+               <reference
+                     definitionId="edu.ualberta.med.biobank.form.instanceof.BiobankEntryForm">
+               </reference>
+         </enabledWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ConfirmHandler"
             commandId="edu.ualberta.med.biobank.commands.confirm">
          <activeWhen>
             <and>
-               <with
-                     variable="activeEditor">
-                  <instanceof
-                        value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
-                  </instanceof>
-               </with>
+               <reference
+                     definitionId="edu.ualberta.med.biobank.form.instanceof.BiobankEntryForm">
+               </reference>
                <reference
                      definitionId="biobank.confirmEnabled">
                </reference>
@@ -358,12 +352,9 @@
             class="edu.ualberta.med.biobank.handlers.ResetHandler"
             commandId="edu.ualberta.med.biobank.commands.reset">
          <activeWhen>
-            <with
-                  variable="activeEditor">
-               <instanceof
-                     value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
-               </instanceof>
-            </with>
+               <reference
+                     definitionId="edu.ualberta.med.biobank.form.instanceof.BiobankEntryForm">
+               </reference>
          </activeWhen>
       </handler>         
       <handler
@@ -768,15 +759,25 @@
                <reference
                      definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
-               <reference
-                     definitionId="biobank.isSuperAdminMode">
-               </reference>
+               <or>
+                  <reference
+                        definitionId="biobank.isSuperAdminMode">
+                  </reference>
+                  <reference
+                        definitionId="biobank2.isCurrentCenterAdmin">
+                  </reference>
+               </or>
             </and>
          </activeWhen>
          <enabledWhen>
-            <reference
-                  definitionId="biobank.isSuperAdminMode">
-            </reference>
+            <or>
+               <reference
+                     definitionId="biobank.isSuperAdminMode">
+               </reference>
+               <reference
+                     definitionId="biobank2.isCurrentCenterAdmin">
+               </reference>
+            </or>
          </enabledWhen>
       </handler>
       <handler
@@ -1033,9 +1034,14 @@
                       style="push">
                    <visibleWhen
                          checkEnabled="false">
-                      <reference
-                            definitionId="biobank.isSuperAdminMode">
-                      </reference>
+                      <or>
+                         <reference
+                               definitionId="biobank.isSuperAdminMode">
+                         </reference>
+                         <reference
+                               definitionId="biobank2.isCurrentCenterAdmin">
+                         </reference>
+                      </or>
                    </visibleWhen>
                 </command>
                 <command
@@ -1885,109 +1891,39 @@
             name="Logging Form">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.AliquotInvoiceByClinicEditor"
+            class="edu.ualberta.med.biobank.forms.reports.SpecimenRequestEditor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.AliquotInvoiceByClinicEditor"
-            name="Aliquots by Clinic">
-      </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.reports.AliquotsByPalletEditor"
-            default="false"
-            icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.AliquotsByPalletEditor"
-            name="Aliquots by Pallet">
-      </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.reports.AliquotInvoiceByPatientEditor"
-            default="false"
-            icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.AliquotInvoiceByPatientEditor"
-            name="Aliquots by Patient">
-      </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.reports.AliquotCountEditor"
-            default="false"
-            icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.AliquotCountEditor"
-            name="Aliquot Count">
-      </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.reports.AliquotsByStudyEditor"
-            default="false"
-            icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.AliquotsByStudyEditor"
-            name="Aliquots per Study">
-      </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.reports.AliquotsByStudyClinicEditor"
-            default="false"
-            icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.AliquotsByStudyClinicEditor"
-            name="Aliquots per Study per Clinic">
-      </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.reports.AliquotsByStudyClinicDateEditor"
-            default="false"
-            icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.AliquotsByStudyClinicDateEditor"
-            name="Aliquots per Study per Clinic by Date">
-      </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.reports.AliquotRequestEditor"
-            default="false"
-            icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.AliquotRequestEditor"
+            id="edu.ualberta.med.biobank.editors.SpecimenRequestEditor"
             name="Aliquot Request">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.FvLPatientVisitsEditor"
+            class="edu.ualberta.med.biobank.forms.reports.ClinicActivityEditor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.FvLPatientVisitsEditor"
+            id="edu.ualberta.med.biobank.editors.ClinicActivityEditor"
             name="Clinic Activity">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.PsByStudyClinicDateEditor"
+            class="edu.ualberta.med.biobank.forms.reports.SpecimenTypePvCountEditor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.PsByStudyClinicDateEditor"
-            name="Patients/PatientVisits by Study, Clinic and Date">
-      </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.reports.PsByStudyDateEditor"
-            default="false"
-            icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.PsByStudyDateEditor"
-            name="Patients/PatientVisits by Study and Date">
-      </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.reports.SampleTypePvCountEditor"
-            default="false"
-            icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.SampleTypePvCountEditor"
+            id="edu.ualberta.med.biobank.editors.SpecimenTypePvCountEditor"
             name="Sample Type Totals by Patient Visit and Study">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.QAAliquotsEditor"
+            class="edu.ualberta.med.biobank.forms.reports.QaSpecimensEditor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.QAAliquotsEditor"
+            id="edu.ualberta.med.biobank.editors.QaSpecimensEditor"
             name="Aliquot QA">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.SampleTypeSUsageEditor"
+            class="edu.ualberta.med.biobank.forms.reports.SpecimenTypeSUsageEditor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.SampleTypeSUsageEditor"
+            id="edu.ualberta.med.biobank.editors.SpecimenTypeSUsageEditor"
             name="Sample Type Usage">
-      </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.reports.PatientWBCEditor"
-            default="false"
-            icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.PatientWBCEditor"
-            name="Patient WBC Aliquots">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.reports.PatientVisitSummaryEditor"
@@ -1997,13 +1933,6 @@
             name="Patient Visit Summary">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.AliquotSCountEditor"
-            default="false"
-            icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.AliquotSCountEditor"
-            name="Aliquot Study Count">
-            </editor>
-<editor
             class="edu.ualberta.med.biobank.forms.ActivityStatusViewForm"
             default="false"
             id="edu.ualberta.med.biobank.forms.ActivityStatusViewForm"
@@ -2029,13 +1958,6 @@
       icon="icons/reportsPerspective.png"
       id="edu.ualberta.med.biobank.editors.FTAReportEditor"
       name="FTA Report">
-</editor>
-<editor
-      class="edu.ualberta.med.biobank.forms.reports.InvoicingReportEditor"
-      default="false"
-      icon="icons/reportsPerspective.png"
-      id="edu.ualberta.med.biobank.editors.InvoicingReportEditor"
-      name="Invoicing Report">
 </editor>
 <editor
       class="edu.ualberta.med.biobank.forms.DispatchViewForm"
@@ -2459,6 +2381,14 @@
             </equals>
          </with>
       </definition>
+      <definition id="edu.ualberta.med.biobank.form.instanceof.BiobankEntryForm">
+        <with
+              variable="activeEditor">
+           <instanceof
+                 value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
+           </instanceof>
+        </with>
+      </definition>
       <definition
             id="biobank.sampleManagementPerspectiveSelected">
          <with
@@ -2576,6 +2506,15 @@
                </test>
             </iterate>
          </with>
+      </definition>
+      <definition
+            id="biobank2.isCurrentCenterAdmin">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.isCurrentCenterAdmin">
+            <equals
+                  value="true">
+            </equals>
+         </with>
       </definition>       
    </extension>
    <extension
@@ -2690,24 +2629,29 @@
             	  mnemonic="%Update.command.mnemonic"
                   id="edu.ualberta.med.biobank.menu.update">
             </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.command.install"
+                  mnemonic="%Install.command.mnemonic"
+                  id="edu.ualberta.med.biobank.menu.install">
+            </command>                     
             <separator
-                  name="edu.ualberta.med.biobank.menu.update.separator"
+                  name="edu.ualberta.med.biobank.menu.update.separatorA"
                   visible="true">
             </separator>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.cbsrHelp"
+                  label="%CbsrHelp.command"
+                  id="edu.ualberta.med.biobank.menu.cbsrHelp">
+            </command>
+            <separator
+                  name="edu.ualberta.med.biobank.menu.update.separatorB"
+                  visible="true">
+            </separator>  
             <command
                   commandId="org.eclipse.ui.help.aboutAction"
                   label="%About.command"
                   mnemonic="%About.command.mnemonic"
                   style="push">
-            </command>
-                        
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:help?after=edu.ualberta.med.biobank.menu.update">
-            <command
-                  commandId="edu.ualberta.med.biobank.command.install"
-            	  mnemonic="%Install.command.mnemonic"
-                  id="edu.ualberta.med.biobank.menu.install">
             </command>
       </menuContribution>
    </extension>
