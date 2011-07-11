@@ -9,13 +9,14 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class CollectionEventAdapter extends AdapterBase {
@@ -37,8 +38,6 @@ public class CollectionEventAdapter extends AdapterBase {
     protected String getLabelInternal() {
         CollectionEventWrapper cevent = getWrapper();
         Assert.isNotNull(cevent, "collection event is null");
-        StringBuilder name = new StringBuilder(cevent.getPatient().getPnumber())
-            .append(" - #").append(cevent.getVisitNumber());
 
         long count = -1;
         try {
@@ -46,7 +45,14 @@ public class CollectionEventAdapter extends AdapterBase {
         } catch (Exception e) {
             logger.error("Problem counting specimens", e);
         }
-        return name.append(" [").append(count).append("]").toString();
+
+        return new StringBuilder("#")
+            .append(cevent.getVisitNumber())
+            .append(" - ")
+            .append(
+                DateFormatter.formatAsDateTime(cevent
+                    .getMinSourceSpecimenDate())).append(" [").append(count)
+            .append("]").toString();
     }
 
     @Override

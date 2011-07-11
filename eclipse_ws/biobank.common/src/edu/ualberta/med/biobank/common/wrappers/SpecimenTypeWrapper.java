@@ -22,6 +22,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
+    private static final String UNKNOWN_IMPORT_NAME = "Unknown / import";
+
     public SpecimenTypeWrapper(WritableApplicationService appService,
         SpecimenType wrappedObject) {
         super(appService, wrappedObject);
@@ -182,6 +184,10 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         checkNoDuplicates(SpecimenType.class,
             SpecimenTypePeer.NAME_SHORT.getName(), getNameShort(),
             "A specimen type with name short");
+    }
+
+    public boolean isUnknownImport() {
+        return getName() != null && UNKNOWN_IMPORT_NAME.equals(getName());
     }
 
 }

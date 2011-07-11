@@ -14,6 +14,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -29,11 +30,11 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PalletScanManagement {
 
-    protected Map<RowColPos, PalletCell> cells;
-    private int successfulScansCount = 0;
+    protected Map<RowColPos, PalletCell> cells = new HashMap<RowColPos, PalletCell>();
+    private int scansCount = 0;
     private boolean useScanner = true;
 
-    private boolean scanTubeAloneMode = false;
+    private boolean scanTubeAloneMode = true;
 
     public void launchScanAndProcessResult(final String plateToScan) {
         launchScanAndProcessResult(plateToScan,
@@ -95,7 +96,6 @@ public class PalletScanManagement {
                 try {
                     scanCells = ScannerConfigPlugin.scan(plateNum, profile);
                     cells = PalletCell.convertArray(scanCells);
-                    successfulScansCount++;
                 } catch (Exception ex) {
                     BgcPlugin
                         .openAsyncError(
@@ -103,53 +103,59 @@ public class PalletScanManagement {
                             ex,
                             "Barcodes can still be scanned with the handheld 2D scanner.");
                     return;
+                } finally {
+                    scansCount++;
+                    afterScanBeforeMerge();
                 }
             }
         } else {
             cells = getFakeScanCells();
-            successfulScansCount++;
+            scansCount++;
+            afterScanBeforeMerge();
         }
-        beforeScanMerge();
-        if (cells == null) {
-            cells = new HashMap<RowColPos, PalletCell>();
-        } else {
-            Map<String, PalletCell> cellValues = getValuesMap(cells);
-            if (rescanMode && oldCells != null) {
-                // rescan: merge previous scan with new in case the scanner
-                // wasn't able to scan well
-                for (Entry<RowColPos, PalletCell> entry : oldCells.entrySet()) {
-                    RowColPos rcp = entry.getKey();
-                    PalletCell oldScannedCell = entry.getValue();
-                    PalletCell newScannedCell = cells.get(rcp);
-                    boolean copyOldValue = false;
-                    if (PalletCell.hasValue(oldScannedCell)) {
-                        copyOldValue = true;
-                        if (PalletCell.hasValue(newScannedCell)
-                            && !oldScannedCell.getValue().equals(
-                                newScannedCell.getValue())) {
-                            // Different values at same position
-                            cells = oldCells;
-                            throw new Exception(
-                                "Scan Aborted: previously scanned specimens has been replaced. "
-                                    + "If this is not a re-scan, reset and start again.");
-                        } else if (!PalletCell.hasValue(newScannedCell)) {
-                            // previous position has value - new has none
-                            PalletCell newPosition = cellValues
-                                .get(oldScannedCell.getValue());
-                            if (newPosition != null) {
-                                // still there but moved to another position, so
-                                // don't copy previous scanned position
-                                copyOldValue = false;
-                            }
+        Map<String, PalletCell> cellValues = getValuesMap(cells);
+        if (rescanMode && oldCells != null) {
+            // rescan: merge previous scan with new in case the scanner
+            // wasn't able to scan well
+            boolean rescanDifferent = false;
+            for (Entry<RowColPos, PalletCell> entry : oldCells.entrySet()) {
+                RowColPos rcp = entry.getKey();
+                PalletCell oldScannedCell = entry.getValue();
+                PalletCell newScannedCell = cells.get(rcp);
+                boolean copyOldValue = false;
+                if (PalletCell.hasValue(oldScannedCell)) {
+                    copyOldValue = true;
+                    if (PalletCell.hasValue(newScannedCell)
+                        && !oldScannedCell.getValue().equals(
+                            newScannedCell.getValue())) {
+                        // Different values at same position
+                        oldScannedCell.setInformation((oldScannedCell
+                            .getInformation() != null ? oldScannedCell
+                            .getInformation() : "")
+                            + " Rescanned value is different");
+                        oldScannedCell.setStatus(CellStatus.ERROR);
+                        rescanDifferent = true;
+
+                    } else if (!PalletCell.hasValue(newScannedCell)) {
+                        // previous position has value - new has none
+                        PalletCell newPosition = cellValues.get(oldScannedCell
+                            .getValue());
+                        if (newPosition != null) {
+                            // still there but moved to another position, so
+                            // don't copy previous scanned position
+                            copyOldValue = false;
                         }
                     }
-                    if (copyOldValue) {
-                        cells.put(rcp, oldScannedCell);
-                    }
+                }
+                if (copyOldValue) {
+                    cells.put(rcp, oldScannedCell);
                 }
             }
-            afterScan();
+            if (rescanDifferent)
+                throw new Exception(
+                    "Scan error: Previously scanned specimens has been replaced. Please cancel and start again.");
         }
+        afterSuccessfulScan();
     }
 
     public void scanTubeAlone(MouseEvent e) {
@@ -226,11 +232,11 @@ public class PalletScanManagement {
         // default does nothing
     }
 
-    protected void beforeScanMerge() {
+    protected void afterScanBeforeMerge() {
         // default does nothing
     }
 
-    protected void afterScan() {
+    protected void afterSuccessfulScan() {
         // default does nothing
     }
 
@@ -252,28 +258,25 @@ public class PalletScanManagement {
     }
 
     public void onReset() {
-        successfulScansCount = 0;
+        scansCount = 0;
         initCells();
     }
 
     public void setUseScanner(boolean useScanner) {
         this.useScanner = useScanner;
-        initCells();
     }
 
     private void initCells() {
-        if (useScanner)
-            cells = null;
-        else
-            cells = new HashMap<RowColPos, PalletCell>();
+        cells = new HashMap<RowColPos, PalletCell>();
     }
 
-    public int getSuccessfulScansCount() {
-        return successfulScansCount;
+    public int getScansCount() {
+        return scansCount;
     }
 
     public void toggleScanTubeAloneMode() {
-        scanTubeAloneMode = !scanTubeAloneMode;
+        // might want to remove this toggle thing if users don't ask for it back
+        // scanTubeAloneMode = !scanTubeAloneMode;
     }
 
     public boolean isScanTubeAloneMode() {

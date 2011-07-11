@@ -64,6 +64,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         Boolean.FALSE, Boolean.class);
     private IObservableValue scanOkValue = new WritableValue(Boolean.TRUE,
         Boolean.class);
+    private IObservableValue hasValues = new WritableValue(Boolean.FALSE,
+        Boolean.class);
 
     private Button scanButton;
     private Button scanTubeAloneSwitch;
@@ -89,6 +91,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                 setScanHasBeenLaunched(true);
                 AbstractScanDialog.this.processScanResult(monitor,
                     AbstractScanDialog.this.currentSite);
+                setHasValues();
             }
 
             @Override
@@ -112,6 +115,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             protected void postprocessScanTubeAlone(PalletCell cell)
                 throws Exception {
                 AbstractScanDialog.this.postprocessScanTubeAlone(cell);
+                setHasValues();
             }
 
             @Override
@@ -248,13 +252,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         scanButton.setEnabled(false);
 
         createScanTubeAloneButton(contents);
-        GridData gd = new GridData();
-        gd.horizontalSpan = 2;
-        gd.horizontalAlignment = SWT.RIGHT;
-        scanTubeAloneSwitch.setLayoutData(gd);
 
         spw = new ScanPalletWidget(contents, getPalletCellStatus());
-        gd = new GridData();
+        GridData gd = new GridData();
         gd.horizontalSpan = 2;
         spw.setLayoutData(gd);
 
@@ -273,6 +273,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), scanHasBeenLaunchedValue,
             "Scan should be launched", IStatus.ERROR);
+        widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
+            Boolean.class), hasValues, "No values scanned", IStatus.ERROR);
 
     }
 
@@ -300,6 +302,15 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             @Override
             public void run() {
                 scanOkValue.setValue(resOk);
+            }
+        });
+    }
+
+    protected void setHasValues() {
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                hasValues.setValue(getCells().size() > 0);
             }
         });
     }
@@ -417,6 +428,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         scanTubeAloneSwitch = new Button(parent, SWT.NONE);
         GridData gd = new GridData();
         gd.verticalAlignment = SWT.TOP;
+        gd.horizontalSpan = 2;
+        gd.horizontalAlignment = SWT.RIGHT;
         scanTubeAloneSwitch.setLayoutData(gd);
         scanTubeAloneSwitch.setText("");
         scanTubeAloneSwitch.setImage(BgcPlugin.getDefault().getImageRegistry()
@@ -437,6 +450,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                 }
             }
         });
+        scanTubeAloneSwitch.setVisible(false);
     }
 
     protected boolean canScanTubeAlone(PalletCell cell) {

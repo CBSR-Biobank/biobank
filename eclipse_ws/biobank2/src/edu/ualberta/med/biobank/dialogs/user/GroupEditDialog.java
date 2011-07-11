@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -117,7 +118,8 @@ public class GroupEditDialog extends BgcBaseDialog {
 
         centerFeaturesWidget = createFeaturesSelectionWidget(
             parent,
-            SessionManager.getAppService().getSecurityCenterFeatures(),
+            SessionManager.getAppService().getSecurityCenterFeatures(
+                SessionManager.getUser()),
             modifiedGroup.getCenterFeaturesEnabled(),
             BiobankSecurityUtil.CENTER_FEATURE_START_NAME,
             Messages.getString("GroupEditDialog.feature.center.list.available"), //$NON-NLS-1$
@@ -153,15 +155,20 @@ public class GroupEditDialog extends BgcBaseDialog {
 
     private List<CenterWrapper<?>> getAllCenters() {
         if (allCenters == null) {
-            try {
-                allCenters = CenterWrapper.getCenters(SessionManager
-                    .getAppService());
-            } catch (Exception e) {
-                BgcPlugin
-                    .openAsyncError(
-                        Messages
-                            .getString("GroupEditDialog.msg.error.retrieve.centers"), e); //$NON-NLS-1$
-            }
+            if (!SessionManager.getUser().isSuperAdministrator())
+                allCenters = Arrays
+                    .asList(new CenterWrapper<?>[] { SessionManager.getUser()
+                        .getCurrentWorkingCenter() });
+            else
+                try {
+                    allCenters = CenterWrapper.getCenters(SessionManager
+                        .getAppService());
+                } catch (Exception e) {
+                    BgcPlugin
+                        .openAsyncError(
+                            Messages
+                                .getString("GroupEditDialog.msg.error.retrieve.centers"), e); //$NON-NLS-1$
+                }
         }
         return allCenters;
     }
@@ -185,12 +192,10 @@ public class GroupEditDialog extends BgcBaseDialog {
             close();
         } catch (ApplicationException e) {
             if (e.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
-                BgcPlugin.openAsyncError(
-                    GROUP_PERSIST_ERROR_TITLE,
+                BgcPlugin.openAsyncError(GROUP_PERSIST_ERROR_TITLE,
                     Messages.getString("GroupEditDialog.msg.error.name.used")); //$NON-NLS-1$
             } else {
-                BgcPlugin.openAsyncError(
-                    GROUP_PERSIST_ERROR_TITLE, e);
+                BgcPlugin.openAsyncError(GROUP_PERSIST_ERROR_TITLE, e);
             }
         }
     }

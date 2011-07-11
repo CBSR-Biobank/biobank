@@ -156,7 +156,7 @@ public class UserManagementDialog extends BgcBaseDialog {
     protected List<Group> getGroups(boolean includeSuperAdmin) {
         try {
             return SessionManager.getAppService().getSecurityGroups(
-                includeSuperAdmin);
+                SessionManager.getUser(), includeSuperAdmin);
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Unable to load groups.", e);
         }
@@ -167,7 +167,7 @@ public class UserManagementDialog extends BgcBaseDialog {
         if (currentUserList == null) {
             try {
                 currentUserList = SessionManager.getAppService()
-                    .getSecurityUsers();
+                    .getSecurityUsers(SessionManager.getUser());
             } catch (ApplicationException e) {
                 BgcPlugin.openAsyncError("Unable to load users.", e);
             }
