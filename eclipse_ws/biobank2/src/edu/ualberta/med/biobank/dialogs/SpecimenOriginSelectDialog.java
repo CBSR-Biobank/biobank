@@ -59,12 +59,12 @@ public class SpecimenOriginSelectDialog extends BgcBaseDialog {
         l.setLayoutData(gd);
         l.setText(Messages.getString("SpecimenOriginSelectDialog.details")); //$NON-NLS-1$
 
+        selectedCenter = SessionManager.getUser().getCurrentWorkingCenter();
+
         List<Object> objectList = new ArrayList<Object>(centers);
-        widgetCreator.createComboViewer(
-            contents,
+        widgetCreator.createComboViewer(contents,
             Messages.getString("SpecimenOriginSelectDialog.centers.label"), //$NON-NLS-1$
-            objectList, SessionManager.getUser().getCurrentWorkingCenter(),
-            null, new ComboSelectionUpdate() {
+            objectList, selectedCenter, null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     if (selectedObject instanceof CenterWrapper<?>)
