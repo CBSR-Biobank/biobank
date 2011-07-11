@@ -11,12 +11,35 @@
 \section{Source Vessels}
 \section{Shipping Methods}
 \section{Activity Status}
-\section{User Administration}
+\section{User Management}
+
+You can open the user/group administration dialog by selecting
+\texttt{Administration} $\to$ \texttt{User Management}.
+This menu is available only if you are a super administrator or administrator 
+of your working center. 
+
+You will see the dialog shown in \ref{fig:user_management}. It allows you to 
+add/delete/edit users and groups. If you are not super administrator, you will 
+only see users and groups of your current working center.
+\begin{figure}[H]
+  \centering
+  \scalebox{0.5}
+	   { \includegraphics*{screenshots/administration/user_management} }
+	   \caption{User management dialog.}
+	   \label{fig:user_management}
+\end{figure}
 
 \subsection{Adding Users}
-To add a new user select \texttt{Administration} $\to$ \texttt{Add User}
-from the main menu. You will see the following dialog window pop up. Enter the
+To add a new user, open the User Management dialog and click on the \fbox{+} button
+of the users section. You will see the following dialog window pop up. Enter the 
 user's details and press the \fbox{OK} button.
+
+A user should be assigned to at least one group. The centres assigned to these groups
+become the 'working centres' of the user.
+
+The password assigned to the new user is temporary. When the user logs in for
+the first time, he/she will be asked to enter the temporary password and
+select a new password.
 \begin{figure}[H]
   \centering
   \scalebox{0.5}
@@ -25,33 +48,102 @@ user's details and press the \fbox{OK} button.
 	   \label{fig:add_user}
 \end{figure}
 
-For \texttt{Available Groups} the following exist:
-\begin{description}
-\item[Website Administrator] This user type has acces to create any type of
-  object in the system: create repository sites, studies, clinics and
-  containers, etc. This user type can also edit global data such as sample
-  types, shipment methods, etc. And also create and edit users.
-\item[CBSR Technician Level 1] This user type can view, update, create and
-  delete patients, shipments, samples, sample types and containers. This user
-  type cannot create repository sites, studies and clinics.
-\item[CBSR Technician Level 2] This user type can view, update and create
-  patients, shipments and samples. This user type cannot create repository
-  sites, studies and clinics.
-\item[Calgary Administrator] \todo[size=\small]{description requried?}.
-\item[Calgary Technician] \todo[size=\small]{description requried?}.
-\end{description}
 
-The password assigned to the new user is temporary. When the user logs in for
-the first time, he / she will be asked to enter the temporary password and
-select a new password.
-
-\subsection{Editing Users}
+\subsection{Modifying Users}
+To modify a user, open the User Management dialog, right click on the user and select 
+edit or delete on the pop-up. If edit is selected, then the same dialog as in \ref{fig:add_user} is displayed.
 \begin{figure}[H]
   \centering
   \scalebox{0.5}
-	   { \includegraphics*{screenshots/administration/edit_users} }
-	   \caption{Editing users.}
-	   \label{fig:edit_users}
+	   { \includegraphics*{screenshots/administration/edit_delete_user} }
+	   \caption{Pop-up to edit or delete users.}
+	   \label{fig:edit_delete_users}
 \end{figure}
 
-\subsection{Password Change}
+
+\subsection{Adding Groups}
+To add a new group, open the User Management dialog and click on the \fbox{+} button 
+of the groups section. You will see the following dialog window pop up. Enter the group's 
+details and press the \fbox{OK} button.
+\begin{figure}[H]
+  \centering
+  \scalebox{0.5}
+	   { \includegraphics*{screenshots/administration/add_group} }
+	   \caption{Adding a group.}
+	   \label{fig:add_group}
+\end{figure}
+
+\begin{description}
+\item[Name] Give a short name, but with enough information to know what working centres the group refers to.
+\item[Is administrator] Check this box if users of this group will also administrate the centre(s). 
+If this box is checked then all features will be authorized for this group, the user management will be available for the centre, and features like create/edit/delete containers and container types will be available. Super administration features like create/edit/delete clinic, studies, sites won't be available (see Super Administrator group description in \ref{predefined_groups}). 
+\item[Working centres] The group should be assigned to at least one working centre. 
+\item[Specific features] This defines the features that the users of this group will be able to perform in the selected working centres.
+\end{description}
+
+\subsubsection{Features available}
+\begin{description}
+\item[Assign positions] User will be able to assign positions to specimens
+\item[Clinic Shipments] User will be able to create/edit/delete clinic shipments (this feature is supposed to be CBSR specific for clinics not using the software)
+\item[Collection Event] User will be able to create/edit/delete collection events
+\item[Dispatch/Request] User will be able to create/edit/delete dispatches and requests
+\item[Link Specimen] User will be able to link aliquoted specimens to their source specimens
+\item[Printer Labels] User will be able to use the print labels menu
+\item[Processing Event] User will be able to create/edit/delete processing events
+\item[Reports] User will be able to access the report view
+\end{description}
+
+\subsubsection{Predefined groups}
+\label{predefined_groups}
+\begin{description}
+\item[Super Administrator] This user type has access to every views of the software 
+  and can create/delete/edit any type of object in the system, and to all centres. 
+  This group is meant to users that will administrate the whole application (including users management).
+\item[CBSR Technician Level 1] This group's users are administrator the site CBSR. They have access to all the features of the application for the site CBSR only. This user type cannot create repository sites, studies and clinics because these are Super administration features.
+\item[CBSR Technician Level 2] This user type has a restricted access to features on site CBSR.
+  For instance this group's users cannot create repository sites, studies, clinics, containers, 
+  container types.
+\item[Calgary Administrator] This groups is similar to the CBSR Technician Level 1 except that it is specific to the site Calgary.
+\item[Calgary Technician] This groups is similar to the CBSR Technician Level 2 except that it is specific to the site Calgary.
+\end{description}
+
+\subsection{Examples}
+
+\subsubsection{Site group}
+
+A site group will need almost all the features since it needs to see collection events, receive dispatches, create processing events, link specimens, assign positions and answer requests.
+In that case the following features should be added to this group: Assign positions, Collection Event, Dispatch/Request, Link Specimen, Processing Event.
+
+\subsubsection{Site group with administration}
+
+If the previous group should also be a administrator group, then the 'Is administrator of these working centres' box should be checked. This will be applied to all users of the group, so you might need to create two different groups, the one describe previously and this one, which give full administration of the site.
+
+\subsubsection{Clinic group}
+
+A clinic group don't need all functionalities of the application. Most of the time, it will only need to create collection events and dispatches. If it also aliquot specimen, it might also need to link them.
+In that case the following features should be added to this group: Collection Event, Dispatch/Request, Link Specimen.
+
+\subsubsection{Clinic group with administration}
+
+If the previous group should also be a administrator group, then the 'Is administrator of these working centres' box should be checked. This will be applied to all users of the group, so you might need to create two different groups, the one describe previously and this one, which give full administration of the clinic.
+
+\subsubsection{Technician user}
+A technician user that does not need to access any administration, will usually be assigned to a single group, with no administration privileges, for example 'CBSR Technician Level 2' or 'Calgary Technician'.
+
+\subsubsection{Center administrator user}
+A user that will administrate its site, will usually be assigned to a single group with administration privileges, for example 'CBSR Technician Level 1' or 'Calgary Administrator'.
+
+\subsubsection{Center administrator user and Super administrator}
+A user that need full access for its own centre and also need to administrate the full application will be assigned to two groups: Super Administrator + its centre group (for instance 'CBSR Technician Level 1').
+
+\section{Password Change}
+
+A user connected to the application can modify its password. This can be done by switching to the administration view and selecting \texttt{Administration} $\to$ \texttt{Change password}. You will see the following dialog window pop up. Enter the old password and the new password twice and press the \fbox{OK} button. You will then be asked to connect again.
+\begin{figure}[H]
+  \centering
+  \scalebox{0.5}
+	   { \includegraphics*{screenshots/administration/change_password} }
+	   \caption{Changing the password.}
+	   \label{fig:change_password}
+\end{figure}
+
