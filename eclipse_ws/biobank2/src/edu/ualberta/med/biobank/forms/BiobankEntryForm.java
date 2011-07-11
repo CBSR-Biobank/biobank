@@ -436,18 +436,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         form.updateToolBar();
     }
 
-    protected void addConfirmAction() {
-        formActions.addConfirmAction(Actions.BIOBANK_CONFIRM);
-    }
-
-    protected void addResetAction() {
-        formActions.addResetAction(Actions.BIOBANK_RESET);
-    }
-
-    protected void addCancelAction() {
-        formActions.addCancelAction(Actions.BIOBANK_CANCEL);
-    }
-
     protected void addPrintAction() {
         formActions.addPrintAction();
     }
