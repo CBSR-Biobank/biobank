@@ -10,9 +10,9 @@ import net.sf.jasperreports.engine.JasperPrint;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
 public class PdfDataExporter extends GuiDataExporter {
@@ -46,12 +46,12 @@ public class PdfDataExporter extends GuiDataExporter {
 
         String path = getPath(data, VALID_EXTS);
         List<Map<String, String>> maps = getPropertyMaps(data, labelProvider,
-            monitor);
+            monitor, true);
 
         try {
             JasperPrint jasperPrint = ReportingUtils.createDynamicReport(
                 data.getTitle(), data.getDescription(), data.getColumnNames(),
-                maps);
+                maps, true);
             ReportingUtils.saveReport(jasperPrint, path);
         } catch (Exception e) {
             BgcPlugin.openAsyncError("Error saving to PDF", e);
@@ -64,9 +64,13 @@ public class PdfDataExporter extends GuiDataExporter {
         }
     }
 
+    /**
+     * if useIntergerProperties is true then the map will contain [{0=value},
+     * {1=value}...] instead of [{name=value}...] (see issue #1312)
+     */
     protected static List<Map<String, String>> getPropertyMaps(Data data,
-        ITableLabelProvider labelProvider, IProgressMonitor monitor)
-        throws DataExportException {
+        ITableLabelProvider labelProvider, IProgressMonitor monitor,
+        boolean useIntegerProperties) throws DataExportException {
         List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
 
         for (Object row : data.getRows()) {
@@ -74,19 +78,28 @@ public class PdfDataExporter extends GuiDataExporter {
                 throw new DataExportException("exporting canceled");
             }
 
-            Map<String, String> map = getPropertyMap(data, row, labelProvider);
+            Map<String, String> map = getPropertyMap(data, row, labelProvider,
+                useIntegerProperties);
             maps.add(map);
         }
 
         return maps;
     }
 
+    /**
+     * if useIntergerProperties is true then the map will contain [{0=value},
+     * {1=value}...] instead of [{name=value}...] (see issue #1312)
+     */
     protected static Map<String, String> getPropertyMap(Data data, Object row,
-        ITableLabelProvider labelProvider) {
+        ITableLabelProvider labelProvider, boolean useIntegerProperties) {
         Map<String, String> map = new HashMap<String, String>();
 
         for (int i = 0, n = data.getColumnNames().size(); i < n; i++) {
-            String property = data.getColumnNames().get(i);
+            String property;
+            if (useIntegerProperties)
+                property = String.valueOf(i);
+            else
+                property = data.getColumnNames().get(i);
             String value = labelProvider.getColumnText(row, i);
             map.put(property, value);
         }

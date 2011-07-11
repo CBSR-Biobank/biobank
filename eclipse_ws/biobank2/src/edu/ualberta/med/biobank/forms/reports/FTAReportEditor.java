@@ -77,4 +77,11 @@ public class FTAReportEditor extends ReportsEditor {
         params.add(ReportsEditor.processDate(afterDate.getDate(), true));
         return params;
     }
+
+    @Override
+    protected void onReset() throws Exception {
+        studyCombo.getCombo().select(0);
+        afterDate.setDate(null);
+        super.onReset();
+    }
 }
