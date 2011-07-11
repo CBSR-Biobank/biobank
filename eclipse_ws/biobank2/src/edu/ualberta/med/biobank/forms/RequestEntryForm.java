@@ -78,9 +78,7 @@ public class RequestEntryForm extends BiobankViewForm {
         BgcBaseText researchGroupLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Research Group");
 
-        // FIXME: following lines does not compile, commenting out for now
-        // setTextValue(researchGroupLabel,
-        // request.getStudy().getResearchGroup().getNameShort());
+        request.getStudy().getResearchGroup().getNameShort();
 
         BgcBaseText submittedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Date Submitted");
@@ -283,10 +281,7 @@ public class RequestEntryForm extends BiobankViewForm {
                 .getCurrentWorkingCenter());
 
             dispatch.setState(DispatchState.CREATION);
-
-            // FIXME: following lines do not compile, commenting out for now
-            // dispatch.setReceiverCenter(request.getStudy().getResearchGroup());
-
+            dispatch.setReceiverCenter(request.getStudy().getResearchGroup());
             dispatch.persist();
             request.reload();
             request.addToDispatchCollection(Arrays.asList(dispatch));
