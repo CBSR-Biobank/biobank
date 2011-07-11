@@ -484,10 +484,9 @@ public abstract class ReportsEditor extends BiobankEntryForm {
 
         if (exportPDF) {
             try {
-                ReportingUtils
-                    .saveReport(ReportingUtils.createDynamicReport(
-                        report.getName(), stringParams, columnInfo, listData),
-                        path);
+                ReportingUtils.saveReport(
+                    ReportingUtils.createDynamicReport(report.getName(),
+                        stringParams, columnInfo, listData, false), path);
             } catch (Exception e) {
                 BgcPlugin.openAsyncError("Error saving to PDF", e);
                 return;
@@ -499,8 +498,10 @@ public abstract class ReportsEditor extends BiobankEntryForm {
             }
         } else {
             try {
-                ReportingUtils.printReport(ReportingUtils.createDynamicReport(
-                    report.getName(), stringParams, columnInfo, listData));
+                ReportingUtils
+                    .printReport(ReportingUtils.createDynamicReport(
+                        report.getName(), stringParams, columnInfo, listData,
+                        false));
             } catch (Exception e) {
                 BgcPlugin.openAsyncError("Printer Error", e);
                 return;
