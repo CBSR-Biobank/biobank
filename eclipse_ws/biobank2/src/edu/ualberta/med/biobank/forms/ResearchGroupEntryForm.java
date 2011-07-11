@@ -108,13 +108,6 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             ResearchGroupPeer.NAME_SHORT.getName(),
             new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 
-        // FIXME: ResearchGroupPeer.SENDS_SHIPMENTS is not defined
-        // createBoundWidgetWithLabel(
-        // client,
-        // Button.class,
-        // SWT.CHECK,
-        //            Messages.getString("researchGroup.field.label.sendsShipments"), null, //$NON-NLS-1$
-        // researchGroup, ResearchGroupPeer.SENDS_SHIPMENTS.getName(), null);
         toolkit.paintBordersFor(client);
 
         activityStatusComboViewer = createComboViewer(

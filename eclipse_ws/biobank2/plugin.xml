@@ -2013,6 +2013,20 @@
       id="edu.ualberta.med.biobank.forms.SpecimenAssignEntryForm"
       name="Specimen Assign">
 </editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"
+      default="false"
+      icon="icons/research_group.png"
+      id="edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"
+      name="Research Group Entry">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.ResearchGroupViewForm"
+      default="false"
+      icon="icons/research_group.png"
+      id="edu.ualberta.med.biobank.forms.ResearchGroupViewForm"
+      name="Research Group View">
+</editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">

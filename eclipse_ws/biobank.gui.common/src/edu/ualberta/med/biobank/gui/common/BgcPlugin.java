@@ -202,6 +202,7 @@ public class BgcPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_CHECK, "checked.gif");
         registerImage(registry, IMG_UNCHECK, "unchecked.gif");
         registerImage(registry, IMG_RESEARCH_GROUP, "research_group.png");
+        registerImage(registry, IMG_RESEARCH_GROUPS, "research_groups.png");
         registerImage(registry, IMG_ERROR, "error.png");
     }
 
