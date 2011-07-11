@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview.processing;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -94,12 +95,16 @@ public class ProcessingEventGroup extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return null;
+        List<AdapterBase> children = getChildren();
+        List<ModelWrapper<?>> wrappers = new ArrayList<ModelWrapper<?>>();
+        for (AdapterBase child : children)
+            wrappers.add(child.getModelObject());
+        return wrappers;
     }
 
     @Override
     protected int getWrapperChildCount() throws Exception {
-        return 0;
+        return getWrapperChildren().size();
     }
 
 }

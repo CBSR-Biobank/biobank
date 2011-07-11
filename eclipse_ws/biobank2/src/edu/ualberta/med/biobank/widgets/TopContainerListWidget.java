@@ -22,11 +22,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class TopContainerListWidget {
 
@@ -45,6 +46,7 @@ public class TopContainerListWidget {
     private ListViewer topContainers;
     private String filterText;
     private Boolean enabled;
+    private List<SiteWrapper> sites;
 
     @SuppressWarnings("unchecked")
     public TopContainerListWidget(final Composite parent, FormToolkit toolkit) {
@@ -62,12 +64,12 @@ public class TopContainerListWidget {
         });
         siteCombo.setContentProvider(new ArrayContentProvider());
         try {
-            List<SiteWrapper> sites = SiteWrapper.getSites(appService);
+            sites = SiteWrapper.getSites(appService);
             SiteWrapper allsites = new SiteWrapper(appService);
             allsites.setNameShort("All Sites");
             sites.add(allsites);
             siteCombo.setInput(sites);
-            siteCombo.getCombo().select(0);
+            GuiUtil.reset(siteCombo, sites.get(0));
         } catch (Exception e1) {
             BgcPlugin.openAsyncError("Failed to load sites", e1);
         }
@@ -79,18 +81,21 @@ public class TopContainerListWidget {
                     try {
                         SiteWrapper s = (SiteWrapper) ((IStructuredSelection) siteCombo
                             .getSelection()).getFirstElement();
-                        if (s.getNameShort().equals("All Sites")) {
-                            List<SiteWrapper> sites = SiteWrapper
-                                .getSites(appService);
-                            for (SiteWrapper site : sites) {
-                                containers.addAll(site
-                                    .getTopContainerCollection());
+                        if (s != null) {
+                            if (s.getNameShort().equals("All Sites")) {
+                                List<SiteWrapper> sites = SiteWrapper
+                                    .getSites(appService);
+                                for (SiteWrapper site : sites) {
+                                    containers.addAll(site
+                                        .getTopContainerCollection());
+                                }
+                            } else {
+                                containers.addAll(s.getTopContainerCollection());
                             }
-                        } else
-                            containers.addAll(s.getTopContainerCollection());
+                        }
                     } catch (Exception e) {
-                        BgcPlugin.openAsyncError(
-                            "Error retrieving containers", e);
+                        BgcPlugin.openAsyncError("Error retrieving containers",
+                            e);
                     }
                     topContainers.setInput(containers);
                     filterBy(filterText);
@@ -190,5 +195,10 @@ public class TopContainerListWidget {
             }
         }
         return containerList;
+    }
+
+    public void reset() {
+        topContainers.setSelection(null);
+        GuiUtil.reset(siteCombo, sites.get(0));
     }
 }

@@ -42,14 +42,17 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void modifyPassword(String oldPassword, String newPassword)
         throws ApplicationException;
 
-    public List<Group> getSecurityGroups(boolean includeSuperAdmin)
+    public List<Group> getSecurityGroups(User currentUser,
+        boolean includeSuperAdmin) throws ApplicationException;
+
+    public List<User> getSecurityUsers(User currentUser)
         throws ApplicationException;
 
-    public List<User> getSecurityUsers() throws ApplicationException;
+    public User persistUser(User currentUser, User userToPersist)
+        throws ApplicationException;
 
-    public User persistUser(User user) throws ApplicationException;
-
-    public void deleteUser(String login) throws ApplicationException;
+    public void deleteUser(User currentUser, String loginToDelete)
+        throws ApplicationException;
 
     public User getCurrentUser() throws ApplicationException;
 
@@ -57,7 +60,8 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public void deleteGroup(Group group) throws ApplicationException;
 
-    public void unlockUser(String userName) throws ApplicationException;
+    public void unlockUser(User currentUser, String userNameToUnlock)
+        throws ApplicationException;
 
     public List<Object> runReport(Report report, int maxResults, int firstRow,
         int timeout) throws ApplicationException;
@@ -66,11 +70,11 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public String getServerVersion();
 
-    public List<ProtectionGroupPrivilege> getSecurityGlobalFeatures()
-        throws ApplicationException;
+    public List<ProtectionGroupPrivilege> getSecurityGlobalFeatures(
+        User currentUser) throws ApplicationException;
 
-    public List<ProtectionGroupPrivilege> getSecurityCenterFeatures()
-        throws ApplicationException;
+    public List<ProtectionGroupPrivilege> getSecurityCenterFeatures(
+        User currentUser) throws ApplicationException;
 
     public QueryHandle createQuery(QueryCommand qc) throws Exception;
 

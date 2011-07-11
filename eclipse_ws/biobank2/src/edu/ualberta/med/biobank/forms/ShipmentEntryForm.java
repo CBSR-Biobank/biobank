@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,6 +17,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -26,8 +28,8 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.SpecimenOriginSelectDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
@@ -92,6 +94,12 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         String tabName;
         if (originInfo.isNew()) {
             tabName = "New Shipment";
+            CenterWrapper<?> userCenter = SessionManager.getUser()
+                .getCurrentWorkingCenter();
+            if (userCenter instanceof SiteWrapper) {
+                originInfo.setReceiverSite((SiteWrapper) userCenter);
+            }
+            shipmentInfo.setReceivedAt(Calendar.getInstance().getTime());
         } else {
             tabName = "Shipment "
                 + originInfo.getShipmentInfo().getFormattedDateReceived();

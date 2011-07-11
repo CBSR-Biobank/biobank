@@ -38,7 +38,7 @@ public enum UICellStatus {
         .asList(EMPTY, NEW, MOVED, FILLED, MISSING, ERROR);
 
     public static List<UICellStatus> DEFAULT_PALLET_SCAN_LINK_STATUS_LIST = Arrays
-        .asList(EMPTY, SCAN_PROFILE, NO_TYPE, TYPE, ERROR);
+        .asList(EMPTY, NO_TYPE, TYPE, ERROR);
 
     public static List<UICellStatus> DEFAULT_PALLET_DISPATCH_RECEIVE_STATUS_LIST = Arrays
         .asList(EMPTY, IN_SHIPMENT_RECEIVED, IN_SHIPMENT_EXPECTED, EXTRA, ERROR);
@@ -70,26 +70,16 @@ public enum UICellStatus {
     }
 
     public UICellStatus mergeWith(UICellStatus newStatus) {
-        switch (this) {
-        case EMPTY:
+        if (this == EMPTY || this == MISSING)
             return newStatus;
-        case FILLED:
-        case MOVED:
+        if (this == ERROR || newStatus == ERROR)
+            return ERROR;
+        if (this == FILLED || this == MOVED) {
             if (newStatus == MISSING || newStatus == ERROR) {
                 return newStatus;
             }
             return this;
-        case ERROR:
-            return ERROR;
-        case MISSING:
-            if (newStatus == ERROR) {
-                return ERROR;
-            }
-            return MISSING;
-        default:
-            break;
         }
         return EMPTY;
     }
-
 }

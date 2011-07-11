@@ -16,8 +16,8 @@ import edu.ualberta.med.biobank.widgets.trees.ReportTreeWidget;
 
 public class ReportsView extends ViewPart {
 
-    public static BgcLogger logger = BgcLogger
-        .getLogger(ReportsView.class.getName());
+    public static BgcLogger logger = BgcLogger.getLogger(ReportsView.class
+        .getName());
 
     public static final String ID = "edu.ualberta.med.biobank.views.ReportsView";
 
@@ -89,7 +89,7 @@ public class ReportsView extends ViewPart {
 
         // Sample Types
         sampleTypeTab = new CTabItem(top, SWT.NONE);
-        sampleTypeTab.setText("Sample Types");
+        sampleTypeTab.setText("Specimen Types");
         Composite sampleTypeBody = new Composite(top, SWT.NONE);
         sampleTypeBody.setLayout(treeLayout);
         sampleTypeBody.setLayoutData(treeGd);

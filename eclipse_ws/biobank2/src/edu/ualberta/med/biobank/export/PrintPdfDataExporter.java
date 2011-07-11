@@ -23,12 +23,12 @@ public class PrintPdfDataExporter extends PdfDataExporter {
         canExport(data);
 
         List<Map<String, String>> maps = getPropertyMaps(data, labelProvider,
-            monitor);
+            monitor, true);
 
         try {
             JasperPrint jasperPrint = ReportingUtils.createDynamicReport(
                 data.getTitle(), data.getDescription(), data.getColumnNames(),
-                maps);
+                maps, true);
             ReportingUtils.printReport(jasperPrint);
         } catch (Exception e) {
             BgcPlugin.openAsyncError("Error printing PDF", e);

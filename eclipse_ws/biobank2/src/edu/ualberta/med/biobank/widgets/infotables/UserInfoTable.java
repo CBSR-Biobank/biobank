@@ -66,6 +66,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                 String userName = selectedUser.getLogin();
                 try {
                     SessionManager.getAppService().unlockUser(
+                        SessionManager.getUser(),
                         ((User) getSelection()).getLogin());
                     selectedUser.setLockedOut(false);
                     reloadCollection(getCollection(), selectedUser);
@@ -160,7 +161,8 @@ public class UserInfoTable extends InfoTableWidget<User> {
     protected int editUser(User user) {
         List<Group> groups = null;
         try {
-            groups = SessionManager.getAppService().getSecurityGroups(true);
+            groups = SessionManager.getAppService().getSecurityGroups(
+                SessionManager.getUser(), true);
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(GROUPS_LOADING_ERROR, e);
             return Dialog.CANCEL;
@@ -189,7 +191,8 @@ public class UserInfoTable extends InfoTableWidget<User> {
             }
 
             if (BgcPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
-                SessionManager.getAppService().deleteUser(loginName);
+                SessionManager.getAppService().deleteUser(
+                    SessionManager.getUser(), loginName);
 
                 // remove the user from the collection
                 getCollection().remove(user);
