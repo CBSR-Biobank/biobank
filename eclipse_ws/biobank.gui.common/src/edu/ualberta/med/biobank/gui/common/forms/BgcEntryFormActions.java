@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.gui.common.forms;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -33,8 +34,18 @@ public class BgcEntryFormActions {
 
     private Action confirmAction;
 
+    private CommandContributionItem reset;
+
+    private CommandContributionItem cancel;
+
+    private ActionContributionItem printAction;
+
     public BgcEntryFormActions(IBgcEntryForm form) {
         this.entryForm = form;
+        this.confirmAction = null;
+        this.reset = null;
+        this.cancel = null;
+        this.printAction = null;
     }
 
     public Action getConfirmAction() {
@@ -42,6 +53,9 @@ public class BgcEntryFormActions {
     }
 
     public void addConfirmAction(String commandId) {
+        if (confirmAction != null)
+            return;
+
         confirmAction = new Action() {
             @Override
             public void run() {
@@ -55,7 +69,10 @@ public class BgcEntryFormActions {
     }
 
     public void addResetAction(String commandId) {
-        CommandContributionItem reset = new CommandContributionItem(
+        if (reset != null)
+            return;
+
+        reset = new CommandContributionItem(
             new CommandContributionItemParameter(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow(), "Reset", commandId, null,
                 resetActionImage, null, null, "Reset", "Reset", "Reset",
@@ -64,7 +81,10 @@ public class BgcEntryFormActions {
     }
 
     public void addCancelAction(String commandId) {
-        CommandContributionItem cancel = new CommandContributionItem(
+        if (cancel != null)
+            return;
+
+        cancel = new CommandContributionItem(
             new CommandContributionItemParameter(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow(), "Cancel", commandId, null,
                 cancelActionImage, null, null, "Cancel", "Cancel", "Cancel",
@@ -73,7 +93,10 @@ public class BgcEntryFormActions {
     }
 
     public void addPrintAction() {
-        Action print = new Action("Print") {
+        if (printAction != null)
+            return;
+
+        Action action = new Action("Print") {
             @Override
             public void run() {
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
@@ -88,8 +111,15 @@ public class BgcEntryFormActions {
                 });
             }
         };
-        print.setImageDescriptor(printActionImage);
-        entryForm.getScrolledForm().getToolBarManager().add(print);
+
+        action.setImageDescriptor(printActionImage);
+        printAction = new ActionContributionItem(action);
+        entryForm.getScrolledForm().getToolBarManager().add(printAction);
     }
 
+    public void setEnablePrintAction(boolean enabled) {
+        if (printAction == null)
+            return;
+        printAction.getAction().setEnabled(enabled);
+    }
 }

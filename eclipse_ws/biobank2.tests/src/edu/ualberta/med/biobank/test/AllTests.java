@@ -7,6 +7,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.wrappers.TestActivityStatus;
 import edu.ualberta.med.biobank.test.wrappers.TestAliquotedSpecimen;
@@ -30,7 +31,6 @@ import edu.ualberta.med.biobank.test.wrappers.TestSourceSpecimen;
 import edu.ualberta.med.biobank.test.wrappers.TestSpecimen;
 import edu.ualberta.med.biobank.test.wrappers.TestSpecimenType;
 import edu.ualberta.med.biobank.test.wrappers.TestStudy;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 @RunWith(Suite.class)
 @SuiteClasses({ TestActivityStatus.class, TestAliquotedSpecimen.class,
@@ -43,7 +43,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
     TestSourceSpecimen.class, TestSpecimen.class, TestSpecimenType.class,
     TestStudy.class })
 public class AllTests {
-    public static WritableApplicationService appService = null;
+    public static BiobankApplicationService appService = null;
 
     @BeforeClass
     public static void setUp() throws Exception {

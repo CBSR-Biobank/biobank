@@ -53,4 +53,11 @@ public class PatientVisitSummaryEditor extends ReportsEditor {
         return params;
     }
 
+    @Override
+    protected void onReset() throws Exception {
+        start.setDate(null);
+        end.setDate(null);
+        super.onReset();
+    }
+
 }

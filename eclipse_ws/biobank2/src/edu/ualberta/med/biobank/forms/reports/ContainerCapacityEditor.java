@@ -34,4 +34,8 @@ public class ContainerCapacityEditor extends ReportsEditor {
         return new ArrayList<Object>();
     }
 
+    @Override
+    protected void onReset() throws Exception {
+    }
+
 }

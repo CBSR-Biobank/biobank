@@ -32,8 +32,8 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
@@ -105,8 +105,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 appService, cevent));
         } else {
             tabName = Messages.getString("CollectionEventEntryForm.title.edit",
-                cevent.getPatient().getPnumber(),
-                cevent.getVisitNumber());
+                cevent.getPatient().getPnumber(), cevent.getVisitNumber());
         }
 
         setPartName(tabName);
@@ -207,6 +206,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {
+                        form.setFocus();
                         specimensTable.addOrEditSpecimen(true, null, cevent
                             .getPatient().getStudy()
                             .getSourceSpecimenCollection(true),
@@ -360,18 +360,31 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     }
 
     @Override
+    public void reset() {
+        super.reset();
+        if (cevent.isNew())
+            // because we set the visit number and the activity status default
+            setDirty(true);
+    }
+
+    @Override
     protected void onReset() throws Exception {
         cevent.reset();
+        cevent.setPatient(patient);
 
         if (cevent.isNew()) {
             cevent.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
-            cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
-                appService, cevent));
+            Integer next = CollectionEventWrapper.getNextVisitNumber(
+                appService, cevent);
+            cevent.setVisitNumber(next);
+            // FIXME for some reasons, the text is not set to the correct number
+            // unless we do it ourself or call setVisitNumber a second time with
+            // a different value (!!??!!) see issues #1306 and #1304
+            visitNumberText.setText(next.toString());
         }
 
         patient.reset();
-        cevent.setPatient(patient);
 
         GuiUtil.reset(activityStatusComboViewer, cevent.getActivityStatus());
 

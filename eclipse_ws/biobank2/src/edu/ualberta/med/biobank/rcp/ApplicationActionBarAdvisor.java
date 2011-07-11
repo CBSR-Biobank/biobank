@@ -24,8 +24,8 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
@@ -37,8 +37,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     public static final String ERROR_LOGS_VIEW = "org.eclipse.pde.runtime.LogView";
 
     List<Action> helpMenuCustomActions = new ArrayList<Action>();
-
-    public static final String CBSR_HELP_ID = "edu.ualberta.med.biobank.commands.cbsrHelp";
 
     public static final String SEND_ERROR_EMAIL_ID = "edu.ualberta.med.biobank.commands.sendErrorMail";
 
@@ -52,9 +50,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     @Override
     protected void makeActions(IWorkbenchWindow window) {
-        createCustomAction(window, "CBSR Help", CBSR_HELP_ID, "cbsrHelp",
-            "Get technical support from CBSR");
-
         createCustomAction(window, "Keyboard Shortcuts...",
             "org.eclipse.ui.window.showKeyAssist", "shorcuts",
             "Show shorcuts for the current view");

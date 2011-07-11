@@ -30,7 +30,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
     private ClinicWrapper clinic;
 
     public ClinicStudyInfoTable(Composite parent, ClinicWrapper clinic) {
-        super(parent, null, HEADINGS, 10);
+        super(parent, null, HEADINGS, 10, StudyWrapper.class);
         this.clinic = clinic;
         setCollection(clinic.getStudyCollection());
     }

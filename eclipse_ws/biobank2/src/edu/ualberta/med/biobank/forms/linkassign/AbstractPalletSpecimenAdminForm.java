@@ -132,12 +132,12 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
 
             @Override
-            protected void beforeScanMerge() {
+            protected void afterScanBeforeMerge() {
                 setScanHasBeenLaunched(true, true);
             }
 
             @Override
-            protected void afterScan() {
+            protected void afterSuccessfulScan() {
                 appendLog(Messages.getString(
                     "linkAssign.activitylog.scanRes.total", //$NON-NLS-1$
                     cells.keySet().size()));
@@ -180,23 +180,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         propertyListener = new IPropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent event) {
-                int plateEnabledCount = 0;
-
-                for (int i = 0; i < edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.SCANNER_PALLET_ENABLED.length; ++i) {
-                    if (!event
-                        .getProperty()
-                        .equals(
-                            edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.SCANNER_PALLET_ENABLED[i]))
-                        continue;
-
-                    int plateId = i + 1;
-                    if (ScannerConfigPlugin.getDefault().getPlateEnabled(
-                        plateId)) {
-                        ++plateEnabledCount;
-                    }
-                }
-
-                // force an error check
+                // force a check on available plates
                 String plateText = plateToScanText.getText();
                 plateToScanText.setText("");
                 plateToScanText.setText(plateText);
@@ -235,7 +219,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void setRescanMode() {
-        if (palletScanManagement.getSuccessfulScansCount() > 0) {
+        if (palletScanManagement.getScansCount() > 0) {
             scanButton.setText("Retry scan");
             rescanMode = true;
             enableFields(false);
@@ -276,7 +260,10 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected void launchScanAndProcessResult() {
         palletScanManagement.launchScanAndProcessResult(plateToScanValue
             .getValue().toString(), getProfile(), isRescanMode());
+        refreshPalletDisplay();
     }
+
+    protected abstract void refreshPalletDisplay();
 
     protected String getProfile() {
         if (profilesCombo == null
@@ -407,7 +394,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected boolean isScanValid() {
-        return scanValidValue.getValue().equals(true);
+        return scanValidValue.getValue().equals(Boolean.TRUE);
     }
 
     protected void setScanHasBeenLaunched(boolean launched) {
@@ -480,9 +467,11 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         appendLogs(res.getLogs());
         processCellResult(palletCell.getRowColPos(), palletCell);
         currentScanState = currentScanState.mergeWith(palletCell.getStatus());
-        boolean ok = isScanValid()
-            && (palletCell.getStatus() != UICellStatus.ERROR);
-        setScanValid(ok);
+        setScanValid(getCells() != null && !getCells().isEmpty()
+            && currentScanState != UICellStatus.ERROR);
+        // boolean ok = isScanValid()
+        // && (palletCell.getStatus() != UICellStatus.ERROR);
+        // setScanValid(ok);
         afterScanAndProcess(palletCell.getRow());
     }
 
@@ -607,8 +596,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         // nothing done by default
     }
 
-    protected boolean isFirstSuccessfulScan() {
-        return palletScanManagement.getSuccessfulScansCount() == 1;
+    protected boolean isAtLeastOneScanLaunched() {
+        return palletScanManagement.getScansCount() > 0;
     }
 
     protected boolean canScanTubeAlone(PalletCell cell) {

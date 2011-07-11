@@ -155,12 +155,8 @@ public abstract class BgcFormBase extends EditorPart implements
 
         book = toolkit.createPageBook(form.getBody(), SWT.V_SCROLL);
         book.setLayout(new GridLayout());
-        GridData gd2 = new GridData();
-        gd2.grabExcessHorizontalSpace = true;
-        gd2.grabExcessVerticalSpace = true;
-        gd2.horizontalAlignment = SWT.FILL;
-        gd2.verticalAlignment = SWT.FILL;
-        book.setLayoutData(gd2);
+        book.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true,
+            true));
         page = book.createPage("page");
         book.showPage("page");
 

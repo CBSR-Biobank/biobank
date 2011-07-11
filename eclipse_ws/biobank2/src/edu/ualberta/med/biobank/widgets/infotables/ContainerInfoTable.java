@@ -43,7 +43,7 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
     public ContainerInfoTable(Composite parent, SiteAdapter site)
         throws Exception {
         super(parent, site.getWrapper().getTopContainerCollection(), HEADINGS,
-            10);
+            10, ContainerWrapper.class);
         siteAdapter = site;
     }
 
