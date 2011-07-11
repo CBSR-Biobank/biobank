@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ResearchGroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
@@ -48,6 +49,8 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     };
 
     private ComboViewer activityStatusComboViewer;
+
+    private ComboViewer studyComboViewer;
 
     @Override
     protected void init() throws Exception {
@@ -110,6 +113,17 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
         toolkit.paintBordersFor(client);
 
+        studyComboViewer = createComboViewer(client,
+            Messages.getString("label.study"),
+            StudyWrapper.getAllStudies(appService), researchGroup.getStudy(),
+            Messages.getString("ResearchGroupEntryForm.study.validator.msg"), //$NON-NLS-1$
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    researchGroup.setStudy((StudyWrapper) selectedObject);
+                }
+            });
+
         activityStatusComboViewer = createComboViewer(
             client,
             Messages.getString("label.activity"), //$NON-NLS-1$
@@ -156,10 +170,12 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         if (researchGroup.isNew()) {
             researchGroup.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
+            researchGroup.setStudy(null);
         }
 
         GuiUtil.reset(activityStatusComboViewer,
             researchGroup.getActivityStatus());
+        GuiUtil.reset(studyComboViewer, researchGroup.getStudy());
 
     }
 }

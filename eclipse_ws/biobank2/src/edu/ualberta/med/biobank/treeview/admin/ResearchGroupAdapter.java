@@ -33,14 +33,14 @@ public class ResearchGroupAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return getTooltipText("ResearchGroup");
+        return getTooltipText("Research Group");
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "ResearchGroup");
-        addViewMenu(menu, "ResearchGroup");
-        addDeleteMenu(menu, "ResearchGroup");
+        addEditMenu(menu, "Research Group");
+        addViewMenu(menu, "Research Group");
+        addDeleteMenu(menu, "Research Group");
     }
 
     @Override

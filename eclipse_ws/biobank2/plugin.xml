@@ -939,7 +939,7 @@
                      commandId="edu.ualberta.med.biobank.commands.researchGroupAdd"
                      icon="icons/rg_add.png"
                      id="edu.ualberta.med.biobank.menu.researchGroupAdd"
-                     label="Add ResearchGroup"
+                     label="Add Research Group"
                      style="push">
                   <visibleWhen
                         checkEnabled="false">

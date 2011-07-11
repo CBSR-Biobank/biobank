@@ -4,7 +4,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.Messages;
@@ -25,15 +24,11 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
 
     private BgcBaseText nameShortLabel;
 
-    private Button hasShipmentsButton;
-
     private BgcBaseText activityStatusLabel;
 
     private BgcBaseText commentLabel;
 
-    private BgcBaseText patientTotal;
-
-    private BgcBaseText ceventTotal;
+    private BgcBaseText studyLabel;
 
     @Override
     protected void init() throws Exception {
@@ -70,21 +65,12 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
             Messages.getString("label.name")); //$NON-NLS-1$
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.getString("label.nameShort")); //$NON-NLS-1$
-        hasShipmentsButton = (Button) createLabelledWidget(client,
-            Button.class, SWT.NONE,
-            Messages.getString("researchGroup.field.label.sendsShipments")); //$NON-NLS-1$
+        studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("label.study")); //$NON-NLS-1$
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.getString("label.activity")); //$NON-NLS-1$
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
             Messages.getString("label.comments")); //$NON-NLS-1$
-        patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages
-                .getString("ResearchGroupViewForm.field.label.totalPatients")); //$NON-NLS-1$
-        ceventTotal = createReadOnlyLabelledField(
-            client,
-            SWT.NONE,
-            Messages
-                .getString("ResearchGroupViewForm.field.label.totalCollectionEvents")); //$NON-NLS-1$
 
         setResearchGroupValues();
     }
@@ -92,11 +78,9 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
     private void setResearchGroupValues() throws Exception {
         setTextValue(nameLabel, researchGroup.getName());
         setTextValue(nameShortLabel, researchGroup.getNameShort());
-        setCheckBoxValue(hasShipmentsButton, researchGroup.getSendsShipments());
+        setTextValue(studyLabel, researchGroup.getStudy());
         setTextValue(activityStatusLabel, researchGroup.getActivityStatus());
         setTextValue(commentLabel, researchGroup.getComment());
-        setTextValue(patientTotal, researchGroup.getPatientCount());
-        setTextValue(ceventTotal, researchGroup.getCollectionEventCount());
     }
 
     @Override
