@@ -430,9 +430,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
 
     protected void addToolbarButtons() {
         formActions = new BgcEntryFormActions(this);
-        formActions.addResetAction(Actions.BIOBANK_RESET);
-        formActions.addCancelAction(Actions.BIOBANK_CANCEL);
-        formActions.addConfirmAction(Actions.BIOBANK_CONFIRM);
+        addResetAction();
+        addCancelAction();
+        addConfirmAction();
         form.updateToolBar();
     }
 

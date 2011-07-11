@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.views;
 import java.util.Date;
 import java.util.List;
 
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -160,7 +161,8 @@ public class ProcessingView extends AbstractAdministrationView {
                 BgcPlugin.openMessage("Processing Event not found", msg);
             } else {
                 showSearchedObjectsInTree(searchedObject);
-                getTreeViewer().expandToLevel(processingNode, 2);
+                getTreeViewer().expandToLevel(processingNode,
+                    TreeViewer.ALL_LEVELS);
             }
         } catch (Exception e) {
             BgcPlugin.openAsyncError("Search error", e);

@@ -39,7 +39,6 @@ import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.util.HQLCriteriaListProxy;
-import edu.ualberta.med.biobank.forms.Actions;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
@@ -484,10 +483,9 @@ public abstract class ReportsEditor extends BiobankEntryForm {
 
         if (exportPDF) {
             try {
-                ReportingUtils
-                    .saveReport(ReportingUtils.createDynamicReport(
-                        report.getName(), stringParams, columnInfo, listData),
-                        path);
+                ReportingUtils.saveReport(
+                    ReportingUtils.createDynamicReport(report.getName(),
+                        stringParams, columnInfo, listData, false), path);
             } catch (Exception e) {
                 BgcPlugin.openAsyncError("Error saving to PDF", e);
                 return;
@@ -499,8 +497,10 @@ public abstract class ReportsEditor extends BiobankEntryForm {
             }
         } else {
             try {
-                ReportingUtils.printReport(ReportingUtils.createDynamicReport(
-                    report.getName(), stringParams, columnInfo, listData));
+                ReportingUtils
+                    .printReport(ReportingUtils.createDynamicReport(
+                        report.getName(), stringParams, columnInfo, listData,
+                        false));
             } catch (Exception e) {
                 BgcPlugin.openAsyncError("Printer Error", e);
                 return;
@@ -574,9 +574,9 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     @Override
     protected void addToolbarButtons() {
         formActions = new BgcEntryFormActions(this);
-        formActions.addResetAction(Actions.BIOBANK_RESET);
-        formActions.addCancelAction(Actions.BIOBANK_CANCEL);
-        formActions.addPrintAction();
+        addResetAction();
+        addCancelAction();
+        addPrintAction();
         form.updateToolBar();
         setEnablePrintAction(false);
     }

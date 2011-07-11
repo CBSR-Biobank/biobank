@@ -58,15 +58,23 @@ public class ReportingUtils {
 
     public static PrinterData data;
 
+    /**
+     * if userIntegerProperties is set to true, then the map contained inside
+     * 'list' should be contain [{0=value}, {1=value}...] instead of
+     * [{name=value}...] (see issue #1312)
+     */
     public static JasperPrint createDynamicReport(String reportName,
-        List<String> description, List<String> columnInfo, List<?> list)
-        throws Exception {
+        List<String> description, List<String> columnInfo, List<?> list,
+        boolean useIntegerProperties) throws Exception {
 
         FastReportBuilder drb = new FastReportBuilder();
         for (int i = 0; i < columnInfo.size(); i++) {
-            drb.addColumn(columnInfo.get(i), columnInfo.get(i), String.class,
-                40, false).setPrintBackgroundOnOddRows(true)
-                .setUseFullPageWidth(true);
+            String title = columnInfo.get(i);
+            String property = title;
+            if (useIntegerProperties)
+                property = String.valueOf(i);
+            drb.addColumn(title, property, String.class, 40, false)
+                .setPrintBackgroundOnOddRows(true).setUseFullPageWidth(true);
         }
 
         String infos = StringUtils.join(description,

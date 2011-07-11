@@ -71,9 +71,9 @@ public class BgcEntryForm extends BgcFormBase implements IBgcEntryForm {
 
     protected void addToolbarButtons() {
         formActions = new BgcEntryFormActions(this);
-        formActions.addResetAction(Actions.GUI_COMMON_RESET);
-        formActions.addCancelAction(Actions.GUI_COMMON_CANCEL);
-        formActions.addConfirmAction(Actions.GUI_COMMON_CONFIRM);
+        addResetAction();
+        addCancelAction();
+        addConfirmAction();
         form.updateToolBar();
     }
 
