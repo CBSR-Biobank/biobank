@@ -52,8 +52,4 @@ AICML: http://aicml.cs.ualberta.ca
       <feature id="biobank2.feature.platform"/>
    </features>
 
-   <configurations>
-      <plugin id="biobank.gui.common" autoStart="true" startLevel="0"/>
-   </configurations>
-
 </product>

@@ -2197,20 +2197,9 @@
             name="Servers">
       </page>
       <page
-            class="edu.ualberta.med.biobank.preferences.GeneralPreferencePage"
+            class="org.eclipse.ui.internal.dialogs.WorkbenchPreferencePage"
             id="org.eclipse.ui.preferencePages.Workbench"
             name="Hidden General (for others pages references)">
-      </page>
-      <page
-            category="edu.ualberta.med.biobank.preferences.general"
-            class="org.eclipse.equinox.internal.p2.ui.sdk.scheduler.AutomaticUpdatesPreferencePage"
-            id="edu.ualberta.med.biobank.preferences.automaticUpdates"
-            name="Automatic Update">
-      </page>
-      <page
-            class="edu.ualberta.med.biobank.preferences.DefaultTopPreferencePage"
-            id="org.eclipse.equinox.internal.p2.ui.sdk.ProvisioningPreferencePage"
-            name="Hidden Install/Update">
       </page>
       <page
             category="edu.ualberta.med.biobank.preferences.general"
@@ -2540,20 +2529,6 @@
          name="Link or Assign perspective">
    </context>  
    </extension>
-    <extension
-         point="org.eclipse.ui.installationPages">
-          <page
-            name="%installedSoftwarePage"
-            class="org.eclipse.equinox.p2.ui.InstalledSoftwarePage"
-            id="10.edu.ualberta.med.biobank.InstalledSoftwarePage">
-          </page>
-          <page
-            name="%installHistoryPage"
-            class="org.eclipse.equinox.p2.ui.RevertProfilePage"
-            id="11.edu.ualberta.med.biobank.RevertProfilePage">
-          </page>
-          
-      </extension>
        <extension
          point="org.eclipse.ui.commands">
       <command
@@ -2565,31 +2540,10 @@
             id="edu.ualberta.med.biobank.command.install">
       </command>
    </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            commandId="edu.ualberta.med.biobank.command.update"
-            class="edu.ualberta.med.biobank.p2.UpdateHandler">
-      </handler>
-      <handler
-            commandId="edu.ualberta.med.biobank.command.install"
-            class="edu.ualberta.med.biobank.p2.InstallNewSoftwareHandler">
-      </handler>
-   </extension>
      <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="menu:help?after=additions">
-            <command
-                  commandId="edu.ualberta.med.biobank.command.update"
-            	  mnemonic="%Update.command.mnemonic"
-                  id="edu.ualberta.med.biobank.menu.update">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.command.install"
-                  mnemonic="%Install.command.mnemonic"
-                  id="edu.ualberta.med.biobank.menu.install">
-            </command>                     
             <separator
                   name="edu.ualberta.med.biobank.menu.update.separatorA"
                   visible="true">

@@ -71,13 +71,14 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
         // 'org.eclipse.ui.preferencePages.Workbench'
         // It will prevent the security preference page warning about its
         // missing category
+
         pm.remove("org.eclipse.equinox.security.ui.category");
+
+        // then we hide the 'Hidden General' preference page. The class of this
+        // page should be PerspectivesPreferencePage even if there is a
+        // Warnings, otherwise a second menu 'general' will be displayed when
+        // the product is exported
         pm.remove("org.eclipse.ui.preferencePages.Workbench");
-        // this preference page is deactivated because it send a warning about
-        // its missing parent. We have our own preference page definition that
-        // is using the exact same
-        pm.remove("org.eclipse.equinox.internal.p2.ui.sdk.scheduler.AutomaticUpdatesPreferencePage");
-        pm.remove("org.eclipse.equinox.internal.p2.ui.sdk.ProvisioningPreferencePage");
     }
 
 }

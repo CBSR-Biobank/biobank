@@ -109,7 +109,7 @@ public class LoginDialog extends TitleAreaDialog {
         servers = new ArrayList<String>();
         userNames = new ArrayList<String>();
 
-        pluginPrefs = new InstanceScope().getNode(Application.PLUGIN_ID);
+        pluginPrefs = InstanceScope.INSTANCE.getNode(Application.PLUGIN_ID);
         Preferences prefsUserNames = pluginPrefs.node(SAVED_USER_NAMES);
 
         IPreferenceStore prefsStore = BiobankPlugin.getDefault()
