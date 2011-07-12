@@ -77,8 +77,9 @@ public class RequestEntryForm extends BiobankViewForm {
 
         BgcBaseText researchGroupLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Research Group");
-        setTextValue(researchGroupLabel, request.getStudy().getResearchGroup()
-            .getNameShort());
+
+        request.getStudy().getResearchGroup().getNameShort();
+
         BgcBaseText submittedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Date Submitted");
         setTextValue(submittedLabel,
