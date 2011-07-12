@@ -38,6 +38,7 @@ public abstract class AbstractRequestGroup extends AdapterBase {
         //
     }
 
+    @Override
     protected String getLabelInternal() {
         return null;
     }
