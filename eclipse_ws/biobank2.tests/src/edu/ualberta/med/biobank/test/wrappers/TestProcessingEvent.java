@@ -170,16 +170,15 @@ public class TestProcessingEvent extends TestDatabase {
             .addProcessingEvent(site, patient, Utils.getRandomDate());
         pevent.delete();
 
-        // make sure pevent cannot be deleted if it has samples
-        pevent = ProcessingEventHelper.addProcessingEvent(site, patient,
-            Utils.getRandomDate());
-        addContainerTypes();
-        addContainers();
+        List<SpecimenTypeWrapper> allSpcTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, true);
 
+        // make sure pevent cannot be deleted if it has samples
         SpecimenWrapper parentSpc = SpecimenHelper.addParentSpecimen();
-        SpecimenWrapper childSpc = SpecimenHelper.addSpecimens(parentSpc,
-            containerMap.get("ChildL1"), 0, 0, 1).get(0);
-        pevent = childSpc.getProcessingEvent();
+        SpecimenWrapper childSpc = SpecimenHelper.addSpecimens(site, parentSpc,
+            1, allSpcTypes).get(0);
+        parentSpc.reload();
+        pevent = parentSpc.getProcessingEvent();
 
         try {
             pevent.delete();
@@ -190,6 +189,7 @@ public class TestProcessingEvent extends TestDatabase {
         }
 
         // delete aliquot and pevent
+        childSpc.reload();
         childSpc.delete();
         pevent.reload();
         pevent.delete();
@@ -200,14 +200,13 @@ public class TestProcessingEvent extends TestDatabase {
         String name = "testDeleteNoMoreSpecimens" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite("site" + name);
 
+        List<SpecimenTypeWrapper> allSpcTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, true);
         SpecimenWrapper parentSpc = SpecimenHelper.addParentSpecimen();
-
-        ProcessingEventWrapper pevent = ProcessingEventHelper
-            .addProcessingEvent(site, parentSpc.getCollectionEvent()
-                .getPatient(), Utils.getRandomDate());
-        pevent.addToSpecimenCollection(Arrays.asList(parentSpc));
-        parentSpc.setProcessingEvent(pevent);
-        pevent.persist();
+        SpecimenWrapper childSpc = SpecimenHelper.addSpecimens(site, parentSpc,
+            1, allSpcTypes).get(0);
+        parentSpc.reload();
+        ProcessingEventWrapper pevent = parentSpc.getProcessingEvent();
 
         try {
             pevent.delete();
@@ -217,8 +216,8 @@ public class TestProcessingEvent extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        pevent.removeFromSpecimenCollection(Arrays.asList(parentSpc));
-        parentSpc.delete();
+        pevent.removeFromSpecimenCollection(Arrays.asList(childSpc));
+        childSpc.delete();
         pevent.reload();
         pevent.persist();
 
@@ -258,7 +257,7 @@ public class TestProcessingEvent extends TestDatabase {
                     continue;
                 // System.out.println("setting aliquot at: " + row + ", " +
                 // col);
-                spcMap.put(row + col * rows,
+                spcMap.put(row + (col * rows),
                     SpecimenHelper.addSpecimen(parentSpc,
                         DbHelper.chooseRandomlyInList(allSpcTypes),
                         parentSpc.getCollectionEvent(), pevent, container, row,
@@ -279,8 +278,8 @@ public class TestProcessingEvent extends TestDatabase {
             Assert.assertNotNull(pos);
             Assert.assertNotNull(pos.row);
             Assert.assertNotNull(pos.col);
-            Assert.assertNotNull(spcMap.get(pos.row + pos.col * rows));
-            Assert.assertEquals(spc, spcMap.get(pos.row + pos.col * rows));
+            Assert.assertNotNull(spcMap.get(pos.row + (pos.col * rows)));
+            Assert.assertEquals(spc, spcMap.get(pos.row + (pos.col * rows)));
         }
 
         // delete all samples now
@@ -325,7 +324,7 @@ public class TestProcessingEvent extends TestDatabase {
                     continue;
                 // System.out.println("setting aliquot at: " + row + ", " +
                 // col);
-                spcMap.put(row + col * rows,
+                spcMap.put(row + (col * rows),
                     SpecimenHelper.addSpecimen(parentSpc,
                         DbHelper.chooseRandomlyInList(allSpcTypes),
                         parentSpc.getCollectionEvent(), pevent, container, row,
