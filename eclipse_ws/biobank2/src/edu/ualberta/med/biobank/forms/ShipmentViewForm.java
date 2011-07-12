@@ -40,6 +40,8 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private BgcBaseText boxNumberLabel;
 
+    private BgcBaseText commentLabel;
+
     private SpecimenEntryWidget specimenWidget;
 
     @Override
@@ -106,6 +108,8 @@ public class ShipmentViewForm extends BiobankViewForm {
             "Box number");
         dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Received");
+        commentLabel = createReadOnlyLabelledField(client,
+            SWT.WRAP | SWT.MULTI, "Comment");
 
         setShipmentValues();
     }
@@ -128,6 +132,7 @@ public class ShipmentViewForm extends BiobankViewForm {
 
         setTextValue(boxNumberLabel, shipInfo.getBoxNumber());
         setTextValue(dateReceivedLabel, shipInfo.getFormattedDateReceived());
+        setTextValue(commentLabel, shipInfo.getComment());
     }
 
     @Override
