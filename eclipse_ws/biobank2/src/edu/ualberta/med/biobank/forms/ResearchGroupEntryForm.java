@@ -35,6 +35,9 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     private static final String MSG_NO_CLINIC_NAME = Messages
         .getString("ResearchGroupEntryForm.msg.noResearchGroupName"); //$NON-NLS-1$
 
+    private static final String MSG_NO_CLINIC_NAME_SHORT = Messages
+        .getString("ResearchGroupEntryForm.msg.noResearchGroupNameShort"); //$NON-NLS-1$
+
     private ResearchGroupAdapter researchGroupAdapter;
 
     private ResearchGroupWrapper researchGroup;
@@ -109,13 +112,14 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
             Messages.getString("label.nameShort"), null, researchGroup, //$NON-NLS-1$
             ResearchGroupPeer.NAME_SHORT.getName(),
-            new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
+            new NonEmptyStringValidator(MSG_NO_CLINIC_NAME_SHORT));
 
         toolkit.paintBordersFor(client);
 
         studyComboViewer = createComboViewer(client,
             Messages.getString("label.study"),
-            StudyWrapper.getAllStudies(appService), researchGroup.getStudy(),
+            ResearchGroupWrapper.getAvailStudies(appService),
+            researchGroup.getStudy(),
             Messages.getString("ResearchGroupEntryForm.study.validator.msg"), //$NON-NLS-1$
             new ComboSelectionUpdate() {
                 @Override
