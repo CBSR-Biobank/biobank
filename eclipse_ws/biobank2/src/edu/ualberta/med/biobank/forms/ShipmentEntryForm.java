@@ -80,6 +80,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private BgcBaseText waybillWidget;
 
+    private BgcBaseText commentText;
+
     private Set<SpecimenWrapper> specimensToPersist = new HashSet<SpecimenWrapper>();
 
     @Override
@@ -196,6 +198,10 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         createDateTimeWidget(client, "Received", shipmentInfo.getReceivedAt(),
             shipmentInfo, ShipmentInfoPeer.RECEIVED_AT.getName(),
             new NotNullValidator("Date Received should be set"));
+
+        commentText = (BgcBaseText) createBoundWidgetWithLabel(client,
+            BgcBaseText.class, SWT.WRAP | SWT.MULTI, "Comments", null,
+            shipmentInfo, "comment", null);
 
     }
 

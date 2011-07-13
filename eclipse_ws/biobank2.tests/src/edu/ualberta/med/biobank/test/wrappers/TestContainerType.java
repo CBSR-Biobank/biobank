@@ -1062,7 +1062,7 @@ public class TestContainerType extends TestDatabase {
         Map<Integer, ContainerLabelingSchemeWrapper> map = ContainerLabelingSchemeWrapper
             .getAllLabelingSchemesMap(appService);
 
-        Assert.assertEquals(5, map.size());
+        Assert.assertEquals(6, map.size());
     }
 
     @Test
