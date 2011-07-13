@@ -62,6 +62,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
 
     public static final String PLUGIN_ID = "biobank";
 
+    public static BundleContext bundleContext;
+
     //
     // ContainerTypeAdapter and Container missing on purpose.
     //
@@ -153,6 +155,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
     @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
+        bundleContext = context;
         plugin = this;
         SessionManager.getInstance();
     }

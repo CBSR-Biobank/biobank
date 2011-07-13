@@ -82,6 +82,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     @Override
     public void postWindowOpen() {
+        P2Util.checkForUpdates();
+
         IStatusLineManager statusline = getWindowConfigurer()
             .getActionBarConfigurer().getStatusLineManager();
         statusline.setMessage(null, "Application ready");

@@ -47,8 +47,13 @@ public class BgcLogger {
 
     public void addRcpLogStatus(int severity, String message, Throwable e) {
         ILog rcpLogger = BgcPlugin.getDefault().getLog();
-        IStatus status = new Status(severity, BgcPlugin.PLUGIN_ID,
-            name + ": " + message, e);
+        IStatus status = new Status(severity, BgcPlugin.PLUGIN_ID, name + ": "
+            + message, e);
+        rcpLogger.log(status);
+    }
+
+    public void addRcpLogStatus(IStatus status) {
+        ILog rcpLogger = BgcPlugin.getDefault().getLog();
         rcpLogger.log(status);
     }
 

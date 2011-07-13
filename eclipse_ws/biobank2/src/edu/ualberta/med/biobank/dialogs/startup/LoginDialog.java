@@ -518,4 +518,5 @@ public class LoginDialog extends TitleAreaDialog {
             return server + "/" + username + "/" + password; //$NON-NLS-1$ //$NON-NLS-2$ 
         }
     }
+
 }

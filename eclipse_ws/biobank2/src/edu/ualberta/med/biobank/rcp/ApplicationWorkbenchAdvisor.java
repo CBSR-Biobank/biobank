@@ -41,18 +41,22 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     public boolean preShutdown() {
         IWorkbench workbench = PlatformUI.getWorkbench();
         IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
+        if (window != null) {
+            IWorkbenchPage page = window.getActivePage();
 
-        if (page.getPerspective().getId().equals(ReportsPerspective.ID)) {
-            IPerspectiveDescriptor main = workbench.getPerspectiveRegistry()
-                .findPerspectiveWithId(MainPerspective.ID);
-            page.setPerspective(main);
-        }
-        if (BiobankPlugin.isAskPrintActivityLog()
-            && page.getPerspective().getId().equals(LinkAssignPerspective.ID)) {
-            BgcPlugin.openInformation("Can't close",
-                "Please end specimen management session before closing");
-            return false;
+            if (page.getPerspective().getId().equals(ReportsPerspective.ID)) {
+                IPerspectiveDescriptor main = workbench
+                    .getPerspectiveRegistry().findPerspectiveWithId(
+                        MainPerspective.ID);
+                page.setPerspective(main);
+            }
+            if (BiobankPlugin.isAskPrintActivityLog()
+                && page.getPerspective().getId()
+                    .equals(LinkAssignPerspective.ID)) {
+                BgcPlugin.openInformation("Can't close",
+                    "Please end specimen management session before closing");
+                return false;
+            }
         }
         if (SessionManager.getInstance().isConnected()) {
             try {
