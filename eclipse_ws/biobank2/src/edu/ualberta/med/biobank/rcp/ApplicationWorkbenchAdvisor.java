@@ -41,18 +41,22 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     public boolean preShutdown() {
         IWorkbench workbench = PlatformUI.getWorkbench();
         IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
+        if (window != null) {
+            IWorkbenchPage page = window.getActivePage();
 
-        if (page.getPerspective().getId().equals(ReportsPerspective.ID)) {
-            IPerspectiveDescriptor main = workbench.getPerspectiveRegistry()
-                .findPerspectiveWithId(MainPerspective.ID);
-            page.setPerspective(main);
-        }
-        if (BiobankPlugin.isAskPrintActivityLog()
-            && page.getPerspective().getId().equals(LinkAssignPerspective.ID)) {
-            BgcPlugin.openInformation("Can't close",
-                "Please end specimen management session before closing");
-            return false;
+            if (page.getPerspective().getId().equals(ReportsPerspective.ID)) {
+                IPerspectiveDescriptor main = workbench
+                    .getPerspectiveRegistry().findPerspectiveWithId(
+                        MainPerspective.ID);
+                page.setPerspective(main);
+            }
+            if (BiobankPlugin.isAskPrintActivityLog()
+                && page.getPerspective().getId()
+                    .equals(LinkAssignPerspective.ID)) {
+                BgcPlugin.openInformation("Can't close",
+                    "Please end specimen management session before closing");
+                return false;
+            }
         }
         if (SessionManager.getInstance().isConnected()) {
             try {
@@ -67,17 +71,8 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     @Override
     public void postStartup() {
         PreferenceManager pm = PlatformUI.getWorkbench().getPreferenceManager();
-        // a 'Hidden General' preference page is added in the plugin.xml with id
-        // 'org.eclipse.ui.preferencePages.Workbench'
-        // It will prevent the security preference page warning about its
-        // missing category
-        pm.remove("org.eclipse.equinox.security.ui.category");
+        // remove the default 'General' preference page of the workbench
         pm.remove("org.eclipse.ui.preferencePages.Workbench");
-        // this preference page is deactivated because it send a warning about
-        // its missing parent. We have our own preference page definition that
-        // is using the exact same
-        pm.remove("org.eclipse.equinox.internal.p2.ui.sdk.scheduler.AutomaticUpdatesPreferencePage");
-        pm.remove("org.eclipse.equinox.internal.p2.ui.sdk.ProvisioningPreferencePage");
     }
 
 }

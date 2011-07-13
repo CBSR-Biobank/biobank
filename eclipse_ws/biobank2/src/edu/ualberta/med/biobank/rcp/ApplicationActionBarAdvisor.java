@@ -138,6 +138,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         }
         helpMenu.add(resetPerspectiveAction);
         helpMenu.add(new Separator());
+        helpMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
     }
 
     @Override

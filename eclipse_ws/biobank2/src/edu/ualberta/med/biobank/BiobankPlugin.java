@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.equinox.p2.ui.Policy;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -15,11 +14,9 @@ import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.services.ISourceProviderService;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.p2.BiobankPolicy;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
@@ -65,6 +62,8 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 public class BiobankPlugin extends AbstractUIPlugin {
 
     public static final String PLUGIN_ID = "biobank";
+
+    public static BundleContext bundleContext;
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -142,8 +141,6 @@ public class BiobankPlugin extends AbstractUIPlugin {
     // The shared instance
     private static BiobankPlugin plugin;
 
-    private ServiceRegistration policyRegistration;
-
     /**
      * The constructor
      */
@@ -161,9 +158,9 @@ public class BiobankPlugin extends AbstractUIPlugin {
     @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
+        bundleContext = context;
         plugin = this;
         SessionManager.getInstance();
-        registerP2Policy(context);
     }
 
     /*
@@ -176,8 +173,6 @@ public class BiobankPlugin extends AbstractUIPlugin {
     @Override
     public void stop(BundleContext context) throws Exception {
         plugin = null;
-        policyRegistration.unregister();
-        policyRegistration = null;
         super.stop(context);
     }
 
@@ -308,11 +303,6 @@ public class BiobankPlugin extends AbstractUIPlugin {
 
         classToImageKey.put(typeName, imageKey);
         return BgcPlugin.getDefault().getImageRegistry().get(imageKey);
-    }
-
-    private void registerP2Policy(BundleContext context) {
-        policyRegistration = context.registerService(Policy.class.getName(),
-            new BiobankPolicy(), null);
     }
 
     /**

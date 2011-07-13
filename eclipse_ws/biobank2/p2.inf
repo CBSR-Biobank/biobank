@@ -3,6 +3,4 @@ requires.1.name = biobank2.feature.core.feature.group
 requires.1.range = [3.0.0, 4.0.0)
 instructions.configure=\
  addRepository(name:BioBank2,type:0,location:http${#58}//aicml-med.cs.ualberta.ca/CBSR/update);\
- addRepository(name:BioBank2,type:1,location:http${#58}//aicml-med.cs.ualberta.ca/CBSR/update);\
- addRepository(name:BioBank2,type:0,location:http${#58}//www.ualberta.ca/~degrisda/CBSR/update);\
- addRepository(name:BioBank2,type:1,location:http${#58}//www.ualberta.ca/~degrisda/CBSR/update);
+ addRepository(name:BioBank2,type:1,location:http${#58}//aicml-med.cs.ualberta.ca/CBSR/update);
