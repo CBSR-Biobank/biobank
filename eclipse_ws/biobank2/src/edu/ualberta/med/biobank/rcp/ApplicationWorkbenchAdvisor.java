@@ -67,17 +67,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     @Override
     public void postStartup() {
         PreferenceManager pm = PlatformUI.getWorkbench().getPreferenceManager();
-        // a 'Hidden General' preference page is added in the plugin.xml with id
-        // 'org.eclipse.ui.preferencePages.Workbench'
-        // It will prevent the security preference page warning about its
-        // missing category
-
-        pm.remove("org.eclipse.equinox.security.ui.category");
-
-        // then we hide the 'Hidden General' preference page. The class of this
-        // page should be PerspectivesPreferencePage even if there is a
-        // Warnings, otherwise a second menu 'general' will be displayed when
-        // the product is exported
+        // remove the default 'General' preference page of the workbench
         pm.remove("org.eclipse.ui.preferencePages.Workbench");
     }
 
