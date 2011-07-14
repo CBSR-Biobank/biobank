@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 public class SiteStudyGroup extends AbstractStudyGroup {
 
     public SiteStudyGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Studies");
+        super(parent, id, Messages.SiteStudyGroup_studies_node_label);
     }
 
     @Override

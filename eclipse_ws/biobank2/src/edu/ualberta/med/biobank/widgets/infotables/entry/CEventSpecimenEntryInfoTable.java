@@ -8,10 +8,10 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -108,13 +108,14 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
                 public void deleteItem(InfoTableEvent event) {
                     SpecimenWrapper sw = getSelection();
                     if (sw != null) {
-                        if (!MessageDialog.openConfirm(PlatformUI
-                            .getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(), Messages
-                            .getString("SpecimenEntryInfoTable.delete.title"),
-                            Messages.getString(
-                                "SpecimenEntryInfoTable.delete.question",
-                                sw.getInventoryId()))) {
+                        if (!MessageDialog
+                            .openConfirm(
+                                PlatformUI.getWorkbench()
+                                    .getActiveWorkbenchWindow().getShell(),
+                                Messages.SpecimenEntryInfoTable_delete_title,
+                                NLS.bind(
+                                    Messages.SpecimenEntryInfoTable_delete_question,
+                                    sw.getInventoryId()))) {
                             return;
                         }
 

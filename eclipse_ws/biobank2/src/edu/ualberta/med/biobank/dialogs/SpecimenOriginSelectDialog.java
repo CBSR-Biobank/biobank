@@ -10,7 +10,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
@@ -33,17 +32,17 @@ public class SpecimenOriginSelectDialog extends BgcBaseDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.getString("SpecimenOriginSelectDialog.description"); //$NON-NLS-1$
+        return Messages.SpecimenOriginSelectDialog_description;
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.getString("SpecimenOriginSelectDialog.title"); //$NON-NLS-1$
+        return Messages.SpecimenOriginSelectDialog_title;
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.getString("SpecimenOriginSelectDialog.title"); //$NON-NLS-1$
+        return Messages.SpecimenOriginSelectDialog_title;
     }
 
     @Override
@@ -57,14 +56,14 @@ public class SpecimenOriginSelectDialog extends BgcBaseDialog {
         GridData gd = new GridData(GridData.FILL, SWT.TOP, true, true, 2, 1);
         gd.widthHint = 400;
         l.setLayoutData(gd);
-        l.setText(Messages.getString("SpecimenOriginSelectDialog.details")); //$NON-NLS-1$
+        l.setText(Messages.SpecimenOriginSelectDialog_details);
 
         selectedCenter = SessionManager.getUser().getCurrentWorkingCenter();
 
         List<Object> objectList = new ArrayList<Object>(centers);
         widgetCreator.createComboViewer(contents,
-            Messages.getString("SpecimenOriginSelectDialog.centers.label"), //$NON-NLS-1$
-            objectList, selectedCenter, null, new ComboSelectionUpdate() {
+            Messages.SpecimenOriginSelectDialog_centers_label, objectList,
+            selectedCenter, null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     if (selectedObject instanceof CenterWrapper<?>)

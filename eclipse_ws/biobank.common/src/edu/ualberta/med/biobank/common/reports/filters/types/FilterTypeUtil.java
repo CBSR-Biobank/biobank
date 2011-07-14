@@ -11,11 +11,11 @@ public class FilterTypeUtil {
         int min, int max) {
         int size = values.size();
         if (min != NOT_BOUND && size < min) {
-            throw new IllegalArgumentException("expecting at least " + min
-                + " argument(s), but received " + size);
+            throw new IllegalArgumentException("expecting at least " + min //$NON-NLS-1$
+                + " argument(s), but received " + size); //$NON-NLS-1$
         } else if (max != NOT_BOUND && size > max) {
-            throw new IllegalArgumentException("expecting at most " + max
-                + " argument(s), but received " + size);
+            throw new IllegalArgumentException("expecting at most " + max //$NON-NLS-1$
+                + " argument(s), but received " + size); //$NON-NLS-1$
         }
     }
 }

@@ -278,13 +278,13 @@ public class User implements Serializable, NotAProxy {
     @Override
     public String toString() {
         Map<String, Object> properties = new LinkedHashMap<String, Object>();
-        properties.put("id", id);
-        properties.put("login", login);
-        properties.put("password", password);
-        properties.put("firstName", firstName);
-        properties.put("lastName", lastName);
-        properties.put("email", email);
-        properties.put("groups", groups);
+        properties.put("id", id); //$NON-NLS-1$
+        properties.put("login", login); //$NON-NLS-1$
+        properties.put("password", password); //$NON-NLS-1$
+        properties.put("firstName", firstName); //$NON-NLS-1$
+        properties.put("lastName", lastName); //$NON-NLS-1$
+        properties.put("email", email); //$NON-NLS-1$
+        properties.put("groups", groups); //$NON-NLS-1$
         return properties.toString();
     }
 
@@ -382,6 +382,6 @@ public class User implements Serializable, NotAProxy {
 
     public boolean isCBSRCenter() {
         CenterWrapper<?> center = getCurrentWorkingCenter();
-        return center != null && center.getNameShort().equals("CBSR");
+        return center != null && center.getNameShort().equals("CBSR"); //$NON-NLS-1$
     }
 }

@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 
 public class DoubleNumberValidator extends AbstractValidator {
 
-    private static final Pattern pattern = Pattern.compile("^[0-9\\.\\+-]*$");
+    private static final Pattern pattern = Pattern.compile("^[0-9\\.\\+-]*$"); //$NON-NLS-1$
 
     private boolean allowEmpty = true;
 

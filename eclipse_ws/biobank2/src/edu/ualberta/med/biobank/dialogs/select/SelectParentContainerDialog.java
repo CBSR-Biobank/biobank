@@ -36,17 +36,17 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
 
     @Override
     protected String getDialogShellTitle() {
-        return "Select parent container";
+        return Messages.SelectParentContainerDialog_dialog_title;
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Select the appropriate parent container";
+        return Messages.SelectParentContainerDialog_description;
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return "Multiple parent containers are possible";
+        return Messages.SelectParentContainerDialog_main_title;
     }
 
     @Override
@@ -56,8 +56,10 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         comboViewer = getWidgetCreator().createComboViewer(contents,
-            "Select parent", containers, null,
-            "A container should be selected", null, new BiobankLabelProvider());
+            Messages.SelectParentContainerDialog_select_label, containers,
+            null,
+            Messages.SelectParentContainerDialog_select_validation_error_msg,
+            null, new BiobankLabelProvider());
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
@@ -67,15 +69,18 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
                 ContainerWrapper parent = container.getParentContainer();
                 boolean hasParents = parent != null;
                 if (hasParents)
-                    text.append(" (Parents: ");
+                    text.append(" (") //$NON-NLS-1$  
+                        .append(
+                            Messages.SelectParentContainerDialog_parents_list_label)
+                        .append(": "); //$NON-NLS-1$  
                 while (parent != null) {
                     text.append(parent.getFullInfoLabel());
                     parent = parent.getParentContainer();
                     if (parent != null)
-                        text.append("; ");
+                        text.append("; "); //$NON-NLS-1$
                 }
                 if (hasParents)
-                    text.append(")");
+                    text.append(")"); //$NON-NLS-1$
                 return text.toString();
             }
         });

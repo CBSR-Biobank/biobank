@@ -25,12 +25,12 @@ public class AdapterFactory {
         Class<?> wrapperClass = wrapper.getClass();
         String wrapperClassName = wrapperClass.getSimpleName();
         String adapterClassName = wrapperClassName
-            .replace("Wrapper", "Adapter");
+            .replace("Wrapper", "Adapter"); //$NON-NLS-1$ //$NON-NLS-2$
         try {
             for (String packageName : adaptersPackages) {
                 Class<?> klass;
                 try {
-                    klass = Class.forName(packageName + "." + adapterClassName);
+                    klass = Class.forName(packageName + "." + adapterClassName); //$NON-NLS-1$
                 } catch (ClassNotFoundException e) {
                     // try next package
                     continue;
@@ -40,11 +40,11 @@ public class AdapterFactory {
                 return (AdapterBase) constructor.newInstance(new Object[] {
                     null, wrapper });
             }
-            throw new Exception("No adapter class found");
+            throw new Exception("No adapter class found"); //$NON-NLS-1$
         } catch (Exception e) {
             throw new RuntimeException(
-                "error in invoking adapter for wrapper: " + wrapperClassName
-                    + " (adapter name is " + adapterClassName + "). ", e);
+                "error in invoking adapter for wrapper: " + wrapperClassName //$NON-NLS-1$
+                    + " (adapter name is " + adapterClassName + "). ", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 }

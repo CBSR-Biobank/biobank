@@ -8,7 +8,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -33,7 +32,7 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.getString("DispatchReceiveScanDialog.description"); //$NON-NLS-1$
+        return Messages.ReceiveScanDialog_description;
     }
 
     @Override
@@ -52,8 +51,7 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
 
     @Override
     protected String getProceedButtonlabel() {
-        return Messages
-            .getString("DispatchReceiveScanDialog.proceed.button.label"); //$NON-NLS-1$
+        return Messages.ReceiveScanDialog_proceed_button_label;
     }
 
     @Override

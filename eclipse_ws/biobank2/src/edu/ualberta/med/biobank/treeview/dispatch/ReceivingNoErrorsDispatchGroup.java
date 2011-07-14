@@ -11,7 +11,7 @@ public class ReceivingNoErrorsDispatchGroup extends AbstractDispatchGroup {
 
     public ReceivingNoErrorsDispatchGroup(AdapterBase parent, int id,
         CenterWrapper<?> center) {
-        super(parent, id, "Receiving", center);
+        super(parent, id, Messages.ReceivingNoErrorsDispatchGroup_receiving_node_label, center);
     }
 
     @Override

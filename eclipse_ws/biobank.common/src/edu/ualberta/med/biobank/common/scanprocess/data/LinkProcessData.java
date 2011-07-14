@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common.scanprocess.data;
 
+import java.util.Locale;
+
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.server.scanprocess.LinkProcess;
 import edu.ualberta.med.biobank.server.scanprocess.ServerProcess;
@@ -11,8 +13,8 @@ public class LinkProcessData implements ProcessData {
 
     @Override
     public ServerProcess getProcessInstance(
-        WritableApplicationService appService, User user) {
-        return new LinkProcess(appService, this, user);
+        WritableApplicationService appService, User user, Locale locale) {
+        return new LinkProcess(appService, this, user, locale);
     }
 
 }

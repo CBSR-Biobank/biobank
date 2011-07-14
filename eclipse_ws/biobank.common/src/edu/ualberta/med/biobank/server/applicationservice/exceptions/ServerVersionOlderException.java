@@ -4,16 +4,17 @@ public class ServerVersionOlderException extends BiobankServerException {
 
     private static final long serialVersionUID = 1L;
 
-    public ServerVersionOlderException(String message) {
-        super(message);
-    }
-
-    public ServerVersionOlderException(String message, Throwable cause) {
-        super(message, cause);
+    public ServerVersionOlderException() {
+        super();
     }
 
     public ServerVersionOlderException(Throwable cause) {
         super(cause);
+    }
+
+    @Override
+    public String getMessage() {
+        return Messages.getString("ServerVersionOlderException.too.new.error.msg"); //$NON-NLS-1$
     }
 
 }

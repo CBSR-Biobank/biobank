@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -15,7 +16,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
@@ -52,7 +52,7 @@ public class DispatchCreateScanDialog extends
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.getString("DispatchCreateScanDialog.description"); //$NON-NLS-1$
+        return Messages.DispatchCreateScanDialog_description;
     }
 
     /**
@@ -64,12 +64,10 @@ public class DispatchCreateScanDialog extends
         if (SessionManager.getUser().getCurrentWorkingCenter() instanceof SiteWrapper) {
             Button palletWithoutPositionRadio = new Button(parent, SWT.RADIO);
             palletWithoutPositionRadio
-                .setText(Messages
-                    .getString("DispatchCreateScanDialog.without.position.radio.text")); //$NON-NLS-1$
+                .setText(Messages.DispatchCreateScanDialog_without_position_radio_text);
             final Button palletWithPositionRadio = new Button(parent, SWT.RADIO);
             palletWithPositionRadio
-                .setText(Messages
-                    .getString("DispatchCreateScanDialog.with.position.radio.text")); //$NON-NLS-1$
+                .setText(Messages.DispatchCreateScanDialog_with_position_radio_text);
 
             palletWithPositionRadio
                 .addSelectionListener(new SelectionAdapter() {
@@ -83,11 +81,9 @@ public class DispatchCreateScanDialog extends
                 });
 
             productBarcodeValidator = new NonEmptyStringValidator(
-                Messages
-                    .getString("DispatchCreateScanDialog.productBarcode.validationMsg"));//$NON-NLS-1$
-            Label palletproductBarcodeLabel = widgetCreator
-                .createLabel(parent, Messages
-                    .getString("DispatchCreateScanDialog.productBarcode.label"));//$NON-NLS-1$
+                Messages.DispatchCreateScanDialog_productBarcode_validationMsg);
+            Label palletproductBarcodeLabel = widgetCreator.createLabel(parent,
+                Messages.DispatchCreateScanDialog_productBarcode_label);
             palletproductBarcodeText = (BgcBaseText) createBoundWidget(parent,
                 BgcBaseText.class, SWT.NONE, palletproductBarcodeLabel,
                 new String[0], this,
@@ -105,8 +101,8 @@ public class DispatchCreateScanDialog extends
         if (show) {
             palletproductBarcodeText.setText(""); //$NON-NLS-1$
         } else {
-            palletproductBarcodeText.setText(Messages
-                .getString("DispatchCreateScanDialog.noposision.text")); //$NON-NLS-1$
+            palletproductBarcodeText
+                .setText(Messages.DispatchCreateScanDialog_noposision_text);
         }
     }
 
@@ -138,10 +134,9 @@ public class DispatchCreateScanDialog extends
             if (currentPallet == null) {
                 BgcPlugin
                     .openAsyncError(
-                        Messages
-                            .getString("DispatchCreateScanDialog.pallet.search.error.title"), //$NON-NLS-1$
-                        Messages.getString(
-                            "DispatchCreateScanDialog.pallet.search.error.msg", //$NON-NLS-1$
+                        Messages.DispatchCreateScanDialog_pallet_search_error_title,
+                        NLS.bind(
+                            Messages.DispatchCreateScanDialog_pallet_search_error_msg,
                             currentProductBarcode));
                 return false;
             }
@@ -157,8 +152,7 @@ public class DispatchCreateScanDialog extends
 
     @Override
     protected String getProceedButtonlabel() {
-        return Messages
-            .getString("DispatchCreateScanDialog.proceed.button.label"); //$NON-NLS-1$
+        return Messages.DispatchCreateScanDialog_proceed_button_label;
     }
 
     @Override

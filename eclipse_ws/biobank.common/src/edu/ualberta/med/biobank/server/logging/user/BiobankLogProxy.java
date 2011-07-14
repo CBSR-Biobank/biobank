@@ -24,11 +24,11 @@ public class BiobankLogProxy implements MethodInterceptor {
             userName = SecurityContextHolder.getContext().getAuthentication()
                 .getName();
         } catch (NullPointerException e) {
-            log.error("Error:  Unable to retrieve userName from SecurityContext; setting userName to 'dummy'");
-            userName = "dummy";
+            log.error("Error:  Unable to retrieve userName from SecurityContext; setting userName to 'dummy'"); //$NON-NLS-1$
+            userName = "dummy"; //$NON-NLS-1$
         }
 
-        log.debug("userName has been set to: " + userName);
+        log.debug("userName has been set to: " + userName); //$NON-NLS-1$
 
         UserInfoHelper.setUserName(userName);
         Object value = invocation.proceed();

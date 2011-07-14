@@ -1,13 +1,13 @@
 package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
@@ -44,13 +44,13 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
         researchGroupAdapter = (ResearchGroupAdapter) adapter;
         researchGroup = researchGroupAdapter.getWrapper();
         researchGroup.reload();
-        setPartName(Messages.getString("ResearchGroupViewForm.title", //$NON-NLS-1$
+        setPartName(NLS.bind(Messages.ResearchGroupViewForm_title,
             researchGroup.getNameShort()));
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("ResearchGroupViewForm.title", //$NON-NLS-1$
+        form.setText(NLS.bind(Messages.ResearchGroupViewForm_title,
             researchGroup.getName()));
 
         GridLayout layout = new GridLayout(1, false);
@@ -67,24 +67,17 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(client);
 
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.name")); //$NON-NLS-1$
+            Messages.label_name);
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.nameShort")); //$NON-NLS-1$
-        hasShipmentsButton = (Button) createLabelledWidget(client,
-            Button.class, SWT.NONE,
-            Messages.getString("researchGroup.field.label.sendsShipments")); //$NON-NLS-1$
+            Messages.label_nameShort);
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.activity")); //$NON-NLS-1$
+            Messages.label_activity);
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.getString("label.comments")); //$NON-NLS-1$
+            Messages.label_comments);
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages
-                .getString("ResearchGroupViewForm.field.label.totalPatients")); //$NON-NLS-1$
-        ceventTotal = createReadOnlyLabelledField(
-            client,
-            SWT.NONE,
-            Messages
-                .getString("ResearchGroupViewForm.field.label.totalCollectionEvents")); //$NON-NLS-1$
+            Messages.ResearchGroupViewForm_field_label_totalPatients);
+        ceventTotal = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.ResearchGroupViewForm_field_label_totalCollectionEvents);
 
         setResearchGroupValues();
     }
@@ -102,9 +95,9 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
     @Override
     public void reload() throws Exception {
         researchGroup.reload();
-        setPartName(Messages.getString(
-            "ResearchGroupViewForm.title", researchGroup.getName())); //$NON-NLS-1$
-        form.setText(Messages.getString("ResearchGroupViewForm.title", //$NON-NLS-1$
+        setPartName(NLS.bind(Messages.ResearchGroupViewForm_title,
+            researchGroup.getName()));
+        form.setText(NLS.bind(Messages.ResearchGroupViewForm_title,
             researchGroup.getName()));
         setResearchGroupValues();
         setAddressValues(researchGroup);

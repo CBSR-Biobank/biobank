@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
@@ -43,11 +44,11 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchSendingEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchSendingEntryForm"; //$NON-NLS-1$
 
-    public static final String MSG_NEW_DISPATCH_OK = "Creating a new dispatch record.";
+    public static final String MSG_NEW_DISPATCH_OK = Messages.DispatchSendingEntryForm_new_ok_msg;
 
-    public static final String MSG_DISPATCH_OK = "Editing an existing dispatch record.";
+    public static final String MSG_DISPATCH_OK = Messages.DispatchSendingEntryForm_edit_ok_msg;
 
     private ComboViewer destSiteComboViewer;
 
@@ -84,7 +85,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Dispatch Information");
+        form.setText(Messages.DispatchSendingEntryForm_form_title);
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
 
@@ -103,9 +104,10 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             ShippingMethodWrapper selectedShippingMethod = dispatch
                 .getShipmentInfo().getShippingMethod();
             shippingMethodViewer = widgetCreator.createComboViewer(client,
-                "Shipping Method", ShippingMethodWrapper
-                    .getShippingMethods(SessionManager.getAppService()),
-                selectedShippingMethod, null, new ComboSelectionUpdate() {
+                Messages.DispatchSendingEntryForm_shipMethod_label,
+                ShippingMethodWrapper.getShippingMethods(SessionManager
+                    .getAppService()), selectedShippingMethod, null,
+                new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
                         dispatch.getShipmentInfo().setShippingMethod(
@@ -114,15 +116,15 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 }, new BiobankLabelProvider());
 
             createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-                "Waybill", null, shipmentInfo,
-                ShipmentInfoPeer.WAYBILL.getName(), null);
+                Messages.DispatchSendingEntryForm_waybill_label, null,
+                shipmentInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
         }
 
         createBoundWidgetWithLabel(
             client,
             BgcBaseText.class,
             SWT.MULTI,
-            "Comments",
+            Messages.DispatchSendingEntryForm_comments_label,
             null,
             BeansObservables.observeValue(dispatch,
                 DispatchPeer.COMMENT.getName()), null);
@@ -133,16 +135,17 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     private void createReceiverCombo(Composite client) {
         if (dispatch.isInTransitState()) {
             BgcBaseText receiverLabel = createReadOnlyLabelledField(client,
-                SWT.NONE, "Receiver");
+                SWT.NONE, Messages.DispatchSendingEntryForm_receiver_label);
             setTextValue(receiverLabel, dispatch.getReceiverCenter()
                 .getNameShort());
         } else {
             try {
-                destSiteComboViewer = createComboViewer(client, "Receiver",
+                destSiteComboViewer = createComboViewer(client,
+                    Messages.DispatchSendingEntryForm_receiver_label,
                     CenterWrapper.getOtherCenters(appService, SessionManager
                         .getUser().getCurrentWorkingCenter()),
                     dispatch.getReceiverCenter(),
-                    "Dispatch must have a receiver",
+                    Messages.DispatchSendingEntryForm_receiver_validation_msg,
                     new ComboSelectionUpdate() {
                         @Override
                         public void doSelection(Object selectedObject) {
@@ -152,19 +155,23 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                         }
                     });
             } catch (ApplicationException e) {
-                BgcPlugin.openAsyncError("Error", "Unable to retrieve Centers");
+                BgcPlugin
+                    .openAsyncError(
+                        Messages.DispatchSendingEntryForm_error_title,
+                        Messages.DispatchSendingEntryForm_retrieve_centers_error_msg);
             }
         }
     }
 
     private void createSpecimensSelectionSection() {
         if (dispatch.isInCreationState()) {
-            Section section = createSection("Specimens");
+            Section section = createSection(Messages.DispatchSendingEntryForm_specimens_title);
             Composite composite = toolkit.createComposite(section);
             composite.setLayout(new GridLayout(1, false));
             section.setClient(composite);
             if (dispatch.isInCreationState()) {
-                addSectionToolbar(section, "Add specimens to this dispatch",
+                addSectionToolbar(section,
+                    Messages.DispatchSendingEntryForm_specimens_description,
                     new SelectionAdapter() {
                         @Override
                         public void widgetSelected(SelectionEvent e) {
@@ -183,9 +190,9 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     }
 
     protected void createSpecimensNonProcessedSection(boolean edit) {
-        String title = "Specimens";
+        String title = Messages.DispatchSendingEntryForm_specimens_title;
         if (dispatch.isInCreationState()) {
-            title = "Added specimens";
+            title = Messages.DispatchSendingEntryForm_added_specimens_title;
         }
         Composite parent = createSectionWithClient(title);
         specimensNonProcessedTable = new DispatchSpecimenListInfoTable(parent,
@@ -230,7 +237,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         try {
             CellProcessResult res = appService.processCellStatus(new Cell(-1,
                 -1, inventoryId, null), new ShipmentProcessData(null, dispatch,
-                true, true), SessionManager.getUser());
+                true, true), SessionManager.getUser(), Locale.getDefault());
             switch (res.getProcessStatus()) {
             case FILLED:
                 // ok
@@ -244,12 +251,15 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 setDirty(true);
                 break;
             case ERROR:
-                BgcPlugin.openAsyncError("Invalid specimen", res.getCell()
-                    .getInformation());
+                BgcPlugin.openAsyncError(
+                    Messages.DispatchSendingEntryForm_invalid_spec_error_title,
+                    res.getCell().getInformation());
                 break;
             }
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error", "Error adding the specimen", e);
+            BgcPlugin.openAsyncError(
+                Messages.DispatchSendingEntryForm_error_title,
+                Messages.DispatchSendingEntryForm_adding_error_msg, e);
         }
     }
 
@@ -283,15 +293,15 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     @Override
     protected String getTextForPartName() {
         if (dispatch.isNew()) {
-            return "New Dispatch";
+            return Messages.DispatchSendingEntryForm_new_title;
         } else {
-            Assert.isNotNull(dispatch, "Dispatch is null");
-            String label = dispatch.getSenderCenter().getNameShort() + " -> "
+            Assert.isNotNull(dispatch, "Dispatch is null"); //$NON-NLS-1$
+            String label = dispatch.getSenderCenter().getNameShort() + " -> " //$NON-NLS-1$
                 + dispatch.getReceiverCenter().getNameShort();
 
             String packedAt = dispatch.getFormattedPackedAt();
             if (packedAt != null)
-                label += " [" + packedAt + "]";
+                label += " [" + packedAt + "]"; //$NON-NLS-1$ //$NON-NLS-2$
             return label;
         }
     }

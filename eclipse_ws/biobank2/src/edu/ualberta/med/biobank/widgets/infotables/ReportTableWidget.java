@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
@@ -56,7 +57,7 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
                 if (element instanceof Object[]) {
                     Object[] castedVals = (Object[]) element;
                     if (castedVals[columnIndex] == null)
-                        return "";
+                        return ""; //$NON-NLS-1$
                     else {
                         if (castedVals[columnIndex] instanceof Date)
                             return DateFormatter
@@ -65,7 +66,7 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
                             return castedVals[columnIndex].toString();
                     }
                 }
-                return "no label provider";
+                return "no label provider"; //$NON-NLS-1$
             }
         };
     }
@@ -150,7 +151,7 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
                 }
             });
         } catch (Exception e) {
-            logger.error("setCollection error", e);
+            logger.error("setCollection error", e); //$NON-NLS-1$
         }
 
     }
@@ -203,11 +204,13 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     @Override
     protected void setPageLabelText() {
+        String total;
         if (pageInfo.pageTotal > 0)
-            pageLabel.setText("Page: " + (pageInfo.page + 1) + " of "
-                + pageInfo.pageTotal);
+            total = String.valueOf(pageInfo.pageTotal);
         else
-            pageLabel.setText("Page: " + (pageInfo.page + 1) + " of " + "?");
+            total = "?"; //$NON-NLS-1$
+        pageLabel.setText(NLS.bind(Messages.ReportTableWidget_pages_label, (pageInfo.page + 1),
+            total));
     }
 
     @Override

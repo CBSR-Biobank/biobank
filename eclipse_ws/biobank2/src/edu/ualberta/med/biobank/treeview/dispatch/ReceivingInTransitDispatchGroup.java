@@ -11,7 +11,7 @@ public class ReceivingInTransitDispatchGroup extends AbstractDispatchGroup {
 
     public ReceivingInTransitDispatchGroup(AdapterBase parent, int id,
         CenterWrapper<?> center) {
-        super(parent, id, "In transit", center);
+        super(parent, id, Messages.ReceivingInTransitDispatchGroup_transit_node_label, center);
     }
 
     @Override

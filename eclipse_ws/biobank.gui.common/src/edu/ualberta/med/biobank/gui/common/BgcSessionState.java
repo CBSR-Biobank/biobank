@@ -8,11 +8,11 @@ import org.eclipse.ui.ISources;
 
 public class BgcSessionState extends AbstractSourceProvider {
 
-    public final static String SESSION_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.gui.common.sourceprovider.loginState";
+    public final static String SESSION_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.gui.common.sourceprovider.loginState"; //$NON-NLS-1$
 
-    public final static String LOGGED_IN = "loggedIn";
+    public final static String LOGGED_IN = "loggedIn"; //$NON-NLS-1$
 
-    public final static String LOGGED_OUT = "loggedOut";
+    public final static String LOGGED_OUT = "loggedOut"; //$NON-NLS-1$
 
     private boolean loggedIn;
 

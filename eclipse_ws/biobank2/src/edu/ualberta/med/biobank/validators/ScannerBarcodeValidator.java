@@ -17,7 +17,7 @@ public class ScannerBarcodeValidator extends AbstractValidator {
     public IStatus validate(Object value) {
         if (!(value instanceof String)) {
             throw new RuntimeException(
-                "Not supposed to be called for non-strings.");
+                Messages.ScannerBarcodeValidator_nonstring_error_msg);
         }
 
         String barcode = (String) value;

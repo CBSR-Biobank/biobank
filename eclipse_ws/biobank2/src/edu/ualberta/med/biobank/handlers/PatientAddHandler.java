@@ -27,7 +27,7 @@ public class PatientAddHandler extends AbstractHandler {
             AdapterBase adapter = new PatientAdapter(null, patient);
             adapter.openEntryForm();
         } catch (Exception exp) {
-            logger.error("Error while opening the patient entry form", exp);
+            logger.error(Messages.PatientAddHandler_patient_open_error, exp);
         }
         return null;
     }

@@ -6,7 +6,7 @@ public class CheckFieldLimitsException extends BiobankException {
 
     private static final long serialVersionUID = 1L;
 
-    private static String MESSAGE = "Field {0} should not exceeds {1} characters. Current value is '{1}'";
+    private static String MESSAGE = Messages.getString("CheckFieldLimitsException.check.message"); //$NON-NLS-1$
 
     public CheckFieldLimitsException(String fieldName, int maxLength,
         String currentValue) {

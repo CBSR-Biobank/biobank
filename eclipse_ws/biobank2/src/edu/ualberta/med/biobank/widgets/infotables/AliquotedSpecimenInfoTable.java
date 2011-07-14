@@ -6,7 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -27,16 +27,16 @@ public class AliquotedSpecimenInfoTable extends
         @Override
         public String toString() {
             return StringUtils.join(new String[] { typeName,
-                (volume != null) ? volume.toString() : "",
-                (quantity != null) ? quantity.toString() : "", status }, "\t");
+                (volume != null) ? volume.toString() : "", //$NON-NLS-1$
+                (quantity != null) ? quantity.toString() : "", status }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.getString("AliquotedSpecimen.field.type.label"),
-        Messages.getString("AliquotedSpecimen.field.volume.label"),
-        Messages.getString("AliquotedSpecimen.field.quantity.label"),
-        Messages.getString("label.activity") };
+        Messages.AliquotedSpecimen_field_type_label,
+        Messages.AliquotedSpecimen_field_volume_label,
+        Messages.AliquotedSpecimen_field_quantity_label,
+        Messages.label_activity };
 
     public AliquotedSpecimenInfoTable(Composite parent,
         List<AliquotedSpecimenWrapper> sampleStorageCollection) {
@@ -50,12 +50,12 @@ public class AliquotedSpecimenInfoTable extends
         TableRowData info = new TableRowData();
         info.sampleStorage = sampleStorage;
         SpecimenTypeWrapper type = sampleStorage.getSpecimenType();
-        Assert.isNotNull(type, "sample storage - sample type is null");
+        Assert.isNotNull(type, "sample storage - sample type is null"); //$NON-NLS-1$
         info.typeName = type.getName();
         info.volume = sampleStorage.getVolume();
         info.quantity = sampleStorage.getQuantity();
         ActivityStatusWrapper status = sampleStorage.getActivityStatus();
-        Assert.isNotNull(status, "sample storage - activity status is null");
+        Assert.isNotNull(status, "sample storage - activity status is null"); //$NON-NLS-1$
         info.status = status.getName();
         return info;
     }
@@ -68,22 +68,21 @@ public class AliquotedSpecimenInfoTable extends
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.AliquotedSpecimenInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
                     return item.typeName;
                 case 1:
-                    return (item.volume != null) ? item.volume.toString() : "";
+                    return NumberFormatter.format(item.volume);
                 case 2:
-                    return (item.quantity != null) ? item.quantity.toString()
-                        : "";
+                    return NumberFormatter.format(item.quantity);
                 case 3:
                     return item.status;
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };

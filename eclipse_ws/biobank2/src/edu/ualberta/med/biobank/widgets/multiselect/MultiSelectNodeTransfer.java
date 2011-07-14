@@ -24,7 +24,7 @@ public class MultiSelectNodeTransfer extends ByteArrayTransfer {
 	}
 
 	private static final String TYPE_NAME =
-		"favorites-transfer-format:" + System.currentTimeMillis() + ":" 
+		"favorites-transfer-format:" + System.currentTimeMillis() + ":"  //$NON-NLS-1$ //$NON-NLS-2$
 		+ INSTANCE.hashCode();
 
 	private static final int TYPEID = registerType(TYPE_NAME);
@@ -58,7 +58,7 @@ public class MultiSelectNodeTransfer extends ByteArrayTransfer {
 			dataOut.writeInt(items.length);
 			for (int i = 0; i < items.length; i++) {
 				MultiSelectNode item = items[i];
-				dataOut.writeUTF("" + item.getId());
+				dataOut.writeUTF("" + item.getId()); //$NON-NLS-1$
 				dataOut.writeUTF(item.getName());
 			}
 			dataOut.close();

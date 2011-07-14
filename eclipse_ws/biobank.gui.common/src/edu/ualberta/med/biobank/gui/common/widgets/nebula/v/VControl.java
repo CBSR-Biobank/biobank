@@ -504,7 +504,7 @@ public abstract class VControl {
     }
 
     public String getToolTipText() {
-        return (tooltipText != null) ? tooltipText : "";
+        return (tooltipText != null) ? tooltipText : ""; //$NON-NLS-1$
     }
 
     public abstract Type getType();
@@ -601,7 +601,7 @@ public abstract class VControl {
             event.data = this;
             event.type = eventType;
             if (this instanceof VNative && eventType == SWT.FocusOut) {
-                System.out.println("wtf");
+                System.out.println("wtf"); //$NON-NLS-1$
             }
             for (Listener listener : getListeners(eventType)) {
                 listener.handleEvent(event);
@@ -1062,7 +1062,7 @@ public abstract class VControl {
 
     @Override
     public String toString() {
-        return super.toString() + " {" + text + "}";
+        return super.toString() + " {" + text + "}"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     public void update() {

@@ -11,7 +11,7 @@ import org.eclipse.ui.PlatformUI;
  * This class controls all aspects of the application's execution
  */
 public class Application implements IApplication {
-    public static final String PLUGIN_ID = "biobank";
+    public static final String PLUGIN_ID = "biobank"; //$NON-NLS-1$
 
     /*
      * (non-Javadoc)
@@ -22,8 +22,8 @@ public class Application implements IApplication {
     @Override
     public Object start(IApplicationContext context) throws Exception {
         Display display = PlatformUI.createDisplay();
-        boolean trace = "true".equalsIgnoreCase(Platform
-            .getDebugOption(PlatformUI.PLUGIN_ID + "/trace/graphics"));
+        boolean trace = "true".equalsIgnoreCase(Platform //$NON-NLS-1$
+            .getDebugOption(PlatformUI.PLUGIN_ID + "/trace/graphics")); //$NON-NLS-1$
         if (trace) {
             Sleak sleak = new Sleak();
             sleak.open();

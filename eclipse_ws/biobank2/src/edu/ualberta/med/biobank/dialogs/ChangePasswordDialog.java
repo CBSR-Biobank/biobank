@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -16,9 +15,11 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.handlers.LogoutHandler;
 
-public class ChangePasswordDialog extends TitleAreaDialog {
+public class ChangePasswordDialog extends BgcBaseDialog {
+
     public static final int MIN_PASSWORD_LENGTH = 5;
 
     private boolean forceChange;
@@ -32,26 +33,17 @@ public class ChangePasswordDialog extends TitleAreaDialog {
 
     public ChangePasswordDialog(Shell parentShell, boolean forceChange) {
         this(parentShell);
-
         this.forceChange = forceChange;
-    }
-
-    @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        setTitle("Change Password");
-        setMessage("Change your password to something different.");
-        return contents;
     }
 
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        shell.setText("Change Password");
+        shell.setText(Messages.ChangePasswordDialog_title);
     }
 
     @Override
-    protected Control createDialogArea(Composite parent) {
+    protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite contents = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(2, false);
         layout.marginTop = 5;
@@ -60,18 +52,21 @@ public class ChangePasswordDialog extends TitleAreaDialog {
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        oldPassText = createPassWordText(contents, "Old Password");
+        oldPassText = createPassWordText(contents,
+            Messages.ChangePasswordDialog_oldPassword_label);
         new Label(contents, SWT.NONE);
         new Label(contents, SWT.NONE); // shhhh! don't tell anyone i did this.
-        newPass1Text = createPassWordText(contents, "Password");
-        newPass2Text = createPassWordText(contents, "Re-type Password");
+        newPass1Text = createPassWordText(contents,
+            Messages.ChangePasswordDialog_password_label);
+        newPass2Text = createPassWordText(contents,
+            Messages.ChangePasswordDialog_password_retype_label);
 
         oldPassText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
                 Text text = (Text) e.widget;
-                if (text.getText().equals(""))
-                    setErrorMessage("Please enter your old password");
+                if (text.getText().equals("")) //$NON-NLS-1$
+                    setErrorMessage(Messages.ChangePasswordDialog_oldPassword_msg);
                 else {
                     setErrorMessage(null);
                 }
@@ -82,7 +77,7 @@ public class ChangePasswordDialog extends TitleAreaDialog {
             public void modifyText(ModifyEvent e) {
                 Text text = (Text) e.widget;
                 if (text.getText().length() < MIN_PASSWORD_LENGTH)
-                    setErrorMessage("Please enter your new password (atleast 5 characters)");
+                    setErrorMessage(Messages.ChangePasswordDialog_password_length_msg);
                 else {
                     setErrorMessage(null);
                     newPass2Text.notifyListeners(SWT.Modify, new Event());
@@ -94,19 +89,17 @@ public class ChangePasswordDialog extends TitleAreaDialog {
             public void modifyText(ModifyEvent e) {
                 Text text = (Text) e.widget;
                 if (!text.getText().equals(newPass1Text.getText()))
-                    setErrorMessage("Please re-enter your new password");
+                    setErrorMessage(Messages.ChangePasswordDialog_password_reenter_msg);
                 else {
                     setErrorMessage(null);
                     oldPassText.notifyListeners(SWT.Modify, new Event());
                 }
             }
         });
-
-        return contents;
     }
 
     private Text createPassWordText(Composite parent, String labelText) {
-        createLabel(parent, labelText);
+        widgetCreator.createLabel(parent, labelText);
         Text text = new Text(parent, SWT.BORDER | SWT.PASSWORD | SWT.FILL);
         text.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true,
             false));
@@ -145,10 +138,9 @@ public class ChangePasswordDialog extends TitleAreaDialog {
                 this.oldPassText.getText(), this.newPass2Text.getText());
 
             SessionManager.getInstance().getSession().resetAppService();
-            BgcPlugin
-                .openInformation(
-                    "Password modified",
-                    "Your password has been successfully changed. You will need to reconnect again to see your data");
+            BgcPlugin.openInformation(
+                Messages.ChangePasswordDialog_success_title,
+                Messages.ChangePasswordDialog_success_msg);
 
             if (forceChange && newPass1Text.getText().isEmpty()) {
                 return;
@@ -159,17 +151,10 @@ public class ChangePasswordDialog extends TitleAreaDialog {
             // FIXME find a way to reconnect the user automatically ?
             super.okPressed();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error changing password", e);
+            BgcPlugin.openAsyncError(Messages.ChangePasswordDialog_error_title,
+                e);
         }
 
-    }
-
-    private Label createLabel(Composite parent, String labelText) {
-        Label label = new Label(parent, SWT.NONE);
-        label.setText(labelText + ": ");
-        label.setLayoutData(new GridData(GridData.END, GridData.CENTER, false,
-            false));
-        return label;
     }
 
     @Override
@@ -182,4 +167,20 @@ public class ChangePasswordDialog extends TitleAreaDialog {
 
         return contents;
     }
+
+    @Override
+    protected String getTitleAreaMessage() {
+        return Messages.ChangePasswordDialog_description;
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        return Messages.ChangePasswordDialog_title;
+    }
+
+    @Override
+    protected String getDialogShellTitle() {
+        return Messages.ChangePasswordDialog_title;
+    }
+
 }

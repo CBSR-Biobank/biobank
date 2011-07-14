@@ -11,9 +11,9 @@ public class ReportFactory {
     public static AbstractReport createReport(BiobankReport report)
         throws ApplicationException {
         try {
-            String reportClass = BiobankReport.editorPath.concat(report
-                .getClassName().concat("Impl"));
-            reportClass = reportClass.replace(".editors", ".server.reports");
+            String reportClass = BiobankReport.EDITOR_PATH.concat(report
+                .getClassName().concat("Impl")); //$NON-NLS-1$
+            reportClass = reportClass.replace(".editors", ".server.reports"); //$NON-NLS-1$ //$NON-NLS-2$
             Class<AbstractReport> clazz = (Class<AbstractReport>) Class
                 .forName(reportClass);
             Constructor<AbstractReport> constructor = clazz

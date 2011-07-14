@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 public class EmailAddressValidator extends AbstractValidator {
 
     private static final Pattern pattern = Pattern
-        .compile("^([^@\\s]+)@((?:[-a-z0-9]+.)+[a-z]{2,})$");
+        .compile("^([^@\\s]+)@((?:[-a-z0-9]+.)+[a-z]{2,})$"); //$NON-NLS-1$
 
     public EmailAddressValidator(String message) {
         super(message);
@@ -22,7 +22,7 @@ public class EmailAddressValidator extends AbstractValidator {
     public IStatus validate(Object value) {
         if (!(value instanceof String)) {
             throw new RuntimeException(
-                "Not supposed to be called for non-strings.");
+                Messages.EmailAddressValidator_nonstring_error_msg);
         }
 
         if (((String) value).length() == 0) {

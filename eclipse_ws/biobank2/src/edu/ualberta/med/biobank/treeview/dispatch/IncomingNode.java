@@ -20,7 +20,7 @@ public class IncomingNode extends AdapterBase {
     private ReceivingRequestGroup requestNode;
 
     public IncomingNode(AdapterBase parent, int id, CenterWrapper<?> center) {
-        super(parent, id, "Incoming", true, false);
+        super(parent, id, Messages.IncomingNode_incoming_node_label, true, false);
         receivedTransitNode = new ReceivingInTransitDispatchGroup(this, 0,
             center);
         receivedTransitNode.setParent(this);

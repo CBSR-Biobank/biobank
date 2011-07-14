@@ -11,6 +11,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
+import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -25,16 +26,23 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
     public static final Map<String, FieldInfo> ADDRESS_FIELDS;
     static {
         Map<String, FieldInfo> aMap = new LinkedHashMap<String, FieldInfo>();
-        aMap.put("street1", new FieldInfo("Street 1", BgcBaseText.class,
+        aMap.put(AddressPeer.STREET1.getName(), new FieldInfo(
+            Messages.AddressEntryFormCommon_street1_label, BgcBaseText.class,
             SWT.NONE, null, null, null));
-        aMap.put("street2", new FieldInfo("Street 2", BgcBaseText.class,
+        aMap.put(AddressPeer.STREET2.getName(), new FieldInfo(
+            Messages.AddressEntryFormCommon_street2_label, BgcBaseText.class,
             SWT.NONE, null, null, null));
-        aMap.put("city", new FieldInfo("City", BgcBaseText.class, SWT.NONE,
-            null, NonEmptyStringValidator.class, "Enter a city"));
-        aMap.put("province", new FieldInfo("Province", Combo.class, SWT.NONE,
-            FormConstants.PROVINCES, null, null));
-        aMap.put("postalCode", new FieldInfo("Postal Code", BgcBaseText.class,
-            SWT.NONE, null, PostalCodeValidator.class, "Invalid postal code"));
+        aMap.put(AddressPeer.CITY.getName(), new FieldInfo(
+            Messages.AddressEntryFormCommon_city_label, BgcBaseText.class,
+            SWT.NONE, null, NonEmptyStringValidator.class,
+            Messages.AddressEntryFormCommon_city_validation_msg));
+        aMap.put(AddressPeer.PROVINCE.getName(), new FieldInfo(
+            Messages.AddressEntryFormCommon_province_label, Combo.class,
+            SWT.NONE, FormConstants.PROVINCES, null, null));
+        aMap.put(AddressPeer.POSTAL_CODE.getName(), new FieldInfo(
+            Messages.AddressEntryFormCommon_postalCode_label,
+            BgcBaseText.class, SWT.NONE, null, PostalCodeValidator.class,
+            Messages.AddressEntryFormCommon_postalCode_validation_msg));
         ADDRESS_FIELDS = Collections.unmodifiableMap(aMap);
     };
 
@@ -45,7 +53,7 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
     }
 
     protected void createAddressArea(ModelWrapper<?> wrapperObject) {
-        Composite client = createSectionWithClient("Address");
+        Composite client = createSectionWithClient(Messages.AddressEntryFormCommon_address_title);
         createBoundWidgetsFromMap(ADDRESS_FIELDS, wrapperObject, client);
     }
 }

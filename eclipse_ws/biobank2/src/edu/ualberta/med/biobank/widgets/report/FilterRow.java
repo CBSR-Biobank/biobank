@@ -48,7 +48,7 @@ class FilterRow extends Composite {
     private static final int MAX_QUERY_TIME = 3;
     private static final int MAX_SUGGESTIONS = 100;
     private static final SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat(
-        "yyyy-MM-dd HH:mm:ss");
+        "yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
     private final FilterSelectWidget filtersWidget;
     private final EntityFilter filter;
     private Composite container;
@@ -170,7 +170,7 @@ class FilterRow extends Composite {
                 if (element instanceof FilterOperator) {
                     return ((FilterOperator) element).getDisplayString();
                 }
-                return "";
+                return ""; //$NON-NLS-1$
             }
         });
 
@@ -232,7 +232,7 @@ class FilterRow extends Composite {
 
     private FilterValueWidget createSimpleFilterValueWidget() {
         FilterValueWidget result = null;
-        boolean isDateProperty = "Date".equals(filter.getEntityProperty()
+        boolean isDateProperty = "Date".equals(filter.getEntityProperty() //$NON-NLS-1$
             .getPropertyType().getName());
 
         Integer filterTypeId = filter.getFilterType();
@@ -377,7 +377,7 @@ class FilterRow extends Composite {
         autoButton.setLayoutData(layoutData);
 
         autoButton
-            .setToolTipText("Suggest possible values (considers other filters)");
+            .setToolTipText(Messages.FilterRow_possible_value_tooltip);
         autoButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_WAND));
         autoButton.addListener(SWT.Selection, new Listener() {
@@ -454,19 +454,19 @@ class FilterRow extends Composite {
                 MAX_SUGGESTIONS, 0, MAX_QUERY_TIME);
 
             if (results.size() >= MAX_SUGGESTIONS) {
-                BgcPlugin.openError("Cannot Suggest Options",
-                    "There are too many possible suggestions to display.");
+                BgcPlugin.openError(Messages.FilterRow_nosuggest_error_title,
+                    Messages.FilterRow_toomany_suggest_error_msg);
                 return false;
             }
         } catch (ApplicationException e) {
             long end = System.currentTimeMillis();
 
             if ((end - start) / 1000 >= MAX_QUERY_TIME) {
-                BgcPlugin.openError("Cannot Suggest Options",
-                    "It is taking too long to find suggestions.", e);
+                BgcPlugin.openError(Messages.FilterRow_nosuggest_error_title,
+                    Messages.FilterRow_toolong_suggest_error_msg, e);
             } else {
-                BgcPlugin.openError("Cannot Suggest Options",
-                    "There was a problem trying to find suggestions.", e);
+                BgcPlugin.openError(Messages.FilterRow_nosuggest_error_title,
+                    Messages.FilterRow_problem_suggest_error_msg, e);
             }
             return false;
         }
@@ -489,8 +489,8 @@ class FilterRow extends Composite {
         Collections.sort(suggestions);
 
         if (suggestions.isEmpty()) {
-            BgcPlugin.openError("Cannot Suggest Options",
-                "There are no possible values to suggest.");
+            BgcPlugin.openError(Messages.FilterRow_nosuggest_error_title,
+                Messages.FilterRow_nosuggest_error_msg);
 
             // forget old suggestions, if any
             suggestions = null;

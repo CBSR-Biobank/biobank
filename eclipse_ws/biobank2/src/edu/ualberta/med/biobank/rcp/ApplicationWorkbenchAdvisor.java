@@ -43,7 +43,6 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
         IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
         if (window != null) {
             IWorkbenchPage page = window.getActivePage();
-
             if (page.getPerspective().getId().equals(ReportsPerspective.ID)) {
                 IPerspectiveDescriptor main = workbench
                     .getPerspectiveRegistry().findPerspectiveWithId(
@@ -53,8 +52,9 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
             if (BiobankPlugin.isAskPrintActivityLog()
                 && page.getPerspective().getId()
                     .equals(LinkAssignPerspective.ID)) {
-                BgcPlugin.openInformation("Can't close",
-                    "Please end specimen management session before closing");
+                BgcPlugin.openInformation(
+                    Messages.ApplicationWorkbenchAdvisor_close_error_title,
+                    Messages.ApplicationWorkbenchAdvisor_close_error_msg);
                 return false;
             }
         }
@@ -72,7 +72,6 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     public void postStartup() {
         PreferenceManager pm = PlatformUI.getWorkbench().getPreferenceManager();
         // remove the default 'General' preference page of the workbench
-        pm.remove("org.eclipse.ui.preferencePages.Workbench");
+        pm.remove("org.eclipse.ui.preferencePages.Workbench"); //$NON-NLS-1$
     }
-
 }

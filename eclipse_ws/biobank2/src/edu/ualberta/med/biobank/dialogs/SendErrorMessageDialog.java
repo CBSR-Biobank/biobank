@@ -26,6 +26,7 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -52,15 +53,25 @@ import edu.ualberta.med.biobank.utils.EMailDescriptor;
 
 public class SendErrorMessageDialog extends BgcBaseDialog {
 
-    private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
+    private static final String CONTENT_TYPE = "text/plain"; //$NON-NLS-1$
 
-    private static final String SEND_ERROR_TITLE = "Send Error EMail";
+    private static final String MAIL_SMTP_SOCKET_FACTORY_FALLBACK_KEY = "mail.smtp.socketFactory.fallback"; //$NON-NLS-1$
+
+    private static final String MAIL_SMTP_SOCKET_FACTORY_CLASS_KEY = "mail.smtp.socketFactory.class"; //$NON-NLS-1$
+
+    private static final String MAIL_SMTP_SOCKET_FACTORY_PORT_KEY = "mail.smtp.socketFactory.port"; //$NON-NLS-1$
+
+    private static final String MAIL_SMTP_PORT_KEY = "mail.smtp.port"; //$NON-NLS-1$
+
+    private static final String MAIL_SMTP_AUTH_KEY = "mail.smtp.auth"; //$NON-NLS-1$
+
+    private static final String MAIL_SMTP_HOST_KEY = "mail.smtp.host"; //$NON-NLS-1$
+
+    private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory"; //$NON-NLS-1$
 
     private EMailDescriptor email;
 
     private List<AttachmentComposite> attachments;
-
-    // private int compositeHeight;
 
     public SendErrorMessageDialog(Shell parentShell) {
         super(parentShell);
@@ -70,12 +81,12 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Please describe steps to reproduce the problem. The application error log will be automatically attached.";
+        return Messages.SendErrorMessageDialog_description;
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return SEND_ERROR_TITLE;
+        return Messages.SendErrorMessageDialog_title;
     }
 
     @Override
@@ -96,18 +107,22 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.NONE,
-            "Title", new String[0], email, "title",
-            new NonEmptyStringValidator("Please enter a title"));
+            Messages.SendErrorMessageDialog_title_label, new String[0], email,
+            "title", //$NON-NLS-1$
+            new NonEmptyStringValidator(
+                Messages.SendErrorMessageDialog_title_validation_msg));
 
         BgcBaseText descText = (BgcBaseText) createBoundWidgetWithLabel(
-            contents, BgcBaseText.class, SWT.MULTI, "Description",
-            new String[0], email, "description", new NonEmptyStringValidator(
-                "Please enter at least a very small comment"));
+            contents, BgcBaseText.class, SWT.MULTI,
+            Messages.SendErrorMessageDialog_description_label, new String[0],
+            email, "description", new NonEmptyStringValidator( //$NON-NLS-1$
+                Messages.SendErrorMessageDialog_description_validation_msg));
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 200;
         descText.setLayoutData(gd);
 
-        Label attLabel = widgetCreator.createLabel(contents, "Attachments");
+        Label attLabel = widgetCreator.createLabel(contents,
+            Messages.SendErrorMessageDialog_attachments_label);
         attLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 
         final Composite attachmentsComposite = new Composite(contents, SWT.NONE);
@@ -123,7 +138,8 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         Button addButton = new Button(contents, SWT.PUSH);
         addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ADD));
-        addButton.setToolTipText("Add attachment");
+        addButton
+            .setToolTipText(Messages.SendErrorMessageDialog_attachments_add_tooltip);
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -140,7 +156,7 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
 
     @Override
     protected String getDialogShellTitle() {
-        return SEND_ERROR_TITLE;
+        return Messages.SendErrorMessageDialog_title;
     }
 
     // private int createAttachmentChooser(Composite parent,
@@ -198,7 +214,8 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         try {
             sendMail();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error sending mail", e);
+            BgcPlugin.openAsyncError(
+                Messages.SendErrorMessageDialog_error_title, e);
         }
         super.okPressed();
     }
@@ -224,38 +241,44 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         context.run(true, false, new IRunnableWithProgress() {
             @Override
             public void run(final IProgressMonitor monitor) {
-                monitor.beginTask("Sending mail...", IProgressMonitor.UNKNOWN);
+                monitor.beginTask(Messages.SendErrorMessageDialog_sending,
+                    IProgressMonitor.UNKNOWN);
                 try {
                     Properties props = new Properties();
-                    props.put("mail.smtp.host", email.getSmtpServer());
-                    props.put("mail.smtp.auth", "true");
+                    props.put(MAIL_SMTP_HOST_KEY, email.getSmtpServer());
+                    props.put(MAIL_SMTP_AUTH_KEY, Boolean.TRUE.toString());
                     // props.put("mail.debug", "true");
-                    props.put("mail.smtp.port", email.getServerPort());
-                    props.put("mail.smtp.socketFactory.port",
+                    props.put(MAIL_SMTP_PORT_KEY, email.getServerPort());
+                    props.put(MAIL_SMTP_SOCKET_FACTORY_PORT_KEY,
                         email.getServerPort());
-                    props.put("mail.smtp.socketFactory.class", SSL_FACTORY);
-                    props.put("mail.smtp.socketFactory.fallback", "false");
+                    props.put(MAIL_SMTP_SOCKET_FACTORY_CLASS_KEY, SSL_FACTORY);
+                    props.put(MAIL_SMTP_SOCKET_FACTORY_FALLBACK_KEY,
+                        Boolean.FALSE.toString());
 
                     Session session = Session.getDefaultInstance(props,
                         new javax.mail.Authenticator() {
                             @Override
                             protected PasswordAuthentication getPasswordAuthentication() {
-                                return new PasswordAuthentication("biobank2",
-                                    email.getServerPassword());
+                                return new PasswordAuthentication(email
+                                    .getServerUsername(), email
+                                    .getServerPassword());
                             }
                         });
                     // session.setDebug(true);
                     Transport.send(getEmailMessage(session));
                     monitor.done();
                 } catch (AuthenticationFailedException afe) {
-                    BgcPlugin.openAsyncError(
-                        "Authentification Error",
-                        "Wrong authentification for "
-                            + email.getServerUsername());
+                    BgcPlugin
+                        .openAsyncError(
+                            Messages.SendErrorMessageDialog_authentificationError_title,
+                            NLS.bind(
+                                Messages.SendErrorMessageDialog_authentificationError_msg,
+                                email.getServerUsername()));
                     monitor.setCanceled(true);
                     return;
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError("Error in sending email", e);
+                    BgcPlugin.openAsyncError(
+                        Messages.SendErrorMessageDialog_error_title, e);
                     monitor.setCanceled(true);
                     return;
                 }
@@ -266,7 +289,7 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
     private Message getEmailMessage(Session session) throws Exception {
         MimeMessage message = new MimeMessage(session);
         message.setSubject(email.getTitle());
-        message.setContent(email.getDescription(), "text/plain");
+        message.setContent(email.getDescription(), CONTENT_TYPE);
 
         message.setRecipient(Message.RecipientType.TO, new InternetAddress(
             email.getReceiverEmail()));
@@ -275,14 +298,14 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
 
         // create and fill the first message part
         MimeBodyPart mbp1 = new MimeBodyPart();
-        String text = email.getDescription() + "\n\n------";
+        String text = email.getDescription() + "\n\n------"; //$NON-NLS-1$
         if (SessionManager.getInstance().isConnected()) {
-            text += "\nCreated by user "
+            text += "\nCreated by user " //$NON-NLS-1$
                 + SessionManager.getInstance().getSession().getUser()
                     .getLogin();
         }
 
-        text += "\nSent from BioBank Java Client, version "
+        text += "\nSent from BioBank Java Client, version " //$NON-NLS-1$
             + BiobankPlugin.getDefault().getBundle().getVersion();
 
         mbp1.setText(text);
@@ -342,13 +365,13 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
             attachmentText = (BgcBaseText) widgetCreator.createWidget(this,
                 BgcBaseText.class, SWT.READ_ONLY, null);
             browseButton = new Button(this, SWT.PUSH);
-            browseButton.setText("Browse");
+            browseButton.setText(Messages.SendErrorMessageDialog_browse_label);
             browseButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     FileDialog fd = new FileDialog(browseButton.getShell(),
                         SWT.OPEN);
-                    fd.setText("Select attachment");
+                    fd.setText(Messages.SendErrorMessageDialog_select_attachment_label);
                     file = fd.open();
                     if (file != null) {
                         attachmentText.setText(file);
@@ -358,13 +381,14 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
             removeButton = new Button(this, SWT.PUSH);
             removeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_DELETE));
-            removeButton.setToolTipText("Remove this attachment");
+            removeButton
+                .setToolTipText(Messages.SendErrorMessageDialog_remove_attachment);
             removeButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     int height = AttachmentComposite.this.computeSize(
                         SWT.DEFAULT, SWT.DEFAULT).y;
-                    attachmentText.setText("");
+                    attachmentText.setText(""); //$NON-NLS-1$
                     AttachmentComposite.this.setVisible(false);
                     GridData gd = (GridData) AttachmentComposite.this
                         .getLayoutData();

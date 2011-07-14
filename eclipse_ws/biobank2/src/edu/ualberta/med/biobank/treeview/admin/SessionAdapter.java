@@ -27,7 +27,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SessionAdapter extends AdapterBase {
 
-    private static final String LOGOUT_COMMAND_ID = "edu.ualberta.med.biobank.commands.logout";
+    private static final String LOGOUT_COMMAND_ID = "edu.ualberta.med.biobank.commands.logout"; //$NON-NLS-1$
 
     public static final int CLINICS_BASE_NODE_ID = 0;
 
@@ -51,7 +51,7 @@ public class SessionAdapter extends AdapterBase {
         if (user.getLogin().isEmpty()) {
             setName(serverName);
         } else {
-            setName(serverName + " [" + user.getLogin() + "]");
+            setName(serverName + " [" + user.getLogin() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         this.serverName = serverName;
         this.user = user;
@@ -103,15 +103,16 @@ public class SessionAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     @Override
     public String getTooltipText() {
         if (appService != null) {
-            return "Current server version: " + appService.getServerVersion();
+            return Messages.SessionAdapter_current_session_label
+                + appService.getServerVersion();
         }
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     private SiteGroup getSitesGroupNode() {
@@ -141,7 +142,7 @@ public class SessionAdapter extends AdapterBase {
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Logout");
+        mi.setText(Messages.SessionAdapter_logout_label);
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -151,7 +152,7 @@ public class SessionAdapter extends AdapterBase {
                 try {
                     handlerService.executeCommand(LOGOUT_COMMAND_ID, null);
                 } catch (Exception ex) {
-                    throw new RuntimeException(LOGOUT_COMMAND_ID + " not found");
+                    throw new RuntimeException(LOGOUT_COMMAND_ID + " not found"); //$NON-NLS-1$
                 }
             }
         });
@@ -205,7 +206,8 @@ public class SessionAdapter extends AdapterBase {
         try {
             return ClinicWrapper.getAllClinics(appService);
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Unable to load clinics from database", e);
+            BgcPlugin.openAsyncError(Messages.SessionAdapter_load_error_title,
+                e);
         }
         return null;
     }

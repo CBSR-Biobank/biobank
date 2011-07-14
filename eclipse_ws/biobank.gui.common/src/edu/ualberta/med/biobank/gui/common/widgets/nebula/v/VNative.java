@@ -97,7 +97,7 @@ public class VNative<T extends Control> extends VControl {
     @Override
     public String getText() {
         try {
-            return (String) control.getClass().getMethod("getText")
+            return (String) control.getClass().getMethod("getText") //$NON-NLS-1$
                 .invoke(control);
         } catch (Exception e) {
             e.printStackTrace();
@@ -131,7 +131,7 @@ public class VNative<T extends Control> extends VControl {
         }
         this.control = control;
         control.addDisposeListener(disposeListener);
-        control.setData("cwt_vcontrol", this);
+        control.setData("cwt_vcontrol", this); //$NON-NLS-1$
         // VTracker.addNative(this);
     }
 
@@ -156,7 +156,7 @@ public class VNative<T extends Control> extends VControl {
     @Override
     public void setText(String text) {
         try {
-            control.getClass().getMethod("setText", String.class)
+            control.getClass().getMethod("setText", String.class) //$NON-NLS-1$
                 .invoke(control, text);
         } catch (Exception e) {
             e.printStackTrace();

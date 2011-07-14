@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -78,7 +79,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         .createFromImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_SAVE_AS_NEW));
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ReportEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ReportEntryForm"; //$NON-NLS-1$
 
     private static final Comparator<EntityFilter> COMPARE_FILTERS_BY_NAME = new Comparator<EntityFilter>() {
         @Override
@@ -138,7 +139,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     @Override
@@ -160,11 +161,12 @@ public class ReportEntryForm extends BiobankEntryForm {
 
         String tabName;
         if (report.isNew()) {
-            tabName = "New " + entityName + " Report";
+            tabName = NLS.bind(Messages.ReportEntryForm_title_new, entityName);
         } else {
             String reportName = report.getName();
             if (reportName == null || reportName.isEmpty()) {
-                tabName = "Unnamed " + entityName + " Report";
+                tabName = NLS.bind(Messages.ReportEntryForm_unamed_report,
+                    entityName);
             } else {
                 tabName = reportName;
             }
@@ -175,7 +177,8 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(report.getEntity().getName() + " Report");
+        form.setText(NLS.bind(Messages.ReportEntryForm_report_name, report
+            .getEntity().getName()));
         page.setLayout(new GridLayout(1, false));
 
         createProperties();
@@ -203,13 +206,14 @@ public class ReportEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(container);
 
         setFirstControl(createBoundWidgetWithLabel(container,
-            BgcBaseText.class, SWT.NONE, "Name", null, report,
-            ReportWrapper.PROPERTY_NAME, new NonEmptyStringValidator(
-                "Name is required.")));
+            BgcBaseText.class, SWT.NONE, Messages.ReportEntryForm_name_label,
+            null, report, ReportWrapper.PROPERTY_NAME,
+            new NonEmptyStringValidator(
+                Messages.ReportEntryForm_name_validation_msg)));
 
         createBoundWidgetWithLabel(container, BgcBaseText.class, SWT.MULTI,
-            "Description", null, report, ReportWrapper.PROPERTY_DESCRIPTION,
-            null);
+            Messages.ReportEntryForm_description_label, null, report,
+            ReportWrapper.PROPERTY_DESCRIPTION, null);
     }
 
     private void createButtons() {
@@ -226,7 +230,8 @@ public class ReportEntryForm extends BiobankEntryForm {
     }
 
     private Control createGenerateButton(Composite parent) {
-        generateButton = toolkit.createButton(parent, "Generate", SWT.NONE);
+        generateButton = toolkit.createButton(parent,
+            Messages.ReportEntryForm_generate_button_label, SWT.NONE);
         generateButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -262,12 +267,13 @@ public class ReportEntryForm extends BiobankEntryForm {
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) {
-                monitor.beginTask("Generating report...",
+                monitor.beginTask(Messages.ReportEntryForm_generating_msg,
                     IProgressMonitor.UNKNOWN);
                 try {
                     results = new ArrayList<Object>();
 
-                    Thread thread = new Thread("Querying") {
+                    Thread thread = new Thread(
+                        Messages.ReportEntryForm_querying) {
                         @SuppressWarnings("unchecked")
                         @Override
                         public void run() {
@@ -277,7 +283,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                             if (results instanceof AbstractBiobankListProxy)
                                 ((AbstractBiobankListProxy<?>) results)
                                     .addBusyListener(new ProgressMonitorDialogBusyListener(
-                                        "Loading more results..."));
+                                        Messages.ReportEntryForm_loading_msg));
                         }
                     };
 
@@ -326,12 +332,13 @@ public class ReportEntryForm extends BiobankEntryForm {
                     });
 
                     Log logMessage = new Log();
-                    logMessage.action = "report";
+                    logMessage.action = "report"; //$NON-NLS-1$
                     appService.logActivity(logMessage);
                     addPrintAction();
 
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError("Report Generation Error", e);
+                    BgcPlugin.openAsyncError(
+                        Messages.ReportEntryForm_generation_error_title, e);
                 }
                 monitor.done();
             }
@@ -404,7 +411,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                         Constructor<?> constructor = entityKlazz
                             .getConstructor();
                         Object instance = constructor.newInstance();
-                        Method setIdMethod = entityKlazz.getMethod("setId",
+                        Method setIdMethod = entityKlazz.getMethod("setId", //$NON-NLS-1$
                             Integer.class);
                         setIdMethod.invoke(instance, id);
 
@@ -413,7 +420,8 @@ public class ReportEntryForm extends BiobankEntryForm {
 
                         SessionManager.openViewForm(wrapper);
                     } catch (Exception e) {
-                        logger.error("Error opening selection", e);
+                        logger.error(
+                            Messages.ReportEntryForm_opening_error_title, e);
                     }
                 }
             }
@@ -445,14 +453,15 @@ public class ReportEntryForm extends BiobankEntryForm {
         }
 
         if (report.getIsCount()) {
-            headers[i] = report.getEntity().getName() + " Count";
+            headers[i] = NLS.bind(Messages.ReportEntryForm_report_name_count,
+                report.getEntity().getName());
         }
 
         return headers;
     }
 
     private void createFiltersSection() {
-        filtersSection = createSection("Filters");
+        filtersSection = createSection(Messages.ReportEntryForm_filters_title);
 
         Composite container = toolkit.createComposite(filtersSection, SWT.NONE);
         GridLayout layout = new GridLayout(1, false);
@@ -512,7 +521,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         container.setLayoutData(layoutData);
 
         Label label = new Label(container, SWT.NONE);
-        label.setText("Add filter:");
+        label.setText(Messages.ReportEntryForm_add_filter_label);
 
         GridData comboLayoutData = new GridData();
         comboLayoutData.widthHint = 200;
@@ -526,7 +535,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                 if (element instanceof EntityFilter) {
                     return ((EntityFilter) element).getName();
                 }
-                return "";
+                return ""; //$NON-NLS-1$
             }
         });
 
@@ -559,7 +568,7 @@ public class ReportEntryForm extends BiobankEntryForm {
     }
 
     private void createOptionsSection() {
-        Section section = createSection("Options");
+        Section section = createSection(Messages.ReportEntryForm_options_title);
         Composite options = toolkit.createComposite(section);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -568,16 +577,18 @@ public class ReportEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(options);
 
         createBoundWidgetWithLabel(options, Button.class, SWT.CHECK,
-            "Show count\r\n(for displayed columns)", null, report, "isCount",
+            Messages.ReportEntryForm_count_option_label, null, report,
+            "isCount", //$NON-NLS-1$
             null);
 
         createBoundWidgetWithLabel(options, Button.class, SWT.CHECK,
-            "Share report", null, report, "isPublic", null);
+            Messages.ReportEntryForm_share_button_label, null, report,
+            "isPublic", null); //$NON-NLS-1$
 
         GridData layoutData = new GridData();
         layoutData.widthHint = 225;
         Label columnsLabel = new Label(options, SWT.NONE);
-        columnsLabel.setText("Columns:");
+        columnsLabel.setText(Messages.ReportEntryForm_columns_label);
         columnsLabel.setLayoutData(layoutData);
 
         columnsWidget = new ColumnSelectWidget(options, SWT.NONE, report);
@@ -639,7 +650,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         // .setActionDefinitionId("edu.ualberta.med.biobank.commands.saveAsNew");
 
         saveAsNewAction.setImageDescriptor(SAVE_AS_NEW_ACTION_IMAGE);
-        saveAsNewAction.setToolTipText("Save As New Report");
+        saveAsNewAction.setToolTipText(Messages.ReportEntryForm_saveAs_label);
 
         form.getToolBarManager().add(saveAsNewAction);
         form.updateToolBar();
@@ -657,16 +668,17 @@ public class ReportEntryForm extends BiobankEntryForm {
             exporter.canExport(data);
         } catch (Exception e) {
             MessageDialog.openError(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), "Cannot Export",
-                e.getMessage());
+                .getActiveWorkbenchWindow().getShell(),
+                Messages.ReportEntryForm_export_error_title, e.getMessage());
             return;
         }
 
         // confirm exporting
-        if (!MessageDialog.openQuestion(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(),
-            "Confirm Report Results Export", "Are you sure you want to "
-                + exporter.getName() + "?")) {
+        if (!MessageDialog.openQuestion(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+            Messages.ReportEntryForm_confirm_title,
+            NLS.bind(Messages.ReportEntryForm_export_question,
+                exporter.getName()))) {
             return;
         }
 
@@ -675,8 +687,8 @@ public class ReportEntryForm extends BiobankEntryForm {
             exporter.export(data, resultsTable.getLabelProvider());
         } catch (Exception e) {
             MessageDialog.openError(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), "Error Exporting",
-                e.getMessage());
+                .getActiveWorkbenchWindow().getShell(),
+                Messages.ReportEntryForm_exporting_error_title, e.getMessage());
             return;
         }
     }
@@ -707,7 +719,7 @@ public class ReportEntryForm extends BiobankEntryForm {
             if (opId != null) {
                 FilterOperator op = FilterOperator.getFilterOperator(opId);
                 if (op != null) {
-                    sb.append(" ");
+                    sb.append(" "); //$NON-NLS-1$
                     sb.append(op.getDisplayString());
                 }
             }
@@ -715,16 +727,16 @@ public class ReportEntryForm extends BiobankEntryForm {
             Collection<ReportFilterValue> values = filter
                 .getReportFilterValueCollection();
             if (values != null) {
-                sb.append(": ");
+                sb.append(": "); //$NON-NLS-1$
                 for (ReportFilterValue value : values) {
-                    sb.append("'");
-                    sb.append(value.getValue().replace("'", "\'"));
+                    sb.append("'"); //$NON-NLS-1$
+                    sb.append(value.getValue().replace("'", "\'")); //$NON-NLS-1$ //$NON-NLS-2$
 
                     if (value.getSecondValue() != null) {
-                        sb.append("' and '");
-                        sb.append(value.getSecondValue().replace("'", "\'"));
+                        sb.append("' and '"); //$NON-NLS-1$
+                        sb.append(value.getSecondValue().replace("'", "\'")); //$NON-NLS-1$ //$NON-NLS-2$
                     }
-                    sb.append("'; ");
+                    sb.append("'; "); //$NON-NLS-1$
                 }
             }
 

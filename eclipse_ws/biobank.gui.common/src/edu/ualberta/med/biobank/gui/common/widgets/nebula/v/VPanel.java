@@ -76,7 +76,7 @@ public class VPanel extends VControl {
         });
 
         VTracker.addTopLevelPanel(this);
-        composite.setData("cwt_vcontrol", this);
+        composite.setData("cwt_vcontrol", this); //$NON-NLS-1$
     }
 
     public VPanel(VPanel panel, int style) {

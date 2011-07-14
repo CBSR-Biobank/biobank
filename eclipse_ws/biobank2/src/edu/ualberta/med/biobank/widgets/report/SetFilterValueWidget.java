@@ -276,10 +276,10 @@ public class SetFilterValueWidget implements FilterValueWidget {
             for (ReportFilterValue value : getValues()) {
                 strings.add(SetFilterValueWidget.this.toString(value));
             }
-            String list = StringUtils.join(strings, ", ");
+            String list = StringUtils.join(strings, ", "); //$NON-NLS-1$
 
             if (list.isEmpty()) {
-                list = "<no values added>";
+                list = Messages.SetFilterValueWidget_novalue_label;
             }
 
             readOnlyText.setText(list);
@@ -289,7 +289,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
             editModeButton = new Button(this, SWT.NONE);
             editModeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_DOWN));
-            editModeButton.setToolTipText("Expand to add values");
+            editModeButton.setToolTipText(Messages.SetFilterValueWidget_expand_label);
             editModeButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {
@@ -333,7 +333,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
             addButton = new Button(this, SWT.NONE);
             addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_ADD));
-            addButton.setToolTipText("Add value to list");
+            addButton.setToolTipText(Messages.SetFilterValueWidget_add_label);
             addButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {
@@ -380,7 +380,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
                         ReportFilterValue value = ((ReportFilterValue) element);
                         return SetFilterValueWidget.this.toString(value);
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             });
             listViewer.setComparator(COMPARATOR);
@@ -400,7 +400,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
             removeButton = new Button(this, SWT.NONE);
             removeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_REMOVE));
-            removeButton.setToolTipText("Remove selected value(s) from list");
+            removeButton.setToolTipText(Messages.SetFilterValueWidget_remove_label);
             removeButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {
@@ -418,7 +418,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
             viewModeButton = new Button(this, SWT.NONE);
             viewModeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_UP));
-            viewModeButton.setToolTipText("Collapse");
+            viewModeButton.setToolTipText(Messages.SetFilterValueWidget_collapse_label);
             viewModeButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {

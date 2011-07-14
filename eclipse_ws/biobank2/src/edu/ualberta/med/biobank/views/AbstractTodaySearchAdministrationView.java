@@ -52,7 +52,7 @@ public abstract class AbstractTodaySearchAdministrationView extends
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Search error", e);
+            BgcPlugin.openAsyncError(Messages.AbstractTodaySearchAdministrationView_search_error_title, e);
         }
     }
 

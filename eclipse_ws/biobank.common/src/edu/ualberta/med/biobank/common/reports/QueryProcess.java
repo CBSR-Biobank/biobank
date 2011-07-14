@@ -26,7 +26,7 @@ public class QueryProcess {
 
     public synchronized Response start(Session s) throws ApplicationException {
         if (this.s != null)
-            throw new ApplicationException("cannot start a query twice");
+            throw new ApplicationException("cannot start a query twice"); //$NON-NLS-1$
 
         this.s = s;
 

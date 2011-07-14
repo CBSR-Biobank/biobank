@@ -20,11 +20,11 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class GroupInfoTable extends InfoTableWidget<Group> {
     public static final int ROWS_PER_PAGE = 8;
-    private static final String[] HEADINGS = new String[] { "Name" };
-    private static final String LOADING_ROW = "loading...";
-    private static final String GROUP_DELETE_ERROR = "Unable to delete group.";
-    private static final String CONFIRM_DELETE_TITLE = "Confirm Deletion";
-    private static final String CONFIRM_DELETE_MESSAGE = "Are you certain you want to delete \"{0}\"?";
+    private static final String[] HEADINGS = new String[] { Messages.GroupInfoTable_name_label };
+    private static final String LOADING_ROW = Messages.GroupInfoTable_loading;
+    private static final String GROUP_DELETE_ERROR = Messages.GroupInfoTable_delete_error_msg;
+    private static final String CONFIRM_DELETE_TITLE = Messages.GroupInfoTable_delete_confirm_title;
+    private static final String CONFIRM_DELETE_MESSAGE = Messages.GroupInfoTable_delete_confirm_msg;
 
     public GroupInfoTable(Composite parent, List<Group> collection) {
         super(parent, collection, HEADINGS, ROWS_PER_PAGE, Group.class);
@@ -71,7 +71,7 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
         }
 
         Group group = (Group) o;
-        return StringUtils.join(Arrays.asList(group.getName()), "\t");
+        return StringUtils.join(Arrays.asList(group.getName()), "\t"); //$NON-NLS-1$
     }
 
     @Override
@@ -89,14 +89,14 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
                     if (columnIndex == 0) {
                         return LOADING_ROW;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
 
                 switch (columnIndex) {
                 case 0:
                     return group.getName();
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };

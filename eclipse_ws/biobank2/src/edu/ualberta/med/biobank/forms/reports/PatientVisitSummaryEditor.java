@@ -13,14 +13,16 @@ public class PatientVisitSummaryEditor extends ReportsEditor {
     protected DateTimeWidget start;
     protected DateTimeWidget end;
 
-    public static String ID = "edu.ualberta.med.biobank.editors.PatientVisitSummaryEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.PatientVisitSummaryEditor"; //$NON-NLS-1$
 
     @Override
     protected void createOptionSection(Composite parent) {
         start = widgetCreator.createDateTimeWidget(parent,
-            "Start Date (Time Drawn)", null, null, null, SWT.DATE);
+            Messages.PatientVisitSummaryEditor_start_label, null, null, null,
+            SWT.DATE);
         end = widgetCreator.createDateTimeWidget(parent,
-            "End Date (Time Drawn)", null, null, null, SWT.DATE);
+            Messages.PatientVisitSummaryEditor_end_label, null, null, null,
+            SWT.DATE);
     }
 
     @Override
@@ -33,15 +35,22 @@ public class PatientVisitSummaryEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Study", "Clinic", "1 Visit", "2 Visit",
-            "3 Visit", "4 Visit", "5+ Visits", "Total Visits", "Total Patients" };
+        return new String[] { Messages.PatientVisitSummaryEditor_study_label,
+            Messages.PatientVisitSummaryEditor_clinic_label,
+            Messages.PatientVisitSummaryEditor_1visit_label,
+            Messages.PatientVisitSummaryEditor_2visits_label,
+            Messages.PatientVisitSummaryEditor_3visits_label,
+            Messages.PatientVisitSummaryEditor_4visits_label,
+            Messages.PatientVisitSummaryEditor_5visits_label,
+            Messages.PatientVisitSummaryEditor_visits_total_label,
+            Messages.PatientVisitSummaryEditor_patient_total_label };
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> param = new ArrayList<String>();
-        param.add("Start Date (Time Drawn)");
-        param.add("End Date (Time Drawn)");
+        param.add(Messages.PatientVisitSummaryEditor_start_label);
+        param.add(Messages.PatientVisitSummaryEditor_end_label);
         return param;
     }
 

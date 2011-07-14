@@ -37,7 +37,7 @@ public class CDT {
         AnalogTime, Date, DateTime, DiscreteTime
     }
 
-    public static final String PickerPart = "PickerPart";
+    public static final String PickerPart = "PickerPart"; //$NON-NLS-1$
 
     /**
      * true if the platform is carbon, false otherwise

@@ -21,7 +21,7 @@ public class InCreationDispatchGroup extends AbstractDispatchGroup {
 
     public InCreationDispatchGroup(AdapterBase parent, int id,
         CenterWrapper<?> center) {
-        super(parent, id, "Creation", center);
+        super(parent, id, Messages.InCreationDispatchGroup_creation_node_label, center);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class InCreationDispatchGroup extends AbstractDispatchGroup {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (SessionManager.canCreate(DispatchWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add Dispatch");
+            mi.setText(Messages.InCreationDispatchGroup_add_label);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

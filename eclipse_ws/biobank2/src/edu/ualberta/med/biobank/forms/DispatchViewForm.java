@@ -11,6 +11,7 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -30,10 +31,10 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
@@ -46,7 +47,7 @@ public class DispatchViewForm extends BiobankViewForm {
     private static BgcLogger logger = BgcLogger
         .getLogger(DispatchViewForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchViewForm"; //$NON-NLS-1$
 
     private DispatchAdapter dispatchAdapter;
 
@@ -75,21 +76,21 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof DispatchAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         dispatchAdapter = (DispatchAdapter) adapter;
         dispatch = (DispatchWrapper) adapter.getModelObject();
         SessionManager.logLookup(dispatch);
         retrieveDispatch();
-        setPartName("Dispatch");
+        setPartName(Messages.DispatchViewForm_title);
     }
 
     private void retrieveDispatch() {
         try {
             dispatch.reload();
         } catch (Exception ex) {
-            logger.error("Error while retrieving shipment "
+            logger.error(Messages.DispatchViewForm_retrieve_ship_error_msg
                 + dispatch.getShipmentInfo().getWaybill(), ex);
         }
     }
@@ -97,7 +98,7 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     public void reload() throws Exception {
         retrieveDispatch();
-        setPartName("Dispatch sent on "
+        setPartName(Messages.DispatchViewForm_fulltitle
             + dispatch.getShipmentInfo().getPackedAt());
         setDispatchValues();
         specimensTree.refresh();
@@ -105,28 +106,30 @@ public class DispatchViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        String dateString = "";
+        String dateString = null;
         if (dispatch.getShipmentInfo() != null
             && dispatch.getShipmentInfo().getPackedAt() != null) {
-            dateString = " on " + dispatch.getFormattedPackedAt();
+            dateString = dispatch.getFormattedPackedAt();
         }
         canSeeEverything = true;
         if (dispatch.getSenderCenter() == null) {
             canSeeEverything = false;
-            BgcPlugin
-                .openAsyncError(
-                    "Access Denied",
-                    "It seems you don't have access to the sender site. Please see administrator to resolve this problem.");
+            BgcPlugin.openAsyncError(
+                Messages.DispatchViewForm_access_denied_error_title,
+                Messages.DispatchViewForm_access_denied_sender_error_msg);
         } else {
-            form.setText("Dispatch sent" + dateString + " from "
-                + dispatch.getSenderCenter().getNameShort());
+            if (dateString == null)
+                form.setText(NLS.bind(Messages.DispatchViewForm_preparation_title,
+                    dateString, dispatch.getSenderCenter().getNameShort()));
+            else
+                form.setText(NLS.bind(Messages.DispatchViewForm_sent_title,
+                    dateString, dispatch.getSenderCenter().getNameShort()));
         }
         if (dispatch.getReceiverCenter() == null) {
             canSeeEverything = false;
-            BgcPlugin
-                .openAsyncError(
-                    "Access Denied",
-                    "It seems you don't have access to the receiver site. Please see administrator to resolve this problem.");
+            BgcPlugin.openAsyncError(
+                Messages.DispatchViewForm_access_denied_error_title,
+                Messages.DispatchViewForm_access_denied_receiver_error_msg);
         }
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -161,7 +164,7 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private void createTreeTableSection() {
         if (dispatch.isInCreationState()) {
-            Composite parent = createSectionWithClient("Specimen added");
+            Composite parent = createSectionWithClient(Messages.DispatchViewForm_specimen_section_label);
             specimensNonProcessedTable = new DispatchSpecimenListInfoTable(
                 parent, dispatch, false) {
                 @Override
@@ -202,8 +205,8 @@ public class DispatchViewForm extends BiobankViewForm {
     private void createReceiveButtons() {
         Composite composite = toolkit.createComposite(page);
         composite.setLayout(new GridLayout(3, false));
-        Button sendButton = toolkit
-            .createButton(composite, "Receive", SWT.PUSH);
+        Button sendButton = toolkit.createButton(composite,
+            Messages.DispatchViewForm_receive_button_label, SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -212,7 +215,7 @@ public class DispatchViewForm extends BiobankViewForm {
         });
 
         Button sendProcessButton = toolkit.createButton(composite,
-            "Receive and Process", SWT.PUSH);
+            Messages.DispatchViewForm_receive_process_button_label, SWT.PUSH);
         sendProcessButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -220,8 +223,8 @@ public class DispatchViewForm extends BiobankViewForm {
             }
         });
 
-        Button lostProcessButton = toolkit.createButton(composite, "Lost",
-            SWT.PUSH);
+        Button lostProcessButton = toolkit.createButton(composite,
+            Messages.DispatchViewForm_lost_button_label, SWT.PUSH);
         lostProcessButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -233,7 +236,8 @@ public class DispatchViewForm extends BiobankViewForm {
     private void createCloseButton() {
         Composite composite = toolkit.createComposite(page);
         composite.setLayout(new GridLayout(2, false));
-        Button sendButton = toolkit.createButton(composite, "Done", SWT.PUSH);
+        Button sendButton = toolkit.createButton(composite,
+            Messages.DispatchViewForm_done_button_label, SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -243,7 +247,8 @@ public class DispatchViewForm extends BiobankViewForm {
     }
 
     private void createSendButton() {
-        final Button sendButton = toolkit.createButton(page, "Send", SWT.PUSH);
+        final Button sendButton = toolkit.createButton(page,
+            Messages.DispatchViewForm_send_button_label, SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -255,7 +260,8 @@ public class DispatchViewForm extends BiobankViewForm {
                         context.run(true, true, new IRunnableWithProgress() {
                             @Override
                             public void run(final IProgressMonitor monitor) {
-                                monitor.beginTask("Saving...",
+                                monitor.beginTask(
+                                    Messages.DispatchViewForm_saving_text,
                                     IProgressMonitor.UNKNOWN);
                                 dispatch.setState(DispatchState.IN_TRANSIT);
                                 try {
@@ -265,23 +271,24 @@ public class DispatchViewForm extends BiobankViewForm {
                                         .openRemoteConnectErrorMessage(exp);
                                     return;
                                 } catch (final RemoteAccessException exp) {
-                                    BgcPlugin
-                                        .openRemoteAccessErrorMessage(exp);
+                                    BgcPlugin.openRemoteAccessErrorMessage(exp);
                                     return;
                                 } catch (final AccessDeniedException ade) {
-                                    BgcPlugin
-                                        .openAccessDeniedErrorMessage(ade);
+                                    BgcPlugin.openAccessDeniedErrorMessage(ade);
                                     return;
                                 } catch (Exception ex) {
-                                    BgcPlugin.openAsyncError(
-                                        "Save error", ex);
+                                    BgcPlugin
+                                        .openAsyncError(
+                                            Messages.DispatchViewForm_save_error_title,
+                                            ex);
                                     return;
                                 }
                                 monitor.done();
                             }
                         });
                     } catch (Exception e1) {
-                        BgcPlugin.openAsyncError("Save error", e1);
+                        BgcPlugin.openAsyncError(
+                            Messages.DispatchViewForm_save_error_title, e1);
                     }
                     SpecimenTransitView.getCurrent().reload();
                     dispatchAdapter.openViewForm();
@@ -300,9 +307,9 @@ public class DispatchViewForm extends BiobankViewForm {
 
         String stateMessage = null;
         if (dispatch.isInLostState())
-            stateMessage = " Dispatch Lost ";
+            stateMessage = Messages.DispatchViewForm_lost_msg;
         else if (dispatch.isInClosedState())
-            stateMessage = " Dispatch Complete ";
+            stateMessage = Messages.DispatchViewForm_complete_msg;
         if (stateMessage != null) {
             Label label = widgetCreator.createLabel(client, stateMessage,
                 SWT.CENTER, false);
@@ -317,32 +324,35 @@ public class DispatchViewForm extends BiobankViewForm {
             label.setLayoutData(gd);
         }
 
-        senderLabel = createReadOnlyLabelledField(client, SWT.NONE, "Sender");
+        senderLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.DispatchViewForm_sender_label);
         receiverLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Receiver");
+            Messages.DispatchViewForm_receiver_label);
         if (!dispatch.isInCreationState()) {
             departedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Packed at");
+                Messages.DispatchViewForm_packedAt_label);
             shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Shipping Method");
+                Messages.DispatchViewForm_shippingMethod_label);
             waybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Waybill");
+                Messages.DispatchViewForm_waybill_label);
         }
         if (dispatch.hasBeenReceived()) {
             dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Date received");
+                Messages.DispatchViewForm_received_label);
         }
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            "Comments");
+            Messages.DispatchViewForm_comments_label);
     }
 
     private void setDispatchValues() {
-        setTextValue(senderLabel,
-            dispatch.getSenderCenter() == null ? " ACCESS DENIED" : dispatch
-                .getSenderCenter().getName());
-        setTextValue(receiverLabel,
-            dispatch.getReceiverCenter() == null ? "ACCESS DENIED" : dispatch
-                .getReceiverCenter().getName());
+        setTextValue(
+            senderLabel,
+            dispatch.getSenderCenter() == null ? Messages.DispatchViewForm_access_denied_value
+                : dispatch.getSenderCenter().getName());
+        setTextValue(
+            receiverLabel,
+            dispatch.getReceiverCenter() == null ? Messages.DispatchViewForm_access_denied_value
+                : dispatch.getReceiverCenter().getName());
         if (departedLabel != null)
             setTextValue(departedLabel, dispatch.getFormattedPackedAt());
 
@@ -351,7 +361,7 @@ public class DispatchViewForm extends BiobankViewForm {
         if (shipInfo != null) {
             if (shippingMethodLabel != null)
                 setTextValue(shippingMethodLabel,
-                    shipInfo.getShippingMethod() == null ? "" : shipInfo
+                    shipInfo.getShippingMethod() == null ? "" : shipInfo //$NON-NLS-1$
                         .getShippingMethod().getName());
             if (waybillLabel != null)
                 setTextValue(waybillLabel, shipInfo.getWaybill());

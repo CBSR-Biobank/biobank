@@ -45,7 +45,7 @@ public class BiobankPartListener implements IPartListener {
                     workbench.showPerspective(ProcessingPerspective.ID,
                         workbench.getActiveWorkbenchWindow());
                 } catch (WorkbenchException e) {
-                    logger.error("Error while opening patients perpective", e);
+                    logger.error("Error while opening patients perpective", e); //$NON-NLS-1$
                 }
             }
         }
@@ -56,7 +56,7 @@ public class BiobankPartListener implements IPartListener {
             try {
                 ((BiobankEntryForm) part).formClosed();
             } catch (Exception e) {
-                logger.error("Error in formClosed method", e);
+                logger.error("Error in formClosed method", e); //$NON-NLS-1$
             }
     }
 

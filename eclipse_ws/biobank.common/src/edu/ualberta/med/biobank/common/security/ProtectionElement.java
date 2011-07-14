@@ -52,7 +52,7 @@ public class ProtectionElement implements Serializable, NotAProxy {
 
     @Override
     public String toString() {
-        return getType() + "/" + getId();
+        return getType() + "/" + getId(); //$NON-NLS-1$
     }
 
     @Override

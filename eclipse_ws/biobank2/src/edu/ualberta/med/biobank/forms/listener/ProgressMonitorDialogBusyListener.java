@@ -40,12 +40,12 @@ public class ProgressMonitorDialogBusyListener implements IBusyListener {
                                 semaphore.release();
                                 monitor.done();
                             } catch (Exception e) {
-                                BgcPlugin.openAsyncError("Thread Error", e);
+                                BgcPlugin.openAsyncError("Thread Error", e); //$NON-NLS-1$
                             }
                         }
                     });
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError("Loading Error", e);
+                    BgcPlugin.openAsyncError(Messages.ProgressMonitorDialogBusyListener_loading_error, e);
                 }
             }
         });

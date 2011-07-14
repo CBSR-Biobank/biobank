@@ -4,7 +4,6 @@ import java.sql.BatchUpdateException;
 
 import org.hibernate.PropertyValueException;
 import org.hibernate.validator.InvalidStateException;
-import org.hibernate.validator.InvalidValue;
 import org.springframework.aop.ThrowsAdvice;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -29,16 +28,7 @@ public class ExceptionInterceptor implements ThrowsAdvice {
      */
     public void afterThrowing(InvalidStateException ise)
         throws ValidationException {
-        StringBuffer message = new StringBuffer();
-        for (int i = 0; i < ise.getInvalidValues().length; i++) {
-            InvalidValue iv = ise.getInvalidValues()[i];
-            message.append(iv.getBeanClass().getSimpleName()).append(": ")
-                .append(iv.getPropertyName()).append(" ")
-                .append(iv.getMessage());
-            if (i != ise.getInvalidValues().length - 1)
-                message.append(". ");
-        }
-        throw new ValidationException(message.toString(), ise);
+        throw new ValidationException(ise);
     }
 
     public void afterThrowing(ApplicationException ae)
@@ -70,9 +60,9 @@ public class ExceptionInterceptor implements ThrowsAdvice {
         Throwable originalMainEx) throws ValueNotSetException {
         if (cause != null && cause instanceof PropertyValueException) {
             PropertyValueException pve = (PropertyValueException) cause;
-            if (pve.getMessage().startsWith("not-null")) {
+            if (pve.getMessage().startsWith("not-null")) { //$NON-NLS-1$
                 String objectName = pve.getEntityName();
-                int i = objectName.lastIndexOf(".");
+                int i = objectName.lastIndexOf("."); //$NON-NLS-1$
                 throw new ValueNotSetException(pve.getPropertyName(),
                     objectName.substring(i + 1), originalMainEx);
             }
@@ -85,7 +75,7 @@ public class ExceptionInterceptor implements ThrowsAdvice {
             BatchUpdateException.class);
         if (cause != null && cause instanceof BatchUpdateException) {
             BatchUpdateException bue = (BatchUpdateException) cause;
-            if (bue.getMessage().contains("Data too long for column")) {
+            if (bue.getMessage().contains("Data too long for column")) { //$NON-NLS-1$
                 throw new StringValueLengthServerException(bue.getMessage());
             }
         }

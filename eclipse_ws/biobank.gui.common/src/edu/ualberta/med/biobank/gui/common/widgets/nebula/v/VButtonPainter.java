@@ -23,8 +23,8 @@ import org.eclipse.swt.widgets.Event;
 @SuppressWarnings("restriction")
 public class VButtonPainter extends VControlPainter {
 
-    static boolean isWindows = System.getProperty("os.name").startsWith(
-        "Windows");
+    static boolean isWindows = System.getProperty("os.name").startsWith( //$NON-NLS-1$
+        "Windows"); //$NON-NLS-1$
 
     @Override
     public void paintBackground(VControl control, Event e) {

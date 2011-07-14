@@ -7,7 +7,6 @@ import java.util.TreeMap;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
@@ -16,6 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
@@ -38,9 +38,9 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    BgcPlugin.openInformation("Extra specimens",
-                        "Some of the specimens in this pallet were not supposed"
-                            + " to be in this shipment.");
+                    BgcPlugin.openInformation(
+                        Messages.RequestReceiveScanDialog_extra_title,
+                        Messages.RequestReceiveScanDialog_extra_msg);
                 }
             });
         }
@@ -51,7 +51,8 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
         try {
             currentShipment.receiveSpecimens(specimens);
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error receiving request", e);
+            BgcPlugin.openAsyncError(
+                Messages.RequestReceiveScanDialog_receiveError_title, e);
         }
     }
 

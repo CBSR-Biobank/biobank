@@ -36,7 +36,7 @@ public class ReportResultsTableWidget<T> extends ReportTableWidget<T> {
                     if (columnIndex < row.length) {
                         Object cell = row[columnIndex];
                         if (cell == null) {
-                            return "";
+                            return ""; //$NON-NLS-1$
                         } else {
                             return cell.toString();
                         }

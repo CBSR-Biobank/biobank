@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: biobank.nl1.fr_CA Fragment
+Bundle-SymbolicName: biobank.nl1.fr_CA
+Bundle-Version: 1.0.0
+Fragment-Host: biobank;bundle-version="[3.0.0,3.1.0)"
+Bundle-ClassPath: src/,.
