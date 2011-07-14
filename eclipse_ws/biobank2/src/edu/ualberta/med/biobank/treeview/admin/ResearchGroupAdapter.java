@@ -45,7 +45,7 @@ public class ResearchGroupAdapter extends AdapterBase {
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this researchGroup?";
+        return "Are you sure you want to delete this research group?";
     }
 
     @Override

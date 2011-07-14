@@ -45,11 +45,6 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
         return getCountResult(appService, new HQLCriteria(RG_COUNT_QRY));
     }
 
-    public void reload() {
-        // TODO Auto-generated method stub
-
-    }
-
     @Override
     public long getCollectionEventCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException {

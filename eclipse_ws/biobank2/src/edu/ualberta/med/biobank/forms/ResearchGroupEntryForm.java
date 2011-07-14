@@ -1,11 +1,12 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.Messages;
@@ -26,23 +27,21 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"; //$NON-NLS-1$
 
-    private static final String MSG_NEW_CLINIC_OK = Messages
+    private static final String MSG_NEW_RG_OK = Messages
         .getString("ResearchGroupEntryForm.creation.msg"); //$NON-NLS-1$
 
-    private static final String MSG_CLINIC_OK = Messages
+    private static final String MSG_RG_OK = Messages
         .getString("ResearchGroupEntryForm.msg.ok"); //$NON-NLS-1$
 
-    private static final String MSG_NO_CLINIC_NAME = Messages
+    private static final String MSG_NO_RG_NAME = Messages
         .getString("ResearchGroupEntryForm.msg.noResearchGroupName"); //$NON-NLS-1$
 
-    private static final String MSG_NO_CLINIC_NAME_SHORT = Messages
+    private static final String MSG_NO_RG_NAME_SHORT = Messages
         .getString("ResearchGroupEntryForm.msg.noResearchGroupNameShort"); //$NON-NLS-1$
 
     private ResearchGroupAdapter researchGroupAdapter;
 
     private ResearchGroupWrapper researchGroup;
-
-    protected Combo session;
 
     private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
         @Override
@@ -61,7 +60,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
         researchGroupAdapter = (ResearchGroupAdapter) adapter;
-        researchGroup = (ResearchGroupWrapper) getModelObject();
+        researchGroup = (ResearchGroupWrapper) adapter.getModelObject();
 
         String tabName;
         if (researchGroup.isNew()) {
@@ -77,9 +76,9 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     @Override
     protected String getOkMessage() {
         if (researchGroup.getId() == null) {
-            return MSG_NEW_CLINIC_OK;
+            return MSG_NEW_RG_OK;
         }
-        return MSG_CLINIC_OK;
+        return MSG_RG_OK;
     }
 
     @Override
@@ -107,18 +106,22 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
             SWT.NONE, Messages.getString("label.name"), null, researchGroup, //$NON-NLS-1$
             ResearchGroupPeer.NAME.getName(), new NonEmptyStringValidator(
-                MSG_NO_CLINIC_NAME)));
+                MSG_NO_RG_NAME)));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
             Messages.getString("label.nameShort"), null, researchGroup, //$NON-NLS-1$
             ResearchGroupPeer.NAME_SHORT.getName(),
-            new NonEmptyStringValidator(MSG_NO_CLINIC_NAME_SHORT));
+            new NonEmptyStringValidator(MSG_NO_RG_NAME_SHORT));
 
         toolkit.paintBordersFor(client);
 
+        List<StudyWrapper> availableStudies = ResearchGroupWrapper
+            .getAvailStudies(appService);
+        if (!researchGroup.isNew())
+            availableStudies.add(researchGroup.getStudy());
+
         studyComboViewer = createComboViewer(client,
-            Messages.getString("label.study"),
-            ResearchGroupWrapper.getAvailStudies(appService),
+            Messages.getString("label.study"), availableStudies,
             researchGroup.getStudy(),
             Messages.getString("ResearchGroupEntryForm.study.validator.msg"), //$NON-NLS-1$
             new ComboSelectionUpdate() {
