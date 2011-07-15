@@ -2424,6 +2424,15 @@
                   value="true">
             </equals>
          </with>
+      </definition>
+      <definition
+            id="biobank2.hasPrinterLabelsRights">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.hasPrinterLabelsRights">
+            <equals
+                  value="true">
+            </equals>
+         </with>
       </definition>       
    </extension>
    <extension

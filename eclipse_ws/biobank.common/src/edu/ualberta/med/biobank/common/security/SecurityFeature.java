@@ -10,8 +10,10 @@ public enum SecurityFeature {
         "Center Feature: Collection Event"), DISPATCH_REQUEST( //$NON-NLS-1$
         "Center Feature: Dispatch/Request"), LINK( //$NON-NLS-1$
         "Center Feature: Link specimens"), PROCESSING_EVENT( //$NON-NLS-1$
-        "Center Feature: Processing Event"), REPORTS("Center Feature: Reports"), LOGGING( //$NON-NLS-1$ //$NON-NLS-2$
-        "Center Feature: Logging"); //$NON-NLS-1$
+        "Center Feature: Processing Event"), //$NON-NLS-1$
+    REPORTS("Center Feature: Reports"), LOGGING( //$NON-NLS-1$ 
+        "Center Feature: Logging"), //$NON-NLS-1$
+    PRINTER_LABELS("Center Feature: Printer Labels"); //$NON-NLS-1$
 
     private String name;
 

@@ -17,19 +17,21 @@ public class SessionState extends AbstractSourceProvider {
     public final static String HAS_CLINIC_SHIPMENT_RIGHTS = "edu.ualberta.med.biobank.sourceprovider.clinicShipmentRights"; //$NON-NLS-1$
     public final static String HAS_DISPATCH_RIGHTS = "edu.ualberta.med.biobank.sourceprovider.dispatchRights"; //$NON-NLS-1$
     public final static String IS_CURRENT_CENTER_ADMIN_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.isCurrentCenterAdmin"; //$NON-NLS-1$
+    public final static String HAS_PRINTER_LABELS_RIGHTS = "edu.ualberta.med.biobank.sourceprovider.hasPrinterLabelsRights"; //$NON-NLS-1$
 
     private boolean isSuperAdminMode;
     private boolean hasWorkingCenter;
     private boolean hasClinicShipmentRights;
     private boolean hasDispatchRights;
     private boolean isCurrentCenterAdmin;
+    private boolean hasPrinterLabelsRights;
 
     @Override
     public String[] getProvidedSourceNames() {
         return new String[] { SESSION_STATE_SOURCE_NAME,
             IS_SUPER_ADMIN_MODE_SOURCE_NAME, HAS_WORKING_CENTER_SOURCE_NAME,
             HAS_CLINIC_SHIPMENT_RIGHTS, HAS_DISPATCH_RIGHTS,
-            IS_CURRENT_CENTER_ADMIN_SOURCE_NAME };
+            IS_CURRENT_CENTER_ADMIN_SOURCE_NAME, HAS_PRINTER_LABELS_RIGHTS };
     }
 
     @Override
@@ -45,6 +47,8 @@ public class SessionState extends AbstractSourceProvider {
             Boolean.toString(hasDispatchRights));
         currentStateMap.put(IS_CURRENT_CENTER_ADMIN_SOURCE_NAME,
             Boolean.toString(isCurrentCenterAdmin));
+        currentStateMap.put(HAS_PRINTER_LABELS_RIGHTS,
+            Boolean.toString(hasPrinterLabelsRights));
         return currentStateMap;
     }
 
@@ -96,6 +100,14 @@ public class SessionState extends AbstractSourceProvider {
             hasDispatchRights);
     }
 
+    private void setHasPrinterLabelsRights(boolean hasPrinterLabelsRights) {
+        if (this.hasPrinterLabelsRights == hasPrinterLabelsRights)
+            return; // no change
+        this.hasPrinterLabelsRights = hasPrinterLabelsRights;
+        fireSourceChanged(ISources.WORKBENCH, HAS_PRINTER_LABELS_RIGHTS,
+            hasPrinterLabelsRights);
+    }
+
     public void setUser(User user) {
         setSuperAdminMode(user != null && user.isInSuperAdminMode());
         setHasWorkingCenter(user != null
@@ -106,5 +118,7 @@ public class SessionState extends AbstractSourceProvider {
             && user.canPerformActions(SecurityFeature.DISPATCH_REQUEST));
         setIsCurrentCenterAdmin(user != null
             && user.isAdministratorForCurrentCenter());
+        setHasPrinterLabelsRights(user != null
+            && user.canPerformActions(SecurityFeature.PRINTER_LABELS));
     }
 }
