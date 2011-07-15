@@ -48,11 +48,11 @@ public class GridContainerDisplay extends AbstractGridDisplay {
         int indexCol) {
         String text = super.getDefaultTextForBox(cells, indexRow, indexCol);
         if (text.isEmpty()) {
-            return "";
+            return ""; //$NON-NLS-1$
         }
 
         if (getCellHeight() <= HEIGHT_TWO_LINES) {
-            return text + " " + getContainerTypeText(cells, indexRow, indexCol);
+            return text + " " + getContainerTypeText(cells, indexRow, indexCol); //$NON-NLS-1$
         }
         return text;
     }
@@ -64,13 +64,13 @@ public class GridContainerDisplay extends AbstractGridDisplay {
         if (getCellHeight() > HEIGHT_TWO_LINES) {
             return getContainerTypeText(cells, indexRow, indexCol);
         }
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     protected String getContainerTypeText(
         Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
         int indexCol) {
-        String sname = "";
+        String sname = ""; //$NON-NLS-1$
         if (cells != null) {
             ContainerCell cell = (ContainerCell) cells.get(new RowColPos(
                 indexRow, indexCol));
@@ -78,9 +78,9 @@ public class GridContainerDisplay extends AbstractGridDisplay {
                 && (cell.getContainer() != null)
                 && (cell.getContainer().getContainerType() != null)
                 && (cell.getContainer().getContainerType().getNameShort() != null))
-                sname = "("
+                sname = "(" //$NON-NLS-1$
                     + cell.getContainer().getContainerType().getNameShort()
-                    + ")";
+                    + ")"; //$NON-NLS-1$
         }
         return sname;
     }

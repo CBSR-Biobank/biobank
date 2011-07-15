@@ -46,7 +46,6 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -109,7 +108,7 @@ public class LoginDialog extends TitleAreaDialog {
         servers = new ArrayList<String>();
         userNames = new ArrayList<String>();
 
-        pluginPrefs = new InstanceScope().getNode(Application.PLUGIN_ID);
+        pluginPrefs = InstanceScope.INSTANCE.getNode(Application.PLUGIN_ID);
         Preferences prefsUserNames = pluginPrefs.node(SAVED_USER_NAMES);
 
         IPreferenceStore prefsStore = BiobankPlugin.getDefault()
@@ -136,16 +135,16 @@ public class LoginDialog extends TitleAreaDialog {
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        shell.setText(Messages.getString("LoginDialog.main.title")); //$NON-NLS-1$
+        shell.setText(Messages.LoginDialog_main_title);
     }
 
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-        setTitle(Messages.getString("LoginDialog.title")); //$NON-NLS-1$
+        setTitle(Messages.LoginDialog_title);
         setTitleImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_LOGINWIZ));
-        setMessage(Messages.getString("LoginDialog.description")); //$NON-NLS-1$
+        setMessage(Messages.LoginDialog_description);
         return contents;
     }
 
@@ -170,11 +169,9 @@ public class LoginDialog extends TitleAreaDialog {
 
         String lastServer = pluginPrefs.get(LAST_SERVER, ""); //$NON-NLS-1$
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
-            Messages.getString("LoginDialog.field.server.validation.msg")); //$NON-NLS-1$
-        serverWidget = createWritableCombo(
-            contents,
-            Messages.getString("LoginDialog.field.server.label"), //$NON-NLS-1$
-            servers.toArray(new String[0]),
+            Messages.LoginDialog_server_validation_msg);
+        serverWidget = createWritableCombo(contents,
+            Messages.LoginDialog_server_label, servers.toArray(new String[0]),
             Authentication.SERVER_PROPERTY_NAME, lastServer, validator);
 
         NonEmptyStringValidator userNameValidator = null;
@@ -182,8 +179,7 @@ public class LoginDialog extends TitleAreaDialog {
         if (BiobankPlugin.getDefault().isDebugging()) {
             new Label(contents, SWT.NONE);
             secureConnectionButton = new Button(contents, SWT.CHECK);
-            secureConnectionButton.setText(Messages
-                .getString("LoginDialog.field.secure.connection")); //$NON-NLS-1$
+            secureConnectionButton.setText("Use secure connection"); //$NON-NLS-1$
             secureConnectionButton.setSelection(lastServer
                 .contains(DEFAULT_SECURE_PORT));
 
@@ -197,26 +193,23 @@ public class LoginDialog extends TitleAreaDialog {
             });
         } else {
             userNameValidator = new NonEmptyStringValidator(
-                Messages.getString("LoginDialog.field.user.validation.msg")); //$NON-NLS-1$
+                Messages.LoginDialog_user_validation_msg);
             passwordValidator = new NonEmptyStringValidator(
-                Messages.getString("LoginDialog.field.password.validaton.msg")); //$NON-NLS-1$
+                Messages.LoginDialog_password_validaton_msg);
         }
 
-        userNameWidget = createWritableCombo(
-            contents,
-            Messages.getString("LoginDialog.field.user.label"), //$NON-NLS-1$
-            userNames.toArray(new String[0]),
+        userNameWidget = createWritableCombo(contents,
+            Messages.LoginDialog_user_label, userNames.toArray(new String[0]),
             Authentication.USERNAME_PROPERTY_NAME,
             pluginPrefs.get(LAST_USER_NAME, ""), userNameValidator); //$NON-NLS-1$
 
         passwordWidget = createPassWordText(contents,
-            Messages.getString("LoginDialog.field.password.label"), //$NON-NLS-1$
+            Messages.LoginDialog_password_label,
             Authentication.PASSWORD_PROPERTY_NAME, passwordValidator);
 
         new Label(contents, SWT.NONE);
         superAdminWidget = new Button(contents, SWT.CHECK);
-        superAdminWidget.setText(Messages
-            .getString("LoginDialog.field.superAdmin")); //$NON-NLS-1$
+        superAdminWidget.setText(Messages.LoginDialog_superAdmin_label);
 
         bindChangeListener();
 
@@ -319,8 +312,8 @@ public class LoginDialog extends TitleAreaDialog {
             new URL(DEFAULT_UNSECURE_PREFIX + serverWidget.getText());
         } catch (MalformedURLException e) {
             MessageDialog.openError(getShell(),
-                Messages.getString("LoginDialog.field.server.url.error.title"), //$NON-NLS-1$
-                Messages.getString("LoginDialog.field.server.url.error.msg")); //$NON-NLS-1$
+                Messages.LoginDialog_serverUrl_error_title,
+                Messages.LoginDialog_serverUrl_error_msg);
             return;
         }
 
@@ -335,8 +328,8 @@ public class LoginDialog extends TitleAreaDialog {
             // }
             if (userNameWidget.getText().equals("")) { //$NON-NLS-1$
                 MessageDialog.openError(getShell(),
-                    Messages.getString("LoginDialog.field.user.error.title"), //$NON-NLS-1$
-                    Messages.getString("LoginDialog.field.user.error.msg")); //$NON-NLS-1$
+                    Messages.LoginDialog_user_error_title,
+                    Messages.LoginDialog_user_validation_msg);
                 return;
             }
         }
@@ -356,9 +349,9 @@ public class LoginDialog extends TitleAreaDialog {
                 // super admin mode
                 sessionHelper.getUser().setInSuperAdminMode(true);
                 if (!sessionHelper.getUser().isInSuperAdminMode())
-                    BgcPlugin
-                        .openAsyncError("Super administrator",
-                            "You don't have rights to connect as super administrator");
+                    BgcPlugin.openAsyncError(
+                        Messages.LoginDialog_superAdmin_error_title,
+                        Messages.LoginDialog_superAdmin_error_msg);
             }
             selectWorkingCenter(sessionHelper);
             if (sessionHelper.getUser().isInSuperAdminMode()
@@ -420,20 +413,16 @@ public class LoginDialog extends TitleAreaDialog {
                 sessionHelper.getAppService());
             // }
         } catch (Exception e) {
-            BgcPlugin
-                .openAsyncError(Messages
-                    .getString("LoginDialog.working.center.error.title"), e); //$NON-NLS-1$
+            BgcPlugin.openAsyncError(
+                Messages.LoginDialog_workingCenter_error_title, e);
         }
         if (workingCenters != null) {
             if (workingCenters.size() == 0) {
                 if (!sessionHelper.getUser().isSuperAdministrator())
                     // cannot access the application.
-                    BgcPlugin
-                        .openAsyncError(
-                            Messages
-                                .getString("LoginDialog.working.center.error.title"), //$NON-NLS-1$
-                            Messages
-                                .getString("LoginDialog.no.working.center.error.msg")); //$NON-NLS-1$
+                    BgcPlugin.openAsyncError(
+                        Messages.LoginDialog_workingCenter_error_title,
+                        Messages.LoginDialog_noWorkingCenter_error_msg);
             } else if (workingCenters.size() == 1
                 && !sessionHelper.getUser().isInSuperAdminMode())
                 sessionHelper.getUser().setCurrentWorkingCenter(
@@ -446,10 +435,9 @@ public class LoginDialog extends TitleAreaDialog {
             && !sessionHelper.getUser().isInSuperAdminMode())
             if (sessionHelper.getUser().isSuperAdministrator()) {
                 // connect in admin mode
-                BgcPlugin.openAsyncInformation(Messages
-                    .getString("LoginDialog.working.center.admin.title"), //$NON-NLS-1$
-                    Messages
-                        .getString("LoginDialog.no.working.center.admin.msg")); //$NON-NLS-1$
+                BgcPlugin.openAsyncInformation(
+                    Messages.LoginDialog_workingCenter_admin_title,
+                    Messages.LoginDialog_noWorkingCenter_admin_msg);
                 // open the administration perspective if another
                 // perspective is open
                 sessionHelper.getUser().setInSuperAdminMode(true);
@@ -462,21 +450,15 @@ public class LoginDialog extends TitleAreaDialog {
                         workbench.showPerspective(MainPerspective.ID,
                             activeWindow);
                     } catch (WorkbenchException e) {
-                        BgcPlugin
-                            .openAsyncError(
-                                Messages
-                                    .getString("LoginDialog.perspective.open.error.msg"), //$NON-NLS-1$
-                                e);
+                        BgcPlugin.openAsyncError(
+                            "Error while opening main perspective", e); //$NON-NLS-1$
                     }
                 }
             } else {
                 // can't connect without a working center
-                BgcPlugin
-                    .openAsyncError(
-                        Messages
-                            .getString("LoginDialog.working.center.selection.error.title"), //$NON-NLS-1$
-                        Messages
-                            .getString("LoginDialog.working.center.selection.error.msg")); //$NON-NLS-1$
+                BgcPlugin.openAsyncError(
+                    Messages.LoginDialog_workingCenterSelection_error_title,
+                    Messages.LoginDialog_workingCenterSelection_error_msg);
             }
     }
 
@@ -518,4 +500,5 @@ public class LoginDialog extends TitleAreaDialog {
             return server + "/" + username + "/" + password; //$NON-NLS-1$ //$NON-NLS-2$ 
         }
     }
+
 }

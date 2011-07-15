@@ -16,7 +16,7 @@ public class TelephoneNumberValidator extends AbstractValidator {
     public IStatus validate(Object value) {
         if (!(value instanceof String)) {
             throw new RuntimeException(
-                "Not supposed to be called for non-strings.");
+                Messages.TelephoneNumberValidator_nonstring_error_msg);
         }
 
         String v = (String) value;

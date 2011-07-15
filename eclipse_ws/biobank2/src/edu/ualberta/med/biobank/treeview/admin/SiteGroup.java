@@ -22,12 +22,12 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public class SiteGroup extends AdapterBase {
 
     public SiteGroup(SessionAdapter parent, int id) {
-        super(parent, id, "All Sites", true, false);
+        super(parent, id, Messages.SiteGroup_sites_node_label, true, false);
     }
 
     @Override
     public void openViewForm() {
-        Assert.isTrue(false, "should not be called");
+        Assert.isTrue(false, "should not be called"); //$NON-NLS-1$
     }
 
     @Override
@@ -44,7 +44,7 @@ public class SiteGroup extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (SessionManager.canCreate(SiteWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add Site");
+            mi.setText(Messages.SiteGroup_add_label);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

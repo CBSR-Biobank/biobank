@@ -6,7 +6,6 @@ import java.util.TreeMap;
 
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
@@ -36,21 +35,15 @@ public class DispatchReceiveScanDialog extends
     @Override
     protected void addExtraCells() {
         if (extras != null && extras.size() > 0) {
-            BgcPlugin
-                .openAsyncInformation(
-                    Messages
-                        .getString("DispatchReceiveScanDialog.notInDispatch.error.title"), //$NON-NLS-1$
-                    Messages
-                        .getString("DispatchReceiveScanDialog.notInDispatch.error.msg")); //$NON-NLS-1$
+            BgcPlugin.openAsyncInformation(
+                Messages.DispatchReceiveScanDialog_notInDispatch_error_title,
+                Messages.DispatchReceiveScanDialog_notInDispatch_error_msg);
             try {
                 currentShipment.addSpecimens(extras,
                     DispatchSpecimenState.EXTRA);
             } catch (Exception e) {
-                BgcPlugin
-                    .openAsyncError(
-                        Messages
-                            .getString("DispatchReceiveScanDialog.flagging.error.title"), //$NON-NLS-1$
-                        e);
+                BgcPlugin.openAsyncError(
+                    Messages.DispatchReceiveScanDialog_flagging_error_title, e);
             }
         }
     }
@@ -85,7 +78,7 @@ public class DispatchReceiveScanDialog extends
                     .size());
 
             palletScanned.put(new RowColPos(6, 6), new PalletCell(new ScanCell(
-                6, 6, "aaar")));
+                6, 6, "aaar"))); //$NON-NLS-1$
         }
         return palletScanned;
     }

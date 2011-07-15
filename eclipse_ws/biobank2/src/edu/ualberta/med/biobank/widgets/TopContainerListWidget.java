@@ -36,7 +36,7 @@ public class TopContainerListWidget {
     private class NameFilter extends ViewerFilter {
         @Override
         public boolean select(Viewer viewer, Object top, Object child) {
-            if (filterText.equals(""))
+            if (filterText.equals("")) //$NON-NLS-1$
                 return true;
             return filterText.startsWith(((ContainerWrapper) child).getLabel());
         }
@@ -50,9 +50,9 @@ public class TopContainerListWidget {
 
     @SuppressWarnings("unchecked")
     public TopContainerListWidget(final Composite parent, FormToolkit toolkit) {
-        filterText = "";
+        filterText = ""; //$NON-NLS-1$
         enabled = true;
-        toolkit.createLabel(parent, "Site:");
+        toolkit.createLabel(parent, Messages.TopContainerListWidget_site_label);
         final BiobankApplicationService appService = SessionManager
             .getAppService();
         siteCombo = new ComboViewer(parent, SWT.NONE);
@@ -66,12 +66,13 @@ public class TopContainerListWidget {
         try {
             sites = SiteWrapper.getSites(appService);
             SiteWrapper allsites = new SiteWrapper(appService);
-            allsites.setNameShort("All Sites");
+            allsites.setNameShort(Messages.TopContainerListWidget_all_label);
             sites.add(allsites);
             siteCombo.setInput(sites);
             GuiUtil.reset(siteCombo, sites.get(0));
         } catch (Exception e1) {
-            BgcPlugin.openAsyncError("Failed to load sites", e1);
+            BgcPlugin.openAsyncError(
+                Messages.TopContainerListWidget_load_error_title, e1);
         }
         siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
@@ -82,7 +83,8 @@ public class TopContainerListWidget {
                         SiteWrapper s = (SiteWrapper) ((IStructuredSelection) siteCombo
                             .getSelection()).getFirstElement();
                         if (s != null) {
-                            if (s.getNameShort().equals("All Sites")) {
+                            if (s.getNameShort().equals(
+                                Messages.TopContainerListWidget_all_label)) {
                                 List<SiteWrapper> sites = SiteWrapper
                                     .getSites(appService);
                                 for (SiteWrapper site : sites) {
@@ -94,8 +96,10 @@ public class TopContainerListWidget {
                             }
                         }
                     } catch (Exception e) {
-                        BgcPlugin.openAsyncError("Error retrieving containers",
-                            e);
+                        BgcPlugin
+                            .openAsyncError(
+                                Messages.TopContainerListWidget_retrieve_error_title,
+                                e);
                     }
                     topContainers.setInput(containers);
                     filterBy(filterText);
@@ -105,17 +109,19 @@ public class TopContainerListWidget {
         });
         siteCombo.getCombo().setLayoutData(
             new GridData(SWT.FILL, SWT.FILL, true, true));
-        toolkit.createLabel(parent, "Top Containers\n(select one or more):");
+        toolkit.createLabel(parent,
+            Messages.TopContainerListWidget_topContainers_label);
         topContainers = new ListViewer(parent, SWT.MULTI | SWT.BORDER);
         topContainers.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
                 return ((ContainerWrapper) element).getLabel()
-                    + "("
+                    + "(" //$NON-NLS-1$
                     + ((ContainerWrapper) element).getContainerType()
-                        .getNameShort() + ") ("
+                        .getNameShort()
+                    + ") (" //$NON-NLS-1$
                     + ((ContainerWrapper) element).getSite().getNameShort()
-                    + ")";
+                    + ")"; //$NON-NLS-1$
             }
         });
         topContainers.setContentProvider(new ArrayContentProvider());

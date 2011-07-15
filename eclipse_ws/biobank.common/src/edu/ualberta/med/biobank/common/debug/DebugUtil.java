@@ -26,15 +26,15 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DebugUtil {
 
-    private static final String RANDOM_LINKED_ALIQUOTED_SPECIMENS_QRY = "select children from "
+    private static final String RANDOM_LINKED_ALIQUOTED_SPECIMENS_QRY = "select children from " //$NON-NLS-1$
         + Center.class.getName()
-        + " as center join center."
+        + " as center join center." //$NON-NLS-1$
         + CenterPeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as pevents join pevents."
+        + " as pevents join pevents." //$NON-NLS-1$
         + ProcessingEventPeer.SPECIMEN_COLLECTION.getName()
-        + " as srcSpcs join srcSpcs."
+        + " as srcSpcs join srcSpcs." //$NON-NLS-1$
         + SpecimenPeer.CHILD_SPECIMEN_COLLECTION.getName()
-        + " as children where center." + CenterPeer.ID.getName() + "=?";
+        + " as children where center." + CenterPeer.ID.getName() + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
     public static List<SpecimenWrapper> getRandomLinkedAliquotedSpecimens(
         WritableApplicationService appService, Integer siteId)
@@ -62,15 +62,15 @@ public class DebugUtil {
         return getRandomAssignedSpecimens(appService, siteId, null);
     }
 
-    private static final String RANDOM_ASSIGNED_SPECIMENS_BASE_QRY = "select specimen from "
+    private static final String RANDOM_ASSIGNED_SPECIMENS_BASE_QRY = "select specimen from " //$NON-NLS-1$
         + Site.class.getName()
-        + " as site join site."
+        + " as site join site." //$NON-NLS-1$
         + SitePeer.CONTAINER_COLLECTION.getName()
-        + " as cont join cont."
+        + " as cont join cont." //$NON-NLS-1$
         + ContainerPeer.SPECIMEN_POSITION_COLLECTION.getName()
-        + " as spcpos join spcpos."
+        + " as spcpos join spcpos." //$NON-NLS-1$
         + SpecimenPositionPeer.SPECIMEN.getName()
-        + " as specimen where site." + SitePeer.ID.getName() + "=?";
+        + " as specimen where site." + SitePeer.ID.getName() + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
     public static List<SpecimenWrapper> getRandomAssignedSpecimens(
         WritableApplicationService appService, Integer siteId, Integer studyId)
@@ -81,10 +81,10 @@ public class DebugUtil {
         StringBuilder qry = new StringBuilder(
             RANDOM_ASSIGNED_SPECIMENS_BASE_QRY);
         if (studyId != null) {
-            qry.append(" and a."
+            qry.append(" and a." //$NON-NLS-1$
                 + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
                     CollectionEventPeer.PATIENT, PatientPeer.STUDY,
-                    StudyPeer.ID) + "=?");
+                    StudyPeer.ID) + "=?"); //$NON-NLS-1$
             params.add(studyId);
         }
 
@@ -103,22 +103,22 @@ public class DebugUtil {
             SpecimenWrapper.class);
     }
 
-    private static final String RANDOM_NON_ASSIGNED_NON_DISPATCHED_SPECIMENS_QRY = "select spec from "
+    private static final String RANDOM_NON_ASSIGNED_NON_DISPATCHED_SPECIMENS_QRY = "select spec from " //$NON-NLS-1$
         + Site.class.getName()
-        + " as site left join site."
+        + " as site left join site." //$NON-NLS-1$
         + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as pe left join pe."
+        + " as pe left join pe." //$NON-NLS-1$
         + ProcessingEventPeer.SPECIMEN_COLLECTION.getName()
-        + " as srcSpcs left join srcSpcs."
+        + " as srcSpcs left join srcSpcs." //$NON-NLS-1$
         + SpecimenPeer.CHILD_SPECIMEN_COLLECTION.getName()
-        + " as spec left join spec."
+        + " as spec left join spec." //$NON-NLS-1$
         + SpecimenPeer.SPECIMEN_POSITION.getName()
-        + " as spcpos where spcpos is null"
-        + " and site."
+        + " as spcpos where spcpos is null" //$NON-NLS-1$
+        + " and site." //$NON-NLS-1$
         + SitePeer.ID.getName()
-        + "=? and spec."
+        + "=? and spec." //$NON-NLS-1$
         + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
-            ActivityStatusPeer.NAME) + "!='Dispatched'";
+            ActivityStatusPeer.NAME) + "!='Dispatched'"; //$NON-NLS-1$
 
     public static List<SpecimenWrapper> getRandomNonAssignedNonDispatchedSpecimens(
         WritableApplicationService appService, Integer siteId, Integer maxSize)
@@ -143,13 +143,13 @@ public class DebugUtil {
             SpecimenWrapper.class);
     }
 
-    private static final String RANDOM_NON_DISPATCHED_SPECIMENS_QRY = "from "
+    private static final String RANDOM_NON_DISPATCHED_SPECIMENS_QRY = "from " //$NON-NLS-1$
         + Specimen.class.getName()
-        + " where "
+        + " where " //$NON-NLS-1$
         + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
-        + "=? and "
+        + "=? and " //$NON-NLS-1$
         + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
-            ActivityStatusPeer.NAME) + "!='Dispatched'";
+            ActivityStatusPeer.NAME) + "!='Dispatched'"; //$NON-NLS-1$
 
     public static List<SpecimenWrapper> getRandomNonDispatchedSpecimens(
         WritableApplicationService appService, Integer centerId, Integer maxSize)

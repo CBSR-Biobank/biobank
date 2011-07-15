@@ -19,6 +19,8 @@ import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
  */
 public class Drawer36Display extends AbstractContainerDisplay {
 
+    public static final String CONTAINER_NAME = "Drawer 36"; //$NON-NLS-1$
+
     public static final int SQUARE_CELL_WIDTH = 70;
 
     public static final int RECTANGLE_CELL_WIDTH = SQUARE_CELL_WIDTH * 2;

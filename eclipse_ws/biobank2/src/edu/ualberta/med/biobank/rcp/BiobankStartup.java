@@ -31,7 +31,7 @@ public class BiobankStartup implements IStartup {
                         .getString(
                             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH);
                     // check if the activity logs path is set...
-                    if (logSave && logPath.equals("")) {
+                    if (logSave && logPath.equals("")) { //$NON-NLS-1$
                         ActivityLogLocationDialog dlg2 = new ActivityLogLocationDialog(
                             window.getShell());
                         dlg2.open();

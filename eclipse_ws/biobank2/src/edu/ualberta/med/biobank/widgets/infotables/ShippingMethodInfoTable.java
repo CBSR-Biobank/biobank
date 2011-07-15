@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class ShippingMethodInfoTable extends
     InfoTableWidget<ShippingMethodWrapper> {
 
-    private static final String[] HEADINGS = new String[] { "Shipping method" };
+    private static final String[] HEADINGS = new String[] { Messages.ShippingMethodInfoTable_ship_label };
 
     public ShippingMethodInfoTable(Composite parent,
         List<ShippingMethodWrapper> sampleStorageCollection) {
@@ -27,15 +27,15 @@ public class ShippingMethodInfoTable extends
                 ShippingMethodWrapper item = (ShippingMethodWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.ShippingMethodInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
                     return item.getName();
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };

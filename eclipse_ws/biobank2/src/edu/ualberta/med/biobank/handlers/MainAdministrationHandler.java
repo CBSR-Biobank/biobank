@@ -22,7 +22,7 @@ public class MainAdministrationHandler extends AbstractHandler implements
                 workbench.showPerspective(MainPerspective.ID,
                     workbench.getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
-            throw new ExecutionException("Error while opening Main perpective",
+            throw new ExecutionException(Messages.MainAdministrationHandler_main_persp_error,
                 e);
         }
         return null;

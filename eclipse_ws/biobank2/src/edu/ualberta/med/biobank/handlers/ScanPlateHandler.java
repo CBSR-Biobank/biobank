@@ -18,12 +18,12 @@ public class ScanPlateHandler extends AbstractHandler implements IHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        FormInput input = new FormInput(null, "Scan Plate");
+        FormInput input = new FormInput(null, Messages.ScanPlateHandler_scan_label);
         try {
             return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, ScanPlateForm.ID, false);
         } catch (PartInitException e) {
-            logger.error("Can't open form with id " + ScanPlateForm.ID, e);
+            logger.error("Can't open form with id " + ScanPlateForm.ID, e); //$NON-NLS-1$
             return null;
         }
     }

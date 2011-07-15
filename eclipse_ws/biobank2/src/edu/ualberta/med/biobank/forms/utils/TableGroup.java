@@ -13,7 +13,7 @@ public abstract class TableGroup<T extends ModelWrapper<?>> implements Node {
     protected ItemState state;
     protected String alternateLabel;
     protected List<Node> tops;
-    protected static final Pattern p = Pattern.compile("/");
+    protected static final Pattern p = Pattern.compile("/"); //$NON-NLS-1$
     protected Node parent = null;
 
     protected TableGroup(ItemState state, T request) {
@@ -39,7 +39,7 @@ public abstract class TableGroup<T extends ModelWrapper<?>> implements Node {
 
     public String getTitle() {
         return (alternateLabel == null ? state.getLabel() : alternateLabel)
-            + " (" + numSpecimens + ")";
+            + " (" + numSpecimens + ")"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     protected abstract void createAdapterTree(ItemState state, T request)

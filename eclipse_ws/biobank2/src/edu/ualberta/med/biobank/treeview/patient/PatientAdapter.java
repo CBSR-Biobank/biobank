@@ -35,7 +35,7 @@ public class PatientAdapter extends AdapterBase {
             try {
                 hasChildren = patientWrapper.getCollectionEventCount(true) > 0;
             } catch (Exception e) {
-                logger.error("error counting events in patient", e);
+                logger.error("error counting events in patient", e); //$NON-NLS-1$
             }
             setHasChildren(hasChildren);
         }
@@ -48,7 +48,7 @@ public class PatientAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         PatientWrapper patientWrapper = getWrapper();
-        Assert.isNotNull(patientWrapper, "patient is null");
+        Assert.isNotNull(patientWrapper, "patient is null"); //$NON-NLS-1$
         return patientWrapper.getPnumber();
     }
 
@@ -58,9 +58,9 @@ public class PatientAdapter extends AdapterBase {
         if (patient != null) {
             StudyWrapper study = patient.getStudy();
             if (study != null)
-                return study.getName() + " - " + getTooltipText("Patient");
+                return study.getName() + " - " + getTooltipText(Messages.PatientAdapter_patient_label); //$NON-NLS-1$
         }
-        return getTooltipText("Patient");
+        return getTooltipText(Messages.PatientAdapter_patient_label);
     }
 
     @Override
@@ -71,14 +71,14 @@ public class PatientAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Patient");
-        addViewMenu(menu, "Patient");
-        addDeleteMenu(menu, "Patient");
+        addEditMenu(menu, Messages.PatientAdapter_patient_label);
+        addViewMenu(menu, Messages.PatientAdapter_patient_label);
+        addDeleteMenu(menu, Messages.PatientAdapter_patient_label);
 
         if (isEditable()
             && SessionManager.canCreate(CollectionEventWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add Collection Event");
+            mi.setText(Messages.PatientAdapter_add_cevent_label);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -131,7 +131,7 @@ public class PatientAdapter extends AdapterBase {
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this patient?";
+        return Messages.PatientAdapter_delete_confirm_msg;
     }
 
     @Override

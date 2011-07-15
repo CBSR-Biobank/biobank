@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.views.LoggingView;
 
 public class LoggingHandler extends AbstractHandler {
 
-    public static final String LOGGING_COMMAND_ID = "edu.ualberta.med.biobank.commands.logging";
+    public static final String LOGGING_COMMAND_ID = "edu.ualberta.med.biobank.commands.logging"; //$NON-NLS-1$
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -23,7 +23,7 @@ public class LoggingHandler extends AbstractHandler {
         try {
             page.showView(LoggingView.ID);
         } catch (PartInitException e) {
-            throw new ExecutionException("View cannot be opened", e);
+            throw new ExecutionException(Messages.LoggingHandler_view_open_error, e);
         }
         return null;
     }

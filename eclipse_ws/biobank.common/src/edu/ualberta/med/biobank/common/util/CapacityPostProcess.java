@@ -18,7 +18,7 @@ public class CapacityPostProcess extends AbstractRowPostProcess {
         if (object != null) {
             Object[] castOb = (Object[]) object;
             Object[] rowObject = new Object[castOb.length + 1];
-            DecimalFormat format = new DecimalFormat("#0.00%");
+            DecimalFormat format = new DecimalFormat("#0.00%"); //$NON-NLS-1$
             for (int i = 0; i < castOb.length; i++)
                 rowObject[i] = castOb[i];
             rowObject[castOb.length] = format.format(((Long) castOb[col2])

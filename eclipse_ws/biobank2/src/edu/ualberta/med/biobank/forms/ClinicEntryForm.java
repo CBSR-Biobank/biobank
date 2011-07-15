@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -12,15 +13,14 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
@@ -31,14 +31,11 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ClinicEntryForm extends AddressEntryFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.ClinicEntryForm"; //$NON-NLS-1$
 
-    private static final String MSG_NEW_CLINIC_OK = Messages
-        .getString("ClinicEntryForm.creation.msg"); //$NON-NLS-1$
+    private static final String MSG_NEW_CLINIC_OK = Messages.ClinicEntryForm_creation_msg;
 
-    private static final String MSG_CLINIC_OK = Messages
-        .getString("ClinicEntryForm.msg.ok"); //$NON-NLS-1$
+    private static final String MSG_CLINIC_OK = Messages.ClinicEntryForm_msg_ok;
 
-    private static final String MSG_NO_CLINIC_NAME = Messages
-        .getString("ClinicEntryForm.msg.noClinicName"); //$NON-NLS-1$
+    private static final String MSG_NO_CLINIC_NAME = Messages.ClinicEntryForm_msg_noClinicName;
 
     private ClinicAdapter clinicAdapter;
 
@@ -67,11 +64,11 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         String tabName;
         if (clinic.isNew()) {
-            tabName = Messages.getString("ClinicEntryForm.title.new"); //$NON-NLS-1$
+            tabName = Messages.ClinicEntryForm_title_new;
             clinic.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else
-            tabName = Messages.getString("ClinicEntryForm.title.edit", //$NON-NLS-1$
+            tabName = NLS.bind(Messages.ClinicEntryForm_title_edit,
                 clinic.getNameShort());
         setPartName(tabName);
     }
@@ -86,10 +83,10 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void createFormContent() throws ApplicationException {
-        form.setText(Messages.getString("ClinicEntryForm.main.title")); //$NON-NLS-1$
+        form.setText(Messages.ClinicEntryForm_main_title);
         page.setLayout(new GridLayout(1, false));
-        toolkit.createLabel(page,
-            Messages.getString("ClinicEntryForm.main.description"), SWT.LEFT); //$NON-NLS-1$
+        toolkit.createLabel(page, Messages.ClinicEntryForm_main_description,
+            SWT.LEFT);
         createClinicInfoSection();
         createAddressArea(clinic);
         createContactSection();
@@ -106,26 +103,25 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.NONE, Messages.getString("label.name"), null, clinic, //$NON-NLS-1$
+            SWT.NONE, Messages.label_name, null, clinic,
             ClinicPeer.NAME.getName(), new NonEmptyStringValidator(
                 MSG_NO_CLINIC_NAME)));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.getString("label.nameShort"), null, clinic, //$NON-NLS-1$
+            Messages.label_nameShort, null, clinic,
             ClinicPeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 MSG_NO_CLINIC_NAME));
 
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            Messages.getString("clinic.field.label.sendsShipments"), null, //$NON-NLS-1$
-            clinic, ClinicPeer.SENDS_SHIPMENTS.getName(), null);
+            Messages.clinic_field_label_sendsShipments, null, clinic,
+            ClinicPeer.SENDS_SHIPMENTS.getName(), null);
         toolkit.paintBordersFor(client);
 
-        activityStatusComboViewer = createComboViewer(
-            client,
-            Messages.getString("label.activity"), //$NON-NLS-1$
+        activityStatusComboViewer = createComboViewer(client,
+            Messages.label_activity,
             ActivityStatusWrapper.getAllActivityStatuses(appService),
             clinic.getActivityStatus(),
-            Messages.getString("ClinicEntryForm.activity.validator.msg"), //$NON-NLS-1$
+            Messages.ClinicEntryForm_activity_validator_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -135,20 +131,18 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             });
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.getString("label.comments"), null, clinic, //$NON-NLS-1$
+            Messages.label_comments, null, clinic,
             ClinicPeer.COMMENT.getName(), null);
     }
 
     private void createContactSection() {
-        Section section = createSection(Messages
-            .getString("clinic.contact.title")); //$NON-NLS-1$
+        Section section = createSection(Messages.clinic_contact_title);
 
         contactEntryWidget = new ContactEntryInfoTable(section, clinic);
         contactEntryWidget.adaptToToolkit(toolkit, true);
         contactEntryWidget.addSelectionChangedListener(listener);
 
-        addSectionToolbar(section,
-            Messages.getString("ClinicEntryForm.contact.button.add"), //$NON-NLS-1$
+        addSectionToolbar(section, Messages.ClinicEntryForm_contact_button_add,
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {

@@ -34,7 +34,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.SpecimenHierarchy;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -85,12 +84,11 @@ public class AliquotedSpecimenSelectionWidget {
                 SWT.LEFT);
         }
         if (!oneRow) {
-            sourceLabel = widgetCreator.createLabel(parent, "Source specimen");
+            sourceLabel = widgetCreator.createLabel(parent, Messages.AliquotedSpecimenSelectionWidget_sources_spec_title);
             sourceControlDecoration = BgcBaseWidget
                 .createDecorator(
                     sourceLabel,
-                    Messages
-                        .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
+                    Messages.AliquotedSpecimenSelectionWidget_selections_validation_msg);
         }
         cvSource = widgetCreator.createComboViewerWithoutLabel(parent, null,
             null, new BiobankLabelProvider());
@@ -99,8 +97,8 @@ public class AliquotedSpecimenSelectionWidget {
             @Override
             public String getText(Object element) {
                 SpecimenWrapper spc = (SpecimenWrapper) element;
-                return spc.getSpecimenType().getNameShort() + "("
-                    + spc.getInventoryId() + ")";
+                return spc.getSpecimenType().getNameShort() + "(" //$NON-NLS-1$
+                    + spc.getInventoryId() + ")"; //$NON-NLS-1$
             }
         });
         cvSource.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -119,12 +117,11 @@ public class AliquotedSpecimenSelectionWidget {
 
         if (!oneRow) {
             resultLabel = widgetCreator.createLabel(parent,
-                "Aliquoted specimen type");
+                Messages.AliquotedSpecimenSelectionWidget_aliquoted_spec_title);
             resultControlDecoration = BgcBaseWidget
                 .createDecorator(
                     resultLabel,
-                    Messages
-                        .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
+                    Messages.AliquotedSpecimenSelectionWidget_selections_validation_msg);
         }
         cvResult = widgetCreator.createComboViewerWithoutLabel(parent, null,
             null, new BiobankLabelProvider());
@@ -145,7 +142,7 @@ public class AliquotedSpecimenSelectionWidget {
             }
         });
         if (oneRow) {
-            textNumber = widgetCreator.getToolkit().createLabel(parent, "",
+            textNumber = widgetCreator.getToolkit().createLabel(parent, "", //$NON-NLS-1$
                 SWT.BORDER);
             GridData gd = new GridData();
             gd.widthHint = 20;
@@ -154,8 +151,7 @@ public class AliquotedSpecimenSelectionWidget {
             rowControlDecoration = BgcBaseWidget
                 .createDecorator(
                     textNumber,
-                    Messages
-                        .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
+                    Messages.AliquotedSpecimenSelectionWidget_selections_validation_msg);
         }
     }
 
@@ -221,7 +217,7 @@ public class AliquotedSpecimenSelectionWidget {
     public void setNumber(Integer number) {
         if (textNumber != null) {
             this.number = number;
-            String text = "";
+            String text = ""; //$NON-NLS-1$
             if (number != null) {
                 text = number.toString();
             }
@@ -317,8 +313,8 @@ public class AliquotedSpecimenSelectionWidget {
             public IStatus validate(Object value) {
                 if (value instanceof Boolean && !(Boolean) value) {
                     decoration.show();
-                    return ValidationStatus.error(Messages
-                        .getString("AliquotedSpecimenSelectionWidget.selections.status.msg"));
+                    return ValidationStatus
+                        .error(Messages.AliquotedSpecimenSelectionWidget_selections_status_msg);
                 } else {
                     decoration.hide();
                     return Status.OK_STATUS;

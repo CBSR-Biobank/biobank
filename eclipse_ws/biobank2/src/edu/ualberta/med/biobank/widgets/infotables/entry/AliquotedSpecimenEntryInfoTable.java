@@ -8,12 +8,12 @@ import java.util.Set;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -146,13 +146,11 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                             .openConfirm(
                                 PlatformUI.getWorkbench()
                                     .getActiveWorkbenchWindow().getShell(),
-                                Messages
-                                    .getString("AliquotedSpecimenEntryInfoTable.delete.title"),
-                                Messages
-                                    .getString(
-                                        "AliquotedSpecimenEntryInfoTable.delete.question",
-                                        aliquotedSpecimen.getSpecimenType()
-                                            .getName()))) {
+                                Messages.AliquotedSpecimenEntryInfoTable_delete_title,
+                                NLS.bind(
+                                    Messages.AliquotedSpecimenEntryInfoTable_delete_question,
+                                    aliquotedSpecimen.getSpecimenType()
+                                        .getName()))) {
                             return;
                         }
 

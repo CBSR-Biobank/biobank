@@ -20,6 +20,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.forms.BgcFormBase;
@@ -80,12 +81,12 @@ public abstract class BiobankFormBase extends BgcFormBase {
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
         if (!(input instanceof FormInput))
-            throw new PartInitException("Invalid editor input");
+            throw new PartInitException("Invalid editor input"); //$NON-NLS-1$
         FormInput formInput = (FormInput) input;
 
         adapter = (AdapterBase) formInput.getAdapter(AdapterBase.class);
         if (adapter != null) {
-            Assert.isNotNull(adapter, "Bad editor input (null value)");
+            Assert.isNotNull(adapter, "Bad editor input (null value)"); //$NON-NLS-1$
             appService = (BiobankApplicationService) adapter.getAppService();
             if (!formInput.hasPreviousForm()) {
                 currentLinkedForms = new ArrayList<BgcFormBase>();
@@ -155,7 +156,12 @@ public abstract class BiobankFormBase extends BgcFormBase {
 
     public static void setTextValue(BgcBaseText label, Object value) {
         if (value != null) {
-            setTextValue(label, value.toString());
+            String stringValue;
+            if (value instanceof Number)
+                stringValue = NumberFormatter.format((Number) value);
+            else
+                stringValue = value.toString();
+            setTextValue(label, stringValue);
         }
     }
 

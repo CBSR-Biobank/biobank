@@ -14,7 +14,7 @@ public class SpecimenLinkHandler extends LinkAssignCommonHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         openLinkAssignPerspective(SpecimenLinkEntryForm.ID, new SpecimenLinkAdapter(
-            SessionManager.getInstance().getSession(), 0, "Specimen Link",
+            SessionManager.getInstance().getSession(), 0, Messages.SpecimenLinkHandler_specimen_link_label,
             false, false));
         return null;
     }

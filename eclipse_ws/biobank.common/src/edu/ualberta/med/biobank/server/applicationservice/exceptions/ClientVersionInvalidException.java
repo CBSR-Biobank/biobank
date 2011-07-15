@@ -4,16 +4,17 @@ public class ClientVersionInvalidException extends BiobankServerException {
 
     private static final long serialVersionUID = 1L;
 
-    public ClientVersionInvalidException(String message) {
-        super(message);
-    }
-
-    public ClientVersionInvalidException(String message, Throwable cause) {
-        super(message, cause);
+    public ClientVersionInvalidException() {
+        super();
     }
 
     public ClientVersionInvalidException(Throwable cause) {
         super(cause);
     }
 
+    @Override
+    public String getMessage() {
+        return Messages
+            .getString("ClientVersionInvalidException.compatibility.error.msg"); //$NON-NLS-1$
+    }
 }

@@ -13,6 +13,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
+import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -20,11 +21,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
 public class SpecimenTypeDialog extends BgcBaseDialog {
-
-    private static final String TITLE = "Specimen Type ";
-
-    private static final String MSG_NO_ST_NAME = "Specimen type must have a name.";
-    private static final String MSG_NO_ST_SNAME = "Specimen type must have a short name.";
 
     // this is the object that is modified via the bound widgets
     private SpecimenTypeWrapper specimenType;
@@ -53,8 +49,8 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
                 allOthersTypesObjects.put(id, type);
             }
         }
-        currentTitle = ((specimenType.getName() == null) ? "Add " : "Edit ")
-            + TITLE;
+        currentTitle = (specimenType.getName() == null ? Messages.SpecimenTypeDialog_title_add
+            : Messages.SpecimenTypeDialog_title_edit);
     }
 
     @Override
@@ -79,15 +75,18 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            "Name", null, specimenType, "name", new NonEmptyStringValidator(
-                MSG_NO_ST_NAME));
+            Messages.SpecimenTypeDialog_name_label, null, specimenType,
+            SpecimenTypePeer.NAME.getName(), new NonEmptyStringValidator(
+                Messages.SpecimenTypeDialog_name_validation_msg));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            "Short Name", null, specimenType, "nameShort",
-            new NonEmptyStringValidator(MSG_NO_ST_SNAME));
+            Messages.SpecimenTypeDialog_nameShort_label, null, specimenType,
+            SpecimenTypePeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
+                Messages.SpecimenTypeDialog_shortName_validation_msg));
 
         multiSelectChildren = new MultiSelectWidget(content, SWT.NONE,
-            "Available types", "Child types", 300);
+            Messages.SpecimenTypeDialog_availableTypes_label,
+            Messages.SpecimenTypeDialog_selectedTypes_label, 300);
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.widthHint = 700;

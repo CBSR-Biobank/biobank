@@ -8,12 +8,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -46,7 +46,7 @@ public class PalletScanManagement {
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) {
-                monitor.beginTask("Scan and process...",
+                monitor.beginTask(Messages.PalletScanManagement_scan_progress,
                     IProgressMonitor.UNKNOWN);
                 try {
                     launchScan(monitor, plateToScan, profile, isRescanMode);
@@ -57,14 +57,15 @@ public class PalletScanManagement {
                     scanAndProcessError(null);
                 } catch (Exception e) {
                     BgcPlugin
-                        .openAsyncError(Messages
-                            .getString("linkAssign.dialog.scanError.title"), //$NON-NLS-1$
+                        .openAsyncError(
+                            Messages.PalletScanManagement_dialog_scanError_title,
                             e);
                     String msg = e.getMessage();
                     if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
                         msg = e.getCause().getMessage();
                     }
-                    scanAndProcessError("ERROR: " + msg);
+                    scanAndProcessError(Messages.PalletScanManagement_error_title
+                        + msg);
                 }
                 monitor.done();
             }
@@ -80,7 +81,7 @@ public class PalletScanManagement {
 
     private void launchScan(IProgressMonitor monitor, String plateToScan,
         String profile, boolean rescanMode) throws Exception {
-        monitor.subTask("Launching scan");
+        monitor.subTask(Messages.PalletScanManagement_launching);
         beforeScan();
         Map<RowColPos, PalletCell> oldCells = cells;
         if (BiobankPlugin.isRealScanEnabled()) {
@@ -88,8 +89,12 @@ public class PalletScanManagement {
                 plateToScan);
             if (plateNum == -1) {
                 plateError();
-                BgcPlugin.openAsyncError("Scan error", "Plate with barcode "
-                    + plateToScan + " is not enabled");
+                BgcPlugin
+                    .openAsyncError(
+                        Messages.PalletScanManagement_scan_error_title,
+                        NLS.bind(
+                            Messages.PalletScanManagement_scan_error_msg_notenabled,
+                            plateToScan));
                 return;
             } else {
                 ScanCell[][] scanCells = null;
@@ -97,11 +102,9 @@ public class PalletScanManagement {
                     scanCells = ScannerConfigPlugin.scan(plateNum, profile);
                     cells = PalletCell.convertArray(scanCells);
                 } catch (Exception ex) {
-                    BgcPlugin
-                        .openAsyncError(
-                            "Scan error", //$NON-NLS-1$
-                            ex,
-                            "Barcodes can still be scanned with the handheld 2D scanner.");
+                    BgcPlugin.openAsyncError(
+                        Messages.PalletScanManagement_scan_error_title, ex,
+                        Messages.PalletScanManagement_scan_error_msg_2dScanner);
                     return;
                 } finally {
                     scansCount++;
@@ -177,7 +180,9 @@ public class PalletScanManagement {
                         try {
                             postprocessScanTubeAlone(cell);
                         } catch (Exception ex) {
-                            BgcPlugin.openAsyncError("Scan tube error", ex);
+                            BgcPlugin.openAsyncError(
+                                Messages.PalletScanManagement_tube_error_title,
+                                ex);
                         }
                     }
                 }

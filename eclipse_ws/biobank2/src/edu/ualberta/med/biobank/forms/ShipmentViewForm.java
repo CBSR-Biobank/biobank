@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -20,7 +21,7 @@ public class ShipmentViewForm extends BiobankViewForm {
     private static BgcLogger logger = BgcLogger
         .getLogger(ShipmentViewForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ShipmentViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ShipmentViewForm"; //$NON-NLS-1$
 
     private ShipmentAdapter shipmentAdapter;
 
@@ -47,7 +48,7 @@ public class ShipmentViewForm extends BiobankViewForm {
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ShipmentAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         shipmentAdapter = (ShipmentAdapter) adapter;
@@ -60,7 +61,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         try {
             originInfo.reload();
         } catch (Exception ex) {
-            logger.error("Error while retrieving shipment "
+            logger.error("Error while retrieving shipment " //$NON-NLS-1$
                 + originInfo.getShipmentInfo().getWaybill(), ex);
         }
     }
@@ -75,7 +76,7 @@ public class ShipmentViewForm extends BiobankViewForm {
     }
 
     private void createSpecimensSection() {
-        Composite client = createSectionWithClient("Specimens");
+        Composite client = createSectionWithClient(Messages.ShipmentViewForm_specimens_title);
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -94,20 +95,22 @@ public class ShipmentViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        senderLabel = createReadOnlyLabelledField(client, SWT.NONE, "Sender");
+        senderLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.ShipmentViewForm_sender_label);
         receiverLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Receiver");
-        waybillLabel = createReadOnlyLabelledField(client, SWT.NONE, "Waybill");
+            Messages.ShipmentViewForm_receiver_label);
+        waybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.ShipmentViewForm_waybill_label);
         shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Shipping Method");
+            Messages.ShipmentViewForm_shipmethod_label);
         if (originInfo.getShipmentInfo().getShippingMethod().needDate()) {
             departedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Packed");
+                Messages.ShipmentViewForm_packed_label);
         }
         boxNumberLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Box number");
+            Messages.ShipmentViewForm_boxNber_label);
         dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Received");
+            Messages.ShipmentViewForm_received_label);
         commentLabel = createReadOnlyLabelledField(client,
             SWT.WRAP | SWT.MULTI, "Comment");
 
@@ -128,7 +131,7 @@ public class ShipmentViewForm extends BiobankViewForm {
             setTextValue(departedLabel, shipInfo.getFormattedDatePacked());
         }
         setTextValue(shippingMethodLabel,
-            shipMethod == null ? "" : shipMethod.getName());
+            shipMethod == null ? "" : shipMethod.getName()); //$NON-NLS-1$
 
         setTextValue(boxNumberLabel, shipInfo.getBoxNumber());
         setTextValue(dateReceivedLabel, shipInfo.getFormattedDateReceived());
@@ -146,15 +149,15 @@ public class ShipmentViewForm extends BiobankViewForm {
     }
 
     private void setPartName() {
-        setPartName("Shipment "
-            + originInfo.getShipmentInfo().getFormattedDateReceived());
+        setPartName(NLS.bind(Messages.ShipmentViewForm_title, originInfo
+            .getShipmentInfo().getFormattedDateReceived()));
     }
 
     private void setFormText() {
         if (!form.isDisposed()) {
-            form.setText("Shipment received on "
-                + originInfo.getShipmentInfo().getFormattedDateReceived()
-                + " from " + originInfo.getCenter().getNameShort());
+            form.setText(NLS.bind(Messages.ShipmentViewForm_form_title,
+                originInfo.getShipmentInfo().getFormattedDateReceived(),
+                originInfo.getCenter().getNameShort()));
         }
     }
 

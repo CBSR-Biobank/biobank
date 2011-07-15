@@ -12,9 +12,9 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
 
-    private static final String[] HEADINGS = new String[] { "Site", "User",
-        "Date", "Action", "Type", "Patient #", "Inventory ID", "Location",
-        "Details" };
+    private static final String[] HEADINGS = new String[] { Messages.LoggingInfoTable_site_label, Messages.LoggingInfoTable_user_label,
+        Messages.LoggingInfoTable_date_label, Messages.LoggingInfoTable_action_label, Messages.LoggingInfoTable_type_label, Messages.LoggingInfoTable_pnumber_label, Messages.LoggingInfoTable_inventoryid_label, Messages.LoggingInfoTable_location_label,
+        Messages.LoggingInfoTable_details_label };
 
     private static final int PAGE_SIZE_ROWS = 20;
 
@@ -37,7 +37,7 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
         public String toString() {
             return StringUtils.join(new String[] { center, user, date, action,
                 type, patientNumber, inventoryId, positionLabel, details },
-                "\t");
+                "\t"); //$NON-NLS-1$
         }
     }
 
@@ -49,9 +49,9 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
                 TableRowData item = getCollectionModelObject((LogWrapper) element);
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.LoggingInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
@@ -73,7 +73,7 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
                 case 8:
                     return item.details;
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };
@@ -93,7 +93,7 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
         Date logQueryDate = logQuery.getCreatedAt();
         if (logQueryDate != null) {
             SimpleDateFormat dateTimeSecond = new SimpleDateFormat(
-                "yyyy-MM-dd HH:mm:ss");
+                "yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
             info.date = dateTimeSecond.format(logQueryDate);
         } else {
             info.date = null;

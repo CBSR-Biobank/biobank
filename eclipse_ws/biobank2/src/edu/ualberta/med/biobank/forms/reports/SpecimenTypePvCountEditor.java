@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SpecimenTypePvCountEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.AliquotCountEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.AliquotCountEditor"; //$NON-NLS-1$
 
     private ComboViewer studyCombo;
 
@@ -21,8 +21,9 @@ public class SpecimenTypePvCountEditor extends ReportsEditor {
     protected void createOptionSection(Composite parent) throws Exception {
         List<StudyWrapper> studies = StudyWrapper.getAllStudies(SessionManager
             .getAppService());
-        studyCombo = widgetCreator.createComboViewer(parent, "Study:", studies,
-            null, new BiobankLabelProvider());
+        studyCombo = widgetCreator.createComboViewer(parent,
+            Messages.SpecimenTypePvCountEditor_study_label, studies, null,
+            new BiobankLabelProvider());
         studyCombo.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {
@@ -42,14 +43,17 @@ public class SpecimenTypePvCountEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Patient Number", "First Time Processed",
-            "First Time Drawn", "Sample Type", "Total" };
+        return new String[] { Messages.SampleTypePvCountEditor_pnumber_label,
+            Messages.SampleTypePvCountEditor_first_processed_label,
+            Messages.SampleTypePvCountEditor_first_drawn_label,
+            Messages.SampleTypePvCountEditor_specType_label,
+            Messages.SampleTypePvCountEditor_total_label };
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> name = new ArrayList<String>();
-        name.add("Study");
+        name.add(Messages.SpecimenTypePvCountEditor_study_label);
         return name;
     }
 

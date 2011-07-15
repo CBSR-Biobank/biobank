@@ -1,13 +1,13 @@
 package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
@@ -48,14 +48,13 @@ public class ClinicViewForm extends AddressViewFormCommon {
         clinicAdapter = (ClinicAdapter) adapter;
         clinic = clinicAdapter.getWrapper();
         clinic.reload();
-        setPartName(Messages.getString("ClinicViewForm.title", //$NON-NLS-1$
+        setPartName(NLS.bind(Messages.ClinicViewForm_title,
             clinic.getNameShort()));
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("ClinicViewForm.title", //$NON-NLS-1$
-            clinic.getName()));
+        form.setText(NLS.bind(Messages.ClinicViewForm_title, clinic.getName()));
 
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
@@ -73,21 +72,19 @@ public class ClinicViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(client);
 
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.name")); //$NON-NLS-1$
+            Messages.label_name);
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.nameShort")); //$NON-NLS-1$
+            Messages.label_nameShort);
         hasShipmentsButton = (Button) createLabelledWidget(client,
-            Button.class, SWT.NONE,
-            Messages.getString("clinic.field.label.sendsShipments")); //$NON-NLS-1$
+            Button.class, SWT.NONE, Messages.clinic_field_label_sendsShipments);
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.activity")); //$NON-NLS-1$
+            Messages.label_activity);
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.getString("label.comments")); //$NON-NLS-1$
+            Messages.label_comments);
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("ClinicViewForm.field.label.totalPatients")); //$NON-NLS-1$
+            Messages.ClinicViewForm_field_label_totalPatients);
         ceventTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages
-                .getString("ClinicViewForm.field.label.totalCollectionEvents")); //$NON-NLS-1$
+            Messages.ClinicViewForm_field_label_totalCollectionEvents);
 
         setClinicValues();
     }
@@ -103,8 +100,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     private void createContactsSection() {
-        Composite client = createSectionWithClient(Messages
-            .getString("clinic.contact.title")); //$NON-NLS-1$
+        Composite client = createSectionWithClient(Messages.clinic_contact_title);
 
         contactsTable = new ContactInfoTable(client,
             clinic.getContactCollection(false));
@@ -113,8 +109,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     protected void createStudiesSection() {
-        Composite client = createSectionWithClient(Messages
-            .getString("ClinicViewForm.studies.title")); //$NON-NLS-1$
+        Composite client = createSectionWithClient(Messages.ClinicViewForm_studies_title);
 
         studiesTable = new ClinicStudyInfoTable(client, clinic);
         studiesTable.adaptToToolkit(toolkit, true);
@@ -126,10 +121,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
     @Override
     public void reload() throws Exception {
         clinic.reload();
-        setPartName(Messages
-            .getString("ClinicViewForm.title", clinic.getName())); //$NON-NLS-1$
-        form.setText(Messages.getString("ClinicViewForm.title", //$NON-NLS-1$
-            clinic.getName()));
+        setPartName(NLS.bind(Messages.ClinicViewForm_title, clinic.getName()));
+        form.setText(NLS.bind(Messages.ClinicViewForm_title, clinic.getName()));
         setClinicValues();
         setAddressValues(clinic);
         contactsTable.setCollection(clinic.getContactCollection(true));

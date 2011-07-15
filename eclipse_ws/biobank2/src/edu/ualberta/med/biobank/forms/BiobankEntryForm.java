@@ -77,6 +77,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public abstract class BiobankEntryForm extends BiobankFormBase implements
     IBgcEntryForm {
 
+    private static final String CONTEXT_ENTRY_FORM = "biobank.context.entryForm"; //$NON-NLS-1$
+
     private static BgcLogger logger = BgcLogger
         .getLogger(BiobankEntryForm.class.getName());
 
@@ -135,8 +137,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         if (!formActions.getConfirmAction().isEnabled()) {
             monitor.setCanceled(true);
             setDirty(true);
-            BgcPlugin.openAsyncError("Form state",
-                "Form in invalid state, save failed.");
+            BgcPlugin.openAsyncError(
+                Messages.BiobankEntryForm_state_error_title,
+                Messages.BiobankEntryForm_state_error_msg);
             return;
         }
         doSaveInternal(monitor);
@@ -154,8 +157,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                     throws InvocationTargetException, InterruptedException {
 
                     try {
-                        monitor
-                            .beginTask("Saving...", IProgressMonitor.UNKNOWN);
+                        monitor.beginTask(Messages.BiobankEntryForm_saving,
+                            IProgressMonitor.UNKNOWN);
                         saveForm();
                         monitor.done();
                     } catch (final RemoteConnectFailureException exp) {
@@ -193,7 +196,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                             }
                         });
                         monitor.setCanceled(true);
-                        BgcPlugin.openAsyncError("Save error", bce);
+                        BgcPlugin.openAsyncError(
+                            Messages.BiobankEntryForm_save_error_title, bce);
                     } catch (BiobankServerException bse) {
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
@@ -202,7 +206,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                             }
                         });
                         monitor.setCanceled(true);
-                        BgcPlugin.openAsyncError("Save error", bse);
+                        BgcPlugin.openAsyncError(
+                            Messages.BiobankEntryForm_save_error_title, bse);
                     } catch (Exception e) {
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
@@ -251,7 +256,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         if (adapter != null && adapter.getModelObject() != null
             && !adapter.getModelObject().canUpdate(SessionManager.getUser())) {
             BgcPlugin.openAccessDeniedErrorMessage();
-            throw new RuntimeException("Cannot edit. Access Denied.");
+            throw new RuntimeException(
+                Messages.BiobankEntryForm_access_denied_error_msg);
         }
     }
 
@@ -273,7 +279,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
 
         IContextService contextService = (IContextService) getSite()
             .getService(IContextService.class);
-        contextService.activateContext("biobank.context.entryForm");
+        contextService.activateContext(CONTEXT_ENTRY_FORM);
     }
 
     abstract protected void saveForm() throws Exception;
@@ -281,7 +287,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     @Override
     public void setFocus() {
         super.setFocus();
-        Assert.isNotNull(firstControl, "first control widget is not set");
+        Assert.isNotNull(firstControl, "first control widget is not set"); //$NON-NLS-1$
         if (!firstControl.isDisposed()) {
             firstControl.setFocus();
         }
@@ -471,7 +477,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                 closeEntryOpenView(true, true);
             }
         } catch (Exception e) {
-            logger.error("Can't save the form", e);
+            logger.error("Can't save the form", e); //$NON-NLS-1$
         }
     }
 
@@ -501,7 +507,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                 && !adapter.getModelObject().isNew();
             closeEntryOpenView(true, openView);
         } catch (Exception e) {
-            logger.error("Can't cancel the form", e);
+            logger.error("Can't cancel the form", e); //$NON-NLS-1$
         }
     }
 
@@ -533,12 +539,4 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
      */
     public abstract String getNextOpenedFormID();
 
-    // protected BasicSiteCombo createBasicSiteCombo(Composite parent,
-    // boolean canUpdateOnly, ComboSelectionUpdate csu) {
-    // Label label = widgetCreator.createLabel(parent, "Repository Site");
-    // BasicSiteCombo siteCombo = new BasicSiteCombo(parent, widgetCreator,
-    // appService, label, canUpdateOnly, csu);
-    // siteCombo.adaptToToolkit(toolkit, true);
-    // return siteCombo;
-    // }
 }

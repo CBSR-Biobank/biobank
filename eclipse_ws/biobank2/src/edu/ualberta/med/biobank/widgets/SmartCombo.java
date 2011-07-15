@@ -133,7 +133,7 @@ public class SmartCombo extends Composite {
     }
 
     protected void reset() {
-        refineList("");
+        refineList(""); //$NON-NLS-1$
         combo.setVisibleItemCount(combo.getItemCount());
         combo.select(0);
         Event event = new Event();
@@ -163,7 +163,7 @@ public class SmartCombo extends Composite {
         if (combo.getItemCount() > 0)
             return combo.getItem(0);
         else
-            return "";
+            return ""; //$NON-NLS-1$
     }
 
     public void setInput(String[] items) {

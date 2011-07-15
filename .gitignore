@@ -51,3 +51,13 @@ runtime-biobank2.product1/
 schema/schema-export.sql
 product/buildDirectory
 product/output.txt
+docs/javaClientUserGuide/*.toc
+docs/javaClientUserGuide/*.log
+docs/javaClientUserGuide/*.aux
+docs/javaClientUserGuide/*.make
+docs/javaClientUserGuide/*.pdf
+docs/javaClientUserGuide/*.out
+docs/javaClientUserGuide/*.d
+docs/javaClientUserGuide/*.fls
+docs/javaClientUserGuide/*.lof
+docs/javaClientUserGuide/*.tdo

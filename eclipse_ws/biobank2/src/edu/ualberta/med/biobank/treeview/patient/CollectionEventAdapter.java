@@ -4,10 +4,10 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -37,22 +37,19 @@ public class CollectionEventAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         CollectionEventWrapper cevent = getWrapper();
-        Assert.isNotNull(cevent, "collection event is null");
-
+        Assert.isNotNull(cevent, "collection event is null"); //$NON-NLS-1$
         long count = -1;
         try {
             count = cevent.getSourceSpecimensCount(false);
         } catch (Exception e) {
-            logger.error("Problem counting specimens", e);
+            logger.error("Problem counting specimens", e); //$NON-NLS-1$
         }
-
-        return new StringBuilder("#")
-            .append(cevent.getVisitNumber())
-            .append(" - ")
+        return new StringBuilder("#") //$NON-NLS-1$ 
+            .append(cevent.getVisitNumber()).append(" - ") //$NON-NLS-1$ 
             .append(
                 DateFormatter.formatAsDateTime(cevent
-                    .getMinSourceSpecimenDate())).append(" [").append(count)
-            .append("]").toString();
+                    .getMinSourceSpecimenDate())).append(" [").append(count) //$NON-NLS-1$ 
+            .append("]").toString(); //$NON-NLS-1$ 
     }
 
     @Override
@@ -60,36 +57,35 @@ public class CollectionEventAdapter extends AdapterBase {
         String tabName = null;
         if (modelObject != null)
             if (modelObject.isNew()) {
-                tabName = Messages
-                    .getString("CollectionEventEntryForm.title.new");
+                tabName = Messages.CollectionEventEntryForm_title_new;
                 try {
                     ((CollectionEventWrapper) modelObject)
                         .setActivityStatus(ActivityStatusWrapper
                             .getActiveActivityStatus(SessionManager
                                 .getAppService()));
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError("Error",
-                        "Unable to create collection event.");
+                    BgcPlugin.openAsyncError(
+                        Messages.CollectionEventAdapter_error_title,
+                        Messages.CollectionEventAdapter_create_error_msg);
                 }
             } else {
-                CollectionEventWrapper cevent = (CollectionEventWrapper) modelObject;
-                tabName = Messages.getString(
-                    "CollectionEventEntryForm.title.edit", cevent.getPatient()
-                        .getPnumber(), cevent.getVisitNumber());
+                tabName = NLS.bind(
+                    Messages.CollectionEventEntryForm_title_edit,
+                    ((CollectionEventWrapper) modelObject).getVisitNumber());
             }
         return tabName;
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Collection Event");
-        addViewMenu(menu, "Collection Event");
-        addDeleteMenu(menu, "Collection Event");
+        addEditMenu(menu, Messages.CollectionEventAdapter_cevent_label);
+        addViewMenu(menu, Messages.CollectionEventAdapter_cevent_label);
+        addDeleteMenu(menu, Messages.CollectionEventAdapter_cevent_label);
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this collection event?";
+        return Messages.CollectionEventAdapter_delete_confirm_msg;
     }
 
     @Override

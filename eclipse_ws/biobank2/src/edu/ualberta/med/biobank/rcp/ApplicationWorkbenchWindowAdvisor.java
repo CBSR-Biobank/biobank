@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbench;
@@ -58,7 +59,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         String windowTitle = product.getName();
 
         if (BiobankPlugin.getDefault().windowTitleShowVersionEnabled()) {
-            windowTitle += " " + product.getDefiningBundle().getVersion();
+            windowTitle += " " + product.getDefiningBundle().getVersion(); //$NON-NLS-1$
         }
         return windowTitle;
     }
@@ -82,9 +83,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     @Override
     public void postWindowOpen() {
+        P2Util.checkForUpdates();
+
         IStatusLineManager statusline = getWindowConfigurer()
             .getActionBarConfigurer().getStatusLineManager();
-        statusline.setMessage(null, "Application ready");
+        statusline.setMessage(null,
+            Messages.ApplicationWorkbenchWindowAdvisor_ready_msg);
 
         IWorkbench workbench = PlatformUI.getWorkbench();
         IWorkbenchWindow activeWindow = workbench.getActiveWorkbenchWindow();
@@ -95,7 +99,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                 workbench.showPerspective(ProcessingPerspective.ID,
                     activeWindow);
             } catch (WorkbenchException e) {
-                logger.error("Error while opening patients perpective", e);
+                logger.error("Error while opening patients perpective", e); //$NON-NLS-1$
             }
         }
         page.addPartListener(new BiobankPartListener());
@@ -123,13 +127,13 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                             mainWindowUpdateTitle(SessionManager.getUser());
                             ServerMsgStatusItem.getInstance().setServerName(
                                 new StringBuffer(SessionManager.getUser()
-                                    .getLogin()).append("@")
+                                    .getLogin()).append("@") //$NON-NLS-1$
                                     .append(SessionManager.getServer())
                                     .toString());
                         } else if (sourceValue
                             .equals(BgcSessionState.LOGGED_OUT)) {
                             mainWindowResetTitle();
-                            ServerMsgStatusItem.getInstance().setServerName("");
+                            ServerMsgStatusItem.getInstance().setServerName(""); //$NON-NLS-1$
                         }
                     }
                 }
@@ -148,7 +152,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     private void activateIfNotInPerspective(String currentPerspectiveId,
         String notId) {
         if (!currentPerspectiveId.equals(notId))
-            BindingContextHelper.activateContextInWorkbench("not." + notId);
+            BindingContextHelper.activateContextInWorkbench("not." + notId); //$NON-NLS-1$
     }
 
     private void mainWindowResetTitle() {
@@ -172,7 +176,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         StringBuffer newTitle = new StringBuffer(getWindowTitle());
 
         if (currentCenterText != null) {
-            newTitle.append(" - Center ").append(currentCenterText);
+            newTitle.append(" - ").append( //$NON-NLS-1$
+                NLS.bind(Messages.ApplicationWorkbenchWindowAdvisor_center_text, currentCenterText));
         }
 
         String newTitleString = newTitle.toString();

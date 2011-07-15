@@ -5,6 +5,10 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class BiobankServerException extends ApplicationException {
     private static final long serialVersionUID = 1L;
 
+    public BiobankServerException() {
+        super();
+    }
+
     public BiobankServerException(String message) {
         super(message);
     }
@@ -16,4 +20,5 @@ public class BiobankServerException extends ApplicationException {
     public BiobankServerException(Throwable cause) {
         super(cause);
     }
+
 }

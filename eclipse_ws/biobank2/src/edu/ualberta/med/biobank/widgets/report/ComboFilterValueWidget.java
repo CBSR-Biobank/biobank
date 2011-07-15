@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Control;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 public class ComboFilterValueWidget implements FilterValueWidget {
-    private static final String DEFAULT_TEXT = "<select or enter value>";
+    private static final String DEFAULT_TEXT = Messages.ComboFilterValueWidget_select_enter_text;
     private final ComboViewer comboViewer;
     private boolean isShowingDefaultText;
 
@@ -71,7 +71,7 @@ public class ComboFilterValueWidget implements FilterValueWidget {
     public void setValues(Collection<ReportFilterValue> values) {
         Combo combo = comboViewer.getCombo();
         if (!combo.isDisposed()) {
-            combo.setText("");
+            combo.setText(""); //$NON-NLS-1$
             for (ReportFilterValue value : values) {
                 if (value != null && value.getValue() != null) {
                     combo.setText(value.getValue());
@@ -119,7 +119,7 @@ public class ComboFilterValueWidget implements FilterValueWidget {
             @Override
             public void focusGained(FocusEvent e) {
                 if (combo.getText().equals(DEFAULT_TEXT)) {
-                    combo.setText("");
+                    combo.setText(""); //$NON-NLS-1$
                     isShowingDefaultText = false;
                 }
             }

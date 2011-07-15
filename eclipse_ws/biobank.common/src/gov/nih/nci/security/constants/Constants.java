@@ -101,49 +101,49 @@ package gov.nih.nci.security.constants;
  *         Window - Preferences - Java - Code Style - Code Templates
  */
 public class Constants {
-    public static final String INITIAL_CONTEXT = "com.sun.jndi.ldap.LdapCtxFactory";
-    public static final String LDAP_HOST = "ldapHost";
-    public static final String LDAP_SEARCHABLE_BASE = "ldapSearchableBase";
-    public static final String LDAP_USER_ID_LABEL = "ldapUserIdLabel";
-    public static final String LDAP_ADMIN_USER_NAME = "ldapAdminUserName";
-    public static final String LDAP_ADMIN_PASSWORD = "ldapAdminPassword";
+    public static final String INITIAL_CONTEXT = "com.sun.jndi.ldap.LdapCtxFactory"; //$NON-NLS-1$
+    public static final String LDAP_HOST = "ldapHost"; //$NON-NLS-1$
+    public static final String LDAP_SEARCHABLE_BASE = "ldapSearchableBase"; //$NON-NLS-1$
+    public static final String LDAP_USER_ID_LABEL = "ldapUserIdLabel"; //$NON-NLS-1$
+    public static final String LDAP_ADMIN_USER_NAME = "ldapAdminUserName"; //$NON-NLS-1$
+    public static final String LDAP_ADMIN_PASSWORD = "ldapAdminPassword"; //$NON-NLS-1$
 
-    public static final String USER_LOGIN_ID = "USER_LOGIN_ID";
-    public static final String USER_PASSWORD = "USER_PASSWORD";
-    public static final String USER_FIRST_NAME = "USER_FIRST_NAME";
-    public static final String USER_LAST_NAME = "USER_LAST_NAME";
-    public static final String USER_EMAIL_ID = "USER_EMAIL_ID";
+    public static final String USER_LOGIN_ID = "USER_LOGIN_ID"; //$NON-NLS-1$
+    public static final String USER_PASSWORD = "USER_PASSWORD"; //$NON-NLS-1$
+    public static final String USER_FIRST_NAME = "USER_FIRST_NAME"; //$NON-NLS-1$
+    public static final String USER_LAST_NAME = "USER_LAST_NAME"; //$NON-NLS-1$
+    public static final String USER_EMAIL_ID = "USER_EMAIL_ID"; //$NON-NLS-1$
 
-    public static final String TABLE_NAME = "TABLE_NAME";
+    public static final String TABLE_NAME = "TABLE_NAME"; //$NON-NLS-1$
 
-    public static final String CSM_EXECUTE_PRIVILEGE = "EXECUTE";
-    public static final String CSM_ACCESS_PRIVILEGE = "ACCESS";
-    public static final String CSM_READ_PRIVILEGE = "READ";
-    public static final String CSM_WRITE_PRIVILEGE = "WRITE";
-    public static final String CSM_UPDATE_PRIVILEGE = "UPDATE";
-    public static final String CSM_DELETE_PRIVILEGE = "DELETE";
-    public static final String CSM_CREATE_PRIVILEGE = "CREATE";
+    public static final String CSM_EXECUTE_PRIVILEGE = "EXECUTE"; //$NON-NLS-1$
+    public static final String CSM_ACCESS_PRIVILEGE = "ACCESS"; //$NON-NLS-1$
+    public static final String CSM_READ_PRIVILEGE = "READ"; //$NON-NLS-1$
+    public static final String CSM_WRITE_PRIVILEGE = "WRITE"; //$NON-NLS-1$
+    public static final String CSM_UPDATE_PRIVILEGE = "UPDATE"; //$NON-NLS-1$
+    public static final String CSM_DELETE_PRIVILEGE = "DELETE"; //$NON-NLS-1$
+    public static final String CSM_CREATE_PRIVILEGE = "CREATE"; //$NON-NLS-1$
 
-    public static final String AUTHENTICATION = "authentication";
-    public static final String AUTHORIZATION = "authorization";
+    public static final String AUTHENTICATION = "authentication"; //$NON-NLS-1$
+    public static final String AUTHORIZATION = "authorization"; //$NON-NLS-1$
 
-    public static final String FILE_NAME_SUFFIX = ".csm.new.hibernate.cfg.xml";
-    public static final String APPLICATION_SECURITY_CONFIG_FILE = "ApplicationSecurityConfig.xml";
-    public static final String YES = "YES";
+    public static final String FILE_NAME_SUFFIX = ".csm.new.hibernate.cfg.xml"; //$NON-NLS-1$
+    public static final String APPLICATION_SECURITY_CONFIG_FILE = "ApplicationSecurityConfig.xml"; //$NON-NLS-1$
+    public static final String YES = "YES"; //$NON-NLS-1$
 
-    public static final String ENCRYPTION_ENABLED = "encryption-enabled";
+    public static final String ENCRYPTION_ENABLED = "encryption-enabled"; //$NON-NLS-1$
 
-    public static final String LOCKOUT_TIME = "1800000";
-    public static final String ALLOWED_LOGIN_TIME = "60000";
-    public static final String ALLOWED_ATTEMPTS = "6";
+    public static final String LOCKOUT_TIME = "1800000"; //$NON-NLS-1$
+    public static final String ALLOWED_LOGIN_TIME = "60000"; //$NON-NLS-1$
+    public static final String ALLOWED_ATTEMPTS = "6"; //$NON-NLS-1$
 
-    public static final String HIBERNATE_MYSQL_DIALECT = "org.hibernate.dialect.MySQLDialect";
-    public static final String CSM_FILTER_ALIAS = "z_csm_filter_alias_z";
-    public static final String CSM_FILTER_USER_QUERY_PART_ONE = "( select pe.attribute_value from csm_protection_group pg, csm_protection_element pe, csm_pg_pe pgpe, csm_user_group_role_pg ugrpg, csm_user u, csm_role_privilege rp, csm_role r, csm_privilege p where ugrpg.role_id = r.role_id and ugrpg.user_id = u.user_id and ugrpg.protection_group_id = ANY (select pg1.protection_group_id from csm_protection_group pg1 where pg1.protection_group_id = pg.protection_group_id or pg1.protection_group_id = (select pg2.parent_protection_group_id from csm_protection_group pg2 where pg2.protection_group_id = pg.protection_group_id)) and pg.protection_group_id = pgpe.protection_group_id and pgpe.protection_element_id = pe.protection_element_id and r.role_id = rp.role_id and rp.privilege_id = p.privilege_id and pe.object_id= '";
-    public static final String CSM_FILTER_USER_QUERY_PART_TWO = "' and p.privilege_name='READ' and u.login_name=:USER_NAME and pe.application_id=:APPLICATION_ID";
-    public static final String CSM_FILTER_GROUP_QUERY_PART_ONE = "( select distinct pe.attribute_value from csm_protection_group pg,    csm_protection_element pe,  csm_pg_pe pgpe, csm_user_group_role_pg ugrpg,   csm_group g,    csm_role_privilege rp,  csm_role r,     csm_privilege p where ugrpg.role_id = r.role_id and ugrpg.group_id = g.group_id and ugrpg.protection_group_id = any ( select pg1.protection_group_id from csm_protection_group pg1  where pg1.protection_group_id = pg.protection_group_id or pg1.protection_group_id =  (select pg2.parent_protection_group_id from csm_protection_group pg2 where pg2.protection_group_id = pg.protection_group_id) ) and pg.protection_group_id = pgpe.protection_group_id and pgpe.protection_element_id = pe.protection_element_id and r.role_id = rp.role_id and rp.privilege_id = p.privilege_id and pe.object_id= '";
-    public static final String CSM_FILTER_GROUP_QUERY_PART_TWO = "' and p.privilege_name='READ' and g.group_name IN (:GROUP_NAMES ) and pe.application_id=:APPLICATION_ID";
+    public static final String HIBERNATE_MYSQL_DIALECT = "org.hibernate.dialect.MySQLDialect"; //$NON-NLS-1$
+    public static final String CSM_FILTER_ALIAS = "z_csm_filter_alias_z"; //$NON-NLS-1$
+    public static final String CSM_FILTER_USER_QUERY_PART_ONE = "( select pe.attribute_value from csm_protection_group pg, csm_protection_element pe, csm_pg_pe pgpe, csm_user_group_role_pg ugrpg, csm_user u, csm_role_privilege rp, csm_role r, csm_privilege p where ugrpg.role_id = r.role_id and ugrpg.user_id = u.user_id and ugrpg.protection_group_id = ANY (select pg1.protection_group_id from csm_protection_group pg1 where pg1.protection_group_id = pg.protection_group_id or pg1.protection_group_id = (select pg2.parent_protection_group_id from csm_protection_group pg2 where pg2.protection_group_id = pg.protection_group_id)) and pg.protection_group_id = pgpe.protection_group_id and pgpe.protection_element_id = pe.protection_element_id and r.role_id = rp.role_id and rp.privilege_id = p.privilege_id and pe.object_id= '"; //$NON-NLS-1$
+    public static final String CSM_FILTER_USER_QUERY_PART_TWO = "' and p.privilege_name='READ' and u.login_name=:USER_NAME and pe.application_id=:APPLICATION_ID"; //$NON-NLS-1$
+    public static final String CSM_FILTER_GROUP_QUERY_PART_ONE = "( select distinct pe.attribute_value from csm_protection_group pg,    csm_protection_element pe,  csm_pg_pe pgpe, csm_user_group_role_pg ugrpg,   csm_group g,    csm_role_privilege rp,  csm_role r,     csm_privilege p where ugrpg.role_id = r.role_id and ugrpg.group_id = g.group_id and ugrpg.protection_group_id = any ( select pg1.protection_group_id from csm_protection_group pg1  where pg1.protection_group_id = pg.protection_group_id or pg1.protection_group_id =  (select pg2.parent_protection_group_id from csm_protection_group pg2 where pg2.protection_group_id = pg.protection_group_id) ) and pg.protection_group_id = pgpe.protection_group_id and pgpe.protection_element_id = pe.protection_element_id and r.role_id = rp.role_id and rp.privilege_id = p.privilege_id and pe.object_id= '"; //$NON-NLS-1$
+    public static final String CSM_FILTER_GROUP_QUERY_PART_TWO = "' and p.privilege_name='READ' and g.group_name IN (:GROUP_NAMES ) and pe.application_id=:APPLICATION_ID"; //$NON-NLS-1$
 
-    public static final String ENABLE = "enable";
+    public static final String ENABLE = "enable"; //$NON-NLS-1$
 
 }

@@ -46,7 +46,7 @@ public abstract class AdapterBase {
     private static BgcLogger logger = BgcLogger.getLogger(AdapterBase.class
         .getName());
 
-    protected static final String BGR_LOADING_LABEL = "loading...";
+    protected static final String BGR_LOADING_LABEL = Messages.AdapterBase_loading;
 
     protected IDeltaListener deltaListener = NullDeltaListener
         .getSoleInstance();
@@ -88,7 +88,7 @@ public abstract class AdapterBase {
             addListener(parent.deltaListener);
         }
         listeners = new ArrayList<AdapterChangedListener>();
-        Assert.isTrue(checkIntegrity(), "integrity checks failed");
+        Assert.isTrue(checkIntegrity(), "integrity checks failed"); //$NON-NLS-1$
     }
 
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
@@ -183,9 +183,9 @@ public abstract class AdapterBase {
     protected String getTooltipText(String string) {
         String name = getLabel();
         if (name == null) {
-            return new StringBuilder("New ").append(string).toString();
+            return new StringBuilder(Messages.AdapterBase_new_label).append(string).toString();
         }
-        return new StringBuilder(string).append(" ").append(name).toString();
+        return new StringBuilder(string).append(" ").append(name).toString(); //$NON-NLS-1$
     }
 
     public List<AdapterBase> getItems() {
@@ -254,7 +254,7 @@ public abstract class AdapterBase {
     public void insertAfter(AdapterBase existingNode, AdapterBase newNode) {
         int pos = children.indexOf(existingNode);
         Assert.isTrue(pos >= 0,
-            "existing node not found: " + existingNode.getLabel());
+            "existing node not found: " + existingNode.getLabel()); //$NON-NLS-1$
         newNode.setParent(this);
         children.add(pos + 1, newNode);
         newNode.addListener(deltaListener);
@@ -380,7 +380,7 @@ public abstract class AdapterBase {
         try {
             loadChildrenSemaphore.acquire();
         } catch (InterruptedException e) {
-            BgcPlugin.openAsyncError("Could not load children", e);
+            BgcPlugin.openAsyncError(Messages.AdapterBase_load_error_title, e);
         }
 
         if (loadChildrenInBackground) {
@@ -410,7 +410,7 @@ public abstract class AdapterBase {
             if (modelObject != null) {
                 text = modelObject.toString();
             }
-            logger.error("Error while loading children of node " + text, e);
+            logger.error("Error while loading children of node " + text, e); //$NON-NLS-1$
         } finally {
             loadChildrenSemaphore.release();
         }
@@ -476,12 +476,12 @@ public abstract class AdapterBase {
                     } catch (final RemoteAccessException exp) {
                         BgcPlugin.openRemoteAccessErrorMessage(exp);
                     } catch (Exception e) {
-                        String modelString = "'unknown'";
+                        String modelString = Messages.AdapterBase_unknow;
                         if (modelObject != null) {
                             modelString = modelObject.toString();
                         }
-                        logger.error("Error while loading children of node "
-                            + modelString + " in background", e);
+                        logger.error("Error while loading children of node " //$NON-NLS-1$
+                            + modelString + " in background", e); //$NON-NLS-1$
                     } finally {
                         loadChildrenSemaphore.release();
                     }
@@ -489,12 +489,12 @@ public abstract class AdapterBase {
             };
             childUpdateThread.start();
         } catch (Exception e) {
-            String nodeString = "null";
+            String nodeString = "null"; //$NON-NLS-1$
             if (modelObject != null) {
                 nodeString = modelObject.toString();
             }
             logger.error(
-                "Error while expanding children of node " + nodeString, e);
+                "Error while expanding children of node " + nodeString, e); //$NON-NLS-1$
             loadChildrenSemaphore.release();
         }
     }
@@ -504,7 +504,7 @@ public abstract class AdapterBase {
     protected void addEditMenu(Menu menu, String objectName) {
         if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Edit " + objectName);
+            mi.setText(Messages.AdapterBase_edit_label + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -516,7 +516,7 @@ public abstract class AdapterBase {
 
     protected void addViewMenu(Menu menu, String objectName) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("View " + objectName);
+        mi.setText(Messages.AdapterBase_view_label + objectName);
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -528,7 +528,7 @@ public abstract class AdapterBase {
     protected void addDeleteMenu(Menu menu, String objectName) {
         if (isDeletable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Delete " + objectName);
+            mi.setText(Messages.AdapterBase_delete_label + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -592,7 +592,7 @@ public abstract class AdapterBase {
                 .openEditor(input, id, focusOnEditor);
             return part;
         } catch (PartInitException e) {
-            logger.error("Can't open form with id " + id, e);
+            logger.error("Can't open form with id " + id, e); //$NON-NLS-1$
             return null;
         }
 
@@ -691,12 +691,12 @@ public abstract class AdapterBase {
     public void deleteWithConfirm() {
         String msg = getConfirmDeleteMessage();
         if (msg == null) {
-            throw new RuntimeException("adapter has no confirm delete msg: "
+            throw new RuntimeException("adapter has no confirm delete msg: " //$NON-NLS-1$
                 + getClass().getName());
         }
         boolean doDelete = true;
         if (msg != null)
-            doDelete = BgcPlugin.openConfirm("Confirm Delete", msg);
+            doDelete = BgcPlugin.openConfirm(Messages.AdapterBase_confirm_delete_title, msg);
         if (doDelete) {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
@@ -712,7 +712,7 @@ public abstract class AdapterBase {
                             modelObject.delete();
                             page.closeEditor(part, true);
                         } catch (Exception e) {
-                            BgcPlugin.openAsyncError("Delete failed", e);
+                            BgcPlugin.openAsyncError(Messages.AdapterBase_delete_error_title, e);
                             getParent().addChild(AdapterBase.this);
                             return;
                         }

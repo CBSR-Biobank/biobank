@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
 public class ProcessingPerspective implements IPerspectiveFactory {
 
-    public static final String ID = "edu.ualberta.med.biobank.perspective.processing";
+    public static final String ID = "edu.ualberta.med.biobank.perspective.processing"; //$NON-NLS-1$
 
     @Override
     public void createInitialLayout(IPageLayout layout) {

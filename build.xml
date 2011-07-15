@@ -648,7 +648,7 @@
     </dependset>
     <mkdir dir="${eclipse.proj.dir.tools}/output-validators" />
     <copy includeemptydirs="false"
-          todir="${eclipse.proj.dir.tools}/output-validators">
+          todir="${eclipse.proj.dir.tools}/output-validators" overwrite="true">
       <fileset dir="${eclipse.proj.dir.tools}/src">
         <exclude name="**/*.launch" />
         <exclude name="**/*.java" />
@@ -774,7 +774,7 @@
           depends="sdk-files,prepare-webapp-orm,package-codegen-orm,modelextender">
     <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
-    <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output">
+    <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output" overwrite="true">
       <fileset dir="${eclipse.proj.dir.common}/src">
         <exclude name="**/*.launch" />
         <exclude name="**/*.java" />
@@ -1161,6 +1161,10 @@
     <copy todir="${buildDirectory}/plugins/biobank2">
       <fileset dir="${eclipse.workspace.dir}/biobank2" />
     </copy>
+  	<!-- TODO : copy all project containing .nl1. into the plugins folder -->
+  	<copy todir="${buildDirectory}/plugins/biobank.nl1.fr_CA">
+  	      <fileset dir="${eclipse.workspace.dir}/biobank.nl1.fr_CA" />
+  	</copy>
     <copy todir="${buildDirectory}/plugins/scannerConfig">
       <fileset dir="${eclipse.workspace.dir}/scannerConfig" />
     </copy>

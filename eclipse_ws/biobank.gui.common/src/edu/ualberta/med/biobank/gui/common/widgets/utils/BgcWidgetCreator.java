@@ -182,7 +182,7 @@ public class BgcWidgetCreator {
                 bindingKey);
         } else {
             Assert.isTrue(false,
-                "invalid widget class " + widgetClass.getName());
+                "invalid widget class " + widgetClass.getName()); //$NON-NLS-1$
         }
         return null;
     }
@@ -216,7 +216,7 @@ public class BgcWidgetCreator {
         final Combo combo = new Combo(composite, SWT.READ_ONLY | SWT.BORDER
             | options);
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        Assert.isNotNull(widgetValues, "combo values not assigned");
+        Assert.isNotNull(widgetValues, "combo values not assigned"); //$NON-NLS-1$
         combo.setItems(widgetValues);
         if (toolkit != null) {
             toolkit.adapt(combo, true, true);
@@ -440,7 +440,7 @@ public class BgcWidgetCreator {
                 fieldLabel, errorMessage));
             UpdateValueStrategy uvs = new UpdateValueStrategy();
             uvs.setAfterGetValidator(validator);
-            IObservableValue selectedValue = new WritableValue("", String.class);
+            IObservableValue selectedValue = new WritableValue("", String.class); //$NON-NLS-1$
             Binding binding = dbc.bindValue(
                 SWTObservables.observeSelection(combo), selectedValue, uvs,
                 null);
@@ -489,7 +489,7 @@ public class BgcWidgetCreator {
         Label label = null;
         String text = fieldLabel;
         if (addColon) {
-            text += ":";
+            text += ":"; //$NON-NLS-1$
         }
         if (toolkit == null) {
             label = new Label(parent, options);
@@ -704,7 +704,7 @@ public class BgcWidgetCreator {
             }
             return field;
         } else if (widgetClass == Label.class) {
-            Label field = createLabel(parent, "", widgetOptions | SWT.LEFT
+            Label field = createLabel(parent, "", widgetOptions | SWT.LEFT //$NON-NLS-1$
                 | SWT.BORDER, false);
             if (value != null) {
                 field.setText(value);
@@ -717,7 +717,7 @@ public class BgcWidgetCreator {
             return button;
         } else {
             Assert.isTrue(false,
-                "invalid widget class " + widgetClass.getName());
+                "invalid widget class " + widgetClass.getName()); //$NON-NLS-1$
         }
         return null;
     }

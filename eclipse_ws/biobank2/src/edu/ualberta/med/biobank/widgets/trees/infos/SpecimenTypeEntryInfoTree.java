@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
@@ -84,14 +85,17 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                         selectedSpecimenTypes.add(specimenType);
                     }
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError("Save Failed", e);
+                    BgcPlugin.openAsyncError(
+                        Messages.SpecimenTypeEntryInfoTree_save_error_title, e);
                 }
                 reloadCollection(selectedSpecimenTypes);
             } else {
                 try {
                     specimenType.reload();
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError("Refresh Failed", e);
+                    BgcPlugin.openAsyncError(
+                        Messages.SpecimenTypeEntryInfoTree_refresh_error_title,
+                        e);
                 }
                 reloadCollection(selectedSpecimenTypes);
             }
@@ -124,18 +128,21 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                         if (!specType.isNew() && specType.isUsedBySpecimens()) {
                             BgcPlugin
                                 .openError(
-                                    "Specimen Type Delete Error",
-                                    "Cannot delete specimen type \""
-                                        + specType.getName()
-                                        + "\" since studies and/or patient visits are using it.");
+                                    Messages.SpecimenTypeEntryInfoTree_delete_error_title,
+                                    NLS.bind(
+                                        Messages.SpecimenTypeEntryInfoTree_delete_error_msg,
+                                        specType.getName()));
                             return;
                         }
 
-                        if (!MessageDialog.openConfirm(PlatformUI
-                            .getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(), "Delete Specimen Type",
-                            "Are you sure you want to delete specimen type \""
-                                + specType.getName() + "\"?")) {
+                        if (!MessageDialog
+                            .openConfirm(
+                                PlatformUI.getWorkbench()
+                                    .getActiveWorkbenchWindow().getShell(),
+                                Messages.SpecimenTypeEntryInfoTree_delete_question_title,
+                                NLS.bind(
+                                    Messages.SpecimenTypeEntryInfoTree_delete_question_msg,
+                                    specType.getName()))) {
                             return;
                         }
 
@@ -147,7 +154,7 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                     } catch (final RemoteConnectFailureException exp) {
                         BgcPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
-                        logger.error("BioBankFormBase.createPartControl Error",
+                        logger.error("BioBankFormBase.createPartControl Error", //$NON-NLS-1$
                             e);
                     }
                 }
@@ -162,9 +169,10 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                     && (sv.getName().equals(type.getName()) || sv
                         .getNameShort().equals(type.getNameShort())))
                     throw new BiobankCheckException(
-                        "That specimen type has already been added.");
+                        Messages.SpecimenTypeEntryInfoTree_already_added_error_msg);
         } catch (BiobankException bce) {
-            BgcPlugin.openAsyncError("Check error", bce);
+            BgcPlugin.openAsyncError(
+                Messages.SpecimenTypeEntryInfoTree_check_error_title, bce);
             return false;
         }
         return true;
@@ -180,7 +188,8 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
             setLists(SpecimenTypeWrapper.getAllSpecimenTypes(
                 SessionManager.getAppService(), true));
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("AppService unavailable", e);
+            BgcPlugin.openAsyncError(
+                Messages.SpecimenTypeEntryInfoTree_unaivalable_error_title, e);
         }
     }
 

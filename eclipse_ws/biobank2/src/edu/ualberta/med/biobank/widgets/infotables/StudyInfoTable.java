@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -22,13 +23,17 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { name, nameShort, status,
-                (patientCount != null) ? patientCount.toString() : "",
-                (visitCount != null) ? visitCount.toString() : "" }, "\t");
+                (patientCount != null) ? patientCount.toString() : "", //$NON-NLS-1$
+                (visitCount != null) ? visitCount.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Name",
-        "Short Name", "Status", "Patients", "Patient Visits" };
+    private static final String[] HEADINGS = new String[] {
+        Messages.StudyInfoTable_name_label,
+        Messages.StudyInfoTable_nameshort_label,
+        Messages.StudyInfoTable_status_label,
+        Messages.StudyInfoTable_patients_label,
+        Messages.StudyInfoTable_visits_label };
 
     public StudyInfoTable(Composite parent, List<StudyWrapper> collection) {
         super(parent, collection, HEADINGS, 10, StudyWrapper.class);
@@ -42,9 +47,9 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.StudyInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
@@ -52,15 +57,13 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
                 case 1:
                     return info.nameShort;
                 case 2:
-                    return (info.status != null) ? info.status : "";
+                    return (info.status != null) ? info.status : ""; //$NON-NLS-1$
                 case 3:
-                    return (info.patientCount != null) ? info.patientCount
-                        .toString() : "";
+                    return NumberFormatter.format(info.patientCount);
                 case 4:
-                    return (info.visitCount != null) ? info.visitCount
-                        .toString() : "";
+                    return NumberFormatter.format(info.visitCount);
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };
@@ -74,7 +77,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         info.nameShort = study.getNameShort();
         info.status = study.getActivityStatus().getName();
         if (info.status == null) {
-            info.status = "";
+            info.status = ""; //$NON-NLS-1$
         }
         info.patientCount = study.getPatientCount(true);
         info.visitCount = study.getCollectionEventCount(true);

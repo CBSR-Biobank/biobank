@@ -290,7 +290,7 @@ public class VTracker implements DisposeListener {
                 widget = ca[0];
             }
         }
-        Object o = widget.getData("cwt_vcontrol");
+        Object o = widget.getData("cwt_vcontrol"); //$NON-NLS-1$
         if (o instanceof VControl) {
             return (VControl) o;
         }

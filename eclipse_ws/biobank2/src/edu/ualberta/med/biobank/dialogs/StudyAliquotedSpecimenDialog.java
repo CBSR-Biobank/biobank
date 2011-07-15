@@ -12,7 +12,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -62,8 +61,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         this.newAliquotedSpecimen.setActivityStatus(origAliquotedSpecimen
             .getActivityStatus());
         if (origAliquotedSpecimen.getSpecimenType() == null) {
-            currentTitle = Messages
-                .getString("AliquotedSpecimenDialog.add.title");
+            currentTitle = Messages.StudyAliquotedSpecimenDialog_add_title;
 
             try {
                 this.newAliquotedSpecimen
@@ -71,12 +69,11 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
                         .getActiveActivityStatus(origAliquotedSpecimen
                             .getAppService()));
             } catch (Exception e) {
-                BgcPlugin.openAsyncError("Database Error",
-                    "Error while retrieving activity status");
+                BgcPlugin.openAsyncError(Messages.StudyAliquotedSpecimenDialog_activityStatus_retrieve_error_title,
+                    Messages.StudyAliquotedSpecimenDialog_activityStatus_retrieve_error_msg);
             }
         } else {
-            currentTitle = Messages
-                .getString("AliquotedSpecimenDialog.edit.title");
+            currentTitle = Messages.StudyAliquotedSpecimenDialog_edit_title;
         }
     }
 
@@ -88,9 +85,9 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
     @Override
     protected String getTitleAreaMessage() {
         if (availableSpecimenTypes.size() > 0)
-            return Messages.getString("AliquotedSpecimenDialog.msg");
+            return Messages.StudyAliquotedSpecimenDialog_msg;
         else
-            return "No more aliquoted specimen type can be derived from the study source specimen types.";
+            return Messages.StudyAliquotedSpecimenDialog_available_nomore_msg;
     }
 
     @Override
@@ -116,9 +113,9 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         specimenTypeComboViewer = getWidgetCreator().createComboViewer(
-            contents, Messages.getString("AliquotedSpecimen.field.type.label"),
+            contents, Messages.StudyAliquotedSpecimenDialog_field_type_label,
             availableSpecimenTypes, newAliquotedSpecimen.getSpecimenType(),
-            Messages.getString("AliquotedSpecimen.field.type.validation.msg"),
+            Messages.StudyAliquotedSpecimenDialog_field_type_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -135,10 +132,10 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
 
         activityStatus = getWidgetCreator().createComboViewer(
             contents,
-            Messages.getString("label.activity"),
+            Messages.StudyAliquotedSpecimenDialog_label_activity,
             ActivityStatusWrapper.getAllActivityStatuses(SessionManager
                 .getAppService()), newAliquotedSpecimen.getActivityStatus(),
-            Messages.getString("validation.activity"),
+            Messages.StudyAliquotedSpecimenDialog_validation_activity,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -147,30 +144,28 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
                             .setActivityStatus((ActivityStatusWrapper) selectedObject);
                     } catch (Exception e) {
                         BgcPlugin.openAsyncError(
-                            "Error setting activity status", e);
+                            Messages.StudyAliquotedSpecimenDialog_activityStatus_error_title, e);
                     }
                 }
             }, new BiobankLabelProvider());
 
         volume = (BgcBaseText) createBoundWidgetWithLabel(contents,
             BgcBaseText.class, SWT.BORDER,
-            Messages.getString("AliquotedSpecimen.field.volume.label"),
-            new String[0], newAliquotedSpecimen,
-            AliquotedSpecimenPeer.VOLUME.getName(), new DoubleNumberValidator(
-                Messages.getString("AliquotedSpecimen.field.validation.msg"),
-                false));
+            Messages.StudyAliquotedSpecimenDialog_volume_label, new String[0],
+            newAliquotedSpecimen, AliquotedSpecimenPeer.VOLUME.getName(),
+            new DoubleNumberValidator(
+                Messages.StudyAliquotedSpecimenDialog_volume_validation_msg, false));
 
         quantity = (BgcBaseText) createBoundWidgetWithLabel(
             contents,
             BgcBaseText.class,
             SWT.BORDER,
-            Messages.getString("AliquotedSpecimen.field.quantity.label"),
+            Messages.StudyAliquotedSpecimenDialog_quantity_label,
             new String[0],
             newAliquotedSpecimen,
             AliquotedSpecimenPeer.QUANTITY.getName(),
-            new IntegerNumberValidator(Messages
-                .getString("AliquotedSpecimen.field.quantity.validation.msg"),
-                false));
+            new IntegerNumberValidator(
+                Messages.StudyAliquotedSpecimenDialog_quantity_validation_msg, false));
     }
 
     @Override
@@ -208,11 +203,11 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         try {
             newAliquotedSpecimen.reset();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error", e);
+            BgcPlugin.openAsyncError(Messages.StudyAliquotedSpecimenDialog_error_title, e);
         }
         specimenTypeComboViewer.getCombo().deselectAll();
-        quantity.setText("");
-        volume.setText("");
+        quantity.setText(""); //$NON-NLS-1$
+        volume.setText(""); //$NON-NLS-1$
         activityStatus.getCombo().deselectAll();
     }
 }

@@ -13,8 +13,8 @@ import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 
 public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
 
-    private static final String[] HEADINGS = new String[] { "Name",
-        "Short Name" };
+    private static final String[] HEADINGS = new String[] { Messages.SpecimenTypeInfoTree_name_label,
+        Messages.SpecimenTypeInfoTree_nameShort_label };
 
     public SpecimenTypeInfoTree(Composite parent,
         List<SpecimenTypeWrapper> specimenCollection) {
@@ -33,9 +33,9 @@ public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
                     item = (SpecimenTypeWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.SpecimenTypeInfoTree_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:

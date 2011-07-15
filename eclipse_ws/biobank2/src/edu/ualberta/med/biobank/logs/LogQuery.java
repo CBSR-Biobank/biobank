@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.osgi.util.NLS;
+
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.LogPeer;
@@ -17,27 +19,30 @@ public class LogQuery {
     private HashMap<String, String> searchQuery = new HashMap<String, String>();
     private List<LogWrapper> dbResults = new ArrayList<LogWrapper>();
 
-    public static final String START_DATE_KEY = "startDate";
-    public static final String END_DATE_KEY = "endDate";
+    public static final String START_DATE_KEY = "startDate"; //$NON-NLS-1$
+    public static final String END_DATE_KEY = "endDate"; //$NON-NLS-1$
 
-    public static final String NONE = "NONE";
-    public static final String ALL = "ALL";
+    // set the time on end date to midnight (00:00 AM)
+    public static final String DEFAULT_START_TIME = "00:00"; //$NON-NLS-1$
+
+    // set the time on end date to 11:59 PM
+    public static final String DEFAULT_END_TIME = "23:59"; //$NON-NLS-1$
+
+    public static final String NONE = "NONE"; //$NON-NLS-1$
+    public static final String ALL = "ALL"; //$NON-NLS-1$
 
     protected LogQuery() {
         /* Define all the keys to be used here */
-        // searchQuery.put("containerType", "");
-        // searchQuery.put("containerLabel", "");
-
-        searchQuery.put(LogPeer.CENTER.getName(), "");
-        searchQuery.put(LogPeer.USERNAME.getName(), "");
-        searchQuery.put(LogPeer.TYPE.getName(), "");
-        searchQuery.put(LogPeer.ACTION.getName(), "");
-        searchQuery.put(LogPeer.PATIENT_NUMBER.getName(), "");
-        searchQuery.put(LogPeer.INVENTORY_ID.getName(), "");
-        searchQuery.put(LogPeer.LOCATION_LABEL.getName(), "");
-        searchQuery.put(LogPeer.DETAILS.getName(), "");
-        searchQuery.put(START_DATE_KEY, "");
-        searchQuery.put(END_DATE_KEY, "");
+        searchQuery.put(LogPeer.CENTER.getName(), ""); //$NON-NLS-1$
+        searchQuery.put(LogPeer.USERNAME.getName(), ""); //$NON-NLS-1$
+        searchQuery.put(LogPeer.TYPE.getName(), ""); //$NON-NLS-1$
+        searchQuery.put(LogPeer.ACTION.getName(), ""); //$NON-NLS-1$
+        searchQuery.put(LogPeer.PATIENT_NUMBER.getName(), ""); //$NON-NLS-1$
+        searchQuery.put(LogPeer.INVENTORY_ID.getName(), ""); //$NON-NLS-1$
+        searchQuery.put(LogPeer.LOCATION_LABEL.getName(), ""); //$NON-NLS-1$
+        searchQuery.put(LogPeer.DETAILS.getName(), ""); //$NON-NLS-1$
+        searchQuery.put(START_DATE_KEY, ""); //$NON-NLS-1$
+        searchQuery.put(END_DATE_KEY, ""); //$NON-NLS-1$
     }
 
     public static LogQuery getInstance() {
@@ -79,13 +84,11 @@ public class LogQuery {
 
         String startDateText = searchQuery.get(START_DATE_KEY);
         startDateText = setValueIfEmpty(startDateText);
-        // set the time on end date to midnight (00:00 AM)
-        Date startDate = formatDate(startDateText, "00:00");
+        Date startDate = formatDate(startDateText, DEFAULT_START_TIME);
 
         String endDateText = searchQuery.get(END_DATE_KEY);
         endDateText = setValueIfEmpty(endDateText);
-        // set the time on end date to 11:59 PM
-        Date endDate = formatDate(endDateText, "23:59");
+        Date endDate = formatDate(endDateText, DEFAULT_END_TIME); //$NON-NLS-1$
 
         dbResults = LogWrapper.getLogs(SessionManager.getAppService(), center,
             user, startDate, endDate, action, patientNumber, inventoryId,
@@ -95,20 +98,20 @@ public class LogQuery {
     private Date formatDate(String dateText, String time) {
         Date date = null;
         if (dateText != null) {
-            date = DateFormatter.parseToDateTime(dateText + " " + time);
+            date = DateFormatter.parseToDateTime(dateText + " " + time); //$NON-NLS-1$
         }
         return date;
     }
 
     private String setValueIfEmpty(String value) {
-        if ("".equals(value))
+        if ("".equals(value)) //$NON-NLS-1$
             return null;
         return value;
     }
 
     private String getValueForNoneAll(String value) {
         if (value.equals(NONE))
-            return "";
+            return ""; //$NON-NLS-1$
         if (value.equals(ALL))
             return null;
         return value;
@@ -117,8 +120,8 @@ public class LogQuery {
     public String getSearchQueryItem(String key) throws Exception {
         String value = searchQuery.get(key);
         if (value == null) {
-            throw new NullPointerException("Search Query key: " + key
-                + " does not exist.");
+            throw new NullPointerException(NLS.bind(
+                Messages.LogQuery_key_error_msg, key));
         }
         return value;
 

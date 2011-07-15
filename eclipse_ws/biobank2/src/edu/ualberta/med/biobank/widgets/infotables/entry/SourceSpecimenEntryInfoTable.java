@@ -12,8 +12,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
@@ -22,6 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
 import edu.ualberta.med.biobank.dialogs.StudySourceSpecimenDialog;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
@@ -148,10 +147,8 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
                             .openConfirm(
                                 PlatformUI.getWorkbench()
                                     .getActiveWorkbenchWindow().getShell(),
-                                Messages
-                                    .getString("SourceSpecimenEntryInfoTable.delete.title"),
-                                Messages
-                                    .getString("SourceSpecimenEntryInfoTable.delete.question"))) {
+                                Messages.SourceSpecimenEntryInfoTable_delete_title,
+                                Messages.SourceSpecimenEntryInfoTable_delete_question)) {
                             return;
                         }
 
@@ -182,7 +179,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (ApplicationException e) {
-            logger.error("initSpecimenTypes", e);
+            logger.error("initSpecimenTypes", e); //$NON-NLS-1$
         }
     }
 

@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.treeview.report.PrivateReportsGroup;
 import edu.ualberta.med.biobank.treeview.report.SharedReportsGroup;
 
 public class AdvancedReportsView extends AbstractAdministrationView {
-    public static final String ID = "edu.ualberta.med.biobank.views.AdvancedReportsView";
+    public static final String ID = "edu.ualberta.med.biobank.views.AdvancedReportsView"; //$NON-NLS-1$
 
     private static AdvancedReportsView currentView;
 

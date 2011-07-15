@@ -25,19 +25,19 @@ public class SpecimenAdapter extends AdapterBase {
 
     @Override
     public void addChild(AdapterBase child) {
-        Assert.isTrue(false, "Cannot add children to this adapter");
+        Assert.isTrue(false, "Cannot add children to this adapter"); //$NON-NLS-1$
     }
 
     @Override
     protected String getLabelInternal() {
         SpecimenWrapper specimen = getSpecimen();
-        Assert.isNotNull(specimen, "specimen is null");
+        Assert.isNotNull(specimen, "specimen is null"); //$NON-NLS-1$
         return specimen.getInventoryId();
     }
 
     @Override
     public String getTooltipText() {
-        return getTooltipText("Specimen");
+        return getTooltipText(Messages.SpecimenAdapter_specimen_label);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class SpecimenAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addViewMenu(menu, "Specimen");
+        addViewMenu(menu, Messages.SpecimenAdapter_specimen_label);
     }
 
     @Override

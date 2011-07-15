@@ -13,12 +13,12 @@ import org.hibernate.loader.criteria.CriteriaQueryTranslator;
 
 public class ReportsUtil {
     // TODO: share this? get from elsewhere?
-    private static final String PROPERTY_DELIMITER = ".";
+    private static final String PROPERTY_DELIMITER = "."; //$NON-NLS-1$
 
     public static String getId(String aliasedPropertyString) {
         AliasedProperty aliasedProperty = getAliasedProperty(aliasedPropertyString);
         if (aliasedProperty != null) {
-            return aliasedProperty.alias + PROPERTY_DELIMITER + "id";
+            return aliasedProperty.alias + PROPERTY_DELIMITER + "id"; //$NON-NLS-1$
         }
         return null;
     }

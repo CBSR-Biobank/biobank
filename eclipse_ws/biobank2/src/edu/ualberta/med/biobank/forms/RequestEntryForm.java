@@ -19,7 +19,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
@@ -105,8 +104,7 @@ public class RequestEntryForm extends BiobankViewForm {
         Section s2 = createSection("Dispatches");
         Composite dispatchCreation = toolkit.createComposite(s2);
         s2.setClient(dispatchCreation);
-        addSectionToolbar(s2,
-            Messages.getString("RequestEntryForm.dispatch.add.title"),
+        addSectionToolbar(s2, Messages.RequestEntryForm_dispatch_add_title,
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {

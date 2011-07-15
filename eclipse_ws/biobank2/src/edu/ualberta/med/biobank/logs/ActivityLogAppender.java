@@ -11,15 +11,16 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
+import edu.ualberta.med.biobank.forms.linkassign.SpecimenAssignEntryForm;
+import edu.ualberta.med.biobank.forms.linkassign.SpecimenLinkEntryForm;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 
 /**
  * Display in ConsoleView and possibly printed.
  * 
  * @see LinkAssignPerspective
- * @see ScanLinkEntryForm
- * @see ScanAssignEntryForm
- * @see CabinetLinkAssignEntryForm
+ * @see SpecimenLinkEntryForm
+ * @see SpecimenAssignEntryForm
  */
 public class ActivityLogAppender extends AppenderSkeleton {
 
@@ -27,9 +28,9 @@ public class ActivityLogAppender extends AppenderSkeleton {
     private MessageConsoleStream consoleStream;
     private List<LogInfo> logsList;
     private static final char[] SYSTEM_LINE_SEPARATOR = System.getProperty(
-        "line.separator").toCharArray();
+        "line.separator").toCharArray(); //$NON-NLS-1$
     public static final PatternLayout layout = new PatternLayout(
-        "%d{HH:mm:ss} %m%n");
+        "%d{HH:mm:ss} %m%n"); //$NON-NLS-1$
 
     public ActivityLogAppender(String name) {
         setName(name);

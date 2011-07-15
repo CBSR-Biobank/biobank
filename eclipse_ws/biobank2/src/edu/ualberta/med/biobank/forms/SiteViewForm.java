@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -9,12 +10,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
@@ -60,13 +60,12 @@ public class SiteViewForm extends AddressViewFormCommon {
         siteAdapter = (SiteAdapter) adapter;
         site = siteAdapter.getWrapper();
         retrieveSite();
-        setPartName(Messages.getString("SiteViewForm.title", //$NON-NLS-1$
-            site.getNameShort()));
+        setPartName(NLS.bind(Messages.SiteViewForm_title, site.getNameShort()));
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("SiteViewForm.title", site.getName())); //$NON-NLS-1$
+        form.setText(NLS.bind(Messages.SiteViewForm_title, site.getName()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -85,25 +84,25 @@ public class SiteViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(client);
 
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.name")); //$NON-NLS-1$
+            Messages.label_name);
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.nameShort")); //$NON-NLS-1$
+            Messages.label_nameShort);
         studyCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("SiteViewForm.field.studyCount.label")); //$NON-NLS-1$
+            Messages.SiteViewForm_field_studyCount_label);
         containerTypeCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("site.field.type.label")); //$NON-NLS-1$
+            Messages.site_field_type_label);
         topContainerCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("SiteViewForm.field.topLevelCount.label")); //$NON-NLS-1$
+            Messages.SiteViewForm_field_topLevelCount_label);
         patientCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("SiteViewForm.field.patientCount.label")); //$NON-NLS-1$
+            Messages.SiteViewForm_field_patientCount_label);
         patientVisitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("SiteViewForm.field.pvCount.label")); //$NON-NLS-1$
+            Messages.SiteViewForm_field_pvCount_label);
         specimenCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("SiteViewForm.field.totalSpecimen")); //$NON-NLS-1$
+            Messages.SiteViewForm_field_totalSpecimen);
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.activity")); //$NON-NLS-1$
+            Messages.label_activity);
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.getString("label.comments")); //$NON-NLS-1$
+            Messages.label_comments);
         setSiteSectionValues();
     }
 
@@ -123,8 +122,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createStudySection() {
-        Section section = createSection(Messages
-            .getString("SiteViewForm.studies.title")); //$NON-NLS-1$
+        Section section = createSection(Messages.SiteViewForm_studies_title);
         studiesTable = new StudyInfoTable(section, site.getStudyCollection());
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addClickListener(collectionDoubleClickListener);
@@ -132,9 +130,8 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createContainerTypesSection() {
-        Section section = createSection(Messages
-            .getString("SiteViewForm.types.title")); //$NON-NLS-1$
-        addSectionToolbar(section, Messages.getString("SiteViewForm.type.add"), //$NON-NLS-1$
+        Section section = createSection(Messages.SiteViewForm_types_title);
+        addSectionToolbar(section, Messages.SiteViewForm_type_add,
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -151,10 +148,8 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createContainerSection() throws Exception {
-        Section section = createSection(Messages
-            .getString("SiteViewForm.topContainers.title")); //$NON-NLS-1$
-        addSectionToolbar(section,
-            Messages.getString("SiteViewForm.topContainers.add"), //$NON-NLS-1$
+        Section section = createSection(Messages.SiteViewForm_topContainers_title);
+        addSectionToolbar(section, Messages.SiteViewForm_topContainers_add,
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -174,9 +169,8 @@ public class SiteViewForm extends AddressViewFormCommon {
     @Override
     public void reload() throws Exception {
         retrieveSite();
-        setPartName(Messages.getString("SiteViewForm.title", //$NON-NLS-1$
-            site.getNameShort()));
-        form.setText(Messages.getString("SiteViewForm.title", site.getName())); //$NON-NLS-1$
+        setPartName(NLS.bind(Messages.SiteViewForm_title, site.getNameShort()));
+        form.setText(NLS.bind(Messages.SiteViewForm_title, site.getName()));
         setSiteSectionValues();
         setAddressValues(site);
         studiesTable.setCollection(site.getStudyCollection());
@@ -189,8 +183,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         try {
             site.reload();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(
-                Messages.getString("SiteViewForm.reload.error.msg"), e); //$NON-NLS-1$
+            BgcPlugin.openAsyncError(Messages.SiteViewForm_reload_error_msg, e);
         }
     }
 

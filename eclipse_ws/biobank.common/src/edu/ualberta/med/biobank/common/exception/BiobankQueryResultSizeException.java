@@ -4,7 +4,7 @@ public class BiobankQueryResultSizeException extends BiobankException {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String DEFAULT_MSG = "Invalid size for HQL query result";
+    private static final String DEFAULT_MSG = "Invalid size for HQL query result"; //$NON-NLS-1$
 
     public BiobankQueryResultSizeException() {
         super(DEFAULT_MSG);
