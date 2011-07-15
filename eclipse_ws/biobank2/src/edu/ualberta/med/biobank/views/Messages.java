@@ -33,8 +33,12 @@ public class Messages extends NLS {
     public static String ProcessingView_go_button_label;
     public static String ProcessingView_notFound_title;
     public static String ProcessingView_notfound_date_msg;
+    public static String ProcessingView_notfound_patient_msg;
     public static String ProcessingView_notfound_worksheet_msg;
+    public static String ProcessingView_number_found_msg;
+    public static String ProcessingView_patient_label;
     public static String ProcessingView_pevent_group_label;
+    public static String ProcessingView_pevent_info_title;
     public static String ProcessingView_search_error_title;
     public static String ProcessingView_worksheet_label;
     public static String ReportsView_clinics_tab_label;
@@ -42,12 +46,6 @@ public class Messages extends NLS {
     public static String ReportsView_patients_tab_label;
     public static String ReportsView_specimens_tab_label;
     public static String ReportsView_specTypes_tab_label;
-    public static String RequestAdministrationView_notfound_error_msg;
-    public static String RequestAdministrationView_notfound_error_title;
-    public static String RequestAdministrationView_notfound_nber_error_msg;
-    public static String RequestAdministrationView_request_nber_label;
-    public static String RequestAdministrationView_search_error_msg;
-    public static String RequestAdministrationView_sites_load_error_title;
     public static String SearchView_noresult__dialog_msg;
     public static String SearchView_noresult_dialog_title;
     public static String SearchView_search_error_title;

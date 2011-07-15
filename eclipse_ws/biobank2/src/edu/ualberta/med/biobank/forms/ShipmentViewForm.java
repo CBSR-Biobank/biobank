@@ -112,7 +112,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.ShipmentViewForm_received_label);
         commentLabel = createReadOnlyLabelledField(client,
-            SWT.WRAP | SWT.MULTI, "Comment");
+            SWT.WRAP | SWT.MULTI, Messages.ShipmentViewForm_comment_label);
 
         setShipmentValues();
     }
@@ -124,7 +124,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         setTextValue(senderLabel, originInfo.getCenter().getName());
 
         SiteWrapper rcvSite = originInfo.getReceiverSite();
-        setTextValue(receiverLabel, rcvSite != null ? rcvSite.getName() : "");
+        setTextValue(receiverLabel, rcvSite != null ? rcvSite.getName() : ""); //$NON-NLS-1$
 
         setTextValue(waybillLabel, originInfo.getShipmentInfo().getWaybill());
         if (departedLabel != null) {

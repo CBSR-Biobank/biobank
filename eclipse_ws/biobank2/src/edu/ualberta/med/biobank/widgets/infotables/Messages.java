@@ -115,6 +115,10 @@ public class Messages extends NLS {
 
     public static String SpecimenInfoTable_loading;
 
+    public static String SpecimenInfoTable_no_first_letter;
+
+    public static String SpecimenInfoTable_origin_center_label;
+
     public static String SpecimenInfoTable_patient_label;
 
     public static String SpecimenInfoTable_pnumber_label;
@@ -132,6 +136,10 @@ public class Messages extends NLS {
     public static String SpecimenInfoTable_type_label;
 
     public static String SpecimenInfoTable_visitNber_label;
+
+    public static String SpecimenInfoTable_worksheet_label;
+
+    public static String SpecimenInfoTable_yes_first_letter;
 
     public static String SpecimenTypeInfoTable_loading;
 

@@ -139,9 +139,9 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
 
     @Override
     protected void onReset() throws Exception {
-        containerLabel.setText("");
+        containerLabel.setText(""); //$NON-NLS-1$
         topContainers.reset();
-        validate("");
+        validate(""); //$NON-NLS-1$
         super.onReset();
     }
 }

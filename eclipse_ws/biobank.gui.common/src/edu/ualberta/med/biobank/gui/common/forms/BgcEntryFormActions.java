@@ -64,7 +64,7 @@ public class BgcEntryFormActions {
         };
         confirmAction.setActionDefinitionId(commandId);
         confirmAction.setImageDescriptor(confirmActionImage);
-        confirmAction.setToolTipText("Confirm");
+        confirmAction.setToolTipText(Messages.BgcEntryFormActions_confirm_tooltip);
         entryForm.getScrolledForm().getToolBarManager().add(confirmAction);
     }
 
@@ -74,9 +74,9 @@ public class BgcEntryFormActions {
 
         reset = new CommandContributionItem(
             new CommandContributionItemParameter(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow(), "Reset", commandId, null,
-                resetActionImage, null, null, "Reset", "Reset", "Reset",
-                SWT.NONE, "Reset", true));
+                .getActiveWorkbenchWindow(), Messages.BgcEntryFormActions_reset_label, commandId, null,
+                resetActionImage, null, null, Messages.BgcEntryFormActions_reset_label, Messages.BgcEntryFormActions_reset_label, Messages.BgcEntryFormActions_reset_label,
+                SWT.NONE, Messages.BgcEntryFormActions_reset_label, true));
         entryForm.getScrolledForm().getToolBarManager().add(reset);
     }
 
@@ -86,9 +86,9 @@ public class BgcEntryFormActions {
 
         cancel = new CommandContributionItem(
             new CommandContributionItemParameter(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow(), "Cancel", commandId, null,
-                cancelActionImage, null, null, "Cancel", "Cancel", "Cancel",
-                SWT.NONE, "Cancel", true));
+                .getActiveWorkbenchWindow(), Messages.BgcEntryFormActions_cancel_label, commandId, null,
+                cancelActionImage, null, null, Messages.BgcEntryFormActions_cancel_label, Messages.BgcEntryFormActions_cancel_label, Messages.BgcEntryFormActions_cancel_label,
+                SWT.NONE, Messages.BgcEntryFormActions_cancel_label, true));
         entryForm.getScrolledForm().getToolBarManager().add(cancel);
     }
 
@@ -96,7 +96,7 @@ public class BgcEntryFormActions {
         if (printAction != null)
             return;
 
-        Action action = new Action("Print") {
+        Action action = new Action(Messages.BgcEntryFormActions_print_label) {
             @Override
             public void run() {
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
@@ -105,7 +105,7 @@ public class BgcEntryFormActions {
                         try {
                             entryForm.print();
                         } catch (Exception ex) {
-                            BgcPlugin.openAsyncError("Error printing.", ex);
+                            BgcPlugin.openAsyncError(Messages.BgcEntryFormActions_print_error_msg, ex);
                         }
                     }
                 });

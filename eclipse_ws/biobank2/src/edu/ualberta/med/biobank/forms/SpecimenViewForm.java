@@ -132,32 +132,32 @@ public class SpecimenViewForm extends BiobankViewForm {
         patientLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.SpecimenViewForm_patient_label);
         originCenterLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Origin center");
+            Messages.SpecimenViewForm_origin_center_label);
         centerLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.SpecimenViewForm_current_center_label);
         positionLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.SpecimenViewForm_position_label);
         isSourceSpcButton = (Button) createLabelledWidget(client, Button.class,
-            SWT.NONE, "Source Specimen");
+            SWT.NONE, Messages.SpecimenViewForm_source_specimen_label);
         if (!specimen.getTopSpecimen().equals(specimen)) {
             sourceInvIdLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Source Inventory ID");
+                Messages.SpecimenViewForm_source_specimenid_label);
         }
 
         ceventLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Collection Event");
+            Messages.SpecimenViewForm_cevent_label);
 
         if (!specimen.getTopSpecimen().equals(specimen)) {
             sourcePeventLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Source Processing Event");
+                Messages.SpecimenViewForm_source_pevent_label);
         }
 
         if (specimen.getProcessingEvent() != null) {
             peventLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Processing Event");
+                Messages.SpecimenViewForm_pevent_label);
         }
         childrenLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Children #");
+            Messages.SpecimenViewForm_children_nber_label);
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.SpecimenViewForm_status_label);
         commentLabel = createReadOnlyLabelledField(client,
@@ -236,17 +236,18 @@ public class SpecimenViewForm extends BiobankViewForm {
             setTextValue(
                 sourcePeventLabel,
                 new StringBuilder(topPevent.getFormattedCreatedAt())
-                    .append(" (worksheet: ").append(topPevent.getWorksheet())
-                    .append(")").toString());
+                    .append(" (") //$NON-NLS-1$
+                    .append(
+                        NLS.bind(Messages.SpecimenViewForm_worksheet_string, topPevent.getWorksheet()))
+                    .append(")").toString()); //$NON-NLS-1$
         }
 
         ProcessingEventWrapper pevent = specimen.getProcessingEvent();
         if (pevent != null) {
-            setTextValue(
-                peventLabel,
-                new StringBuilder(pevent.getFormattedCreatedAt())
-                    .append(" (worksheet: ").append(pevent.getWorksheet())
-                    .append(")").toString());
+            setTextValue(peventLabel,
+                new StringBuilder(pevent.getFormattedCreatedAt()).append(" (") //$NON-NLS-1$
+                    .append(NLS.bind(Messages.SpecimenViewForm_worksheet_string, pevent.getWorksheet()))
+                    .append(")").toString()); //$NON-NLS-1$
         }
 
         setTextValue(childrenLabel, specimen.getChildSpecimenCollection(false)

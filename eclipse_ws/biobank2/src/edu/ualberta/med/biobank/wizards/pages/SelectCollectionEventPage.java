@@ -20,11 +20,11 @@ import edu.ualberta.med.biobank.widgets.infotables.CollectionEventInfoTable;
 public class SelectCollectionEventPage extends BiobankWizardPage {
     public static final String PAGE_NAME = SelectCollectionEventPage.class
         .getCanonicalName();
-    private static final String CEVENT_REQUIRED = "Please select a collection event.";
+    private static final String CEVENT_REQUIRED = Messages.SelectCollectionEventPage_required_msg;
     private CollectionEventInfoTable ceventsTable;
 
     public SelectCollectionEventPage() {
-        super(PAGE_NAME, "Select a collection event", null);
+        super(PAGE_NAME, Messages.SelectCollectionEventPage_description, null);
     }
 
     public void setCollectionEventList(List<CollectionEventWrapper> cevents) {

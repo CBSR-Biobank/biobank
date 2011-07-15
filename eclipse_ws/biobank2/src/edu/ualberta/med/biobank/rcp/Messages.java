@@ -17,6 +17,11 @@ public class Messages extends NLS {
     public static String ApplicationWorkbenchAdvisor_close_error_title;
     public static String ApplicationWorkbenchWindowAdvisor_center_text;
     public static String ApplicationWorkbenchWindowAdvisor_ready_msg;
+    public static String P2Util_update_checking;
+    public static String P2Util_update_info_msg;
+    public static String P2Util_update_info_title;
+    public static String P2Util_update_noprovisioning_error_msg;
+    public static String P2Util_update_notfound_msg;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

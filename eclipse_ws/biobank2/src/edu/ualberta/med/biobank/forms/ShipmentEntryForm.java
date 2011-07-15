@@ -81,8 +81,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private BgcBaseText waybillWidget;
 
-    private BgcBaseText commentText;
-
     private Set<SpecimenWrapper> specimensToPersist = new HashSet<SpecimenWrapper>();
 
     @Override
@@ -208,9 +206,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             ShipmentInfoPeer.RECEIVED_AT.getName(), new NotNullValidator(
                 Messages.ShipmentEntryForm_received_validation_msg));
 
-        commentText = (BgcBaseText) createBoundWidgetWithLabel(client,
-            BgcBaseText.class, SWT.WRAP | SWT.MULTI, "Comments", null,
-            shipmentInfo, "comment", null);
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.WRAP
+            | SWT.MULTI, Messages.ShipmentEntryForm_comments_label, null,
+            shipmentInfo, ShipmentInfoPeer.COMMENT.getName(), null);
 
     }
 

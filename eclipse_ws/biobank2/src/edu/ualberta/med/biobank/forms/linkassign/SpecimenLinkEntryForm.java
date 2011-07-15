@@ -524,7 +524,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 modifiedSources.add(sourceSpecimen);
                 sb.append(Messages
                     .format(
-                        "LINKED: ''{0}'' with type ''{1}'' to source: {2} ({3}) - Patient: {4} - Visit: {5} - Center: {6}\n",
+                        Messages.SpecimenLinkEntryForm_linked_msg_multiple,
                         cell.getValue(), cell.getType().getName(),
                         sourceSpecimen.getSpecimenType().getNameShort(),
                         sourceSpecimen.getInventoryId(), sourceSpecimen
@@ -563,7 +563,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
         appendLog(Messages
             .format(
-                "LINKED: ''{0}'' with type ''{1}'' to source: {2} ({3}) - Patient: {4} - Visit: {5} - Center: {6} - Position: {7}\n",
+                Messages.SpecimenLinkEntryForm_linked_msg_single,
                 singleSpecimen.getInventoryId(), singleSpecimen
                     .getSpecimenType().getName(), singleSpecimen
                     .getParentSpecimen().getInventoryId(), singleSpecimen

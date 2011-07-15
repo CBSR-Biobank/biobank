@@ -134,8 +134,8 @@ public class PalletScanManagement {
                         // Different values at same position
                         oldScannedCell.setInformation((oldScannedCell
                             .getInformation() != null ? oldScannedCell
-                            .getInformation() : "")
-                            + " Rescanned value is different");
+                            .getInformation() : "") //$NON-NLS-1$
+                            + " " + Messages.PalletScanManagement_rescan_differnt_msg); //$NON-NLS-1$
                         oldScannedCell.setStatus(CellStatus.ERROR);
                         rescanDifferent = true;
 
@@ -156,7 +156,7 @@ public class PalletScanManagement {
             }
             if (rescanDifferent)
                 throw new Exception(
-                    "Scan error: Previously scanned specimens has been replaced. Please cancel and start again.");
+                    Messages.PalletScanManagement_scan_error_previous_different_msg);
         }
         afterSuccessfulScan();
     }

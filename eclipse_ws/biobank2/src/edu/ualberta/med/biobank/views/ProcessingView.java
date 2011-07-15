@@ -78,7 +78,7 @@ public class ProcessingView extends AbstractAdministrationView {
             }
         });
         radioPatient = new Button(composite, SWT.RADIO);
-        radioPatient.setText("Patient");
+        radioPatient.setText(Messages.ProcessingView_patient_label);
         radioPatient.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -158,7 +158,7 @@ public class ProcessingView extends AbstractAdministrationView {
                         treeText.getText());
                 } else if (radioPatient.getSelection()) {
                     msg = NLS.bind(
-                        "No Processing Events found for patient {0}",
+                        Messages.ProcessingView_notfound_patient_msg,
                         treeText.getText());
                 } else {
                     msg = NLS.bind(Messages.ProcessingView_notfound_date_msg,
@@ -219,8 +219,8 @@ public class ProcessingView extends AbstractAdministrationView {
             List<AdapterBase> nodeRes = rootNode.search(searchedObjects.get(0));
             nodeRes.get(0).performDoubleClick();
         } else
-            BgcPlugin.openMessage("Processing Events", searchedObjects.size()
-                + " found.");
+            BgcPlugin.openMessage(Messages.ProcessingView_pevent_info_title,
+                NLS.bind(Messages.ProcessingView_number_found_msg, searchedObjects.size()));
     }
 
     public AdapterBase getProcessingNode() {

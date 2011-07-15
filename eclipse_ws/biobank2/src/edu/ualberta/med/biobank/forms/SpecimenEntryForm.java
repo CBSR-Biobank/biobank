@@ -194,10 +194,10 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                     specimen.setCollectionEvent(wizard.getCollectionEvent());
                     String comment = specimen.getComment();
                     if (comment == null)
-                        comment = "";
+                        comment = ""; //$NON-NLS-1$
                     else
-                        comment += "\n";
-                    comment += "Patient/Collection Event modification: "
+                        comment += "\n"; //$NON-NLS-1$
+                    comment += Messages.SpecimenEntryForm_cevent_modification
                         + wizard.getComment();
                     specimen.setComment(comment);
                     patientField.setText(specimen.getCollectionEvent()
@@ -212,11 +212,11 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             && specimen.getChildSpecimenCollection(false).size() == 0);
 
         originCenterLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Origin center");
+            Messages.SpecimenEntryForm_origin_center_label);
         setTextValue(originCenterLabel, specimen.getOriginInfo().getCenter()
             .getNameShort());
         centerLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Current center");
+            Messages.SpecimenEntryForm_current_center_label);
         setTextValue(centerLabel, specimen.getCenterString());
 
         createReadOnlyLabelledField(client, SWT.NONE,
@@ -226,18 +226,20 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         boolean isSourceSpc = specimen.getTopSpecimen().equals(specimen);
 
         Button isSourceSpcButton = (Button) createLabelledWidget(client,
-            Button.class, SWT.NONE, "Source Specimen");
+            Button.class, SWT.NONE,
+            Messages.SpecimenEntryForm_source_specimen_label);
         isSourceSpcButton.setEnabled(false);
         isSourceSpcButton.setSelection(isSourceSpc);
 
         if (!isSourceSpc) {
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Source Inventory ID", specimen.getTopSpecimen()
-                    .getInventoryId());
+                Messages.SpecimenEntryForm_source_inventoryid_label, specimen
+                    .getTopSpecimen().getInventoryId());
         }
 
         ceventText = createReadOnlyLabelledField(client, SWT.NONE,
-            "Collection Event", specimen.getCollectionInfo());
+            Messages.SpecimenEntryForm_cEvent_label,
+            specimen.getCollectionInfo());
 
         if (!isSourceSpc) {
             ProcessingEventWrapper topPevent = specimen.getTopSpecimen()
@@ -245,24 +247,25 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             createReadOnlyLabelledField(
                 client,
                 SWT.NONE,
-                "Source Processing Event",
+                Messages.SpecimenEntryForm_source_pevent,
                 new StringBuilder(topPevent.getFormattedCreatedAt())
-                    .append(" (worksheet: ").append(topPevent.getWorksheet())
-                    .append(")").toString());
+                    .append(" (") //$NON-NLS-1$
+                    .append(
+                        NLS.bind(Messages.SpecimenEntryForm_worksheet_string, topPevent.getWorksheet()))
+                    .append(")").toString()); //$NON-NLS-1$
         }
 
         ProcessingEventWrapper pevent = specimen.getProcessingEvent();
         if (pevent != null) {
-            createReadOnlyLabelledField(
-                client,
-                SWT.NONE,
-                "Processing Event",
-                new StringBuilder(pevent.getFormattedCreatedAt())
-                    .append(" (worksheet: ").append(pevent.getWorksheet())
-                    .append(")").toString());
+            createReadOnlyLabelledField(client, SWT.NONE,
+                Messages.SpecimenEntryForm_pevent_label, new StringBuilder(
+                    pevent.getFormattedCreatedAt()).append(" (") //$NON-NLS-1$
+                    .append(NLS.bind(Messages.SpecimenEntryForm_worksheet_string, pevent.getWorksheet()))
+                    .append(")").toString()); //$NON-NLS-1$
         }
 
-        createReadOnlyLabelledField(client, SWT.NONE, "Children #",
+        createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.SpecimenEntryForm_children_nber_label,
             String.valueOf(specimen.getChildSpecimenCollection(false).size()));
 
         activityStatusComboViewer = createComboViewer(client,

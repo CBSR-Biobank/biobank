@@ -517,7 +517,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
             onReset();
             setDirty(false);
         } catch (Exception e) {
-            logger.error("Can't reset the form", e);
+            logger.error("Can't reset the form", e); //$NON-NLS-1$
         }
     }
 

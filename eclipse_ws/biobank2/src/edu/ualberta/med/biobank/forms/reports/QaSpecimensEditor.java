@@ -142,7 +142,7 @@ public class QaSpecimensEditor extends ReportsEditor {
         end.setDate(null);
         topContainers.reset();
         typesViewer.getCombo().deselectAll();
-        numSpecimensText.setText("");
+        numSpecimensText.setText(""); //$NON-NLS-1$
         super.onReset();
     }
 

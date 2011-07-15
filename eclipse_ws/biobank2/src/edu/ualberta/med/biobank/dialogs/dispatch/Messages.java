@@ -7,6 +7,7 @@ public class Messages extends NLS {
     public static String AbstractScanDialog_cancelPallet_label;
     public static String AbstractScanDialog_fakeScan_label;
     public static String AbstractScanDialog_launchScan_label;
+    public static String AbstractScanDialog_no_values;
     public static String AbstractScanDialog_plateToScan_label;
     public static String AbstractScanDialog_plateToScan_validationMsg;
     public static String AbstractScanDialog_proceedError_title;

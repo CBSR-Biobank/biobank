@@ -197,7 +197,7 @@ public class BgcPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_LOGGING, "table_row_delete.png"); //$NON-NLS-1$
         registerImage(registry, IMG_PROCESSING, "processingView.png"); //$NON-NLS-1$
         registerImage(registry, IMG_PROCESSING_EVENT,
-            "processingPerspective.png");
+            "processingPerspective.png"); //$NON-NLS-1$
         registerImage(registry, IMG_SAVE_AS_NEW, "application_form_add.png"); //$NON-NLS-1$
         registerImage(registry, IMG_CHECK, "checked.gif"); //$NON-NLS-1$
         registerImage(registry, IMG_UNCHECK, "unchecked.gif"); //$NON-NLS-1$
@@ -214,8 +214,8 @@ public class BgcPlugin extends AbstractUIPlugin {
                 ImageDescriptor desc = ImageDescriptor.createFromURL(url);
                 registry.put(key, desc);
             } else {
-                logger.error("Could not get URL for image: key" + key
-                    + ", filname " + fileName);
+                logger.error("Could not get URL for image: key" + key //$NON-NLS-1$
+                    + ", filname " + fileName); //$NON-NLS-1$
             }
         } catch (Exception e) {
             logger.error("Error registering an image", e); //$NON-NLS-1$

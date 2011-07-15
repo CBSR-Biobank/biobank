@@ -104,7 +104,7 @@ public class BgcEntryForm extends BgcFormBase implements IBgcEntryForm {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().saveEditor(this, false);
         } catch (Exception e) {
-            logger.error("Can't save the form", e);
+            logger.error("Can't save the form", e); //$NON-NLS-1$
         }
     }
 

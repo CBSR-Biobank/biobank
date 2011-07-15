@@ -274,7 +274,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             Boolean.class), scanHasBeenLaunchedValue,
             Messages.AbstractScanDialog_scan_validation_msg, IStatus.ERROR);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), hasValues, "No values scanned", IStatus.ERROR);
+            Boolean.class), hasValues, Messages.AbstractScanDialog_no_values, IStatus.ERROR);
 
     }
 

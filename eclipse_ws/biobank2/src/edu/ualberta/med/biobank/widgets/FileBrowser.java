@@ -28,7 +28,7 @@ public class FileBrowser extends BgcBaseWidget {
         setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
         setLayout(new GridLayout(3, false));
         Label l = new Label(this, SWT.NONE);
-        l.setText(label + ":");
+        l.setText(label + ":"); //$NON-NLS-1$
         textfield = new BgcBaseText(this, SWT.NONE);
         textfield.setEditable(false);
         textfield.setLayoutData(new GridData(GridData.FILL, GridData.FILL,
@@ -85,7 +85,7 @@ public class FileBrowser extends BgcBaseWidget {
     }
 
     public void reset() {
-        textfield.setText("");
+        textfield.setText(""); //$NON-NLS-1$
     }
 
 }

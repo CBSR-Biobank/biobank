@@ -41,16 +41,6 @@ public class Messages extends NLS {
 
     public static String BiobankEntryForm_access_denied_error_msg;
 
-    public static String BiobankEntryForm_cancel_label;
-
-    public static String BiobankEntryForm_confirm_tooltip;
-
-    public static String BiobankEntryForm_print_error_title;
-
-    public static String BiobankEntryForm_print_label;
-
-    public static String BiobankEntryForm_reset_label;
-
     public static String BiobankEntryForm_save_error_title;
 
     public static String BiobankEntryForm_saving;
@@ -581,6 +571,8 @@ public class Messages extends NLS {
 
     public static String ShipmentEntryForm_center_select_msg;
 
+    public static String ShipmentEntryForm_comments_label;
+
     public static String ShipmentEntryForm_dispatched_specimen_error_msg;
 
     public static String ShipmentEntryForm_edit_ship_ok_msg;
@@ -627,6 +619,8 @@ public class Messages extends NLS {
 
     public static String ShipmentViewForm_boxNber_label;
 
+    public static String ShipmentViewForm_comment_label;
+
     public static String ShipmentViewForm_form_title;
 
     public static String ShipmentViewForm_packed_label;
@@ -657,21 +651,37 @@ public class Messages extends NLS {
 
     public static String ShippingMethodViewForm_title;
 
-    public static String SpecimenEntryForm_center_label;
+    public static String SpecimenEntryForm_cEvent_label;
+
+    public static String SpecimenEntryForm_cevent_modification;
 
     public static String SpecimenEntryForm_change_button_label;
+
+    public static String SpecimenEntryForm_children_nber_label;
 
     public static String SpecimenEntryForm_comments_label;
 
     public static String SpecimenEntryForm_created_label;
 
+    public static String SpecimenEntryForm_current_center_label;
+
     public static String SpecimenEntryForm_form_title;
 
     public static String SpecimenEntryForm_ok_msg;
 
+    public static String SpecimenEntryForm_origin_center_label;
+
+    public static String SpecimenEntryForm_pevent_label;
+
     public static String SpecimenEntryForm_pnumber_label;
 
     public static String SpecimenEntryForm_position_label;
+
+    public static String SpecimenEntryForm_source_inventoryid_label;
+
+    public static String SpecimenEntryForm_source_pevent;
+
+    public static String SpecimenEntryForm_source_specimen_label;
 
     public static String SpecimenEntryForm_status_label;
 
@@ -686,6 +696,8 @@ public class Messages extends NLS {
     public static String SpecimenEntryForm_type_validation_msg;
 
     public static String SpecimenEntryForm_volume_label;
+
+    public static String SpecimenEntryForm_worksheet_string;
 
     public static String SpecimenListViewForm_nonactive_label;
 
@@ -703,7 +715,9 @@ public class Messages extends NLS {
 
     public static String SpecimenTypesViewForm_title;
 
-    public static String SpecimenViewForm_collection_label;
+    public static String SpecimenViewForm_cevent_label;
+
+    public static String SpecimenViewForm_children_nber_label;
 
     public static String SpecimenViewForm_comments_label;
 
@@ -713,9 +727,19 @@ public class Messages extends NLS {
 
     public static String SpecimenViewForm_dispatch_title;
 
+    public static String SpecimenViewForm_origin_center_label;
+
     public static String SpecimenViewForm_patient_label;
 
+    public static String SpecimenViewForm_pevent_label;
+
     public static String SpecimenViewForm_position_label;
+
+    public static String SpecimenViewForm_source_pevent_label;
+
+    public static String SpecimenViewForm_source_specimen_label;
+
+    public static String SpecimenViewForm_source_specimenid_label;
 
     public static String SpecimenViewForm_status_label;
 
@@ -728,6 +752,8 @@ public class Messages extends NLS {
     public static String SpecimenViewForm_visualization_title;
 
     public static String SpecimenViewForm_volume_label;
+
+    public static String SpecimenViewForm_worksheet_string;
 
     public static String RequestEntryForm_dispatch_add_title;
 

@@ -39,7 +39,7 @@ import edu.ualberta.med.biobank.gui.common.BgcLogger;
  */
 public class P2Util {
 
-    private static final String JUSTUPDATED = "justUpdated";
+    private static final String JUSTUPDATED = "justUpdated"; //$NON-NLS-1$
 
     private static BgcLogger logger = BgcLogger.getLogger(P2Util.class
         .getName());
@@ -53,7 +53,7 @@ public class P2Util {
             logger
                 .addRcpLogStatus(
                     IStatus.ERROR,
-                    "No provisioning agent found.  This application is not set up for updates.",
+                    Messages.P2Util_update_noprovisioning_error_msg,
                     null);
         }
         // XXX if we're restarting after updating, don't check again.
@@ -99,7 +99,7 @@ public class P2Util {
         // constructors.
         UpdateOperation operation = new UpdateOperation(session);
         SubMonitor sub = SubMonitor.convert(monitor,
-            "Checking for application updates...", 200);
+            Messages.P2Util_update_checking, 200);
         IStatus status = operation.resolveModal(sub.newChild(100));
         if (status.getCode() == UpdateOperation.STATUS_NOTHING_TO_UPDATE) {
             return status;
@@ -116,7 +116,7 @@ public class P2Util {
             ProvisioningJob job = operation.getProvisioningJob(null);
             if (job == null)
                 return new Status(IStatus.ERROR, BiobankPlugin.PLUGIN_ID,
-                    "No updates were found.");
+                    Messages.P2Util_update_notfound_msg);
 
             PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
                 @Override
@@ -124,8 +124,8 @@ public class P2Util {
                     MessageDialog
                         .openInformation(
                             null,
-                            "Updates",
-                            "Updates have been found. The application will restart after the installation is done.");
+                            Messages.P2Util_update_info_title,
+                            Messages.P2Util_update_info_msg);
                 }
             });
 

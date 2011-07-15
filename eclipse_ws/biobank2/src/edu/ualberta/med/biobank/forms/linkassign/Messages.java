@@ -133,6 +133,8 @@ public class Messages extends NLS {
 
     public static String SpecimenAssignEntryForm_activity_title;
 
+    public static String SpecimenAssignEntryForm_assigned_msg_single;
+
     public static String SpecimenAssignEntryForm_cannot_hold_specimens_error_msg;
 
     public static String SpecimenAssignEntryForm_EntryForm_position_none;
@@ -140,6 +142,8 @@ public class Messages extends NLS {
     public static String SpecimenAssignEntryForm_error_title;
 
     public static String SpecimenAssignEntryForm_form_title;
+
+    public static String SpecimenAssignEntryForm_inventoryid_single_validator_msg;
 
     public static String SpecimenAssignEntryForm_log_reseting_error_msg;
 
@@ -185,8 +189,6 @@ public class Messages extends NLS {
 
     public static String SpecimenAssignEntryForm_single_inventoryId_label;
 
-    public static String SpecimenAssignEntryForm_single_inventoryId_validator_msg;
-
     public static String SpecimenAssignEntryForm_single_new_position_label;
 
     public static String SpecimenAssignEntryForm_single_old_position_check_label;
@@ -211,8 +213,6 @@ public class Messages extends NLS {
 
     public static String SpecimenLinkEntryForm_activitylog_save_summary;
 
-    public static String SpecimenLinkEntryForm_activitylog_specimen_linked;
-
     public static String SpecimenLinkEntryForm_activitylog_specimens_start;
 
     public static String SpecimenLinkEntryForm_description_ok;
@@ -228,6 +228,10 @@ public class Messages extends NLS {
     public static String SpecimenLinkEntryForm_inventoryId_label;
 
     public static String SpecimenLinkEntryForm_inventoryId_validator_msg;
+
+    public static String SpecimenLinkEntryForm_linked_msg_multiple;
+
+    public static String SpecimenLinkEntryForm_linked_msg_single;
 
     public static String SpecimenLinkEntryForm_position_label_none;
 

@@ -133,13 +133,13 @@ public abstract class ReportsEditor extends BiobankEntryForm {
         warning = toolkit
             .createLabel(
                 buttonSection,
-                "Printing/PDFs disabled. Results exceed 1000 rows. Please export to CSV or refine your search.");
+                Messages.ReportsEditor_print_disabled_msg);
         GridData wgd = new GridData();
         wgd.horizontalSpan = 4;
         warning.setVisible(false);
         warning.setLayoutData(wgd);
 
-        generateButton = toolkit.createButton(buttonSection, "Generate",
+        generateButton = toolkit.createButton(buttonSection, Messages.ReportsEditor_generate_label,
             SWT.NONE);
         generateButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -304,13 +304,13 @@ public abstract class ReportsEditor extends BiobankEntryForm {
             || reportData.size() > 1000) {
             printButton.setEnabled(false);
             exportPDFButton.setEnabled(false);
-            printButton.setToolTipText("Results exceed 1000 rows");
-            exportPDFButton.setToolTipText("Results exceed 1000 rows");
+            printButton.setToolTipText(Messages.ReportsEditor_exceed_1000_msg);
+            exportPDFButton.setToolTipText(Messages.ReportsEditor_exceed_1000_msg);
             warning.setVisible(true);
             setEnablePrintAction(false);
         } else {
-            printButton.setToolTipText("Print");
-            exportPDFButton.setToolTipText("Export PDF");
+            printButton.setToolTipText(Messages.ReportsEditor_print_label);
+            exportPDFButton.setToolTipText(Messages.ReportsEditor_pdfexport_label);
             setEnablePrintAction(true);
             warning.setVisible(false);
         }
@@ -326,7 +326,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
         try {
             printTable(false, false);
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error while printing", e);
+            BgcPlugin.openAsyncError(Messages.ReportsEditor_print_error_msg, e);
         }
         return true;
     }
@@ -588,7 +588,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     @Override

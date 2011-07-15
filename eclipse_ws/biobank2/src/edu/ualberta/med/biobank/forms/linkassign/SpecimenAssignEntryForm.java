@@ -255,7 +255,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         Label inventoryIdLabel = widgetCreator.createLabel(fieldsComposite,
             Messages.SpecimenAssignEntryForm_single_inventoryId_label);
         inventoryIdText = (BgcBaseText) createWidget(fieldsComposite,
-            BgcBaseText.class, SWT.NONE, "");
+            BgcBaseText.class, SWT.NONE, ""); //$NON-NLS-1$
         inventoryIdText.addKeyListener(textFieldKeyListener);
         inventoryIdText.addFocusListener(new FocusAdapter() {
             @Override
@@ -283,12 +283,12 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             }
         });
         AbstractValidator inventoryValidator = new AbstractValidator(
-            "Enter a valid inventory ID") {
+            Messages.SpecimenAssignEntryForm_inventoryid_single_validator_msg) {
             @Override
             public IStatus validate(Object value) {
                 if ((Boolean) foundSpecNull.getValue()) {
                     showDecoration();
-                    return ValidationStatus.error("Enter a valid inventory ID");
+                    return ValidationStatus.error(Messages.SpecimenAssignEntryForm_inventoryid_single_validator_msg);
                 }
                 hideDecoration();
                 return ValidationStatus.ok();
@@ -1003,7 +1003,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         singleSpecimen.persist();
         appendLog(Messages
             .format(
-                "ASSIGNED position {0} (site {1}) to specimen {2} - Type: {3} - Patient: {4} - Visit#: {5}",
+                Messages.SpecimenAssignEntryForm_assigned_msg_single,
                 singleSpecimen.getPositionString(true, false), singleSpecimen
                     .getCurrentCenter().getNameShort(), singleSpecimen
                     .getInventoryId(), singleSpecimen.getSpecimenType()

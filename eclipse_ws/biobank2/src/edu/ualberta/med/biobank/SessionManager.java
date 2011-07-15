@@ -355,7 +355,7 @@ public class SessionManager {
         // (display is weird otherwise)
         if (login
             && page.getPerspective().getId()
-                .startsWith("edu.ualberta.med.biobank")
+                .startsWith("edu.ualberta.med.biobank") //$NON-NLS-1$
             && page.getViewReferences().length == 0)
             try {
                 page.getWorkbenchWindow()

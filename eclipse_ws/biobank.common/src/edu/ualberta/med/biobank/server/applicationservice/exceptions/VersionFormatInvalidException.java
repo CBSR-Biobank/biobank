@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.server.applicationservice.exceptions;
 
-import edu.ualberta.med.biobank.server.applicationservice.Messages;
-
 public class VersionFormatInvalidException extends BiobankServerException {
 
     private static final long serialVersionUID = 1L;

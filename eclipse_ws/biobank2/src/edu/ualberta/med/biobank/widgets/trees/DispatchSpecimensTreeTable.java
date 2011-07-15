@@ -138,7 +138,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                         return ((DispatchSpecimenWrapper) ((TreeItemAdapter) element)
                             .getSpecimen()).getComment();
                     else
-                        return "";
+                        return ""; //$NON-NLS-1$
                 }
                 return ""; //$NON-NLS-1$
             }

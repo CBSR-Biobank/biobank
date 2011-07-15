@@ -57,6 +57,12 @@ public class Messages extends NLS {
     public static String QAAliquotsEditor_top_label;
     public static String QAAliquotsEditor_top_validation_msg;
     public static String QAAliquotsEditor_types_validation_msg;
+    public static String ReportsEditor_exceed_1000_msg;
+    public static String ReportsEditor_generate_label;
+    public static String ReportsEditor_pdfexport_label;
+    public static String ReportsEditor_print_disabled_msg;
+    public static String ReportsEditor_print_error_msg;
+    public static String ReportsEditor_print_label;
     public static String SampleTypePvCountEditor_first_drawn_label;
     public static String SampleTypePvCountEditor_first_processed_label;
     public static String SampleTypePvCountEditor_pnumber_label;

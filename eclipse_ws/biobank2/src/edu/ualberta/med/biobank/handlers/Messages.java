@@ -4,6 +4,8 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.handlers.messages"; //$NON-NLS-1$
+    public static String CbsrHelp_browser_error_msg;
+    public static String CbsrHelp_url_error_msg;
     public static String DecodePlateHandler_decode_label;
     public static String DeleteSelectionHandler_delete_error_msg;
     public static String DeleteSelectionHandler_delete_error_title;

@@ -60,7 +60,7 @@ public class QaSpecimensImpl extends AbstractReport {
             String specimenType = specimen.getSpecimenType().getNameShort();
 
             String dateProcessed = Messages.getString(
-                "QAAliquotsImpl.nodate_processed", report.getLocale()); //$NON-NLS-1$
+                "QaSpecimensImpl.nodate_processed", report.getLocale()); //$NON-NLS-1$
             Specimen parentSpecimen = specimen.getParentSpecimen();
             if (parentSpecimen != null) {
                 ProcessingEvent pe = parentSpecimen.getProcessingEvent();

@@ -26,7 +26,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         ALL(new String[] { Messages.SpecimenInfoTable_inventoryid_label,
             Messages.SpecimenInfoTable_type_label,
             Messages.SpecimenInfoTable_patient_label,
-            Messages.SpecimenInfoTable_visitNber_label, "Origin Center",
+            Messages.SpecimenInfoTable_visitNber_label, Messages.SpecimenInfoTable_origin_center_label,
             Messages.SpecimenInfoTable_current_center_label,
             Messages.SpecimenInfoTable_position_label,
             Messages.SpecimenInfoTable_created_label,
@@ -81,7 +81,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             Messages.SpecimenInfoTable_quantity_label,
             Messages.SpecimenInfoTable_status_label,
             Messages.SpecimenInfoTable_study_label,
-            Messages.SpecimenInfoTable_pnumber_label, "Origin Center",
+            Messages.SpecimenInfoTable_pnumber_label, Messages.SpecimenInfoTable_origin_center_label,
             Messages.SpecimenInfoTable_current_center_label,
             Messages.SpecimenInfoTable_comment_label }) {
             @Override
@@ -108,8 +108,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 9:
                     return row.center;
                 case 10:
-                    return (row.comment == null || row.comment.equals("")) ? "N"
-                        : "Y";
+                    return (row.comment == null || row.comment.equals("")) ? Messages.SpecimenInfoTable_no_first_letter //$NON-NLS-1$
+                        : Messages.SpecimenInfoTable_yes_first_letter;
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -128,9 +128,9 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         ALIQUOTS(new String[] { Messages.SpecimenInfoTable_inventoryid_label,
             Messages.SpecimenInfoTable_type_label,
             Messages.SpecimenInfoTable_position_label,
-            Messages.SpecimenInfoTable_created_label, "Worksheet",
+            Messages.SpecimenInfoTable_created_label, Messages.SpecimenInfoTable_worksheet_label,
             Messages.SpecimenInfoTable_quantity_label,
-            Messages.SpecimenInfoTable_status_label, "Origin Center",
+            Messages.SpecimenInfoTable_status_label, Messages.SpecimenInfoTable_origin_center_label,
             Messages.SpecimenInfoTable_current_center_label,
             Messages.SpecimenInfoTable_comment_label }) {
             @Override
@@ -155,8 +155,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 8:
                     return row.center;
                 case 9:
-                    return (row.comment == null || row.comment.equals("")) ? "N"
-                        : "Y";
+                    return (row.comment == null || row.comment.equals("")) ? Messages.SpecimenInfoTable_no_first_letter //$NON-NLS-1$
+                        : Messages.SpecimenInfoTable_yes_first_letter;
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -208,7 +208,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         public String toString() {
             return StringUtils.join(new String[] { inventoryId, type, patient,
                 pvNumber, createdAt, center, originCenter,
-                (quantity == null) ? "" : quantity.toString(), position,
+                (quantity == null) ? "" : quantity.toString(), position, //$NON-NLS-1$
                 activityStatus, comment }, "\t"); //$NON-NLS-1$
         }
     }
@@ -280,7 +280,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         }
 
         info.createdAt = specimen.getFormattedCreatedAt();
-        info.worksheet = specimen.getParentSpecimen() == null ? "" : specimen
+        info.worksheet = specimen.getParentSpecimen() == null ? "" : specimen //$NON-NLS-1$
             .getParentSpecimen().getProcessingEvent().getWorksheet();
         Double quantity = specimen.getQuantity();
         info.quantity = quantity;
@@ -290,7 +290,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         info.comment = specimen.getComment();
         info.center = specimen.getCurrentCenter().getNameShort();
 
-        info.originCenter = "";
+        info.originCenter = ""; //$NON-NLS-1$
         OriginInfoWrapper oi = specimen.getOriginInfo();
         if (oi != null) {
             CenterWrapper<?> originCenter = oi.getCenter();
