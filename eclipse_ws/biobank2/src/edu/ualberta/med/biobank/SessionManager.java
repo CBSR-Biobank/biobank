@@ -353,10 +353,7 @@ public class SessionManager {
         }
         // don't want to switch if was activated by an handler after login
         // (display is weird otherwise)
-        if (login
-            && page.getPerspective().getId()
-                .startsWith("edu.ualberta.med.biobank") //$NON-NLS-1$
-            && page.getViewReferences().length == 0)
+        if (login && page.getViewReferences().length == 0)
             try {
                 page.getWorkbenchWindow()
                     .getWorkbench()

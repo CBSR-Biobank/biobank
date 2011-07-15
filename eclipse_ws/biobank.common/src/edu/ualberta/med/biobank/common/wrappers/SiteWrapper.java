@@ -20,7 +20,6 @@ import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.base.SiteBaseWrapper;
 import edu.ualberta.med.biobank.model.Center;
@@ -231,15 +230,6 @@ public class SiteWrapper extends SiteBaseWrapper {
         HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
         return getCountResult(appService, criteria);
-    }
-
-    /**
-     * Only webadministrator can update the site object itself. To check if a
-     * user can modify data inside a site, use user.canUpdateSite method
-     */
-    @Override
-    public boolean canUpdate(User user) {
-        return user.isSuperAdministrator();
     }
 
     @Override
