@@ -19,7 +19,7 @@ public class SpecimenTypeSUsageEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { Messages.SampleTypeSUsageEditor_specType_label, Messages.SampleTypeSUsageEditor_study_label };
+        return new String[] { Messages.SpecimenTypeSUsageEditor_specType_label, Messages.SpecimenTypeSUsageEditor_study_label };
     }
 
     @Override

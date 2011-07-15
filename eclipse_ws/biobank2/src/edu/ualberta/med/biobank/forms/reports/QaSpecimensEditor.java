@@ -39,13 +39,13 @@ public class QaSpecimensEditor extends ReportsEditor {
     @Override
     protected void createOptionSection(Composite parent) throws Exception {
         start = widgetCreator.createDateTimeWidget(parent,
-            Messages.QAAliquotsEditor_start_label, null, null, null, SWT.DATE);
+            Messages.QaSpecimensEditor_start_label, null, null, null, SWT.DATE);
         end = widgetCreator.createDateTimeWidget(parent,
-            Messages.QAAliquotsEditor_end_label, null, null, null, SWT.DATE);
+            Messages.QaSpecimensEditor_end_label, null, null, null, SWT.DATE);
         topContainers = new TopContainerListWidget(parent, toolkit);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), listStatus,
-            Messages.QAAliquotsEditor_top_validation_msg);
+            Messages.QaSpecimensEditor_top_validation_msg);
         topContainers.addSelectionChangedListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -57,8 +57,8 @@ public class QaSpecimensEditor extends ReportsEditor {
             }
         });
         typesViewer = createSpecimenTypeComboOption(
-            Messages.QAAliquotsEditor_specType_label, parent);
-        createValidatedIntegerText(Messages.QAAliquotsEditor_nb_specs_label,
+            Messages.QaSpecimensEditor_specType_label, parent);
+        createValidatedIntegerText(Messages.QaSpecimensEditor_nb_specs_label,
             parent);
     }
 
@@ -92,7 +92,7 @@ public class QaSpecimensEditor extends ReportsEditor {
         Collection<SpecimenTypeWrapper> allSpecTypes = SpecimenTypeWrapper
             .getAllSpecimenTypes(SessionManager.getAppService(), true);
         ComboViewer widget = widgetCreator.createComboViewer(parent, labelText,
-            allSpecTypes, null, Messages.QAAliquotsEditor_types_validation_msg,
+            allSpecTypes, null, Messages.QaSpecimensEditor_types_validation_msg,
             null, new BiobankLabelProvider());
         widget.setLabelProvider(new BiobankLabelProvider() {
             @Override
@@ -112,27 +112,27 @@ public class QaSpecimensEditor extends ReportsEditor {
             .createBoundWidgetWithLabel(parent, BgcBaseText.class, SWT.BORDER,
                 labelText, new String[0], numSpecimens,
                 new IntegerNumberValidator(
-                    Messages.QAAliquotsEditor_specNb_validation_msg, false));
+                    Messages.QaSpecimensEditor_specNb_validation_msg, false));
         return widget;
     }
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { Messages.QAAliquotsEditor_location_label,
-            Messages.QAAliquotsEditor_inventoryid_label,
-            Messages.QAAliquotsEditor_patient_label,
-            Messages.QAAliquotsEditor_processed_label,
-            Messages.QAAliquotsEditor_specType_label };
+        return new String[] { Messages.QaSpecimensEditor_location_label,
+            Messages.QaSpecimensEditor_inventoryid_label,
+            Messages.QaSpecimensEditor_patient_label,
+            Messages.QaSpecimensEditor_processed_label,
+            Messages.QaSpecimensEditor_specType_label };
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> paramNames = new ArrayList<String>();
-        paramNames.add(Messages.QAAliquotsEditor_start_label);
-        paramNames.add(Messages.QAAliquotsEditor_end_label);
-        paramNames.add(Messages.QAAliquotsEditor_top_label);
-        paramNames.add(Messages.QAAliquotsEditor_specType_label);
-        paramNames.add(Messages.QAAliquotsEditor_nb_specs_label);
+        paramNames.add(Messages.QaSpecimensEditor_start_label);
+        paramNames.add(Messages.QaSpecimensEditor_end_label);
+        paramNames.add(Messages.QaSpecimensEditor_top_label);
+        paramNames.add(Messages.QaSpecimensEditor_specType_label);
+        paramNames.add(Messages.QaSpecimensEditor_nb_specs_label);
         return paramNames;
     }
 

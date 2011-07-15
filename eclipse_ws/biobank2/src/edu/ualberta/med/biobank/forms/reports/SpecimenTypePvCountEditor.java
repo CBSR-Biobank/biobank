@@ -43,11 +43,11 @@ public class SpecimenTypePvCountEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { Messages.SampleTypePvCountEditor_pnumber_label,
-            Messages.SampleTypePvCountEditor_first_processed_label,
-            Messages.SampleTypePvCountEditor_first_drawn_label,
-            Messages.SampleTypePvCountEditor_specType_label,
-            Messages.SampleTypePvCountEditor_total_label };
+        return new String[] { Messages.SpecimenTypePvCountEditor_pnumber_label,
+            Messages.SpecimenTypePvCountEditor_first_processed_label,
+            Messages.SpecimenTypePvCountEditor_first_drawn_label,
+            Messages.SpecimenTypePvCountEditor_specType_label,
+            Messages.SpecimenTypePvCountEditor_total_label };
     }
 
     @Override

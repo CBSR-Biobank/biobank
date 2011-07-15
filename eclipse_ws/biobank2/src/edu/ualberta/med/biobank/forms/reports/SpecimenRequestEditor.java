@@ -33,7 +33,7 @@ public class SpecimenRequestEditor extends ReportsEditor {
         parent.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true,
             false));
         csvSelector = new FileBrowser(parent,
-            Messages.AliquotRequestEditor_browse_label, SWT.NONE);
+            Messages.SpecimenRequestEditor_browse_label, SWT.NONE);
         csvSelector.adaptToToolkit(toolkit, true);
     }
 
@@ -76,18 +76,18 @@ public class SpecimenRequestEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { Messages.AliquotRequestEditor_patient_label,
-            Messages.AliquotRequestEditor_inventory_id_label,
-            Messages.AliquotRequestEditor_drawn_label,
-            Messages.AliquotRequestEditor_type_label,
-            Messages.AliquotRequestEditor_location_label,
-            Messages.AliquotRequestEditor_status_label };
+        return new String[] { Messages.SpecimenRequestEditor_patient_label,
+            Messages.SpecimenRequestEditor_inventory_id_label,
+            Messages.SpecimenRequestEditor_drawn_label,
+            Messages.SpecimenRequestEditor_type_label,
+            Messages.SpecimenRequestEditor_location_label,
+            Messages.SpecimenRequestEditor_status_label };
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> paramName = new ArrayList<String>();
-        paramName.add(Messages.AliquotRequestEditor_browse_label);
+        paramName.add(Messages.SpecimenRequestEditor_browse_label);
         return paramName;
     }
 
