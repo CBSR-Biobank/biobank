@@ -43,6 +43,9 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
             Messages.AddressEntryFormCommon_postalCode_label,
             BgcBaseText.class, SWT.NONE, null, PostalCodeValidator.class,
             Messages.AddressEntryFormCommon_postalCode_validation_msg));
+        aMap.put(AddressPeer.COUNTRY.getName(), new FieldInfo(
+            Messages.AddressEntryFormCommon_country_label, BgcBaseText.class,
+            SWT.NONE, null, null, null));
         ADDRESS_FIELDS = Collections.unmodifiableMap(aMap);
     };
 

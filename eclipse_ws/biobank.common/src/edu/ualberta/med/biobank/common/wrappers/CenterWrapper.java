@@ -140,6 +140,14 @@ public abstract class CenterWrapper<E extends Center> extends
         initAddress().setProperty(AddressPeer.EMAIL_ADDRESS, emailAddress);
     }
 
+    public String getCountry() {
+        return getProperty(getAddress(), AddressPeer.COUNTRY);
+    }
+
+    public void setCountry(String country) {
+        initAddress().setProperty(AddressPeer.COUNTRY, country);
+    }
+
     public static final String PROCESSING_EVENT_COUNT_QRY = "select count(proc) from "
         + ProcessingEvent.class.getName()
         + " as proc where "
