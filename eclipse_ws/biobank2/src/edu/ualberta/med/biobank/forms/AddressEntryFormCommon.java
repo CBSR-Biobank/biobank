@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -16,7 +15,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.validators.PostalCodeValidator;
 
 public abstract class AddressEntryFormCommon extends BiobankEntryForm {
 
@@ -37,12 +35,11 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
             SWT.NONE, null, NonEmptyStringValidator.class,
             Messages.AddressEntryFormCommon_city_validation_msg));
         aMap.put(AddressPeer.PROVINCE.getName(), new FieldInfo(
-            Messages.AddressEntryFormCommon_province_label, Combo.class,
-            SWT.NONE, FormConstants.PROVINCES, null, null));
+            Messages.AddressEntryFormCommon_province_label, BgcBaseText.class,
+            SWT.NONE, null, null, null));
         aMap.put(AddressPeer.POSTAL_CODE.getName(), new FieldInfo(
             Messages.AddressEntryFormCommon_postalCode_label,
-            BgcBaseText.class, SWT.NONE, null, PostalCodeValidator.class,
-            Messages.AddressEntryFormCommon_postalCode_validation_msg));
+            BgcBaseText.class, SWT.NONE, null, null, null));
         aMap.put(AddressPeer.COUNTRY.getName(), new FieldInfo(
             Messages.AddressEntryFormCommon_country_label, BgcBaseText.class,
             SWT.NONE, null, null, null));

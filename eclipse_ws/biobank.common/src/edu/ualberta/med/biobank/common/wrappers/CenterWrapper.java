@@ -63,6 +63,7 @@ public abstract class CenterWrapper<E extends Center> extends
         aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.PHONE_NUMBER));
         aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.FAX_NUMBER));
         aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.EMAIL_ADDRESS));
+        aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.COUNTRY));
 
         return aList;
     }
