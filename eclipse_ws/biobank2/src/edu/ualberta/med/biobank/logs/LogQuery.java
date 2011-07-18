@@ -88,7 +88,7 @@ public class LogQuery {
 
         String endDateText = searchQuery.get(END_DATE_KEY);
         endDateText = setValueIfEmpty(endDateText);
-        Date endDate = formatDate(endDateText, DEFAULT_END_TIME); //$NON-NLS-1$
+        Date endDate = formatDate(endDateText, DEFAULT_END_TIME);
 
         dbResults = LogWrapper.getLogs(SessionManager.getAppService(), center,
             user, startDate, endDate, action, patientNumber, inventoryId,

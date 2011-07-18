@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.validators.StringLengthValidator;
  */
 public class MoveContainerDialog extends BgcBaseDialog {
 
-    private ContainerWrapper srcContainer;
     private ContainerWrapper dstContainer;
 
     private String title;
@@ -29,7 +28,6 @@ public class MoveContainerDialog extends BgcBaseDialog {
         ContainerWrapper dstContainer) {
         super(parent);
         Assert.isNotNull(srcContainer);
-        this.srcContainer = srcContainer;
         this.dstContainer = dstContainer;
         title = NLS.bind(Messages.MoveContainerDialog_title,
             srcContainer.getLabel());

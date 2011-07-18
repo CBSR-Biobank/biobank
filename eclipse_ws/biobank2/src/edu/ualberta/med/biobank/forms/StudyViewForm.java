@@ -206,7 +206,7 @@ public class StudyViewForm extends BiobankViewForm {
     private void setPvDataSectionValues() throws Exception {
         for (StudyPvCustomInfo pvCustomInfo : pvCustomInfoList) {
             String label = pvCustomInfo.getLabel();
-            if (label.equals(DATE_PROCESSED_INFO_FIELD_NAME)) { //$NON-NLS-1$
+            if (label.equals(DATE_PROCESSED_INFO_FIELD_NAME)) {
                 // skip this attribute since its already part of PatientVisit
                 continue;
             }

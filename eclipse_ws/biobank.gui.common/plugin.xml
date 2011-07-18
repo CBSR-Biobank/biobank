@@ -64,17 +64,17 @@
       <command
             categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.gui.common.commands.confirm"
-            name="Confirm">
+            name="%confirm.command.name">
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.gui.common.commands.cancel"
-            name="Cancel">
+            name="%cancel.command.name">
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.gui.common.commands.reset"
-            name="Reset">
+            name="%reset.command.name">
       </command>
    </extension>
 </plugin>

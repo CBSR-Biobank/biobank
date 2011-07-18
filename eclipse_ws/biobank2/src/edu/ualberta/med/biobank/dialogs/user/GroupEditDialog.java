@@ -141,7 +141,7 @@ public class GroupEditDialog extends BgcBaseDialog {
                 pgp.getName().replace(replaceString, "")); //$NON-NLS-1$
         }
         MultiSelectWidget featuresWidget = new MultiSelectWidget(parent,
-            SWT.NONE, availableString, enabledString, 75); //$NON-NLS-1$
+            SWT.NONE, availableString, enabledString, 75);
         featuresWidget.setSelections(featuresMap, selectedFeatures);
         return featuresWidget;
     }

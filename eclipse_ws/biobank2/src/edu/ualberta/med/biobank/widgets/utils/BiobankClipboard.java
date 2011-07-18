@@ -46,7 +46,7 @@ public class BiobankClipboard {
                             row.add(""); //$NON-NLS-1$
                         }
                     }
-                    selectedRows.add(StringUtils.join(row, '\t')); //$NON-NLS-1$
+                    selectedRows.add(StringUtils.join(row, '\t'));
                 }
                 if (selectedRows.size() > 0) {
                     StringBuilder sb = new StringBuilder();

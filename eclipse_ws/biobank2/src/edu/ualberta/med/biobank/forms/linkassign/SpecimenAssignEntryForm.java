@@ -288,7 +288,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             public IStatus validate(Object value) {
                 if ((Boolean) foundSpecNull.getValue()) {
                     showDecoration();
-                    return ValidationStatus.error(Messages.SpecimenAssignEntryForm_inventoryid_single_validator_msg);
+                    return ValidationStatus
+                        .error(Messages.SpecimenAssignEntryForm_inventoryid_single_validator_msg);
                 }
                 hideDecoration();
                 return ValidationStatus.ok();
@@ -649,7 +650,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                                 NLS.bind(
                                     Messages.SpecimenAssignEntryForm_multiple_dialog_positionUsed_error_msg,
                                     barcodeAtPosition, currentMultipleContainer
-                                        .getSite().getNameShort())); //$NON-NLS-1$
+                                        .getSite().getNameShort()));
                         appendLog(Messages
                             .format(
                                 Messages.SpecimenAssignEntryForm_multiple_activitylog_pallet_positionUsedMsg,
@@ -864,23 +865,20 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private void createPalletTypesViewer(Composite parent)
         throws ApplicationException {
         initPalletContainerTypes();
-        palletTypesViewer = widgetCreator
-            .createComboViewer(
-                parent,
-                Messages.SpecimenAssignEntryForm_multiple_palletType_label,
-                null,
-                null,
-                Messages.SpecimenAssignEntryForm_multiple_palletType_validationMsg,
-                true, PALLET_TYPES_BINDING, new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        currentMultipleContainer
-                            .setContainerType((ContainerTypeWrapper) selectedObject);
-                        palletTypesViewer.getCombo().setFocus();
-                        if (!useScanner)
-                            displayPalletPositions();
-                    }
-                }, new BiobankLabelProvider());
+        palletTypesViewer = widgetCreator.createComboViewer(parent,
+            Messages.SpecimenAssignEntryForm_multiple_palletType_label, null,
+            null,
+            Messages.SpecimenAssignEntryForm_multiple_palletType_validationMsg,
+            true, PALLET_TYPES_BINDING, new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    currentMultipleContainer
+                        .setContainerType((ContainerTypeWrapper) selectedObject);
+                    palletTypesViewer.getCombo().setFocus();
+                    if (!useScanner)
+                        displayPalletPositions();
+                }
+            }, new BiobankLabelProvider());
     }
 
     /**
@@ -1001,16 +999,14 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     private void saveSingleSpecimen() throws Exception {
         singleSpecimen.persist();
-        appendLog(Messages
-            .format(
-                Messages.SpecimenAssignEntryForm_assigned_msg_single,
-                singleSpecimen.getPositionString(true, false), singleSpecimen
-                    .getCurrentCenter().getNameShort(), singleSpecimen
-                    .getInventoryId(), singleSpecimen.getSpecimenType()
-                    .getName(),
-                singleSpecimen.getSpecimenType().getNameShort(), singleSpecimen
-                    .getCollectionEvent().getPatient().getPnumber(),
-                singleSpecimen.getCollectionEvent().getVisitNumber()));
+        appendLog(Messages.format(
+            Messages.SpecimenAssignEntryForm_assigned_msg_single,
+            singleSpecimen.getPositionString(true, false), singleSpecimen
+                .getCurrentCenter().getNameShort(), singleSpecimen
+                .getInventoryId(), singleSpecimen.getSpecimenType().getName(),
+            singleSpecimen.getSpecimenType().getNameShort(), singleSpecimen
+                .getCollectionEvent().getPatient().getPnumber(), singleSpecimen
+                .getCollectionEvent().getVisitNumber()));
     }
 
     @Override

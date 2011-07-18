@@ -19,7 +19,7 @@ public class PropertyFieldBuilder {
     // @formatter:off    
     private static final String FIELD_TEMPLATE = 
         "\tpublic static final Property<" + Token.PROPERTY_CLASS + ", " + Token.MODEL_CLASS + "> " + Token.VARIABLE_NAME + " = Property.create("
-        + "\n\t\t\"" + Token.PROPERTY_NAME + "\""
+        + "\n\t\t\"" + Token.PROPERTY_NAME + "\" //$NON-NLS-1$ "
         + "\n\t\t, new TypeReference<" + Token.PROPERTY_CLASS + ">() {}"
         + "\n\t\t, new Property.Accessor<" + Token.PROPERTY_CLASS + ", " + Token.MODEL_CLASS + ">() {"
         + "\n\t\t\t@Override"
