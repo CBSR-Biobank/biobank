@@ -6,6 +6,7 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableColumn;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ReportResultsTableWidget<T> extends ReportTableWidget<T> {
@@ -35,11 +36,11 @@ public class ReportResultsTableWidget<T> extends ReportTableWidget<T> {
 
                     if (columnIndex < row.length) {
                         Object cell = row[columnIndex];
-                        if (cell == null) {
+                        if (cell == null)
                             return ""; //$NON-NLS-1$
-                        } else {
-                            return cell.toString();
-                        }
+                        if (cell instanceof Number)
+                            return NumberFormatter.format((Number) cell);
+                        return cell.toString();
                     }
                 }
                 return element.toString();

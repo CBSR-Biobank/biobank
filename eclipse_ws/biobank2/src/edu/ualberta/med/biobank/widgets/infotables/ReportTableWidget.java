@@ -209,8 +209,8 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
             total = String.valueOf(pageInfo.pageTotal);
         else
             total = "?"; //$NON-NLS-1$
-        pageLabel.setText(NLS.bind(Messages.ReportTableWidget_pages_label, (pageInfo.page + 1),
-            total));
+        pageLabel.setText(NLS.bind(Messages.ReportTableWidget_pages_label,
+            (pageInfo.page + 1), total));
     }
 
     @Override
