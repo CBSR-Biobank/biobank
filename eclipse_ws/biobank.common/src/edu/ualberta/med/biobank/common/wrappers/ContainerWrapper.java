@@ -449,6 +449,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                         position.reload();
                     } catch (Exception ex) {
                         // do nothing
+                        ex.printStackTrace();
                     }
                     SpecimenWrapper spc = position.getSpecimen();
                     specimens.put(

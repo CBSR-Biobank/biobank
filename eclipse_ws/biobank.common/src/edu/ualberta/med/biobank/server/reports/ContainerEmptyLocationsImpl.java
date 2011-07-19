@@ -38,14 +38,19 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
         List<Object> results) {
         List<Object> processedResults = new ArrayList<Object>();
         for (Object c : results) {
+
+            ContainerWrapper container = new ContainerWrapper(appService,
+                (Container) c);
             try {
-                ContainerWrapper container = new ContainerWrapper(appService,
-                    (Container) c);
                 container.reload();
-                int rows = container.getRowCapacity();
-                int cols = container.getColCapacity();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            int rows = container.getRowCapacity();
+            int cols = container.getColCapacity();
+            try {
                 Map<RowColPos, SpecimenWrapper> aliquots = container
-                    .getSpecimens();
+                    .getSpecimens(true);
 
                 for (int i = 0; i < rows; i++) {
                     for (int j = 0; j < cols; j++) {
@@ -63,9 +68,9 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
                     }
                 }
             } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
+
         }
         return processedResults;
     }

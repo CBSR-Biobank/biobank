@@ -10,8 +10,12 @@ ALTER TABLE request_specimen ADD COLUMN REQUEST_ID INT(11) NOT NULL COMMENT '', 
 ALTER TABLE request_specimen ADD CONSTRAINT FK579572D8A2F14F4F FOREIGN KEY FK579572D8A2F14F4F (REQUEST_ID) REFERENCES request (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 -- add country field and set all existing ones to Canada (issue #1237)
-ALTER TABLE ADDRESS ADD COLUMN COUNTRY varchar(50);
+alter table ADDRESS add COLUMN COUNTRY varchar(50);
+update ADDRESS set COUNTRY = 'Canada';
 
-UPDATE ADDRESS SET COUNTRY = 'Canada';
 
+-- update discriminator of SpecimenPosition (before was AliquotPosition)
+update abstract_position
+set discriminator = 'SpecimenPosition'
+where discriminator = 'AliquotPosition';
 
