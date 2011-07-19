@@ -442,6 +442,7 @@ public abstract class CenterWrapper<E extends Center> extends
 
     @Override
     public boolean canUpdate(User user) {
-        return user.isAdministratorForCurrentCenter();
+        return user.isInSuperAdminMode()
+            || user.isAdministratorForCurrentCenter();
     }
 }
