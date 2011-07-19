@@ -117,6 +117,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         setFirstControl(client);
 
+        boolean labelIsFirstControl = false;
         if ((container.isNew() && container.getParentContainer() == null)
             || (container.getContainerType() != null && Boolean.TRUE
                 .equals(container.getContainerType().getTopLevel()))) {
@@ -126,6 +127,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 Messages.ContainerEntryForm_label_label, null, container,
                 ContainerPeer.LABEL.getName(), new NonEmptyStringValidator(
                     MSG_CONTAINER_NAME_EMPTY)));
+            labelIsFirstControl = true;
         } else {
             BgcBaseText l = createReadOnlyLabelledField(client, SWT.NONE,
                 Messages.ContainerEntryForm_label_label);
@@ -135,7 +137,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         Control c = createBoundWidgetWithLabel(client, BgcBaseText.class,
             SWT.NONE, Messages.ContainerEntryForm_barcode_label, null,
             container, ContainerPeer.PRODUCT_BARCODE.getName(), null);
-        if (getFirstControl() == null)
+        if (!labelIsFirstControl)
             setFirstControl(c);
 
         activityStatusComboViewer = createComboViewer(client,
