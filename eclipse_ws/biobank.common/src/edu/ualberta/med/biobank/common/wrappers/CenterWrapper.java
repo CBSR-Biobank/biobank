@@ -63,6 +63,7 @@ public abstract class CenterWrapper<E extends Center> extends
         aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.PHONE_NUMBER));
         aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.FAX_NUMBER));
         aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.EMAIL_ADDRESS));
+        aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.COUNTRY));
 
         return aList;
     }
@@ -138,6 +139,14 @@ public abstract class CenterWrapper<E extends Center> extends
 
     public void setEmailAddress(String emailAddress) {
         initAddress().setProperty(AddressPeer.EMAIL_ADDRESS, emailAddress);
+    }
+
+    public String getCountry() {
+        return getProperty(getAddress(), AddressPeer.COUNTRY);
+    }
+
+    public void setCountry(String country) {
+        initAddress().setProperty(AddressPeer.COUNTRY, country);
     }
 
     public static final String PROCESSING_EVENT_COUNT_QRY = "select count(proc) from "

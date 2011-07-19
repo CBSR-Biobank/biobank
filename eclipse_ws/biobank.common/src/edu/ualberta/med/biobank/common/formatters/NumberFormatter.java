@@ -13,6 +13,10 @@ public class NumberFormatter {
     public static final NumberFormat perCentFormatter = NumberFormat
         .getPercentInstance(Locale.getDefault());
 
+    static {
+        perCentFormatter.setMinimumFractionDigits(2);
+    }
+
     public static String format(Number nb) {
         if (nb == null) {
             return ""; //$NON-NLS-1$

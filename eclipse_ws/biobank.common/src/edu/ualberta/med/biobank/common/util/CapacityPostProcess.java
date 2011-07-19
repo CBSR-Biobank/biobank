@@ -1,10 +1,11 @@
 package edu.ualberta.med.biobank.common.util;
 
-import java.text.DecimalFormat;
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 
 public class CapacityPostProcess extends AbstractRowPostProcess {
 
     private static final long serialVersionUID = 1L;
+
     private int col1;
     private int col2;
 
@@ -18,11 +19,13 @@ public class CapacityPostProcess extends AbstractRowPostProcess {
         if (object != null) {
             Object[] castOb = (Object[]) object;
             Object[] rowObject = new Object[castOb.length + 1];
-            DecimalFormat format = new DecimalFormat("#0.00%"); //$NON-NLS-1$
+            // first columns are the same:
             for (int i = 0; i < castOb.length; i++)
                 rowObject[i] = castOb[i];
-            rowObject[castOb.length] = format.format(((Long) castOb[col2])
-                * 1.0 / ((Long) castOb[col1]));
+            // additional column contains percentage:
+            Double percent = ((Long) castOb[col2]) * 1.0
+                / ((Long) castOb[col1]);
+            rowObject[castOb.length] = NumberFormatter.formatPerCent(percent);
             return rowObject;
         }
         return null;

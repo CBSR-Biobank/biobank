@@ -27,6 +27,8 @@ public class Messages extends NLS {
 
     public static String AddressEntryFormCommon_city_validation_msg;
 
+    public static String AddressEntryFormCommon_country_label;
+
     public static String AddressEntryFormCommon_postalCode_label;
 
     public static String AddressEntryFormCommon_postalCode_validation_msg;
