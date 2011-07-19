@@ -19,6 +19,10 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
 
     public RowColPos(Integer row, Integer col) {
         super();
+        if (row == null)
+            throw new RuntimeException("row cannot be null");
+        if (col == null)
+            throw new RuntimeException("col cannot be null");
         this.row = row;
         this.col = col;
     }

@@ -8,3 +8,9 @@ ALTER TABLE request_specimen DROP FOREIGN KEY FK579572D8D990A70;
 ALTER TABLE request_specimen DROP INDEX FK579572D8D990A70, DROP COLUMN AREQUEST_ID;
 ALTER TABLE request_specimen ADD COLUMN REQUEST_ID INT(11) NOT NULL COMMENT '', ADD INDEX FK579572D8A2F14F4F (REQUEST_ID);
 ALTER TABLE request_specimen ADD CONSTRAINT FK579572D8A2F14F4F FOREIGN KEY FK579572D8A2F14F4F (REQUEST_ID) REFERENCES request (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+
+-- update discriminator of SpecimenPosition (before was AliquotPosition)
+update abstract_position
+set discriminator = 'SpecimenPosition'
+where discriminator = 'AliquotPosition';
