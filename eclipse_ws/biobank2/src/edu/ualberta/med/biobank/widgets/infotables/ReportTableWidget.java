@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -62,8 +63,10 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
                         if (castedVals[columnIndex] instanceof Date)
                             return DateFormatter
                                 .formatAsDate((Date) castedVals[columnIndex]);
-                        else
-                            return castedVals[columnIndex].toString();
+                        if (castedVals[columnIndex] instanceof Number)
+                            return NumberFormatter
+                                .format((Number) castedVals[columnIndex]);
+                        return castedVals[columnIndex].toString();
                     }
                 }
                 return "no label provider"; //$NON-NLS-1$
