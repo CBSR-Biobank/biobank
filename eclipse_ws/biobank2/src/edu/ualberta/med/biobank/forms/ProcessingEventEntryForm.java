@@ -245,6 +245,10 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
+        ActivityStatusWrapper a = ActivityStatusWrapper.getActivityStatus(
+            appService, ActivityStatusWrapper.CLOSED_STATUS_STRING);
+        for (SpecimenWrapper ss : pEvent.getSpecimenCollection(false))
+            ss.setActivityStatus(a);
         pEvent.persist();
         SessionManager.updateAllSimilarNodes(pEventAdapter, true);
     }
