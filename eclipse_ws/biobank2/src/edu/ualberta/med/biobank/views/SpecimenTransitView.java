@@ -186,9 +186,10 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             if (searchedObject == null || searchedObject.size() == 0) {
                 String msg;
                 if (radioWaybill.getSelection()) {
-                    msg = NLS.bind(
-                        Messages.SpecimenTransitView_notfound_waybill_error_msg,
-                        treeText.getText());
+                    msg = NLS
+                        .bind(
+                            Messages.SpecimenTransitView_notfound_waybill_error_msg,
+                            treeText.getText());
                 } else {
                     msg = NLS.bind(
                         Messages.SpecimenTransitView_notfound_date_error_msg,
@@ -248,11 +249,13 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         searchedNode.performExpand();
         if (searchedObjects.size() == 1) {
             List<AdapterBase> nodeRes = rootNode.search(searchedObjects.get(0));
-            nodeRes.get(0).performDoubleClick();
+            if (nodeRes.size() > 0)
+                nodeRes.get(0).performDoubleClick();
         } else
             BgcPlugin.openMessage(
-                Messages.SpecimenTransitView_res_dialog_title,
-                NLS.bind(Messages.SpecimenTransitView_found_multiple_msg, searchedObjects.size()));
+                Messages.SpecimenTransitView_res_dialog_title, NLS.bind(
+                    Messages.SpecimenTransitView_found_multiple_msg,
+                    searchedObjects.size()));
     }
 
     public static AdapterBase addToNode(AdapterBase parentNode,
