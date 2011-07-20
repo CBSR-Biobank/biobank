@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -150,6 +151,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     protected void saveForm() throws Exception {
         site.persist();
         siteAdapter.getParent().performExpand();
+        SessionManager.getUser().updateCurrentCenter(site);
     }
 
     @Override

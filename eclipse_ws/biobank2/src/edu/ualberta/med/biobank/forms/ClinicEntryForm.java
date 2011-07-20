@@ -169,6 +169,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             .getDeletedContacts());
         clinic.persist();
         SessionManager.updateAllSimilarNodes(clinicAdapter, true);
+        SessionManager.getUser().updateCurrentCenter(clinic);
     }
 
     @Override

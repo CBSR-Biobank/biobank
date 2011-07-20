@@ -384,4 +384,16 @@ public class User implements Serializable, NotAProxy {
         CenterWrapper<?> center = getCurrentWorkingCenter();
         return center != null && center.getNameShort().equals("CBSR"); //$NON-NLS-1$
     }
+
+    /**
+     * if center is the current center, then current center is reset to be sure
+     * it has latest modifications
+     * 
+     * @throws Exception
+     */
+    public void updateCurrentCenter(CenterWrapper<?> center) throws Exception {
+        if (center != null && center.equals(currentWorkingCenter)) {
+            currentWorkingCenter.reset();
+        }
+    }
 }
