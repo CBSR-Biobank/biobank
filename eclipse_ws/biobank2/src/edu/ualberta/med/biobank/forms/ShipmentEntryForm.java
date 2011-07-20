@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -83,6 +84,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private Set<SpecimenWrapper> specimensToPersist = new HashSet<SpecimenWrapper>();
 
+    private DateTimeWidget receivedAtWidget;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ShipmentAdapter,
@@ -92,15 +95,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         originInfo = (OriginInfoWrapper) getModelObject();
         shipmentInfo = originInfo.getShipmentInfo();
 
+        setDefaultValues();
+
         String tabName;
         if (originInfo.isNew()) {
             tabName = Messages.ShipmentEntryForm_title_new;
-            CenterWrapper<?> userCenter = SessionManager.getUser()
-                .getCurrentWorkingCenter();
-            if (userCenter instanceof SiteWrapper) {
-                originInfo.setReceiverSite((SiteWrapper) userCenter);
-            }
-            shipmentInfo.setReceivedAt(Calendar.getInstance().getTime());
         } else {
             tabName = NLS.bind(Messages.ShipmentEntryForm_title_edit,
                 originInfo.getShipmentInfo().getFormattedDateReceived());
@@ -201,7 +200,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             Messages.ShipmentEntryForm_boxNber_label, null, shipmentInfo,
             ShipmentInfoPeer.BOX_NUMBER.getName(), null);
 
-        createDateTimeWidget(client, Messages.ShipmentEntryForm_received_label,
+        receivedAtWidget = createDateTimeWidget(client,
+            Messages.ShipmentEntryForm_received_label,
             shipmentInfo.getReceivedAt(), shipmentInfo,
             ShipmentInfoPeer.RECEIVED_AT.getName(), new NotNullValidator(
                 Messages.ShipmentEntryForm_received_validation_msg));
@@ -386,9 +386,25 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         specimenEntryWidget.setSpecimens(originInfo
             .getSpecimenCollection(false));
 
+        setDefaultValues();
         GuiUtil.reset(senderComboViewer, originInfo.getCenter());
         GuiUtil.reset(receiverComboViewer, originInfo.getReceiverSite());
         GuiUtil.reset(shippingMethodComboViewer,
             shipmentInfo.getShippingMethod());
+    }
+
+    private void setDefaultValues() {
+        if (originInfo.isNew()) {
+            CenterWrapper<?> userCenter = SessionManager.getUser()
+                .getCurrentWorkingCenter();
+            if (userCenter instanceof SiteWrapper) {
+                originInfo.setReceiverSite((SiteWrapper) userCenter);
+            }
+            Date receivedAt = Calendar.getInstance().getTime();
+            shipmentInfo.setReceivedAt(receivedAt);
+            // FIXME for some reasons, the date is not set - any link to issue
+            // #1306 ?
+            receivedAtWidget.setDate(receivedAt);
+        }
     }
 }
