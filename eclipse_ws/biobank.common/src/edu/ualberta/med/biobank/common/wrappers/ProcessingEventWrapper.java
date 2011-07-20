@@ -65,6 +65,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         for (SpecimenWrapper ss : removedSpecimens) {
             if (!ss.isNew()) {
                 ss.setProcessingEvent(null);
+                ss.setActivityStatus(ActivityStatusWrapper
+                    .getActiveActivityStatus(appService));
                 ss.persist();
             }
         }
