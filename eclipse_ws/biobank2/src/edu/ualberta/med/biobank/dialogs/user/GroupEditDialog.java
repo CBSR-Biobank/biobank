@@ -7,8 +7,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -79,19 +77,9 @@ public class GroupEditDialog extends BgcBaseDialog {
             "name", new NonEmptyStringValidator( //$NON-NLS-1$
                 Messages.GroupEditDialog_msg_name_required));
 
-        final Button isCenterAdministratorCheckBox = (Button) createBoundWidgetWithLabel(
-            contents, Button.class, SWT.CHECK,
+        createBoundWidgetWithLabel(contents, Button.class, SWT.CHECK,
             Messages.GroupEditDialog_center_administrator_title, null,
             modifiedGroup, "isWorkingCentersAdministrator", null); //$NON-NLS-1$
-        isCenterAdministratorCheckBox
-            .addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    setCenterAdministrator();
-                }
-            });
-        isCenterAdministratorCheckBox
-            .setToolTipText(Messages.GroupEditDialog_center_administrator_tooltip);
 
         List<String> centerNames = new ArrayList<String>();
         final LinkedHashMap<Integer, String> centerMap = new LinkedHashMap<Integer, String>();
@@ -117,18 +105,8 @@ public class GroupEditDialog extends BgcBaseDialog {
             BiobankSecurityUtil.CENTER_FEATURE_START_NAME,
             Messages.GroupEditDialog_feature_center_list_available,
             Messages.GroupEditDialog_feature_center_list_selected);
-        setCenterAdministrator();
-    }
-
-    protected void setCenterAdministrator() {
-        boolean centerAdministrator = modifiedGroup
-            .getIsWorkingCentersAdministrator();
-        centerFeaturesWidget.setEnabled(!centerAdministrator);
-        if (centerAdministrator)
-            centerFeaturesWidget.selectAll();
-        else
-            centerFeaturesWidget.setSelection(modifiedGroup
-                .getCenterFeaturesEnabled());
+        centerFeaturesWidget.setSelection(modifiedGroup
+            .getCenterFeaturesEnabled());
     }
 
     private MultiSelectWidget createFeaturesSelectionWidget(Composite parent,
@@ -171,12 +149,8 @@ public class GroupEditDialog extends BgcBaseDialog {
         try {
             modifiedGroup.setWorkingCenterIds(workingCentersWidget
                 .getSelected());
-            if (modifiedGroup.getIsWorkingCentersAdministrator())
-                modifiedGroup
-                    .setCenterFeaturesEnabled(new ArrayList<Integer>());
-            else
-                modifiedGroup.setCenterFeaturesEnabled(centerFeaturesWidget
-                    .getSelected());
+            modifiedGroup.setCenterFeaturesEnabled(centerFeaturesWidget
+                .getSelected());
             Group groupeResult = SessionManager.getAppService().persistGroup(
                 modifiedGroup);
             originalGroup.copy(groupeResult);

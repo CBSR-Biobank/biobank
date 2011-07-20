@@ -97,7 +97,7 @@ public class SessionManager {
         IWorkbench workbench = BiobankPlugin.getDefault().getWorkbench();
         IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
             .getActivePage();
-        updateVisibility(page, true);
+        updateViewsVisibility(page, true);
     }
 
     public void deleteSession() throws Exception {
@@ -336,7 +336,7 @@ public class SessionManager {
         return getUser().isInSuperAdminMode();
     }
 
-    public static void updateVisibility(IWorkbenchPage page, boolean login) {
+    public static void updateViewsVisibility(IWorkbenchPage page, boolean login) {
         try {
             SessionManager sm = getInstance();
             if (sm.isConnected()) {
