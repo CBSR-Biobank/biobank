@@ -197,15 +197,18 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return shipments;
     }
 
-    // @SuppressWarnings("unchecked")
-    // @Override
-    // jmf: Cannot just return the origin center becaus then the receivers
-    // cannot edit the shipment
-    // public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
-    // if (getCenter() != null)
-    // return Arrays.asList(getCenter());
-    // return super.getSecuritySpecificCenters();
-    // }
+    /**
+     * security specific to the 2 centers involved in the shipment
+     */
+    @Override
+    public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
+        List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>();
+        if (getCenter() != null)
+            centers.add(getCenter());
+        if (getReceiverSite() != null)
+            centers.add(getReceiverSite());
+        return centers;
+    }
 
     @Override
     protected Log getLogMessage(String action, String site, String details) {

@@ -537,11 +537,9 @@
             class="edu.ualberta.med.biobank.handlers.PatientMergeHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.patientMerge">
          <activeWhen>
-            <and>
               <reference
                     definitionId="biobank.processingPerspectiveSelected">
               </reference>
-            </and>
          </activeWhen>
           <enabledWhen>
             <and>
@@ -558,9 +556,8 @@
                      </instanceof>
                   </iterate>
           	  </with>
-      <reference
-            definitionId="biobank.canUpdate">
-      </reference>
+              <reference definitionId="biobank.canUpdate">
+              </reference>
             </and>
          </enabledWhen>
       </handler>
@@ -592,11 +589,9 @@
             class="edu.ualberta.med.biobank.handlers.CollectionEventAddHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd">
          <activeWhen>
-            <and>
                <reference
                      definitionId="biobank.processingPerspectiveSelected">
                </reference>
-            </and>
          </activeWhen>
          <enabledWhen>
             <and>
@@ -613,9 +608,8 @@
                      </instanceof>
                   </iterate>
           	  </with>
-      <reference
-            definitionId="biobank.canUpdate">
-      </reference>
+      		  <reference definitionId="biobank.canUpdate">
+      		  </reference>
             </and>
          </enabledWhen>
       </handler>
