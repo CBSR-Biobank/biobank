@@ -49,7 +49,8 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
         specimenWidget.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(specimenWidget);
 
-        addSectionToolbar(section, Messages.SpecimenTypesViewForm_add_specimen_button,
+        addSectionToolbar(section,
+            Messages.SpecimenTypesViewForm_add_specimen_button,
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {

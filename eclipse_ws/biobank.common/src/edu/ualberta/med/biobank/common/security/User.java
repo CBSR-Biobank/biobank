@@ -5,7 +5,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,9 +13,6 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class User implements Serializable, NotAProxy {
@@ -48,54 +44,61 @@ public class User implements Serializable, NotAProxy {
 
     /**
      * [object type | privilege] = list of center class names. Specific rights
-     * applied on the center type.
+     * applied on the center types.
      */
-    private static transient Map<TypePrivilegeKey, List<String>> specificRightsMapping;
-
-    private static class TypePrivilegeKey {
-        public String type;
-        public Privilege privilege;
-
-        public TypePrivilegeKey(String type, Privilege privilege) {
-            this.type = type;
-            this.privilege = privilege;
-        }
-
-        @Override
-        public boolean equals(Object object) {
-            if (object instanceof TypePrivilegeKey) {
-                TypePrivilegeKey tpk = (TypePrivilegeKey) object;
-                return type.equals(tpk.type) && privilege.equals(tpk.privilege);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return type.hashCode() + privilege.hashCode();
-        }
-    }
-
-    static {
-        specificRightsMapping = new HashMap<TypePrivilegeKey, List<String>>();
-
-        addSpecificMappings(
-            Container.class.getName(),
-            Arrays.asList(Privilege.CREATE, Privilege.UPDATE, Privilege.DELETE),
-            Arrays.asList(Site.class.getName()));
-        addSpecificMappings(
-            ContainerType.class.getName(),
-            Arrays.asList(Privilege.CREATE, Privilege.UPDATE, Privilege.DELETE),
-            Arrays.asList(Site.class.getName()));
-    }
-
-    private static void addSpecificMappings(String objectType,
-        List<Privilege> privileges, List<String> centerClassNames) {
-        for (Privilege privilege : privileges) {
-            specificRightsMapping.put(new TypePrivilegeKey(objectType,
-                privilege), centerClassNames);
-        }
-    }
+    // FIXME DD: not sure anymore this is needed. I will just keep the code a
+    // few days to check I can remove it.
+    // private static transient Map<TypePrivilegeKey, List<String>>
+    // specificRightsMapping;
+    //
+    // private static class TypePrivilegeKey {
+    // public String type;
+    // public Privilege privilege;
+    //
+    // public TypePrivilegeKey(String type, Privilege privilege) {
+    // this.type = type;
+    // this.privilege = privilege;
+    // }
+    //
+    // @Override
+    // public boolean equals(Object object) {
+    // if (object instanceof TypePrivilegeKey) {
+    // TypePrivilegeKey tpk = (TypePrivilegeKey) object;
+    // return type.equals(tpk.type) && privilege.equals(tpk.privilege);
+    // }
+    // return false;
+    // }
+    //
+    // @Override
+    // public int hashCode() {
+    // return type.hashCode() + privilege.hashCode();
+    // }
+    // }
+    //
+    // static {
+    // specificRightsMapping = new HashMap<TypePrivilegeKey, List<String>>();
+    //
+    // addSpecificMappings(
+    // Container.class.getName(),
+    // Arrays.asList(Privilege.CREATE, Privilege.UPDATE, Privilege.DELETE),
+    // Arrays.asList(Site.class.getName()));
+    // addSpecificMappings(
+    // ContainerType.class.getName(),
+    // Arrays.asList(Privilege.CREATE, Privilege.UPDATE, Privilege.DELETE),
+    // Arrays.asList(Site.class.getName()));
+    // addSpecificMappings(
+    // Contact.class.getName(),
+    // Arrays.asList(Privilege.CREATE, Privilege.UPDATE, Privilege.DELETE),
+    // Arrays.asList(Clinic.class.getName()));
+    // }
+    //
+    // private static void addSpecificMappings(String objectType,
+    // List<Privilege> privileges, List<String> centerClassNames) {
+    // for (Privilege privilege : privileges) {
+    // specificRightsMapping.put(new TypePrivilegeKey(objectType,
+    // privilege), centerClassNames);
+    // }
+    // }
 
     public boolean isLockedOut() {
         return isLockedOut;
@@ -252,12 +255,12 @@ public class User implements Serializable, NotAProxy {
         CenterWrapper<?> currentCenter = getCurrentWorkingCenter();
         if (!isInSuperAdminMode() && currentCenter != null) {
             // check object specific rights depending on center type
-            List<String> centerSpecificRights = specificRightsMapping
-                .get(new TypePrivilegeKey(type, privilege));
-            if (centerSpecificRights != null) {
-                currentCenterRights = centerSpecificRights
-                    .contains(currentCenter.getWrappedClass().getName());
-            }
+            // List<String> centerSpecificRights = specificRightsMapping
+            // .get(new TypePrivilegeKey(type, privilege));
+            // if (centerSpecificRights != null) {
+            // currentCenterRights = centerSpecificRights
+            // .contains(currentCenter.getWrappedClass().getName());
+            // }
             // check object rights depending on centers set on object
             if (specificCenters != null && specificCenters.size() > 0)
                 currentCenterRights = currentCenterRights
