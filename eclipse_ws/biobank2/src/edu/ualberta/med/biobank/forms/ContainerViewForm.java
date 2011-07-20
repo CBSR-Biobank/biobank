@@ -502,7 +502,8 @@ public class ContainerViewForm extends BiobankViewForm {
         setTextValue(activityStatusLabel, container.getActivityStatus());
         setTextValue(commentsLabel, container.getComment());
         setTextValue(containerTypeLabel, container.getContainerType().getName());
-        setTextValue(temperatureLabel, container.getTemperature());
+        setTextValue(temperatureLabel, container.getTopContainer()
+            .getTemperature());
         if (container.hasParentContainer()) {
             if (rowLabel != null) {
                 setTextValue(rowLabel, container.getPositionAsRowCol().row);

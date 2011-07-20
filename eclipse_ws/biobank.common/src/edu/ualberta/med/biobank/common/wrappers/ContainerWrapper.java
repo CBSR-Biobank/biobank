@@ -195,8 +195,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             }
             if (labelChanged) {
                 // the label need to be modified
-                String label = parent.getLabel() + getPositionString();
-                setLabel(label);
+                setLabelUsingPositionAndParent();
                 checkLabelUniqueForType();
             }
         }
@@ -204,6 +203,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         persistSpecimens();
         setPath();
         setTopContainer();
+    }
+
+    public void setLabelUsingPositionAndParent() {
+        ContainerWrapper parent = getParentContainer();
+        if (parent != null) {
+            String label = parent.getLabel() + getPositionString();
+            setLabel(label);
+        }
     }
 
     public RowColPos getPositionAsRowCol() {
@@ -988,7 +995,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             ContainerWrapper newContainer = new ContainerWrapper(appService);
             newContainer.setContainerType(type);
             newContainer.setSite(getSite());
-            newContainer.setTemperature(getTemperature());
             newContainer.setPositionAsRowCol(new RowColPos(i, j));
             newContainer.setParent(this);
             newContainer.setActivityStatus(ActivityStatusWrapper

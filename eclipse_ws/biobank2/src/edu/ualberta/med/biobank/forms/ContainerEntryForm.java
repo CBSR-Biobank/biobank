@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -72,6 +73,11 @@ public class ContainerEntryForm extends BiobankEntryForm {
             tabName = Messages.ContainerEntryForm_new_title;
             container.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
+            if (container.hasParentContainer()) {
+                // need to set the label at least for display. But will be set
+                // during persit dependencies of the container
+                container.setLabelUsingPositionAndParent();
+            }
         } else {
             tabName = NLS.bind(Messages.ContainerEntryForm_edit_title,
                 container.getLabel());
@@ -186,7 +192,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     ContainerTypeWrapper ct = (ContainerTypeWrapper) selectedObject;
                     container.setContainerType(ct);
                     if (tempWidget != null) {
-                        tempWidget.setText(""); //$NON-NLS-1$
                         if (ct != null && Boolean.TRUE.equals(ct.getTopLevel())) {
                             Double temp = ct.getDefaultTemperature();
                             if (temp == null) {
@@ -198,10 +203,17 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     }
                 }
             });
+        // temperature is set for the toplevel container only.
+        String tempProperty = ContainerPeer.TEMPERATURE.getName();
+        if (container.hasParentContainer())
+            // subcontainer are using topcontainer temperature. This is display
+            // only.
+            tempProperty = Property.concatNames(ContainerPeer.TOP_CONTAINER,
+                ContainerPeer.TEMPERATURE);
         tempWidget = (BgcBaseText) createBoundWidgetWithLabel(client,
             BgcBaseText.class, SWT.NONE,
             Messages.ContainerEntryForm_temperature_label, null, container,
-            ContainerPeer.TEMPERATURE.getName(), new DoubleNumberValidator(
+            tempProperty, new DoubleNumberValidator(
                 Messages.ContainerEntryForm_temperature_validation_msg));
         if (container.hasParentContainer())
             tempWidget.setEnabled(false);

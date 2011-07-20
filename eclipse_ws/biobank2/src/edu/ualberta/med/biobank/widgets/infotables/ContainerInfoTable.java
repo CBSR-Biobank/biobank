@@ -95,7 +95,7 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
         }
         info.status = container.getActivityStatus().getName();
         info.barcode = container.getProductBarcode();
-        info.temperature = container.getTemperature();
+        info.temperature = container.getTopContainer().getTemperature();
         return info;
     }
 
