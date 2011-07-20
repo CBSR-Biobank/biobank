@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.dialogs.startup.LoginDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.handlers.LogoutHandler;
@@ -148,8 +149,13 @@ public class ChangePasswordDialog extends BgcBaseDialog {
 
             LogoutHandler lh = new LogoutHandler();
             lh.execute(null);
+
             // FIXME find a way to reconnect the user automatically ?
             super.okPressed();
+
+            LoginDialog ld = new LoginDialog(getShell());
+
+            ld.open();
         } catch (Exception e) {
             BgcPlugin.openAsyncError(Messages.ChangePasswordDialog_error_title,
                 e);

@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcSessionState;
@@ -87,12 +86,6 @@ public class SessionManager {
             serverName, user);
         rootNode.addChild(sessionAdapter);
         updateSessionState();
-
-        if (sessionAdapter.getUser().passwordChangeRequired()) {
-            ChangePasswordDialog dlg = new ChangePasswordDialog(PlatformUI
-                .getWorkbench().getActiveWorkbenchWindow().getShell(), true);
-            dlg.open();
-        }
 
         IWorkbench workbench = BiobankPlugin.getDefault().getWorkbench();
         IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
