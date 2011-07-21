@@ -432,8 +432,9 @@ public class LinkFormPatientManagement {
             return Collections.emptyList();
         List<SpecimenWrapper> specs;
         try {
-            specs = currentCEventSelected.getSourceSpecimenCollectionInProcess(
-                currentPEventSelected, true);
+            specs = currentCEventSelected
+                .getSourceSpecimenCollectionInProcessNotFlagged(
+                    currentPEventSelected, true);
             if (specs.size() == 0) {
                 BgcPlugin
                     .openAsyncError(

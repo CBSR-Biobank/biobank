@@ -182,12 +182,29 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                             NLS.bind(
                                 Messages.ProcessingEventEntryForm_center_spec_error_msg,
                                 centerName));
-                    } else if (specimen.isUsedInDispatch())
+                    } else if (!specimen.isActive())
+                        throw new VetoException(
+                            NLS.bind(
+                                Messages.ProcessingEventEntryForm_spec_active_only_error_msg,
+                                specimen.getActivityStatus().getName()));
+                    else if (specimen.isUsedInDispatch())
                         throw new VetoException(
                             Messages.ProcessingEventEntryForm_spec_dispatch_error_msg);
                     else if (specimen.getParentContainer() != null)
                         throw new VetoException(
                             Messages.ProcessingEventEntryForm_stored_spec_error_msg);
+                    else if (!SessionManager
+                        .getUser()
+                        .getCurrentWorkingCenter()
+                        .getStudyCollection()
+                        .contains(
+                            specimen.getCollectionEvent().getPatient()
+                                .getStudy()))
+                        throw new VetoException(
+                            NLS.bind(
+                                Messages.ProcessingEventEntryForm_spec_study_allowed_only_error_msg,
+                                specimen.getCollectionEvent().getPatient()
+                                    .getStudy().getNameShort()));
                     else if (pEvent.getSpecimenCollection(false).size() > 0
                         && !pEvent
                             .getSpecimenCollection(false)

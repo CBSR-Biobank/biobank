@@ -96,6 +96,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
             pEvent.getSpecimenCollection(true), ColumnsShown.SOURCE_SPECIMENS,
             10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
+        sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
     }
 
     @Override

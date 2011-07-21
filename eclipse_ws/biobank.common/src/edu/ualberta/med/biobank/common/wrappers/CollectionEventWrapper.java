@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
@@ -311,26 +312,29 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return aliquotedSpecimens;
     }
 
-    private static String SOURCE_SPEC_IN_PROCESS_QRY = "select spec from "
+    private static String SOURCE_SPEC_IN_PROCESS_NOT_FLAGGED_QRY = "select spec from "
         + Specimen.class.getName()
         + " as spec where spec."
         + Property.concatNames(SpecimenPeer.ORIGINAL_COLLECTION_EVENT,
             CollectionEventPeer.ID)
         + " = ? and spec."
         + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
-            ProcessingEventPeer.ID) + " = ?";
+            ProcessingEventPeer.ID)
+        + " = ? and spec."
+        + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
+            ActivityStatusPeer.NAME) + " != 'Flagged'";
 
     /**
      * source specimen that are in a process event
      * 
      * @throws ApplicationException
      */
-    public List<SpecimenWrapper> getSourceSpecimenCollectionInProcess(
+    public List<SpecimenWrapper> getSourceSpecimenCollectionInProcessNotFlagged(
         ProcessingEventWrapper pEvent, boolean sort)
         throws ApplicationException {
         List<Specimen> raw = appService.query(new HQLCriteria(
-            SOURCE_SPEC_IN_PROCESS_QRY, Arrays.asList(new Object[] { getId(),
-                pEvent.getId() })));
+            SOURCE_SPEC_IN_PROCESS_NOT_FLAGGED_QRY, Arrays.asList(new Object[] {
+                getId(), pEvent.getId() })));
         if (raw == null) {
             return new ArrayList<SpecimenWrapper>();
         }
