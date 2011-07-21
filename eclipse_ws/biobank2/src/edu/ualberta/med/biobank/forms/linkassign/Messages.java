@@ -201,7 +201,9 @@ public class Messages extends NLS {
 
     public static String SpecimenAssignEntryForm_single_position_validationMsg;
 
-    public static String SpecimenAssignEntryForm_single_specimen_transit_error;
+    public static String SpecimenAssignEntryForm_single_spec_center_error;
+
+    public static String SpecimenAssignEntryForm_single_spec_transit_error;
 
     public static String SpecimenAssignEntryForm_single_type_label;
 

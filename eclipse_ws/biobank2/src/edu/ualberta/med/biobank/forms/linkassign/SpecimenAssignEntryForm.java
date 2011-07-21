@@ -351,10 +351,14 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         }
 
         singleSpecimen.initObjectWith(foundSpecimen);
-        if (singleSpecimen.isUsedInDispatch()) {
+        if (singleSpecimen.isUsedInDispatch())
             throw new Exception(
-                Messages.SpecimenAssignEntryForm_single_specimen_transit_error);
-        }
+                Messages.SpecimenAssignEntryForm_single_spec_transit_error);
+        if (!SessionManager.getUser().getCurrentWorkingCenter()
+            .equals(singleSpecimen.getCurrentCenter()))
+            throw new Exception(NLS.bind(
+                Messages.SpecimenAssignEntryForm_single_spec_center_error,
+                singleSpecimen.getCurrentCenter().getNameShort()));
         singleTypeText.setText(singleSpecimen.getSpecimenType().getNameShort());
         singleCollectionDateText.setText(singleSpecimen.getTopSpecimen()
             .getFormattedCreatedAt());
@@ -816,8 +820,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected void defaultInitialisation() {
         super.defaultInitialisation();
-        useScannerButton.setSelection(useScanner);
-        setUseScanner(!mode.isSingleMode() && useScanner);
+        boolean use = !mode.isSingleMode() && useScanner;
+        useScannerButton.setSelection(use);
+        setUseScanner(use);
     }
 
     @Override

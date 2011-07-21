@@ -189,8 +189,9 @@ public class ProcessingView extends AbstractAdministrationView {
                     treeText.getText().trim());
         } else
             processingEvents = ProcessingEventWrapper
-                .getProcessingEventsWithDate(SessionManager.getAppService(),
-                    dateWidget.getDate());
+                .getProcessingEventsWithDateForCenter(
+                    SessionManager.getAppService(), dateWidget.getDate(),
+                    SessionManager.getUser().getCurrentWorkingCenter());
         return processingEvents;
     }
 
@@ -220,7 +221,8 @@ public class ProcessingView extends AbstractAdministrationView {
             nodeRes.get(0).performDoubleClick();
         } else
             BgcPlugin.openMessage(Messages.ProcessingView_pevent_info_title,
-                NLS.bind(Messages.ProcessingView_number_found_msg, searchedObjects.size()));
+                NLS.bind(Messages.ProcessingView_number_found_msg,
+                    searchedObjects.size()));
     }
 
     public AdapterBase getProcessingNode() {

@@ -334,7 +334,11 @@ public class Messages extends NLS {
 
     public static String ProcessingEventEntryForm_other_pEvent_error_msg;
 
+    public static String ProcessingEventEntryForm_spec_active_only_error_msg;
+
     public static String ProcessingEventEntryForm_spec_dispatch_error_msg;
+
+    public static String ProcessingEventEntryForm_spec_study_allowed_only_error_msg;
 
     public static String ProcessingEventEntryForm_specimens_title;
 
