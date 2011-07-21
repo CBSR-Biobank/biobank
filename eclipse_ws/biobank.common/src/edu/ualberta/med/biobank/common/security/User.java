@@ -358,6 +358,8 @@ public class User implements Serializable, NotAProxy {
     }
 
     public boolean canPerformActions(List<SecurityFeature> features) {
+        if (isInSuperAdminMode())
+            return true;
         for (SecurityFeature feature : features) {
             boolean ok = hasPrivilegeOnProtectionGroup(Privilege.UPDATE,
                 feature.getName());
