@@ -65,14 +65,13 @@ public class CollectionView extends AbstractAdministrationView {
     }
 
     protected void notFound(String text) {
-        boolean create = BgcPlugin.openConfirm(Messages.CollectionView_patient_error_title,
+        boolean create = BgcPlugin.openConfirm(
+            Messages.CollectionView_patient_error_title,
             Messages.CollectionView_patient_error_msg);
         if (create) {
             PatientWrapper patient = new PatientWrapper(
                 SessionManager.getAppService());
             patient.setPnumber(text);
-            ((PatientSearchedNode) CollectionView.getCurrent()
-                .getSearchedNode()).addSearchObject(patient);
             AdapterBase adapter = new PatientAdapter(null, patient);
             adapter.openEntryForm();
         }
@@ -119,7 +118,7 @@ public class CollectionView extends AbstractAdministrationView {
         return Messages.CollectionView_patient_tooltip;
     }
 
-    protected void showSearchedObjectsInTree(
+    public void showSearchedObjectsInTree(
         List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
         for (ModelWrapper<?> searchedObject : searchedObjects) {
             List<AdapterBase> nodeRes = rootNode.search(searchedObject);
@@ -181,7 +180,8 @@ public class CollectionView extends AbstractAdministrationView {
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.CollectionView_search_error_msg, e);
+            BgcPlugin.openAsyncError(Messages.CollectionView_search_error_msg,
+                e);
         }
     }
 
