@@ -343,22 +343,27 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             singleSpecimen.getInventoryId()));
         SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(appService,
             singleSpecimen.getInventoryId());
-        foundSpecNull.setValue(foundSpecimen == null);
+        foundSpecNull.setValue(false);
         if (foundSpecimen == null) {
+            foundSpecNull.setValue(true);
             throw new Exception(NLS.bind(
                 Messages.SpecimenAssignEntryForm_single_inventoryId_error,
                 singleSpecimen.getInventoryId()));
         }
 
         singleSpecimen.initObjectWith(foundSpecimen);
-        if (singleSpecimen.isUsedInDispatch())
+        if (singleSpecimen.isUsedInDispatch()) {
+            foundSpecNull.setValue(true);
             throw new Exception(
                 Messages.SpecimenAssignEntryForm_single_spec_transit_error);
+        }
         if (!SessionManager.getUser().getCurrentWorkingCenter()
-            .equals(singleSpecimen.getCurrentCenter()))
+            .equals(singleSpecimen.getCurrentCenter())) {
+            foundSpecNull.setValue(true);
             throw new Exception(NLS.bind(
                 Messages.SpecimenAssignEntryForm_single_spec_center_error,
                 singleSpecimen.getCurrentCenter().getNameShort()));
+        }
         singleTypeText.setText(singleSpecimen.getSpecimenType().getNameShort());
         singleCollectionDateText.setText(singleSpecimen.getTopSpecimen()
             .getFormattedCreatedAt());
@@ -1040,7 +1045,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         if (!mode.isSingleMode()) {
             palletproductBarcodeText.setFocus();
         }
-
+        foundSpecNull.setValue(true);
         singleSpecimen.reset(); // reset internal values
         setDirty(false);
         initWithProduct = false;
