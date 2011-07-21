@@ -28,13 +28,17 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.ModifyStateDispatchDialog;
 import edu.ualberta.med.biobank.forms.utils.DispatchTableGroup;
 import edu.ualberta.med.biobank.forms.utils.TableGroup;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
+import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.utils.BiobankClipboard;
 
@@ -43,6 +47,8 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     private TreeViewer tv;
     private DispatchWrapper shipment;
     protected List<DispatchTableGroup> groups;
+    private List<IDoubleClickListener> doubleClickListeners;
+    private MenuItem editItem;
 
     public DispatchSpecimensTreeTable(Composite parent,
         final DispatchWrapper shipment, final boolean editSpecimensState,
@@ -251,6 +257,25 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
 
     public void refresh() {
         tv.setInput("refresh"); //$NON-NLS-1$
+    }
+
+    public void addClickListener(IDoubleClickListener listener) {
+        doubleClickListeners.add(listener);
+        if (SessionManager.canUpdate(SpecimenWrapper.class)) {
+            editItem = new MenuItem(getMenu(), SWT.PUSH);
+            editItem.setText(Messages.DispatchSpecimensTreeTable_edit_label);
+            editItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    ModelWrapper<?> selection = getSelectedSpecimen();
+                    if (selection != null) {
+                        AdapterBase adapter = AdapterFactory
+                            .getAdapter(selection);
+                        adapter.openEntryForm();
+                    }
+                }
+            });
+        }
     }
 
 }

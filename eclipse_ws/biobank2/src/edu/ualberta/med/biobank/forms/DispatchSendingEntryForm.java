@@ -186,6 +186,20 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             specimensTreeTable = new DispatchSpecimensTreeTable(page, dispatch,
                 !dispatch.isInClosedState() && !dispatch.isInLostState(), true);
             specimensTreeTable.addSelectionChangedListener(biobankListener);
+            specimensTreeTable.addClickListener(new IDoubleClickListener() {
+                @Override
+                public void doubleClick(DoubleClickEvent event) {
+                    Object selection = event.getSelection();
+                    if (selection instanceof InfoTableSelection) {
+                        InfoTableSelection tableSelection = (InfoTableSelection) selection;
+                        DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) tableSelection
+                            .getObject();
+                        if (dsa != null) {
+                            SessionManager.openViewForm(dsa.getSpecimen());
+                        }
+                    }
+                }
+            });
         }
     }
 
