@@ -318,7 +318,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
                 getCenter()));
     }
 
-    public static String PE_BY_PATIENT_STRING = "select s."
+    public static String PE_BY_PATIENT_STRING = "select distinct s."
         + SpecimenPeer.PROCESSING_EVENT.getName()
         + " from "
         + Specimen.class.getName()
