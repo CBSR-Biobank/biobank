@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -141,7 +142,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                CollectionView.getCurrent().getSearchedNode().performExpand();
+                CollectionView.getCurrent().showSearchedObjectsInTree(
+                    Arrays.asList(patient), true);
             }
         });
     }

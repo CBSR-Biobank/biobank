@@ -9,8 +9,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
-import edu.ualberta.med.biobank.views.CollectionView;
 
 public class PatientAddHandler extends AbstractHandler {
 
@@ -22,8 +20,6 @@ public class PatientAddHandler extends AbstractHandler {
         try {
             PatientWrapper patient = new PatientWrapper(
                 SessionManager.getAppService());
-            ((PatientSearchedNode) CollectionView.getCurrent()
-                .getSearchedNode()).addSearchObject(patient);
             AdapterBase adapter = new PatientAdapter(null, patient);
             adapter.openEntryForm();
         } catch (Exception exp) {
