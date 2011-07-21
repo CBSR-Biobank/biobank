@@ -4,6 +4,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.widgets.trees.messages"; //$NON-NLS-1$
+    public static String DispatchSpecimensTreeTable_edit_label;
     public static String DispatchSpecimensTreeTable_comment_label;
     public static String DispatchSpecimensTreeTable_inventoryid_label;
     public static String DispatchSpecimensTreeTable_modidy_comment_label;

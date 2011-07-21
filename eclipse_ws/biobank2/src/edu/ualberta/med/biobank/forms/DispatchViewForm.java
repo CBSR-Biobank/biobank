@@ -119,8 +119,9 @@ public class DispatchViewForm extends BiobankViewForm {
                 Messages.DispatchViewForm_access_denied_sender_error_msg);
         } else {
             if (dateString == null)
-                form.setText(NLS.bind(Messages.DispatchViewForm_preparation_title,
-                    dateString, dispatch.getSenderCenter().getNameShort()));
+                form.setText(NLS.bind(
+                    Messages.DispatchViewForm_preparation_title, dateString,
+                    dispatch.getSenderCenter().getNameShort()));
             else
                 form.setText(NLS.bind(Messages.DispatchViewForm_sent_title,
                     dateString, dispatch.getSenderCenter().getNameShort()));
@@ -199,6 +200,7 @@ public class DispatchViewForm extends BiobankViewForm {
         } else {
             specimensTree = new DispatchSpecimensTreeTable(page, dispatch,
                 false, false);
+            specimensTree.addClickListener();
         }
     }
 
