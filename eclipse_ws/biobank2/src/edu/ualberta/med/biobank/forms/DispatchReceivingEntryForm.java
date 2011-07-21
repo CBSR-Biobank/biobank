@@ -46,6 +46,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         specimensTree = new DispatchSpecimensTreeTable(page, dispatch,
             editSpecimens, true);
         specimensTree.addSelectionChangedListener(biobankListener);
+        specimensTree.addClickListener();
     }
 
     private void createMainSection() {
