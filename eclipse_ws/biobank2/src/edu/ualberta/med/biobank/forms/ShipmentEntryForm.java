@@ -84,8 +84,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private Set<SpecimenWrapper> specimensToPersist = new HashSet<SpecimenWrapper>();
 
-    private DateTimeWidget receivedAtWidget;
-
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ShipmentAdapter,
@@ -200,8 +198,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             Messages.ShipmentEntryForm_boxNber_label, null, shipmentInfo,
             ShipmentInfoPeer.BOX_NUMBER.getName(), null);
 
-        receivedAtWidget = createDateTimeWidget(client,
-            Messages.ShipmentEntryForm_received_label,
+        createDateTimeWidget(client, Messages.ShipmentEntryForm_received_label,
             shipmentInfo.getReceivedAt(), shipmentInfo,
             ShipmentInfoPeer.RECEIVED_AT.getName(), new NotNullValidator(
                 Messages.ShipmentEntryForm_received_validation_msg));
@@ -402,9 +399,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             }
             Date receivedAt = Calendar.getInstance().getTime();
             shipmentInfo.setReceivedAt(receivedAt);
-            // FIXME for some reasons, the date is not set - any link to issue
-            // #1306 ?
-            receivedAtWidget.setDate(receivedAt);
         }
     }
 }

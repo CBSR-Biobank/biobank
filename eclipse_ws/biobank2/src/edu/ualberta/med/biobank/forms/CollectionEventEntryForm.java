@@ -363,10 +363,6 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             Integer next = CollectionEventWrapper.getNextVisitNumber(
                 appService, cevent);
             cevent.setVisitNumber(next);
-            // FIXME for some reasons, the text is not set to the correct number
-            // unless we do it ourself or call setVisitNumber a second time with
-            // a different value (!!??!!) see issues #1306 and #1304
-            visitNumberText.setText(next.toString());
         }
 
         patient.reset();

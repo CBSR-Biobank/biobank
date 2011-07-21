@@ -809,8 +809,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             newValues.add(element.getWrappedObject());
         }
 
-        setModelProperty(modelWrapper, property, newValues);
-        modelWrapper.cacheProperty(property, wrappers);
+        setModelProperty(modelWrapper, property, newValues, wrappers);
     }
 
     protected <W extends ModelWrapper<? extends R>, R> List<W> getWrapperCollection(
@@ -946,8 +945,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     private <T, M> void setProperty(ModelWrapper<M> modelWrapper,
         Property<T, ? super M> property, T newValue) {
-        setModelProperty(modelWrapper, property, newValue);
-        modelWrapper.cacheProperty(property, newValue);
+        setModelProperty(modelWrapper, property, newValue, newValue);
     }
 
     private static <T, M> T getModelProperty(ModelWrapper<M> modelWrapper,
@@ -971,8 +969,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return value;
     }
 
-    private <T, M> void setModelProperty(ModelWrapper<M> modelWrapper,
-        Property<? extends T, ? super M> property, T newValue) {
+    private <T, M, R> void setModelProperty(ModelWrapper<M> modelWrapper,
+        Property<? extends T, ? super M> property, T newValue, R valueForCache) {
         try {
             M model = modelWrapper.getWrappedObject();
             Class<?> modelKlazz = model.getClass();
@@ -989,6 +987,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
             setter.invoke(model, newValue);
 
+            // need to add into cache before the firePropertyChange is called
+            // because its will call the getters that refers to the cache
+            modelWrapper.cacheProperty(property, valueForCache);
             propertyChangeSupport.firePropertyChange(property.getName(),
                 oldValue, newValue);
         } catch (Exception e) {
