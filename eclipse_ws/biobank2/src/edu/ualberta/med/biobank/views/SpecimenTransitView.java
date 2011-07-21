@@ -220,18 +220,22 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             Date date = dateWidget.getDate();
             if (date != null) {
                 wrappers.addAll(OriginInfoWrapper.getShipmentsByDateReceived(
-                    SessionManager.getAppService(), date));
+                    SessionManager.getAppService(), date, SessionManager
+                        .getUser().getCurrentWorkingCenter()));
                 wrappers.addAll(DispatchWrapper.getDispatchesByDateReceived(
-                    SessionManager.getAppService(), date));
+                    SessionManager.getAppService(), date, SessionManager
+                        .getUser().getCurrentWorkingCenter()));
                 return wrappers;
             }
         } else {
             Date date = dateWidget.getDate();
             if (date != null) {
                 wrappers.addAll(OriginInfoWrapper.getShipmentsByDateSent(
-                    SessionManager.getAppService(), date));
+                    SessionManager.getAppService(), date, SessionManager
+                        .getUser().getCurrentWorkingCenter()));
                 wrappers.addAll(DispatchWrapper.getDispatchesByDateSent(
-                    SessionManager.getAppService(), date));
+                    SessionManager.getAppService(), date, SessionManager
+                        .getUser().getCurrentWorkingCenter()));
                 return wrappers;
             }
         }

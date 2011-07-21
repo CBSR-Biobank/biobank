@@ -45,7 +45,8 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
         throws ApplicationException {
         if (SessionManager.getInstance().isConnected())
             return OriginInfoWrapper.getTodayShipments(SessionManager
-                .getAppService());
+                .getAppService(), SessionManager.getUser()
+                .getCurrentWorkingCenter());
         else
             return null;
     }

@@ -429,9 +429,9 @@ public class TestDispatch extends TestDatabase {
         testDispatch.getShipmentInfo().persist();
         testDispatch.reload();
         Assert.assertTrue(DispatchWrapper.getDispatchesByDateSent(appService,
-            date).size() == 1);
+            date, site).size() == 1);
         Assert.assertTrue(DispatchWrapper.getDispatchesByDateReceived(
-            appService, date).size() == 0);
+            appService, date, site).size() == 0);
         testDispatch.setSenderCenter(clinic);
         testDispatch.setReceiverCenter(site);
     }
@@ -448,9 +448,9 @@ public class TestDispatch extends TestDatabase {
         testDispatch.getShipmentInfo().persist();
         testDispatch.reload();
         Assert.assertTrue(DispatchWrapper.getDispatchesByDateReceived(
-            appService, date).size() == 1);
+            appService, date, site).size() == 1);
         Assert.assertTrue(DispatchWrapper.getDispatchesByDateSent(appService,
-            date).size() == 0);
+            date, site).size() == 0);
         testDispatch.setSenderCenter(clinic);
         testDispatch.setReceiverCenter(site);
     }

@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
@@ -137,9 +138,13 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     }
 
     public static List<OriginInfoWrapper> getTodayShipments(
-        BiobankApplicationService appService) throws ApplicationException {
-        return getShipmentsByDateReceived(appService, new Date());
+        BiobankApplicationService appService, CenterWrapper<?> center)
+        throws ApplicationException {
+        return getShipmentsByDateReceived(appService, new Date(), center);
     }
+
+    private static final String SHIPMENTS_BY_WAYBILL_QRY = SHIPMENT_HQL_STRING
+        + " where s." + ShipmentInfoPeer.WAYBILL.getName() + " = ?";
 
     /**
      * Search for shipments in the site with the given waybill
@@ -147,9 +152,8 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     public static List<OriginInfoWrapper> getShipmentsByWaybill(
         WritableApplicationService appService, String waybill)
         throws ApplicationException {
-        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING + " where s."
-            + ShipmentInfoPeer.WAYBILL.getName() + " = ?");
-        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+
+        HQLCriteria criteria = new HQLCriteria(SHIPMENTS_BY_WAYBILL_QRY,
             Arrays.asList(new Object[] { waybill }));
 
         List<OriginInfo> origins = appService.query(criteria);
@@ -159,19 +163,27 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return shipments;
     }
 
+    private static final String SHIPMENTS_BY_DATE_RECEIVED_QRY = SHIPMENT_HQL_STRING
+        + " where DATE(s."
+        + ShipmentInfoPeer.RECEIVED_AT.getName()
+        + ") = DATE(?) and (o."
+        + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
+        + "= ? or o."
+        + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
+        + " = ?)";
+
     /**
      * Search for shipments in the site with the given date received. Don't use
-     * hour and minute.
+     * hour and minute. Will check the given center is either the sender or the
+     * receiver.
      */
     public static List<OriginInfoWrapper> getShipmentsByDateReceived(
-        WritableApplicationService appService, Date dateReceived)
-        throws ApplicationException {
+        WritableApplicationService appService, Date dateReceived,
+        CenterWrapper<?> center) throws ApplicationException {
 
-        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING
-            + " where DATE(s." + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + ") = DATE(?)");
-        HQLCriteria criteria = new HQLCriteria(qry.toString(),
-            Arrays.asList(new Object[] { dateReceived }));
+        Integer centerId = center.getId();
+        HQLCriteria criteria = new HQLCriteria(SHIPMENTS_BY_DATE_RECEIVED_QRY,
+            Arrays.asList(new Object[] { dateReceived, centerId, centerId }));
 
         List<OriginInfo> origins = appService.query(criteria);
         List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
@@ -180,15 +192,22 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return shipments;
     }
 
-    public static List<OriginInfoWrapper> getShipmentsByDateSent(
-        WritableApplicationService appService, Date dateSent)
-        throws ApplicationException {
+    private static final String SHIPMENTS_BY_DATE_SENT_QRY = SHIPMENT_HQL_STRING
+        + " where DATE(s."
+        + ShipmentInfoPeer.PACKED_AT.getName()
+        + ") = DATE(?) and (o."
+        + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
+        + "= ? or o."
+        + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
+        + " = ?)";
 
-        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING
-            + " where DATE(s." + ShipmentInfoPeer.PACKED_AT.getName()
-            + ") = DATE(?)");
-        HQLCriteria criteria = new HQLCriteria(qry.toString(),
-            Arrays.asList(new Object[] { dateSent }));
+    public static List<OriginInfoWrapper> getShipmentsByDateSent(
+        WritableApplicationService appService, Date dateSent,
+        CenterWrapper<?> center) throws ApplicationException {
+
+        Integer centerId = center.getId();
+        HQLCriteria criteria = new HQLCriteria(SHIPMENTS_BY_DATE_SENT_QRY,
+            Arrays.asList(new Object[] { dateSent, centerId, centerId }));
 
         List<OriginInfo> origins = appService.query(criteria);
         List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
