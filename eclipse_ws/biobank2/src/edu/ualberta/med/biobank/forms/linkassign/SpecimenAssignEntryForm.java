@@ -816,8 +816,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected void defaultInitialisation() {
         super.defaultInitialisation();
-        useScannerButton.setSelection(useScanner);
-        setUseScanner(!mode.isSingleMode() && useScanner);
+        boolean use = !mode.isSingleMode() && useScanner;
+        useScannerButton.setSelection(use);
+        setUseScanner(use);
     }
 
     @Override
