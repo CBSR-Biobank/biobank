@@ -296,10 +296,8 @@ public class StudyEntryForm extends BiobankEntryForm {
                 try {
                     study.deleteStudyEventAttr(studyPvAttrCustom.getLabel());
                 } catch (BiobankCheckException e) {
-                    throw new UserUIException(
-                        NLS.bind(
-                            Messages.StudyEntryForm_delete_error_msg,
-                            label), e);
+                    throw new UserUIException(NLS.bind(
+                        Messages.StudyEntryForm_delete_error_msg, label), e);
                 }
             } else if (studyPvAttrCustom.widget.getSelected()) {
                 newPvInfoLabels.add(studyPvAttrCustom.getLabel());
