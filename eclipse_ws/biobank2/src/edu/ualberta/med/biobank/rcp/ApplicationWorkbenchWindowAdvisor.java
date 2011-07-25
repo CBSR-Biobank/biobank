@@ -123,17 +123,24 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
                     if (sourceValue != null) {
+                        IStatusLineManager statusline = getWindowConfigurer()
+                            .getActionBarConfigurer().getStatusLineManager();
+                        MsgStatusItem serverItem = (MsgStatusItem) statusline
+                            .find(ApplicationActionBarAdvisor.STATUS_SERVER_MSG_ID);
+                        MsgStatusItem superAdminItem = (MsgStatusItem) statusline
+                            .find(ApplicationActionBarAdvisor.SUPER_ADMIN_MSG_ID);
                         if (sourceValue.equals(BgcSessionState.LOGGED_IN)) {
                             mainWindowUpdateTitle(SessionManager.getUser());
-                            ServerMsgStatusItem.getInstance().setServerName(
-                                new StringBuffer(SessionManager.getUser()
-                                    .getLogin()).append("@") //$NON-NLS-1$
-                                    .append(SessionManager.getServer())
-                                    .toString());
+                            serverItem.setText(new StringBuffer(SessionManager
+                                .getUser().getLogin()).append("@") //$NON-NLS-1$
+                                .append(SessionManager.getServer()).toString());
+                            superAdminItem.setVisible(SessionManager.getUser()
+                                .isInSuperAdminMode());
                         } else if (sourceValue
                             .equals(BgcSessionState.LOGGED_OUT)) {
                             mainWindowResetTitle();
-                            ServerMsgStatusItem.getInstance().setServerName(""); //$NON-NLS-1$
+                            serverItem.setText(""); //$NON-NLS-1$
+                            superAdminItem.setVisible(false);
                         }
                     }
                 }
@@ -177,7 +184,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
         if (currentCenterText != null) {
             newTitle.append(" - ").append( //$NON-NLS-1$
-                NLS.bind(Messages.ApplicationWorkbenchWindowAdvisor_center_text, currentCenterText));
+                NLS.bind(
+                    Messages.ApplicationWorkbenchWindowAdvisor_center_text,
+                    currentCenterText));
         }
 
         String newTitleString = newTitle.toString();
