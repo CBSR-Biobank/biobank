@@ -406,6 +406,8 @@ public class TestDispatch extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(name + "_clinic");
         DispatchWrapper testDispatch = DispatchHelper.addDispatch(site, clinic,
             ShippingMethodWrapper.getShippingMethods(appService).get(0));
+        site.reload();
+        clinic.reload();
         Assert.assertTrue(site.getSrcDispatchCollection(false).size() == 1);
         Assert.assertTrue(clinic.getDstDispatchCollection(false).size() == 1);
         testDispatch.setSenderCenter(clinic);
