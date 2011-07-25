@@ -276,13 +276,20 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                     if (specimen == null)
                         throw new VetoException(
                             Messages.ShipmentEntryForm_notfound_error_msg);
-                    else if (specimen.isUsedInDispatch())
+                    if (!SessionManager.getUser().getCurrentWorkingCenter()
+                        .equals(specimen.getCurrentCenter()))
+                        throw new VetoException(
+                            NLS.bind(
+                                Messages.ShipmentEntryForm_other_center_error_msg,
+                                specimen.getInventoryId(), specimen
+                                    .getCurrentCenter().getNameShort()));
+                    if (specimen.isUsedInDispatch())
                         throw new VetoException(
                             Messages.ShipmentEntryForm_dispatched_specimen_error_msg);
-                    else if (specimen.getParentContainer() != null)
+                    if (specimen.getParentContainer() != null)
                         throw new VetoException(
                             Messages.ShipmentEntryForm_stored_error_msg);
-                    else if (specimen.getOriginInfo() != null
+                    if (specimen.getOriginInfo() != null
                         && specimen.getOriginInfo().getShipmentInfo() != null
                         && !specimen.getOriginInfo().getShipmentInfo()
                             .equals(originInfo.getShipmentInfo()))

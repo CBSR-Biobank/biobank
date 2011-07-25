@@ -591,6 +591,8 @@ public class Messages extends NLS {
 
     public static String ShipmentEntryForm_notfound_error_msg;
 
+    public static String ShipmentEntryForm_other_center_error_msg;
+
     public static String ShipmentEntryForm_packed_label;
 
     public static String ShipmentEntryForm_packed_validation_msg;

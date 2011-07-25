@@ -130,7 +130,7 @@ public class DispatchCreateProcess extends ServerProcess {
                 // not in database
                 scanCell.setStatus(CellStatus.ERROR);
                 scanCell.setInformation(Messages.getString(
-                    "ScanAssign.scanStatus.specimen.notlinked", locale)); //$NON-NLS-1$
+                    "DispatchProcess.scanStatus.specimen.notfound", locale)); //$NON-NLS-1$
             } else {
                 if (expectedSpecimen != null
                     && !foundSpecimen.equals(expectedSpecimen)) {
@@ -204,7 +204,7 @@ public class DispatchCreateProcess extends ServerProcess {
                 cell.setInformation(MessageFormat.format(
                     Messages
                         .getString(
-                            "DispatchProcess.create.specime.inNotClosedDispatch", locale), //$NON-NLS-1$
+                            "DispatchProcess.create.specimen.inNotClosedDispatch", locale), //$NON-NLS-1$
                     specimen.getInventoryId()));
             } else {
                 if (alreadyInShipment)

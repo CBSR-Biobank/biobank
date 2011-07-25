@@ -220,7 +220,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
         // new specimens added
         for (SpecimenWrapper specimen : newSpecimens) {
-            if (specimen.getCurrentCenter().equals(getSenderCenter())) {
+            if (specimen.getCurrentCenter().equals(getSenderCenter())
+                || isInReceivedState()) {
+                // in received state, let any specimen to be added just in case
+                // it received something wrong
                 if (!currentSpecimenList.contains(specimen)) {
                     DispatchSpecimenWrapper dsa = new DispatchSpecimenWrapper(
                         appService);

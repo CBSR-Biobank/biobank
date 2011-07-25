@@ -104,7 +104,7 @@ public class AssignProcess extends ServerProcess {
             SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(
                 appService, value);
             if (foundSpecimen == null) {
-                updateCellAsNotLinked(positionString, scanCell);
+                updateCellAsNotFound(positionString, scanCell);
             } else if (!foundSpecimen.getCurrentCenter().equals(
                 user.getCurrentWorkingCenter())) {
                 updateCellAsInOtherSite(positionString, scanCell, foundSpecimen);
@@ -184,12 +184,12 @@ public class AssignProcess extends ServerProcess {
     /**
      * specimen not found in site (not yet linked ?)
      */
-    private void updateCellAsNotLinked(String position, Cell scanCell) {
+    private void updateCellAsNotFound(String position, Cell scanCell) {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages.getString(
-            "ScanAssign.scanStatus.specimen.notlinked", locale));//$NON-NLS-1$
+            "ScanAssign.scanStatus.specimen.notfound", locale));//$NON-NLS-1$
         appendNewLog(MessageFormat.format(Messages.getString(
-            "ScanAssign.activitylog.specimen.notlinked", locale), //$NON-NLS-1$
+            "ScanAssign.activitylog.specimen.notfound", locale), //$NON-NLS-1$
             position, scanCell.getValue()));
     }
 
