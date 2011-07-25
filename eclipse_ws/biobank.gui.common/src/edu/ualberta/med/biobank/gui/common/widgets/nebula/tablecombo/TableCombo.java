@@ -79,6 +79,7 @@ import org.eclipse.swt.widgets.Widget;
  * 
  */
 
+@SuppressWarnings("unused")
 public class TableCombo extends Composite {
     private Shell popup;
     private Button arrow;
@@ -482,7 +483,7 @@ public class TableCombo extends Composite {
             notifyListeners(SWT.Dispose, event);
             event.type = SWT.None;
 
-            if (popup != null && !popup.isDisposed()) {
+            if ((popup != null) && !popup.isDisposed()) {
                 table.removeListener(SWT.Dispose, listener);
                 popup.dispose();
             }
@@ -498,7 +499,7 @@ public class TableCombo extends Composite {
             break;
         case SWT.FocusIn:
             Control focusControl = getDisplay().getFocusControl();
-            if (focusControl == arrow || focusControl == table)
+            if ((focusControl == arrow) || (focusControl == table))
                 return;
             if (isDropped()) {
                 table.setFocus();
@@ -527,7 +528,7 @@ public class TableCombo extends Composite {
         int borderWidth = getBorderWidth();
 
         // use user defined values if they are specified.
-        if (wHint != SWT.DEFAULT && hHint != SWT.DEFAULT) {
+        if ((wHint != SWT.DEFAULT) && (hHint != SWT.DEFAULT)) {
             overallWidth = wHint;
             overallHeight = hHint;
         } else {
@@ -565,8 +566,8 @@ public class TableCombo extends Composite {
 
             overallHeight = Math.max(textSize.y, arrowSize.y);
             overallHeight = Math.max(maxImageHeight, overallHeight);
-            overallWidth = Math.max(maxTextWidth + 2 * spacer + arrowSize.x + 2
-                * borderWidth, tableSize.x);
+            overallWidth = Math.max(maxTextWidth + (2 * spacer) + arrowSize.x
+                + (2 * borderWidth), tableSize.x);
 
             // use user specified if they were entered.
             if (wHint != SWT.DEFAULT)
@@ -575,8 +576,8 @@ public class TableCombo extends Composite {
                 overallHeight = hHint;
         }
 
-        return new Point(overallWidth + 2 * borderWidth, overallHeight + 2
-            * borderWidth);
+        return new Point(overallWidth + (2 * borderWidth), overallHeight
+            + (2 * borderWidth));
     }
 
     /**
@@ -774,7 +775,7 @@ public class TableCombo extends Composite {
         // whether
         // it is needed or not.
         if (!table.getVerticalBar().getVisible()
-            && tableSize.x - table.getVerticalBar().getSize().x >= tableComboSize.x - 2) {
+            && ((tableSize.x - table.getVerticalBar().getSize().x) >= (tableComboSize.x - 2))) {
 
             tableWidth = tableWidth - table.getVerticalBar().getSize().x;
 
@@ -811,10 +812,10 @@ public class TableCombo extends Composite {
         int overallHeight = tableRect.height + 2;
         int x = parentRect.x;
         int y = parentRect.y + comboSize.y;
-        if (y + overallHeight > displayRect.y + displayRect.height)
+        if ((y + overallHeight) > (displayRect.y + displayRect.height))
             y = parentRect.y - overallHeight;
-        if (x + overallWidth > displayRect.x + displayRect.width)
-            x = displayRect.x + displayRect.width - tableRect.width;
+        if ((x + overallWidth) > (displayRect.x + displayRect.width))
+            x = (displayRect.x + displayRect.width) - tableRect.width;
 
         // set the bounds of the popup
         popup.setBounds(x, y, overallWidth, overallHeight);
@@ -834,7 +835,7 @@ public class TableCombo extends Composite {
         Control[] siblings = getParent().getChildren();
         for (int i = 0; i < siblings.length; i++) {
             if (siblings[i] == TableCombo.this) {
-                if (i > 0 && siblings[i - 1] instanceof Label) {
+                if ((i > 0) && (siblings[i - 1] instanceof Label)) {
                     return (Label) siblings[i - 1];
                 }
             }
@@ -1103,8 +1104,8 @@ public class TableCombo extends Composite {
             if (!hasFocus)
                 return;
             Control focusControl = getDisplay().getFocusControl();
-            if (focusControl == arrow || focusControl == table
-                || focusControl == text)
+            if ((focusControl == arrow) || (focusControl == table)
+                || (focusControl == text))
                 return;
             hasFocus = false;
             Shell shell = getShell();
@@ -1519,8 +1520,8 @@ public class TableCombo extends Composite {
                 // Escape key cancels popup list
                 dropDown(false);
             }
-            if ((event.stateMask & SWT.ALT) != 0
-                && (event.keyCode == SWT.ARROW_UP || event.keyCode == SWT.ARROW_DOWN)) {
+            if (((event.stateMask & SWT.ALT) != 0)
+                && ((event.keyCode == SWT.ARROW_UP) || (event.keyCode == SWT.ARROW_DOWN))) {
                 dropDown(false);
             }
             if (event.character == SWT.CR) {
@@ -1615,8 +1616,8 @@ public class TableCombo extends Composite {
             }
             Composite comp = TableCombo.this;
             do {
-                if (comp.getListeners(event.type) != null
-                    && comp.getListeners(event.type).length > 0) {
+                if ((comp.getListeners(event.type) != null)
+                    && (comp.getListeners(event.type).length > 0)) {
                     comp.notifyListeners(event.type, event);
                     break;
                 }
@@ -1752,7 +1753,7 @@ public class TableCombo extends Composite {
             return;
         }
 
-        if (0 <= index && index < table.getItemCount()) {
+        if ((0 <= index) && (index < table.getItemCount())) {
             if (index != getSelectionIndex()) {
 
                 // refresh the text field and image label
@@ -2018,7 +2019,7 @@ public class TableCombo extends Composite {
         if (isDisposed())
             return;
         // TEMPORARY CODE
-        if (popup == null || popup.isDisposed())
+        if ((popup == null) || popup.isDisposed())
             return;
         if (!visible)
             popup.setVisible(false);
@@ -2077,7 +2078,7 @@ public class TableCombo extends Composite {
      * @param columnWidths
      */
     public void defineColumns(String[] columnHeaders) {
-        if (columnHeaders != null && columnHeaders.length > 0) {
+        if ((columnHeaders != null) && (columnHeaders.length > 0)) {
             defineColumnsInternal(columnHeaders, null, columnHeaders.length);
         }
     }
@@ -2094,7 +2095,7 @@ public class TableCombo extends Composite {
     public void defineColumns(int[] columnBounds) {
         this.columnWidths = columnBounds;
 
-        if (columnBounds != null && columnBounds.length > 0) {
+        if ((columnBounds != null) && (columnBounds.length > 0)) {
             defineColumnsInternal(null, columnBounds, columnBounds.length);
         }
     }
@@ -2126,9 +2127,9 @@ public class TableCombo extends Composite {
      * @param columnBounds
      */
     public void defineColumns(String[] columnHeaders, int[] columnBounds) {
-        if (columnHeaders != null || columnBounds != null) {
+        if ((columnHeaders != null) || (columnBounds != null)) {
             int total = columnHeaders == null ? 0 : columnHeaders.length;
-            if (columnBounds != null && columnBounds.length > total) {
+            if ((columnBounds != null) && (columnBounds.length > total)) {
                 total = columnBounds.length;
             }
 
@@ -2187,7 +2188,7 @@ public class TableCombo extends Composite {
         checkWidget();
 
         // don't accept invalid input.
-        if (ddWidthPct > 0 && ddWidthPct <= 100) {
+        if ((ddWidthPct > 0) && (ddWidthPct <= 100)) {
             this.tableWidthPercentage = ddWidthPct;
         }
     }
@@ -2229,7 +2230,7 @@ public class TableCombo extends Composite {
         int index = 0;
         int length = string.length();
         do {
-            while (index < length && string.charAt(index) != '&')
+            while ((index < length) && (string.charAt(index) != '&'))
                 index++;
             if (++index >= length)
                 return '\0';
@@ -2321,7 +2322,7 @@ public class TableCombo extends Composite {
      * @return
      */
     private boolean wasColumnWidthSpecified(int columnIndex) {
-        return (columnWidths != null && columnWidths.length > columnIndex && columnWidths[columnIndex] != SWT.DEFAULT);
+        return ((columnWidths != null) && (columnWidths.length > columnIndex) && (columnWidths[columnIndex] != SWT.DEFAULT));
     }
 
     void textEvent(Event event) {
@@ -2350,8 +2351,8 @@ public class TableCombo extends Composite {
             event.doit = keyEvent.doit;
             if (!event.doit)
                 break;
-            if (event.keyCode == SWT.ARROW_UP
-                || event.keyCode == SWT.ARROW_DOWN) {
+            if ((event.keyCode == SWT.ARROW_UP)
+                || (event.keyCode == SWT.ARROW_DOWN)) {
                 event.doit = false;
                 if ((event.stateMask & SWT.ALT) != 0) {
                     boolean dropped = isDropped();
@@ -2549,7 +2550,7 @@ public class TableCombo extends Composite {
         }
 
         // is there any extra space that the table is not using?
-        if (totalAvailWidth > totalColumnWidthUsage + scrollBarSize) {
+        if (totalAvailWidth > (totalColumnWidthUsage + scrollBarSize)) {
             int totalAmtToBeAllocated = (totalAvailWidth
                 - totalColumnWidthUsage - scrollBarSize);
 

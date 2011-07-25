@@ -133,6 +133,7 @@ public class SessionAdapter extends AdapterBase {
         return (ClinicMasterGroup) adapter;
     }
 
+    @SuppressWarnings("unused")
     private ResearchGroupMasterGroup getResearchGroupGroupNode() {
         AdapterBase adapter = getChild(RESEARCH_GROUPS_BASE_NODE_ID);
         Assert.isNotNull(adapter);

@@ -34,6 +34,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class SiteWrapper extends SiteBaseWrapper {
     private static final String TOP_CONTAINER_COLLECTION_CACHE_KEY = "topContainerCollection";
 
+    @SuppressWarnings("unused")
     private Map<RequestState, List<RequestWrapper>> requestCollectionMap = new HashMap<RequestState, List<RequestWrapper>>();
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {

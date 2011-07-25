@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@SuppressWarnings("unused")
 public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
 
     public ResearchGroupWrapper(WritableApplicationService appService,
@@ -32,6 +33,7 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
         return 0;
     }
 
+    @Override
     public void reload() {
         // TODO Auto-generated method stub
 
