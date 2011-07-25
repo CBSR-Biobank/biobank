@@ -353,7 +353,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             String s1 = getPositionString(true, true);
             String s2 = ((SpecimenWrapper) o).getPositionString(true, true);
             if (s1 == null || s2 == null)
-                getInventoryId().compareTo(
+                return getInventoryId().compareTo(
                     ((SpecimenWrapper) o).getInventoryId());
             else
                 return s1.compareTo(s2);

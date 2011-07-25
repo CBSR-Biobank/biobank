@@ -141,10 +141,6 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         String inventoryId = newSpecimenInventoryId.getText().trim();
         if (!inventoryId.isEmpty()) {
             try {
-                // FIXME related to issue #1198 : should call this method with
-                // the current user, but can be a problem in dispatch. What
-                // security modification should be made ? Should we check that
-                // anyway ?
                 SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
                     appService, inventoryId);
                 addSpecimen(specimen);

@@ -226,7 +226,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
             };
             backgroundThread.start();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.AbstractInfoTableWidget_load_error_title, e);
+            BgcPlugin.openAsyncError(
+                Messages.AbstractInfoTableWidget_load_error_title, e);
         }
 
         layout(true, true);
@@ -323,7 +324,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         firstButton = new Button(paginationWidget, SWT.NONE);
         firstButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_FIRST));
-        firstButton.setToolTipText(Messages.AbstractInfoTableWidget_first_label);
+        firstButton
+            .setToolTipText(Messages.AbstractInfoTableWidget_first_label);
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -334,7 +336,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         prevButton = new Button(paginationWidget, SWT.NONE);
         prevButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_PREV));
-        prevButton.setToolTipText(Messages.AbstractInfoTableWidget_previous_label);
+        prevButton
+            .setToolTipText(Messages.AbstractInfoTableWidget_previous_label);
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -430,4 +433,5 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
     protected abstract void lastPage();
 
     protected abstract void setPageLabelText();
+
 }
