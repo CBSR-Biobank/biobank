@@ -236,16 +236,6 @@ public class TestSpecimen extends TestDatabase {
 
         childSpc.setSpecimenType(oldSpecimenType);
         childSpc.persist();
-
-        ContainerWrapper container = new ContainerWrapper(appService);
-        SpecimenWrapper specimen = new SpecimenWrapper(appService);
-        specimen.setParent(container);
-        try {
-            specimen.persist();
-            Assert.fail("container has no container type");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
     }
 
     @Test

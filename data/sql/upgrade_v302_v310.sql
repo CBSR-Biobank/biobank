@@ -20,7 +20,11 @@ set discriminator = 'SpecimenPosition'
 where discriminator = 'AliquotPosition';
 
 
--- start updates in security tables - see issue #1324
+-- --------------------------------------------------------------------------------------------
+--
+-- security tables - see issue #1324
+--
+-- --------------------------------------------------------------------------------------------
 
 -- all center features are no longer children of the 'center feature'
 update csm_protection_group set parent_protection_group_id = null where protection_group_name like 'Center Feature:%';
@@ -30,7 +34,7 @@ delete from csm_user_group_role_pg where group_id = 5 and protection_group_id = 
 
 -- add all center features to CBSR Tech1 (id=6) (which is a center admin group)
 INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date)
-select 6, 8, protection_group_id, sysdate() 
+select 6, 8, protection_group_id, sysdate()
 from csm_protection_group where protection_group_name like 'Center Feature:%';
 
 -- add some of center features to Calgary Admin (id=9) (which is a center admin group)
@@ -51,23 +55,22 @@ insert into csm_protection_group (protection_group_name, protection_group_descri
 delete from csm_pg_pe where protection_group_id = 45;
 
 -- link ContainerType to SiteAdmin protection group
-insert into csm_pg_pe (protection_group_id, protection_element_id, update_date) 
+insert into csm_pg_pe (protection_group_id, protection_element_id, update_date)
 select protection_group_id, 20, sysdate()
-from csm_protection_group where protection_group_name = 'Internal: Site Administrator'; 
+from csm_protection_group where protection_group_name = 'Internal: Site Administrator';
 
 -- link Container to SiteAdmin protection group
-insert into csm_pg_pe (protection_group_id, protection_element_id, update_date) 
+insert into csm_pg_pe (protection_group_id, protection_element_id, update_date)
 select protection_group_id, 19, sysdate()
-from csm_protection_group where protection_group_name = 'Internal: Site Administrator'; 
+from csm_protection_group where protection_group_name = 'Internal: Site Administrator';
 
 -- link ContainerPosition to SiteAdmin protection group
-insert into csm_pg_pe (protection_group_id, protection_element_id, update_date) 
+insert into csm_pg_pe (protection_group_id, protection_element_id, update_date)
 select protection_group_id, 7, sysdate()
-from csm_protection_group where protection_group_name = 'Internal: Site Administrator'; 
+from csm_protection_group where protection_group_name = 'Internal: Site Administrator';
 
 -- link Contact to ClinicAdmin protection group
-insert into csm_pg_pe (protection_group_id, protection_element_id, update_date) 
+insert into csm_pg_pe (protection_group_id, protection_element_id, update_date)
 select protection_group_id, 30, sysdate()
-from csm_protection_group where protection_group_name = 'Internal: Clinic Administrator'; 
+from csm_protection_group where protection_group_name = 'Internal: Clinic Administrator';
 
--- end updates in security tables
