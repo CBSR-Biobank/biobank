@@ -66,10 +66,10 @@
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
   <condition property="LOG4J_LEVEL_WARN" value="warn" else="error">
-    <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
+    <equals arg1="${log-debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
   <condition property="LOG4J_LEVEL_DEBUG" value="debug" else="error">
-	<equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
+	<equals arg1="${log-debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
   <condition property="isHostAicmlMed">
     <equals arg1="${host.name}"
