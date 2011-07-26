@@ -32,7 +32,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             Messages.SpecimenInfoTable_created_label,
             Messages.SpecimenInfoTable_quantity_label,
             Messages.SpecimenInfoTable_status_label,
-            Messages.SpecimenInfoTable_comment_label }) {
+            Messages.SpecimenInfoTable_comments_label }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -83,7 +83,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             Messages.SpecimenInfoTable_study_label,
             Messages.SpecimenInfoTable_pnumber_label, Messages.SpecimenInfoTable_origin_center_label,
             Messages.SpecimenInfoTable_current_center_label,
-            Messages.SpecimenInfoTable_comment_label }) {
+            Messages.SpecimenInfoTable_comments_label }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -132,7 +132,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             Messages.SpecimenInfoTable_quantity_label,
             Messages.SpecimenInfoTable_status_label, Messages.SpecimenInfoTable_origin_center_label,
             Messages.SpecimenInfoTable_current_center_label,
-            Messages.SpecimenInfoTable_comment_label }) {
+            Messages.SpecimenInfoTable_comments_label }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
