@@ -100,6 +100,7 @@ public class BgcPlugin extends AbstractUIPlugin {
     public static final String IMG_RESEARCH_GROUP = "research_group"; //$NON-NLS-1$
     public static final String IMG_RESEARCH_GROUPS = "research_groups"; //$NON-NLS-1$
     public static final String IMG_ERROR = "error"; //$NON-NLS-1$
+    public static final String IMG_ADMIN = "admin"; //$NON-NLS-1$
 
     private static BgcLogger logger = BgcLogger.getLogger(BgcPlugin.class
         .getName());
@@ -203,6 +204,7 @@ public class BgcPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_UNCHECK, "unchecked.gif"); //$NON-NLS-1$
         registerImage(registry, IMG_RESEARCH_GROUP, "research_group.png"); //$NON-NLS-1$
         registerImage(registry, IMG_ERROR, "error.png"); //$NON-NLS-1$
+        registerImage(registry, IMG_ADMIN, "superAdmin.png"); //$NON-NLS-1$
     }
 
     public void registerImage(ImageRegistry registry, String key,

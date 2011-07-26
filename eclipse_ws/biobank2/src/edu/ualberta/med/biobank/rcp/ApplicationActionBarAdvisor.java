@@ -14,9 +14,12 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.application.ActionBarAdvisor;
@@ -24,10 +27,15 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
+
+    public static final String STATUS_SERVER_MSG_ID = "biobank.serverMsg"; //$NON-NLS-1$
+
+    public static final String SUPER_ADMIN_MSG_ID = "biobank.superAdminMsg"; //$NON-NLS-1$
 
     private static final String SHORTCUTS_COMMAND_ID = "org.eclipse.ui.window.showKeyAssist"; //$NON-NLS-1$
 
@@ -156,9 +164,27 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     @Override
     protected void fillStatusLine(IStatusLineManager statusLine) {
-        ServerMsgStatusItem serverMsgStatusItem = ServerMsgStatusItem
-            .getInstance();
-        serverMsgStatusItem.setServerName(""); //$NON-NLS-1$
+        final MsgStatusItem superAdminMsgStatusItem = new MsgStatusItem(
+            SUPER_ADMIN_MSG_ID);
+        superAdminMsgStatusItem.setIcon(BiobankPlugin.getDefault().getImage(
+            BgcPlugin.IMG_ADMIN));
+        superAdminMsgStatusItem.setText("Super Administrator Mode"); //$NON-NLS-1$
+        superAdminMsgStatusItem.setVisible(false);
+
+        statusLine.add(superAdminMsgStatusItem);
+
+        final MsgStatusItem serverMsgStatusItem = new MsgStatusItem(
+            STATUS_SERVER_MSG_ID) {
+            @Override
+            public Color getBackgroundColor(String text) {
+                if (text != null && !text.endsWith("@cbsr.med.ualberta.ca")) { //$NON-NLS-1$
+                    return PlatformUI.getWorkbench().getDisplay()
+                        .getSystemColor(SWT.COLOR_YELLOW);
+                }
+                return null;
+            }
+        };
+        serverMsgStatusItem.setText(""); //$NON-NLS-1$
         statusLine.add(serverMsgStatusItem);
     }
 }

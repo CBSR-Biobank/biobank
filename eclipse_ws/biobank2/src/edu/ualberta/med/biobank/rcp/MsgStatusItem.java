@@ -7,20 +7,13 @@ import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.action.StatusLineLayoutData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.PlatformUI;
 
-public class ServerMsgStatusItem extends ContributionItem {
-
-    private static ServerMsgStatusItem instance = null;
-
-    /**
-     * The composite into which this contribution item has been placed. This
-     * will be <code>null</code> if this instance has not yet been initialized.
-     */
-    private Composite statusLine = null;
+public class MsgStatusItem extends ContributionItem {
 
     private CLabel label;
 
@@ -30,25 +23,18 @@ public class ServerMsgStatusItem extends ContributionItem {
 
     private int heightHint = -1;
 
-    private ServerMsgStatusItem() {
-        super("biobank.serverMsg"); //$NON-NLS-1$
-    }
+    private Image icon;
 
-    public static ServerMsgStatusItem getInstance() {
-        if (instance == null) {
-            instance = new ServerMsgStatusItem();
-        }
-
-        return instance;
+    public MsgStatusItem(String id) {
+        super(id);
     }
 
     @Override
     public void fill(Composite parent) {
-        statusLine = parent;
-
         Label sep = new Label(parent, SWT.SEPARATOR);
-        label = new CLabel(statusLine, SWT.BORDER | SWT.SHADOW_NONE);
-        setLabelText(this.text);
+        label = new CLabel(parent, SWT.BORDER | SWT.SHADOW_NONE);
+        setLabelText(text);
+        setLabelIcon(icon);
 
         Point preferredSize = label.computeSize(SWT.DEFAULT, SWT.DEFAULT);
         widthHint = preferredSize.x;
@@ -63,7 +49,7 @@ public class ServerMsgStatusItem extends ContributionItem {
         sep.setLayoutData(data);
     }
 
-    public void setServerName(String text) {
+    public void setText(String text) {
         Assert.isNotNull(text);
 
         this.text = LegacyActionTools.escapeMnemonics(text);
@@ -72,19 +58,30 @@ public class ServerMsgStatusItem extends ContributionItem {
         if (this.text.length() == 0) {
             if (isVisible()) {
                 setVisible(false);
-                IContributionManager contributionManager = getParent();
-
-                if (contributionManager != null) {
-                    contributionManager.update(true);
-                }
             }
         } else if (!isVisible()) {
             setVisible(true);
-            IContributionManager contributionManager = getParent();
+        }
+    }
 
-            if (contributionManager != null) {
-                contributionManager.update(true);
-            }
+    public void setIcon(Image icon) {
+        this.icon = icon;
+        setLabelIcon(icon);
+    }
+
+    public void setLabelIcon(Image image) {
+        if ((label == null) || label.isDisposed()) {
+            return;
+        }
+        label.setImage(image);
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        IContributionManager contributionManager = getParent();
+        if (contributionManager != null) {
+            contributionManager.update(true);
         }
     }
 
@@ -95,11 +92,15 @@ public class ServerMsgStatusItem extends ContributionItem {
 
         label.setText(this.text);
 
-        if ((text != null) && !text.endsWith("@cbsr.med.ualberta.ca")) { //$NON-NLS-1$
-            label.setBackground(PlatformUI.getWorkbench().getDisplay()
-                .getSystemColor(SWT.COLOR_YELLOW));
+        if (text != null) {
+            Color color = getBackgroundColor(text);
+            if (color != null)
+                label.setBackground(color);
         }
+    }
 
+    public Color getBackgroundColor(@SuppressWarnings("unused") String text) {
+        return null;
     }
 
 }
