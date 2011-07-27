@@ -105,7 +105,7 @@ public class Messages extends NLS {
     public static String SourceSpecimenInfoTable_no_label;
 
     public static String SourceSpecimenInfoTable_yes_label;
-    public static String SpecimenInfoTable_comment_label;
+    public static String SpecimenInfoTable_comments_label;
 
     public static String SpecimenInfoTable_created_label;
 
