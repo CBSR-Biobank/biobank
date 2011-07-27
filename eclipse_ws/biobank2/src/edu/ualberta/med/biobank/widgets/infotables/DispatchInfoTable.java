@@ -34,8 +34,12 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         }
     }
 
-    private static final String[] HEADINGS = new String[] { Messages.DispatchInfoTable_time_label,
-        Messages.DispatchInfoTable_received_label, Messages.DispatchInfoTable_waybill_label, Messages.DispatchInfoTable_state_label, Messages.DispatchInfoTable_spec_state_label };
+    private static final String[] HEADINGS = new String[] {
+        Messages.DispatchInfoTable_time_label,
+        Messages.DispatchInfoTable_received_label,
+        Messages.DispatchInfoTable_waybill_label,
+        Messages.DispatchInfoTable_state_label,
+        Messages.DispatchInfoTable_spec_state_label };
 
     private boolean editMode = false;
 
@@ -85,12 +89,15 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         throws Exception {
         TableRowData info = new TableRowData();
         info.ds = ds;
-        info.dispatchTime = ds.getShipmentInfo().getPackedAt();
-        info.dateReceived = ds.getShipmentInfo().getReceivedAt();
+        info.dispatchTime = ds.getShipmentInfo() == null ? null : ds
+            .getShipmentInfo().getPackedAt();
+        info.dateReceived = ds.getShipmentInfo() == null ? null : ds
+            .getShipmentInfo().getReceivedAt();
         info.dstatus = ds.getStateDescription();
         info.astatus = ds.getDispatchSpecimen(a.getInventoryId())
             .getStateDescription();
-        info.waybill = ds.getShipmentInfo().getWaybill();
+        info.waybill = ds.getShipmentInfo() == null ? null : ds
+            .getShipmentInfo().getWaybill();
         return info;
     }
 
