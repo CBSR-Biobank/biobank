@@ -174,13 +174,17 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public Group persistGroup(Group group) throws ApplicationException {
-        return BiobankSecurityUtil.persistGroup(group);
+    public Group persistGroup(User currentUser, Group group)
+        throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        return BiobankSecurityUtil.persistGroup(currentUser, group);
     }
 
     @Override
-    public void deleteGroup(Group group) throws ApplicationException {
-        BiobankSecurityUtil.deleteGroup(group);
+    public void deleteGroup(User currentUser, Group group)
+        throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        BiobankSecurityUtil.deleteGroup(currentUser, group);
     }
 
     @Override

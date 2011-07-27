@@ -401,9 +401,10 @@ public class BiobankSecurityUtil {
     }
 
     public static edu.ualberta.med.biobank.common.security.Group persistGroup(
+        edu.ualberta.med.biobank.common.security.User currentUser,
         edu.ualberta.med.biobank.common.security.Group group)
         throws ApplicationException {
-        if (isSuperAdministrator()) {
+        if (canPerformCenterAdminAction(currentUser)) {
             try {
                 UserProvisioningManager upm = SecurityServiceProvider
                     .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
@@ -561,9 +562,10 @@ public class BiobankSecurityUtil {
     }
 
     public static void deleteGroup(
+        edu.ualberta.med.biobank.common.security.User currentUser,
         edu.ualberta.med.biobank.common.security.Group group)
         throws ApplicationException {
-        if (isSuperAdministrator()) {
+        if (canPerformCenterAdminAction(currentUser)) {
             try {
                 UserProvisioningManager upm = SecurityServiceProvider
                     .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);

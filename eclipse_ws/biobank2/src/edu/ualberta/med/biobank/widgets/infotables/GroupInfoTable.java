@@ -119,7 +119,8 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
                 new Object[] { name });
 
             if (BgcPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
-                SessionManager.getAppService().deleteGroup(group);
+                SessionManager.getAppService().deleteGroup(
+                    SessionManager.getUser(), group);
                 // remove the user from the collection
                 getCollection().remove(group);
                 reloadCollection(getCollection(), null);
