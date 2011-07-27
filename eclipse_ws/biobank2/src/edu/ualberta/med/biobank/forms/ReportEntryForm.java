@@ -363,7 +363,6 @@ public class ReportEntryForm extends BiobankEntryForm {
         container.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(container);
 
-        // TODO: printPDF and PdfExporter-s
         createExporterButton(container, new CsvDataExporter());
         createExporterButton(container, new PdfDataExporter());
         printPdfDataExporter = new PrintPdfDataExporter();
