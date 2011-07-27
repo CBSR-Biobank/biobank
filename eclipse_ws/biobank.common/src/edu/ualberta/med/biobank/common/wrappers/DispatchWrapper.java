@@ -47,6 +47,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private boolean hasSpecimenStatesChanged = false;
 
+    private boolean removeSpecimensPosition = false;
+
     public DispatchWrapper(WritableApplicationService appService) {
         super(appService);
     }
@@ -122,6 +124,17 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         for (DispatchSpecimenWrapper dds : deletedDispatchedSpecimens) {
             if (!dds.isNew()) {
                 dds.delete();
+            }
+        }
+
+        // set true when state is switch to in_transit. This means we need to
+        // remove the specimens position
+        if (removeSpecimensPosition) {
+            for (DispatchSpecimenWrapper rds : getDispatchSpecimenCollection(false)) {
+                if (rds.getSpecimen().getPosition() != null) {
+                    rds.getSpecimen().setPosition(null);
+                    toBePersistedDispatchedSpecimens.add(rds);
+                }
             }
         }
 
@@ -232,6 +245,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                     dsa.setDispatchSpecimenState(state);
                     if (state == DispatchSpecimenState.EXTRA) {
                         specimen.setCurrentCenter(getReceiverCenter());
+                        // remove position in case it has one in the previous
+                        // center.
+                        specimen.setPosition(null);
                         toBePersistedDispatchedSpecimens.add(dsa);
                     }
                     newDispatchSpecimens.add(dsa);
@@ -336,6 +352,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public void setState(DispatchState ds) {
         setState(ds.getId());
+        removeSpecimensPosition = (ds == DispatchState.IN_TRANSIT);
     }
 
     @Override
@@ -424,19 +441,13 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     @Override
-    public void reload() throws Exception {
-        super.reload();
-        resetMap();
-    }
-
-    @Override
     protected void resetInternalFields() {
-        super.resetInternalFields();
         resetMap();
         deletedDispatchedSpecimens.clear();
         toBePersistedDispatchedSpecimens.clear();
         hasNewSpecimens = false;
         hasSpecimenStatesChanged = false;
+        removeSpecimensPosition = false;
     }
 
     public void resetMap() {
