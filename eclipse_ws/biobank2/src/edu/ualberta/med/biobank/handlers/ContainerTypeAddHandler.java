@@ -24,7 +24,8 @@ public class ContainerTypeAddHandler extends AbstractHandler {
     @Override
     public boolean isEnabled() {
         return SessionManager.getUser() != null
-            && SessionManager.getUser().getCurrentWorkingCenter() != null
+            // only for sites, not all centers
+            && SessionManager.getUser().getCurrentWorkingSite() != null
             && SessionManager.canCreate(ContainerTypeWrapper.class);
     }
 }
