@@ -23,7 +23,7 @@ public class ReportResultsTableWidget<T> extends ReportTableWidget<T> {
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    public BiobankLabelProvider getLabelProvider(final boolean formatNumbers) {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -38,7 +38,7 @@ public class ReportResultsTableWidget<T> extends ReportTableWidget<T> {
                         Object cell = row[columnIndex];
                         if (cell == null)
                             return ""; //$NON-NLS-1$
-                        if (cell instanceof Number)
+                        if (formatNumbers && cell instanceof Number)
                             return NumberFormatter.format((Number) cell);
                         return cell.toString();
                     }

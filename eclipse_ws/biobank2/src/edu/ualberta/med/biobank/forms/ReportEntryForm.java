@@ -683,7 +683,8 @@ public class ReportEntryForm extends BiobankEntryForm {
 
         // export
         try {
-            exporter.export(data, resultsTable.getLabelProvider());
+            exporter.export(data, resultsTable
+                .getLabelProvider(!(exporter instanceof CsvDataExporter)));
         } catch (Exception e) {
             MessageDialog.openError(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(),

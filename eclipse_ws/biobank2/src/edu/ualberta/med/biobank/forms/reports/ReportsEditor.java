@@ -345,7 +345,8 @@ public abstract class ReportsEditor extends BiobankEntryForm {
             bw.write("," + columnInfo.get(j)); //$NON-NLS-1$
         }
         bw.println();
-        BiobankLabelProvider stringConverter = reportTable.getLabelProvider();
+        BiobankLabelProvider stringConverter = reportTable
+            .getLabelProvider(false);
         for (Object row : reportData) {
             Object[] castOb = (Object[]) row;
             bw.write("\"" + stringConverter.getColumnText(castOb, 0) + "\""); //$NON-NLS-1$ //$NON-NLS-2$
@@ -401,20 +402,17 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                 columnInfo.add(names[i1]);
             }
 
-            if (exportCSV) {
-                String[] filterExt = { "*.csv" }; //$NON-NLS-1$
-                path = runExportDialog(report.getName().replaceAll(" ", "_") //$NON-NLS-1$ //$NON-NLS-2$
-                    + "_" + DateFormatter.formatAsDate(new Date()), filterExt); //$NON-NLS-1$
+            if (exportCSV || exportPDF) {
+                String fileName = report.getName().replaceAll(" ", "_") //$NON-NLS-1$ //$NON-NLS-2$
+                    + "_" + DateFormatter.formatAsDate(new Date()); //$NON-NLS-1$ /
+                String[] filterExt = (exportCSV) ? new String[] { "*.csv" } //$NON-NLS-1$ 
+                    : new String[] { ".pdf" }; //$NON-NLS-1$
+                path = runExportDialog(fileName, filterExt);
                 if (path == null) {
                     BgcPlugin.openAsyncError("Exporting canceled.", //$NON-NLS-1$
                         "Select a valid path and try again."); //$NON-NLS-1$
                     return;
                 }
-            } else if (exportPDF) {
-                String[] filterExt = new String[] { ".pdf" }; //$NON-NLS-1$
-                path = runExportDialog(report.getName().replaceAll(" ", "_") //$NON-NLS-1$ //$NON-NLS-2$
-                    + "_" + DateFormatter.formatAsDate(new Date()), filterExt); //$NON-NLS-1$
-
             }
             IRunnableContext context = new ProgressMonitorDialog(Display
                 .getDefault().getActiveShell());
