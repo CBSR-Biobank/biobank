@@ -57,9 +57,11 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public User getCurrentUser() throws ApplicationException;
 
-    public Group persistGroup(Group group) throws ApplicationException;
+    public Group persistGroup(User currentUser, Group group)
+        throws ApplicationException;
 
-    public void deleteGroup(Group group) throws ApplicationException;
+    public void deleteGroup(User currentUser, Group group)
+        throws ApplicationException;
 
     public void unlockUser(User currentUser, String userNameToUnlock)
         throws ApplicationException;
