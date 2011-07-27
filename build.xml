@@ -519,6 +519,7 @@
       <transaction src="${data.sql.dir}/specimenTypes.sql" />
       <transaction src="${data.sql.dir}/containerLabelingScheme.sql" />
       <transaction src="${data.sql.dir}/shippingMethod.sql" />
+      <transaction src="${data.sql.dir}/advancedReportsData.sql" />
       <transaction src="${secu-log.dir}/schemaSecurity.sql" />
       <transaction>commit;</transaction>
       <classpath>

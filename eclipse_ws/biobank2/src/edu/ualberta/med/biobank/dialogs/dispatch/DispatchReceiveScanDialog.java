@@ -78,7 +78,7 @@ public class DispatchReceiveScanDialog extends
                     .size());
 
             palletScanned.put(new RowColPos(6, 6), new PalletCell(new ScanCell(
-                6, 6, "aaar"))); //$NON-NLS-1$
+                6, 6, "aaah"))); //$NON-NLS-1$
         }
         return palletScanned;
     }

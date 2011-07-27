@@ -91,8 +91,8 @@ public abstract class BaseCombo extends Canvas {
                     + (win32 ? 1 : 0), cRect.width - bSize.x - (win32 ? 2 : 0),
                     tSize.y - (win32 ? 2 : 0));
                 button.setBounds(
-                    win32 ? (cRect.x + cRect.width - cRect.height + 1)
-                        : (cRect.x + cRect.width - bSize.x), cRect.y,
+                    win32 ? (((cRect.x + cRect.width) - cRect.height) + 1)
+                        : ((cRect.x + cRect.width) - bSize.x), cRect.y,
                     win32 ? (cRect.height - 1) : bSize.x, win32 ? cRect.height
                         : bSize.y);
             }
@@ -198,7 +198,7 @@ public abstract class BaseCombo extends Canvas {
      */
     protected static boolean containsControl(Control control,
         Composite composite) {
-        if (composite != null && !composite.isDisposed()) {
+        if ((composite != null) && !composite.isDisposed()) {
             Control[] children = composite.getChildren();
             for (Control child : children) {
                 if (!child.isDisposed()) {
@@ -286,7 +286,7 @@ public abstract class BaseCombo extends Canvas {
 
     private Listener textListener;
     private Listener shellListener;
-    private Listener comboListener = new Listener() {
+    protected Listener comboListener = new Listener() {
         @Override
         public void handleEvent(Event event) {
             switch (event.type) {
@@ -377,14 +377,14 @@ public abstract class BaseCombo extends Canvas {
      * @return true if the {@link #button} field is in a fit state to be used
      */
     protected boolean checkButton() {
-        return (button != null && !button.isDisposed());
+        return ((button != null) && !button.isDisposed());
     }
 
     /**
      * @return true if the {@link #content} field is in a fit state to be used
      */
     protected boolean checkContent() {
-        return (content != null && !content.isDisposed());
+        return ((content != null) && !content.isDisposed());
     }
 
     /**
@@ -392,14 +392,14 @@ public abstract class BaseCombo extends Canvas {
      *         used
      */
     protected boolean checkContentShell() {
-        return (contentShell != null && !contentShell.isDisposed());
+        return ((contentShell != null) && !contentShell.isDisposed());
     }
 
     /**
      * @return true if the {@link #text} field is in a fit state to be used
      */
     protected boolean checkText() {
-        return (text != null && !text.isDisposed());
+        return ((text != null) && !text.isDisposed());
     }
 
     private void createButton(int style) {
@@ -448,7 +448,7 @@ public abstract class BaseCombo extends Canvas {
             public void handleEvent(Event event) {
                 switch (event.type) {
                 case SWT.KeyDown:
-                    if (event.stateMask == SWT.CTRL && event.keyCode == ' ') {
+                    if ((event.stateMask == SWT.CTRL) && (event.keyCode == ' ')) {
                         event.doit = false;
                         setOpen(true);
                     }
@@ -465,7 +465,7 @@ public abstract class BaseCombo extends Canvas {
 
         int mask = SWT.TRAIL | SWT.LEAD;
         int textStyle = SWT.SINGLE | (style & mask);
-        if (!win32 && (style & SWT.BORDER) != 0) {
+        if (!win32 && ((style & SWT.BORDER) != 0)) {
             textStyle |= SWT.BORDER;
         }
 
@@ -591,7 +591,7 @@ public abstract class BaseCombo extends Canvas {
                         setOpen(false);
                         break;
                     case SWT.Deactivate:
-                        if (!checkContent() || content.getMenu() == null
+                        if (!checkContent() || (content.getMenu() == null)
                             || !content.getMenu().isVisible()) {
                             setOpen(false);
                         }
@@ -973,7 +973,7 @@ public abstract class BaseCombo extends Canvas {
      * @see BaseCombo#setOpen(boolean)
      */
     protected synchronized void setOpen(boolean open, final Runnable callback) {
-        if (content == null || content.isDisposed()) {
+        if ((content == null) || content.isDisposed()) {
             if (contentShell != null) {
                 contentShell.dispose();
                 contentShell = null;
@@ -982,7 +982,7 @@ public abstract class BaseCombo extends Canvas {
             return;
         }
 
-        if (contentShell == null || contentShell.isDisposed()) {
+        if ((contentShell == null) || contentShell.isDisposed()) {
             createContentShell();
         }
 

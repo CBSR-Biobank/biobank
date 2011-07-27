@@ -52,6 +52,10 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     @Override
     public BiobankLabelProvider getLabelProvider() {
+        return getLabelProvider(true);
+    }
+
+    public BiobankLabelProvider getLabelProvider(final boolean formatNumbers) {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -63,7 +67,8 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
                         if (castedVals[columnIndex] instanceof Date)
                             return DateFormatter
                                 .formatAsDate((Date) castedVals[columnIndex]);
-                        if (castedVals[columnIndex] instanceof Number)
+                        if (formatNumbers
+                            && castedVals[columnIndex] instanceof Number)
                             return NumberFormatter
                                 .format((Number) castedVals[columnIndex]);
                         return castedVals[columnIndex].toString();
