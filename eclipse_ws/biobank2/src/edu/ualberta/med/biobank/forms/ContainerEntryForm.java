@@ -96,7 +96,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText(Messages.ContainerEntryForm_form_title);
-
+        setDirty(true);
         page.setLayout(new GridLayout(1, false));
         createContainerSection();
         createButtonsSection();
