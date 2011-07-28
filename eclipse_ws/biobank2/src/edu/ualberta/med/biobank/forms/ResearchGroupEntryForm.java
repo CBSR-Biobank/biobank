@@ -157,6 +157,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     public void saveForm() throws Exception {
         researchGroup.persist();
         SessionManager.updateAllSimilarNodes(researchGroupAdapter, true);
+        SessionManager.getUser().updateCurrentCenter(researchGroup);
     }
 
     @Override
