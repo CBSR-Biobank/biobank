@@ -904,7 +904,7 @@
                      commandId="edu.ualberta.med.biobank.commands.researchGroupAdd"
                      icon="icons/rg_add.png"
                      id="edu.ualberta.med.biobank.menu.researchGroupAdd"
-                     label="Add ResearchGroup"
+                     label="Add Research Group"
                      style="push">
                   <visibleWhen
                         checkEnabled="false">
@@ -1951,6 +1951,20 @@
       default="false"
       id="edu.ualberta.med.biobank.forms.SpecimenAssignEntryForm"
       name="%SpecimenAssign.editor">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"
+      default="false"
+      icon="icons/research_group.png"
+      id="edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"
+      name="Research Group Entry">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.ResearchGroupViewForm"
+      default="false"
+      icon="icons/research_group.png"
+      id="edu.ualberta.med.biobank.forms.ResearchGroupViewForm"
+      name="Research Group View">
 </editor>
    </extension>
    <extension

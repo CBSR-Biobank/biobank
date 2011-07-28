@@ -18,14 +18,14 @@ import edu.ualberta.med.biobank.treeview.AbstractResearchGroupGroup;
 public class ResearchGroupMasterGroup extends AbstractResearchGroupGroup {
 
     public ResearchGroupMasterGroup(SessionAdapter sessionAdapter, int id) {
-        super(sessionAdapter, id, "All ResearchGroups");
+        super(sessionAdapter, id, "All Research Groups");
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (SessionManager.canCreate(ResearchGroupWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add ResearchGroup");
+            mi.setText("Add Research Group");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -52,7 +52,8 @@ public class ResearchGroupMasterGroup extends AbstractResearchGroupGroup {
 
     @Override
     protected int getWrapperChildCount() throws Exception {
-        return ResearchGroupWrapper.getCount(SessionManager.getAppService());
+        return (int) ResearchGroupWrapper.getCount(SessionManager
+            .getAppService());
     }
 
 }

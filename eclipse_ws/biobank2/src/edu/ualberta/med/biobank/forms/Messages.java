@@ -781,6 +781,8 @@ public class Messages extends NLS {
     public static String ResearchGroupEntryForm_main_description;
     public static String ResearchGroupEntryForm_activity_validator_msg;
     public static String ResearchGroupEntryForm_contact_button_add;
+    public static String ResearchGroupEntryForm_study_label;
+
     public static String ResearchGroupEntryForm_study_validator_msg;
 
     static {
