@@ -183,7 +183,8 @@ public abstract class AdapterBase {
     protected String getTooltipText(String string) {
         String name = getLabel();
         if (name == null) {
-            return new StringBuilder(Messages.AdapterBase_new_label).append(string).toString();
+            return new StringBuilder(Messages.AdapterBase_new_label).append(
+                string).toString();
         }
         return new StringBuilder(string).append(" ").append(name).toString(); //$NON-NLS-1$
     }
@@ -696,7 +697,8 @@ public abstract class AdapterBase {
         }
         boolean doDelete = true;
         if (msg != null)
-            doDelete = BgcPlugin.openConfirm(Messages.AdapterBase_confirm_delete_title, msg);
+            doDelete = BgcPlugin.openConfirm(
+                Messages.AdapterBase_confirm_delete_title, msg);
         if (doDelete) {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
@@ -712,7 +714,8 @@ public abstract class AdapterBase {
                             modelObject.delete();
                             page.closeEditor(part, true);
                         } catch (Exception e) {
-                            BgcPlugin.openAsyncError(Messages.AdapterBase_delete_error_title, e);
+                            BgcPlugin.openAsyncError(
+                                Messages.AdapterBase_delete_error_title, e);
                             getParent().addChild(AdapterBase.this);
                             return;
                         }
