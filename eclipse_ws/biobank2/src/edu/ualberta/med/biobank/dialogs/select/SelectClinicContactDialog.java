@@ -1,8 +1,15 @@
 package edu.ualberta.med.biobank.dialogs.select;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -11,6 +18,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
@@ -26,6 +34,8 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
     private ContactWrapper selectedContact;
 
     private List<ContactWrapper> contacts;
+
+    private ComboViewer clinicCombo;
 
     public SelectClinicContactDialog(Shell parent, List<ContactWrapper> contacts) {
         super(parent);
@@ -48,12 +58,41 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
     }
 
     @Override
-    protected void createDialogAreaInternal(Composite parent) throws Exception {
-        Composite contents = new Composite(parent, SWT.NONE);
-        contents.setLayout(new GridLayout(1, false));
-        contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    protected void createDialogAreaInternal(final Composite parent)
+        throws Exception {
+        final Composite contents = new Composite(parent, SWT.NONE);
+        contents.setLayout(new GridLayout(2, false));
+        GridData cgd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        contents.setLayoutData(cgd);
 
-        contactInfoTable = new StudyContactEntryInfoTable(contents, null);
+        HashSet<ClinicWrapper> clinics = new HashSet<ClinicWrapper>();
+        for (ContactWrapper contact : contacts)
+            clinics.add(contact.getClinic());
+
+        LabelProvider labelProvider = new LabelProvider() {
+            @Override
+            public String getText(Object o) {
+                return ((ClinicWrapper) o).getNameShort();
+            }
+        };
+
+        clinicCombo = widgetCreator.createComboViewer(contents, "Clinic",
+            new ArrayList<ClinicWrapper>(clinics), null, labelProvider);
+        clinicCombo
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    filterContacts((ClinicWrapper) ((StructuredSelection) event
+                        .getSelection()).getFirstElement());
+                    getShell().setSize(
+                        contents.getParent().getParent()
+                            .computeSize(SWT.DEFAULT, getShell().getSize().y));
+                }
+            });
+
+        contactInfoTable = new StudyContactEntryInfoTable(contents,
+            new ArrayList<ContactWrapper>());
         contactInfoTable.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -62,8 +101,15 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
                         IDialogConstants.OK_ID).setEnabled(true);
             }
         });
-        contactInfoTable.setCollection(contacts);
+        GridData gd = new GridData(SWT.FILL, SWT.NONE, true, true);
+        gd.horizontalSpan = 2;
+        contactInfoTable.setLayoutData(gd);
         contactInfoTable.setEnabled(true);
+
+    }
+
+    protected void filterContacts(ClinicWrapper clinic) {
+        contactInfoTable.setCollection(clinic.getContactCollection(true));
     }
 
     @Override

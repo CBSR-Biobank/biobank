@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> {
 
-    private static final int PAGE_SIZE_ROWS = 15;
+    private static final int PAGE_SIZE_ROWS = 10;
 
     protected static class TableRowData {
         ContactWrapper contact;
@@ -32,8 +32,14 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         }
     }
 
-    private static final String[] HEADINGS = new String[] { Messages.StudyContactEntryInfoTable_clinic_label,
-        Messages.StudyContactEntryInfoTable_name_label, Messages.StudyContactEntryInfoTable_title_label, Messages.StudyContactEntryInfoTable_email_label, Messages.StudyContactEntryInfoTable_mobile_label, Messages.StudyContactEntryInfoTable_pager_label, Messages.StudyContactEntryInfoTable_office_label };
+    private static final String[] HEADINGS = new String[] {
+        Messages.StudyContactEntryInfoTable_clinic_label,
+        Messages.StudyContactEntryInfoTable_name_label,
+        Messages.StudyContactEntryInfoTable_title_label,
+        Messages.StudyContactEntryInfoTable_email_label,
+        Messages.StudyContactEntryInfoTable_mobile_label,
+        Messages.StudyContactEntryInfoTable_pager_label,
+        Messages.StudyContactEntryInfoTable_office_label };
 
     public StudyContactEntryInfoTable(Composite parent,
         List<ContactWrapper> contactCollection) {
