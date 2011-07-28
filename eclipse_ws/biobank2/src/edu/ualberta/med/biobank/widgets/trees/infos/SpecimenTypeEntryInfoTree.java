@@ -125,7 +125,7 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                 SpecimenTypeWrapper specType = getSelection();
                 if (specType != null) {
                     try {
-                        if (!specType.isNew() && specType.isUsedBySpecimens()) {
+                        if (!specType.isNew() && specType.isUsed()) {
                             BgcPlugin
                                 .openError(
                                     Messages.SpecimenTypeEntryInfoTree_delete_error_title,
@@ -154,8 +154,8 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                     } catch (final RemoteConnectFailureException exp) {
                         BgcPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
-                        logger.error("BioBankFormBase.createPartControl Error", //$NON-NLS-1$
-                            e);
+                        BgcPlugin.openAsyncError(
+                            "Error deleting specimen type", e);
                     }
                 }
             }
