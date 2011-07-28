@@ -275,7 +275,9 @@ public abstract class BgcFormBase extends EditorPart implements
     }
 
     public static void setTextValue(BgcBaseText label, String value) {
-        if ((value != null) && !label.isDisposed()) {
+        if (!label.isDisposed()) {
+            if (value == null)
+                value = ""; //$NON-NLS-1$
             label.setText(value);
         }
     }
