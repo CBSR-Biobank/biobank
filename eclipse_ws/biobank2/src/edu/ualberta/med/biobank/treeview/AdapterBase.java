@@ -428,10 +428,8 @@ public abstract class AdapterBase {
             int childCount = getWrapperChildCount();
             if (childCount == 0) {
                 setHasChildren(false);
-                loadChildrenSemaphore.release();
-                return;
-            }
-            setHasChildren(true);
+            } else
+                setHasChildren(true);
             final List<AdapterBase> newNodes = new ArrayList<AdapterBase>();
             for (int i = 0, n = childCount - children.size(); i < n; ++i) {
                 final AdapterBase node = createChildNode(-i);
@@ -719,6 +717,7 @@ public abstract class AdapterBase {
                             getParent().addChild(AdapterBase.this);
                             return;
                         }
+                        getParent().rebuild();
                         getParent().notifyListeners();
                         notifyListeners();
                         additionalRefreshAfterDelete();
