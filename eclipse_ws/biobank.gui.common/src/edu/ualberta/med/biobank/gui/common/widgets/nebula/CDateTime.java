@@ -382,7 +382,8 @@ public class CDateTime extends BaseCombo {
                 public void handleEvent(Event event) {
                     if (SWT.ESC == event.keyCode) {
                         event.doit = false;
-                        if (selection.length > 0 && selection[0] != cancelDate) {
+                        if ((selection.length > 0)
+                            && (selection[0] != cancelDate)) {
                             setSelection(cancelDate);
                         }
                         setOpen(false);
@@ -390,7 +391,7 @@ public class CDateTime extends BaseCombo {
                 }
             });
 
-            if (field.length > 1 || isTime) {
+            if ((field.length > 1) || isTime) {
                 createPickerToolbar(pickerPanel);
             }
         }
@@ -478,7 +479,7 @@ public class CDateTime extends BaseCombo {
                     Display.getDefault().asyncExec(new Runnable() {
                         @Override
                         public void run() {
-                            if (contentShell != null
+                            if ((contentShell != null)
                                 && !contentShell.isDisposed()) {
                                 contentShell.dispose();
                                 contentShell = null;
@@ -528,7 +529,7 @@ public class CDateTime extends BaseCombo {
                 sel.x += textSelectionOffset.y;
             aci.setIndex(sel.x);
             Object[] oa = aci.getAttributes().keySet().toArray();
-            if (oa.length == 0 && sel.x > 0) {
+            if ((oa.length == 0) && (sel.x > 0)) {
                 sel.x -= 1;
                 aci.setIndex(sel.x);
                 oa = aci.getAttributes().keySet().toArray();
@@ -571,9 +572,9 @@ public class CDateTime extends BaseCombo {
      *            selection)
      */
     void fieldNext(boolean async) {
-        if (activeField >= 0 && activeField < field.length - 1) {
+        if ((activeField >= 0) && (activeField < (field.length - 1))) {
             if (Calendar.ZONE_OFFSET == getCalendarField(field[activeField + 1])) {
-                if (activeField < field.length - 2) {
+                if (activeField < (field.length - 2)) {
                     setActiveField(activeField + 2);
                 } else {
                     setActiveField(0);
@@ -607,7 +608,7 @@ public class CDateTime extends BaseCombo {
      *            selection)
      */
     void fieldPrev(boolean async) {
-        if (activeField > 0 && activeField < field.length) {
+        if ((activeField > 0) && (activeField < field.length)) {
             if (Calendar.ZONE_OFFSET == getCalendarField(field[activeField - 1])) {
                 if (activeField > 1) {
                     setActiveField(activeField - 2);
@@ -927,9 +928,9 @@ public class CDateTime extends BaseCombo {
         if (event.stateMask != 0) {
             return;
         }
-        if ('\r' == event.keyCode || SWT.KEYPAD_CR == event.keyCode) {
+        if (('\r' == event.keyCode) || (SWT.KEYPAD_CR == event.keyCode)) {
             fireSelectionChanged(true);
-        } else if (SWT.BS == event.keyCode || SWT.DEL == event.keyCode) {
+        } else if ((SWT.BS == event.keyCode) || (SWT.DEL == event.keyCode)) {
             event.doit = false;
             setSelection((Date) null);
             fireSelectionChanged();
@@ -966,7 +967,7 @@ public class CDateTime extends BaseCombo {
                 break;
             default:
                 if (hasField(activeField)
-                    && activeField + 1 < separator.length
+                    && ((activeField + 1) < separator.length)
                     && String.valueOf(event.character).equals(
                         separator[activeField + 1])) {
                     fieldNext();
@@ -1003,8 +1004,8 @@ public class CDateTime extends BaseCombo {
             break;
         case SWT.TRAVERSE_TAB_NEXT:
             if (tabStops && hasSelection()) {
-                if (activeField == field.length - 1
-                    || (activeField == field.length - 2 && Calendar.ZONE_OFFSET == getCalendarField(field[field.length - 1]))) {
+                if ((activeField == (field.length - 1))
+                    || ((activeField == (field.length - 2)) && (Calendar.ZONE_OFFSET == getCalendarField(field[field.length - 1])))) {
                     event.doit = true;
                 } else {
                     event.doit = false;
@@ -1018,8 +1019,8 @@ public class CDateTime extends BaseCombo {
             break;
         case SWT.TRAVERSE_TAB_PREVIOUS:
             if (tabStops && hasSelection()) {
-                if (activeField == 0
-                    || (activeField == 1 && Calendar.ZONE_OFFSET == getCalendarField(field[0]))) {
+                if ((activeField == 0)
+                    || ((activeField == 1) && (Calendar.ZONE_OFFSET == getCalendarField(field[0])))) {
                     event.doit = true;
                 } else {
                     event.doit = false;
@@ -1043,7 +1044,7 @@ public class CDateTime extends BaseCombo {
      *         field array
      */
     private boolean hasField(int field) {
-        return field >= 0 && field <= this.field.length;
+        return (field >= 0) && (field <= this.field.length);
     }
 
     /**
@@ -1248,7 +1249,7 @@ public class CDateTime extends BaseCombo {
     }
 
     private boolean checkPicker() {
-        return picker != null && !picker.isDisposed();
+        return (picker != null) && !picker.isDisposed();
     }
 
     /**
@@ -1276,7 +1277,7 @@ public class CDateTime extends BaseCombo {
         int timeStyle = (format & CDT.TIME_SHORT) != 0 ? DateFormat.SHORT
             : (format & CDT.TIME_MEDIUM) != 0 ? DateFormat.MEDIUM : -1;
         String str = null;
-        if (dateStyle != -1 && timeStyle != -1) {
+        if ((dateStyle != -1) && (timeStyle != -1)) {
             str = ((SimpleDateFormat) DateFormat.getDateTimeInstance(dateStyle,
                 timeStyle, locale)).toPattern();
         } else if (dateStyle != -1) {
@@ -1474,7 +1475,7 @@ public class CDateTime extends BaseCombo {
                 this.selection = new Date[] { selection };
             }
         }
-        if (singleSelection && this.selection.length > 0) {
+        if (singleSelection && (this.selection.length > 0)) {
             show(selection);
         } else {
             updateText();
@@ -1572,7 +1573,7 @@ public class CDateTime extends BaseCombo {
         for (char c = aci.first(); c != CharacterIterator.DONE; c = aci.next()) {
             Object[] oa = aci.getAttributes().keySet().toArray();
             if (oa.length > 0) {
-                if (oa[0] != last && i < field.length) {
+                if ((oa[0] != last) && (i < field.length)) {
                     if (getCalendarField((Field) oa[0]) < 0) {
                         if (bak.length > 0) {
                             field = new Field[bak.length];
@@ -1650,7 +1651,7 @@ public class CDateTime extends BaseCombo {
         if (!hasSelection()) {
             s0 = 0;
             s1 = buffer.length();
-        } else if (activeField >= 0 && activeField < field.length) {
+        } else if ((activeField >= 0) && (activeField < field.length)) {
             AttributedCharacterIterator aci = df
                 .formatToCharacterIterator(getSelection());
             for (char c = aci.first(); c != CharacterIterator.DONE; c = aci
@@ -1697,12 +1698,16 @@ public class CDateTime extends BaseCombo {
                     }
 
                     if (!string.equals(text.getText())) {
+                        if (isDropDown()) {
+                            removeListener(SWT.Move, comboListener);
+                            removeListener(SWT.Resize, comboListener);
+                        }
+
                         text.setText(string);
 
-                        // if the picker is shown and the layout resizes, then
-                        // the picker is closed - avoid this
-                        if (picker == null) {
-                            getParent().layout(true);
+                        if (isDropDown()) {
+                            addListener(SWT.Move, comboListener);
+                            addListener(SWT.Resize, comboListener);
                         }
                     }
                     textControl.setSelection(selStart, selEnd);
@@ -1742,7 +1747,7 @@ public class CDateTime extends BaseCombo {
      */
     void verify(Event e) {
         e.doit = false;
-        if (field.length == 0 || activeField == FIELD_NONE)
+        if ((field.length == 0) || (activeField == FIELD_NONE))
             return;
 
         char c = e.character;

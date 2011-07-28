@@ -22,8 +22,10 @@ import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
 public class SpecimenTypeDialog extends BgcBaseDialog {
 
+    private SpecimenTypeWrapper origSpecimenType;
+
     // this is the object that is modified via the bound widgets
-    private SpecimenTypeWrapper specimenType;
+    private SpecimenTypeWrapper tmpSpecimenType;
 
     private String message;
 
@@ -38,8 +40,11 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
         String message, List<SpecimenTypeWrapper> allTypes) {
         super(parent);
         Assert.isNotNull(specimenType);
-        this.specimenType = specimenType;
+        this.origSpecimenType = specimenType;
+        this.tmpSpecimenType = new SpecimenTypeWrapper(null);
+        simpleCopyTo(origSpecimenType, tmpSpecimenType);
         this.message = message;
+
         allOthersTypesStrings = new LinkedHashMap<Integer, String>();
         allOthersTypesObjects = new HashMap<Integer, SpecimenTypeWrapper>();
         for (SpecimenTypeWrapper type : allTypes) {
@@ -51,6 +56,11 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
         }
         currentTitle = (specimenType.getName() == null ? Messages.SpecimenTypeDialog_title_add
             : Messages.SpecimenTypeDialog_title_edit);
+    }
+
+    private void simpleCopyTo(SpecimenTypeWrapper src, SpecimenTypeWrapper dest) {
+        dest.setName(src.getName());
+        dest.setNameShort(src.getNameShort());
     }
 
     @Override
@@ -75,12 +85,12 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            Messages.SpecimenTypeDialog_name_label, null, specimenType,
+            Messages.SpecimenTypeDialog_name_label, null, tmpSpecimenType,
             SpecimenTypePeer.NAME.getName(), new NonEmptyStringValidator(
                 Messages.SpecimenTypeDialog_name_validation_msg));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            Messages.SpecimenTypeDialog_nameShort_label, null, specimenType,
+            Messages.SpecimenTypeDialog_nameShort_label, null, tmpSpecimenType,
             SpecimenTypePeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 Messages.SpecimenTypeDialog_shortName_validation_msg));
 
@@ -93,8 +103,10 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
         gd.horizontalSpan = 2;
         multiSelectChildren.setLayoutData(gd);
 
+        // use origSpecimenType on purpose. tmpSpecimenType doesn't have the
+        // children.
         List<Integer> selectedTypes = new ArrayList<Integer>();
-        for (SpecimenTypeWrapper child : specimenType
+        for (SpecimenTypeWrapper child : origSpecimenType
             .getChildSpecimenTypeCollection(false)) {
             selectedTypes.add(child.getId());
         }
@@ -103,16 +115,17 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
 
     @Override
     protected void okPressed() {
+        simpleCopyTo(tmpSpecimenType, origSpecimenType);
         List<SpecimenTypeWrapper> addedTypes = new ArrayList<SpecimenTypeWrapper>();
         for (Integer addedId : multiSelectChildren.getAddedToSelection()) {
             addedTypes.add(allOthersTypesObjects.get(addedId));
         }
-        specimenType.addToChildSpecimenTypeCollection(addedTypes);
+        origSpecimenType.addToChildSpecimenTypeCollection(addedTypes);
         List<SpecimenTypeWrapper> removedTypes = new ArrayList<SpecimenTypeWrapper>();
         for (Integer removedId : multiSelectChildren.getRemovedToSelection()) {
             removedTypes.add(allOthersTypesObjects.get(removedId));
         }
-        specimenType.removeFromChildSpecimenTypeCollection(removedTypes);
+        origSpecimenType.removeFromChildSpecimenTypeCollection(removedTypes);
         super.okPressed();
     }
 }

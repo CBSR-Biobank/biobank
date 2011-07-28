@@ -64,9 +64,6 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     // Table Data
     private List<Object> reportData;
 
-    // Warning label
-    private Label warning;
-
     // Buttons
     private Button generateButton;
     private Button printButton;
@@ -130,17 +127,8 @@ public abstract class ReportsEditor extends BiobankEntryForm {
         buttonSection.setLayout(gl);
         toolkit.adapt(buttonSection);
 
-        warning = toolkit
-            .createLabel(
-                buttonSection,
-                Messages.ReportsEditor_print_disabled_msg);
-        GridData wgd = new GridData();
-        wgd.horizontalSpan = 4;
-        warning.setVisible(false);
-        warning.setLayoutData(wgd);
-
-        generateButton = toolkit.createButton(buttonSection, Messages.ReportsEditor_generate_label,
-            SWT.NONE);
+        generateButton = toolkit.createButton(buttonSection,
+            Messages.ReportsEditor_generate_label, SWT.NONE);
         generateButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -296,24 +284,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
             exportCSVButton.setEnabled(false);
         }
         reportTable.dispose();
-        // if size > 1000 or unknown, disable print and
-        // export to pdf
-        if ((reportData instanceof HQLCriteriaListProxy && (((HQLCriteriaListProxy<?>) reportData)
-            .getRealSize() == -1 || ((HQLCriteriaListProxy<?>) reportData)
-            .getRealSize() > 1000))
-            || reportData.size() > 1000) {
-            printButton.setEnabled(false);
-            exportPDFButton.setEnabled(false);
-            printButton.setToolTipText(Messages.ReportsEditor_exceed_1000_msg);
-            exportPDFButton.setToolTipText(Messages.ReportsEditor_exceed_1000_msg);
-            warning.setVisible(true);
-            setEnablePrintAction(false);
-        } else {
-            printButton.setToolTipText(Messages.ReportsEditor_print_label);
-            exportPDFButton.setToolTipText(Messages.ReportsEditor_pdfexport_label);
-            setEnablePrintAction(true);
-            warning.setVisible(false);
-        }
+
         reportTable = new ReportTableWidget<Object>(page, reportData,
             getColumnNames());
         reportTable.adaptToToolkit(toolkit, true);
@@ -374,7 +345,8 @@ public abstract class ReportsEditor extends BiobankEntryForm {
             bw.write("," + columnInfo.get(j)); //$NON-NLS-1$
         }
         bw.println();
-        BiobankLabelProvider stringConverter = reportTable.getLabelProvider();
+        BiobankLabelProvider stringConverter = reportTable
+            .getLabelProvider(false);
         for (Object row : reportData) {
             Object[] castOb = (Object[]) row;
             bw.write("\"" + stringConverter.getColumnText(castOb, 0) + "\""); //$NON-NLS-1$ //$NON-NLS-2$
@@ -399,6 +371,14 @@ public abstract class ReportsEditor extends BiobankEntryForm {
 
     public void printTable(final Boolean exportCSV, final Boolean exportPDF)
         throws Exception {
+
+        if (exportCSV == false
+            && ((reportData instanceof HQLCriteriaListProxy && (((HQLCriteriaListProxy<?>) reportData)
+                .getRealSize() == -1 || ((HQLCriteriaListProxy<?>) reportData)
+                .getRealSize() > 1000)) || reportData.size() > 1000)) {
+            throw new Exception(Messages.ReportsEditor_exceed_1000_msg);
+        }
+
         boolean doPrint;
         if (exportCSV || exportPDF)
             doPrint = MessageDialog.openQuestion(PlatformUI.getWorkbench()
@@ -422,20 +402,17 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                 columnInfo.add(names[i1]);
             }
 
-            if (exportCSV) {
-                String[] filterExt = { "*.csv" }; //$NON-NLS-1$
-                path = runExportDialog(report.getName().replaceAll(" ", "_") //$NON-NLS-1$ //$NON-NLS-2$
-                    + "_" + DateFormatter.formatAsDate(new Date()), filterExt); //$NON-NLS-1$
+            if (exportCSV || exportPDF) {
+                String fileName = report.getName().replaceAll(" ", "_") //$NON-NLS-1$ //$NON-NLS-2$
+                    + "_" + DateFormatter.formatAsDate(new Date()); //$NON-NLS-1$ /
+                String[] filterExt = (exportCSV) ? new String[] { "*.csv" } //$NON-NLS-1$ 
+                    : new String[] { ".pdf" }; //$NON-NLS-1$
+                path = runExportDialog(fileName, filterExt);
                 if (path == null) {
                     BgcPlugin.openAsyncError("Exporting canceled.", //$NON-NLS-1$
                         "Select a valid path and try again."); //$NON-NLS-1$
                     return;
                 }
-            } else if (exportPDF) {
-                String[] filterExt = new String[] { ".pdf" }; //$NON-NLS-1$
-                path = runExportDialog(report.getName().replaceAll(" ", "_") //$NON-NLS-1$ //$NON-NLS-2$
-                    + "_" + DateFormatter.formatAsDate(new Date()), filterExt); //$NON-NLS-1$
-
             }
             IRunnableContext context = new ProgressMonitorDialog(Display
                 .getDefault().getActiveShell());

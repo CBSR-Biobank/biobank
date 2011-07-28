@@ -734,7 +734,7 @@
                         definitionId="biobank.isSuperAdminMode">
                   </reference>
                   <reference
-                        definitionId="biobank2.isCurrentCenterAdmin">
+                        definitionId="biobank.isCurrentCenterAdmin">
                   </reference>
                </or>
             </and>
@@ -745,7 +745,7 @@
                      definitionId="biobank.isSuperAdminMode">
                </reference>
                <reference
-                     definitionId="biobank2.isCurrentCenterAdmin">
+                     definitionId="biobank.isCurrentCenterAdmin">
                </reference>
             </or>
          </enabledWhen>
@@ -932,11 +932,16 @@
                      style="push">
                   <visibleWhen
                         checkEnabled="false">
-                     <not>
-                        <reference
-                              definitionId="biobank.isSuperAdminMode">
-                        </reference>
-                     </not>
+                     <and>
+                       <not>
+                          <reference
+                                definitionId="biobank.isSuperAdminMode">
+                          </reference>
+                       </not>
+                       <reference
+                             definitionId="biobank.isSite">
+                       </reference>
+                     </and>
                   </visibleWhen>
                </command>
                <command
@@ -946,11 +951,16 @@
                      style="push">
                   <visibleWhen
                         checkEnabled="false">
-                     <not>
-                        <reference
-                              definitionId="biobank.isSuperAdminMode">
-                        </reference>
-                     </not>
+                     <and>
+                       <not>
+                          <reference
+                                definitionId="biobank.isSuperAdminMode">
+                          </reference>
+                       </not>
+                       <reference
+                             definitionId="biobank.isSite">
+                       </reference>
+                     </and>
                   </visibleWhen>
                </command>
                 <command
@@ -997,7 +1007,7 @@
                                definitionId="biobank.isSuperAdminMode">
                          </reference>
                          <reference
-                               definitionId="biobank2.isCurrentCenterAdmin">
+                               definitionId="biobank.isCurrentCenterAdmin">
                          </reference>
                       </or>
                    </visibleWhen>
@@ -1263,11 +1273,16 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <not>
-                     <reference
-                           definitionId="biobank.isSuperAdminMode">
-                     </reference>
-                  </not>
+                    <and>
+                       <not>
+                          <reference
+                                definitionId="biobank.isSuperAdminMode">
+                          </reference>
+                       </not>
+                       <reference
+                             definitionId="biobank.isSite">
+                       </reference>
+                     </and>
                </visibleWhen>
             </command>
             <command
@@ -1276,11 +1291,16 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <not>
-                     <reference
-                           definitionId="biobank.isSuperAdminMode">
-                     </reference>
-                  </not>
+                     <and>
+                       <not>
+                          <reference
+                                definitionId="biobank.isSuperAdminMode">
+                          </reference>
+                       </not>
+                       <reference
+                             definitionId="biobank.isSite">
+                       </reference>
+                     </and>
                </visibleWhen>
             </command>
             <command
@@ -2411,7 +2431,7 @@
          </with>
       </definition>
       <definition
-            id="biobank2.isCurrentCenterAdmin">
+            id="biobank.isCurrentCenterAdmin">
          <with
                variable="edu.ualberta.med.biobank.sourceprovider.isCurrentCenterAdmin">
             <equals
@@ -2420,11 +2440,38 @@
          </with>
       </definition>
       <definition
-            id="biobank2.hasPrinterLabelsRights">
+            id="biobank.hasPrinterLabelsRights">
          <with
                variable="edu.ualberta.med.biobank.sourceprovider.hasPrinterLabelsRights">
             <equals
                   value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank.isClinic">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.currentCenterType">
+            <equals
+                  value="Clinic">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank.isSite">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.currentCenterType">
+            <equals
+                  value="Site">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank.isResearchGroup">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.currentCenterType">
+            <equals
+                  value="ResearchGroup">
             </equals>
          </with>
       </definition>       

@@ -363,7 +363,6 @@ public class ReportEntryForm extends BiobankEntryForm {
         container.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(container);
 
-        // TODO: printPDF and PdfExporter-s
         createExporterButton(container, new CsvDataExporter());
         createExporterButton(container, new PdfDataExporter());
         printPdfDataExporter = new PrintPdfDataExporter();
@@ -684,7 +683,8 @@ public class ReportEntryForm extends BiobankEntryForm {
 
         // export
         try {
-            exporter.export(data, resultsTable.getLabelProvider());
+            exporter.export(data, resultsTable
+                .getLabelProvider(!(exporter instanceof CsvDataExporter)));
         } catch (Exception e) {
             MessageDialog.openError(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(),

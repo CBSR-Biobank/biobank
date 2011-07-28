@@ -25,11 +25,12 @@ class FixSpcIdLowerCase < ScriptBase
 select inventory_id
 from specimen spc
 where lower(spc.inventory_id)=spc.inventory_id
-and length(spc.inventory_id)=10;
+and length(spc.inventory_id)=10
+and spc.inventory_id!='sw missing';
 LOWER_CASE_SPC_ID_QRY_END
 
   SPC_ID_QRY = <<SPC_ID_QRY_END
-select pnumber,topspc.created_at date_drawn,stype.name spc_type,
+select pnumber,topspc.created_at date_drawn,stype.name spc_type,spc.id,
 spc.inventory_id,spc.created_at,act.name astatus,spc.comment
 from specimen spc
 join specimen topspc on topspc.id=spc.top_specimen_id
@@ -67,8 +68,6 @@ SPC_INSERT_QRY
       end
     end
 
-    print "querying for specimens with lower case NUNC IDs\n" if (Choice.choices[:sql])
-
     getDbConnection("biobank", 'localhost')
     lower_case_spcs = Array.new
     res = @dbh.query(LOWER_CASE_SPC_ID_QRY)
@@ -76,20 +75,49 @@ SPC_INSERT_QRY
       lower_case_spcs << row['inventory_id']
     end
 
-    print FIELDS.join(','), "\n"
+    # this hash has a value of 'true' if there is an upper case equivalent in
+    # the database
+    lc_spc_id_info = Hash.new
 
     lower_case_spcs.each do |inv_id|
-      res = @dbh.query(SPC_ID_QRY.gsub('{inventory_id}', inv_id))
-      print res.fetch_row.join(','), "\n"
-
       res = @dbh.query(SPC_ID_QRY.gsub('{inventory_id}', inv_id.upcase))
-      if res.num_rows == 1
-        print res.fetch_row.join(','), "\n"
+      has_upper = (res.num_rows == 1)
+      lc_spc_id_info[inv_id] = { 'has_upper' => has_upper }
+
+      if has_upper
+        row = res.fetch_hash
+        lc_spc_id_info[inv_id]['id'] = row['id']
       end
-      print "\n"
     end
 
-    if (Choice.choices[:sql])
+    date_str = Time.new.strftime("%Y-%m-%d")
+
+    lc_spc_id_info.each do |lc_inv_id, value|
+      if value['has_upper']
+
+        # set activity status set to Closed, set comment of "<date> barcode
+        # invalid", and set created_at time will be copied to the uppercase
+        # one.
+        print "setting #{lc_inv_id} activity status to closed\n"
+        @dbh.query("update specimen spc, activity_status astat
+set spc.activity_status_id=astat.id,
+spc.comment='#{date_str} barcode invalid'
+where spc.inventory_id='#{lc_inv_id}'
+and astat.name='Closed'")
+        @dbh.query("update specimen lc_spc, specimen uc_spc
+set uc_spc.created_at=lc_spc.created_at
+where lc_spc.inventory_id='#{lc_inv_id}'
+and uc_spc.inventory_id='#{lc_inv_id.upcase}'")
+
+      else
+
+        #  the inventory ID will be set to the upper case one.
+        print "setting #{lc_inv_id.upcase} created at time\n"
+        @dbh.query("update specimen spc
+set spc.inventory_id='#{lc_inv_id.upcase}'
+where spc.id='#{value['id']}'")
+
+      end
     end
   end
 end

@@ -21,7 +21,7 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
 
     private SpecimenTypeEntryInfoTree specimenWidget;
 
-    private List<SpecimenTypeWrapper> globalSampleTypes;
+    private List<SpecimenTypeWrapper> globalSpecimenTypes;
 
     @Override
     public void init() throws Exception {
@@ -33,18 +33,18 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
         form.setText(Messages.SpecimenTypesViewForm_title);
         page.setLayout(new GridLayout(1, false));
 
-        globalSampleTypes = SpecimenTypeWrapper.getAllSpecimenTypes(appService,
+        globalSpecimenTypes = SpecimenTypeWrapper.getAllSpecimenTypes(appService,
             true);
-        if (globalSampleTypes == null) {
-            globalSampleTypes = new ArrayList<SpecimenTypeWrapper>();
+        if (globalSpecimenTypes == null) {
+            globalSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
         }
-        createGlobalSampleTypeSection();
+        createGlobalSpecimenTypeSection();
     }
 
-    private void createGlobalSampleTypeSection() {
+    private void createGlobalSpecimenTypeSection() {
         Section section = createSection(Messages.SpecimenTypesViewForm_title);
         specimenWidget = new SpecimenTypeEntryInfoTree(section,
-            globalSampleTypes, Messages.SpecimenTypesViewForm_add_type_label,
+            globalSpecimenTypes, Messages.SpecimenTypesViewForm_add_type_label,
             Messages.SpecimenTypesViewForm_edit_type_label);
         specimenWidget.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(specimenWidget);

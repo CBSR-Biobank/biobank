@@ -15,16 +15,24 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 public class ShippingMethodDialog extends BgcBaseDialog {
 
     private String message;
-    private ShippingMethodWrapper shippingMethod;
+    private ShippingMethodWrapper origShippingMethod;
+    private ShippingMethodWrapper tmpShippingMethod;
     private String currentTitle;
 
     public ShippingMethodDialog(Shell parent,
         ShippingMethodWrapper shippingMethod, String message) {
         super(parent);
-        this.shippingMethod = shippingMethod;
+        this.origShippingMethod = shippingMethod;
+        this.tmpShippingMethod = new ShippingMethodWrapper(null);
+        copyTo(origShippingMethod, tmpShippingMethod);
         this.message = message;
         currentTitle = (shippingMethod.getName() == null ? Messages.ShippingMethodDialog_title_add
             : Messages.ShippingMethodDialog_title_edit);
+    }
+
+    private void copyTo(ShippingMethodWrapper src, ShippingMethodWrapper dest) {
+        dest.setName(src.getName());
+
     }
 
     @Override
@@ -49,8 +57,14 @@ public class ShippingMethodDialog extends BgcBaseDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            Messages.ShippingMethodDialog_name_label, null, shippingMethod,
+            Messages.ShippingMethodDialog_name_label, null, tmpShippingMethod,
             ShippingMethodPeer.NAME.getName(), new NonEmptyStringValidator(
                 Messages.ShippingMethodDialog_name_validation_msg));
+    }
+
+    @Override
+    protected void okPressed() {
+        copyTo(tmpShippingMethod, origShippingMethod);
+        super.okPressed();
     }
 }

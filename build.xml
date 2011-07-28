@@ -66,10 +66,10 @@
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
   <condition property="LOG4J_LEVEL_WARN" value="warn" else="error">
-    <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
+    <equals arg1="${log-debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
   <condition property="LOG4J_LEVEL_DEBUG" value="debug" else="error">
-	<equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
+	<equals arg1="${log-debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
   <condition property="isHostAicmlMed">
     <equals arg1="${host.name}"
@@ -519,6 +519,7 @@
       <transaction src="${data.sql.dir}/specimenTypes.sql" />
       <transaction src="${data.sql.dir}/containerLabelingScheme.sql" />
       <transaction src="${data.sql.dir}/shippingMethod.sql" />
+      <transaction src="${data.sql.dir}/advancedReportsData.sql" />
       <transaction src="${secu-log.dir}/schemaSecurity.sql" />
       <transaction>commit;</transaction>
       <classpath>
