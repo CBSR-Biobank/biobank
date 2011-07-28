@@ -115,9 +115,10 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         if (!researchGroup.isNew())
             availableStudies.add(researchGroup.getStudy());
 
-        studyComboViewer = createComboViewer(client, Messages.ResearchGroupEntryForm_study_label, availableStudies,
+        studyComboViewer = createComboViewer(client,
+            Messages.ResearchGroupEntryForm_study_label, availableStudies,
             researchGroup.getStudy(),
-            Messages.ResearchGroupEntryForm_study_validator_msg, //$NON-NLS-1$
+            Messages.ResearchGroupEntryForm_study_validator_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -125,9 +126,8 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
                 }
             });
 
-        activityStatusComboViewer = createComboViewer(
-            client,
-            Messages.label_activity, //$NON-NLS-1$
+        activityStatusComboViewer = createComboViewer(client,
+            Messages.label_activity,
             ActivityStatusWrapper.getAllActivityStatuses(appService),
             researchGroup.getActivityStatus(),
             Messages.ResearchGroupEntryForm_activity_validator_msg,
@@ -157,6 +157,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     public void saveForm() throws Exception {
         researchGroup.persist();
         SessionManager.updateAllSimilarNodes(researchGroupAdapter, true);
+        SessionManager.getUser().updateCurrentCenter(researchGroup);
     }
 
     @Override

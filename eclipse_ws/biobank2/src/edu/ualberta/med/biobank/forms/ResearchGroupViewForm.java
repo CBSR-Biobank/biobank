@@ -172,7 +172,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.label_name);
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.label_nameShort); //$NON-NLS-1$
+            Messages.label_nameShort);
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study"); //$NON-NLS-1$
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.label_activity);
@@ -182,7 +182,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
         setResearchGroupValues();
     }
 
-    private void setResearchGroupValues() throws Exception {
+    private void setResearchGroupValues() {
         setTextValue(nameLabel, researchGroup.getName());
         setTextValue(nameShortLabel, researchGroup.getNameShort());
         setTextValue(studyLabel, researchGroup.getStudy());
