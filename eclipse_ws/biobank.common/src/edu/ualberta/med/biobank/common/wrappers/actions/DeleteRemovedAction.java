@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.EntityMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -56,8 +55,8 @@ public class DeleteRemovedAction<E> extends WrapperAction<E> {
         // possible that an object will be double-deleted (first by this
         // method, removing an old value, then by cascading a delete on the
         // old value), throwing an exception.
-        session.flush();
-        session.clear();
+        // session.flush();
+        // session.clear();
 
         return null;
     }
@@ -78,13 +77,12 @@ public class DeleteRemovedAction<E> extends WrapperAction<E> {
     }
 
     private Collection<Object> getOldValues(Session session) {
-        session = session.getSession(EntityMode.POJO);
-
         Collection<Object> oldValues = new ArrayList<Object>();
 
         String hql = "SELECT " + property.getName() + " FROM "
             + getModelClass().getName() + " m WHERE m = ?";
         Query query = session.createQuery(hql);
+        query.setCacheable(false);
         query.setParameter(0, getModel());
 
         List<?> results = query.list();

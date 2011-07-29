@@ -65,7 +65,7 @@ public class ContainerPositionInBoundsCheck<E extends AbstractPosition> extends
         Integer col = AbstractPositionPeer.COL.get(model);
 
         if (maxRow != null && maxCol != null
-            && (row >= maxRow || col >= maxCol)) {
+            && (row < 0 || row >= maxRow || col < 0 || col >= maxCol)) {
             String msg = MessageFormat.format(OUT_OF_BOUNDS_POSITION_MSG, row,
                 col, maxRow, maxCol);
             throw new BiobankSessionException(msg);

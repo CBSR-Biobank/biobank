@@ -535,7 +535,7 @@ public class TestContainer extends TestDatabase {
         try {
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");
-        } catch (BiobankCheckException e) {
+        } catch (BiobankSessionException e) {
             Assert.assertTrue(true);
         }
 
@@ -544,7 +544,7 @@ public class TestContainer extends TestDatabase {
         try {
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");
-        } catch (BiobankCheckException e) {
+        } catch (BiobankSessionException e) {
             Assert.assertTrue(true);
         }
 
@@ -644,7 +644,7 @@ public class TestContainer extends TestDatabase {
             break;
         }
         case 2: {
-            int index = maxRows * col + row;
+            int index = (maxRows * col) + row;
             label = String.format("%c%c",
                 ContainerLabelingSchemeWrapper.CBSR_2_CHAR_LABELLING_PATTERN
                     .charAt(index / len),
@@ -653,7 +653,7 @@ public class TestContainer extends TestDatabase {
             break;
         }
         case 3: {
-            int index = maxRows * col + row + 1;
+            int index = (maxRows * col) + row + 1;
             label = String.format("%02d", index);
             break;
         }
@@ -1050,13 +1050,13 @@ public class TestContainer extends TestDatabase {
                     label = String.format("%c%d", 'A' + row, col + 1);
                     break;
                 case 2:
-                    int sum = row + col * maxRow;
+                    int sum = row + (col * maxRow);
                     label = "" + CBSR_ALPHA.charAt(sum / CBSR_ALPHA.length())
                         + CBSR_ALPHA.charAt(sum % CBSR_ALPHA.length());
                     break;
                 case 3:
                 default:
-                    label = String.format("%02d", row + col * maxRow + 1);
+                    label = String.format("%02d", row + (col * maxRow) + 1);
                 }
                 child = container.getChild(row, col);
                 Assert.assertEquals(child, container.getChildByLabel(label));
@@ -1152,8 +1152,8 @@ public class TestContainer extends TestDatabase {
         top.reload();
 
         Collection<ContainerWrapper> children = top.getChildren().values();
-        Assert.assertTrue(children.size() == CONTAINER_TOP_ROWS
-            * CONTAINER_TOP_COLS);
+        Assert
+            .assertTrue(children.size() == (CONTAINER_TOP_ROWS * CONTAINER_TOP_COLS));
         for (ContainerWrapper container : children) {
             if (container.getPositionAsRowCol().equals(0, 0)) {
                 Assert.assertTrue(container.getContainerType().equals(

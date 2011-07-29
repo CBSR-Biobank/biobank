@@ -913,7 +913,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         tasks.add(new UniquePreCheck<Container>(this, UNIQUE_LABEL_PROPS));
         tasks.add(new UniquePreCheck<Container>(this, UNIQUE_BARCODE_PROPS));
 
-        tasks.deleteRemovedUnchecked(this, ContainerPeer.POSITION);
+        // TODO: is this next line necessary? Causes error w/ hibernate, so
+        // allow cascade via hibernate?
+        // tasks.deleteRemovedUnchecked(this, ContainerPeer.POSITION);
 
         super.addPersistTasks(tasks);
 
