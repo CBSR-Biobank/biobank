@@ -5,7 +5,6 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -15,11 +14,13 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
@@ -61,7 +62,8 @@ public class BiobankLabelProvider extends LabelProvider implements
                 try {
                     return String.valueOf(study.getPatientCount(true));
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError(Messages.BiobankLabelProvider_count_error_title, e);
+                    BgcPlugin.openAsyncError(
+                        Messages.BiobankLabelProvider_count_error_title, e);
                 }
             }
         } else if (element instanceof SpecimenWrapper) {
@@ -74,7 +76,8 @@ public class BiobankLabelProvider extends LabelProvider implements
                     .getSpecimenType().getName();
             case 2:
                 String position = specimen.getPositionString();
-                return (position != null) ? position : Messages.BiobankLabelProvider_none_string;
+                return (position != null) ? position
+                    : Messages.BiobankLabelProvider_none_string;
             case 3:
                 return specimen.getCreatedAt() == null ? "" : DateFormatter //$NON-NLS-1$
                     .formatAsDateTime(specimen.getCreatedAt());
@@ -151,6 +154,8 @@ public class BiobankLabelProvider extends LabelProvider implements
             return ((ClinicWrapper) element).getName();
         } else if (element instanceof SiteWrapper) {
             return ((SiteWrapper) element).getNameShort();
+        } else if (element instanceof ResearchGroupWrapper) {
+            return ((ResearchGroupWrapper) element).getNameShort();
         } else if (element instanceof CollectionEventWrapper) {
             return ((CollectionEventWrapper) element).getVisitNumber()
                 .toString();

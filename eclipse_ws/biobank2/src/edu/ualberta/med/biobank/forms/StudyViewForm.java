@@ -42,7 +42,7 @@ public class StudyViewForm extends BiobankViewForm {
     private SourceSpecimenInfoTable sourceSpecimenTable;
 
     private static class StudyPvCustomInfo extends PvAttrCustom {
-        public BgcBaseText wiget;
+        public BgcBaseText widget;
     }
 
     private List<StudyPvCustomInfo> pvCustomInfoList;
@@ -194,7 +194,7 @@ public class StudyViewForm extends BiobankViewForm {
             if (pvCustomInfo.getAllowedValues() != null) {
                 subcomp.setLayout(new GridLayout(2, false));
 
-                pvCustomInfo.wiget = createReadOnlyLabelledField(subcomp,
+                pvCustomInfo.widget = createReadOnlyLabelledField(subcomp,
                     SWT.NONE, pvCustomInfo.getLabel());
             } else {
                 subcomp.setLayout(new GridLayout(1, false));
@@ -210,7 +210,7 @@ public class StudyViewForm extends BiobankViewForm {
                 // skip this attribute since its already part of PatientVisit
                 continue;
             }
-            setTextValue(pvCustomInfo.wiget, StringUtils.join(
+            setTextValue(pvCustomInfo.widget, StringUtils.join(
                 study.getStudyEventAttrPermissible(label), ";")); //$NON-NLS-1$
         }
     }
