@@ -23,7 +23,7 @@ public class ClassUtils {
         String fullyQualifiedName = c.getName();
         int lastDot = fullyQualifiedName.lastIndexOf('.');
         if (lastDot == -1) {
-            return "";
+            return ""; //$NON-NLS-1$
         }
         return fullyQualifiedName.substring(0, lastDot);
     }

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.dialogs;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -17,32 +18,34 @@ import edu.ualberta.med.biobank.validators.StringLengthValidator;
  */
 public class MoveContainerDialog extends BgcBaseDialog {
 
-    private ContainerWrapper srcContainer;
     private ContainerWrapper dstContainer;
 
-    private String newLabel = "";
+    private String title;
+
+    private String newLabel = ""; //$NON-NLS-1$
 
     public MoveContainerDialog(Shell parent, ContainerWrapper srcContainer,
         ContainerWrapper dstContainer) {
         super(parent);
         Assert.isNotNull(srcContainer);
-        this.srcContainer = srcContainer;
         this.dstContainer = dstContainer;
+        title = NLS.bind(Messages.MoveContainerDialog_title,
+            srcContainer.getLabel());
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return "Move Container";
+        return title;
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Select the destination for this container.";
+        return Messages.MoveContainerDialog_description;
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return "Move Container " + srcContainer.getLabel();
+        return title;
     }
 
     @Override
@@ -52,11 +55,10 @@ public class MoveContainerDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         BgcBaseText bbt = (BgcBaseText) createBoundWidgetWithLabel(contents,
-            BgcBaseText.class, SWT.FILL, "Destination Address", null, this,
-            "newLabel", new StringLengthValidator(2,
-                "Destination label must be another container "
-                    + "(4 characters minimum)."));
-
+            BgcBaseText.class, SWT.FILL,
+            Messages.MoveContainerDialog_destination_label, null, this,
+            "newLabel", new StringLengthValidator(2, //$NON-NLS-1$
+                Messages.MoveContainerDialog_destination_validation_msg));
         if (this.dstContainer != null)
             bbt.setText(this.dstContainer.getLabel());
     }

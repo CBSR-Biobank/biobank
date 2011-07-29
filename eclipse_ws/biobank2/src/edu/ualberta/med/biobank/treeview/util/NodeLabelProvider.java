@@ -22,7 +22,7 @@ public class NodeLabelProvider implements ILabelProvider {
         if (element instanceof AdapterBase) {
             return ((AdapterBase) element).getLabel();
         }
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     @Override

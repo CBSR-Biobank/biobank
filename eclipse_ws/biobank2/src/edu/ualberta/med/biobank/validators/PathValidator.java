@@ -18,7 +18,7 @@ public class PathValidator extends AbstractValidator {
     public IStatus validate(Object value) {
         if (value != null && !(value instanceof String)) {
             throw new RuntimeException(
-                "Not supposed to be called for non-strings.");
+                Messages.PathValidator_nonstring_error_msg);
         }
         if (value != null && ((String) value).length() != 0
             && new File((String) value).exists()) {

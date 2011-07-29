@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -103,18 +102,16 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         }
         this.allSpecimenTypes = allSpecimenTypes;
         if (addMode) {
-            currentTitle = Messages
-                .getString("CEventSourceSpecimenDialog.title.add"); //$NON-NLS-1$
+            currentTitle = Messages.CEventSourceSpecimenDialog_title_add;
         } else {
-            currentTitle = Messages
-                .getString("CEventSourceSpecimenDialog.title.edit"); //$NON-NLS-1$
+            currentTitle = Messages.CEventSourceSpecimenDialog_title_edit;
         }
         try {
             allActivityStatus = ActivityStatusWrapper
                 .getAllActivityStatuses(SessionManager.getAppService());
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages
-                .getString("CEventSourceSpecimenDialog.activity.error.msg"), e); //$NON-NLS-1$
+            BgcPlugin.openAsyncError(
+                Messages.CEventSourceSpecimenDialog_activity_error_msg, e);
         }
     }
 
@@ -126,9 +123,9 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
     @Override
     protected String getTitleAreaMessage() {
         if (addMode) {
-            return Messages.getString("CEventSourceSpecimenDialog.msg.add"); //$NON-NLS-1$
+            return Messages.CEventSourceSpecimenDialog_msg_add;
         } else {
-            return Messages.getString("CEventSourceSpecimenDialog.msg.edit"); //$NON-NLS-1$
+            return Messages.CEventSourceSpecimenDialog_msg_edit;
         }
     }
 
@@ -147,14 +144,13 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             contents,
             BgcBaseText.class,
             SWT.NONE,
-            Messages.getString("SourceSpecimen.field.inventoryId.label"), //$NON-NLS-1$
+            Messages.CEventSourceSpecimenDialog_field_inventoryId_label,
             null,
             internalSpecimen,
             SpecimenPeer.INVENTORY_ID.getName(),
             new InventoryIdValidator(
                 excludeList,
-                Messages
-                    .getString("CEventSourceSpecimenDialog.field.inventoryID.validator.msg"), //$NON-NLS-1$
+                Messages.CEventSourceSpecimenDialog_field_inventoryID_validator_msg,
                 editedSpecimen));
         GridData gd = (GridData) inventoryIdWidget.getLayoutData();
         gd.horizontalSpan = 2;
@@ -162,26 +158,21 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         addSpecimenTypeWidgets(contents);
 
         timeDrawnLabel = widgetCreator.createLabel(contents,
-            Messages.getString("CEventSourceSpecimenDialog.field.time.label")); //$NON-NLS-1$
-        timeDrawnLabel.setToolTipText(Messages
-            .getString("CEventSourceSpecimenDialog.field.time.tooltip")); //$NON-NLS-1$
-        timeDrawnWidget = createDateTimeWidget(
-            contents,
-            timeDrawnLabel,
-            internalSpecimen.getCreatedAt(),
-            internalSpecimen,
-            SpecimenPeer.CREATED_AT.getName(),
-            new NotNullValidator(
-                Messages
-                    .getString("CEventSourceSpecimenDialog.field.time.validation.msg")), //$NON-NLS-1$
+            Messages.CEventSourceSpecimenDialog_field_time_label);
+        timeDrawnLabel
+            .setToolTipText(Messages.CEventSourceSpecimenDialog_field_time_tooltip);
+        timeDrawnWidget = createDateTimeWidget(contents, timeDrawnLabel,
+            internalSpecimen.getCreatedAt(), internalSpecimen,
+            SpecimenPeer.CREATED_AT.getName(), new NotNullValidator(
+                Messages.CEventSourceSpecimenDialog_field_time_validation_msg),
             SWT.DATE | SWT.TIME, null);
         gd = (GridData) timeDrawnWidget.getLayoutData();
         gd.horizontalSpan = 2;
 
         activityStatusComboViewer = widgetCreator.createComboViewer(contents,
-            Messages.getString("label.activity"), allActivityStatus, //$NON-NLS-1$
-            internalSpecimen.getActivityStatus(),
-            Messages.getString("validation.activity"), //$NON-NLS-1$
+            Messages.CEventSourceSpecimenDialog_label_activity,
+            allActivityStatus, internalSpecimen.getActivityStatus(),
+            Messages.CEventSourceSpecimenDialog_validation_activity,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -194,19 +185,18 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
         BgcBaseText commentWidget = (BgcBaseText) createBoundWidgetWithLabel(
             contents, BgcBaseText.class, SWT.MULTI,
-            Messages.getString("label.comments"), null, internalSpecimen, //$NON-NLS-1$
-            SpecimenPeer.COMMENT.getName(), null);
+            Messages.CEventSourceSpecimenDialog_label_comments, null,
+            internalSpecimen, SpecimenPeer.COMMENT.getName(), null);
         gd = (GridData) commentWidget.getLayoutData();
         gd.horizontalSpan = 2;
         gd.widthHint = 400;
 
-        quantityLabel = widgetCreator.createLabel(contents, Messages
-            .getString("CEventSourceSpecimenDialog.field.quantity.label")); //$NON-NLS-1$
+        quantityLabel = widgetCreator.createLabel(contents,
+            Messages.CEventSourceSpecimenDialog_field_quantity_label);
         quantityLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         quantityTextValidator = new DoubleNumberValidator(
-            Messages
-                .getString("CEventSourceSpecimenDialog.field.quantity.validation.msg")); //$NON-NLS-1$
+            Messages.CEventSourceSpecimenDialog_field_quantity_validation_msg);
         quantityText = (BgcBaseText) createBoundWidget(contents,
             BgcBaseText.class, SWT.BORDER, quantityLabel, new String[0],
             internalSpecimen, SpecimenPeer.QUANTITY.getName(),
@@ -228,37 +218,32 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         if (ssw == null && type != null && allSpecimenTypes.contains(type)) {
             useStudyOnlySourceSpecimens = false;
         }
-        specimenTypeComboViewer = getWidgetCreator()
-            .createComboViewer(
-                contents,
-                Messages
-                    .getString("CEventSourceSpecimenDialog.field.type.label"), //$NON-NLS-1$
-                mapStudySourceSpecimen.values(),
-                ssw,
-                Messages
-                    .getString("CEventSourceSpecimenDialog.field.type.validation.msg"), //$NON-NLS-1$
-                new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        if (selectedObject instanceof SourceSpecimenWrapper) {
-                            internalSpecimen
-                                .setSpecimenType(((SourceSpecimenWrapper) selectedObject)
-                                    .getSpecimenType());
-                        } else {
-                            internalSpecimen
-                                .setSpecimenType((SpecimenTypeWrapper) selectedObject);
-                        }
-                        updateWidgetVisibilityAndValues();
+        specimenTypeComboViewer = getWidgetCreator().createComboViewer(
+            contents, Messages.CEventSourceSpecimenDialog_field_type_label,
+            mapStudySourceSpecimen.values(), ssw,
+            Messages.CEventSourceSpecimenDialog_field_type_validation_msg,
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    if (selectedObject instanceof SourceSpecimenWrapper) {
+                        internalSpecimen
+                            .setSpecimenType(((SourceSpecimenWrapper) selectedObject)
+                                .getSpecimenType());
+                    } else {
+                        internalSpecimen
+                            .setSpecimenType((SpecimenTypeWrapper) selectedObject);
                     }
-                }, new BiobankLabelProvider());
+                    updateWidgetVisibilityAndValues();
+                }
+            }, new BiobankLabelProvider());
         if (!useStudyOnlySourceSpecimens) {
             specimenTypeComboViewer.setInput(allSpecimenTypes);
             specimenTypeComboViewer.setSelection(new StructuredSelection(type));
         }
 
         final Button allSpecimenTypesCheckBox = new Button(contents, SWT.CHECK);
-        allSpecimenTypesCheckBox.setText(Messages
-            .getString("CEventSourceSpecimenDialog.field.type.checkbox")); //$NON-NLS-1$
+        allSpecimenTypesCheckBox
+            .setText(Messages.CEventSourceSpecimenDialog_field_type_checkbox);
         allSpecimenTypesCheckBox.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -321,7 +306,8 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         try {
             internalSpecimen.reset();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error", e);
+            BgcPlugin.openAsyncError(
+                Messages.CEventSourceSpecimenDialog_reset_error_title, e);
         }
         inventoryIdWidget.setText(""); //$NON-NLS-1$
         inventoryIdWidget.setFocus();

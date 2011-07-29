@@ -11,6 +11,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
+import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -327,12 +328,8 @@ public class TestDispatch extends TestDatabase {
         String name = "testGetSetSpecimenCollection" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
-        senderSite.persist();
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
-        receiverSite.persist();
 
-        senderSite.persist();
-        senderSite.reload();
         DispatchWrapper dispatch = DispatchHelper.addDispatch(senderSite,
             receiverSite, ShippingMethodWrapper.getShippingMethods(appService)
                 .get(0));
@@ -406,6 +403,8 @@ public class TestDispatch extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(name + "_clinic");
         DispatchWrapper testDispatch = DispatchHelper.addDispatch(site, clinic,
             ShippingMethodWrapper.getShippingMethods(appService).get(0));
+        site.reload();
+        clinic.reload();
         Assert.assertTrue(site.getSrcDispatchCollection(false).size() == 1);
         Assert.assertTrue(clinic.getDstDispatchCollection(false).size() == 1);
         testDispatch.setSenderCenter(clinic);
@@ -429,9 +428,9 @@ public class TestDispatch extends TestDatabase {
         testDispatch.getShipmentInfo().persist();
         testDispatch.reload();
         Assert.assertTrue(DispatchWrapper.getDispatchesByDateSent(appService,
-            date).size() == 1);
+            date, site).size() == 1);
         Assert.assertTrue(DispatchWrapper.getDispatchesByDateReceived(
-            appService, date).size() == 0);
+            appService, date, site).size() == 0);
         testDispatch.setSenderCenter(clinic);
         testDispatch.setReceiverCenter(site);
     }
@@ -448,11 +447,74 @@ public class TestDispatch extends TestDatabase {
         testDispatch.getShipmentInfo().persist();
         testDispatch.reload();
         Assert.assertTrue(DispatchWrapper.getDispatchesByDateReceived(
-            appService, date).size() == 1);
+            appService, date, site).size() == 1);
         Assert.assertTrue(DispatchWrapper.getDispatchesByDateSent(appService,
-            date).size() == 0);
+            date, site).size() == 0);
         testDispatch.setSenderCenter(clinic);
         testDispatch.setReceiverCenter(site);
     }
 
+    @Test
+    public void testSwitchToTransit() throws Exception {
+        // expect specimen with position to have their position removed.
+        String name = "testSwitchToTransit" + r.nextInt();
+        StudyWrapper study = StudyHelper.addStudy(name);
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+
+        DispatchWrapper dispatch = DispatchHelper.addDispatch(senderSite,
+            receiverSite, ShippingMethodWrapper.getShippingMethods(appService)
+                .get(0));
+
+        // create specimens with position.
+        List<SpecimenTypeWrapper> specTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, false);
+        ContainerTypeWrapper containerType = ContainerTypeHelper
+            .addContainerType(senderSite, name, name, 1, 8, 12, false);
+        containerType.addToSpecimenTypeCollection(specTypes);
+        containerType.persist();
+        containerType.reload();
+        ContainerTypeWrapper topContainerType = ContainerTypeHelper
+            .addContainerTypeRandom(senderSite, name + "top", true);
+        topContainerType.addToChildContainerTypeCollection(Arrays
+            .asList(containerType));
+        topContainerType.persist();
+        topContainerType.reload();
+        ContainerWrapper topContainer = ContainerHelper.addContainer(
+            String.valueOf(r.nextInt()), name + "top", null, senderSite,
+            topContainerType);
+        ContainerWrapper container = ContainerHelper.addContainer(null, name,
+            topContainer, senderSite, containerType, 0, 0);
+
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.addToContactCollection(Arrays.asList(contact));
+        study.persist();
+        study.reload();
+
+        CollectionEventWrapper cevent = CollectionEventHelper
+            .addCollectionEvent(clinic, patient, 1);
+
+        List<SpecimenWrapper> spcSet1 = addSpecimensToContainerRow(cevent,
+            container, 0, specTypes);
+
+        dispatch.addSpecimens(spcSet1, DispatchSpecimenState.NONE);
+        dispatch.persist();
+        dispatch.reload();
+
+        for (SpecimenWrapper sp : spcSet1) {
+            sp.reload();
+            Assert.assertNotNull(sp.getPosition());
+        }
+
+        dispatch.setState(DispatchState.IN_TRANSIT);
+        dispatch.persist();
+
+        for (SpecimenWrapper sp : spcSet1) {
+            sp.reload();
+            Assert.assertNull(sp.getPosition());
+        }
+
+    }
 }

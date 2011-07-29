@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -23,8 +24,10 @@ public class ClinicVisitInfoTable extends
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Visit #",
-        "Source Specimens", "Aliquoted Specimens" };
+    private static final String[] HEADINGS = new String[] {
+        Messages.ClinicVisitInfoTable_nber_label,
+        Messages.ClinicVisitInfoTable_source_specs_label,
+        Messages.ClinicVisitInfoTable_aliquoted_spec_label };
 
     public ClinicVisitInfoTable(Composite parent,
         List<CollectionEventWrapper> collection) {
@@ -39,19 +42,19 @@ public class ClinicVisitInfoTable extends
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.ClinicVisitInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
                     return item.visit.toString();
                 case 1:
-                    return item.numSource.toString();
+                    return NumberFormatter.format(item.numSource);
                 case 2:
-                    return item.numSpecimens.toString();
+                    return NumberFormatter.format(item.numSpecimens);
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };

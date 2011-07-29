@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -10,6 +11,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -46,11 +48,11 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentEntryForm extends BiobankEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ShipmentEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ShipmentEntryForm"; //$NON-NLS-1$
 
-    public static final String MSG_NEW_SHIPMENT_OK = "Creating a new shipment record.";
+    public static final String MSG_NEW_SHIPMENT_OK = Messages.ShipmentEntryForm_new_ship_ok_msg;
 
-    public static final String MSG_SHIPMENT_OK = "Editing an existing shipment record.";
+    public static final String MSG_SHIPMENT_OK = Messages.ShipmentEntryForm_edit_ship_ok_msg;
 
     private ShipmentInfoWrapper shipmentInfo;
 
@@ -68,9 +70,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private NonEmptyStringValidator waybillValidator;
 
-    private static final String WAYBILL_BINDING = "shipment-waybill-binding";
+    private static final String WAYBILL_BINDING = "shipment-waybill-binding"; //$NON-NLS-1$
 
-    private static final String DATE_SHIPPED_BINDING = "shipment-date-shipped-binding";
+    private static final String DATE_SHIPPED_BINDING = "shipment-date-shipped-binding"; //$NON-NLS-1$
 
     private DateTimeWidget dateSentWidget;
 
@@ -85,31 +87,27 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ShipmentAdapter,
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         originInfo = (OriginInfoWrapper) getModelObject();
         shipmentInfo = originInfo.getShipmentInfo();
 
+        setDefaultValues();
+
         String tabName;
         if (originInfo.isNew()) {
-            tabName = "New Shipment";
-            CenterWrapper<?> userCenter = SessionManager.getUser()
-                .getCurrentWorkingCenter();
-            if (userCenter instanceof SiteWrapper) {
-                originInfo.setReceiverSite((SiteWrapper) userCenter);
-            }
-            shipmentInfo.setReceivedAt(Calendar.getInstance().getTime());
+            tabName = Messages.ShipmentEntryForm_title_new;
         } else {
-            tabName = "Shipment "
-                + originInfo.getShipmentInfo().getFormattedDateReceived();
+            tabName = NLS.bind(Messages.ShipmentEntryForm_title_edit,
+                originInfo.getShipmentInfo().getFormattedDateReceived());
         }
         setPartName(tabName);
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Shipment Information");
+        form.setText(Messages.ShipmentEntryForm_form_title);
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
         createMainSection();
@@ -124,10 +122,12 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        senderComboViewer = createComboViewer(client, "Sender",
+        senderComboViewer = createComboViewer(client,
+            Messages.ShipmentEntryForm_sender_label,
             ClinicWrapper.getAllClinics(appService),
             (ClinicWrapper) originInfo.getCenter(),
-            "A sender center should be selected", new ComboSelectionUpdate() {
+            Messages.ShipmentEntryForm_sender_validation_msg,
+            new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     originInfo.setCenter((CenterWrapper<?>) selectedObject);
@@ -137,20 +137,23 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             });
         setFirstControl(senderComboViewer.getControl());
 
-        receiverComboViewer = createComboViewer(client, "Receiver",
+        receiverComboViewer = createComboViewer(client,
+            Messages.ShipmentEntryForm_receiver_label,
             SiteWrapper.getSites(appService), originInfo.getReceiverSite(),
-            "A receiving site should be selected", new ComboSelectionUpdate() {
+            Messages.ShipmentEntryForm_receiver_validation_msg,
+            new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     originInfo.setReceiverSite((SiteWrapper) selectedObject);
                 }
             });
 
-        waybillLabel = widgetCreator.createLabel(client, "Waybill");
+        waybillLabel = widgetCreator.createLabel(client,
+            Messages.ShipmentEntryForm_waybill_label);
         waybillLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         waybillValidator = new NonEmptyStringValidator(
-            "A waybill should be set");
+            Messages.ShipmentEntryForm_waybill_validation_msg);
         waybillWidget = (BgcBaseText) createBoundWidget(client,
             BgcBaseText.class, SWT.NONE, waybillLabel, new String[0],
             shipmentInfo, ShipmentInfoPeer.WAYBILL.getName(), waybillValidator,
@@ -162,7 +165,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         }
 
         shippingMethodComboViewer = createComboViewer(client,
-            "Shipping Method",
+            Messages.ShipmentEntryForm_shipMethod_label,
             ShippingMethodWrapper.getShippingMethods(appService), originInfo
                 .getShipmentInfo().getShippingMethod(), null,
             new ComboSelectionUpdate() {
@@ -177,10 +180,12 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 }
             });
 
-        departedLabel = widgetCreator.createLabel(client, "Packed");
+        departedLabel = widgetCreator.createLabel(client,
+            Messages.ShipmentEntryForm_packed_label);
         departedLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        departedValidator = new NotNullValidator("Date Packed should be set");
+        departedValidator = new NotNullValidator(
+            Messages.ShipmentEntryForm_packed_validation_msg);
 
         dateSentWidget = createDateTimeWidget(client, departedLabel,
             shipmentInfo.getPackedAt(), shipmentInfo,
@@ -190,12 +195,17 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             && shipmentInfo.getShippingMethod().needDate());
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            "Box Number", null, shipmentInfo,
+            Messages.ShipmentEntryForm_boxNber_label, null, shipmentInfo,
             ShipmentInfoPeer.BOX_NUMBER.getName(), null);
 
-        createDateTimeWidget(client, "Received", shipmentInfo.getReceivedAt(),
-            shipmentInfo, ShipmentInfoPeer.RECEIVED_AT.getName(),
-            new NotNullValidator("Date Received should be set"));
+        createDateTimeWidget(client, Messages.ShipmentEntryForm_received_label,
+            shipmentInfo.getReceivedAt(), shipmentInfo,
+            ShipmentInfoPeer.RECEIVED_AT.getName(), new NotNullValidator(
+                Messages.ShipmentEntryForm_received_validation_msg));
+
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.WRAP
+            | SWT.MULTI, Messages.ShipmentEntryForm_comments_label, null,
+            shipmentInfo, ShipmentInfoPeer.COMMENT.getName(), null);
 
     }
 
@@ -212,7 +222,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 widgetCreator.addBinding(WAYBILL_BINDING);
             } else {
                 widgetCreator.removeBinding(WAYBILL_BINDING);
-                waybillWidget.setText("");
+                waybillWidget.setText(""); //$NON-NLS-1$
             }
         }
         form.layout(true, true);
@@ -233,7 +243,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     }
 
     private void createSpecimensSection() {
-        Composite client = createSectionWithClient("Specimens");
+        Composite client = createSectionWithClient(Messages.ShipmentEntryForm_specimens_title);
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
@@ -254,7 +264,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         specimenEntryWidget
             .addDoubleClickListener(collectionDoubleClickListener);
         specimenEntryWidget.addBinding(widgetCreator,
-            "Specimens should be added to a shipment");
+            Messages.ShipmentEntryForm_specimens_validation_msg);
 
         VetoListener<ItemAction, SpecimenWrapper> vetoListener = new VetoListener<ItemAction, SpecimenWrapper>() {
             @Override
@@ -265,21 +275,28 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 case PRE_ADD:
                     if (specimen == null)
                         throw new VetoException(
-                            "No specimen found for that inventory id.");
-                    else if (specimen.isUsedInDispatch())
+                            Messages.ShipmentEntryForm_notfound_error_msg);
+                    if (!SessionManager.getUser().getCurrentWorkingCenter()
+                        .equals(specimen.getCurrentCenter()))
                         throw new VetoException(
-                            "Specimen is currently listed in a dispatch.");
-                    else if (specimen.getParentContainer() != null)
+                            NLS.bind(
+                                Messages.ShipmentEntryForm_other_center_error_msg,
+                                specimen.getInventoryId(), specimen
+                                    .getCurrentCenter().getNameShort()));
+                    if (specimen.isUsedInDispatch())
                         throw new VetoException(
-                            "Specimen is currently listed as stored in a container.");
-                    else if (specimen.getOriginInfo() != null
+                            Messages.ShipmentEntryForm_dispatched_specimen_error_msg);
+                    if (specimen.getParentContainer() != null)
+                        throw new VetoException(
+                            Messages.ShipmentEntryForm_stored_error_msg);
+                    if (specimen.getOriginInfo() != null
                         && specimen.getOriginInfo().getShipmentInfo() != null
                         && !specimen.getOriginInfo().getShipmentInfo()
                             .equals(originInfo.getShipmentInfo()))
                         throw new VetoException(
-                            "Specimen is currently part of another shipment: "
-                                + specimen.getOriginInfo().getShipmentInfo()
-                                + ". You must remove this specimen from that shipment before it can be added to this one.");
+                            NLS.bind(
+                                Messages.ShipmentEntryForm_inAnother_ship_error_msg,
+                                specimen.getOriginInfo().getShipmentInfo()));
                     break;
                 case POST_ADD:
                     originInfo.addToSpecimenCollection(Arrays.asList(specimen));
@@ -297,7 +314,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                                 specimensToPersist.add(specimen);
                             } else {
                                 throw new VetoException(
-                                    "Must select a new center for this specimen to originate from.");
+                                    Messages.ShipmentEntryForm_center_select_msg);
                             }
                         } catch (ApplicationException e) {
                             throw new VetoException(e.getMessage());
@@ -373,9 +390,22 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         specimenEntryWidget.setSpecimens(originInfo
             .getSpecimenCollection(false));
 
+        setDefaultValues();
         GuiUtil.reset(senderComboViewer, originInfo.getCenter());
         GuiUtil.reset(receiverComboViewer, originInfo.getReceiverSite());
         GuiUtil.reset(shippingMethodComboViewer,
             shipmentInfo.getShippingMethod());
+    }
+
+    private void setDefaultValues() {
+        if (originInfo.isNew()) {
+            CenterWrapper<?> userCenter = SessionManager.getUser()
+                .getCurrentWorkingCenter();
+            if (userCenter instanceof SiteWrapper) {
+                originInfo.setReceiverSite((SiteWrapper) userCenter);
+            }
+            Date receivedAt = Calendar.getInstance().getTime();
+            shipmentInfo.setReceivedAt(receivedAt);
+        }
     }
 }

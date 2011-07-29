@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.equinox.p2.ui.Policy;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -15,11 +14,9 @@ import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.services.ISourceProviderService;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.p2.BiobankPolicy;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
@@ -34,11 +31,14 @@ import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeGroup;
+import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
+import edu.ualberta.med.biobank.treeview.admin.ResearchGroupMasterGroup;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteGroup;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchCenterAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.InCreationDispatchGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.IncomingNode;
 import edu.ualberta.med.biobank.treeview.dispatch.OutgoingNode;
@@ -50,10 +50,8 @@ import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
-import edu.ualberta.med.biobank.treeview.request.ApprovedRequestNode;
-import edu.ualberta.med.biobank.treeview.request.DispatchCenterAdapter;
+import edu.ualberta.med.biobank.treeview.request.ReceivingRequestGroup;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
-import edu.ualberta.med.biobank.treeview.request.RequestSiteAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
@@ -63,7 +61,9 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 @SuppressWarnings("restriction")
 public class BiobankPlugin extends AbstractUIPlugin {
 
-    public static final String PLUGIN_ID = "biobank";
+    public static final String PLUGIN_ID = "biobank"; //$NON-NLS-1$
+
+    public static BundleContext bundleContext;
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -114,10 +114,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
             BgcPlugin.IMG_DISPATCH_SHIPMENT);
         classToImageKey.put(DispatchCenterAdapter.class.getName(),
             BgcPlugin.IMG_SITE);
-        classToImageKey.put(RequestSiteAdapter.class.getName(),
-            BgcPlugin.IMG_SITE);
-        classToImageKey.put(ApprovedRequestNode.class.getName(),
-            BgcPlugin.IMG_REQUEST);
+        classToImageKey.put(ReceivingRequestGroup.class.getName(),
+            BgcPlugin.IMG_REQUEST_SHIPPED);
         classToImageKey.put(RequestAdapter.class.getName(),
             BgcPlugin.IMG_REQUEST);
         classToImageKey.put(SpecimenAdapter.class.getName(),
@@ -126,6 +124,10 @@ public class BiobankPlugin extends AbstractUIPlugin {
             BgcPlugin.IMG_PROCESSING_EVENT);
         classToImageKey.put(ProcessingEventGroup.class.getName(),
             BgcPlugin.IMG_PROCESSING);
+        classToImageKey.put(ResearchGroupAdapter.class.getName(),
+            BgcPlugin.IMG_RESEARCH_GROUP);
+        classToImageKey.put(ResearchGroupMasterGroup.class.getName(),
+            BgcPlugin.IMG_RESEARCH_GROUPS);
     };
 
     private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] {
@@ -134,12 +136,10 @@ public class BiobankPlugin extends AbstractUIPlugin {
         BgcPlugin.IMG_PALLET, };
 
     public static final String BARCODES_FILE = BiobankPlugin.class.getPackage()
-        .getName() + ".barcode";
+        .getName() + ".barcode"; //$NON-NLS-1$
 
     // The shared instance
     private static BiobankPlugin plugin;
-
-    private ServiceRegistration policyRegistration;
 
     /**
      * The constructor
@@ -158,9 +158,9 @@ public class BiobankPlugin extends AbstractUIPlugin {
     @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
+        bundleContext = context;
         plugin = this;
         SessionManager.getInstance();
-        registerP2Policy(context);
     }
 
     /*
@@ -173,8 +173,6 @@ public class BiobankPlugin extends AbstractUIPlugin {
     @Override
     public void stop(BundleContext context) throws Exception {
         plugin = null;
-        policyRegistration.unregister();
-        policyRegistration = null;
         super.stop(context);
     }
 
@@ -239,7 +237,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
 
     public static boolean isRealScanEnabled() {
         String realScan = Platform.getDebugOption(BiobankPlugin.PLUGIN_ID
-            + "/realScan");
+            + "/realScan"); //$NON-NLS-1$
         if (realScan != null) {
             return Boolean.valueOf(realScan);
         }
@@ -305,11 +303,6 @@ public class BiobankPlugin extends AbstractUIPlugin {
 
         classToImageKey.put(typeName, imageKey);
         return BgcPlugin.getDefault().getImageRegistry().get(imageKey);
-    }
-
-    private void registerP2Policy(BundleContext context) {
-        policyRegistration = context.registerService(Policy.class.getName(),
-            new BiobankPolicy(), null);
     }
 
     /**

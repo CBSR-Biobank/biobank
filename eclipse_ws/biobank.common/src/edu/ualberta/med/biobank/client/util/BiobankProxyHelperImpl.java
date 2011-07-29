@@ -79,7 +79,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
         map.put(plainObject, plainObject);
         Method[] methods = plainObject.getClass().getMethods();
         for (Method method : methods) {
-            if (method.getName().startsWith("get")
+            if (method.getName().startsWith("get") //$NON-NLS-1$
                 && method.getParameterTypes().length == 0) {
                 Object childObject = method.invoke(plainObject);
                 if (!(childObject == null || isPrimitiveObject(childObject) || childObject instanceof Class)
@@ -95,26 +95,26 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                                 String cglibClassName = objectProxy
                                     .getListChunk().get(0).getClass().getName();
                                 int startindex = cglibClassName
-                                    .indexOf("$$EnhancerByCGLIB");
+                                    .indexOf("$$EnhancerByCGLIB"); //$NON-NLS-1$
                                 associationName = cglibClassName.substring(0,
                                     startindex);
                             }
                             String className = objectProxy.getTargetClassName();
                             throw new Exception(
-                                "update or delete elements for the association "
+                                "update or delete elements for the association " //$NON-NLS-1$
                                     + associationName
-                                    + " is not allowed.association "
+                                    + " is not allowed.association " //$NON-NLS-1$
                                     + associationName
-                                    + " for Class "
+                                    + " for Class " //$NON-NLS-1$
                                     + className
-                                    + " is not fully initialized. Total size of assocation in database "
-                                    + associationSize + " retrieved size is "
-                                    + objectProxy.getListChunk().size() + ".");
+                                    + " is not fully initialized. Total size of assocation in database " //$NON-NLS-1$
+                                    + associationSize + " retrieved size is " //$NON-NLS-1$
+                                    + objectProxy.getListChunk().size() + "."); //$NON-NLS-1$
                         }
                     }
-                    log.debug("invoking " + method.getName() + " on class "
+                    log.debug("invoking " + method.getName() + " on class " //$NON-NLS-1$ //$NON-NLS-2$
                         + plainObject.getClass());
-                    String setterMethodName = "set"
+                    String setterMethodName = "set" //$NON-NLS-1$
                         + method.getName().substring(3);
                     if (childObject instanceof List
                         && !(childObject instanceof Set)) {
@@ -206,7 +206,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
         Method method = invocation.getMethod();
         String methodName = method.getName();
         Object args[] = invocation.getArguments();
-        if (methodName.startsWith("get") && (args == null || args.length == 0)) {
+        if (methodName.startsWith("get") && (args == null || args.length == 0)) { //$NON-NLS-1$
             String fieldName = methodName.substring(3);
             fieldName = Character.toLowerCase(fieldName.charAt(0))
                 + fieldName.substring(1);
@@ -231,7 +231,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                 ((AbstractBiobankListProxy<?>) obj).setAppService(as);
 
             if (!field.getType().getName()
-                .equalsIgnoreCase("java.util.Collection")) {
+                .equalsIgnoreCase("java.util.Collection")) { //$NON-NLS-1$
                 Collection<?> results = (Collection<?>) obj;
                 if (results.size() == 1)
                     value = results.iterator().next();
@@ -239,14 +239,14 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                     value = null;
                 else
                     throw new Exception(
-                        "Invalid data obtained from the database for the "
-                            + fieldName + " attribute of the "
+                        "Invalid data obtained from the database for the " //$NON-NLS-1$
+                            + fieldName + " attribute of the " //$NON-NLS-1$
                             + bean.getClass().getName());
             }
 
             Class<?>[] params = new Class[] { field.getType() };
             Method setter = getMethod(bean,
-                "set" + method.getName().substring(3), params);
+                "set" + method.getName().substring(3), params); //$NON-NLS-1$
             if (setter != null && params != null && params.length == 1)
                 setter.invoke(bean, new Object[] { value });
 

@@ -39,7 +39,7 @@ public class BiobankTableSorter implements Comparator<Object>, Serializable {
             return ((Boolean) o1).compareTo((Boolean) o2);
         }
         Assert
-            .isTrue(false, "invalid class for o1: " + o1.getClass().getName());
+            .isTrue(false, "invalid class for o1: " + o1.getClass().getName()); //$NON-NLS-1$
         return 0;
     }
 

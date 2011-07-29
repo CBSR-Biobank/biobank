@@ -35,7 +35,7 @@ public class InventoryIdValidator extends AbstractValidator {
     public IStatus validate(Object value) {
         if ((value != null) && !(value instanceof String)) {
             throw new RuntimeException(
-                "Not supposed to be called for non-strings.");
+                Messages.InventoryIdValidator_nonstring_error_msg);
         }
 
         if (value == null || (((String) value).length() == 0)) {
@@ -64,7 +64,7 @@ public class InventoryIdValidator extends AbstractValidator {
                 } catch (DuplicateEntryException e) {
                     duplicate = true;
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError("Error checking inventory id",
+                    BgcPlugin.openAsyncError(Messages.InventoryIdValidator_checking_error_msg,
                         e);
                 }
             }

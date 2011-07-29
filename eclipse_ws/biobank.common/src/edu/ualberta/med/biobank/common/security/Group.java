@@ -17,19 +17,19 @@ public class Group implements Serializable, NotAProxy {
     private static final long serialVersionUID = 1L;
 
     // FIXME just remember the ID that should never change ?
-    public static final String GROUP_SUPER_ADMIN = "Super Administrator";
+    public static final String GROUP_SUPER_ADMIN = "Super Administrator"; //$NON-NLS-1$
     // need the id if is trying to rename it. What is the best ? Are we sure
     // this will be always initialized that way ?
     public static final Long GROUP_SUPER_ADMIN_ID = 5L;
 
     // FIXME just remember the ID that should never change ?
-    public static final String PG_CENTER_ADMINISTRATOR = "Internal: Center Administrator";
+    public static final String PG_CENTER_ADMINISTRATOR = "Internal: Center Administrator"; //$NON-NLS-1$
     // same as above
     public static final Long PG_CENTER_ADMINISTRATOR_ID = 45L;
 
-    public static final String CENTER_FULL_ACCESS = "Center Full Access";
-    public static final String READ_ONLY = "Read Only";
-    public static final String OBJECT_FULL_ACCESS = "Object Full Access";
+    public static final String CENTER_FULL_ACCESS = "Center Full Access"; //$NON-NLS-1$
+    public static final String READ_ONLY = "Read Only"; //$NON-NLS-1$
+    public static final String OBJECT_FULL_ACCESS = "Object Full Access"; //$NON-NLS-1$
 
     private Long id;
 
@@ -130,7 +130,7 @@ public class Group implements Serializable, NotAProxy {
 
     @Override
     public String toString() {
-        return getId() + "/" + getName();
+        return getId() + "/" + getName(); //$NON-NLS-1$
     }
 
     public Map<ProtectionElement, Set<Privilege>> getPrivilegesMap() {

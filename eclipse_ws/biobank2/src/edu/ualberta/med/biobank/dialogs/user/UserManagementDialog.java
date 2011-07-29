@@ -32,16 +32,9 @@ import edu.ualberta.med.biobank.widgets.infotables.UserInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserManagementDialog extends BgcBaseDialog {
-    private static final String TITLE = "User Management";
-    private static final String TITLE_AREA_MESSAGE = "Right-click to modify, delete or unlock users and groups.";
     private UserInfoTable userInfoTable;
     private List<User> currentUserList;
     private GroupInfoTable groupInfoTable;
-
-    private static final String USER_ADDED_TITLE = "User Added";
-    private static final String USER_ADDED_MESSAGE = "Successfully added new user \"{0}\".";
-    private static final String GROUP_ADDED_TITLE = "Group Added";
-    private static final String GROUP_ADDED_MESSAGE = "Successfully added new group \"{0}\".";
 
     public UserManagementDialog(Shell parentShell) {
         super(parentShell);
@@ -49,17 +42,17 @@ public class UserManagementDialog extends BgcBaseDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return TITLE_AREA_MESSAGE;
+        return Messages.UserManagementDialog_description;
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return TITLE;
+        return Messages.UserManagementDialog_title;
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return TITLE;
+        return Messages.UserManagementDialog_title;
     }
 
     @Override
@@ -68,8 +61,10 @@ public class UserManagementDialog extends BgcBaseDialog {
         contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        Section usersSection = createSection(contents, "Users",
-            "Add a new user", new SelectionAdapter() {
+        Section usersSection = createSection(contents,
+            Messages.UserManagementDialog_users_label,
+            Messages.UserManagementDialog_addUser_label,
+            new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     addUser();
@@ -98,13 +93,15 @@ public class UserManagementDialog extends BgcBaseDialog {
         List<User> tmpUsers = new ArrayList<User>();
         for (int i = 0; i < UserInfoTable.ROWS_PER_PAGE + 1; i++) {
             User user = new User();
-            user.setLogin("loading...");
+            user.setLogin(Messages.UserManagementDialog_loading);
             tmpUsers.add(user);
         }
         userInfoTable.setCollection(tmpUsers);
 
-        Section groupsSection = createSection(contents, "Groups",
-            "Add a new group", new SelectionAdapter() {
+        Section groupsSection = createSection(contents,
+            Messages.UserManagementDialog_groups_label,
+            Messages.UserManagementDialog_addGroup_label,
+            new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     addGroup();
@@ -116,7 +113,7 @@ public class UserManagementDialog extends BgcBaseDialog {
         List<Group> tmpGroups = new ArrayList<Group>();
         for (int i = 0; i < GroupInfoTable.ROWS_PER_PAGE + 1; i++) {
             Group group = new Group();
-            group.setName("loading...");
+            group.setName(Messages.UserManagementDialog_loading);
             tmpGroups.add(group);
         }
         groupInfoTable.setCollection(tmpGroups);
@@ -143,8 +140,10 @@ public class UserManagementDialog extends BgcBaseDialog {
                     getShell().getDisplay().syncExec(new Runnable() {
                         @Override
                         public void run() {
-                            BgcPlugin.openAsyncError(
-                                "Problem getting users and groups", ex);
+                            BgcPlugin
+                                .openAsyncError(
+                                    Messages.UserManagementDialog_get_users_groups_error_title,
+                                    ex);
                         }
                     });
                 }
@@ -158,7 +157,8 @@ public class UserManagementDialog extends BgcBaseDialog {
             return SessionManager.getAppService().getSecurityGroups(
                 SessionManager.getUser(), includeSuperAdmin);
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Unable to load groups.", e);
+            BgcPlugin.openAsyncError(
+                Messages.UserManagementDialog_groups_load_error_title, e);
         }
         return new ArrayList<Group>();
     }
@@ -169,7 +169,8 @@ public class UserManagementDialog extends BgcBaseDialog {
                 currentUserList = SessionManager.getAppService()
                     .getSecurityUsers(SessionManager.getUser());
             } catch (ApplicationException e) {
-                BgcPlugin.openAsyncError("Unable to load users.", e);
+                BgcPlugin.openAsyncError(
+                    Messages.UserManagementDialog_users_load_error_title, e);
             }
         }
         return currentUserList;
@@ -181,8 +182,10 @@ public class UserManagementDialog extends BgcBaseDialog {
             .getActiveWorkbenchWindow().getShell(), user, getGroups(true), true);
         int res = dlg.open();
         if (res == Status.OK) {
-            BgcPlugin.openAsyncInformation(USER_ADDED_TITLE,
-                MessageFormat.format(USER_ADDED_MESSAGE, user.getLogin()));
+            BgcPlugin.openAsyncInformation(
+                Messages.UserManagementDialog_user_added_title, MessageFormat
+                    .format(Messages.UserManagementDialog_user_added_msg,
+                        user.getLogin()));
             getUsers().add(user);
             userInfoTable.reloadCollection(getUsers(), user);
         }
@@ -194,8 +197,10 @@ public class UserManagementDialog extends BgcBaseDialog {
             .getActiveWorkbenchWindow().getShell(), group, true);
         int res = dlg.open();
         if (res == Status.OK) {
-            BgcPlugin.openAsyncInformation(GROUP_ADDED_TITLE,
-                MessageFormat.format(GROUP_ADDED_MESSAGE, group.getName()));
+            BgcPlugin.openAsyncInformation(
+                Messages.UserManagementDialog_group_added_title, MessageFormat
+                    .format(Messages.UserManagementDialog_group_added_msg,
+                        group.getName()));
             groupInfoTable.reloadCollection(getGroups(false), group);
         }
     }

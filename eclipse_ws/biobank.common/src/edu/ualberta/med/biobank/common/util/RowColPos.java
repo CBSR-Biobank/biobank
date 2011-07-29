@@ -19,6 +19,10 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
 
     public RowColPos(Integer row, Integer col) {
         super();
+        if (row == null)
+            throw new RuntimeException("row cannot be null");
+        if (col == null)
+            throw new RuntimeException("col cannot be null");
         this.row = row;
         this.col = col;
     }
@@ -40,7 +44,7 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
 
     @Override
     public int hashCode() {
-        String hash = "";
+        String hash = ""; //$NON-NLS-1$
         if (row != null) {
             hash += row.toString();
         }
@@ -52,7 +56,7 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
 
     @Override
     public String toString() {
-        return "(" + row + "," + col + ")";
+        return "(" + row + "," + col + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     @Override

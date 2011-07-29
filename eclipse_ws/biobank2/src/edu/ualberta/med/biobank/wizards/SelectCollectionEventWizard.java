@@ -67,7 +67,7 @@ public class SelectCollectionEventWizard extends BiobankWizard {
                 cePage.setCollectionEventList(patient
                     .getCollectionEventCollection(true));
             } else {
-                pnumberPage.setErrorMessage("Patient does not exist.");
+                pnumberPage.setErrorMessage(Messages.SelectCollectionEventWizard_notexists_error_msg);
                 return false;
             }
         }

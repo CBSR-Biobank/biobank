@@ -20,7 +20,7 @@ public class NodeContentProvider implements ITreeContentProvider,
      */
     @Override
     public Object[] getChildren(Object element) {
-        Assert.isTrue(element instanceof AdapterBase, "Invalid object");
+        Assert.isTrue(element instanceof AdapterBase, "Invalid object"); //$NON-NLS-1$
         return ((AdapterBase) element).getChildren().toArray();
     }
 
@@ -33,7 +33,7 @@ public class NodeContentProvider implements ITreeContentProvider,
      */
     @Override
     public Object getParent(Object element) {
-        Assert.isTrue(element instanceof AdapterBase, "Invalid object");
+        Assert.isTrue(element instanceof AdapterBase, "Invalid object"); //$NON-NLS-1$
         return ((AdapterBase) element).getParent();
     }
 
@@ -46,7 +46,7 @@ public class NodeContentProvider implements ITreeContentProvider,
      */
     @Override
     public boolean hasChildren(Object element) {
-        Assert.isTrue(element instanceof AdapterBase, "Invalid object");
+        Assert.isTrue(element instanceof AdapterBase, "Invalid object"); //$NON-NLS-1$
         return ((AdapterBase) element).hasChildren();
     }
 

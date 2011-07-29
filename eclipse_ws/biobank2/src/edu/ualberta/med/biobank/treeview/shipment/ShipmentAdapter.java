@@ -23,7 +23,7 @@ public class ShipmentAdapter extends AdapterBase {
 
         if (originInfo.getShipmentInfo() == null) {
             throw new NullPointerException(
-                "No shipment information is associated with the given origin information.");
+                Messages.ShipmentAdapter_noShipment_error_msg);
         }
 
         setHasChildren(false);
@@ -38,11 +38,11 @@ public class ShipmentAdapter extends AdapterBase {
         OriginInfoWrapper originInfo = getWrapper();
         ShipmentInfoWrapper shipmentInfo = originInfo.getShipmentInfo();
 
-        String label = "";
+        String label = ""; //$NON-NLS-1$
         if (shipmentInfo.getReceivedAt() != null)
             label += shipmentInfo.getFormattedDateReceived();
         if (shipmentInfo.getWaybill() != null) {
-            label += " (" + shipmentInfo.getWaybill() + ")";
+            label += " (" + shipmentInfo.getWaybill() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         return label;
@@ -54,21 +54,22 @@ public class ShipmentAdapter extends AdapterBase {
         if (originInfo != null) {
             CenterWrapper<?> center = originInfo.getCenter();
             if (center != null)
-                return center.getName() + " - " + getTooltipText("Shipment");
+                return center.getName()
+                    + " - " + getTooltipText(Messages.ShipmentAdapter_tooltip_no_origin); //$NON-NLS-1$ 
         }
-        return getTooltipText("Shipment");
+        return getTooltipText(Messages.ShipmentAdapter_tooltip_no_origin);
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Shipment");
-        addViewMenu(menu, "Shipment");
-        addDeleteMenu(menu, "Shipment");
+        addEditMenu(menu, Messages.ShipmentAdapter_shipment_label);
+        addViewMenu(menu, Messages.ShipmentAdapter_shipment_label);
+        addDeleteMenu(menu, Messages.ShipmentAdapter_shipment_label);
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this shipment?";
+        return Messages.ShipmentAdapter_delete_confirm;
     }
 
     @Override

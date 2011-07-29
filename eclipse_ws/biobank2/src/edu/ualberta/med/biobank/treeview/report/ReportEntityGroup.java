@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -35,7 +36,7 @@ public class ReportEntityGroup extends AdapterBase {
 
     @Override
     public void openViewForm() {
-        Assert.isTrue(false, "should not be called");
+        Assert.isTrue(false, "should not be called"); //$NON-NLS-1$
     }
 
     @Override
@@ -52,7 +53,7 @@ public class ReportEntityGroup extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (parent.isModifiable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("New " + entity.getName() + " Report");
+            mi.setText(NLS.bind(Messages.ReportEntityGroup_new_label, entity.getName()));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

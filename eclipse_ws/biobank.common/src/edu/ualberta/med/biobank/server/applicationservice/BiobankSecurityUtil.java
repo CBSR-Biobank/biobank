@@ -43,11 +43,11 @@ public class BiobankSecurityUtil {
     private static Logger log = Logger.getLogger(BiobankSecurityUtil.class
         .getName());
 
-    public static final String APPLICATION_CONTEXT_NAME = "biobank";
+    public static final String APPLICATION_CONTEXT_NAME = "biobank"; //$NON-NLS-1$
 
-    public static final String GLOBAL_FEATURE_START_NAME = "Global Feature: ";
+    public static final String GLOBAL_FEATURE_START_NAME = "Global Feature: "; //$NON-NLS-1$
 
-    public static final String CENTER_FEATURE_START_NAME = "Center Feature: ";
+    public static final String CENTER_FEATURE_START_NAME = "Center Feature: "; //$NON-NLS-1$
 
     public static void modifyPassword(String oldPassword, String newPassword)
         throws ApplicationException {
@@ -60,21 +60,22 @@ public class BiobankSecurityUtil {
             String userLogin = authentication.getName();
             if (!oldPassword.equals(authentication.getCredentials())) {
                 throw new ApplicationException(
-                    "Cannot modify password: verification password is incorrect.");
+                    Messages
+                        .getString("BiobankSecurityUtil.pwd.verif.error.msg")); //$NON-NLS-1$
             }
             if (oldPassword.equals(newPassword)) {
                 throw new ApplicationException(
-                    "New password needs to be different from the old one.");
+                    Messages.getString("BiobankSecurityUtil.pwd.new.error.msg")); //$NON-NLS-1$
             }
             User user = upm.getUser(userLogin);
             user.setPassword(newPassword);
             user.setStartDate(null);
             upm.modifyUser(user);
         } catch (ApplicationException ae) {
-            log.error("Error modifying password", ae);
+            log.error("Error modifying password", ae); //$NON-NLS-1$
             throw ae;
         } catch (Exception ex) {
-            log.error("Error modifying password", ex);
+            log.error("Error modifying password", ex); //$NON-NLS-1$
             throw new ApplicationException(ex);
         }
     }
@@ -106,12 +107,13 @@ public class BiobankSecurityUtil {
                 }
                 return list;
             } catch (Exception ex) {
-                log.error("Error retrieving security groups", ex);
+                log.error("Error retrieving security groups", ex); //$NON-NLS-1$
                 throw new ApplicationException(ex);
             }
         } else {
             throw new ApplicationException(
-                "Only Website Administrators or Administrators of current center can retrieve security groups");
+                Messages
+                    .getString("BiobankSecurityUtil.webadmin.groups.error.msg")); //$NON-NLS-1$
         }
     }
 
@@ -136,7 +138,7 @@ public class BiobankSecurityUtil {
             }
             String type = pe.getObjectId();
             String id = null;
-            if ("id".equals(pe.getAttribute())) {
+            if ("id".equals(pe.getAttribute())) { //$NON-NLS-1$
                 id = pe.getValue();
             }
             biobankGroup.addProtectionElementPrivilege(type, id, privileges);
@@ -216,12 +218,13 @@ public class BiobankSecurityUtil {
                 }
                 return list;
             } catch (Exception ex) {
-                log.error("Error retrieving security users", ex);
+                log.error("Error retrieving security users", ex); //$NON-NLS-1$
                 throw new ApplicationException(ex);
             }
         } else {
             throw new ApplicationException(
-                "Only Website Administrators or Administrators of current center can retrieve all security users");
+                Messages
+                    .getString("BiobankSecurityUtil.webadmin.users.error.msg")); //$NON-NLS-1$
         }
     }
 
@@ -234,7 +237,9 @@ public class BiobankSecurityUtil {
                 UserProvisioningManager upm = SecurityServiceProvider
                     .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
                 if (newUser.getLogin() == null) {
-                    throw new ApplicationException("Login should be set");
+                    throw new ApplicationException(
+                        Messages
+                            .getString("BiobankSecurityUtil.login.set.error.msg")); //$NON-NLS-1$
                 }
 
                 User serverUser = null;
@@ -264,14 +269,15 @@ public class BiobankSecurityUtil {
                     .getGroups()) {
                     Group g = upm.getGroupById(groupDto.getId().toString());
                     if (g == null) {
-                        throw new ApplicationException("Invalid group "
-                            + groupDto + " user groups.");
+                        throw new ApplicationException("Invalid group " //$NON-NLS-1$
+                            + groupDto + " user groups."); //$NON-NLS-1$
                     }
                     groups.add(g);
                 }
                 if (groups.size() == 0) {
                     throw new ApplicationException(
-                        "No group has been set for this user.");
+                        Messages
+                            .getString("BiobankSecurityUtil.nogroup_error_msg")); //$NON-NLS-1$
                 }
                 serverUser.setGroups(groups);
                 if (serverUser.getUserId() == null) {
@@ -283,15 +289,16 @@ public class BiobankSecurityUtil {
                 newUser.setId(serverUser.getUserId());
                 return newUser;
             } catch (ApplicationException ae) {
-                log.error("Error persisting security user", ae);
+                log.error("Error persisting security user", ae); //$NON-NLS-1$
                 throw ae;
             } catch (Exception ex) {
-                log.error("Error persisting security user", ex);
+                log.error("Error persisting security user", ex); //$NON-NLS-1$
                 throw new ApplicationException(ex.getMessage(), ex);
             }
         } else {
             throw new ApplicationException(
-                "Only Website Administrators or Administrators of current center can add/modify users");
+                Messages
+                    .getString("BiobankSecurityUtil.wenadmin.modif.user.error.msg")); //$NON-NLS-1$
         }
     }
 
@@ -305,7 +312,9 @@ public class BiobankSecurityUtil {
                 String currentLogin = SecurityContextHolder.getContext()
                     .getAuthentication().getName();
                 if (currentLogin.equals(loginToDelete)) {
-                    throw new ApplicationException("User cannot delete himself");
+                    throw new ApplicationException(
+                        Messages
+                            .getString("BiobankSecurityUtil.delete.self.error.msg")); //$NON-NLS-1$
                 }
                 User serverUser = upm.getUser(loginToDelete);
                 if (serverUser == null) {
@@ -314,15 +323,16 @@ public class BiobankSecurityUtil {
                 }
                 upm.removeUser(serverUser.getUserId().toString());
             } catch (ApplicationException ae) {
-                log.error("Error deleting security user", ae);
+                log.error("Error deleting security user", ae); //$NON-NLS-1$
                 throw ae;
             } catch (Exception ex) {
-                log.error("Error deleting security user", ex);
+                log.error("Error deleting security user", ex); //$NON-NLS-1$
                 throw new ApplicationException(ex.getMessage(), ex);
             }
         } else {
             throw new ApplicationException(
-                "Only Website Administrators or Administrators of current center can delete users");
+                Messages
+                    .getString("BiobankSecurityUtil.webadmin.delete.user.error.msg")); //$NON-NLS-1$
         }
     }
 
@@ -337,13 +347,15 @@ public class BiobankSecurityUtil {
             String userLogin = authentication.getName();
             User serverUser = upm.getUser(userLogin);
             if (serverUser == null)
-                throw new ApplicationException("Problem with user retrieval");
+                throw new ApplicationException(
+                    Messages
+                        .getString("BiobankSecurityUtil.user.retrieve.error.msg")); //$NON-NLS-1$
             return createUser(upm, serverUser, null);
         } catch (ApplicationException ae) {
-            log.error("Error getting current user", ae);
+            log.error("Error getting current user", ae); //$NON-NLS-1$
             throw ae;
         } catch (Exception ex) {
-            log.error("Error getting current user", ex);
+            log.error("Error getting current user", ex); //$NON-NLS-1$
             throw new ApplicationException(ex.getMessage(), ex);
         }
     }
@@ -389,18 +401,22 @@ public class BiobankSecurityUtil {
     }
 
     public static edu.ualberta.med.biobank.common.security.Group persistGroup(
+        edu.ualberta.med.biobank.common.security.User currentUser,
         edu.ualberta.med.biobank.common.security.Group group)
         throws ApplicationException {
-        if (isSuperAdministrator()) {
+        if (canPerformCenterAdminAction(currentUser)) {
             try {
                 UserProvisioningManager upm = SecurityServiceProvider
                     .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
                 if (!group.canBeEdited()) {
                     throw new ApplicationException(
-                        "This group cannot be modified.");
+                        Messages
+                            .getString("BiobankSecurityUtil.group.modif.error.msg")); //$NON-NLS-1$
                 }
                 if (group.getName() == null) {
-                    throw new ApplicationException("Name should be set.");
+                    throw new ApplicationException(
+                        Messages
+                            .getString("BiobankSecurityUtil.name.error.msg")); //$NON-NLS-1$
                 }
 
                 Group serverGroup = null;
@@ -456,15 +472,16 @@ public class BiobankSecurityUtil {
                     group.getCenterFeaturesEnabled());
                 return createGroup(upm, serverGroup);
             } catch (ApplicationException ae) {
-                log.error("Error persisting security group", ae);
+                log.error("Error persisting security group", ae); //$NON-NLS-1$
                 throw ae;
             } catch (Exception ex) {
-                log.error("Error persisting security group", ex);
+                log.error("Error persisting security group", ex); //$NON-NLS-1$
                 throw new ApplicationException(ex.getMessage(), ex);
             }
         } else {
             throw new ApplicationException(
-                "Only Website Administrators or Administrators of current center can add/modify groups");
+                Messages
+                    .getString("BiobankSecurityUtil.webadmin.group.modif.error.msg")); //$NON-NLS-1$
         }
     }
 
@@ -513,20 +530,20 @@ public class BiobankSecurityUtil {
         ProtectionElement pe = new ProtectionElement();
         // FIXME would be better to get the exact class name to search
         // pe.setObjectId(Site.class.getName());
-        pe.setAttribute("id");
+        pe.setAttribute("id"); //$NON-NLS-1$
         pe.setValue(centerId.toString());
         ProtectionElementSearchCriteria c = new ProtectionElementSearchCriteria(
             pe);
         List<?> peList = upm.getObjects(c);
         if (peList.size() != 1)
             throw new ApplicationException(
-                "Problem with center protection element for id=" + centerId);
+                "Problem with center protection element for id=" + centerId); //$NON-NLS-1$
         pe = (ProtectionElement) peList.get(0);
         Set<ProtectionGroup> pgs = upm.getProtectionGroups(pe
             .getProtectionElementId().toString());
         if (pgs.size() != 1)
             throw new ApplicationException(
-                "Problem with protection group for center with id=" + centerId);
+                "Problem with protection group for center with id=" + centerId); //$NON-NLS-1$
         return pgs.iterator().next();
     }
 
@@ -537,7 +554,7 @@ public class BiobankSecurityUtil {
         role.setName(roleName);
         List<?> roles = upm.getObjects(new RoleSearchCriteria(role));
         if (roles.size() != 1)
-            throw new ApplicationException("Problem getting role " + roleName);
+            throw new ApplicationException("Problem getting role " + roleName); //$NON-NLS-1$
         role = (Role) roles.get(0);
         upm.assignGroupRoleToProtectionGroup(protectionGroupID.toString(),
             serverGroup.getGroupId().toString(), new String[] { role.getId()
@@ -545,9 +562,10 @@ public class BiobankSecurityUtil {
     }
 
     public static void deleteGroup(
+        edu.ualberta.med.biobank.common.security.User currentUser,
         edu.ualberta.med.biobank.common.security.Group group)
         throws ApplicationException {
-        if (isSuperAdministrator()) {
+        if (canPerformCenterAdminAction(currentUser)) {
             try {
                 UserProvisioningManager upm = SecurityServiceProvider
                     .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
@@ -555,24 +573,25 @@ public class BiobankSecurityUtil {
                     Group serverGroup = upm.getGroupById(group.getId()
                         .toString());
                     if (serverGroup == null) {
-                        throw new ApplicationException("Security group "
-                            + group.getName() + " not found.");
+                        throw new ApplicationException("Security group " //$NON-NLS-1$
+                            + group.getName() + " not found."); //$NON-NLS-1$
                     }
                     upm.removeGroup(serverGroup.getGroupId().toString());
                 } else {
-                    throw new ApplicationException("Deletion of group "
-                        + group.getName() + " is not authorized.");
+                    throw new ApplicationException("Deletion of group " //$NON-NLS-1$
+                        + group.getName() + " is not authorized."); //$NON-NLS-1$
                 }
             } catch (ApplicationException ae) {
-                log.error("Error deleting security group", ae);
+                log.error("Error deleting security group", ae); //$NON-NLS-1$
                 throw ae;
             } catch (Exception ex) {
-                log.error("Error deleting security group", ex);
+                log.error("Error deleting security group", ex); //$NON-NLS-1$
                 throw new ApplicationException(ex.getMessage(), ex);
             }
         } else {
             throw new ApplicationException(
-                "Only Website Administrators or Administrators of current center can delete groups");
+                Messages
+                    .getString("BiobankSecurityUtil.webadmin_delete_eror.msg")); //$NON-NLS-1$
         }
     }
 
@@ -596,7 +615,7 @@ public class BiobankSecurityUtil {
                 UserProvisioningManager upm = SecurityServiceProvider
                     .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
                 ProtectionGroup pg = new ProtectionGroup();
-                pg.setProtectionGroupName(protectionGroupNameStart + "%");
+                pg.setProtectionGroupName(protectionGroupNameStart + "%"); //$NON-NLS-1$
                 List<ProtectionGroupPrivilege> features = new ArrayList<ProtectionGroupPrivilege>();
                 for (Object object : upm
                     .getObjects(new ProtectionGroupSearchCriteria(pg))) {
@@ -608,12 +627,13 @@ public class BiobankSecurityUtil {
                 }
                 return features;
             } catch (Exception ex) {
-                log.error("Error retrieving security features", ex);
+                log.error("Error retrieving security features", ex); //$NON-NLS-1$
                 throw new ApplicationException(ex);
             }
         } else {
             throw new ApplicationException(
-                "Only super administrators can retrieve security features");
+                Messages
+                    .getString("BiobankSecurityUtil.webadmin.features.error.msg")); //$NON-NLS-1$
         }
     }
 
@@ -634,7 +654,9 @@ public class BiobankSecurityUtil {
                 .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
             User user = upm.getUser(userLogin);
             if (user == null) {
-                throw new ApplicationException("Error retrieving security user");
+                throw new ApplicationException(
+                    Messages
+                        .getString("BiobankSecurityUtil.user.retrieve.error.msg")); //$NON-NLS-1$
             }
             Set<?> groups = upm.getGroups(user.getUserId().toString());
             for (Object obj : groups) {
@@ -648,10 +670,10 @@ public class BiobankSecurityUtil {
             }
             return false;
         } catch (ApplicationException ae) {
-            log.error("Error checking isWebsiteAdministrator", ae);
+            log.error("Error checking isWebsiteAdministrator", ae); //$NON-NLS-1$
             throw ae;
         } catch (Exception ex) {
-            log.error("Error checking isWebsiteAdministrator", ex);
+            log.error("Error checking isWebsiteAdministrator", ex); //$NON-NLS-1$
             throw new ApplicationException(ex);
         }
     }
@@ -666,28 +688,28 @@ public class BiobankSecurityUtil {
             // Create protection element for the center
             ProtectionElement pe = new ProtectionElement();
             pe.setApplication(currentApplication);
-            pe.setProtectionElementName(centerClass.getSimpleName() + "/"
+            pe.setProtectionElementName(centerClass.getSimpleName() + "/" //$NON-NLS-1$
                 + centerNameShort);
             pe.setProtectionElementDescription(centerNameShort);
             pe.setObjectId(centerClass.getName());
-            pe.setAttribute("id");
+            pe.setAttribute("id"); //$NON-NLS-1$
             pe.setValue(centerId.toString());
             upm.createProtectionElement(pe);
 
             // Create a new protection group for this protection element only
             ProtectionGroup pg = new ProtectionGroup();
             pg.setApplication(currentApplication);
-            pg.setProtectionGroupName(centerClass.getSimpleName() + " "
+            pg.setProtectionGroupName(centerClass.getSimpleName() + " " //$NON-NLS-1$
                 + centerNameShort);
-            pg.setProtectionGroupDescription("Protection group for center "
-                + centerNameShort + " (id=" + centerId + ")");
+            pg.setProtectionGroupDescription("Protection group for center " //$NON-NLS-1$
+                + centerNameShort + " (id=" + centerId + ")"); //$NON-NLS-1$ //$NON-NLS-2$
             pg.setProtectionElements(new HashSet<ProtectionElement>(Arrays
                 .asList(pe)));
             upm.createProtectionGroup(pg);
         } catch (Exception e) {
-            log.error("error adding new center security", e);
-            throw new RuntimeException("Error adding new center " + centerId
-                + ":" + centerNameShort + " security:" + e.getMessage());
+            log.error("error adding new center security", e); //$NON-NLS-1$
+            throw new RuntimeException("Error adding new center " + centerId //$NON-NLS-1$
+                + ":" + centerNameShort + " security:" + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
@@ -699,7 +721,7 @@ public class BiobankSecurityUtil {
                 .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
             ProtectionElement searchPE = new ProtectionElement();
             searchPE.setObjectId(centerClass.getName());
-            searchPE.setAttribute("id");
+            searchPE.setAttribute("id"); //$NON-NLS-1$
             searchPE.setValue(centerId.toString());
             SearchCriteria sc = new ProtectionElementSearchCriteria(searchPE);
             List<ProtectionElement> peToDelete = upm.getObjects(sc);
@@ -725,9 +747,9 @@ public class BiobankSecurityUtil {
                 upm.removeProtectionGroup(pgId);
             }
         } catch (Exception e) {
-            log.error("error deleting center security", e);
-            throw new RuntimeException("Error deleting center " + centerId
-                + ":" + nameShort + " security: " + e.getMessage());
+            log.error("error deleting center security", e); //$NON-NLS-1$
+            throw new RuntimeException("Error deleting center " + centerId //$NON-NLS-1$
+                + ":" + nameShort + " security: " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
     }

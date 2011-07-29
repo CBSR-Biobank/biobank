@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -76,7 +77,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         FormToolkit toolkit, WritableApplicationService appService,
         boolean editable) {
         super(parent, style);
-        Assert.isNotNull(toolkit, "toolkit is null");
+        Assert.isNotNull(toolkit, "toolkit is null"); //$NON-NLS-1$
         this.appService = appService;
         this.editable = editable;
 
@@ -86,7 +87,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
 
         if (editable) {
             Label label = toolkit.createLabel(this,
-                "Enter specimen inventory ID to add:");
+                Messages.SpecimenEntryWidget_inventoryid_label);
             GridData gd = new GridData();
             gd.horizontalSpan = 2;
             label.setLayoutData(gd);
@@ -97,10 +98,10 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                     public void handleEvent(Event e) {
                         addSpecimen();
                         newSpecimenInventoryId.setFocus();
-                        newSpecimenInventoryId.setText("");
+                        newSpecimenInventoryId.setText(""); //$NON-NLS-1$
                     }
                 });
-            addButton = toolkit.createButton(this, "", SWT.PUSH);
+            addButton = toolkit.createButton(this, "", SWT.PUSH); //$NON-NLS-1$
             addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_ADD));
             addButton.addSelectionListener(new SelectionAdapter() {
@@ -140,24 +141,21 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         String inventoryId = newSpecimenInventoryId.getText().trim();
         if (!inventoryId.isEmpty()) {
             try {
-                // FIXME related to issue #1198 : should call this method with
-                // the current user, but can be a problem in dispatch. What
-                // security modification should be made ? Should we check that
-                // anyway ?
                 SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
                     appService, inventoryId);
                 addSpecimen(specimen);
             } catch (Exception e) {
-                BgcPlugin.openAsyncError("Error while looking up specimen", e);
+                BgcPlugin.openAsyncError(
+                    Messages.SpecimenEntryWidget_retrieve_error_title, e);
             }
         }
     }
 
     private void addSpecimen(SpecimenWrapper specimen) {
         if (specimen != null && specimens.contains(specimen)) {
-            BgcPlugin.openAsyncError("Error",
-                "Specimen " + specimen.getInventoryId()
-                    + " has already been added to this list");
+            BgcPlugin.openAsyncError(Messages.SpecimenEntryWidget_error_title,
+                NLS.bind(Messages.SpecimenEntryWidget_already_added_error_msg,
+                    specimen.getInventoryId()));
             return;
         }
 
@@ -179,7 +177,8 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
 
             vetoListenerSupport.notifyListeners(postAdd);
         } catch (VetoException e) {
-            BgcPlugin.openAsyncError("Error", e.getMessage());
+            BgcPlugin.openAsyncError(Messages.SpecimenEntryWidget_error_title,
+                e.getMessage());
         }
     }
 
@@ -192,12 +191,12 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
             public void deleteItem(InfoTableEvent event) {
                 SpecimenWrapper specimen = specTable.getSelection();
                 if (specimen != null) {
-                    if (!MessageDialog.openConfirm(
-                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(),
-                        "Delete Specimen",
-                        "Are you sure you want to remove specimen "
-                            + specimen.getInventoryId() + "?")) {
+                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell(),
+                        Messages.SpecimenEntryWidget_delete_question_title,
+                        NLS.bind(
+                            Messages.SpecimenEntryWidget_delete_question_msg,
+                            specimen.getInventoryId()))) {
                         return;
                     }
 
@@ -220,7 +219,9 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                             vetoListenerSupport.notifyListeners(postDelete);
                         }
                     } catch (VetoException e) {
-                        BgcPlugin.openAsyncError("Error", e.getMessage());
+                        BgcPlugin.openAsyncError(
+                            Messages.SpecimenEntryWidget_error_title,
+                            e.getMessage());
                     }
                 }
             }

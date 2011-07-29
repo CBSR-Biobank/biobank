@@ -6,8 +6,8 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class AdapterBasePropertyTester extends PropertyTester {
 
-    public static final String CAN_DELETE = "canDelete";
-    public static final String CAN_UPDATE = "canUpdate";
+    public static final String CAN_DELETE = "canDelete"; //$NON-NLS-1$
+    public static final String CAN_UPDATE = "canUpdate"; //$NON-NLS-1$
 
     public AdapterBasePropertyTester() {
         //

@@ -50,17 +50,18 @@ public class PvInfoWidget extends BgcBaseWidget {
     private static Map<String, LabelDialogInfo> LABEL_DLG_INFO = new HashMap<String, LabelDialogInfo>() {
         private static final long serialVersionUID = 1L;
         {
-            put("Patient Type",
-                new LabelDialogInfo("Patient Type Values",
-                    "Please enter a patient type:",
-                    "To enter multiple patient type values, separate with semicolon."));
-            put("Visit Type",
-                new LabelDialogInfo("Visit Type Values",
-                    "Please enter a visit type:",
-                    "To enter multiple visit type values, separate with semicolon."));
-            put("Consent", new LabelDialogInfo("Consent Types",
-                "Please enter a consent type:",
-                "To enter multiple consent values, separate with semicolon."));
+            put(Messages.PvInfoWidget_patient_type_label, new LabelDialogInfo(
+                Messages.PvInfoWidget_patient_type_title,
+                Messages.PvInfoWidget_patient_type_prompt,
+                Messages.PvInfoWidget_patient_type_help));
+            put(Messages.PvInfoWidget_visit_type_label, new LabelDialogInfo(
+                Messages.PvInfoWidget_visit_type_title,
+                Messages.PvInfoWidget_visit_type_prompt,
+                Messages.PvInfoWidget_visit_type_help));
+            put(Messages.PvInfoWidget_consent_label, new LabelDialogInfo(
+                Messages.PvInfoWidget_consent_title,
+                Messages.PvInfoWidget_consent_prompt,
+                Messages.PvInfoWidget_consent_help));
         }
     };
 
@@ -76,7 +77,7 @@ public class PvInfoWidget extends BgcBaseWidget {
 
         if (hasListValues) {
             labelDlgInfo = LABEL_DLG_INFO.get(pvCustomInfo.getLabel());
-            Assert.isNotNull(labelDlgInfo, "no dialog info for label "
+            Assert.isNotNull(labelDlgInfo, "no dialog info for label " //$NON-NLS-1$
                 + pvCustomInfo.getLabel());
 
             createCheckButton(pvCustomInfo, selected);
@@ -94,14 +95,14 @@ public class PvInfoWidget extends BgcBaseWidget {
             addButton = new Button(bcomp, SWT.PUSH);
             addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_ADD));
-            addButton.setToolTipText("Add");
+            addButton.setToolTipText(Messages.PvInfoWidget_add_label);
             addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             addButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     notifyListeners();
-                    Assert.isNotNull(labelDlgInfo, "no dialog info for label "
+                    Assert.isNotNull(labelDlgInfo, "no dialog info for label " //$NON-NLS-1$
                         + pvCustomInfo.getLabel());
 
                     ListAddDialog dlg = new ListAddDialog(PlatformUI
@@ -139,7 +140,7 @@ public class PvInfoWidget extends BgcBaseWidget {
             removeButton = new Button(bcomp, SWT.PUSH);
             removeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_DELETE));
-            removeButton.setToolTipText("Remove");
+            removeButton.setToolTipText(Messages.PvInfoWidget_remove_label);
             removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             removeButton.addSelectionListener(new SelectionAdapter() {
@@ -163,7 +164,7 @@ public class PvInfoWidget extends BgcBaseWidget {
                 .getActiveWorkbenchWindow().getShell(), SWT.POP_UP);
 
             MenuItem mi = new MenuItem(m, SWT.CASCADE);
-            mi.setText("Move to Top");
+            mi.setText(Messages.PvInfoWidget_move_top_label);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -185,7 +186,7 @@ public class PvInfoWidget extends BgcBaseWidget {
             });
 
             mi = new MenuItem(m, SWT.CASCADE);
-            mi.setText("Move Up");
+            mi.setText(Messages.PvInfoWidget_move_up_label);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -208,7 +209,7 @@ public class PvInfoWidget extends BgcBaseWidget {
             });
 
             mi = new MenuItem(m, SWT.CASCADE);
-            mi.setText("Move Down");
+            mi.setText(Messages.PvInfoWidget_move_down_label);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -231,7 +232,7 @@ public class PvInfoWidget extends BgcBaseWidget {
             });
 
             mi = new MenuItem(m, SWT.CASCADE);
-            mi.setText("Move to Bottom");
+            mi.setText(Messages.PvInfoWidget_move_bottom_label);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -283,7 +284,8 @@ public class PvInfoWidget extends BgcBaseWidget {
 
     public String getValues() {
         if (hasListValues) {
-            return StringUtils.join(itemList.getItems(), ";");
+            return StringUtils.join(itemList.getItems(),
+                PvAttrCustom.VALUE_MULTIPLE_SEPARATOR);
         }
         return null;
     }

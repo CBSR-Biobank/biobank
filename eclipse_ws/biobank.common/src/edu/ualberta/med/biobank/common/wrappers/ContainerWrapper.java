@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,7 +12,6 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 
-import edu.ualberta.med.biobank.common.Messages;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -195,8 +195,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             }
             if (labelChanged) {
                 // the label need to be modified
-                String label = parent.getLabel() + getPositionString();
-                setLabel(label);
+                setLabelUsingPositionAndParent();
                 checkLabelUniqueForType();
             }
         }
@@ -204,6 +203,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         persistSpecimens();
         setPath();
         setTopContainer();
+    }
+
+    public void setLabelUsingPositionAndParent() {
+        ContainerWrapper parent = getParentContainer();
+        if (parent != null) {
+            String label = parent.getLabel() + getPositionString();
+            setLabel(label);
+        }
     }
 
     public RowColPos getPositionAsRowCol() {
@@ -449,6 +456,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                         position.reload();
                     } catch (Exception ex) {
                         // do nothing
+                        ex.printStackTrace();
                     }
                     SpecimenWrapper spc = position.getSpecimen();
                     specimens.put(
@@ -987,7 +995,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             ContainerWrapper newContainer = new ContainerWrapper(appService);
             newContainer.setContainerType(type);
             newContainer.setSite(getSite());
-            newContainer.setTemperature(getTemperature());
             newContainer.setPositionAsRowCol(new RowColPos(i, j));
             newContainer.setParent(this);
             newContainer.setActivityStatus(ActivityStatusWrapper
@@ -1113,19 +1120,22 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             String errorMsg;
             if (contType == null)
                 if (isContainerPosition)
-                    errorMsg = Messages
-                        .getString(
-                            "ContainerWrapper.getPossibleContainersFromPosition.error.notfound.msg", //$NON-NLS-1$
+                    errorMsg = MessageFormat
+                        .format(
+                            Messages
+                                .getString("ContainerWrapper.getPossibleContainersFromPosition.error.notfound.msg"), //$NON-NLS-1$
                             res.toString());
                 else
-                    errorMsg = Messages
-                        .getString(
-                            "ContainerWrapper.getPossibleContainersFromPosition.error.notfoundSpecimenHolder.msg", //$NON-NLS-1$
+                    errorMsg = MessageFormat
+                        .format(
+                            Messages
+                                .getString("ContainerWrapper.getPossibleContainersFromPosition.error.notfoundSpecimenHolder.msg"), //$NON-NLS-1$
                             res.toString());
             else
-                errorMsg = Messages
-                    .getString(
-                        "ContainerWrapper.getPossibleContainersFromPosition.error.notfoundWithType.msg",//$NON-NLS-1$
+                errorMsg = MessageFormat
+                    .format(
+                        Messages
+                            .getString("ContainerWrapper.getPossibleContainersFromPosition.error.notfoundWithType.msg"),//$NON-NLS-1$
                         contType.getNameShort(), res.toString());
 
             throw new BiobankException(errorMsg);

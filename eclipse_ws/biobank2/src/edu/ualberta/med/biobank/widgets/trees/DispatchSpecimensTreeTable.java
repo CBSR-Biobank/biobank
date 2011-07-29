@@ -28,21 +28,26 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.ModifyStateDispatchDialog;
 import edu.ualberta.med.biobank.forms.utils.DispatchTableGroup;
 import edu.ualberta.med.biobank.forms.utils.TableGroup;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
-import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankClipboard;
+import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
+import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.utils.BiobankClipboard;
 
 public class DispatchSpecimensTreeTable extends BgcBaseWidget {
 
     private TreeViewer tv;
     private DispatchWrapper shipment;
     protected List<DispatchTableGroup> groups;
+    private MenuItem editItem;
+    private Menu menu;
 
     public DispatchSpecimensTreeTable(Composite parent,
         final DispatchWrapper shipment, final boolean editSpecimensState,
@@ -64,24 +69,27 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         tree.setLinesVisible(true);
 
         TreeColumn tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Inventory Id");
+        tc.setText(Messages.DispatchSpecimensTreeTable_inventoryid_label);
         tc.setWidth(200);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Type");
+        tc.setText(Messages.DispatchSpecimensTreeTable_type_label);
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Patient Number");
+        tc.setText(Messages.DispatchSpecimensTreeTable_pnumber_label);
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Activity Status");
+        tc.setText(Messages.DispatchSpecimensTreeTable_status_label);
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Dispatch comment");
+        tc.setText(Messages.DispatchSpecimensTreeTable_comment_label);
         tc.setWidth(100);
+
+        menu = new Menu(parent);
+        tv.getTree().setMenu(menu);
 
         ITreeContentProvider contentProvider = new ITreeContentProvider() {
             @Override
@@ -124,42 +132,33 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                 if (element instanceof TableGroup) {
                     if (columnIndex == 0)
                         return ((TableGroup<?>) element).getTitle();
-                    return "";
+                    return ""; //$NON-NLS-1$
                 } else if (element instanceof RequestContainerAdapter) {
                     if (columnIndex == 0)
                         return ((RequestContainerAdapter) element)
                             .getLabelInternal();
-                    return "";
+                    return ""; //$NON-NLS-1$
                 } else if (element instanceof TreeItemAdapter) {
-                    return ((TreeItemAdapter) element)
-                        .getColumnText(columnIndex);
+                    if (columnIndex < 3)
+                        return ((TreeItemAdapter) element)
+                            .getColumnText(columnIndex);
+                    if (columnIndex == 4)
+                        return ((DispatchSpecimenWrapper) ((TreeItemAdapter) element)
+                            .getSpecimen()).getComment();
+                    else
+                        return ""; //$NON-NLS-1$
                 }
-                return "";
+                return ""; //$NON-NLS-1$
             }
         };
         tv.setLabelProvider(labelProvider);
-        tv.setInput("root");
-
-        tv.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-            public void doubleClick(DoubleClickEvent event) {
-                Object o = ((IStructuredSelection) tv.getSelection())
-                    .getFirstElement();
-                if (o instanceof DispatchSpecimenWrapper) {
-                    DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) o;
-                    SessionManager.openViewForm(dsa.getSpecimen());
-                }
-            }
-        });
-
-        final Menu menu = new Menu(this);
-        tv.getTree().setMenu(menu);
-
+        tv.setInput("root"); //$NON-NLS-1$
         menu.addListener(SWT.Show, new Listener() {
             @Override
             public void handleEvent(Event event) {
                 for (MenuItem menuItem : menu.getItems()) {
-                    menuItem.dispose();
+                    if (!menuItem.equals(editItem))
+                        menuItem.dispose();
                 }
                 BiobankClipboard.addClipboardCopySupport(tv, menu,
                     labelProvider, 5);
@@ -191,7 +190,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     protected void addModifyCommentMenu(Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Modify comment");
+        item.setText(Messages.DispatchSpecimensTreeTable_modidy_comment_label);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -204,7 +203,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     private void addSetMissingMenu(final Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Set as missing");
+        item.setText(Messages.DispatchSpecimensTreeTable_set_missing_label);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -244,7 +243,39 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     }
 
     public void refresh() {
-        tv.setInput("refresh");
+        tv.setInput("refresh"); //$NON-NLS-1$
+    }
+
+    public void addClickListener() {
+        tv.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                DispatchSpecimenWrapper selection = getSelectedSpecimen();
+                if (selection != null) {
+                    SessionManager.openViewForm(selection.getSpecimen());
+                }
+            }
+        });
+        if (SessionManager.canUpdate(SpecimenWrapper.class)) {
+            editItem = new MenuItem(getMenu(), SWT.PUSH);
+            editItem.setText(Messages.DispatchSpecimensTreeTable_edit_label);
+            editItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    DispatchSpecimenWrapper selection = getSelectedSpecimen();
+                    if (selection != null) {
+                        AdapterBase adapter = AdapterFactory
+                            .getAdapter(selection.getSpecimen());
+                        adapter.openEntryForm();
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    public Menu getMenu() {
+        return menu;
     }
 
 }

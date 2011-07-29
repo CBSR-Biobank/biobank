@@ -96,8 +96,8 @@ public class BetweenFilterValueWidget implements FilterValueWidget {
 
     @Override
     public String toString(ReportFilterValue value) {
-        return "\"" + value.getValue() + "\" and \"" + value.getSecondValue()
-            + "\"";
+        return "\"" + value.getValue() + "\" and \"" + value.getSecondValue() //$NON-NLS-1$ //$NON-NLS-2$
+            + "\""; //$NON-NLS-1$
     }
 
     private Composite createControls(Composite parent) {
@@ -124,7 +124,7 @@ public class BetweenFilterValueWidget implements FilterValueWidget {
         labelLayoutData.verticalIndent = 0;
 
         Label label = new Label(container, SWT.NONE);
-        label.setText("and ");
+        label.setText("and "); //$NON-NLS-1$
         label.setLayoutData(labelLayoutData);
 
         Control maxControl = maxValueWidget.getControl();

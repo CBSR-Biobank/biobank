@@ -18,14 +18,14 @@ import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 public class ClinicMasterGroup extends AbstractClinicGroup {
 
     public ClinicMasterGroup(SessionAdapter sessionAdapter, int id) {
-        super(sessionAdapter, id, "All Clinics");
+        super(sessionAdapter, id, Messages.ClinicMasterGroup_clinics_node_label);
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (SessionManager.canCreate(ClinicWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add Clinic");
+            mi.setText(Messages.ClinicMasterGroup_add_label);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

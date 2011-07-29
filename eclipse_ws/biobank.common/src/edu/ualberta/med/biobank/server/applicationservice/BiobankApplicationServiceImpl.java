@@ -31,6 +31,7 @@ import gov.nih.nci.system.util.ClassCache;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -80,8 +81,8 @@ public class BiobankApplicationServiceImpl extends
      */
     @Override
     public void logActivity(Log log) throws Exception {
-        Logger logger = Logger.getLogger("Biobank.Activity");
-        logger.log(Level.toLevel("INFO"),
+        Logger logger = Logger.getLogger("Biobank.Activity"); //$NON-NLS-1$
+        logger.log(Level.toLevel("INFO"), //$NON-NLS-1$
             MessageGenerator.generateStringMessage(log));
     }
 
@@ -173,13 +174,17 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public Group persistGroup(Group group) throws ApplicationException {
-        return BiobankSecurityUtil.persistGroup(group);
+    public Group persistGroup(User currentUser, Group group)
+        throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        return BiobankSecurityUtil.persistGroup(currentUser, group);
     }
 
     @Override
-    public void deleteGroup(Group group) throws ApplicationException {
-        BiobankSecurityUtil.deleteGroup(group);
+    public void deleteGroup(User currentUser, Group group)
+        throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        BiobankSecurityUtil.deleteGroup(currentUser, group);
     }
 
     @Override
@@ -215,10 +220,11 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
-        ProcessData processData, boolean isRescanMode, User user)
+        ProcessData processData, boolean isRescanMode, User user, Locale locale)
         throws ApplicationException {
         try {
-            ServerProcess process = processData.getProcessInstance(this, user);
+            ServerProcess process = processData.getProcessInstance(this, user,
+                locale);
             return process.processScanResult(cells, isRescanMode);
         } catch (ApplicationException ae) {
             throw ae;
@@ -229,9 +235,11 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public CellProcessResult processCellStatus(Cell cell,
-        ProcessData processData, User user) throws ApplicationException {
+        ProcessData processData, User user, Locale locale)
+        throws ApplicationException {
         try {
-            ServerProcess process = processData.getProcessInstance(this, user);
+            ServerProcess process = processData.getProcessInstance(this, user,
+                locale);
             return process.processCellStatus(cell);
         } catch (ApplicationException ae) {
             throw ae;

@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShow
 
 public class CollectionEventViewForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventViewForm"; //$NON-NLS-1$
 
     private static BgcLogger logger = BgcLogger
         .getLogger(CollectionEventViewForm.class.getName());
@@ -55,7 +55,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof CollectionEventAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         ceventAdapter = (CollectionEventAdapter) adapter;
@@ -63,13 +63,13 @@ public class CollectionEventViewForm extends BiobankViewForm {
         retrievePatientVisit();
         SessionManager.logLookup(cevent);
 
-        setPartName(Messages.getString("CollectionEventViewForm.title", cevent
-            .getPatient().getPnumber(), cevent.getVisitNumber()));
+        setPartName(NLS.bind(Messages.CollectionEventViewForm_title,
+            cevent.getVisitNumber()));
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("CollectionEventViewForm.main.title",
+        form.setText(NLS.bind(Messages.CollectionEventViewForm_main_title,
             +cevent.getVisitNumber()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -86,17 +86,19 @@ public class CollectionEventViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
-        patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
+        studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.CollectionEventViewForm_study_label);
+        patientLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.CollectionEventViewForm_patient_label);
         visitNumberLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Visit#");
+            Messages.CollectionEventViewForm_visitNber_label);
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.activity"));
+            Messages.label_activity);
 
         createPvDataSection(client);
 
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.getString("label.comments"));
+            Messages.label_comments);
 
         setCollectionEventValues();
     }
@@ -149,8 +151,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void createSourceSpecimensSection() {
-        Composite client = createSectionWithClient(Messages
-            .getString("CollectionEventViewForm.sourcespecimens.title"));
+        Composite client = createSectionWithClient(Messages.CollectionEventViewForm_sourcespecimens_title);
         sourceSpecimenTable = new SpecimenInfoTable(client,
             cevent.getOriginalSpecimenCollection(true),
             ColumnsShown.SOURCE_SPECIMENS, 10);
@@ -160,8 +161,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private void createAliquotedSpecimensSection() {
         // FIXME should we show that to clinics ?
-        Composite client = createSectionWithClient(Messages
-            .getString("CollectionEventViewForm.aliquotedspecimens.title"));
+        Composite client = createSectionWithClient(Messages.CollectionEventViewForm_aliquotedspecimens_title);
         aliquotedSpecimenTable = new SpecimenInfoTable(client,
             cevent.getAliquotedSpecimenCollection(true), ColumnsShown.ALIQUOTS,
             10);
@@ -172,9 +172,9 @@ public class CollectionEventViewForm extends BiobankViewForm {
     @Override
     public void reload() {
         retrievePatientVisit();
-        setPartName(Messages.getString("CollectionEventViewForm.title", cevent
-            .getPatient().getPnumber(), cevent.getVisitNumber()));
-        form.setText(Messages.getString("CollectionEventViewForm.main.title",
+        setPartName(NLS.bind(Messages.CollectionEventViewForm_title,
+            cevent.getVisitNumber()));
+        form.setText(NLS.bind(Messages.CollectionEventViewForm_main_title,
             +cevent.getVisitNumber()));
         setCollectionEventValues();
         sourceSpecimenTable.setCollection(cevent
@@ -187,10 +187,9 @@ public class CollectionEventViewForm extends BiobankViewForm {
         try {
             cevent.reload();
         } catch (Exception ex) {
-            logger.error(
-                "Error while retrieving patient visit "
-                    + cevent.getVisitNumber() + "(patient "
-                    + cevent.getPatient() + ")", ex);
+            logger.error("Error while retrieving patient visit " //$NON-NLS-1$
+                + cevent.getVisitNumber() + "(patient " //$NON-NLS-1$
+                + cevent.getPatient() + ")", ex); //$NON-NLS-1$
         }
     }
 

@@ -8,7 +8,7 @@ import org.eclipse.ui.IPerspectiveFactory;
  */
 public class LinkAssignPerspective implements IPerspectiveFactory {
 
-    public final static String ID = "edu.ualberta.med.biobank.perspective.linkAssign";
+    public final static String ID = "edu.ualberta.med.biobank.perspective.linkAssign"; //$NON-NLS-1$
 
     @Override
     public void createInitialLayout(IPageLayout layout) {

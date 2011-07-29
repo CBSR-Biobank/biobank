@@ -16,7 +16,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -27,8 +26,8 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
-import edu.ualberta.med.biobank.widgets.BiobankClipboard;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.utils.BiobankClipboard;
 
 public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
 
@@ -95,7 +94,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         table.setLayout(new TableLayout());
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        GridData gd = new GridData(SWT.FILL, SWT.NONE, true, true);
         table.setLayoutData(gd);
 
         setHeadings(headings, columnWidths);
@@ -105,13 +104,12 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
 
         addPaginationWidget();
 
-        if (collection != null)
-            setCollection(collection);
+        autoSizeColumns = columnWidths == null ? true : false;
 
         menu = new Menu(parent);
         tableViewer.getTable().setMenu(menu);
 
-        autoSizeColumns = columnWidths == null ? true : false;
+        setCollection(collection);
 
         BiobankClipboard.addClipboardCopySupport(tableViewer, menu,
             (BiobankLabelProvider) getLabelProvider(), headings.length);
@@ -200,7 +198,6 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
                 init(collection);
                 setPaginationParams(collection);
             }
-
             if (paginationRequired) {
                 showPaginationWidget();
                 setPageLabelText();
@@ -208,28 +205,21 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
             } else if (paginationWidget != null)
                 paginationWidget.setVisible(false);
 
-            final Display display = getTableViewer().getTable().getDisplay();
             resizeTable();
             backgroundThread = new Thread() {
                 @Override
                 public void run() {
                     tableLoader(collection, selection);
-                    if (autoSizeColumns) {
-                        display.syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                autoSizeColumns();
-                            }
-                        });
-                    }
                 }
             };
             backgroundThread.start();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Cannot Load Table Data", e);
+            BgcPlugin.openAsyncError(
+                Messages.AbstractInfoTableWidget_load_error_title, e);
         }
-
-        layout(true, true);
+        if (autoSizeColumns) {
+            autoSizeColumns();
+        }
     }
 
     private void autoSizeColumns() {
@@ -282,7 +272,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         int tableWidth = Math.max(500, tableViewer.getTable().getSize().x);
 
         int totalWidths = 0;
-        tableViewer.getTable().setVisible(false);
+        table.setVisible(false);
         for (int i = 0; i < table.getColumnCount(); i++) {
             int width = (int) ((double) maxCellContentsWidths[i]
                 / sumOfMaxTextWidths * tableWidth);
@@ -292,7 +282,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
                 table.getColumn(i).setWidth(width);
             totalWidths += width;
         }
-        tableViewer.getTable().setVisible(true);
+
+        table.setVisible(true);
     }
 
     protected abstract void init(List<T> collection);
@@ -302,9 +293,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         GridData gd = (GridData) table.getLayoutData();
         int rows = Math.max(pageInfo.rowsPerPage, 5);
         gd.heightHint = (rows - 1) * table.getItemHeight()
-            + table.getHeaderHeight() + 4;
-        layout(true, true);
-
+            + table.getHeaderHeight() + table.getBorderWidth();
     }
 
     protected abstract void setPaginationParams(List<T> collection);
@@ -323,7 +312,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         firstButton = new Button(paginationWidget, SWT.NONE);
         firstButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_FIRST));
-        firstButton.setToolTipText("First page");
+        firstButton
+            .setToolTipText(Messages.AbstractInfoTableWidget_first_label);
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -334,7 +324,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         prevButton = new Button(paginationWidget, SWT.NONE);
         prevButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_PREV));
-        prevButton.setToolTipText("Previous page");
+        prevButton
+            .setToolTipText(Messages.AbstractInfoTableWidget_previous_label);
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -347,7 +338,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         nextButton = new Button(paginationWidget, SWT.NONE);
         nextButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_NEXT));
-        nextButton.setToolTipText("Next page");
+        nextButton.setToolTipText(Messages.AbstractInfoTableWidget_next_label);
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -358,7 +349,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         lastButton = new Button(paginationWidget, SWT.NONE);
         lastButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_LAST));
-        lastButton.setToolTipText("Last page");
+        lastButton.setToolTipText(Messages.AbstractInfoTableWidget_last_label);
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -372,7 +363,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
 
         // do not display it yet, wait till collection is added
         paginationWidget.setVisible(false);
-        GridData gd = new GridData(SWT.END, SWT.TOP, true, true);
+        GridData gd = new GridData(SWT.END, SWT.TOP, true, false);
         gd.exclude = false;
         paginationWidget.setLayoutData(gd);
         layout(true, true);
@@ -430,4 +421,5 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
     protected abstract void lastPage();
 
     protected abstract void setPageLabelText();
+
 }

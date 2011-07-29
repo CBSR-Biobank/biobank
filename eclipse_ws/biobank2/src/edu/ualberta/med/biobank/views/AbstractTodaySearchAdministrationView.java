@@ -4,11 +4,10 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public abstract class AbstractTodaySearchAdministrationView extends
     AbstractAdministrationView {
@@ -52,35 +51,20 @@ public abstract class AbstractTodaySearchAdministrationView extends
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Search error", e);
+            BgcPlugin
+                .openAsyncError(
+                    Messages.AbstractTodaySearchAdministrationView_search_error_title,
+                    e);
         }
     }
+
+    protected abstract void showSearchedObjectsInTree(
+        List<? extends ModelWrapper<?>> searchedObject, boolean b);
 
     protected abstract List<? extends ModelWrapper<?>> search(String text)
         throws Exception;
 
     protected abstract void notFound(String text);
-
-    protected void showSearchedObjectsInTree(
-        List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
-        for (ModelWrapper<?> searchedObject : searchedObjects) {
-            List<AdapterBase> nodeRes = todayNode.search(searchedObject);
-            if (nodeRes.size() == 0) {
-                nodeRes = searchedNode.search(searchedObject);
-                if (nodeRes.size() == 0) {
-                    searchedNode.addSearchObject(searchedObject);
-                    searchedNode.performExpand();
-                    nodeRes = searchedNode.search(searchedObject);
-                }
-            }
-            if (nodeRes.size() > 0) {
-                setSelectedNode(nodeRes.get(0));
-                if (doubleClick) {
-                    nodeRes.get(0).performDoubleClick();
-                }
-            }
-        }
-    }
 
     @Override
     public void reload() {

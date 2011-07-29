@@ -10,6 +10,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public abstract class ServerProcess {
@@ -17,12 +18,14 @@ public abstract class ServerProcess {
     protected ProcessData data;
     protected User user;
     private List<String> logs;
+    protected Locale locale;
 
     public ServerProcess(WritableApplicationService appService,
-        ProcessData data, User user) {
+        ProcessData data, User user, Locale locale) {
         this.appService = appService;
         this.data = data;
         this.user = user;
+        this.locale = locale;
         user.initCurrentWorkingCenter(appService);
         logs = new ArrayList<String>();
     }
@@ -49,4 +52,5 @@ public abstract class ServerProcess {
     public void appendNewLog(String log) {
         logs.add(log);
     }
+
 }

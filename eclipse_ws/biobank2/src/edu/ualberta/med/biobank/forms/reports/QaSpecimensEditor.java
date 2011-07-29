@@ -24,12 +24,13 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class QaSpecimensEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.QAAliquotsEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.QAAliquotsEditor"; //$NON-NLS-1$
 
     private DateTimeWidget start;
     private DateTimeWidget end;
-    private ComboViewer sampleType;
-    private IObservableValue numAliquots;
+    private ComboViewer typesViewer;
+    private IObservableValue numSpecimens;
+
     private IObservableValue listStatus = new WritableValue(Boolean.TRUE,
         Boolean.class);
     private TopContainerListWidget topContainers;
@@ -38,12 +39,13 @@ public class QaSpecimensEditor extends ReportsEditor {
     @Override
     protected void createOptionSection(Composite parent) throws Exception {
         start = widgetCreator.createDateTimeWidget(parent,
-            "Start Date (Linked)", null, null, null, SWT.DATE);
-        end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
-            null, null, null, SWT.DATE);
+            Messages.QaSpecimensEditor_start_label, null, null, null, SWT.DATE);
+        end = widgetCreator.createDateTimeWidget(parent,
+            Messages.QaSpecimensEditor_end_label, null, null, null, SWT.DATE);
         topContainers = new TopContainerListWidget(parent, toolkit);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), listStatus, "Top Container List Empty");
+            Boolean.class), listStatus,
+            Messages.QaSpecimensEditor_top_validation_msg);
         topContainers.addSelectionChangedListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -54,8 +56,10 @@ public class QaSpecimensEditor extends ReportsEditor {
             public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
-        sampleType = createSampleTypeComboOption("Sample Type", parent);
-        numSpecimensText = createValidatedIntegerText("# Specimens", parent);
+        typesViewer = createSpecimenTypeComboOption(
+            Messages.QaSpecimensEditor_specType_label, parent);
+        createValidatedIntegerText(Messages.QaSpecimensEditor_nb_specs_label,
+            parent);
     }
 
     @Override
@@ -63,11 +67,11 @@ public class QaSpecimensEditor extends ReportsEditor {
         List<Object> params = new ArrayList<Object>();
         params.add(ReportsEditor.processDate(start.getDate(), true));
         params.add(ReportsEditor.processDate(end.getDate(), false));
-        params.add(((SpecimenTypeWrapper) ((IStructuredSelection) sampleType
+        params.add(((SpecimenTypeWrapper) ((IStructuredSelection) typesViewer
             .getSelection()).getFirstElement()).getNameShort());
         report.setContainerList(ReportsEditor
             .containerIdsToString(topContainers.getSelectedContainerIds()));
-        params.add(Integer.parseInt((String) numAliquots.getValue()));
+        params.add(Integer.parseInt((String) numSpecimens.getValue()));
         report.setParams(params);
     }
 
@@ -77,19 +81,19 @@ public class QaSpecimensEditor extends ReportsEditor {
         params.add(ReportsEditor.processDate(start.getDate(), true));
         params.add(ReportsEditor.processDate(end.getDate(), false));
         params.add(topContainers.getSelectedContainerNames());
-        params.add(((SpecimenTypeWrapper) ((IStructuredSelection) sampleType
+        params.add(((SpecimenTypeWrapper) ((IStructuredSelection) typesViewer
             .getSelection()).getFirstElement()).getNameShort());
-        params.add(Integer.parseInt((String) numAliquots.getValue()));
+        params.add(Integer.parseInt((String) numSpecimens.getValue()));
         return params;
     }
 
-    protected ComboViewer createSampleTypeComboOption(String labelText,
+    protected ComboViewer createSpecimenTypeComboOption(String labelText,
         Composite parent) throws ApplicationException {
-        Collection<SpecimenTypeWrapper> sampleTypeWrappers = SpecimenTypeWrapper
+        Collection<SpecimenTypeWrapper> allSpecTypes = SpecimenTypeWrapper
             .getAllSpecimenTypes(SessionManager.getAppService(), true);
         ComboViewer widget = widgetCreator.createComboViewer(parent, labelText,
-            sampleTypeWrappers, null, "No selection", null,
-            new BiobankLabelProvider());
+            allSpecTypes, null, Messages.QaSpecimensEditor_types_validation_msg,
+            null, new BiobankLabelProvider());
         widget.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {
@@ -103,28 +107,32 @@ public class QaSpecimensEditor extends ReportsEditor {
 
     protected BgcBaseText createValidatedIntegerText(String labelText,
         Composite parent) {
-        numAliquots = new WritableValue("", String.class);
+        numSpecimens = new WritableValue("", String.class); //$NON-NLS-1$
         BgcBaseText widget = (BgcBaseText) widgetCreator
             .createBoundWidgetWithLabel(parent, BgcBaseText.class, SWT.BORDER,
-                labelText, new String[0], numAliquots,
-                new IntegerNumberValidator("Enter a valid integer.", false));
+                labelText, new String[0], numSpecimens,
+                new IntegerNumberValidator(
+                    Messages.QaSpecimensEditor_specNb_validation_msg, false));
         return widget;
     }
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Location", "Inventory ID", "Patient",
-            "Date Processed", "Sample Type" };
+        return new String[] { Messages.QaSpecimensEditor_location_label,
+            Messages.QaSpecimensEditor_inventoryid_label,
+            Messages.QaSpecimensEditor_patient_label,
+            Messages.QaSpecimensEditor_processed_label,
+            Messages.QaSpecimensEditor_specType_label };
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> paramNames = new ArrayList<String>();
-        paramNames.add("Start Date (Linked)");
-        paramNames.add("End Date (Linked)");
-        paramNames.add("Top Container");
-        paramNames.add("Sample Type");
-        paramNames.add("# Aliquots");
+        paramNames.add(Messages.QaSpecimensEditor_start_label);
+        paramNames.add(Messages.QaSpecimensEditor_end_label);
+        paramNames.add(Messages.QaSpecimensEditor_top_label);
+        paramNames.add(Messages.QaSpecimensEditor_specType_label);
+        paramNames.add(Messages.QaSpecimensEditor_nb_specs_label);
         return paramNames;
     }
 
@@ -133,8 +141,8 @@ public class QaSpecimensEditor extends ReportsEditor {
         start.setDate(null);
         end.setDate(null);
         topContainers.reset();
-        sampleType.getCombo().select(0);
-        numSpecimensText.setText("");
+        typesViewer.getCombo().deselectAll();
+        numSpecimensText.setText(""); //$NON-NLS-1$
         super.onReset();
     }
 

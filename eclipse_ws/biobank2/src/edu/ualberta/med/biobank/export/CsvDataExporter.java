@@ -9,10 +9,10 @@ import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
 public class CsvDataExporter extends GuiDataExporter {
-    private static final String[] VALID_EXTS = { "*.csv" };
+    private static final String[] VALID_EXTS = { "*.csv" }; //$NON-NLS-1$
 
     public CsvDataExporter() {
-        super("Export CSV");
+        super(Messages.CsvDataExporter_name);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class CsvDataExporter extends GuiDataExporter {
             Object[] labels = new Object[numHeaders];
             for (Object row : data.getRows()) {
                 if (monitor.isCanceled()) {
-                    throw new DataExportException("Exporting canceled.");
+                    throw new DataExportException(Messages.CsvDataExporter_cancel_msg);
                 }
 
                 for (int i = 0; i < numHeaders; i++) {

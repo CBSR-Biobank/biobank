@@ -28,7 +28,7 @@ public class ComboAndQuantityWidget extends BgcBaseWidget {
 
         valuesCombo = new Combo(this, SWT.NONE);
         Label l = new Label(this, SWT.NONE);
-        l.setText("Quantity:");
+        l.setText(Messages.ComboAndQuantityWidget_qunatity_label);
         quantitiesText = new BgcBaseText(this, SWT.NONE);
     }
 
@@ -40,14 +40,14 @@ public class ComboAndQuantityWidget extends BgcBaseWidget {
 
     public void setText(String value, int quantity) {
         valuesCombo.setText(value);
-        quantitiesText.setText(String.format("%d", quantity));
+        quantitiesText.setText(String.format("%d", quantity)); //$NON-NLS-1$
     }
 
     public String getText() {
         if ((valuesCombo.getText().length() != 1)
             || (valuesCombo.getText().length() != 1))
             return null;
-        return valuesCombo.getText() + " " + quantitiesText.getText();
+        return valuesCombo.getText() + " " + quantitiesText.getText(); //$NON-NLS-1$
     }
 
     public void addSelectionListener(SelectionListener listener) {

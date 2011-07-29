@@ -135,7 +135,7 @@ public abstract class SubqueryExpression implements Criterion {
             if (this.criteriaImpl.getAlias() == null) {
                 alias = criteriaQuery.generateSQLAlias();
             } else {
-                alias = this.criteriaImpl.getAlias() + "_";
+                alias = this.criteriaImpl.getAlias() + "_"; //$NON-NLS-1$
             }
 
             innerQuery = new CriteriaQueryTranslator(factory, criteriaImpl,

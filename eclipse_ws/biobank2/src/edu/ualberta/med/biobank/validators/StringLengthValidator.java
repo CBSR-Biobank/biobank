@@ -24,7 +24,7 @@ public class StringLengthValidator extends AbstractValidator {
     public IStatus validate(Object value) {
         if ((value != null) && !(value instanceof String)) {
             throw new RuntimeException(
-                "Not supposed to be called for non-strings.");
+                Messages.StringLengthValidator_nonstring_error_msg);
         }
 
         if ((value != null) && ((String) value).length() >= length) {

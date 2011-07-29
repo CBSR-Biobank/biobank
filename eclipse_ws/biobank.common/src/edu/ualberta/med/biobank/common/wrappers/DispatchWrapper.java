@@ -47,6 +47,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private boolean hasSpecimenStatesChanged = false;
 
+    private boolean removeSpecimensPosition = false;
+
     public DispatchWrapper(WritableApplicationService appService) {
         super(appService);
     }
@@ -79,6 +81,13 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         if (getShipmentInfo() != null)
             return DateFormatter.formatAsDateTime(getShipmentInfo()
                 .getPackedAt());
+        return null;
+    }
+
+    public String getFormattedReceivedAt() {
+        if (getShipmentInfo() != null)
+            return DateFormatter.formatAsDateTime(getShipmentInfo()
+                .getReceivedAt());
         return null;
     }
 
@@ -115,6 +124,17 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         for (DispatchSpecimenWrapper dds : deletedDispatchedSpecimens) {
             if (!dds.isNew()) {
                 dds.delete();
+            }
+        }
+
+        // set true when state is switch to in_transit. This means we need to
+        // remove the specimens position
+        if (removeSpecimensPosition) {
+            for (DispatchSpecimenWrapper rds : getDispatchSpecimenCollection(false)) {
+                if (rds.getSpecimen().getPosition() != null) {
+                    rds.getSpecimen().setPosition(null);
+                    toBePersistedDispatchedSpecimens.add(rds);
+                }
             }
         }
 
@@ -213,7 +233,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
         // new specimens added
         for (SpecimenWrapper specimen : newSpecimens) {
-            if (specimen.getCurrentCenter().equals(getSenderCenter())) {
+            if (specimen.getCurrentCenter().equals(getSenderCenter())
+                || isInReceivedState()) {
+                // in received state, let any specimen to be added just in case
+                // it received something wrong
                 if (!currentSpecimenList.contains(specimen)) {
                     DispatchSpecimenWrapper dsa = new DispatchSpecimenWrapper(
                         appService);
@@ -222,6 +245,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                     dsa.setDispatchSpecimenState(state);
                     if (state == DispatchSpecimenState.EXTRA) {
                         specimen.setCurrentCenter(getReceiverCenter());
+                        // remove position in case it has one in the previous
+                        // center.
+                        specimen.setPosition(null);
                         toBePersistedDispatchedSpecimens.add(dsa);
                     }
                     newDispatchSpecimens.add(dsa);
@@ -326,6 +352,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public void setState(DispatchState ds) {
         setState(ds.getId());
+        removeSpecimensPosition = (ds == DispatchState.IN_TRANSIT);
     }
 
     @Override
@@ -414,19 +441,13 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     @Override
-    public void reload() throws Exception {
-        super.reload();
-        resetMap();
-    }
-
-    @Override
     protected void resetInternalFields() {
-        super.resetInternalFields();
         resetMap();
         deletedDispatchedSpecimens.clear();
         toBePersistedDispatchedSpecimens.clear();
         hasNewSpecimens = false;
         hasSpecimenStatesChanged = false;
+        removeSpecimensPosition = false;
     }
 
     public void resetMap() {
@@ -462,7 +483,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         if ((state != null)
             && ((state.equals(DispatchState.CREATION)
                 || state.equals(DispatchState.IN_TRANSIT) || state
-                .equals(DispatchState.LOST)))) {
+                    .equals(DispatchState.LOST)))) {
             String packedAt = getFormattedPackedAt();
             if ((packedAt != null) && (packedAt.length() > 0)) {
                 detailsList.add(new StringBuilder("packed at: ").append(
@@ -511,19 +532,27 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return shipments;
     }
 
+    private static final String DISPATCHES_BY_DATE_RECEIVED_QRY = DISPATCH_HQL_STRING
+        + " where DATE(s."
+        + ShipmentInfoPeer.RECEIVED_AT.getName()
+        + ") = DATE(?) and (d."
+        + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
+        + "= ? or d."
+        + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
+        + " = ?)";
+
     /**
      * Search for shipments in the site with the given date received. Don't use
      * hour and minute.
      */
     public static List<DispatchWrapper> getDispatchesByDateReceived(
-        WritableApplicationService appService, Date dateReceived)
-        throws ApplicationException {
+        WritableApplicationService appService, Date dateReceived,
+        CenterWrapper<?> center) throws ApplicationException {
 
-        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING
-            + " where DATE(s." + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + ") = DATE(?)");
-        HQLCriteria criteria = new HQLCriteria(qry.toString(),
-            Arrays.asList(new Object[] { dateReceived }));
+        Integer centerId = center.getId();
+        HQLCriteria criteria = new HQLCriteria(
+            DISPATCHES_BY_DATE_RECEIVED_QRY.toString(),
+            Arrays.asList(new Object[] { dateReceived, centerId, centerId }));
 
         List<Dispatch> origins = appService.query(criteria);
         List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(
@@ -532,15 +561,21 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return shipments;
     }
 
-    public static List<DispatchWrapper> getDispatchesByDateSent(
-        WritableApplicationService appService, Date dateSent)
-        throws ApplicationException {
+    private static final String DISPATCHED_BY_DATE_SENT_QRY = DISPATCH_HQL_STRING
+        + " where DATE(s."
+        + ShipmentInfoPeer.PACKED_AT.getName()
+        + ") = DATE(?) and (d."
+        + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
+        + "= ? or d."
+        + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
+        + " = ?)";
 
-        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING
-            + " where DATE(s." + ShipmentInfoPeer.PACKED_AT.getName()
-            + ") = DATE(?)");
-        HQLCriteria criteria = new HQLCriteria(qry.toString(),
-            Arrays.asList(new Object[] { dateSent }));
+    public static List<DispatchWrapper> getDispatchesByDateSent(
+        WritableApplicationService appService, Date dateSent,
+        CenterWrapper<?> center) throws ApplicationException {
+        Integer centerId = center.getId();
+        HQLCriteria criteria = new HQLCriteria(DISPATCHED_BY_DATE_SENT_QRY,
+            Arrays.asList(new Object[] { dateSent, centerId, centerId }));
 
         List<Dispatch> origins = appService.query(criteria);
         List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(

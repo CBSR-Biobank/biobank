@@ -54,11 +54,11 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
             try {
                 return query(request, (BiobankSQLCriteria) obj);
             } catch (JDBCException ex) {
-                log.error("JDBC Exception in ORMDAOImpl ", ex);
-                throw new DAOException("JDBC Exception in ORMDAOImpl ", ex);
+                log.error("JDBC Exception in ORMDAOImpl ", ex); //$NON-NLS-1$
+                throw new DAOException("JDBC Exception in ORMDAOImpl ", ex); //$NON-NLS-1$
             } catch (Exception e) {
-                log.error("Exception ", e);
-                throw new DAOException("Exception in ORMDAOImpl ", e);
+                log.error("Exception ", e); //$NON-NLS-1$
+                throw new DAOException("Exception in ORMDAOImpl ", e); //$NON-NLS-1$
             }
         } else if (request.getRequest() instanceof QueryHandleRequest) {
             QueryHandleRequest qhr = (QueryHandleRequest) request.getRequest();
@@ -70,13 +70,13 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
                         qhr.getQueryCommand(), qhr.getAppService()));
                 } catch (DataAccessResourceFailureException e) {
                     log.error(
-                        "DataAccessResourceFailureException in ORMDAOImpl ", e);
+                        "DataAccessResourceFailureException in ORMDAOImpl ", e); //$NON-NLS-1$
                     throw new DAOException(
-                        "DataAccessResourceFailureException in ORMDAOImpl ", e);
+                        "DataAccessResourceFailureException in ORMDAOImpl ", e); //$NON-NLS-1$
                 } catch (IllegalStateException e) {
-                    log.error("IllegalStateException in ORMDAOImpl ", e);
+                    log.error("IllegalStateException in ORMDAOImpl ", e); //$NON-NLS-1$
                     throw new DAOException(
-                        "IllegalStateException in ORMDAOImpl ", e);
+                        "IllegalStateException in ORMDAOImpl ", e); //$NON-NLS-1$
                 }
                 return new Response(handle);
             } else if (qhr.getCommandType().equals(CommandType.STOP)) {
@@ -98,7 +98,7 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
 
     protected Response query(Request request, BiobankSQLCriteria sqlCriteria)
         throws Exception {
-        log.info("SQL Query :" + sqlCriteria.getSqlString());
+        log.info("SQL Query :" + sqlCriteria.getSqlString()); //$NON-NLS-1$
         Response rsp = new Response();
         HibernateCallback callBack = getExecuteSQLQueryHibernateCallback(
             sqlCriteria.getSqlString(), request.getFirstRow() == null ? -1

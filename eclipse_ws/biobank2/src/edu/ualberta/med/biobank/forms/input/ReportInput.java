@@ -10,7 +10,7 @@ public class ReportInput extends FormInput {
 
     @Override
     public String getName() {
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     public Object getNode() {

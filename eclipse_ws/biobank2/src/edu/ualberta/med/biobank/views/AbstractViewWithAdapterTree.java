@@ -90,7 +90,7 @@ public abstract class AbstractViewWithAdapterTree extends
                 try {
                     page.showView(getId());
                 } catch (PartInitException pie) {
-                    logger.error("Error activating the view", pie);
+                    logger.error(Messages.AbstractViewWithAdapterTree_view_activate_error_title, pie);
                 }
             }
         }

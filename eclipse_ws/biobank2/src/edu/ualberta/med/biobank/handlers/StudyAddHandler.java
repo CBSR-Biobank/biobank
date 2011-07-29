@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 
 public class StudyAddHandler extends AbstractHandler {
-    public static final String ID = "edu.ualberta.med.biobank.commands.addStudy";
+    public static final String ID = "edu.ualberta.med.biobank.commands.addStudy"; //$NON-NLS-1$
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

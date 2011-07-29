@@ -6,6 +6,8 @@ public interface Node {
 
     public List<Node> getChildren();
 
-    public Object getParent();
+    public Node getParent();
+
+    public void removeChild(Node o);
 
 }

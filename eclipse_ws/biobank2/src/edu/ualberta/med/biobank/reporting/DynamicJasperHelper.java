@@ -98,12 +98,13 @@ import ar.com.fdvs.dj.util.LayoutUtils;
  * can't find the url for the jasper file that is in this plugin. Since this
  * class is in biobank2 plugin then the url is found. (see issue #1239)
  */
+@SuppressWarnings({ "unchecked", "rawtypes", "unused" })
 public class DynamicJasperHelper {
 
     private static final Log log = LogFactory.getLog(DynamicJasperHelper.class);
-    public static final String DEFAULT_XML_ENCODING = "UTF-8";
+    public static final String DEFAULT_XML_ENCODING = "UTF-8"; //$NON-NLS-1$
     private static final String DJ_RESOURCE_BUNDLE = DynamicJasperHelper.class
-        .getPackage().getName() + ".dj-messages";
+        .getPackage().getName() + ".dj-messages"; //$NON-NLS-1$
 
     private final static void registerEntities(DynamicJasperDesign jd,
         DynamicReport dr, LayoutManager layoutManager) {
@@ -120,8 +121,8 @@ public class DynamicJasperHelper {
         Locale locale = dr.getReportLocale() == null ? Locale.getDefault() : dr
             .getReportLocale();
         if (log.isDebugEnabled()) {
-            log.debug("Requested Locale = " + dr.getReportLocale()
-                + ", Locale to use: " + locale);
+            log.debug("Requested Locale = " + dr.getReportLocale() //$NON-NLS-1$
+                + ", Locale to use: " + locale); //$NON-NLS-1$
         }
         ResourceBundle messages = null;
         if (dr.getResourceBundle() != null) {
@@ -129,7 +130,7 @@ public class DynamicJasperHelper {
                 messages = ResourceBundle.getBundle(dr.getResourceBundle(),
                     locale);
             } catch (MissingResourceException e) {
-                log.warn(e.getMessage() + ", usign default (dj-messages)");
+                log.warn(e.getMessage() + ", usign default (dj-messages)"); //$NON-NLS-1$
             }
         }
 
@@ -137,16 +138,16 @@ public class DynamicJasperHelper {
             try {
                 messages = ResourceBundle.getBundle(DJ_RESOURCE_BUNDLE, locale);
             } catch (MissingResourceException e) {
-                log.warn(e.getMessage() + ", usign default (dj-messages)");
+                log.warn(e.getMessage() + ", usign default (dj-messages)"); //$NON-NLS-1$
                 try {
                     messages = ResourceBundle.getBundle(DJ_RESOURCE_BUNDLE,
                         Locale.ENGLISH); // this cannot fail because is included
                                          // in the DJ jar
                 } catch (MissingResourceException e2) {
-                    log.error("Default messajes not found: "
-                        + DJ_RESOURCE_BUNDLE + ", " + e2.getMessage(), e2);
-                    throw new DJException("Default messajes file not found: "
-                        + DJ_RESOURCE_BUNDLE + "en.properties", e2);
+                    log.error("Default messajes not found: " //$NON-NLS-1$
+                        + DJ_RESOURCE_BUNDLE + ", " + e2.getMessage(), e2); //$NON-NLS-1$
+                    throw new DJException("Default messajes file not found: " //$NON-NLS-1$
+                        + DJ_RESOURCE_BUNDLE + "en.properties", e2); //$NON-NLS-1$
                 }
             }
         }
@@ -225,15 +226,15 @@ public class DynamicJasperHelper {
         DynamicJasperDesign jd = null;
         try {
             if (dr.getTemplateFileName() != null) {
-                log.info("about to load template file: "
+                log.info("about to load template file: " //$NON-NLS-1$
                     + dr.getTemplateFileName()
-                    + ", Attemping to find the file directly in the file system.");
+                    + ", Attemping to find the file directly in the file system."); //$NON-NLS-1$
                 File file = new File(dr.getTemplateFileName());
                 if (file.exists()) {
                     JasperDesign jdesign = JRXmlLoader.load(file);
                     jd = DJJRDesignHelper.downCast(jdesign, dr);
                 } else {
-                    log.info("Not found: Attemping to find the file in the classpath...");
+                    log.info("Not found: Attemping to find the file in the classpath..."); //$NON-NLS-1$
                     URL url = DynamicJasperHelper.class.getClassLoader()
                         .getResource(dr.getTemplateFileName());
                     JasperDesign jdesign = JRXmlLoader.load(url.openStream());
@@ -351,7 +352,7 @@ public class DynamicJasperHelper {
     public static JasperPrint generateJasperPrint(DynamicReport dr,
         LayoutManager layoutManager, JRDataSource ds, Map _parameters)
         throws JRException {
-        log.info("generating JasperPrint");
+        log.info("generating JasperPrint"); //$NON-NLS-1$
         JasperPrint jp = null;
 
         // if (_parameters == null)
@@ -395,7 +396,7 @@ public class DynamicJasperHelper {
     public static JasperPrint generateJasperPrint(DynamicReport dr,
         LayoutManager layoutManager, Connection con, Map _parameters)
         throws JRException {
-        log.info("generating JasperPrint");
+        log.info("generating JasperPrint"); //$NON-NLS-1$
         JasperPrint jp = null;
 
         if (_parameters == null)
@@ -433,7 +434,7 @@ public class DynamicJasperHelper {
      */
     public static JasperPrint generateJasperPrint(DynamicReport dr,
         LayoutManager layoutManager, Map _parameters) throws JRException {
-        log.info("generating JasperPrint");
+        log.info("generating JasperPrint"); //$NON-NLS-1$
         JasperPrint jp = null;
 
         if (_parameters == null)
@@ -595,8 +596,8 @@ public class DynamicJasperHelper {
                 try {
                     Object value = _parameters.get(key);
                     if (jd.getParametersMap().get(key) != null) {
-                        log.warn("Parameter \"" + key
-                            + "\" already registered, skipping this one: "
+                        log.warn("Parameter \"" + key //$NON-NLS-1$
+                            + "\" already registered, skipping this one: " //$NON-NLS-1$
                             + value);
                         continue;
                     }
@@ -639,7 +640,7 @@ public class DynamicJasperHelper {
      */
     public final static JasperReport generateJasperReport(DynamicReport dr,
         LayoutManager layoutManager, Map generatedParams) throws JRException {
-        log.info("generating JasperReport");
+        log.info("generating JasperReport"); //$NON-NLS-1$
         JasperReport jr = null;
         if (generatedParams == null)
             generatedParams = new HashMap();
@@ -655,7 +656,7 @@ public class DynamicJasperHelper {
 
         layoutManager.applyLayout(jd, dr);
         JRProperties.setProperty(JRCompiler.COMPILER_PREFIX,
-            "ar.com.fdvs.dj.util.DJJRJdtCompiler");
+            "ar.com.fdvs.dj.util.DJJRJdtCompiler"); //$NON-NLS-1$
         jr = JasperCompileManager.compileReport(jd);
         generatedParams.putAll(jd.getParametersWithValues());
         return jr;

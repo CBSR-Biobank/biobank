@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -352,7 +353,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             String s1 = getPositionString(true, true);
             String s2 = ((SpecimenWrapper) o).getPositionString(true, true);
             if (s1 == null || s2 == null)
-                getInventoryId().compareTo(
+                return getInventoryId().compareTo(
                     ((SpecimenWrapper) o).getInventoryId());
             else
                 return s1.compareTo(s2);
@@ -522,5 +523,15 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
     public boolean hasUnknownImportType() {
         return getSpecimenType() != null && getSpecimenType().isUnknownImport();
+    }
+
+    /**
+     * return true if the user can edit this object
+     */
+    @Override
+    public boolean canUpdate(User user) {
+        return super.canUpdate(user)
+            && (user.getCurrentWorkingCenter().getStudyCollection()
+                .contains(getCollectionEvent().getPatient().getStudy()));
     }
 }

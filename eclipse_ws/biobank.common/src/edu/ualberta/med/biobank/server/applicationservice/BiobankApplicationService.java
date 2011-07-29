@@ -17,6 +17,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -56,9 +57,11 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public User getCurrentUser() throws ApplicationException;
 
-    public Group persistGroup(Group group) throws ApplicationException;
+    public Group persistGroup(User currentUser, Group group)
+        throws ApplicationException;
 
-    public void deleteGroup(Group group) throws ApplicationException;
+    public void deleteGroup(User currentUser, Group group)
+        throws ApplicationException;
 
     public void unlockUser(User currentUser, String userNameToUnlock)
         throws ApplicationException;
@@ -83,11 +86,12 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void stopQuery(QueryHandle qh) throws Exception;
 
     public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
-        ProcessData processData, boolean rescanMode, User user)
+        ProcessData processData, boolean rescanMode, User user, Locale locale)
         throws ApplicationException;
 
     public CellProcessResult processCellStatus(Cell cell,
-        ProcessData processData, User user) throws ApplicationException;
+        ProcessData processData, User user, Locale locale)
+        throws ApplicationException;
 
     public List<String> executeGetSourceSpecimenUniqueInventoryIds(int numIds)
         throws ApplicationException;

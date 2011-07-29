@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SendDispatchDialog extends BgcBaseDialog {
 
-    private static final String TITLE = "Dispatching specimens";
+    private static final String TITLE = Messages.SendDispatchDialog_title;
     private DispatchWrapper shipment;
 
     public SendDispatchDialog(Shell parentShell, DispatchWrapper shipment) {
@@ -31,7 +31,7 @@ public class SendDispatchDialog extends BgcBaseDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Fill the following fields to complete the shipment";
+        return Messages.SendDispatchDialog_description;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class SendDispatchDialog extends BgcBaseDialog {
 
         ShippingMethodWrapper selectedShippingMethod = shipInfo
             .getShippingMethod();
-        widgetCreator.createComboViewer(contents, "Shipping Method",
+        widgetCreator.createComboViewer(contents, Messages.SendDispatchDialog_shippingMethod_label,
             ShippingMethodWrapper.getShippingMethods(SessionManager
                 .getAppService()), selectedShippingMethod, null,
             new ComboSelectionUpdate() {
@@ -68,13 +68,13 @@ public class SendDispatchDialog extends BgcBaseDialog {
             }, new BiobankLabelProvider());
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.NONE,
-            "Waybill", null, shipInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
+            Messages.SendDispatchDialog_waybill_label, null, shipInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
 
         Date date = new Date();
         shipment.getShipmentInfo().setPackedAt(date);
-        createDateTimeWidget(contents, "Time Packed", date, shipInfo,
+        createDateTimeWidget(contents, Messages.SendDispatchDialog_timePacked_label, date, shipInfo,
             ShipmentInfoPeer.PACKED_AT.getName(), new NotNullValidator(
-                "Packed should be set"));
+                Messages.SendDispatchDialog_timePacked_validator_msg));
     }
 
 }

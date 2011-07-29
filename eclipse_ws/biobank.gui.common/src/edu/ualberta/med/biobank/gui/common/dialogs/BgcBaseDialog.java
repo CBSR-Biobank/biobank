@@ -35,8 +35,8 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
-import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 
 public abstract class BgcBaseDialog extends TitleAreaDialog {
 
@@ -99,15 +99,14 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
 
     @Override
     protected Control createDialogArea(Composite parent) {
-        Composite parentComposite = (Composite) super.createDialogArea(parent);
-        Composite contents = new Composite(parentComposite, SWT.NONE);
+        Composite contents = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout();
         layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
         layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
         layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
         layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
         contents.setLayout(layout);
-        contents.setLayoutData(new GridData(GridData.FILL_BOTH));
+        contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         try {
             createDialogAreaInternal(contents);
@@ -118,14 +117,15 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
         } catch (final AccessDeniedException ade) {
             BgcPlugin.openAccessDeniedErrorMessage(ade);
         } catch (BiobankCheckException bce) {
-            BgcPlugin.openAsyncError("Save error", bce);
+            BgcPlugin.openAsyncError(Messages.BgcBaseDialog_save_error_title,
+                bce);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         bindChangeListener();
         setupFinished = true;
-        return parentComposite;
+        return parent;
     }
 
     protected abstract void createDialogAreaInternal(Composite parent)
@@ -179,7 +179,7 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
 
     protected void setOkButtonEnabled(boolean enabled) {
         Button okButton = getButton(IDialogConstants.OK_ID);
-        if (okButton != null && !okButton.isDisposed()) {
+        if ((okButton != null) && !okButton.isDisposed()) {
             okButton.setEnabled(enabled);
         } else {
             okButtonEnabled = enabled;

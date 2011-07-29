@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 
 public class EditSpecimenTypesHandler extends AbstractHandler {
-    public static final String ID = "edu.ualberta.med.biobank.commands.editSpecimenTypes";
+    public static final String ID = "edu.ualberta.med.biobank.commands.editSpecimenTypes"; //$NON-NLS-1$
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -28,7 +28,7 @@ public class EditSpecimenTypesHandler extends AbstractHandler {
                 .openEditor(new FormInput(sessionAdapter),
                     SpecimenTypesViewForm.ID, false, 0);
         } catch (Exception e) {
-            throw new ExecutionException("Could not execute handler.", e);
+            throw new ExecutionException(Messages.EditSpecimenTypesHandler_handler_error_msg, e);
         }
 
         return null;

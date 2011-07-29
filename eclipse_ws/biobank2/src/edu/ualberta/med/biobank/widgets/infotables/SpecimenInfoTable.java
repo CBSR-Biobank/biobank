@@ -8,6 +8,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -22,9 +23,16 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
 
     public static enum ColumnsShown {
-        ALL(new String[] { "Inventory ID", "Type", "Patient", "Visit#",
-            "Origin Center", "Current Center", "Position", "Time created",
-            "Quantity (ml)", "Activity status", "Comment" }) {
+        ALL(new String[] { Messages.SpecimenInfoTable_inventoryid_label,
+            Messages.SpecimenInfoTable_type_label,
+            Messages.SpecimenInfoTable_patient_label,
+            Messages.SpecimenInfoTable_visitNber_label, Messages.SpecimenInfoTable_origin_center_label,
+            Messages.SpecimenInfoTable_current_center_label,
+            Messages.SpecimenInfoTable_position_label,
+            Messages.SpecimenInfoTable_created_label,
+            Messages.SpecimenInfoTable_quantity_label,
+            Messages.SpecimenInfoTable_status_label,
+            Messages.SpecimenInfoTable_comments_label }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -35,7 +43,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 2:
                     return row.patient;
                 case 3:
-                    return row.pvNumber.toString();
+                    return row.pvNumber;
                 case 4:
                     return row.originCenter;
                 case 5:
@@ -45,13 +53,13 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 7:
                     return row.createdAt;
                 case 8:
-                    return row.quantity;
+                    return NumberFormatter.format(row.quantity);
                 case 9:
                     return row.activityStatus;
                 case 10:
                     return row.comment;
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
 
@@ -65,9 +73,17 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 return null;
             }
         },
-        SOURCE_SPECIMENS(new String[] { "Inventory ID", "Type", "Position",
-            "Time drawn", "Quantity (ml)", "Activity status", "Study",
-            "Patient #", "Origin Center", "Current Center", "Comment" }) {
+        SOURCE_SPECIMENS(new String[] {
+            Messages.SpecimenInfoTable_inventoryid_label,
+            Messages.SpecimenInfoTable_type_label,
+            Messages.SpecimenInfoTable_position_label,
+            Messages.SpecimenInfoTable_time_drawn_label,
+            Messages.SpecimenInfoTable_quantity_label,
+            Messages.SpecimenInfoTable_status_label,
+            Messages.SpecimenInfoTable_study_label,
+            Messages.SpecimenInfoTable_pnumber_label, Messages.SpecimenInfoTable_origin_center_label,
+            Messages.SpecimenInfoTable_current_center_label,
+            Messages.SpecimenInfoTable_comments_label }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -80,7 +96,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 3:
                     return row.createdAt;
                 case 4:
-                    return row.quantity;
+                    return NumberFormatter.format(row.quantity);
                 case 5:
                     return row.activityStatus;
                 case 6:
@@ -92,10 +108,10 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 9:
                     return row.center;
                 case 10:
-                    return (row.comment == null || row.comment.equals("")) ? "N"
-                        : "Y";
+                    return (row.comment == null || row.comment.equals("")) ? Messages.SpecimenInfoTable_no_first_letter //$NON-NLS-1$
+                        : Messages.SpecimenInfoTable_yes_first_letter;
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
 
@@ -109,9 +125,14 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 return null;
             }
         },
-        ALIQUOTS(new String[] { "Inventory ID", "Type", "Position",
-            "Time created", "Worksheet", "Quantity (ml)", "Activity status",
-            "Origin Center", "Current Center", "Comment" }) {
+        ALIQUOTS(new String[] { Messages.SpecimenInfoTable_inventoryid_label,
+            Messages.SpecimenInfoTable_type_label,
+            Messages.SpecimenInfoTable_position_label,
+            Messages.SpecimenInfoTable_created_label, Messages.SpecimenInfoTable_worksheet_label,
+            Messages.SpecimenInfoTable_quantity_label,
+            Messages.SpecimenInfoTable_status_label, Messages.SpecimenInfoTable_origin_center_label,
+            Messages.SpecimenInfoTable_current_center_label,
+            Messages.SpecimenInfoTable_comments_label }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -126,7 +147,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 4:
                     return row.worksheet;
                 case 5:
-                    return row.quantity;
+                    return NumberFormatter.format(row.quantity);
                 case 6:
                     return row.activityStatus;
                 case 7:
@@ -134,10 +155,10 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 case 8:
                     return row.center;
                 case 9:
-                    return (row.comment == null || row.comment.equals("")) ? "N"
-                        : "Y";
+                    return (row.comment == null || row.comment.equals("")) ? Messages.SpecimenInfoTable_no_first_letter //$NON-NLS-1$
+                        : Messages.SpecimenInfoTable_yes_first_letter;
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
 
@@ -178,7 +199,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         public String createdAt;
         public String center;
         public String originCenter;
-        public String quantity;
+        public Double quantity;
         public String position;
         public String activityStatus;
         public String comment;
@@ -186,8 +207,9 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { inventoryId, type, patient,
-                pvNumber, createdAt, center, originCenter, quantity, position,
-                activityStatus, comment }, "\t");
+                pvNumber, createdAt, center, originCenter,
+                (quantity == null) ? "" : quantity.toString(), position, //$NON-NLS-1$
+                activityStatus, comment }, "\t"); //$NON-NLS-1$
         }
     }
 
@@ -218,9 +240,9 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.SpecimenInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 return currentColumnsShowns.getColumnValue(info, columnIndex);
             }
@@ -234,13 +256,13 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         info.specimen = specimen;
         info.inventoryId = specimen.getInventoryId();
         SpecimenTypeWrapper type = specimen.getSpecimenType();
-        Assert.isNotNull(type, "specimen with null for specimen type");
+        Assert.isNotNull(type, "specimen with null for specimen type"); //$NON-NLS-1$
         info.type = type.getName();
         CollectionEventWrapper cEvent = specimen.getCollectionEvent();
 
-        info.patient = "";
-        info.studyName = "";
-        info.pvNumber = "";
+        info.patient = ""; //$NON-NLS-1$
+        info.studyName = ""; //$NON-NLS-1$
+        info.pvNumber = ""; //$NON-NLS-1$
 
         if (cEvent != null) {
             PatientWrapper patient = cEvent.getPatient();
@@ -254,21 +276,21 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             }
 
             Integer visitNumber = cEvent.getVisitNumber();
-            info.pvNumber = (visitNumber == null) ? "" : visitNumber.toString();
+            info.pvNumber = (visitNumber == null) ? "" : visitNumber.toString(); //$NON-NLS-1$
         }
 
         info.createdAt = specimen.getFormattedCreatedAt();
-        info.worksheet = specimen.getParentSpecimen() == null ? "" : specimen
+        info.worksheet = specimen.getParentSpecimen() == null ? "" : specimen //$NON-NLS-1$
             .getParentSpecimen().getProcessingEvent().getWorksheet();
         Double quantity = specimen.getQuantity();
-        info.quantity = (quantity == null) ? "" : quantity.toString();
+        info.quantity = quantity;
         info.position = specimen.getPositionString();
         ActivityStatusWrapper status = specimen.getActivityStatus();
-        info.activityStatus = (status == null) ? "" : status.getName();
+        info.activityStatus = (status == null) ? "" : status.getName(); //$NON-NLS-1$
         info.comment = specimen.getComment();
         info.center = specimen.getCurrentCenter().getNameShort();
 
-        info.originCenter = "";
+        info.originCenter = ""; //$NON-NLS-1$
         OriginInfoWrapper oi = specimen.getOriginInfo();
         if (oi != null) {
             CenterWrapper<?> originCenter = oi.getCenter();

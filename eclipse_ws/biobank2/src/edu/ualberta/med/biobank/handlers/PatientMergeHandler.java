@@ -21,9 +21,9 @@ public class PatientMergeHandler extends AbstractHandler {
         try {
             AdapterBase.openForm(
                 new FormInput(CollectionView.getCurrentPatient()),
-                "edu.ualberta.med.biobank.forms.PatientMergeForm", true);
+                "edu.ualberta.med.biobank.forms.PatientMergeForm", true); //$NON-NLS-1$
         } catch (Exception exp) {
-            logger.error("Error while opening the patient merge form", exp);
+            logger.error("Error while opening the patient merge form", exp); //$NON-NLS-1$
         }
         return null;
     }

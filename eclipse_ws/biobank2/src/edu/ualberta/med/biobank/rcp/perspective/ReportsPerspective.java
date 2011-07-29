@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.views.ReportsView;
 
 public class ReportsPerspective implements IPerspectiveFactory {
 
-    public static final String ID = "edu.ualberta.med.biobank.perspective.reports";
+    public static final String ID = "edu.ualberta.med.biobank.perspective.reports"; //$NON-NLS-1$
 
     @Override
     public void createInitialLayout(IPageLayout layout) {

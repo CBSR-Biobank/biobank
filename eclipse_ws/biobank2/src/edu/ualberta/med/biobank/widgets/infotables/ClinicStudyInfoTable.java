@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -19,13 +20,15 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { studyShortName,
-                (patientCount != null) ? patientCount.toString() : "",
-                (visitCount != null) ? visitCount.toString() : "" }, "\t");
+                (patientCount != null) ? patientCount.toString() : "", //$NON-NLS-1$
+                (visitCount != null) ? visitCount.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Study",
-        "#Patients", "#Collection Events" };
+    private static final String[] HEADINGS = new String[] {
+        Messages.ClinicStudyInfoTable_study_label,
+        Messages.ClinicStudyInfoTable_patient_count_label,
+        Messages.ClinicStudyInfoTable_cvent_count_label };
 
     private ClinicWrapper clinic;
 
@@ -43,22 +46,20 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.ClinicStudyInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
 
                 switch (columnIndex) {
                 case 0:
                     return item.studyShortName;
                 case 1:
-                    return (item.patientCount != null) ? item.patientCount
-                        .toString() : "";
+                    return NumberFormatter.format(item.patientCount);
                 case 2:
-                    return (item.visitCount != null) ? item.visitCount
-                        .toString() : "";
+                    return NumberFormatter.format(item.visitCount);
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };
@@ -70,7 +71,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         info.study = study;
         info.studyShortName = study.getNameShort();
         if (info.studyShortName == null) {
-            info.studyShortName = "";
+            info.studyShortName = ""; //$NON-NLS-1$
         }
         info.patientCount = clinic.getPatientCountForStudy(study);
         info.visitCount = clinic.getCollectionEventCountForStudy(study);

@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
+import java.util.Locale;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -22,13 +24,14 @@ import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
 public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm"; //$NON-NLS-1$
     private DispatchSpecimensTreeTable specimensTree;
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Dispatch sent on " + dispatch.getFormattedPackedAt()
-            + " from " + dispatch.getSenderCenter().getNameShort());
+        form.setText(NLS.bind(Messages.DispatchReceivingEntryForm_form_title,
+            dispatch.getFormattedPackedAt(), dispatch.getSenderCenter()
+                .getNameShort()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -43,6 +46,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         specimensTree = new DispatchSpecimensTreeTable(page, dispatch,
             editSpecimens, true);
         specimensTree.addSelectionChangedListener(biobankListener);
+        specimensTree.addClickListener();
     }
 
     private void createMainSection() {
@@ -54,29 +58,30 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         toolkit.paintBordersFor(client);
 
         BgcBaseText senderLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Sender");
+            Messages.DispatchReceivingEntryForm_sender_label);
         setTextValue(senderLabel, dispatch.getSenderCenter().getName());
         BgcBaseText receiverLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Receiver");
+            SWT.NONE, Messages.DispatchReceivingEntryForm_receiver_label);
         setTextValue(receiverLabel, dispatch.getReceiverCenter().getName());
         BgcBaseText departedLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Departed");
+            SWT.NONE, Messages.DispatchReceivingEntryForm_departed_label);
         setTextValue(departedLabel, dispatch.getFormattedPackedAt());
         BgcBaseText shippingMethodLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Shipping Method");
+            SWT.NONE, Messages.DispatchReceivingEntryForm_shipMethod_label);
         setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
-            .getShippingMethod() == null ? "" : dispatch.getShipmentInfo()
+            .getShippingMethod() == null ? "" : dispatch.getShipmentInfo() //$NON-NLS-1$
             .getShippingMethod().getName());
         BgcBaseText waybillLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Waybill");
+            SWT.NONE, Messages.DispatchReceivingEntryForm_waybill_label);
         setTextValue(waybillLabel, dispatch.getShipmentInfo().getWaybill());
         BgcBaseText dateReceivedLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Date received");
+            SWT.NONE, Messages.DispatchReceivingEntryForm_received_label);
         setTextValue(dateReceivedLabel, dispatch.getShipmentInfo()
             .getFormattedDateReceived());
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            "Comments", null, dispatch, DispatchPeer.COMMENT.getName(), null);
+            Messages.DispatchReceivingEntryForm_comments_label, null, dispatch,
+            DispatchPeer.COMMENT.getName(), null);
 
     }
 
@@ -96,7 +101,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         try {
             CellProcessResult res = appService.processCellStatus(new Cell(-1,
                 -1, inventoryId, null), new ShipmentProcessData(null, dispatch,
-                false, false), SessionManager.getUser());
+                false, false), SessionManager.getUser(), Locale.getDefault());
             SpecimenWrapper specimen = null;
             if (res.getCell().getSpecimenId() != null) {
                 specimen = new SpecimenWrapper(appService);
@@ -111,18 +116,25 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                 setDirty(true);
                 break;
             case IN_SHIPMENT_RECEIVED:
-                BgcPlugin.openInformation("Specimen already accepted",
-                    "Specimen with inventory id " + inventoryId
-                        + " is already in received list.");
+                BgcPlugin
+                    .openInformation(
+                        Messages.DispatchReceivingEntryForm_already_accepted_title,
+                        NLS.bind(
+                            Messages.DispatchReceivingEntryForm_already_accepted_msg,
+                            inventoryId));
                 break;
             case EXTRA:
-                BgcPlugin.openInformation("Specimen not found",
-                    "Specimen with inventory id " + inventoryId
-                        + " has not been found in this dispatch."
-                        + " It will be moved into the extra-pending list.");
+                BgcPlugin
+                    .openInformation(
+                        Messages.DispatchReceivingEntryForm_noFound_error_title,
+                        NLS.bind(
+                            Messages.DispatchReceivingEntryForm_notFound_errror_msg,
+                            inventoryId));
                 if (specimen == null) {
-                    BgcPlugin.openAsyncError("Problem with specimen",
-                        "Specimen is extra but object is null");
+                    BgcPlugin
+                        .openAsyncError(
+                            Messages.DispatchReceivingEntryForm_specimen_pb_error_title,
+                            Messages.DispatchReceivingEntryForm_specimen_pb_error_msg);
                     break;
                 }
                 dispatch.addSpecimens(Arrays.asList(specimen),
@@ -131,17 +143,19 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                 setDirty(true);
                 break;
             default:
-                BgcPlugin.openInformation("Problem with specimen", res
-                    .getCell().getInformation());
+                BgcPlugin.openInformation(
+                    Messages.DispatchReceivingEntryForm_specimen_pb_er, res
+                        .getCell().getInformation());
             }
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error receiving the specimen", e);
+            BgcPlugin.openAsyncError(
+                Messages.DispatchReceivingEntryForm_receive_error_title, e);
         }
     }
 
     @Override
     protected String getOkMessage() {
-        return "Receiving dispatch";
+        return Messages.DispatchReceivingEntryForm_ok_msg;
     }
 
     @Override
@@ -151,7 +165,8 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
     @Override
     protected String getTextForPartName() {
-        return "Dispatch sent on " + dispatch.getShipmentInfo().getPackedAt();
+        return NLS.bind(Messages.DispatchReceivingEntryForm_title, dispatch
+            .getShipmentInfo().getPackedAt());
     }
 
     @Override

@@ -9,9 +9,9 @@ import edu.ualberta.med.biobank.model.Log;
 public class LogSql {
 
     public static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(
-        "yyyy-MM-dd HH:mm:ss");
+        "yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
 
-    public static final String COMMA = ",";
+    public static final String COMMA = ","; //$NON-NLS-1$
 
     public static String toTitleCase(String str) {
         StringBuffer sb = new StringBuffer();
@@ -19,7 +19,7 @@ public class LogSql {
             char ch = str.charAt(i);
 
             if (Character.isUpperCase(ch) && (i > 0)) {
-                sb.append("_" + ch);
+                sb.append("_" + ch); //$NON-NLS-1$
             } else {
                 sb.append(Character.toUpperCase(ch));
             }
@@ -34,7 +34,7 @@ public class LogSql {
     public static String getLogMessageSQLStatement(Log log) {
 
         StringBuffer sql = new StringBuffer();
-        sql.append("INSERT INTO log (");
+        sql.append("INSERT INTO log ("); //$NON-NLS-1$
         sql.append(LogPeer.USERNAME.getName());
         sql.append(COMMA + toTitleCase(LogPeer.CENTER.getName()));
         sql.append(COMMA + toTitleCase(LogPeer.CREATED_AT.getName()));
@@ -44,32 +44,32 @@ public class LogSql {
         sql.append(COMMA + toTitleCase(LogPeer.LOCATION_LABEL.getName()));
         sql.append(COMMA + toTitleCase(LogPeer.DETAILS.getName()));
         sql.append(COMMA + toTitleCase(LogPeer.TYPE.getName()));
-        sql.append(") VALUES ('");
+        sql.append(") VALUES ('"); //$NON-NLS-1$
         sql.append(initString(log.getUsername()));
-        sql.append("','");
+        sql.append("','"); //$NON-NLS-1$
         sql.append(initString(log.getCenter()));
-        sql.append("','");
+        sql.append("','"); //$NON-NLS-1$
         sql.append(initString(log.getCreatedAt()));
-        sql.append("','");
+        sql.append("','"); //$NON-NLS-1$
         sql.append(initString(log.getAction()));
-        sql.append("','");
+        sql.append("','"); //$NON-NLS-1$
         sql.append(initString(log.getPatientNumber()));
-        sql.append("','");
+        sql.append("','"); //$NON-NLS-1$
         sql.append(initString(log.getInventoryId()));
-        sql.append("','");
+        sql.append("','"); //$NON-NLS-1$
         sql.append(initString(log.getLocationLabel()));
-        sql.append("','");
+        sql.append("','"); //$NON-NLS-1$
         sql.append(initString(log.getDetails()));
-        sql.append("','");
+        sql.append("','"); //$NON-NLS-1$
         sql.append(initString(log.getType()));
-        sql.append("');");
+        sql.append("');"); //$NON-NLS-1$
         return sql.toString();
     }
 
     public static String initString(String str) {
-        String test = "";
+        String test = ""; //$NON-NLS-1$
         if (str != null) {
-            test = str.trim().replaceAll("'", "''");
+            test = str.trim().replaceAll("'", "''"); //$NON-NLS-1$ //$NON-NLS-2$
 
         }
         return test;
@@ -77,7 +77,7 @@ public class LogSql {
 
     public static String initString(Date date) {
         if (date == null) {
-            return "";
+            return ""; //$NON-NLS-1$
         }
         return dateTimeFormatter.format(date);
     }

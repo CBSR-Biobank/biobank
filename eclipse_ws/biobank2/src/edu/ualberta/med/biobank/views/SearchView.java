@@ -31,7 +31,7 @@ import edu.ualberta.med.biobank.utils.SearchType;
 
 public class SearchView extends ViewPart {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.SearchView";
+    public static final String ID = "edu.ualberta.med.biobank.views.SearchView"; //$NON-NLS-1$
 
     private BgcBaseText searchText;
     private ComboViewer searchTypeCombo;
@@ -86,7 +86,7 @@ public class SearchView extends ViewPart {
                         .getFirstElement();
                     searchText
                         .setEnabled(searchType != SearchType.SPECIMEN_NON_ACTIVE);
-                    searchText.setText("");
+                    searchText.setText(""); //$NON-NLS-1$
                 }
             });
 
@@ -105,7 +105,7 @@ public class SearchView extends ViewPart {
         });
 
         searchButton = new Button(parent, SWT.PUSH);
-        searchButton.setText("Search");
+        searchButton.setText(Messages.SearchView_search_label);
         searchButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -145,11 +145,11 @@ public class SearchView extends ViewPart {
                     if (res != null && res.size() > 0) {
                         type.processResults(res);
                     } else {
-                        BgcPlugin.openInformation("Search Result",
-                            "no result");
+                        BgcPlugin.openInformation(Messages.SearchView_noresult_dialog_title,
+                            Messages.SearchView_noresult__dialog_msg);
                     }
                 } catch (Exception ex) {
-                    BgcPlugin.openAsyncError("Search error", ex);
+                    BgcPlugin.openAsyncError(Messages.SearchView_search_error_title, ex);
                 }
             }
         });

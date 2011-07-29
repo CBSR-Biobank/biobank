@@ -28,20 +28,20 @@ public class FileBrowser extends BgcBaseWidget {
         setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
         setLayout(new GridLayout(3, false));
         Label l = new Label(this, SWT.NONE);
-        l.setText(label + ":");
+        l.setText(label + ":"); //$NON-NLS-1$
         textfield = new BgcBaseText(this, SWT.NONE);
         textfield.setEditable(false);
         textfield.setLayoutData(new GridData(GridData.FILL, GridData.FILL,
             true, false));
         browse = new Button(this, style);
-        browse.setText("Browse");
+        browse.setText(Messages.FileBrowser_browse_label);
         browse.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 FileDialog fd = new FileDialog(FileBrowser.this.getShell(),
                     SWT.OPEN);
-                fd.setText("Open");
-                String[] filterExt = { "*.csv" };
+                fd.setText(Messages.FileBrowser_open_label);
+                String[] filterExt = { "*.csv" }; //$NON-NLS-1$
                 fd.setFilterExtensions(filterExt);
                 String path = fd.open();
                 if (path != null) {
@@ -62,10 +62,10 @@ public class FileBrowser extends BgcBaseWidget {
                 fileReader = new FileReader(file);
                 BufferedReader br = new BufferedReader(fileReader);
                 while (br.ready())
-                    contents.append(br.readLine()).append("\n");
+                    contents.append(br.readLine()).append("\n"); //$NON-NLS-1$
                 br.close();
             } catch (Exception e1) {
-                BgcPlugin.openError("IO Error", "Unable to read file.", e1);
+                BgcPlugin.openError(Messages.FileBrowser_io_error_title, Messages.FileBrowser_io_error_msg, e1);
             }
             setText(contents.toString());
         }
@@ -85,7 +85,7 @@ public class FileBrowser extends BgcBaseWidget {
     }
 
     public void reset() {
-        textfield.setText("");
+        textfield.setText(""); //$NON-NLS-1$
     }
 
 }

@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
@@ -65,6 +66,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         for (SpecimenWrapper ss : removedSpecimens) {
             if (!ss.isNew()) {
                 ss.setProcessingEvent(null);
+                ss.setActivityStatus(ActivityStatusWrapper
+                    .getActiveActivityStatus(appService));
                 ss.persist();
             }
         }
@@ -206,12 +209,16 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     private static final String PROCESSING_EVENT_BY_DATE_QRY = "select pEvent from "
         + ProcessingEvent.class.getName()
         + " pEvent where DATE(pEvent."
-        + ProcessingEventPeer.CREATED_AT.getName() + ")=DATE(?)";
+        + ProcessingEventPeer.CREATED_AT.getName()
+        + ")=DATE(?) and pEvent."
+        + Property.concatNames(ProcessingEventPeer.CENTER, CenterPeer.ID)
+        + "= ?";
 
-    public static List<ProcessingEventWrapper> getProcessingEventsWithDate(
-        WritableApplicationService appService, Date date) throws Exception {
+    public static List<ProcessingEventWrapper> getProcessingEventsWithDateForCenter(
+        WritableApplicationService appService, Date date,
+        CenterWrapper<?> center) throws Exception {
         HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_BY_DATE_QRY,
-            Arrays.asList(new Object[] { date }));
+            Arrays.asList(new Object[] { date, center.getId() }));
         List<ProcessingEvent> pvs = appService.query(c);
         List<ProcessingEventWrapper> pvws = new ArrayList<ProcessingEventWrapper>();
         for (ProcessingEvent pv : pvs)
@@ -316,7 +323,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
                 getCenter()));
     }
 
-    public static String PE_BY_PATIENT_STRING = "select s."
+    public static String PE_BY_PATIENT_STRING = "select distinct s."
         + SpecimenPeer.PROCESSING_EVENT.getName()
         + " from "
         + Specimen.class.getName()
