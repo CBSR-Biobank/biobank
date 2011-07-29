@@ -74,6 +74,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private static final String DATE_SHIPPED_BINDING = "shipment-date-shipped-binding"; //$NON-NLS-1$
 
+    private static final String BOX_NUMBER_BINDING = "box-number-binding"; //$NON-NLS-1$
+
     private DateTimeWidget dateSentWidget;
 
     private Label departedLabel;
@@ -83,6 +85,12 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private BgcBaseText waybillWidget;
 
     private Set<SpecimenWrapper> specimensToPersist = new HashSet<SpecimenWrapper>();
+
+    private BgcBaseText boxNumberWidget;
+
+    private Label boxLabel;
+
+    private NonEmptyStringValidator boxValidator;
 
     @Override
     protected void init() throws Exception {
@@ -131,7 +139,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 @Override
                 public void doSelection(Object selectedObject) {
                     originInfo.setCenter((CenterWrapper<?>) selectedObject);
-                    activateWaybillWidget(((ClinicWrapper) selectedObject)
+                    activateWidgets(((ClinicWrapper) selectedObject)
                         .getSendsShipments());
                 }
             });
@@ -158,11 +166,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             BgcBaseText.class, SWT.NONE, waybillLabel, new String[0],
             shipmentInfo, ShipmentInfoPeer.WAYBILL.getName(), waybillValidator,
             WAYBILL_BINDING);
-
-        ClinicWrapper clinic = (ClinicWrapper) originInfo.getCenter();
-        if (clinic != null) {
-            activateWaybillWidget(clinic.getSendsShipments());
-        }
 
         shippingMethodComboViewer = createComboViewer(client,
             Messages.ShipmentEntryForm_shipMethod_label,
@@ -194,9 +197,18 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         activateDepartedWidget(shipmentInfo.getShippingMethod() != null
             && shipmentInfo.getShippingMethod().needDate());
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.ShipmentEntryForm_boxNber_label, null, shipmentInfo,
-            ShipmentInfoPeer.BOX_NUMBER.getName(), null);
+        boxLabel = widgetCreator.createLabel(client,
+            Messages.ShipmentEntryForm_boxNber_label);
+        boxLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+        boxNumberWidget = (BgcBaseText) createBoundWidget(client,
+            BgcBaseText.class, SWT.NONE, waybillLabel, new String[0],
+            shipmentInfo, ShipmentInfoPeer.BOX_NUMBER.getName(), null,
+            BOX_NUMBER_BINDING);
+
+        ClinicWrapper clinic = (ClinicWrapper) originInfo.getCenter();
+        if (clinic != null) {
+            activateWidgets(clinic.getSendsShipments());
+        }
 
         createDateTimeWidget(client, Messages.ShipmentEntryForm_received_label,
             shipmentInfo.getReceivedAt(), shipmentInfo,
@@ -209,21 +221,31 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     }
 
-    protected void activateWaybillWidget(boolean waybillNeeded) {
+    protected void activateWidgets(boolean sendsShipments) {
         if (waybillLabel != null && !waybillLabel.isDisposed()) {
-            waybillLabel.setVisible(waybillNeeded);
-            ((GridData) waybillLabel.getLayoutData()).exclude = !waybillNeeded;
+            waybillLabel.setVisible(sendsShipments);
+            ((GridData) waybillLabel.getLayoutData()).exclude = !sendsShipments;
         }
         if (waybillWidget != null && !waybillWidget.isDisposed()) {
-            waybillWidget.setVisible(waybillNeeded);
-            ((GridData) waybillWidget.getLayoutData()).exclude = !waybillNeeded;
+            waybillWidget.setVisible(sendsShipments);
+            ((GridData) waybillWidget.getLayoutData()).exclude = !sendsShipments;
 
-            if (waybillNeeded) {
+            if (sendsShipments) {
                 widgetCreator.addBinding(WAYBILL_BINDING);
             } else {
                 widgetCreator.removeBinding(WAYBILL_BINDING);
                 waybillWidget.setText(""); //$NON-NLS-1$
             }
+        }
+
+        boxNumberWidget.setVisible(sendsShipments);
+        ((GridData) boxNumberWidget.getLayoutData()).exclude = !sendsShipments;
+        boxLabel.setVisible(sendsShipments);
+        ((GridData) boxLabel.getLayoutData()).exclude = !sendsShipments;
+        if (sendsShipments) {
+            widgetCreator.addBinding(BOX_NUMBER_BINDING);
+        } else {
+            widgetCreator.removeBinding(BOX_NUMBER_BINDING);
         }
         form.layout(true, true);
     }
@@ -278,11 +300,10 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                             Messages.ShipmentEntryForm_notfound_error_msg);
                     if (!SessionManager.getUser().getCurrentWorkingCenter()
                         .equals(specimen.getCurrentCenter()))
-                        throw new VetoException(
-                            NLS.bind(
-                                Messages.ShipmentEntryForm_other_center_error_msg,
-                                specimen.getInventoryId(), specimen
-                                    .getCurrentCenter().getNameShort()));
+                        throw new VetoException(NLS.bind(
+                            Messages.ShipmentEntryForm_other_center_error_msg,
+                            specimen.getInventoryId(), specimen
+                                .getCurrentCenter().getNameShort()));
                     if (specimen.isUsedInDispatch())
                         throw new VetoException(
                             Messages.ShipmentEntryForm_dispatched_specimen_error_msg);
