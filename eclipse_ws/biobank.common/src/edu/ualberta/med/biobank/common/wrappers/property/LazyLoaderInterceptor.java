@@ -47,9 +47,15 @@ public class LazyLoaderInterceptor implements GetterInterceptor, Serializable {
 
             List<?> results = query.list();
 
-            @SuppressWarnings("unchecked")
-            P tmp = (P) results;
-            value = tmp;
+            if (subProperty.isCollection()) {
+                @SuppressWarnings("unchecked")
+                P tmp = (P) results;
+                value = tmp;
+            } else {
+                @SuppressWarnings("unchecked")
+                P tmp = (P) results.get(0);
+                value = tmp;
+            }
         }
 
         depth++;

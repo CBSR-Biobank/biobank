@@ -28,7 +28,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePr
  */
 public class UniquePreCheck<E> extends WrapperCheck<E> implements PreCheck {
     private static final long serialVersionUID = 1L;
-    private static final String HQL = "SELECT COUNT(*) FROM {0} o WHERE ({1}) = {2} {3}";
+    private static final String HQL = "SELECT COUNT(*) FROM {0} o WHERE ({1}) = ({2}) {3}";
     private static final String EXCEPTION_STRING = "There already exists a {0} with property value(s) ({1}) for ({2}), respectively. These field(s) must be unique.";
 
     private final Collection<Property<?, ? super E>> properties;
@@ -67,17 +67,37 @@ public class UniquePreCheck<E> extends WrapperCheck<E> implements PreCheck {
 
     private Query getQuery(Session session) {
         String modelName = getModelClass().getName();
-        String props = StringUtil.join(properties, ", ");
-        String values = StringUtil.join(getValues(session), ", ");
-
+        String propertyNames = StringUtil.join(getPropertyNames(), ", ");
+        String valueBindings = getValueBindings();
         String notSelfCondition = getNotSelfCondition();
 
-        String hql = MessageFormat.format(HQL, modelName, props, values,
-            notSelfCondition);
+        String hql = MessageFormat.format(HQL, modelName, propertyNames,
+            valueBindings, notSelfCondition);
 
         Query query = session.createQuery(hql);
+        setParameters(session, query);
 
         return query;
+    }
+
+    private String getValueBindings() {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 1, n = properties.size(); i <= n; i++) {
+            sb.append("?");
+            if (i < n) {
+                sb.append(",");
+            }
+        }
+
+        return sb.toString();
+    }
+
+    private void setParameters(Session session, Query query) {
+        List<Object> values = getValues(session);
+        for (int i = 0, n = values.size(); i < n; i++) {
+            query.setParameter(i, values.get(i));
+        }
     }
 
     private String getNotSelfCondition() {
@@ -90,6 +110,16 @@ public class UniquePreCheck<E> extends WrapperCheck<E> implements PreCheck {
         }
 
         return idCheck;
+    }
+
+    private List<String> getPropertyNames() {
+        List<String> propertyNames = new ArrayList<String>();
+
+        for (Property<?, ? super E> property : properties) {
+            propertyNames.add(property.getName());
+        }
+
+        return propertyNames;
     }
 
     private List<Object> getValues(Session session) {
