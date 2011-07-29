@@ -519,7 +519,11 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     protected void addDeleteTasks(TaskList tasks) {
         tasks.add(check().empty(SpecimenPeer.CHILD_SPECIMEN_COLLECTION));
 
-        tasks.delete(this, SpecimenPeer.SPECIMEN_POSITION);
+        // Either Hibernate must delete this object (via the defined cascade) or
+        // do it here, but not both. If both are done, then a
+        // StaleStateException is thrown because an attempt is made to delete an
+        // already deleted object.
+        // tasks.delete(this, SpecimenPeer.SPECIMEN_POSITION);
 
         super.addDeleteTasks(tasks);
     }

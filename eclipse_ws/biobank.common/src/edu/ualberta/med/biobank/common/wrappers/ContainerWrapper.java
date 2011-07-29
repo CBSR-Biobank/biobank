@@ -339,9 +339,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         specimen.setParent(this, rowColPos);
 
         getSpecimens().put(rowColPos, specimen);
-
-        addToSpecimenPositionCollection(Arrays.asList(specimen
-            .getSpecimenPosition()));
     }
 
     /**
@@ -446,8 +443,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         child.setParent(this, rowColPos);
 
         getChildren().put(rowColPos, child);
-
-        addToChildPositionCollection(Arrays.asList(child.getPosition()));
     }
 
     /**

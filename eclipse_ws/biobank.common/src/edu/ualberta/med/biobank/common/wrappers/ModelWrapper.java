@@ -50,22 +50,27 @@ import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
+    final Map<Property<?, ?>, Object> propertyCache = new HashMap<Property<?, ?>, Object>();
+
     protected WritableApplicationService appService;
     protected E wrappedObject;
     protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
         this);
     protected HashMap<String, Object> cache = new HashMap<String, Object>();
 
-    final Map<Property<?, ?>, Object> propertyCache = new HashMap<Property<?, ?>, Object>();
     private final List<WrapperListener> listeners = new ArrayList<WrapperListener>();
     private final ElementTracker<E> elementTracker = new ElementTracker<E>(this);
     private final ElementQueue<E> elementQueue = new ElementQueue<E>(this);
     private final WrapperCascader<E> cascader = new WrapperCascader<E>(this);
     private final WrapperChecker<E> preChecker = new WrapperChecker<E>(this);
 
+    private IdentityHashMap<Object, ModelWrapper<?>> modelWrapperMap = new IdentityHashMap<Object, ModelWrapper<?>>();
+
     public ModelWrapper(WritableApplicationService appService, E wrappedObject) {
         this.appService = appService;
         this.wrappedObject = wrappedObject;
+
+        addSelfToModelWrapperMap();
     }
 
     public ModelWrapper(WritableApplicationService appService) {
@@ -83,6 +88,20 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                     e);
             }
         }
+
+        addSelfToModelWrapperMap();
+    }
+
+    private void addSelfToModelWrapperMap() {
+        if (wrappedObject != null) {
+            // TODO: extract into method that unproxies for us so not repeated
+            // here and in wrap*Smarter()
+            @SuppressWarnings("unchecked")
+            E unproxiedModel = (E) ProxyUtil
+                .convertProxyToObject(wrappedObject);
+
+            modelWrapperMap.put(unproxiedModel, this);
+        }
     }
 
     public E getWrappedObject() {
@@ -96,6 +115,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         wrappedObject = newWrappedObject;
 
         clear();
+        addSelfToModelWrapperMap();
 
         firePropertyChanges(oldWrappedObject, newWrappedObject);
     }
@@ -149,6 +169,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 wrappedObject = getNewObject();
             }
         }
+
+        addSelfToModelWrapperMap();
 
         firePropertyChanges(oldWrappedObject, wrappedObject);
     }
@@ -429,6 +451,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private void resetToNewObject() throws Exception {
         E oldWrappedObject = wrappedObject;
         wrappedObject = getNewObject();
+
+        addSelfToModelWrapperMap();
+
         firePropertyChanges(oldWrappedObject, wrappedObject);
     }
 
@@ -671,8 +696,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return this.getId().compareTo(arg0.getId());
     }
 
-    IdentityHashMap<Object, ModelWrapper<?>> wrappersMap = new IdentityHashMap<Object, ModelWrapper<?>>();
-
+    // TODO: rename this
     private <W extends ModelWrapper<? extends M>, M> W wrapModelSmarter(
         M model, Class<W> wrapperKlazz) throws Exception {
 
@@ -681,12 +705,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         // several proxies exist for the exact same model object? okay...
         @SuppressWarnings("unchecked")
-        W wrapper = (W) wrappersMap.get(unproxiedModel);
+        W wrapper = (W) modelWrapperMap.get(unproxiedModel);
 
         if (wrapper == null) {
             wrapper = wrapModel(appService, model, wrapperKlazz);
-            wrapper.wrappersMap = wrappersMap;
-            wrappersMap.put(unproxiedModel, wrapper);
+            wrapper.modelWrapperMap = modelWrapperMap;
+            modelWrapperMap.put(unproxiedModel, wrapper);
         }
 
         return wrapper;
@@ -950,6 +974,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         allWrappers.addAll(newWrappers);
 
         if (currentWrappers != null) {
+            currentWrappers.removeAll(newWrappers);
             allWrappers.addAll(currentWrappers);
         }
 
@@ -1172,6 +1197,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         elementTracker.clear();
         propertyCache.clear();
         cache.clear();
+
+        // TODO: should we clear the modelWrapperMap?
+        modelWrapperMap.clear();
 
         resetInternalFields();
     }
