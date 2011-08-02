@@ -720,10 +720,9 @@ public class TestContainer extends TestDatabase {
 
                 // System.out.println("type/" + childType + " scheme/"
                 // + childType.getChildLabelingScheme() + " label/" + label);
-                parent.addChild(
-                    label,
-                    ContainerHelper.newContainer(null,
-                        TestCommon.getNewBarcode(r), parent, site, childType));
+                ContainerWrapper child = ContainerHelper.newContainer(null,
+                    TestCommon.getNewBarcode(r), null, site, childType);
+                parent.addChild(label, child);
             }
         }
         parent.persist();
@@ -732,9 +731,11 @@ public class TestContainer extends TestDatabase {
         // now add one more outside bounds
         label = getLabel(labelingScheme, maxRows + 1, maxCols + 1, maxRows,
             maxCols);
+
         try {
-            parent.addChild(label, ContainerHelper.newContainer(null,
-                TestCommon.getNewBarcode(r), parent, site, childType));
+            ContainerWrapper child = ContainerHelper.newContainer(null,
+                TestCommon.getNewBarcode(r), null, site, childType);
+            parent.addChild(label, child);
             Assert.fail("should not be allowed to add children beyond limit");
         } catch (Exception e) {
             Assert.assertTrue(true);

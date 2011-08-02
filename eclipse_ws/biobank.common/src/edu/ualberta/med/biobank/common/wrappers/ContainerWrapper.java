@@ -207,7 +207,12 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         throw new BiobankRuntimeException("cannot set path on container");
     }
 
-    public void setParent(ContainerWrapper container, RowColPos position) {
+    public void setParent(ContainerWrapper container, RowColPos position)
+        throws BiobankCheckException {
+        container.addChild(position.getRow(), position.getCol(), this);
+    }
+
+    public void setParentInternal(ContainerWrapper container, RowColPos position) {
         if (container == null) {
             setPosition(null);
         } else {
@@ -432,7 +437,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         checkPositionValid(rowColPos);
 
         ContainerWrapper containerAtPosition = getChild(rowColPos);
-        if (containerAtPosition != null) {
+        if (containerAtPosition != null && !containerAtPosition.equals(child)) {
             String label = getFullInfoLabel();
             String existingContainerLabel = containerAtPosition.getLabel();
             String msg = MessageFormat.format(CONTAINER_AT_POSITION_MSG, label,
@@ -440,7 +445,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             throw new BiobankCheckException(msg);
         }
 
-        child.setParent(this, rowColPos);
+        child.setParentInternal(this, rowColPos);
 
         getChildren().put(rowColPos, child);
     }

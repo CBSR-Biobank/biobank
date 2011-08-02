@@ -34,6 +34,8 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankRuntimeException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -484,7 +486,14 @@ public class ContainerViewForm extends BiobankViewForm {
                     SiteAdapter.class).getWrapper());
 
                 RowColPos position = new RowColPos(cell.getRow(), cell.getCol());
-                containerToOpen.setParent(container, position);
+
+                try {
+                    containerToOpen.setParent(container, position);
+                } catch (BiobankCheckException e) {
+                    // TODO: something better?
+                    throw new BiobankRuntimeException(e);
+                }
+
                 newAdapter = new ContainerAdapter(containerAdapter,
                     containerToOpen);
                 newAdapter.openEntryForm(true);

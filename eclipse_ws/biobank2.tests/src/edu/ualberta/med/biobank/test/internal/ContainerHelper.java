@@ -166,6 +166,6 @@ public class ContainerHelper extends DbHelper {
             topContainer.persist();
         }
         site.reload();
-        return count + count * 5;
+        return count + (count * 5);
     }
 }
