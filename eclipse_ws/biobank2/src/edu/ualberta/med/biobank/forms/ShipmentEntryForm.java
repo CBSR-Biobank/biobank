@@ -90,8 +90,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private Label boxLabel;
 
-    private NonEmptyStringValidator boxValidator;
-
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ShipmentAdapter,

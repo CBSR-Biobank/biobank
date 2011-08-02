@@ -32,6 +32,11 @@ public class Messages extends NLS {
     public static String ContainerTypeAdapter_type_label;
     public static String ContainerTypeGroup_add_label;
     public static String ContainerTypeGroup_types_node_label;
+    public static String ResearchGroupAdapter_delete_confirm_msg;
+    public static String ResearchGroupAdapter_menu_label;
+    public static String ResearchGroupAdapter_tooltip;
+    public static String ResearchGroupMasterGroup_add_rgroup_menu;
+    public static String ResearchGroupMasterGroup_all_rgroups_label;
     public static String SessionAdapter_current_session_label;
     public static String SessionAdapter_load_error_title;
     public static String SessionAdapter_logout_label;

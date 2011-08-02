@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.dialogs.SpecimenTypeDialog;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.trees.infos.listener.IInfoTreeAddItemListener;
@@ -28,9 +27,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  * additional specimen type to the collection.
  */
 public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
-
-    private static BgcLogger logger = BgcLogger
-        .getLogger(SpecimenTypeEntryInfoTree.class.getName());
 
     private List<SpecimenTypeWrapper> selectedSpecimenTypes;
 
@@ -154,8 +150,10 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                     } catch (final RemoteConnectFailureException exp) {
                         BgcPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
-                        BgcPlugin.openAsyncError(
-                            "Error deleting specimen type", e);
+                        BgcPlugin
+                            .openAsyncError(
+                                Messages.SpecimenTypeEntryInfoTree_delete_type_error_msg,
+                                e);
                     }
                 }
             }

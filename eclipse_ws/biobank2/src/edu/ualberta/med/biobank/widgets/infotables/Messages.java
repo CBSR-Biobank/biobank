@@ -297,6 +297,20 @@ public class Messages extends NLS {
 
     public static String ReportTableWidget_pages_label;
 
+    public static String RequestDispatchInfoTable_loading;
+
+    public static String RequestDispatchInfoTable_packed_label;
+
+    public static String RequestDispatchInfoTable_received_label;
+
+    public static String RequestDispatchInfoTable_receiver_label;
+
+    public static String RequestDispatchInfoTable_sender_label;
+
+    public static String RequestDispatchInfoTable_state_label;
+
+    public static String RequestDispatchInfoTable_total_specs_label;
+
     public static String UserInfoTable_confirm_delete_msg;
 
     public static String UserInfoTable_confirm_delete_suicide_msg;
