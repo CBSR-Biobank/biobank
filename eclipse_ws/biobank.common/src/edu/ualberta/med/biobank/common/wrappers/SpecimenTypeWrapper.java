@@ -81,11 +81,14 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
                     + ". Specimens of this type exists in storage, or studies are using it in their definition."
                     + " Remove all references to this type before deleting it.");
         }
-        if (getParentSpecimenTypeCollection(false).size() > 0) {
-            throw new BiobankDeleteException(
-                "Unable to delete specimen type "
-                    + getName()
-                    + ". This type has one or more parent types. Remove these parents before deleting it.");
+    }
+
+    @Override
+    public void deleteDependencies() throws Exception {
+        // should remove this type from its parents
+        for (SpecimenTypeWrapper parent : getParentSpecimenTypeCollection(false)) {
+            parent.removeFromChildSpecimenTypeCollection(Arrays.asList(this));
+            parent.persist();
         }
     }
 
