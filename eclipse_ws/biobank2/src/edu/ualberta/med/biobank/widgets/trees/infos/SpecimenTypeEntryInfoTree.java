@@ -121,6 +121,7 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                 SpecimenTypeWrapper specType = getSelection();
                 if (specType != null) {
                     try {
+                        specType.reload();
                         if (!specType.isNew() && specType.isUsed()) {
                             BgcPlugin
                                 .openError(
@@ -145,8 +146,10 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                         // equals method now compare toString() results if both
                         // ids are null.
                         selectedSpecimenTypes.remove(specType);
+                        needReload.addAll(specType
+                            .getParentSpecimenTypeCollection(false));
                         specType.delete();
-                        setCollection(selectedSpecimenTypes);
+                        reloadCollection(selectedSpecimenTypes);
                     } catch (final RemoteConnectFailureException exp) {
                         BgcPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
