@@ -404,6 +404,7 @@ public class TestSpecimenType extends TestDatabase {
         Integer childId = child.getId();
         parent.delete();
 
+        // parent should be deleted but not the child
         SpecimenType parentInDB = ModelUtils.getObjectWithId(appService,
             SpecimenType.class, parentId);
         Assert.assertNull(parentInDB);
@@ -425,16 +426,17 @@ public class TestSpecimenType extends TestDatabase {
 
         child.reload();
         parent.reload();
-        Integer parentId = parent.getId();
-        Integer childId = child.getId();
+        try {
+            child.delete();
+            Assert.fail("Cannot delete with a parent");
+        } catch (BiobankDeleteException bde) {
+            Assert.assertTrue(true);
+        }
+        // need to remove the parent/child relation.
+        parent.removeFromChildSpecimenTypeCollection(Arrays.asList(child));
+        parent.persist();
+        child.reload();
         child.delete();
-
-        SpecimenType parentInDB = ModelUtils.getObjectWithId(appService,
-            SpecimenType.class, parentId);
-        Assert.assertNotNull(parentInDB);
-        SpecimenType childInDB = ModelUtils.getObjectWithId(appService,
-            SpecimenType.class, childId);
-        Assert.assertNull(childInDB);
     }
 
     @Test

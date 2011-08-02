@@ -911,8 +911,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             false);
 
         if (!currentWrappers.containsAll(wrappersToRemove)) {
-            throw new BiobankCheckException(
-                "studies are not associated with site ");
+            throw new BiobankCheckException("object not in list");
         }
 
         removeFromWrapperCollection(property, wrappersToRemove);

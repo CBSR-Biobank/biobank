@@ -81,6 +81,12 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
                     + ". Specimens of this type exists in storage, or studies are using it in their definition."
                     + " Remove all references to this type before deleting it.");
         }
+        if (getParentSpecimenTypeCollection(false).size() > 0) {
+            throw new BiobankDeleteException(
+                "Unable to delete specimen type "
+                    + getName()
+                    + ". This type has one or more parent types. Remove these parents before deleting it.");
+        }
     }
 
     public static final String ALL_SAMPLE_TYPES_QRY = "from "
@@ -198,6 +204,49 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
     public boolean isUnknownImport() {
         return getName() != null && UNKNOWN_IMPORT_NAME.equals(getName());
+    }
+
+    /**
+     * @deprecated instead of
+     *             child.addToParentSpecimenTypeCollection(Arrays.asList
+     *             (parent)), do
+     *             parent.addToChildSpecimenTypeCollection(Arrays.asList(child))
+     *             (this hibernate mapping with correlation table works only in
+     *             one way)
+     */
+    @Override
+    @Deprecated
+    public void addToParentSpecimenTypeCollection(
+        List<SpecimenTypeWrapper> parentSpecimenTypeCollection) {
+    }
+
+    /**
+     * @deprecated instead of
+     *             child.removeFromParentSpecimenTypeCollection(Arrays
+     *             .asList(parent)), do
+     *             parent.removeFromChildSpecimenTypeCollection
+     *             (Arrays.asList(child)) (this hibernate mapping with
+     *             correlation table works only in one way)
+     */
+    @Override
+    @Deprecated
+    public void removeFromParentSpecimenTypeCollection(
+        List<SpecimenTypeWrapper> parentSpecimenTypeCollection) {
+    }
+
+    /**
+     * @deprecated instead of
+     *             child.removeFromParentSpecimenTypeCollectionWithCheck
+     *             (Arrays.asList (parent)), do
+     *             parent.removeFromChildSpecimenTypeCollectionWithCheck(Arrays
+     *             .asList(child)) (this hibernate mapping with correlation
+     *             table works only in one way)
+     */
+    @Override
+    @Deprecated
+    public void removeFromParentSpecimenTypeCollectionWithCheck(
+        List<SpecimenTypeWrapper> parentSpecimenTypeCollection)
+        throws BiobankCheckException {
     }
 
 }
