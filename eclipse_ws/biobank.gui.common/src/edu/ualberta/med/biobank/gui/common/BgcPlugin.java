@@ -202,7 +202,7 @@ public class BgcPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_SAVE_AS_NEW, "application_form_add.png"); //$NON-NLS-1$
         registerImage(registry, IMG_CHECK, "checked.gif"); //$NON-NLS-1$
         registerImage(registry, IMG_UNCHECK, "unchecked.gif"); //$NON-NLS-1$
-        registerImage(registry, IMG_RESEARCH_GROUPS, "research_groups.png");
+        registerImage(registry, IMG_RESEARCH_GROUPS, "research_groups.png"); //$NON-NLS-1$
         registerImage(registry, IMG_RESEARCH_GROUP, "research_group.png"); //$NON-NLS-1$
         registerImage(registry, IMG_ERROR, "error.png"); //$NON-NLS-1$
         registerImage(registry, IMG_ADMIN, "superAdmin.png"); //$NON-NLS-1$
