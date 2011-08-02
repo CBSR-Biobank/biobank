@@ -1,9 +1,10 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
+import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ContactBaseWrapper;
 import edu.ualberta.med.biobank.model.Contact;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -15,6 +16,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * contact
  */
 public class ContactWrapper extends ContactBaseWrapper {
+    private static final String HAS_STUDIES_MSG = "Unable to delete contact {0}. No more study reference should exist.";
 
     public ContactWrapper(WritableApplicationService appService,
         Contact wrappedObject) {
@@ -30,20 +32,6 @@ public class ContactWrapper extends ContactBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankDeleteException,
-        ApplicationException {
-        if (!deleteAllowed()) {
-            throw new BiobankDeleteException("Unable to delete contact "
-                + getName() + ". No more study reference should exist.");
-        }
-    }
-
-    public boolean deleteAllowed() {
-        List<StudyWrapper> studies = getStudyCollection(false);
-        return ((studies == null) || (studies.size() == 0));
-    }
-
-    @Override
     public int compareTo(ModelWrapper<Contact> c2) {
         if (c2 instanceof ContactWrapper) {
             String myName = wrappedObject.getName();
@@ -53,6 +41,26 @@ public class ContactWrapper extends ContactBaseWrapper {
             }
         }
         return 0;
+    }
+
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        String hasStudiesMsg = MessageFormat.format(HAS_STUDIES_MSG, getName());
+
+        tasks.add(check().empty(ContactPeer.STUDY_COLLECTION, hasStudiesMsg));
+
+        super.addDeleteTasks(tasks);
+    }
+
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        WrapperTransaction.persist(this, appService);
+    }
+
+    @Override
+    public void delete() throws Exception {
+        WrapperTransaction.delete(this, appService);
     }
 
     @Override

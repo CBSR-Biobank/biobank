@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
@@ -52,7 +53,7 @@ public class TestContact extends TestDatabase {
 
         List<StudyWrapper> studiesSorted = contact.getStudyCollection(true);
         if (studiesSorted.size() > 1) {
-            for (int i = 0; i < studiesSorted.size() - 1; i++) {
+            for (int i = 0; i < (studiesSorted.size() - 1); i++) {
                 StudyWrapper s1 = studiesSorted.get(i);
                 StudyWrapper s2 = studiesSorted.get(i + 1);
                 Assert.assertTrue(s1.compareTo(s2) <= 0);
@@ -147,7 +148,7 @@ public class TestContact extends TestDatabase {
         try {
             contact.delete();
             Assert.fail("one study still linked to this contact");
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankSessionException bce) {
             Assert.assertTrue(true);
         }
 
