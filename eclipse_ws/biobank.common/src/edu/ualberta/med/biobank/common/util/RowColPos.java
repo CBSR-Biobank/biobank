@@ -40,7 +40,7 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
     }
 
     public boolean equals(Integer row, Integer col) {
-        return (row.equals(row) && col.equals(col));
+        return (this.row.equals(row) && this.col.equals(col));
     }
 
     @Override

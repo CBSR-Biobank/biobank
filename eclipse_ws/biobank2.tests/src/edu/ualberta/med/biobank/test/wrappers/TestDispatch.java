@@ -350,7 +350,7 @@ public class TestDispatch extends TestDatabase {
         topContainerType.persist();
         topContainerType.reload();
         ContainerWrapper topContainer = ContainerHelper.addContainer(
-            String.valueOf(r.nextInt()), name + "top", null, senderSite,
+            String.valueOf(r.nextInt()), name + "top", senderSite,
             topContainerType);
         ContainerWrapper container = ContainerHelper.addContainer(null, name,
             topContainer, senderSite, containerType, 0, 0);

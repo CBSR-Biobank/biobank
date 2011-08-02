@@ -289,7 +289,7 @@ public class TestSite extends TestDatabase {
         List<ContainerTypeWrapper> types = site
             .getContainerTypeCollection(true);
         if (types.size() > 1) {
-            for (int i = 0; i < types.size() - 1; i++) {
+            for (int i = 0; i < (types.size() - 1); i++) {
                 ContainerTypeWrapper type1 = types.get(i);
                 ContainerTypeWrapper type2 = types.get(i + 1);
                 Assert.assertTrue(type1.compareTo(type2) <= 0);
@@ -341,8 +341,7 @@ public class TestSite extends TestDatabase {
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
             site, name);
         ContainerWrapper container = ContainerHelper.newContainer(
-            String.valueOf(r.nextInt()), name + "newContainer", null, site,
-            type);
+            String.valueOf(r.nextInt()), name + "newContainer", site, type);
         site.addToContainerCollection(Arrays.asList(container));
         site.persist();
 
@@ -546,7 +545,7 @@ public class TestSite extends TestDatabase {
         List<ContainerWrapper> containers = site
             .getTopContainerCollection(true);
         if (containers.size() > 1) {
-            for (int i = 0; i < containers.size() - 1; i++) {
+            for (int i = 0; i < (containers.size() - 1); i++) {
                 ContainerWrapper container1 = containers.get(i);
                 ContainerWrapper containter2 = containers.get(i + 1);
                 Assert.assertTrue(container1.compareTo(containter2) <= 0);

@@ -37,7 +37,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,7 +63,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private final WrapperCascader<E> cascader = new WrapperCascader<E>(this);
     private final WrapperChecker<E> preChecker = new WrapperChecker<E>(this);
 
-    private IdentityHashMap<Object, ModelWrapper<?>> modelWrapperMap = new IdentityHashMap<Object, ModelWrapper<?>>();
+    private HashMap<Object, ModelWrapper<?>> modelWrapperMap = new HashMap<Object, ModelWrapper<?>>();
 
     public ModelWrapper(WritableApplicationService appService, E wrappedObject) {
         this.appService = appService;
@@ -1198,8 +1197,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         propertyCache.clear();
         cache.clear();
 
-        // TODO: should we clear the modelWrapperMap?
-        modelWrapperMap.clear();
+        // Don't clear the map because it might be shared with other
+        // ModelWrapper-s. Instead, start a new map.
+        // TODO: remove ModelWrapper.this from the propertyCache of all
+        // ModelWrapper-s in the modelWrapperMap? reload() really messes things
+        // up.
+        modelWrapperMap = new HashMap<Object, ModelWrapper<?>>();
 
         resetInternalFields();
     }

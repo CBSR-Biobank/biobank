@@ -357,7 +357,7 @@ public class TestContainerType extends TestDatabase {
         // test changing labeling scheme
         topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
         ContainerHelper.addContainer(String.valueOf(r.nextInt()),
-            TestCommon.getNewBarcode(r), null, site, topType);
+            TestCommon.getNewBarcode(r), site, topType);
         topType.setChildLabelingSchemeById(3);
 
         try {
@@ -374,7 +374,7 @@ public class TestContainerType extends TestDatabase {
 
         topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
         ContainerHelper.addContainer(String.valueOf(r.nextInt()),
-            TestCommon.getNewBarcode(r), null, site, topType);
+            TestCommon.getNewBarcode(r), site, topType);
         topType.setTopLevel(false);
 
         try {
@@ -391,7 +391,7 @@ public class TestContainerType extends TestDatabase {
 
         topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
         ContainerHelper.addContainer(String.valueOf(r.nextInt()),
-            TestCommon.getNewBarcode(r), null, site, topType);
+            TestCommon.getNewBarcode(r), site, topType);
         topType.setRowCapacity(1);
 
         try {
@@ -416,7 +416,7 @@ public class TestContainerType extends TestDatabase {
         ContainerTypeWrapper topType = addContainerTypeHierarchy(containerTypeMap
             .get("TopCT"));
         ContainerHelper.addContainer(String.valueOf(r.nextInt()),
-            TestCommon.getNewBarcode(r), null, site, topType);
+            TestCommon.getNewBarcode(r), site, topType);
         try {
             topType.delete();
             Assert.fail("cannot delete, one container is using this type");
@@ -471,7 +471,7 @@ public class TestContainerType extends TestDatabase {
 
             if (key.equals("TopCT")) {
                 ContainerWrapper top = ContainerHelper.addContainer("01",
-                    TestCommon.getNewBarcode(r), null, site, ct);
+                    TestCommon.getNewBarcode(r), site, ct);
                 containers.add(top);
             } else {
                 containers.add(ContainerHelper.addContainer(null,
@@ -650,8 +650,7 @@ public class TestContainerType extends TestDatabase {
 
         // add containers
         ContainerWrapper top = ContainerHelper.addContainer("01",
-            TestCommon.getNewBarcode(r), null, site,
-            containerTypeMap.get("TopCT"));
+            TestCommon.getNewBarcode(r), site, containerTypeMap.get("TopCT"));
         ContainerWrapper cont1 = ContainerHelper.addContainer(null,
             TestCommon.getNewBarcode(r), top, site,
             containerTypeMap.get("ChildCtL1"), 0, 0);
@@ -787,14 +786,13 @@ public class TestContainerType extends TestDatabase {
             .assertEquals(3, topType.getChildContainerTypeCollection().size());
 
         ContainerWrapper top = ContainerHelper.addContainer("01",
-            TestCommon.getNewBarcode(r), null, site,
-            containerTypeMap.get("TopCT"));
+            TestCommon.getNewBarcode(r), site, containerTypeMap.get("TopCT"));
         top.addChild(0, 0, ContainerHelper.newContainer(null,
-            TestCommon.getNewBarcode(r), top, site, childType1));
+            TestCommon.getNewBarcode(r), site, childType1));
         top.addChild(0, 1, ContainerHelper.newContainer(null,
-            TestCommon.getNewBarcode(r), top, site, childType1_2));
+            TestCommon.getNewBarcode(r), site, childType1_2));
         top.addChild(0, 2, ContainerHelper.newContainer(null,
-            TestCommon.getNewBarcode(r), top, site, childType1_3));
+            TestCommon.getNewBarcode(r), site, childType1_3));
         top.persist();
         top.reload();
 
@@ -1071,8 +1069,8 @@ public class TestContainerType extends TestDatabase {
             .get("TopCT"));
         ContainerTypeWrapper childTypeL1 = containerTypeMap.get("ChildCtL1");
 
-        ContainerWrapper top = ContainerHelper.addContainer("01", "01", null,
-            site, topType);
+        ContainerWrapper top = ContainerHelper.addContainer("01", "01", site,
+            topType);
         ContainerHelper.addContainer(null, "1stChild", top, site, childTypeL1,
             0, 0);
         ContainerHelper.addContainer(null, "2ndChild", top, site, childTypeL1,

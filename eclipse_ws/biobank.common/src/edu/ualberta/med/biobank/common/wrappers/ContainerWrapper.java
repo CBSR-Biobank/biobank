@@ -209,7 +209,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     public void setParent(ContainerWrapper container, RowColPos position)
         throws BiobankCheckException {
-        container.addChild(position.getRow(), position.getCol(), this);
+        if (container != null) {
+            container.addChild(position.getRow(), position.getCol(), this);
+        } else {
+            setParentInternal(null, position);
+        }
     }
 
     public void setParentInternal(ContainerWrapper container, RowColPos position) {
@@ -381,6 +385,18 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
             List<ContainerPositionWrapper> positions = getChildPositionCollection(false);
             for (ContainerPositionWrapper position : positions) {
+                // explicitly set the parent container because (1) skip
+                // lazy-loading later and (2) will put the parentContainer
+                // property in the cache so it is used (see methods getPath(),
+                // getLabel(), and getTopContainer() where recursion is used).
+                // If no wrapper has been loaded, then the model value is used,
+                // which can be inconsistent.
+                //
+                // setWrappedProperty() is used because it does not
+                // bi-directionally set the property.
+                position.setWrappedProperty(
+                    ContainerPositionPeer.PARENT_CONTAINER, this);
+
                 ContainerWrapper container = position.getContainer();
                 RowColPos rowColPos = new RowColPos(position);
 

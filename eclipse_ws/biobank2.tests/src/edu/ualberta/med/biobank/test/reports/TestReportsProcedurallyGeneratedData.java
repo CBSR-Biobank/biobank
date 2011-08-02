@@ -373,8 +373,8 @@ public final class TestReportsProcedurallyGeneratedData implements
                 for (ContainerTypeWrapper containerType : allContainerTypes) {
                     if (containerType.getTopLevel()) {
                         containers.add(ContainerHelper.addContainer(labelPrefix
-                            + getInstance().getRandString(), null,
-                            parentContainer, site, containerType));
+                            + getInstance().getRandString(), null, site,
+                            containerType));
                     }
                 }
             }
@@ -399,7 +399,7 @@ public final class TestReportsProcedurallyGeneratedData implements
                     for (int col = 0; col < numCols; col++) {
                         // don't breach some limit, otherwise we will generate
                         // WAY TOO MANY Container-s
-                        if (totalCapacity * MAX_CONTAINER_CAPACITY <= containersAdded) {
+                        if ((totalCapacity * MAX_CONTAINER_CAPACITY) <= containersAdded) {
                             break;
                         }
 

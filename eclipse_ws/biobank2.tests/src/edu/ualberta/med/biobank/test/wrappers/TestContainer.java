@@ -18,7 +18,6 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankRuntimeException;
-import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -35,6 +34,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropertyException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
@@ -127,8 +127,7 @@ public class TestContainer extends TestDatabase {
 
     private void addContainers() throws BiobankCheckException, Exception {
         ContainerWrapper top = ContainerHelper.addContainer("01",
-            TestCommon.getNewBarcode(r), null, site,
-            containerTypeMap.get("TopCT"));
+            TestCommon.getNewBarcode(r), site, containerTypeMap.get("TopCT"));
         containerMap.put("Top", top);
     }
 
@@ -231,7 +230,7 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper freezer, cabinet, hotel, drawer;
 
         freezer = ContainerHelper.addContainer("02",
-            TestCommon.getNewBarcode(r), null, site, freezerType);
+            TestCommon.getNewBarcode(r), site, freezerType);
         hotel = ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r),
             freezer, site, hotelType, 0, 0);
         freezer.reload();
@@ -239,7 +238,7 @@ public class TestContainer extends TestDatabase {
         containerMap.put("H02AA", hotel);
 
         cabinet = ContainerHelper.addContainer("02",
-            TestCommon.getNewBarcode(r), null, site, cabinetType);
+            TestCommon.getNewBarcode(r), site, cabinetType);
         drawer = ContainerHelper.addContainer(null,
             TestCommon.getNewBarcode(r), cabinet, site, drawerType, 0, 0);
         cabinet.reload();
@@ -250,7 +249,7 @@ public class TestContainer extends TestDatabase {
     @Test
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
         ContainerWrapper container = ContainerHelper.addContainer(
-            String.valueOf(r.nextInt()), null, null, site,
+            String.valueOf(r.nextInt()), null, site,
             containerTypeMap.get("TopCT"));
         testGettersAndSetters(container, GETTER_SKIP_METHODS);
     }
@@ -258,7 +257,7 @@ public class TestContainer extends TestDatabase {
     @Test
     public void testGetWrappedClass() throws Exception {
         ContainerWrapper container = ContainerHelper.addContainer(
-            String.valueOf(r.nextInt()), null, null, site,
+            String.valueOf(r.nextInt()), null, site,
             containerTypeMap.get("TopCT"));
         Assert.assertEquals(Container.class, container.getWrappedClass());
     }
@@ -266,7 +265,7 @@ public class TestContainer extends TestDatabase {
     @Test
     public void createValidContainer() throws Exception {
         ContainerWrapper container = ContainerHelper.addContainer("05", null,
-            null, site, containerTypeMap.get("TopCT"));
+            site, containerTypeMap.get("TopCT"));
 
         Integer id = container.getId();
         Assert.assertNotNull(id);
@@ -278,21 +277,21 @@ public class TestContainer extends TestDatabase {
     @Test
     public void testCreateNoSite() throws Exception {
         try {
-            ContainerHelper.addContainer("05", null, null, null,
+            ContainerHelper.addContainer("05", null, null,
                 containerTypeMap.get("TopCT"));
             Assert.fail("should not be allowed to add container with no site");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
         ContainerWrapper container = ContainerHelper.newContainer("05", null,
-            null, null, containerTypeMap.get("TopCT"));
+            null, containerTypeMap.get("TopCT"));
         Assert.assertEquals(null, container.getSite());
     }
 
     @Test
     public void testCreateNoContainerType() throws Exception {
         try {
-            ContainerHelper.addContainer("05", null, null, site, null);
+            ContainerHelper.addContainer("05", null, site, null);
             Assert
                 .fail("should not be allowed to add container with no container type");
         } catch (NullPropertyException e) {
@@ -300,7 +299,7 @@ public class TestContainer extends TestDatabase {
         }
 
         ContainerWrapper container = ContainerHelper.newContainer("05", null,
-            null, site, null);
+            site, null);
         Assert.assertEquals(null, container.getContainerType());
         Assert.assertEquals(null, container.getRowCapacity());
         Assert.assertEquals(null, container.getColCapacity());
@@ -318,9 +317,9 @@ public class TestContainer extends TestDatabase {
     public void testLabel() throws Exception {
         // make sure label is unique
         ContainerWrapper container2;
-        ContainerHelper.addContainer("05", null, null, site,
+        ContainerHelper.addContainer("05", null, site,
             containerTypeMap.get("TopCT"));
-        container2 = ContainerHelper.newContainer("05", null, null, site,
+        container2 = ContainerHelper.newContainer("05", null, site,
             containerTypeMap.get("TopCT"));
 
         try {
@@ -341,7 +340,7 @@ public class TestContainer extends TestDatabase {
             site, "Top Container Type 2", "TCT2", 2, 3, 10, true);
 
         ContainerWrapper top2 = ContainerHelper.addContainer("02",
-            TestCommon.getNewBarcode(r), null, site, topType2);
+            TestCommon.getNewBarcode(r), site, topType2);
         Assert.assertEquals("02 (TCT2)", top2.getFullInfoLabel());
     }
 
@@ -370,9 +369,9 @@ public class TestContainer extends TestDatabase {
 
         String barcode = TestCommon.getNewBarcode(r);
 
-        ContainerHelper.addContainer("05", barcode, null, site,
+        ContainerHelper.addContainer("05", barcode, site,
             containerTypeMap.get("TopCT"));
-        container2 = ContainerHelper.newContainer("06", barcode, null, site,
+        container2 = ContainerHelper.newContainer("06", barcode, site,
             containerTypeMap.get("TopCT"));
 
         try {
@@ -389,7 +388,7 @@ public class TestContainer extends TestDatabase {
         ContainerTypeWrapper type = containerTypeMap.get("ChildCtL4");
 
         ContainerWrapper container = ContainerHelper.newContainer("02",
-            TestCommon.getNewBarcode(r), null, site, type);
+            TestCommon.getNewBarcode(r), site, type);
 
         // should have a parent
         try {
@@ -421,12 +420,11 @@ public class TestContainer extends TestDatabase {
             .getChildContainerTypeCollection().get(0);
 
         ContainerWrapper container = ContainerHelper.newContainer("02",
-            TestCommon.getNewBarcode(r), parent, site, type);
-        container.setParent(parent, new RowColPos(10, 10));
+            TestCommon.getNewBarcode(r), site, type);
         try {
-            container.persist();
+            container.setParent(parent, new RowColPos(10, 10));
             Assert.fail("position not ok in parent container");
-        } catch (BiobankSessionException bce) {
+        } catch (BiobankCheckException e) {
             Assert.assertTrue(true);
         }
 
@@ -434,12 +432,14 @@ public class TestContainer extends TestDatabase {
         container.persist();
 
         ContainerWrapper container2 = ContainerHelper.newContainer(null,
-            TestCommon.getNewBarcode(r), null, site, type);
-        container2.setParent(parent, new RowColPos(0, 0));
+            TestCommon.getNewBarcode(r), site, type);
         container2.setContainerType(type);
         try {
+            container2.setParent(parent, new RowColPos(0, 0));
             container2.persist();
             Assert.fail("position not available");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
         } catch (BiobankSessionException e) {
             Assert.assertTrue(true);
         }
@@ -477,8 +477,7 @@ public class TestContainer extends TestDatabase {
     @Test
     public void testActivityStatus() throws Exception {
         ContainerWrapper container = ContainerHelper.addContainer("05",
-            TestCommon.getNewBarcode(r), null, site,
-            containerTypeMap.get("TopCT"));
+            TestCommon.getNewBarcode(r), site, containerTypeMap.get("TopCT"));
         container.setActivityStatus(null);
 
         try {
@@ -496,15 +495,14 @@ public class TestContainer extends TestDatabase {
     @Test
     public void testReset() throws Exception {
         ContainerWrapper container = ContainerHelper.addContainer("05",
-            TestCommon.getNewBarcode(r), null, site,
-            containerTypeMap.get("TopCT"));
+            TestCommon.getNewBarcode(r), site, containerTypeMap.get("TopCT"));
         container.reset();
     }
 
     @Test
     public void testReload() throws Exception {
         ContainerWrapper container = ContainerHelper.newContainer("05",
-            "uvwxyz", null, site, containerTypeMap.get("TopCT"));
+            "uvwxyz", site, containerTypeMap.get("TopCT"));
         container.reload();
     }
 
@@ -528,22 +526,26 @@ public class TestContainer extends TestDatabase {
         }
 
         // create new child
-        child = ContainerHelper.newContainer(null, "uvwxyzabcdef", top, site,
-            containerTypeMap.get("ChildCtL1"), top.getRowCapacity(),
-            top.getColCapacity());
-
         try {
+            child = ContainerHelper.newContainer(null, "uvwxyzabcdef", top,
+                site, containerTypeMap.get("ChildCtL1"), top.getRowCapacity(),
+                top.getColCapacity());
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
         } catch (BiobankSessionException e) {
             Assert.assertTrue(true);
         }
 
-        child.setParent(top,
-            new RowColPos(top.getRowCapacity() + 1, top.getColCapacity() + 1));
         try {
+            child.setParent(top,
+                new RowColPos(top.getRowCapacity() + 1,
+                    top.getColCapacity() + 1));
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
         } catch (BiobankSessionException e) {
             Assert.assertTrue(true);
         }
@@ -554,6 +556,9 @@ public class TestContainer extends TestDatabase {
             Assert.fail("should not be allowed to set an invalid position");
         } catch (ValidationException e) {
             Assert.assertTrue(true);
+        } catch (ApplicationException e) {
+            // TODO: figure out why this isn't being wrapped and thrown as
+            // ValidationException
         }
     }
 
@@ -606,10 +611,10 @@ public class TestContainer extends TestDatabase {
             site, "Top Container Type 2", "TCT2", 2, 3, 10, true);
 
         top2 = ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r),
-            null, site, topType2);
+            site, topType2);
 
         top1 = ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r),
-            null, site, containerTypeMap.get("TopCT"));
+            site, containerTypeMap.get("TopCT"));
         childL1 = ContainerHelper.addContainer("02AA", "0001", top1, site,
             containerTypeMap.get("ChildCtL1"), 0, 0);
         top1.reload();
@@ -721,7 +726,7 @@ public class TestContainer extends TestDatabase {
                 // System.out.println("type/" + childType + " scheme/"
                 // + childType.getChildLabelingScheme() + " label/" + label);
                 ContainerWrapper child = ContainerHelper.newContainer(null,
-                    TestCommon.getNewBarcode(r), null, site, childType);
+                    TestCommon.getNewBarcode(r), site, childType);
                 parent.addChild(label, child);
             }
         }
@@ -734,7 +739,7 @@ public class TestContainer extends TestDatabase {
 
         try {
             ContainerWrapper child = ContainerHelper.newContainer(null,
-                TestCommon.getNewBarcode(r), null, site, childType);
+                TestCommon.getNewBarcode(r), site, childType);
             parent.addChild(label, child);
             Assert.fail("should not be allowed to add children beyond limit");
         } catch (Exception e) {
@@ -1089,7 +1094,7 @@ public class TestContainer extends TestDatabase {
     @Test
     public void testGetContainersByLabel() {
         try {
-            ContainerHelper.addContainer("01AA", "asdf", null, site,
+            ContainerHelper.addContainer("01AA", "asdf", site,
                 ContainerTypeHelper.addContainerTypeRandom(site, "ct", true));
         } catch (Exception e) {
             Assert.fail();
@@ -1120,8 +1125,10 @@ public class TestContainer extends TestDatabase {
 
         // now add to DB
 
-        top.addChild(1, 0, ContainerHelper.newContainer(null, barcode, top,
-            site, containerTypeMap.get("ChildCtL1")));
+        ContainerWrapper child = ContainerHelper.newContainer(null, barcode,
+            site, containerTypeMap.get("ChildCtL1"));
+
+        top.addChild(1, 0, child);
         top.persist();
         top.reload();
 
@@ -1231,7 +1238,7 @@ public class TestContainer extends TestDatabase {
         Assert.assertEquals(0, top.compareTo(top));
     }
 
-    @Test(expected = DuplicateEntryException.class)
+    @Test(expected = DuplicatePropertySetException.class)
     public void testContainerTypeSameSite() throws Exception {
         SiteWrapper altSite = SiteHelper.addSite("Site2 - Container Test"
             + Utils.getRandomString(10));
@@ -1241,8 +1248,8 @@ public class TestContainer extends TestDatabase {
             CONTAINER_TOP_COLS, true);
         altTopType.persist();
 
-        ContainerHelper.addContainer("01", TestCommon.getNewBarcode(r), null,
-            site, containerTypeMap.get("TopCT"));
+        ContainerHelper.addContainer("01", TestCommon.getNewBarcode(r), site,
+            containerTypeMap.get("TopCT"));
     }
 
     @Test
@@ -1263,7 +1270,7 @@ public class TestContainer extends TestDatabase {
         childType.reload();
 
         ContainerWrapper altTop = ContainerHelper.addContainer("01",
-            TestCommon.getNewBarcode(r), null, altSite, altTopType);
+            TestCommon.getNewBarcode(r), altSite, altTopType);
 
         // now a container of type container type for alternate site to the main
         // site
@@ -1279,7 +1286,7 @@ public class TestContainer extends TestDatabase {
             ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r),
                 containerMap.get("Top"), site, childType, 0, 0);
             Assert.fail("type should be in the same site");
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankSessionException bce) {
             Assert.assertTrue(true);
         }
     }
@@ -1291,9 +1298,10 @@ public class TestContainer extends TestDatabase {
         top = containerMap.get("Top");
         for (int row = 0; row < CONTAINER_TOP_ROWS; ++row) {
             for (int col = 0; col < CONTAINER_TOP_COLS; ++col) {
-                top.addChild(row, col, ContainerHelper.newContainer(null,
-                    TestCommon.getNewBarcode(r), top, site,
-                    containerTypeMap.get("ChildCtL1")));
+                ContainerWrapper child = ContainerHelper.newContainer(null,
+                    TestCommon.getNewBarcode(r), site,
+                    containerTypeMap.get("ChildCtL1"));
+                top.addChild(row, col, child);
             }
         }
         top.persist();
@@ -1301,9 +1309,10 @@ public class TestContainer extends TestDatabase {
 
         // now add one more
         try {
-            top.addChild(0, 0, ContainerHelper.newContainer(null,
-                TestCommon.getNewBarcode(r), top, site,
-                containerTypeMap.get("ChildCtL1")));
+            ContainerWrapper child = ContainerHelper.newContainer(null,
+                TestCommon.getNewBarcode(r), site,
+                containerTypeMap.get("ChildCtL1"));
+            top.addChild(0, 0, child);
             Assert.fail("position already occupied");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
@@ -1377,11 +1386,11 @@ public class TestContainer extends TestDatabase {
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(
             newSite, name, "N", 1, 3, 5, false);
         ContainerWrapper newContainer = ContainerHelper.newContainer(null,
-            name, top, newSite, type);
+            name, top, newSite, type, 1, 1);
         try {
             newContainer.persist();
             Assert.fail("container not from same site that parent");
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankSessionException e) {
             Assert.assertTrue(true);
         }
     }
@@ -1397,17 +1406,16 @@ public class TestContainer extends TestDatabase {
 
         ContainerWrapper child = ContainerHelper.newContainer(null,
             TestCommon.getNewBarcode(r), top, site,
-            containerTypeMap.get("ChildCtL1"));
-        top.addChild(0, 0, child);
-        ContainerWrapper child2 = ContainerHelper.newContainer(null,
-            TestCommon.getNewBarcode(r), child, site,
-            containerTypeMap.get("ChildCtL2"));
+            containerTypeMap.get("ChildCtL1"), 0, 0);
         top.persist();
         top.reload();
 
-        child.addChild(0, 0, child2);
+        ContainerWrapper child2 = ContainerHelper.newContainer(null,
+            TestCommon.getNewBarcode(r), child, site,
+            containerTypeMap.get("ChildCtL2"), 0, 0);
         child.persist();
         child.reload();
+
         String child2Label = child2.getLabel();
         String childLabel = child.getLabel();
         Assert.assertTrue(child2Label.startsWith(childLabel));
@@ -1432,8 +1440,7 @@ public class TestContainer extends TestDatabase {
 
         ContainerWrapper child = ContainerHelper.newContainer(null,
             TestCommon.getNewBarcode(r), top, site,
-            containerTypeMap.get("ChildCtL1"));
-        top.addChild(0, 0, child);
+            containerTypeMap.get("ChildCtL1"), 0, 0);
         top.persist();
         top.reload();
         String childLabel = child.getLabel();
@@ -1442,8 +1449,7 @@ public class TestContainer extends TestDatabase {
 
         ContainerWrapper child2 = ContainerHelper.newContainer(null,
             TestCommon.getNewBarcode(r), child, site,
-            containerTypeMap.get("ChildCtL2"));
-        child.addChild(0, 0, child2);
+            containerTypeMap.get("ChildCtL2"), 0, 0);
         child.persist();
         child.reload();
         String child2Label = child2.getLabel();
@@ -1483,11 +1489,11 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper top = containerMap.get("Top");
 
         ContainerWrapper child = ContainerHelper.newContainer(null,
-            TestCommon.getNewBarcode(r), top, site,
+            TestCommon.getNewBarcode(r), site,
             containerTypeMap.get("ChildCtL1"));
         top.addChild(0, 0, child);
         ContainerWrapper child2 = ContainerHelper.newContainer(null,
-            TestCommon.getNewBarcode(r), top, site,
+            TestCommon.getNewBarcode(r), site,
             containerTypeMap.get("ChildCtL1"));
         top.addChild(0, 1, child2);
         top.persist();
@@ -1511,10 +1517,10 @@ public class TestContainer extends TestDatabase {
         top.getContainerType().persist();
 
         ContainerWrapper child = ContainerHelper.newContainer(null,
-            TestCommon.getNewBarcode(r), top, site, childType);
+            TestCommon.getNewBarcode(r), site, childType);
         top.addChild(0, 0, child);
         ContainerWrapper child2 = ContainerHelper.newContainer(null,
-            TestCommon.getNewBarcode(r), top, site, childType);
+            TestCommon.getNewBarcode(r), site, childType);
         top.addChild(0, 1, child2);
         top.persist();
 
@@ -1577,13 +1583,13 @@ public class TestContainer extends TestDatabase {
         top.getContainerType().persist();
 
         ContainerWrapper child = ContainerHelper.newContainer(null,
-            TestCommon.getNewBarcode(r), top, site, childType);
+            TestCommon.getNewBarcode(r), site, childType);
         top.addChild(0, 0, child);
         ContainerWrapper child2 = ContainerHelper.newContainer(null,
-            TestCommon.getNewBarcode(r), top, site, childType);
+            TestCommon.getNewBarcode(r), site, childType);
         top.addChild(0, 1, child2);
         ContainerWrapper child3 = ContainerHelper.newContainer(null,
-            TestCommon.getNewBarcode(r), top, site, childType2);
+            TestCommon.getNewBarcode(r), site, childType2);
         top.addChild(0, 2, child3);
         top.persist();
 
@@ -1620,7 +1626,7 @@ public class TestContainer extends TestDatabase {
         for (int row = 0; row < CONTAINER_TOP_ROWS; row++) {
             for (int col = 0; col < CONTAINER_TOP_COLS; col++) {
                 ContainerWrapper child = ContainerHelper.newContainer(null,
-                    TestCommon.getNewBarcode(r), top, site,
+                    TestCommon.getNewBarcode(r), site,
                     containerTypeMap.get("ChildCtL1"));
                 top.addChild(row, col, child);
             }
@@ -1641,8 +1647,8 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper top = addContainerHierarchy(containerMap.get("Top"));
         ContainerWrapper child = containerMap.get("ChildL1"); // 01AA
 
-        ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r), null,
-            site, containerTypeMap.get("TopCT"));
+        ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r), site,
+            containerTypeMap.get("TopCT"));
 
         String newLabel = "01AF";
         List<ContainerWrapper> newParentContainers = child
@@ -1663,8 +1669,8 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper top = addContainerHierarchy(containerMap.get("Top"));
         ContainerWrapper child = containerMap.get("ChildL1"); // 01AA
 
-        ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r), null,
-            site, containerTypeMap.get("TopCT"));
+        ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r), site,
+            containerTypeMap.get("TopCT"));
 
         top.addChild(2, 3, child);
         child.persist();
@@ -1693,8 +1699,7 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper child = containerMap.get("ChildL1"); // 01AA01
 
         ContainerWrapper top2 = ContainerHelper.addContainer("02",
-            TestCommon.getNewBarcode(r), null, site,
-            containerTypeMap.get("TopCT"));
+            TestCommon.getNewBarcode(r), site, containerTypeMap.get("TopCT"));
 
         String newLabel = "02AF";
         List<ContainerWrapper> altParentContainers = child

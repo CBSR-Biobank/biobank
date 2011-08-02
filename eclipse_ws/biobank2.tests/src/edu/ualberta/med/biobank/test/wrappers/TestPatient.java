@@ -96,8 +96,7 @@ public class TestPatient extends TestDatabase {
 
     private void addContainers() throws Exception {
         ContainerWrapper top = ContainerHelper.addContainer("01",
-            TestCommon.getNewBarcode(r), null, site,
-            containerTypeMap.get("TopCT"));
+            TestCommon.getNewBarcode(r), site, containerTypeMap.get("TopCT"));
         containerMap.put("Top", top);
 
         ContainerWrapper childL1 = ContainerHelper.addContainer(null,

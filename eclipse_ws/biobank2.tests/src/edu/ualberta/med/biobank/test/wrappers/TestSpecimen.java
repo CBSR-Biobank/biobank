@@ -74,7 +74,7 @@ public class TestSpecimen extends TestDatabase {
         topType.persist();
 
         topContainer = ContainerHelper.addContainer("top" + r.nextInt(), "cc",
-            null, site, topType);
+            site, topType);
 
         ContainerWrapper container = ContainerHelper.addContainer(null, "2nd",
             topContainer, site, typeChild, 3, 3);
@@ -383,7 +383,7 @@ public class TestSpecimen extends TestDatabase {
             .getSpecimenType()));
         type.persist();
         ContainerWrapper parent = ContainerHelper.addContainer(
-            "newcontainerParent", "ccNew", null, site, type);
+            "newcontainerParent", "ccNew", site, type);
 
         childSpc.setParent(parent, childSpc.getPosition());
         childSpc.persist();
@@ -717,7 +717,7 @@ public class TestSpecimen extends TestDatabase {
         ContainerTypeWrapper topType = ContainerTypeHelper.addContainerType(
             destSite, "ct11", "ct11", 1, 5, 6, true);
         ContainerWrapper topCont = ContainerHelper.addContainer("11", "11",
-            null, destSite, topType);
+            destSite, topType);
         ContainerTypeWrapper childType = ContainerTypeHelper.addContainerType(
             destSite, "ct22", "ct22", 2, 4, 7, false);
         topType.addToChildContainerTypeCollection(Arrays.asList(childType));

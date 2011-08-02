@@ -99,8 +99,7 @@ public class TestProcessingEvent extends TestDatabase {
 
     private void addContainers() throws Exception {
         ContainerWrapper top = ContainerHelper.addContainer("01",
-            TestCommon.getNewBarcode(r), null, site,
-            containerTypeMap.get("TopCT"));
+            TestCommon.getNewBarcode(r), site, containerTypeMap.get("TopCT"));
         containerMap.put("Top", top);
 
         ContainerWrapper childL1 = ContainerHelper.addContainer(null,
@@ -258,7 +257,7 @@ public class TestProcessingEvent extends TestDatabase {
                 if (r.nextGaussian() > 0.0)
                     continue;
                 System.out.println("setting aliquot at: " + row + ", " + col);
-                spcMap.put(row + col * rows,
+                spcMap.put(row + (col * rows),
                     SpecimenHelper.addSpecimen(parentSpc,
                         DbHelper.chooseRandomlyInList(allSpcTypes),
                         parentSpc.getCollectionEvent(), pevent, container, row,
@@ -280,7 +279,8 @@ public class TestProcessingEvent extends TestDatabase {
             Assert.assertNotNull(pos);
             Assert.assertNotNull(pos.getCol());
             Assert.assertNotNull(pos.getRow());
-            Assert.assertEquals(spc, spcMap.get(pos.getRow() + pos.getCol() * rows));
+            Assert.assertEquals(spc,
+                spcMap.get(pos.getRow() + (pos.getCol() * rows)));
         }
 
         // delete all samples now (children before parents)
@@ -329,7 +329,7 @@ public class TestProcessingEvent extends TestDatabase {
                     // continue;
                     // System.out.println("setting aliquot at: " + row + ", " +
                     // col);
-                    spcMap.put(row + col * rows, SpecimenHelper.addSpecimen(
+                    spcMap.put(row + (col * rows), SpecimenHelper.addSpecimen(
                         parentSpc, DbHelper.chooseRandomlyInList(allSpcTypes),
                         parentSpc.getCollectionEvent(), pevent, container, row,
                         col));
