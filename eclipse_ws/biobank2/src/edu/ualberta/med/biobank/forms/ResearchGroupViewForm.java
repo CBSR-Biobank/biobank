@@ -163,7 +163,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
         SpecimenTransitView.reloadCurrent();
     }
 
-    private void createResearchGroupSection() throws Exception {
+    private void createResearchGroupSection() {
         Composite client = toolkit.createComposite(page);
         client.setLayout(new GridLayout(2, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

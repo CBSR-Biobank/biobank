@@ -29,6 +29,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  */
 public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
 
+    @SuppressWarnings("unused")
     private static BgcLogger logger = BgcLogger
         .getLogger(SpecimenTypeEntryInfoTree.class.getName());
 
