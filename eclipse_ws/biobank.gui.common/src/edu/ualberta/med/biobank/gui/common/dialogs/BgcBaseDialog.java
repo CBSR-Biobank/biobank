@@ -123,6 +123,12 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
             throw new RuntimeException(e);
         }
 
+        // Build the separator line
+        Label bottomSeparator = new Label(parent, SWT.HORIZONTAL
+            | SWT.SEPARATOR);
+        bottomSeparator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL
+            | GridData.GRAB_HORIZONTAL));
+
         bindChangeListener();
         setupFinished = true;
         return parent;

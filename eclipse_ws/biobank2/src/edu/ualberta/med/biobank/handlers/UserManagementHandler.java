@@ -6,14 +6,16 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.dialogs.user.UserManagementDialog;
+import edu.ualberta.med.biobank.test.TestDialog;
 
 public class UserManagementHandler extends AbstractHandler implements IHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        new UserManagementDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell()).open();
+        new TestDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+            .getShell()).open();
+        // new UserManagementDialog(PlatformUI.getWorkbench()
+        // .getActiveWorkbenchWindow().getShell()).open();
         return null;
     }
 }

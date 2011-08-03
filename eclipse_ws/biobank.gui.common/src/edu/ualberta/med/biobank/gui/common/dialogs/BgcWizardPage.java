@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.wizards.pages;
+package edu.ualberta.med.biobank.gui.common.dialogs;
 
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
@@ -11,10 +11,10 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 
-public abstract class BiobankWizardPage extends WizardPage {
+public abstract class BgcWizardPage extends WizardPage {
     private BgcWidgetCreator widgetCreator;
 
-    protected BiobankWizardPage(String pageName, String title,
+    protected BgcWizardPage(String pageName, String title,
         ImageDescriptor titleImage) {
         super(pageName, title, titleImage);
 
