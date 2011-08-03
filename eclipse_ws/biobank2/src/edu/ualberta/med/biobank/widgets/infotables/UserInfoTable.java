@@ -27,9 +27,11 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserInfoTable extends InfoTableWidget<User> {
-    public static final int ROWS_PER_PAGE = 8;
-    private static final String[] HEADINGS = new String[] { Messages.UserInfoTable_login_label, Messages.UserInfoTable_email_label,
-        Messages.UserInfoTable_firstname_label, Messages.UserInfoTable_lastname_label };
+    public static final int ROWS_PER_PAGE = 12;
+    private static final String[] HEADINGS = new String[] {
+        Messages.UserInfoTable_login_label, Messages.UserInfoTable_email_label,
+        Messages.UserInfoTable_firstname_label,
+        Messages.UserInfoTable_lastname_label };
     private static final String LOADING_ROW = Messages.UserInfoTable_loading;
     private static final String GROUPS_LOADING_ERROR = Messages.UserInfoTable_load_error_msg;
     private static final String USER_DELETE_ERROR = Messages.UserInfoTable_delete_error_msg;

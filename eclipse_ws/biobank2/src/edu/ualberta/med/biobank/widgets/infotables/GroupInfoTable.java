@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class GroupInfoTable extends InfoTableWidget<Group> {
-    public static final int ROWS_PER_PAGE = 8;
+    public static final int ROWS_PER_PAGE = 12;
     private static final String[] HEADINGS = new String[] { Messages.GroupInfoTable_name_label };
     private static final String LOADING_ROW = Messages.GroupInfoTable_loading;
     private static final String GROUP_DELETE_ERROR = Messages.GroupInfoTable_delete_error_msg;
