@@ -16,7 +16,7 @@ public class RequestInput implements Serializable {
     private String pnumber;
     private String inventoryID;
     private Date dateDrawn;
-    private String sampleTypeNameShort;
+    private String specimenTypeNameShort;
     private String location;
     private String activityStatus;
 
@@ -37,11 +37,11 @@ public class RequestInput implements Serializable {
     }
 
     public String getSpecimenTypeNameShort() {
-        return sampleTypeNameShort;
+        return specimenTypeNameShort;
     }
 
-    public void setSpecimenTypeNameShort(String sampleType) {
-        this.sampleTypeNameShort = sampleType;
+    public void setSpecimenTypeNameShort(String specimenType) {
+        this.specimenTypeNameShort = specimenType;
     }
 
     public String getLocation() {

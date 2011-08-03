@@ -16,6 +16,16 @@ public class Messages extends NLS {
     public static String ReportTreeWidget_delete_label;
     public static String ReportTreeWidget_error_msg;
     public static String ReportTreeWidget_error_title;
+    public static String RequestSpecimensTreeTable_claim_error_title;
+    public static String RequestSpecimensTreeTable_claim_menu;
+    public static String RequestSpecimensTreeTable_claimed_label;
+    public static String RequestSpecimensTreeTable_flag_unavailable_menu;
+    public static String RequestSpecimensTreeTable_id_label;
+    public static String RequestSpecimensTreeTable_location_label;
+    public static String RequestSpecimensTreeTable_patient_label;
+    public static String RequestSpecimensTreeTable_save_error_title;
+    public static String RequestSpecimensTreeTable_state_label;
+    public static String RequestSpecimensTreeTable_type_label;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

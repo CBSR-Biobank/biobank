@@ -12,7 +12,7 @@ public class ReceivingRequestGroup extends AbstractRequestGroup {
 
     public ReceivingRequestGroup(AdapterBase parent, int id,
         CenterWrapper<?> center) {
-        super(parent, id, "Pending Requests", center);
+        super(parent, id, Messages.ReceivingRequestGroup_node_label, center);
     }
 
     @Override
