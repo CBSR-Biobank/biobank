@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.dmscanlib.ScanCellPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -36,14 +37,24 @@ public class PalletCell extends AbstractUICell {
 
     public static Map<RowColPos, PalletCell> convertArray(ScanCell[][] scancells) {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
-        for (int i = 0; i < ScanCell.ROW_MAX; i++) {
-            for (int j = 0; j < ScanCell.COL_MAX; j++) {
+        for (int i = 0; i < ScanCellPos.ROW_MAX; i++) {
+            for (int j = 0; j < ScanCellPos.COL_MAX; j++) {
                 ScanCell scanCell = scancells[i][j];
                 if (scanCell != null && scanCell.getValue() != null) {
                     palletScanned.put(new RowColPos(i, j), new PalletCell(
                         scanCell));
                 }
             }
+        }
+        return palletScanned;
+    }
+
+    public static Map<RowColPos, PalletCell> convertArray(
+        Map<ScanCellPos, ScanCell> scancells) {
+        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
+        for (ScanCell cell : scancells.values()) {
+            palletScanned.put(new RowColPos(cell.getRow(), cell.getColumn()),
+                new PalletCell(cell));
         }
         return palletScanned;
     }

@@ -31,8 +31,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
+import edu.ualberta.med.biobank.widgets.IFileBrowserListener;
 
-public class ResearchGroupViewForm extends AddressViewFormCommon {
+public class ResearchGroupViewForm extends AddressViewFormCommon implements
+    IFileBrowserListener {
     public static final String ID = "edu.ualberta.med.biobank.forms.ResearchGroupViewForm"; //$NON-NLS-1$
 
     private ResearchGroupAdapter researchGroupAdapter;
@@ -85,9 +87,10 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
         toolkit.createLabel(client,
-            Messages.ResearchGroupViewForm_request_description);
-        csvSelector = new FileBrowser(client,
-            Messages.ResearchGroupViewForm_csvFile_label, SWT.NONE);
+            "Submit a request on behalf of this research group:");
+        csvSelector = new FileBrowser(client, "CSV File", SWT.NONE,
+            new String[] { ".csv" }); //$NON-NLS-1$
+        csvSelector.addFileSelectedListener(this);
         csvSelector.adaptToToolkit(toolkit, true);
         Button b = new Button(client, SWT.PUSH);
         b.setText(Messages.ResearchGroupViewForm_upload_button);
@@ -103,6 +106,11 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
             }
         });
         // b.setEnabled(false);
+    }
+
+    @Override
+    public void fileSelected(String filename) {
+        // do nothing
     }
 
     public void saveRequest() throws Exception {

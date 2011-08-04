@@ -351,6 +351,7 @@ public class Messages extends NLS {
     public static String ProcessingEventEntryForm_worksheet_validation_msg;
 
     public static String DecodePlate_tabTitle;
+
     public static String DecodePlate_dialog_scanError_title;
 
     public static String DecodePlateForm_button_scan_decode_label;
@@ -364,6 +365,11 @@ public class Messages extends NLS {
     public static String DecodePlateForm_noplate_error_msg;
 
     public static String DecodePlateForm_scanning_decoding;
+
+    public static String DecodeImageForm_decoding;
+
+    public static String DecodeImage_dialog_scanError_title;
+
     public static String DispatchReceivingEntryForm_already_accepted_msg;
 
     public static String DispatchReceivingEntryForm_already_accepted_title;
@@ -838,6 +844,9 @@ public class Messages extends NLS {
     public static String ResearchGroupEntryForm_study_label;
 
     public static String ResearchGroupEntryForm_study_validator_msg;
+
+    public static String DecodeImage_tabTitle;
+    public static String DecodeImage_browse_label;
 
     static {
         // initialize resource bundle

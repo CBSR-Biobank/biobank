@@ -99,7 +99,7 @@ public class PalletScanManagement {
             } else {
                 ScanCell[][] scanCells = null;
                 try {
-                    scanCells = ScannerConfigPlugin.scan(plateNum, profile);
+                    scanCells = ScannerConfigPlugin.decodePlate(plateNum, profile);
                     cells = PalletCell.convertArray(scanCells);
                 } catch (Exception ex) {
                     BgcPlugin.openAsyncError(
