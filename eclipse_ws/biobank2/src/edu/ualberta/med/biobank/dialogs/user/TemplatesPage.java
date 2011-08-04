@@ -17,12 +17,12 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogWithPages;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.TableFilter;
-import edu.ualberta.med.biobank.widgets.infotables.TemplateInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.GroupTemplateInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.UserInfoTable;
 
 public abstract class TemplatesPage extends BgcDialogPage {
 
-    private TemplateInfoTable templateInfoTable;
+    private GroupTemplateInfoTable templateInfoTable;
 
     public TemplatesPage(BgcDialogWithPages dialog) {
         super(dialog);
@@ -55,7 +55,7 @@ public abstract class TemplatesPage extends BgcDialogPage {
             }
         };
 
-        templateInfoTable = new TemplateInfoTable(content, null) {
+        templateInfoTable = new GroupTemplateInfoTable(content, null) {
             @Override
             protected boolean deleteTemplate(GroupTemplate template) {
                 boolean deleted = super.deleteTemplate(template);

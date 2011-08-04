@@ -21,10 +21,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class GroupInfoTable extends InfoTableWidget<Group> {
     public static final int ROWS_PER_PAGE = 12;
     private static final String[] HEADINGS = new String[] { Messages.GroupInfoTable_name_label };
-    private static final String LOADING_ROW = Messages.GroupInfoTable_loading;
-    private static final String GROUP_DELETE_ERROR = Messages.GroupInfoTable_delete_error_msg;
-    private static final String CONFIRM_DELETE_TITLE = Messages.GroupInfoTable_delete_confirm_title;
-    private static final String CONFIRM_DELETE_MESSAGE = Messages.GroupInfoTable_delete_confirm_msg;
 
     public GroupInfoTable(Composite parent, List<Group> collection) {
         super(parent, collection, HEADINGS, ROWS_PER_PAGE, Group.class);
@@ -87,7 +83,7 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
                 Group group = (Group) ((BiobankCollectionModel) element).o;
                 if (group == null) {
                     if (columnIndex == 0) {
-                        return LOADING_ROW;
+                        return Messages.GroupInfoTable_loading;
                     }
                     return ""; //$NON-NLS-1$
                 }
@@ -115,20 +111,23 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
     protected boolean deleteGroup(Group group) {
         try {
             String name = group.getName();
-            String message = MessageFormat.format(CONFIRM_DELETE_MESSAGE,
+            String message = MessageFormat.format(
+                Messages.GroupInfoTable_delete_confirm_msg,
                 new Object[] { name });
 
-            if (BgcPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
+            if (BgcPlugin.openConfirm(
+                Messages.GroupInfoTable_delete_confirm_title, message)) {
                 SessionManager.getAppService().deleteGroup(
                     SessionManager.getUser(), group);
-                // remove the user from the collection
+                // remove the group from the collection
                 getCollection().remove(group);
                 reloadCollection(getCollection(), null);
                 notifyListeners();
                 return true;
             }
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(GROUP_DELETE_ERROR, e);
+            BgcPlugin.openAsyncError(Messages.GroupInfoTable_delete_error_msg,
+                e);
         }
         return false;
     }

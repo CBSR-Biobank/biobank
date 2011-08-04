@@ -55,9 +55,15 @@ public abstract class GroupsPage extends BgcDialogPage {
             }
         };
 
-        // FIXME when delete group should delete from list ?
-        // FIXME quand edit doit reloader aussi ?
-        groupInfoTable = new GroupInfoTable(content, null);
+        groupInfoTable = new GroupInfoTable(content, null) {
+            @Override
+            protected boolean deleteGroup(Group group) {
+                boolean deleted = super.deleteGroup(group);
+                if (deleted)
+                    getCurrentAllGroupsList().remove(group);
+                return deleted;
+            }
+        };
         List<Group> tmpGroups = new ArrayList<Group>();
         for (int i = 0; i < GroupInfoTable.ROWS_PER_PAGE + 1; i++) {
             Group group = new Group();
@@ -110,8 +116,6 @@ public abstract class GroupsPage extends BgcDialogPage {
         return internalGroupList;
     }
 
-    protected abstract List<Group> getCurrentAllGroupsList();
-
     protected void addGroup() {
         final Group group = new Group();
         GroupEditDialog dlg = new GroupEditDialog(PlatformUI.getWorkbench()
@@ -122,19 +126,19 @@ public abstract class GroupsPage extends BgcDialogPage {
                 Messages.UserManagementDialog_group_added_title, MessageFormat
                     .format(Messages.UserManagementDialog_group_added_msg,
                         group.getName()));
-            resetAllGroupsList();
-            internalGroupList = null;
+            getCurrentAllGroupsList().add(group);
+            internalGroupList.add(group);
             groupInfoTable.reloadCollection(getInternalAllGroupsList(), group);
         }
     }
-
-    protected abstract void resetAllGroupsList();
-
-    protected abstract List<GroupTemplate> getTemplates();
 
     @Override
     public void runAddAction() {
         addGroup();
     }
+
+    protected abstract List<Group> getCurrentAllGroupsList();
+
+    protected abstract List<GroupTemplate> getTemplates();
 
 }

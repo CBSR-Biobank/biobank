@@ -61,6 +61,7 @@ public abstract class UsersPage extends BgcDialogPage {
             @Override
             protected int editUser(User user) {
                 int res = super.editUser(user);
+                // when user modify itself. Close everything to log again
                 if (res == UserEditDialog.CLOSE_PARENT_RETURN_CODE) {
                     dialog.close();
                 }
@@ -73,6 +74,11 @@ public abstract class UsersPage extends BgcDialogPage {
                 if (deleted)
                     getCurrentAllUsersList().remove(user);
                 return deleted;
+            }
+
+            @Override
+            protected List<Group> getGroups() {
+                return UsersPage.this.getGroups();
             }
         };
         List<User> tmpUsers = new ArrayList<User>();

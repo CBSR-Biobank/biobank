@@ -69,11 +69,6 @@ public class UserManagementDialog extends BgcDialogWithPages {
             }
 
             @Override
-            protected void resetAllGroupsList() {
-                currentAllGroupsList = null;
-            }
-
-            @Override
             protected List<GroupTemplate> getTemplates() {
                 return getGroupTemplates();
             }

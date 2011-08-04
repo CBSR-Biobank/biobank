@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,14 +12,16 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.security.GroupTemplate;
 import edu.ualberta.med.biobank.dialogs.user.TemplateEditDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class TemplateInfoTable extends InfoTableWidget<GroupTemplate> {
+public class GroupTemplateInfoTable extends InfoTableWidget<GroupTemplate> {
     public static final int ROWS_PER_PAGE = 12;
     private static final String[] HEADINGS = new String[] { "Name" };
     private static final String LOADING_ROW = "loading...";
 
-    public TemplateInfoTable(Composite parent, List<GroupTemplate> collection) {
+    public GroupTemplateInfoTable(Composite parent,
+        List<GroupTemplate> collection) {
         super(parent, collection, HEADINGS, ROWS_PER_PAGE, GroupTemplate.class);
 
         addEditItemListener(new IInfoTableEditItemListener() {
@@ -101,31 +104,23 @@ public class TemplateInfoTable extends InfoTableWidget<GroupTemplate> {
     }
 
     protected boolean deleteTemplate(GroupTemplate template) {
-        // FIXME
         // try {
-        // String loginName = user.getLogin();
-        // String message;
-        //
-        // if (SessionManager.getUser().equals(user)) {
-        // message = CONFIRM_SUICIDE_MESSAGE;
-        // } else {
-        // message = MessageFormat.format(CONFIRM_DELETE_MESSAGE,
-        // new Object[] { loginName });
-        // }
-        //
-        // if (BgcPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
-        // SessionManager.getAppService().deleteUser(
-        // SessionManager.getUser(), loginName);
-        //
-        // // remove the user from the collection
-        // getCollection().remove(user);
-        //
-        // reloadCollection(getCollection(), null);
-        // notifyListeners();
-        // return true;
-        // }
+        String name = template.getName();
+        String message = MessageFormat.format(
+            "Are you sure you want to delete ''{0}''?", new Object[] { name });
+
+        if (BgcPlugin.openConfirm("Confirm Deletion", message)) {
+            // FIXME
+            // SessionManager.getAppService().deleteGroup(
+            // SessionManager.getUser(), group);
+            // remove the template from the collection
+            getCollection().remove(template);
+            reloadCollection(getCollection());
+            notifyListeners();
+            return true;
+        }
         // } catch (ApplicationException e) {
-        // BgcPlugin.openAsyncError(USER_DELETE_ERROR, e);
+        // BgcPlugin.openAsyncError("Unable to delete template", e);
         // }
         return false;
     }
