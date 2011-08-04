@@ -6,7 +6,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -21,6 +28,7 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
+import edu.ualberta.med.biobank.common.security.GroupTemplate;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -34,7 +42,6 @@ import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class GroupEditDialog extends BgcBaseDialog {
-    public static final int CLOSE_PARENT_RETURN_CODE = 3;
     private final String currentTitle;
     private final String titleAreaMessage;
 
@@ -43,14 +50,17 @@ public class GroupEditDialog extends BgcBaseDialog {
     private List<CenterWrapper<?>> allCenters;
     private MultiSelectWidget centerFeaturesWidget;
     private Text centersFilterText;
-    private Text featuresFilterText;
+    private List<GroupTemplate> templates;
+    private LinkedHashMap<Integer, String> allFeaturesMap;
 
-    public GroupEditDialog(Shell parent, Group originalGroup, boolean isNewGroup) {
+    public GroupEditDialog(Shell parent, Group originalGroup,
+        List<GroupTemplate> templates, boolean isNewGroup) {
         super(parent);
         Assert.isNotNull(originalGroup);
         this.originalGroup = originalGroup;
         this.modifiedGroup = new Group();
         this.modifiedGroup.copy(originalGroup);
+        this.templates = templates;
         if (isNewGroup) {
             currentTitle = Messages.GroupEditDialog_title_add;
             titleAreaMessage = Messages.GroupEditDialog_titlearea_add;
@@ -135,6 +145,44 @@ public class GroupEditDialog extends BgcBaseDialog {
         gd.widthHint = 250;
         separator.setLayoutData(gd);
 
+        if (templates != null) {
+            Composite comp = new Composite(parent, SWT.NONE);
+            GridLayout gl = new GridLayout(2, false);
+            gl.horizontalSpacing = 0;
+            gl.marginHeight = 0;
+            gl.marginWidth = 0;
+            gl.verticalSpacing = 0;
+            comp.setLayout(gl);
+            gd = new GridData();
+            gd.grabExcessHorizontalSpace = true;
+            gd.horizontalAlignment = SWT.FILL;
+            comp.setLayoutData(gd);
+            widgetCreator.createLabel(comp, "Template");
+            final ComboViewer templatesViewer = new ComboViewer(comp);
+            templatesViewer.setContentProvider(new ArrayContentProvider());
+            templatesViewer.setLabelProvider(new LabelProvider() {
+                @Override
+                public String getText(Object element) {
+                    return ((GroupTemplate) element).getName();
+                }
+            });
+            templatesViewer.setComparator(new ViewerComparator());
+            templatesViewer.setInput(templates);
+            gd = new GridData();
+            gd.horizontalAlignment = SWT.FILL;
+            gd.grabExcessHorizontalSpace = true;
+            templatesViewer.getCombo().setLayoutData(gd);
+            templatesViewer
+                .addSelectionChangedListener(new ISelectionChangedListener() {
+                    @Override
+                    public void selectionChanged(SelectionChangedEvent event) {
+                        GroupTemplate template = (GroupTemplate) ((IStructuredSelection) templatesViewer
+                            .getSelection()).getFirstElement();
+                        centerFeaturesWidget.setSelections(allFeaturesMap,
+                            template.getCenterFeaturesEnabled());
+                    }
+                });
+        }
         centerFeaturesWidget = createFeaturesSelectionWidget(
             parent,
             SessionManager.getAppService().getSecurityCenterFeatures(
@@ -143,44 +191,20 @@ public class GroupEditDialog extends BgcBaseDialog {
             BiobankSecurityUtil.CENTER_FEATURE_START_NAME,
             Messages.GroupEditDialog_feature_center_list_available,
             Messages.GroupEditDialog_feature_center_list_selected);
-        centerFeaturesWidget.setSelection(modifiedGroup
-            .getCenterFeaturesEnabled());
-        centerFeaturesWidget.setFilter(new ViewerFilter() {
-            @Override
-            public boolean select(Viewer viewer, Object parentElement,
-                Object element) {
-                if (featuresFilterText == null)
-                    return true;
-                MultiSelectNode node = (MultiSelectNode) element;
-                return TableFilter.contains(node.getName(),
-                    featuresFilterText.getText());
-            }
-        });
-        label = new Label(parent, SWT.NONE);
-        label.setText("Enter text to filter the features lists:");
-        featuresFilterText = new Text(parent, SWT.BORDER);
-        gd = new GridData(SWT.FILL, SWT.NONE, true, false);
-        featuresFilterText.setLayoutData(gd);
-        featuresFilterText.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                centerFeaturesWidget.refreshLists();
-            }
-        });
     }
 
     private MultiSelectWidget createFeaturesSelectionWidget(Composite parent,
         List<ProtectionGroupPrivilege> availableFeatures,
         List<Integer> selectedFeatures, String replaceString,
         String availableString, String enabledString) {
-        final LinkedHashMap<Integer, String> featuresMap = new LinkedHashMap<Integer, String>();
+        allFeaturesMap = new LinkedHashMap<Integer, String>();
         for (ProtectionGroupPrivilege pgp : availableFeatures) {
-            featuresMap.put(pgp.getId().intValue(),
+            allFeaturesMap.put(pgp.getId().intValue(),
                 pgp.getName().replace(replaceString, "")); //$NON-NLS-1$
         }
         MultiSelectWidget featuresWidget = new MultiSelectWidget(parent,
             SWT.NONE, availableString, enabledString, 110);
-        featuresWidget.setSelections(featuresMap, selectedFeatures);
+        featuresWidget.setSelections(allFeaturesMap, selectedFeatures);
         return featuresWidget;
     }
 

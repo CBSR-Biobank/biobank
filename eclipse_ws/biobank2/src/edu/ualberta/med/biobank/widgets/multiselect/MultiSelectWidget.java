@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -239,12 +238,6 @@ public class MultiSelectWidget extends BgcBaseWidget {
         super.setEnabled(enabled);
         selTree.getControl().setEnabled(enabled);
         availTree.getControl().setEnabled(enabled);
-    }
-
-    public void setSelection(List<Integer> selected) {
-        availTree.getTree().selectAll();
-        availTree.setSelection(new StructuredSelection(selected));
-        moveTreeViewerSelection(availTree, selTree);
     }
 
     public void refreshLists() {

@@ -104,7 +104,7 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
 
     protected void editGroup(Group group) {
         GroupEditDialog dlg = new GroupEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), group, false);
+            .getActiveWorkbenchWindow().getShell(), group, null, false);
         int res = dlg.open();
         if (res == Dialog.OK) {
             reloadCollection(getCollection(), group);

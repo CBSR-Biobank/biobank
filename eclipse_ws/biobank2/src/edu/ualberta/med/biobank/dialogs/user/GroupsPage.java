@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.security.Group;
+import edu.ualberta.med.biobank.common.security.GroupTemplate;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogWithPages;
@@ -54,6 +55,8 @@ public abstract class GroupsPage extends BgcDialogPage {
             }
         };
 
+        // FIXME when delete group should delete from list ?
+        // FIXME quand edit doit reloader aussi ?
         groupInfoTable = new GroupInfoTable(content, null);
         List<Group> tmpGroups = new ArrayList<Group>();
         for (int i = 0; i < GroupInfoTable.ROWS_PER_PAGE + 1; i++) {
@@ -112,7 +115,7 @@ public abstract class GroupsPage extends BgcDialogPage {
     protected void addGroup() {
         final Group group = new Group();
         GroupEditDialog dlg = new GroupEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), group, true);
+            .getActiveWorkbenchWindow().getShell(), group, getTemplates(), true);
         int res = dlg.open();
         if (res == Status.OK) {
             BgcPlugin.openAsyncInformation(
@@ -126,6 +129,8 @@ public abstract class GroupsPage extends BgcDialogPage {
     }
 
     protected abstract void resetAllGroupsList();
+
+    protected abstract List<GroupTemplate> getTemplates();
 
     @Override
     public void runAddAction() {
