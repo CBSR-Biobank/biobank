@@ -16,6 +16,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -204,12 +205,21 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
                 enablePaginationWidget(false);
             } else if (paginationWidget != null)
                 paginationWidget.setVisible(false);
+            final Display display = getTableViewer().getTable().getDisplay();
 
             resizeTable();
             backgroundThread = new Thread() {
                 @Override
                 public void run() {
                     tableLoader(collection, selection);
+                    if (autoSizeColumns) {
+                        display.syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                autoSizeColumns();
+                            }
+                        });
+                    }
                 }
             };
             backgroundThread.start();
@@ -217,9 +227,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
             BgcPlugin.openAsyncError(
                 Messages.AbstractInfoTableWidget_load_error_title, e);
         }
-        if (autoSizeColumns) {
-            autoSizeColumns();
-        }
+
     }
 
     private void autoSizeColumns() {
@@ -269,7 +277,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
             sumOfMaxTextWidths += width;
         }
 
-        int tableWidth = Math.max(500, tableViewer.getTable().getSize().x);
+        int tableWidth = Math.max(1, tableViewer.getTable().getSize().x);
 
         int totalWidths = 0;
         table.setVisible(false);
