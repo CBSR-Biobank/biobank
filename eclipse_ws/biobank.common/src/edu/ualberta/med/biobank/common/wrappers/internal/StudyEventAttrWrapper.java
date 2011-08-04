@@ -7,6 +7,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.EventAttrPeer;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyEventAttrBaseWrapper;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
@@ -60,5 +61,16 @@ public class StudyEventAttrWrapper extends StudyEventAttrBaseWrapper {
     public static List<StudyEventAttrWrapper> getStudyEventAttrCollection(
         StudyWrapper study) {
         return study.getStudyEventAttrCollection(false);
+    }
+
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        WrapperTransaction.persist(this, appService);
+    }
+
+    @Override
+    public void delete() throws Exception {
+        WrapperTransaction.delete(this, appService);
     }
 }

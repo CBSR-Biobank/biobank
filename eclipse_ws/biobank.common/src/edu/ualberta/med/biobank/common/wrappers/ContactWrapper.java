@@ -31,6 +31,11 @@ public class ContactWrapper extends ContactBaseWrapper {
         return getStudyCollection(false);
     }
 
+    public boolean deleteAllowed() {
+        List<StudyWrapper> studies = getStudyCollection(false);
+        return ((studies == null) || (studies.size() == 0));
+    }
+
     @Override
     public int compareTo(ModelWrapper<Contact> c2) {
         if (c2 instanceof ContactWrapper) {

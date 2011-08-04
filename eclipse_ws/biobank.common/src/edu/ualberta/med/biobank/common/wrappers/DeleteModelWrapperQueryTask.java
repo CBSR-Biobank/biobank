@@ -20,7 +20,8 @@ import org.hibernate.Session;
  * @author jferland
  * 
  */
-public class DeleteModelWrapperQueryTask<E> implements RebindableWrapperQueryTask {
+public class DeleteModelWrapperQueryTask<E> implements
+    RebindableWrapperQueryTask {
     private final ModelWrapper<E> modelWrapper;
 
     public DeleteModelWrapperQueryTask(ModelWrapper<E> modelWrapper) {
@@ -66,6 +67,12 @@ public class DeleteModelWrapperQueryTask<E> implements RebindableWrapperQueryTas
         public Object doAction(Session session) throws BiobankSessionException {
             E model = getModel();
             session.delete(model);
+
+            // set the id to null so that the object is not loaded and so that
+            // Hibernate won't do any cascades with it because it has no
+            // identifier
+            getIdProperty().set(model, null);
+
             return model;
         }
     }
