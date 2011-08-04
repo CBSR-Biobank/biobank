@@ -78,12 +78,13 @@ public class UserManagementDialog extends BgcDialogWithPages {
                 return getGroupTemplates();
             }
         });
-        nodes.add(new TemplatesPage(this) {
-            @Override
-            protected List<GroupTemplate> getCurrentAllTemplatesList() {
-                return getGroupTemplates();
-            }
-        });
+        if (SessionManager.getUser().isSuperAdministrator())
+            nodes.add(new TemplatesPage(this) {
+                @Override
+                protected List<GroupTemplate> getCurrentAllTemplatesList() {
+                    return getGroupTemplates();
+                }
+            });
         return nodes;
     }
 
