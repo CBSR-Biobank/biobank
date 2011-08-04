@@ -65,10 +65,10 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     private List<Object> reportData;
 
     // Buttons
-    private Button generateButton;
-    private Button printButton;
-    private Button exportPDFButton;
-    private Button exportCSVButton;
+    protected Button generateButton;
+    protected Button printButton;
+    protected Button exportPDFButton;
+    protected Button exportCSVButton;
 
     // Mostly for visibility reasons
     private String path;

@@ -52,7 +52,7 @@ import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
-import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.dmscanlib.ScanCellPos;
 
 // FIXME the custom selection is not done in this version. 
 public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
@@ -216,7 +216,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         specimenTypesWidgets = new ArrayList<AliquotedSpecimenSelectionWidget>();
         AliquotedSpecimenSelectionWidget precedent = null;
-        for (int i = 0; i < ScanCell.ROW_MAX; i++) {
+        for (int i = 0; i < ScanCellPos.ROW_MAX; i++) {
             final AliquotedSpecimenSelectionWidget typeWidget = new AliquotedSpecimenSelectionWidget(
                 typesSelectionPerRowComposite,
                 ContainerLabelingSchemeWrapper.SBS_ROW_LABELLING_PATTERN
@@ -522,15 +522,14 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 sourceSpecimen.addToChildSpecimenCollection(Arrays
                     .asList(aliquotedSpecimen));
                 modifiedSources.add(sourceSpecimen);
-                sb.append(Messages
-                    .format(
-                        Messages.SpecimenLinkEntryForm_linked_msg_multiple,
-                        cell.getValue(), cell.getType().getName(),
-                        sourceSpecimen.getSpecimenType().getNameShort(),
-                        sourceSpecimen.getInventoryId(), sourceSpecimen
-                            .getCollectionEvent().getPatient().getPnumber(),
-                        sourceSpecimen.getCollectionEvent().getVisitNumber(),
-                        currentSelectedCenter.getNameShort()));
+                sb.append(Messages.format(
+                    Messages.SpecimenLinkEntryForm_linked_msg_multiple, cell
+                        .getValue(), cell.getType().getName(), sourceSpecimen
+                        .getSpecimenType().getNameShort(), sourceSpecimen
+                        .getInventoryId(), sourceSpecimen.getCollectionEvent()
+                        .getPatient().getPnumber(), sourceSpecimen
+                        .getCollectionEvent().getVisitNumber(),
+                    currentSelectedCenter.getNameShort()));
                 nber++;
             }
         }
@@ -561,16 +560,14 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         if (posStr == null) {
             posStr = Messages.SpecimenLinkEntryForm_position_label_none;
         }
-        appendLog(Messages
-            .format(
-                Messages.SpecimenLinkEntryForm_linked_msg_single,
-                singleSpecimen.getInventoryId(), singleSpecimen
-                    .getSpecimenType().getName(), singleSpecimen
-                    .getParentSpecimen().getInventoryId(), singleSpecimen
-                    .getParentSpecimen().getSpecimenType().getNameShort(),
-                linkFormPatientManagement.getCurrentPatient().getPnumber(),
-                singleSpecimen.getCollectionEvent().getVisitNumber(),
-                singleSpecimen.getCurrentCenter().getNameShort(), posStr));
+        appendLog(Messages.format(
+            Messages.SpecimenLinkEntryForm_linked_msg_single, singleSpecimen
+                .getInventoryId(), singleSpecimen.getSpecimenType().getName(),
+            singleSpecimen.getParentSpecimen().getInventoryId(), singleSpecimen
+                .getParentSpecimen().getSpecimenType().getNameShort(),
+            linkFormPatientManagement.getCurrentPatient().getPnumber(),
+            singleSpecimen.getCollectionEvent().getVisitNumber(),
+            singleSpecimen.getCurrentCenter().getNameShort(), posStr));
     }
 
     @Override

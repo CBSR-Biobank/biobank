@@ -1,14 +1,22 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Button;
 
+import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 public abstract class PlateForm extends BiobankViewForm {
 
     protected Button scanButton;
+
+    protected Map<RowColPos, PalletCell> cells;
 
     protected IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
 
@@ -36,5 +44,37 @@ public abstract class PlateForm extends BiobankViewForm {
             }
         }
     };
+
+    /**
+     * go through cells retrieved from scan, set status and update the types
+     * combos components
+     */
+    protected void processScanResult() {
+        Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
+        for (RowColPos rcp : cells.keySet()) {
+            Integer typesRowsCount = typesRows.get(rcp.row);
+            if (typesRowsCount == null) {
+                typesRowsCount = 0;
+            }
+            PalletCell cell = null;
+            cell = cells.get(rcp);
+            processCellStatus(cell);
+            if (PalletCell.hasValue(cell)) {
+                typesRowsCount++;
+                typesRows.put(rcp.row, typesRowsCount);
+            }
+        }
+    }
+
+    /**
+     * Process the cell: apply a status and set correct information
+     */
+    protected void processCellStatus(PalletCell cell) {
+        if (cell != null) {
+            cell.setStatus((cell.getValue() != null) ? UICellStatus.FILLED
+                : UICellStatus.EMPTY);
+            cell.setTitle(cell.getValue());
+        }
+    }
 
 }

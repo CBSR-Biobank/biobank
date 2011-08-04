@@ -28,10 +28,6 @@ public class Messages extends NLS {
 
     public static String FileBrowser_browse_label;
 
-    public static String FileBrowser_io_error_msg;
-
-    public static String FileBrowser_io_error_title;
-
     public static String FileBrowser_open_label;
 
     public static String PlateSelectionWidget_plate_label;
