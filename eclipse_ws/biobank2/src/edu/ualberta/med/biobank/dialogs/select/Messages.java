@@ -15,6 +15,7 @@ public class Messages extends NLS {
     public static String ContactAddDialog_title_add;
     public static String ContactAddDialog_title_edit;
     public static String ContactAddDialog_title_label;
+    public static String SelectClinicContactDialog_clinic_label;
     public static String SelectClinicContactDialog_description;
     public static String SelectClinicContactDialog_dialog_title;
     public static String SelectClinicContactDialog_main_title;

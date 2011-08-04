@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.trees.infos;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -13,8 +14,11 @@ import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 
 public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
 
-    private static final String[] HEADINGS = new String[] { Messages.SpecimenTypeInfoTree_name_label,
+    private static final String[] HEADINGS = new String[] {
+        Messages.SpecimenTypeInfoTree_name_label,
         Messages.SpecimenTypeInfoTree_nameShort_label };
+
+    protected List<SpecimenTypeWrapper> needReload = new ArrayList<SpecimenTypeWrapper>();
 
     public SpecimenTypeInfoTree(Composite parent,
         List<SpecimenTypeWrapper> specimenCollection) {
@@ -76,10 +80,15 @@ public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
         if (node != null && node instanceof BiobankCollectionModel) {
             BiobankCollectionModel model = (BiobankCollectionModel) node;
             Object obj = model.o;
-            if (obj != null)
+            if (obj != null) {
+                SpecimenTypeWrapper spc = (SpecimenTypeWrapper) obj;
+                if (needReload.contains(spc)) {
+                    spc.reload();
+                    needReload.remove(spc);
+                }
                 return createNodes(node,
-                    ((SpecimenTypeWrapper) obj)
-                        .getChildSpecimenTypeCollection(true));
+                    spc.getChildSpecimenTypeCollection(true));
+            }
         }
         return super.getNodeChildren(node);
     }

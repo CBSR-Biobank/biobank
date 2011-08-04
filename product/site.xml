@@ -3,5 +3,5 @@
    <feature url="features/biobank2.feature.core_@VERSION@.jar" id="biobank2.feature.core" version="@VERSION@">
       <category name="biobank2.category"/>
    </feature>
-   <category-def name="biobank2.category" label="BioBank2"/>
+   <category-def name="biobank2.category" label="BioBank"/>
 </site>

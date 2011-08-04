@@ -296,7 +296,8 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
             };
             backgroundThread.start();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.AbstractInfoTreeWidget_load_error_title, e);
+            BgcPlugin.openAsyncError(
+                Messages.AbstractInfoTreeWidget_load_error_title, e);
         }
 
         layout(true, true);
@@ -402,7 +403,8 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         prevButton = new Button(paginationWidget, SWT.NONE);
         prevButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_PREV));
-        prevButton.setToolTipText(Messages.AbstractInfoTreeWidget_previous_label);
+        prevButton
+            .setToolTipText(Messages.AbstractInfoTreeWidget_previous_label);
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
