@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.security.Group;
@@ -71,14 +72,14 @@ public abstract class GroupsPage extends BgcDialogPage {
                                 // working because the current thread is still
                                 // alive (see setCollection implementation).
                                 // With a small pause, it is ok.
-                    getShell().getDisplay().syncExec(new Runnable() {
+                    Display.getDefault().syncExec(new Runnable() {
                         @Override
                         public void run() {
                             groupInfoTable.setCollection(groups);
                         }
                     });
                 } catch (final Exception ex) {
-                    getShell().getDisplay().syncExec(new Runnable() {
+                    Display.getDefault().syncExec(new Runnable() {
                         @Override
                         public void run() {
                             BgcPlugin

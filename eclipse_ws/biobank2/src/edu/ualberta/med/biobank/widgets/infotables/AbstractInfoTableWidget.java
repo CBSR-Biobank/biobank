@@ -112,6 +112,13 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
 
         setCollection(collection);
 
+        // need to autosize at creation to be sure the size is well initialized
+        // the first time. (if don't do that, display problems in UserManagement
+        // Dialog):
+        if (autoSizeColumns) {
+            autoSizeColumns();
+        }
+
         BiobankClipboard.addClipboardCopySupport(tableViewer, menu,
             (BiobankLabelProvider) getLabelProvider(), headings.length);
 
@@ -227,7 +234,6 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
             BgcPlugin.openAsyncError(
                 Messages.AbstractInfoTableWidget_load_error_title, e);
         }
-
     }
 
     private void autoSizeColumns() {
@@ -277,7 +283,9 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
             sumOfMaxTextWidths += width;
         }
 
-        int tableWidth = Math.max(1, tableViewer.getTable().getSize().x);
+        // need to give default max=500 when can't know the size of the table
+        // yet (see UserManagementDialog)
+        int tableWidth = Math.max(500, tableViewer.getTable().getSize().x);
 
         int totalWidths = 0;
         table.setVisible(false);
