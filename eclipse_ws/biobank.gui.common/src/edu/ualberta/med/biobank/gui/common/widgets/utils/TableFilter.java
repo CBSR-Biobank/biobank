@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.dialogs.user;
+package edu.ualberta.med.biobank.gui.common.widgets.utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ public abstract class TableFilter<T> {
 
     public TableFilter(Composite parent) {
         Label label = new Label(parent, SWT.NONE);
-        label.setText("Enter text to filter the list:");
+        label.setText(Messages.TableFilter_filterText_label);
         filterText = new Text(parent, SWT.BORDER);
         GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
         filterText.setLayoutData(gd);

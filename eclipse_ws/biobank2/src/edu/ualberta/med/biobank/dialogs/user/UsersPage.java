@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogWithPages;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.TableFilter;
 import edu.ualberta.med.biobank.widgets.infotables.UserInfoTable;
 
 public abstract class UsersPage extends BgcDialogPage {
@@ -29,7 +30,7 @@ public abstract class UsersPage extends BgcDialogPage {
 
     @Override
     public String getTitle() {
-        return "Users";
+        return Messages.UsersPage_page_title;
     }
 
     @Override

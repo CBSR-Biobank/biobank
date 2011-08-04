@@ -21,6 +21,10 @@ public class Messages extends NLS {
     public static String GroupEditDialog_feature_center_list_available;
     public static String GroupEditDialog_feature_center_list_selected;
 
+    public static String GroupsPage_page_title;
+
+    public static String TemplatesPage_page_title;
+
     public static String UserEditDialog_deleteRight_confirm_msg;
 
     public static String UserEditDialog_deleteRight_confirm_title;
@@ -30,6 +34,8 @@ public class Messages extends NLS {
     public static String UserEditDialog_description_edit;
 
     public static String UserEditDialog_Email_label;
+
+    public static String UserEditDialog_filterText_label;
 
     public static String UserEditDialog_firstName_label;
 
@@ -94,6 +100,8 @@ public class Messages extends NLS {
     public static String UserManagementDialog_users_label;
 
     public static String UserManagementDialog_users_load_error_title;
+
+    public static String UsersPage_page_title;
 
     static {
         // initialize resource bundle

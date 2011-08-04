@@ -15,7 +15,7 @@ public class TemplatesPage extends BgcDialogPage {
 
     @Override
     public String getTitle() {
-        return "Groups Templates";
+        return Messages.TemplatesPage_page_title;
     }
 
     @Override

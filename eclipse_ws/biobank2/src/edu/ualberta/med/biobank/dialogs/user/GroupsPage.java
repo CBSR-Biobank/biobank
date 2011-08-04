@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogWithPages;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.TableFilter;
 import edu.ualberta.med.biobank.widgets.infotables.GroupInfoTable;
 
 public abstract class GroupsPage extends BgcDialogPage {
@@ -28,7 +29,7 @@ public abstract class GroupsPage extends BgcDialogPage {
 
     @Override
     public String getTitle() {
-        return "Groups";
+        return Messages.GroupsPage_page_title;
     }
 
     @Override

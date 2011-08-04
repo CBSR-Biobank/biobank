@@ -95,7 +95,6 @@ public class UserManagementDialog extends BgcDialogWithPages {
     protected List<Group> getGroups() {
         if (currentAllGroupsList == null)
             try {
-                // FIXME voir pour SuperAdmin group a ne pas modifier
                 currentAllGroupsList = SessionManager.getAppService()
                     .getSecurityGroups(SessionManager.getUser(), true);
             } catch (ApplicationException e) {
