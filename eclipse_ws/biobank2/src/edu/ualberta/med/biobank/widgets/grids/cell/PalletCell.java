@@ -35,20 +35,6 @@ public class PalletCell extends AbstractUICell {
         this.scanCell = scanCell;
     }
 
-    public static Map<RowColPos, PalletCell> convertArray(ScanCell[][] scancells) {
-        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
-        for (int i = 0; i < ScanCellPos.ROW_MAX; i++) {
-            for (int j = 0; j < ScanCellPos.COL_MAX; j++) {
-                ScanCell scanCell = scancells[i][j];
-                if (scanCell != null && scanCell.getValue() != null) {
-                    palletScanned.put(new RowColPos(i, j), new PalletCell(
-                        scanCell));
-                }
-            }
-        }
-        return palletScanned;
-    }
-
     public static Map<RowColPos, PalletCell> convertArray(
         Map<ScanCellPos, ScanCell> scancells) {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();

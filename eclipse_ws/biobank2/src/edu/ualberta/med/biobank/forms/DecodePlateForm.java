@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -21,6 +22,7 @@ import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.dmscanlib.ScanCellPos;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public class DecodePlateForm extends PlateForm {
@@ -137,9 +139,8 @@ public class DecodePlateForm extends PlateForm {
     protected void launchScan(IProgressMonitor monitor) throws Exception {
         monitor.subTask(Messages.DecodePlateForm_launching);
 
-        ScanCell[][] decodedCells = null;
-        decodedCells = ScannerConfigPlugin.decodePlate(plateToScan,
-            ProfileManager.ALL_PROFILE_NAME);
+        Map<ScanCellPos, ScanCell> decodedCells = ScannerConfigPlugin
+            .decodePlate(plateToScan, ProfileManager.ALL_PROFILE_NAME);
         cells = PalletCell.convertArray(decodedCells);
     }
 

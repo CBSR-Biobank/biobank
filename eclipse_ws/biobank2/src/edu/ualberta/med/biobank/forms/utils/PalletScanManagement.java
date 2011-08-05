@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.dmscanlib.ScanCellPos;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -97,9 +98,10 @@ public class PalletScanManagement {
                             plateToScan));
                 return;
             } else {
-                ScanCell[][] scanCells = null;
+                Map<ScanCellPos, ScanCell> scanCells = null;
                 try {
-                    scanCells = ScannerConfigPlugin.decodePlate(plateNum, profile);
+                    scanCells = ScannerConfigPlugin.decodePlate(plateNum,
+                        profile);
                     cells = PalletCell.convertArray(scanCells);
                 } catch (Exception ex) {
                     BgcPlugin.openAsyncError(
@@ -132,10 +134,10 @@ public class PalletScanManagement {
                         && !oldScannedCell.getValue().equals(
                             newScannedCell.getValue())) {
                         // Different values at same position
-                        oldScannedCell.setInformation((oldScannedCell
-                            .getInformation() != null ? oldScannedCell
-                            .getInformation() : "") //$NON-NLS-1$
-                            + " " + Messages.PalletScanManagement_rescan_differnt_msg); //$NON-NLS-1$
+                        oldScannedCell
+                            .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
+                                .getInformation() : "") //$NON-NLS-1$
+                                + " " + Messages.PalletScanManagement_rescan_differnt_msg); //$NON-NLS-1$
                         oldScannedCell.setStatus(CellStatus.ERROR);
                         rescanDifferent = true;
 
