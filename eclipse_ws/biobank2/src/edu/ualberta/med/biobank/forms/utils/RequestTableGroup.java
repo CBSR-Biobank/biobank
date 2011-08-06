@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+@SuppressWarnings("nls")
 public class RequestTableGroup extends TableGroup<RequestWrapper> {
 
     public RequestTableGroup(RequestSpecimenState ds, String alternateLabel,

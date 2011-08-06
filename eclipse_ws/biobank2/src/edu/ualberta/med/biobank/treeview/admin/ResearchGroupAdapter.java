@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.forms.ResearchGroupEntryForm;
 import edu.ualberta.med.biobank.forms.ResearchGroupViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
+@SuppressWarnings("nls")
 public class ResearchGroupAdapter extends AdapterBase {
 
     public ResearchGroupAdapter(AdapterBase parent,

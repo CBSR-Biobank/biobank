@@ -20,8 +20,10 @@ import org.supercsv.prefs.CsvPreference;
 
 import edu.ualberta.med.biobank.server.reports.SpecimenRequest;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
+import edu.ualberta.med.biobank.widgets.IFileBrowserListener;
 
-public class SpecimenRequestEditor extends ReportsEditor {
+public class SpecimenRequestEditor extends ReportsEditor implements
+    IFileBrowserListener {
 
     public static String ID = "edu.ualberta.med.biobank.editors.AliquotRequestEditor"; //$NON-NLS-1$
 
@@ -33,8 +35,17 @@ public class SpecimenRequestEditor extends ReportsEditor {
         parent.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true,
             false));
         csvSelector = new FileBrowser(parent,
-            Messages.SpecimenRequestEditor_browse_label, SWT.NONE);
+            Messages.SpecimenRequestEditor_browse_label, SWT.NONE,
+            new String[] { "*.csv" }); //$NON-NLS-1$
+        csvSelector.addFileSelectedListener(this);
         csvSelector.adaptToToolkit(toolkit, true);
+        generateButton.setEnabled(false);
+    }
+
+    @Override
+    public void fileSelected(String filename) {
+        // enable the button once a file has been selected
+        generateButton.setEnabled(true);
     }
 
     @Override
