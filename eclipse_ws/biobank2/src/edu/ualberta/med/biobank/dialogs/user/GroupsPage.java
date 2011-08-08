@@ -63,6 +63,14 @@ public abstract class GroupsPage extends BgcDialogPage {
                     getCurrentAllGroupsList().remove(group);
                 return deleted;
             }
+
+            @Override
+            protected void duplicate(Group origGroup) {
+                final Group newGroup = new Group();
+                newGroup.copy(origGroup);
+                newGroup.setName("CopyOf" + newGroup.getName());
+                addGroup(newGroup);
+            }
         };
         List<Group> tmpGroups = new ArrayList<Group>();
         for (int i = 0; i < GroupInfoTable.ROWS_PER_PAGE + 1; i++) {
@@ -116,25 +124,26 @@ public abstract class GroupsPage extends BgcDialogPage {
         return internalGroupList;
     }
 
-    protected void addGroup() {
-        final Group group = new Group();
+    protected void addGroup(Group newGroup) {
         GroupEditDialog dlg = new GroupEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), group, getTemplates(), true);
+            .getActiveWorkbenchWindow().getShell(), newGroup, getTemplates(),
+            true);
         int res = dlg.open();
         if (res == Status.OK) {
             BgcPlugin.openAsyncInformation(
                 Messages.UserManagementDialog_group_added_title, MessageFormat
                     .format(Messages.UserManagementDialog_group_added_msg,
-                        group.getName()));
-            getCurrentAllGroupsList().add(group);
-            internalGroupList.add(group);
-            groupInfoTable.reloadCollection(getInternalAllGroupsList(), group);
+                        newGroup.getName()));
+            getCurrentAllGroupsList().add(newGroup);
+            internalGroupList.add(newGroup);
+            groupInfoTable.reloadCollection(getInternalAllGroupsList(),
+                newGroup);
         }
     }
 
     @Override
     public void runAddAction() {
-        addGroup();
+        addGroup(new Group());
     }
 
     protected abstract List<Group> getCurrentAllGroupsList();

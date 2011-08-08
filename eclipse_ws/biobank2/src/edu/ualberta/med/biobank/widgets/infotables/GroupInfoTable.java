@@ -7,8 +7,12 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -18,7 +22,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class GroupInfoTable extends InfoTableWidget<Group> {
+public abstract class GroupInfoTable extends InfoTableWidget<Group> {
     public static final int ROWS_PER_PAGE = 12;
     private static final String[] HEADINGS = new String[] { Messages.GroupInfoTable_name_label };
 
@@ -38,7 +42,18 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
                 deleteGroup((Group) getSelection());
             }
         });
+
+        MenuItem item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Duplicate");
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                duplicate((Group) getSelection());
+            }
+        });
     }
+
+    protected abstract void duplicate(Group origGroup);
 
     @SuppressWarnings("serial")
     @Override
