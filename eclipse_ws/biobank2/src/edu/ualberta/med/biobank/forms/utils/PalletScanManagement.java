@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms.utils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -98,7 +99,7 @@ public class PalletScanManagement {
                             plateToScan));
                 return;
             } else {
-                Map<ScanCellPos, ScanCell> scanCells = null;
+                List<ScanCell> scanCells = null;
                 try {
                     scanCells = ScannerConfigPlugin.decodePlate(plateNum,
                         profile);

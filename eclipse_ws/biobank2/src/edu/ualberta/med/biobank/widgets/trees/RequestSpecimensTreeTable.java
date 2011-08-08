@@ -37,6 +37,7 @@ import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
+@SuppressWarnings("nls")
 public class RequestSpecimensTreeTable extends BgcBaseWidget {
 
     private TreeViewer tv;

@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
-import java.util.Map;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -21,9 +21,9 @@ import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
-import edu.ualberta.med.scannerconfig.dmscanlib.ScanCellPos;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
+@SuppressWarnings("nls")
 public class DecodeImageForm extends PlateForm implements IFileBrowserListener {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DecodeImageForm"; //$NON-NLS-1$
@@ -86,8 +86,8 @@ public class DecodeImageForm extends PlateForm implements IFileBrowserListener {
     }
 
     protected void decodeImage() throws Exception {
-        Map<ScanCellPos, ScanCell> decodedCells = ScannerConfigPlugin
-            .decodeImage(1, ProfileManager.ALL_PROFILE_NAME, imageFilename);
+        List<ScanCell> decodedCells = ScannerConfigPlugin.decodeImage(1,
+            ProfileManager.ALL_PROFILE_NAME, imageFilename);
         cells = PalletCell.convertArray(decodedCells);
 
         Display.getDefault().asyncExec(new Runnable() {

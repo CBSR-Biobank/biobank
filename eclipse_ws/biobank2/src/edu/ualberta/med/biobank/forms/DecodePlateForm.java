@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
-import java.util.Map;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -139,8 +139,8 @@ public class DecodePlateForm extends PlateForm {
     protected void launchScan(IProgressMonitor monitor) throws Exception {
         monitor.subTask(Messages.DecodePlateForm_launching);
 
-        Map<ScanCellPos, ScanCell> decodedCells = ScannerConfigPlugin
-            .decodePlate(plateToScan, ProfileManager.ALL_PROFILE_NAME);
+        List<ScanCell> decodedCells = ScannerConfigPlugin.decodePlate(
+            plateToScan, ProfileManager.ALL_PROFILE_NAME);
         cells = PalletCell.convertArray(decodedCells);
     }
 

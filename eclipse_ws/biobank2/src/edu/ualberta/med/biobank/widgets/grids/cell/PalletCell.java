@@ -36,9 +36,9 @@ public class PalletCell extends AbstractUICell {
     }
 
     public static Map<RowColPos, PalletCell> convertArray(
-        Map<ScanCellPos, ScanCell> scancells) {
+        List<ScanCell> scancells) {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
-        for (ScanCell cell : scancells.values()) {
+        for (ScanCell cell : scancells) {
             palletScanned.put(new RowColPos(cell.getRow(), cell.getColumn()),
                 new PalletCell(cell));
         }

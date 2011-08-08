@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
+@SuppressWarnings("nls")
 public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
     private static final String[] HEADINGS = new String[] {

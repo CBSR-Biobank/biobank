@@ -3,8 +3,6 @@
 ;Redesigned for BZFlag by blast007
 ;Redesigned for BioBank by Thomas Polasek
 
-; Uses UAC plug-in version 0.0.11d. Install from here: http://nsis.sourceforge.net/UAC_plug-in
-
 ;--------------------------------
 ;BioBank Version Variables
 
@@ -12,11 +10,9 @@
   !define VERSION_STR "2.0.1.a" 
   !define EXPORTED_PRODUCT_NAME "${PRODUCT_NAME}_v${VERSION_STR}_win32"
 
- ; Definitions for Java 6.0
+; Definitions for Java 6.0
 !define JRE_VERSION "6.0"
 !define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=42742&/jre-6u22-windows-i586-p.exe"
-;!define JRE_VERSION "5.0"
-;!define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=22933&/jre-1_5_0_16-windows-i586-p.exe"
  
 ; use javaw.exe to avoid dosbox.
 ; use java.exe to keep stdout/stderr
@@ -27,9 +23,7 @@
 !insertmacro GetParameters
 !include "WordFunc.nsh"
 !insertmacro VersionCompare
-!include "UAC.nsh"
-
-RequestExecutionLevel user
+!include LogicLib.nsh
 
 ;--------------------------------
 ;Compression options
@@ -155,6 +149,19 @@ RequestExecutionLevel user
   DeleteRegKey HKLM "SOFTWARE\${PRODUCT_NAME}"
   DeleteRegKey HKCU "Software\${PRODUCT_NAME}"
 !macroend
+
+
+RequestExecutionLevel admin ;Require admin rights on NT6+ (When UAC is turned on)
+
+Function .onInit
+UserInfo::GetAccountType
+pop $0
+${If} $0 != "admin" ;Require admin rights on NT4+
+    MessageBox mb_iconstop "Administrator rights required!"
+    SetErrorLevel 740 ;ERROR_ELEVATION_REQUIRED
+    Quit
+${EndIf}
+FunctionEnd
 
 ;--------------------------------
 ;Installer Sections
@@ -297,7 +304,6 @@ Function GetJRE
     IfErrors DownloadJRE JreFound
  
   DownloadJRE:
-    Call ElevateToAdmin
     MessageBox MB_ICONINFORMATION "${PRODUCT_NAME} uses Java Runtime Environment ${JRE_VERSION}, it will now be downloaded and installed."
     StrCpy $2 "$TEMP\Java Runtime Environment.exe"
     nsisdl::download /TIMEOUT=30000 ${JRE_URL} $2
@@ -342,30 +348,5 @@ Function CheckJREVersion
  
   CheckDone:
     Pop $R1
-FunctionEnd
-
-; Attempt to give the UAC plug-in a user process and an admin process.
-Function ElevateToAdmin
-  UAC_Elevate:
-    !insertmacro UAC_RunElevated
-    StrCmp 1223 $0 UAC_ElevationAborted ; UAC dialog aborted by user?
-    StrCmp 0 $0 0 UAC_Err ; Error?
-    StrCmp 1 $1 0 UAC_Success ;Are we the real deal or just the wrapper?
-    Quit
- 
-  UAC_ElevationAborted:
-    # elevation was aborted, run as normal?
-    MessageBox MB_ICONSTOP "This installer requires admin access, aborting!"
-    Abort
- 
-  UAC_Err:
-    MessageBox MB_ICONSTOP "Unable to elevate, error $0"
-    Abort
- 
-  UAC_Success:
-    StrCmp 1 $3 +4 ;Admin?
-    StrCmp 3 $1 0 UAC_ElevationAborted ;Try again?
-    MessageBox MB_ICONSTOP "This installer requires admin access, try again"
-    goto UAC_Elevate 
 FunctionEnd
 
