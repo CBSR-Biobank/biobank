@@ -10,11 +10,9 @@
   !define VERSION_STR "2.0.1.a" 
   !define EXPORTED_PRODUCT_NAME "${PRODUCT_NAME}_v${VERSION_STR}_win32"
 
- ; Definitions for Java 6.0
+; Definitions for Java 6.0
 !define JRE_VERSION "6.0"
 !define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=42742&/jre-6u22-windows-i586-p.exe"
-;!define JRE_VERSION "5.0"
-;!define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=22933&/jre-1_5_0_16-windows-i586-p.exe"
  
 ; use javaw.exe to avoid dosbox.
 ; use java.exe to keep stdout/stderr
