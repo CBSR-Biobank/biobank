@@ -20,6 +20,8 @@ public class PerspectiveSecurity {
      */
     private static Map<String, Map<String, List<SecurityFeature>>> featureEnablements;
 
+    private static Map<String, Boolean> centerNeeded;
+
     private static Map<String, String> preferredViews;
 
     static {
@@ -51,6 +53,11 @@ public class PerspectiveSecurity {
                 for (Entry<String, List<SecurityFeature>> entry : map
                     .entrySet()) {
                     boolean show = user.canPerformActions(entry.getValue());
+                    if (user.getCurrentWorkingCenter() == null
+                        && user.isInSuperAdminMode()
+                        && ProcessingPerspective.ID.equals(perspectiveId)) {
+                        show = false;
+                    }
                     if (show) {
                         page.showView(entry.getKey());
                         if (entry.getKey().equals(
@@ -74,5 +81,4 @@ public class PerspectiveSecurity {
                 }
         }
     }
-
 }

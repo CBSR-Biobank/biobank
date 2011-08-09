@@ -11,13 +11,19 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
@@ -29,11 +35,13 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.TableFilter;
 import edu.ualberta.med.biobank.handlers.LogoutHandler;
 import edu.ualberta.med.biobank.validators.EmptyStringValidator;
 import edu.ualberta.med.biobank.validators.MatchingTextValidator;
 import edu.ualberta.med.biobank.validators.OrValidator;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
+import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNode;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -48,6 +56,7 @@ public class UserEditDialog extends BgcBaseDialog {
     private Map<Long, Group> allGroupsMap = new HashMap<Long, Group>();
     private MultiSelectWidget groupsWidget;
     private boolean isNewUser;
+    private Text filterText;
 
     public UserEditDialog(Shell parent, User originalUser,
         List<Group> groupList, boolean isNewUser) {
@@ -122,7 +131,7 @@ public class UserEditDialog extends BgcBaseDialog {
 
         createPasswordWidgets(contents);
 
-        createGroupsWidget(parent);
+        createGroupsWidget(contents);
     }
 
     @Override
@@ -166,7 +175,6 @@ public class UserEditDialog extends BgcBaseDialog {
     private void createGroupsWidget(Composite parent) {
         final LinkedHashMap<Integer, String> groupMap = new LinkedHashMap<Integer, String>();
         List<String> groupNames = new ArrayList<String>();
-
         for (Entry<Long, Group> entry : allGroupsMap.entrySet()) {
             Integer groupId = entry.getKey().intValue();
             String groupName = entry.getValue().getName();
@@ -185,7 +193,11 @@ public class UserEditDialog extends BgcBaseDialog {
             && originalUser.isSuperAdministrator();
         groupsWidget = new MultiSelectWidget(parent, SWT.NONE,
             Messages.UserEditDialog_groups_available_label,
-            Messages.UserEditDialog_groups_assigned_label, 75);
+            Messages.UserEditDialog_groups_assigned_label, 130);
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL
+            | GridData.GRAB_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        groupsWidget.setLayoutData(gd);
         groupsWidget.setSelections(groupMap, userInGroupIds);
         groupsWidget
             .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
@@ -225,6 +237,29 @@ public class UserEditDialog extends BgcBaseDialog {
                     modifiedUser.setGroups(newGroups);
                 }
             });
+        groupsWidget.setFilter(new ViewerFilter() {
+            @Override
+            public boolean select(Viewer viewer, Object parentElement,
+                Object element) {
+                if (filterText == null)
+                    return true;
+                MultiSelectNode node = (MultiSelectNode) element;
+                return TableFilter.contains(node.getName(),
+                    filterText.getText());
+            }
+        });
+
+        Label label = new Label(parent, SWT.NONE);
+        label.setText(Messages.UserEditDialog_filterText_label);
+        filterText = new Text(parent, SWT.BORDER);
+        gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+        filterText.setLayoutData(gd);
+        filterText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                groupsWidget.refreshLists();
+            }
+        });
     }
 
     private void createPasswordWidgets(Composite parent) {

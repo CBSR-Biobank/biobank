@@ -28,10 +28,12 @@ public class StudyAddInfoTable extends StudyInfoTable {
 
     private SiteWrapper site;
 
-    public StudyAddInfoTable(Composite parent, SiteWrapper site) {
+    public StudyAddInfoTable(Composite parent, SiteWrapper site,
+        boolean createDeleteSupport) {
         super(parent, site.getStudyCollection(true));
         this.site = site;
-        addDeleteSupport();
+        if (createDeleteSupport)
+            addDeleteCreateSupport();
     }
 
     @Override
@@ -67,7 +69,7 @@ public class StudyAddInfoTable extends StudyInfoTable {
         }
     }
 
-    private void addDeleteSupport() {
+    private void addDeleteCreateSupport() {
         addAddItemListener(new IInfoTableAddItemListener() {
             @Override
             public void addItem(InfoTableEvent event) {
