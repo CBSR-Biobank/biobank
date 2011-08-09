@@ -596,4 +596,7 @@ public class ContainerLabelingSchemeWrapper extends
         }
         return null;
     }
+
+    // TODO: convert this to use the transactions model? Probably not necessary
+    // since this is mostly a read-only class.
 }

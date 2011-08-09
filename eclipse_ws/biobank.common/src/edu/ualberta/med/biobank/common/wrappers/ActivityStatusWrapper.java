@@ -199,4 +199,6 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
         return getName();
     }
 
+    // TODO: convert this to use the transactions model? Probably not necessary
+    // since this is mostly a read-only class.
 }

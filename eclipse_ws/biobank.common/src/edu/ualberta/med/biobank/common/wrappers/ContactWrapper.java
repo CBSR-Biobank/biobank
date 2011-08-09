@@ -49,6 +49,25 @@ public class ContactWrapper extends ContactBaseWrapper {
     }
 
     @Override
+    public String toString() {
+        return getName() + " (" + getMobileNumber() + ")";
+    }
+
+    private static final String ALL_CONTACTS_QRY = "from "
+        + Contact.class.getName();
+
+    public static List<ContactWrapper> getAllContacts(
+        WritableApplicationService appService) throws ApplicationException {
+        List<ContactWrapper> wrappers = new ArrayList<ContactWrapper>();
+        HQLCriteria c = new HQLCriteria(ALL_CONTACTS_QRY);
+        List<Contact> contacts = appService.query(c);
+        for (Contact contact : contacts) {
+            wrappers.add(new ContactWrapper(appService, contact));
+        }
+        return wrappers;
+    }
+
+    @Override
     protected void addDeleteTasks(TaskList tasks) {
         String hasStudiesMsg = MessageFormat.format(HAS_STUDIES_MSG, getName());
 
@@ -66,24 +85,5 @@ public class ContactWrapper extends ContactBaseWrapper {
     @Override
     public void delete() throws Exception {
         WrapperTransaction.delete(this, appService);
-    }
-
-    @Override
-    public String toString() {
-        return getName() + " (" + getMobileNumber() + ")";
-    }
-
-    private static final String ALL_CONTACTS_QRY = "from "
-        + Contact.class.getName();
-
-    public static List<ContactWrapper> getAllContacts(
-        WritableApplicationService appService) throws ApplicationException {
-        List<ContactWrapper> wrappers = new ArrayList<ContactWrapper>();
-        HQLCriteria c = new HQLCriteria(ALL_CONTACTS_QRY);
-        List<Contact> contacts = appService.query(c);
-        for (Contact contact : contacts) {
-            wrappers.add(new ContactWrapper(appService, contact));
-        }
-        return wrappers;
     }
 }
