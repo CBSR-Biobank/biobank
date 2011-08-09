@@ -1,8 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -16,7 +15,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
@@ -30,8 +28,6 @@ public class DecodePlateForm extends PlateForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.DecodePlateForm"; //$NON-NLS-1$
 
     private ScanPalletWidget spw;
-
-    private Map<RowColPos, PalletCell> cells;
 
     private PlateSelectionWidget plateSelectionWidget;
 
@@ -139,45 +135,12 @@ public class DecodePlateForm extends PlateForm {
         });
     }
 
-    /**
-     * go through cells retrieved from scan, set status and update the types
-     * combos components
-     */
-    private void processScanResult() {
-        Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
-        for (RowColPos rcp : cells.keySet()) {
-            Integer typesRowsCount = typesRows.get(rcp.row);
-            if (typesRowsCount == null) {
-                typesRowsCount = 0;
-            }
-            PalletCell cell = null;
-            cell = cells.get(rcp);
-            processCellStatus(cell);
-            if (PalletCell.hasValue(cell)) {
-                typesRowsCount++;
-                typesRows.put(rcp.row, typesRowsCount);
-            }
-        }
-    }
-
     protected void launchScan(IProgressMonitor monitor) throws Exception {
         monitor.subTask(Messages.DecodePlateForm_launching);
 
-        ScanCell[][] decodedCells = null;
-        decodedCells = ScannerConfigPlugin.scan(plateToScan,
-            ProfileManager.ALL_PROFILE_NAME);
+        List<ScanCell> decodedCells = ScannerConfigPlugin.decodePlate(
+            plateToScan, ProfileManager.ALL_PROFILE_NAME);
         cells = PalletCell.convertArray(decodedCells);
-    }
-
-    /**
-     * Process the cell: apply a status and set correct information
-     */
-    private void processCellStatus(PalletCell cell) {
-        if (cell != null) {
-            cell.setStatus((cell.getValue() != null) ? UICellStatus.FILLED
-                : UICellStatus.EMPTY);
-            cell.setTitle(cell.getValue());
-        }
     }
 
 }
