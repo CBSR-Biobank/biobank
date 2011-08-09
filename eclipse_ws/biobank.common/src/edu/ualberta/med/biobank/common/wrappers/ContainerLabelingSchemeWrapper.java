@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerLabelingSchemeBaseWrapper;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -219,6 +220,26 @@ public class ContainerLabelingSchemeWrapper extends
         }
 
         return isInBounds;
+    }
+
+    public static boolean canLabel(ContainerLabelingScheme scheme,
+        Capacity capacity) {
+        boolean canLabel = true;
+
+        if (canLabel && scheme.getMaxRows() != null) {
+            canLabel &= capacity.getRowCapacity() <= scheme.getMaxRows();
+        }
+
+        if (canLabel && scheme.getMaxCols() != null) {
+            canLabel &= capacity.getColCapacity() <= scheme.getMaxCols();
+        }
+
+        if (canLabel && scheme.getMaxCapacity() != null) {
+            int max = capacity.getRowCapacity() * capacity.getColCapacity();
+            canLabel &= max <= scheme.getMaxCapacity();
+        }
+
+        return canLabel;
     }
 
     private static final String POS_LABEL_LEN_QRY = "select min(minChars), max(maxChars) from "

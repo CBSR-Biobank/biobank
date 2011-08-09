@@ -141,8 +141,13 @@ public class TestActivityStatus extends TestDatabase {
             studyEventAttr, topContainer, topContainerType, cevent,
             aliquotedSpecimenType, pevent, study, site };
         for (ModelWrapper<?> wrapper : wrappers) {
-            testDeleteFail(wrapper,
-                name + ClassUtils.getClassName(wrapper.getClass()));
+            try {
+                testDeleteFail(wrapper,
+                    name + ClassUtils.getClassName(wrapper.getClass()));
+            } catch (Exception e) {
+                throw e;
+            }
+
         }
     }
 
@@ -239,7 +244,7 @@ public class TestActivityStatus extends TestDatabase {
 
         statuses = ActivityStatusWrapper.getAllActivityStatuses(appService);
         after = statuses.size();
-        Assert.assertEquals(before - 5 + 3, after);
+        Assert.assertEquals((before - 5) + 3, after);
         Assert.assertTrue(statuses.containsAll(toAdd));
 
         addedstatus.addAll(toAdd);

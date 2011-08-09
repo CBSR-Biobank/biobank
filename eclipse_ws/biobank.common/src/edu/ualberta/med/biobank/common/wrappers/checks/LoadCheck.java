@@ -12,14 +12,22 @@ public abstract class LoadCheck<E> extends WrapperCheck<E> {
 
     private static final String CANNOT_LOAD_MSG = "Unable to load object type {0} with id ''{1}''.";
 
-    protected LoadCheck(ModelWrapper<E> wrapper) {
+    public LoadCheck(ModelWrapper<E> wrapper) {
         super(wrapper);
     }
 
     protected E loadModel(Session session) {
-        @SuppressWarnings("unchecked")
-        E loaded = (E) session.load(getModelClass(), getModelId());
-        // session.setReadOnly(loaded, true);
+        E loaded = null;
+
+        Integer id = getModelId();
+
+        if (id != null) {
+            @SuppressWarnings("unchecked")
+            E tmp = (E) session.load(getModelClass(), id);
+            loaded = tmp;
+            // session.setReadOnly(loaded, true);
+        }
+
         return loaded;
     }
 
@@ -27,9 +35,9 @@ public abstract class LoadCheck<E> extends WrapperCheck<E> {
     public void doCheck(Session session) throws BiobankSessionException {
         E freshObject = loadModel(session);
 
-        if (freshObject == null) {
+        Integer id = getModelId();
+        if (id != null && freshObject == null) {
             String modelClass = getModelClass().getSimpleName();
-            String id = getModelId().toString();
             String msg = MessageFormat.format(CANNOT_LOAD_MSG, modelClass, id);
 
             throw new BiobankSessionException(msg);

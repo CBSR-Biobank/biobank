@@ -2,12 +2,11 @@ package edu.ualberta.med.biobank.common.wrappers.checks;
 
 import java.text.MessageFormat;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.actions.CountUsesAction;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 
@@ -24,10 +23,8 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsed
 public class NotUsedCheck<E> extends WrapperCheck<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_MESSAGE = "{0} {1} is still in use by {2}.";
-    private static final String COUNT_HQL = "SELECT count(m) FROM {0} m WHERE m.{1} = ?";
 
-    private final Property<? super E, ?> property;
-    private final Class<?> propertyClass;
+    private final CountUsesAction<E> countAction;
     private final String modelString;
     private final String exceptionMessage;
 
@@ -43,20 +40,15 @@ public class NotUsedCheck<E> extends WrapperCheck<E> {
         Property<? super E, ? super T> property, Class<T> propertyClass,
         String errorMessage) {
         super(wrapper);
-        this.propertyClass = propertyClass;
-        this.property = property;
+        this.countAction = new CountUsesAction<E>(wrapper, property,
+            propertyClass);
         this.modelString = wrapper.toString();
         this.exceptionMessage = errorMessage;
     }
 
     @Override
     public void doCheck(Session session) throws BiobankSessionException {
-        String hql = MessageFormat.format(COUNT_HQL, propertyClass.getName(),
-            property.getName());
-        Query query = session.createQuery(hql);
-        query.setParameter(0, getModel());
-
-        Long count = HibernateUtil.getCountFromQuery(query);
+        Long count = countAction.doAction(session);
 
         if (count > 0) {
             String message = getExceptionMessage();
@@ -69,7 +61,8 @@ public class NotUsedCheck<E> extends WrapperCheck<E> {
 
         if (exceptionMessage == null) {
             String modelClass = Format.modelClass(getModelClass());
-            String propertyClass = Format.modelClass(this.propertyClass);
+            String propertyClass = Format.modelClass(countAction
+                .getPropertyClass());
 
             exceptionMessage = MessageFormat.format(EXCEPTION_MESSAGE,
                 modelClass, modelString, propertyClass);

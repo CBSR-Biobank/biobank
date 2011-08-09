@@ -21,7 +21,7 @@ import java.util.Set;
 // TODO: should add a class to check that the elements that we think were added
 // and removed were actually added and removed (as this could be wrong if the
 // underlying model object was modified then given to the wrapper).
-class ElementTracker<E> {
+public class ElementTracker<E> {
     private final Map<Property<? extends Collection<?>, ? super E>, Object> map = new HashMap<Property<? extends Collection<?>, ? super E>, Object>();
     private final ModelWrapper<E> wrapper;
 

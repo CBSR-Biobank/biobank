@@ -843,6 +843,17 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return wrappers;
     }
 
+    public static <M> Collection<M> unwrapModelCollection(
+        Collection<ModelWrapper<M>> wrappers) {
+        Collection<M> unwrapped = new ArrayList<M>();
+
+        for (ModelWrapper<M> wrapper : wrappers) {
+            unwrapped.add(wrapper.getWrappedObject());
+        }
+
+        return unwrapped;
+    }
+
     protected <W extends ModelWrapper<? extends R>, R> W getWrappedProperty(
         Property<R, ? super E> property, Class<W> wrapperKlazz) {
         return getWrappedProperty(this, property, wrapperKlazz);
@@ -1207,7 +1218,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         resetInternalFields();
     }
 
-    protected ElementTracker<E> getElementTracker() {
+    public ElementTracker<E> getElementTracker() {
         return elementTracker;
     }
 

@@ -1,7 +1,11 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
+import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.TaskList;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
 import edu.ualberta.med.biobank.common.wrappers.base.CapacityBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.CapacityPostPersistChecks;
 import edu.ualberta.med.biobank.model.Capacity;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -43,4 +47,24 @@ public class CapacityWrapper extends CapacityBaseWrapper {
         return 0;
     }
 
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(check().notNull(CapacityPeer.ROW_CAPACITY));
+        tasks.add(check().notNull(CapacityPeer.COL_CAPACITY));
+
+        super.addPersistTasks(tasks);
+
+        tasks.add(new CapacityPostPersistChecks(this));
+    }
+
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        WrapperTransaction.persist(this, appService);
+    }
+
+    @Override
+    public void delete() throws Exception {
+        WrapperTransaction.delete(this, appService);
+    }
 }
