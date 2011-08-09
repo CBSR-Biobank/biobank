@@ -14,8 +14,8 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.widgets.FileBrowser;
-import edu.ualberta.med.biobank.widgets.IFileBrowserListener;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcFileBrowser;
+import edu.ualberta.med.biobank.gui.common.widgets.IBgcFileBrowserListener;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
@@ -23,14 +23,14 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
-@SuppressWarnings("nls")
-public class DecodeImageForm extends PlateForm implements IFileBrowserListener {
+public class DecodeImageForm extends PlateForm implements
+    IBgcFileBrowserListener {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DecodeImageForm"; //$NON-NLS-1$
 
     private ScanPalletWidget spw;
 
-    private FileBrowser imageFileSelector;
+    private BgcFileBrowser imageFileSelector;
 
     private String imageFilename;
 
@@ -46,7 +46,7 @@ public class DecodeImageForm extends PlateForm implements IFileBrowserListener {
         page.setLayout(layout);
         page.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
 
-        imageFileSelector = new FileBrowser(page,
+        imageFileSelector = new BgcFileBrowser(page,
             Messages.DecodeImage_browse_label, SWT.NONE,
             new String[] { "*.bmp" }); //$NON-NLS-1$
         imageFileSelector.addFileSelectedListener(this);

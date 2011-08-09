@@ -7,7 +7,6 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-@SuppressWarnings("nls")
 public class ReceivingRequestGroup extends AbstractRequestGroup {
 
     public ReceivingRequestGroup(AdapterBase parent, int id,

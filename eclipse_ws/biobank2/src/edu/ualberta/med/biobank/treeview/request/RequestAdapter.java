@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.RequestEntryForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-@SuppressWarnings("nls")
 public class RequestAdapter extends AdapterBase {
 
     public RequestAdapter(AdapterBase parent, RequestWrapper ship) {

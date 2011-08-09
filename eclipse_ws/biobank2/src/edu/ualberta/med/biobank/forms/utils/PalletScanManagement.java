@@ -26,7 +26,6 @@ import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
-import edu.ualberta.med.scannerconfig.dmscanlib.ScanCellPos;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 

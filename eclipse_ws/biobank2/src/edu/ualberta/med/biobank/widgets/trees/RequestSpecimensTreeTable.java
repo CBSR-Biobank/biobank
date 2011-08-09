@@ -37,7 +37,6 @@ import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-@SuppressWarnings("nls")
 public class RequestSpecimensTreeTable extends BgcBaseWidget {
 
     private TreeViewer tv;
@@ -214,7 +213,8 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                 spec.persist();
             }
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.RequestSpecimensTreeTable_claim_error_title, e);
+            BgcPlugin.openAsyncError(
+                Messages.RequestSpecimensTreeTable_claim_error_title, e);
         }
     }
 
@@ -232,7 +232,10 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                         spec.persist();
                         spec.reload();
                     } catch (Exception e) {
-                        BgcPlugin.openAsyncError(Messages.RequestSpecimensTreeTable_save_error_title, e);
+                        BgcPlugin
+                            .openAsyncError(
+                                Messages.RequestSpecimensTreeTable_save_error_title,
+                                e);
                     }
                 }
                 refresh();

@@ -18,23 +18,23 @@ import org.supercsv.io.CsvBeanReader;
 import org.supercsv.io.ICsvBeanReader;
 import org.supercsv.prefs.CsvPreference;
 
+import edu.ualberta.med.biobank.gui.common.widgets.BgcFileBrowser;
+import edu.ualberta.med.biobank.gui.common.widgets.IBgcFileBrowserListener;
 import edu.ualberta.med.biobank.server.reports.SpecimenRequest;
-import edu.ualberta.med.biobank.widgets.FileBrowser;
-import edu.ualberta.med.biobank.widgets.IFileBrowserListener;
 
 public class SpecimenRequestEditor extends ReportsEditor implements
-    IFileBrowserListener {
+    IBgcFileBrowserListener {
 
     public static String ID = "edu.ualberta.med.biobank.editors.AliquotRequestEditor"; //$NON-NLS-1$
 
-    private FileBrowser csvSelector;
+    private BgcFileBrowser csvSelector;
 
     @Override
     protected void createOptionSection(Composite parent) {
         parent.setLayout(new GridLayout(1, false));
         parent.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true,
             false));
-        csvSelector = new FileBrowser(parent,
+        csvSelector = new BgcFileBrowser(parent,
             Messages.SpecimenRequestEditor_browse_label, SWT.NONE,
             new String[] { "*.csv" }); //$NON-NLS-1$
         csvSelector.addFileSelectedListener(this);

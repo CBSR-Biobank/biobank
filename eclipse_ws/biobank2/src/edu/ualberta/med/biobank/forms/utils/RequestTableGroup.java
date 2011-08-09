@@ -23,7 +23,6 @@ import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-@SuppressWarnings("nls")
 public class RequestTableGroup extends TableGroup<RequestWrapper> {
 
     public RequestTableGroup(RequestSpecimenState ds, String alternateLabel,
@@ -47,7 +46,8 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
     public static List<RequestTableGroup> getGroupsForRequest(
         RequestWrapper ship) {
         ArrayList<RequestTableGroup> groups = new ArrayList<RequestTableGroup>();
-        groups.add(new RequestTableGroup(null, Messages.RequestTableGroup_all_node_label, ship));
+        groups.add(new RequestTableGroup(null,
+            Messages.RequestTableGroup_all_node_label, ship));
         groups.add(new RequestTableGroup(RequestSpecimenState.PULLED_STATE,
             ship));
         return groups;

@@ -39,7 +39,6 @@ import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.infotables.RequestDispatchInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.RequestSpecimensTreeTable;
 
-@SuppressWarnings("nls")
 public class RequestEntryForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.RequestEntryFormBase"; //$NON-NLS-1$
@@ -61,7 +60,6 @@ public class RequestEntryForm extends BiobankViewForm {
         createMainSection();
     }
 
-    @SuppressWarnings("unused")
     private void createMainSection() {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);

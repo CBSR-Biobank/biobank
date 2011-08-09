@@ -15,11 +15,11 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractResearchGroupGroup;
 
-@SuppressWarnings("nls")
 public class ResearchGroupMasterGroup extends AbstractResearchGroupGroup {
 
     public ResearchGroupMasterGroup(SessionAdapter sessionAdapter, int id) {
-        super(sessionAdapter, id, Messages.ResearchGroupMasterGroup_all_rgroups_label);
+        super(sessionAdapter, id,
+            Messages.ResearchGroupMasterGroup_all_rgroups_label);
     }
 
     @Override

@@ -28,13 +28,13 @@ import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcFileBrowser;
+import edu.ualberta.med.biobank.gui.common.widgets.IBgcFileBrowserListener;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
-import edu.ualberta.med.biobank.widgets.FileBrowser;
-import edu.ualberta.med.biobank.widgets.IFileBrowserListener;
 
 public class ResearchGroupViewForm extends AddressViewFormCommon implements
-    IFileBrowserListener {
+    IBgcFileBrowserListener {
     public static final String ID = "edu.ualberta.med.biobank.forms.ResearchGroupViewForm"; //$NON-NLS-1$
 
     private ResearchGroupAdapter researchGroupAdapter;
@@ -53,7 +53,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
 
     private BgcBaseText studyLabel;
 
-    private FileBrowser csvSelector;
+    private BgcFileBrowser csvSelector;
 
     @Override
     protected void init() throws Exception {
@@ -88,7 +88,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         toolkit.paintBordersFor(client);
         toolkit.createLabel(client,
             "Submit a request on behalf of this research group:");
-        csvSelector = new FileBrowser(client, "CSV File", SWT.NONE,
+        csvSelector = new BgcFileBrowser(client, "CSV File", SWT.NONE,
             new String[] { ".csv" }); //$NON-NLS-1$
         csvSelector.addFileSelectedListener(this);
         csvSelector.adaptToToolkit(toolkit, true);
