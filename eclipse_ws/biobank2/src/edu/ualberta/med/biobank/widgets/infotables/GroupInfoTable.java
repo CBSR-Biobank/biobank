@@ -44,7 +44,7 @@ public abstract class GroupInfoTable extends InfoTableWidget<Group> {
         });
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Duplicate");
+        item.setText(Messages.GroupInfoTable_duplicate);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -115,7 +115,7 @@ public abstract class GroupInfoTable extends InfoTableWidget<Group> {
 
     protected void editGroup(Group group) {
         GroupEditDialog dlg = new GroupEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), group, null, false);
+            .getActiveWorkbenchWindow().getShell(), group, false);
         int res = dlg.open();
         if (res == Dialog.OK) {
             reloadCollection(getCollection(), group);

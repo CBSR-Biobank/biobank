@@ -162,8 +162,8 @@ public abstract class UserInfoTable extends InfoTableWidget<User> {
     protected int editUser(User user) {
         List<Group> groups = getGroups();
         if (groups == null) {
-            BgcPlugin.openAsyncError("Error",
-                "No groups availables. Groups should be first added.");
+            BgcPlugin.openAsyncError(Messages.UserInfoTable_error_title,
+                Messages.UserInfoTable_nogroups_msg);
             return Dialog.CANCEL;
         }
 

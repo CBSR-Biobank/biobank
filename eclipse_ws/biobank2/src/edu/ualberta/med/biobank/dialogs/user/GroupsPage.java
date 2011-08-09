@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.security.Group;
-import edu.ualberta.med.biobank.common.security.GroupTemplate;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogWithPages;
@@ -68,7 +67,7 @@ public abstract class GroupsPage extends BgcDialogPage {
             protected void duplicate(Group origGroup) {
                 final Group newGroup = new Group();
                 newGroup.copy(origGroup);
-                newGroup.setName("CopyOf" + newGroup.getName());
+                newGroup.setName("CopyOf" + newGroup.getName()); //$NON-NLS-1$
                 addGroup(newGroup);
             }
         };
@@ -126,8 +125,7 @@ public abstract class GroupsPage extends BgcDialogPage {
 
     protected void addGroup(Group newGroup) {
         GroupEditDialog dlg = new GroupEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), newGroup, getTemplates(),
-            true);
+            .getActiveWorkbenchWindow().getShell(), newGroup, true);
         int res = dlg.open();
         if (res == Status.OK) {
             BgcPlugin.openAsyncInformation(
@@ -147,7 +145,5 @@ public abstract class GroupsPage extends BgcDialogPage {
     }
 
     protected abstract List<Group> getCurrentAllGroupsList();
-
-    protected abstract List<GroupTemplate> getTemplates();
 
 }

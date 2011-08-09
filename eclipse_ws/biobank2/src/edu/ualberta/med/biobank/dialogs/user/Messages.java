@@ -21,6 +21,8 @@ public class Messages extends NLS {
     public static String GroupEditDialog_feature_center_list_available;
     public static String GroupEditDialog_feature_center_list_selected;
 
+    public static String GroupEditDialog_filter_centers;
+
     public static String GroupsPage_page_title;
 
     public static String TemplatesPage_page_title;

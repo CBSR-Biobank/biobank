@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -10,7 +9,6 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
-import edu.ualberta.med.biobank.common.security.GroupTemplate;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
@@ -21,7 +19,6 @@ public class UserManagementDialog extends BgcDialogWithPages {
 
     private List<User> currentAllUsersList;
     private List<Group> currentAllGroupsList;
-    private List<GroupTemplate> currentAllTemplatesList;
 
     public UserManagementDialog(Shell parentShell) {
         super(parentShell);
@@ -67,19 +64,7 @@ public class UserManagementDialog extends BgcDialogWithPages {
             protected List<Group> getCurrentAllGroupsList() {
                 return getGroups();
             }
-
-            @Override
-            protected List<GroupTemplate> getTemplates() {
-                return getGroupTemplates();
-            }
         });
-        if (SessionManager.getUser().isSuperAdministrator())
-            nodes.add(new TemplatesPage(this) {
-                @Override
-                protected List<GroupTemplate> getCurrentAllTemplatesList() {
-                    return getGroupTemplates();
-                }
-            });
         return nodes;
     }
 
@@ -113,27 +98,4 @@ public class UserManagementDialog extends BgcDialogWithPages {
         return currentAllGroupsList;
     }
 
-    protected List<GroupTemplate> getGroupTemplates() {
-        if (currentAllTemplatesList == null) {
-            currentAllTemplatesList = new ArrayList<GroupTemplate>();
-            // FIXME should retrieve true information from server
-
-            // Shipt=46
-            // cevent=47
-            // assign=48
-            // dispatch=50
-            // link=67
-            // printer=74
-            // pevent=66
-            // reports=65
-
-            GroupTemplate clinic = new GroupTemplate(1L, "Clinic");
-            clinic.setCenterFeaturesEnabled(Arrays.asList(47, 50));
-            currentAllTemplatesList.add(clinic);
-            GroupTemplate site = new GroupTemplate(2L, "Site");
-            site.setCenterFeaturesEnabled(Arrays.asList(47, 50, 66, 67, 48));
-            currentAllTemplatesList.add(site);
-        }
-        return currentAllTemplatesList;
-    }
 }

@@ -253,6 +253,8 @@ public class Messages extends NLS {
 
     public static String GroupInfoTable_delete_error_msg;
 
+    public static String GroupInfoTable_duplicate;
+
     public static String GroupInfoTable_loading;
 
     public static String GroupInfoTable_name_label;
@@ -321,6 +323,8 @@ public class Messages extends NLS {
 
     public static String UserInfoTable_email_label;
 
+    public static String UserInfoTable_error_title;
+
     public static String UserInfoTable_firstname_label;
 
     public static String UserInfoTable_lastname_label;
@@ -330,6 +334,8 @@ public class Messages extends NLS {
     public static String UserInfoTable_loading;
 
     public static String UserInfoTable_login_label;
+
+    public static String UserInfoTable_nogroups_msg;
 
     public static String UserInfoTable_unlock_error_msg;
 
