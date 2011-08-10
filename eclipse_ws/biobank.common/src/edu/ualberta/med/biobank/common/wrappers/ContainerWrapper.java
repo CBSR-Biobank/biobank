@@ -291,7 +291,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     public void setParent(ContainerWrapper container)
         throws BiobankFailedQueryException, BiobankCheckException {
-        objectWithPositionManagement.setParent(container);
+        objectWithPositionManagement.setParentContainer(container);
 
         setPath();
         for (ContainerWrapper child : getChildren().values()) {
@@ -306,7 +306,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     private void persistSpecimens() throws Exception {
         for (SpecimenWrapper specimen : addedSpecimens) {
-            specimen.setParent(this);
+            specimen.setParentContainer(this);
             specimen.persist();
         }
     }
@@ -515,7 +515,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             }
         }
         specimen.setPosition(new RowColPos(row, col));
-        specimen.setParent(this);
+        specimen.setParentContainer(this);
         specimens.put(new RowColPos(row, col), specimen);
         addedSpecimens.add(specimen);
     }
