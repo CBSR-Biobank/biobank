@@ -398,6 +398,14 @@ public abstract class CenterWrapper<E extends Center> extends
 
     }
 
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(check().uniqueAndNotNull(CenterPeer.NAME));
+        tasks.add(check().uniqueAndNotNull(CenterPeer.NAME_SHORT));
+
+        super.addPersistTasks(tasks);
+    }
+
     // TODO: remove if allowing bi-direcitonal links.
     // public List<DispatchWrapper> getSrcDispatchCollection(boolean sort) {
     // return HQLAccessor.getCachedCollection(this,

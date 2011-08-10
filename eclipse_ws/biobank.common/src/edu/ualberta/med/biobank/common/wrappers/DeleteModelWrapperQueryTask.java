@@ -9,6 +9,10 @@ import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
+import java.text.MessageFormat;
+
+import org.hibernate.PropertyValueException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 
 /**
@@ -58,6 +62,7 @@ public class DeleteModelWrapperQueryTask<E> implements
      */
     private static class DeleteAction<E> extends WrapperAction<E> {
         private static final long serialVersionUID = 1L;
+        private static final String HQL = "DELETE FROM {0} WHERE {1} = ?";
 
         public DeleteAction(ModelWrapper<E> wrapper) {
             super(wrapper);
@@ -66,7 +71,15 @@ public class DeleteModelWrapperQueryTask<E> implements
         @Override
         public Object doAction(Session session) throws BiobankSessionException {
             E model = getModel();
-            session.delete(model);
+
+            // Calling session.delete() does not sometimes work because it
+            // null-checks values, and can fail. For example, trying to delete a
+            // contact whose clinic value is null will not work.
+            try {
+                session.delete(model);
+            } catch (PropertyValueException e) {
+                doHqlDelete(session);
+            }
 
             // set the id to null so that the object is not loaded and so that
             // Hibernate won't do any cascades with it because it has no
@@ -74,6 +87,20 @@ public class DeleteModelWrapperQueryTask<E> implements
             getIdProperty().set(model, null);
 
             return model;
+        }
+
+        private void doHqlDelete(Session session) {
+            Integer id = getIdProperty().get(getModel());
+
+            if (id != null) {
+                String className = getModelClass().getName();
+                String idPropName = getIdProperty().getName();
+                String hql = MessageFormat.format(HQL, className, idPropName);
+
+                Query query = session.createQuery(hql);
+                query.setParameter(0, id);
+                query.executeUpdate();
+            }
         }
     }
 }

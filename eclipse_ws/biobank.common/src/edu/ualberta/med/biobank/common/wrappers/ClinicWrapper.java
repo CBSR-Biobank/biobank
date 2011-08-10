@@ -2,12 +2,8 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
@@ -18,8 +14,7 @@ import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ClinicBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.ContactBaseWrapper;
-import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.common.wrappers.checks.ClinicPreDeleteChecks;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
@@ -28,9 +23,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ClinicWrapper extends ClinicBaseWrapper {
-
     private static final String STUDY_COLLECTION_CACHE_KEY = "studyCollection";
-    private Set<ContactBaseWrapper> deletedContacts = new HashSet<ContactBaseWrapper>();
 
     public ClinicWrapper(WritableApplicationService appService) {
         super(appService);
@@ -41,24 +34,6 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         super(appService, wrappedObject);
         setSendsShipments(getSendsShipments() == null ? false
             : getSendsShipments());
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        checkNoDuplicates(Center.class, CenterPeer.NAME.getName(), getName(),
-            "A center with name");
-        checkNoDuplicates(Center.class, CenterPeer.NAME_SHORT.getName(),
-            getNameShort(), "A center with short name");
-    }
-
-    @Override
-    protected void persistDependencies(Clinic origObject) throws Exception {
-        for (ContactBaseWrapper c : deletedContacts) {
-            if (!c.isNew()) {
-                c.delete();
-            }
-        }
     }
 
     /**
@@ -97,16 +72,6 @@ public class ClinicWrapper extends ClinicBaseWrapper {
             cache.put(STUDY_COLLECTION_CACHE_KEY, studyCollection);
         }
         return studyCollection;
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankDeleteException,
-        ApplicationException {
-        List<StudyWrapper> studies = getStudyCollection();
-        if (studies != null && studies.size() > 0) {
-            throw new BiobankDeleteException("Unable to delete clinic "
-                + getName() + ". No more study reference should exist.");
-        }
     }
 
     @Override
@@ -186,11 +151,6 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         return getCountResult(appService, new HQLCriteria(CLINIC_COUNT_QRY));
     }
 
-    @Override
-    protected void resetInternalFields() {
-        deletedContacts.clear();
-    }
-
     public static final String COLLECTION_EVENT_COUNT_QRY = "select count(cevent) from "
         + Clinic.class.getName()
         + " as clinic join clinic."
@@ -237,18 +197,27 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     }
 
     @Override
-    public void removeFromContactCollection(
-        List<? extends ContactBaseWrapper> contactCollection) {
-        super.removeFromContactCollection(contactCollection);
-        deletedContacts.addAll(contactCollection);
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.deleteRemoved(this, ClinicPeer.CONTACT_COLLECTION);
+
+        super.addPersistTasks(tasks);
     }
 
     @Override
-    public void removeFromContactCollectionWithCheck(
-        List<? extends ContactBaseWrapper> contactCollection)
-        throws BiobankCheckException {
-        super.removeFromContactCollectionWithCheck(contactCollection);
-        deletedContacts.addAll(contactCollection);
+    protected void addDeleteTasks(TaskList tasks) {
+        tasks.add(new ClinicPreDeleteChecks(this));
+
+        super.addDeleteTasks(tasks);
     }
 
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        WrapperTransaction.persist(this, appService);
+    }
+
+    @Override
+    public void delete() throws Exception {
+        WrapperTransaction.delete(this, appService);
+    }
 }
