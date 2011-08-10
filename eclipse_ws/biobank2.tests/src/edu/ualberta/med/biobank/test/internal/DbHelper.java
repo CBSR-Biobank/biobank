@@ -66,6 +66,7 @@ public class DbHelper {
         for (DispatchWrapper dispatch : dispaches) {
             dispatch.reload();
             deleteFromList(dispatch.getDispatchSpecimenCollection(false));
+            dispatch.reload();
             dispatch.delete();
         }
     }
