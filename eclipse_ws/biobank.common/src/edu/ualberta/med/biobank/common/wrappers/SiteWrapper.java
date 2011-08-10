@@ -298,15 +298,6 @@ public class SiteWrapper extends SiteBaseWrapper {
     }
 
     @Override
-    protected void addPersistTasks(TaskList tasks) {
-        // TODO: move to center?
-        tasks.add(check().uniqueAndNotNull(SitePeer.NAME));
-        tasks.add(check().uniqueAndNotNull(SitePeer.NAME_SHORT));
-
-        super.addPersistTasks(tasks);
-    }
-
-    @Override
     protected void addDeleteTasks(TaskList tasks) {
         String errMsg = MessageFormat.format(EXISTING_CHILDREN_MSG, getName());
         tasks.add(check().empty(SitePeer.CONTAINER_COLLECTION, errMsg));

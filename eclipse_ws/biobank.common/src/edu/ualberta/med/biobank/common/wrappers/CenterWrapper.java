@@ -177,19 +177,6 @@ public abstract class CenterWrapper<E extends Center> extends
     public abstract long getPatientCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException;
 
-    @Override
-    protected void persistDependencies(Center origObject) throws Exception {
-        deleteCollectionEvents();
-    }
-
-    private void deleteCollectionEvents() throws Exception {
-        for (CollectionEventWrapper ce : deletedCollectionEvents) {
-            if (!ce.isNew()) {
-                ce.delete();
-            }
-        }
-    }
-
     public static List<CenterWrapper<?>> getCenters(
         WritableApplicationService appService) throws ApplicationException {
         StringBuilder qry = new StringBuilder(ALL_CENTERS_HQL_STRING);
@@ -404,6 +391,22 @@ public abstract class CenterWrapper<E extends Center> extends
         tasks.add(check().uniqueAndNotNull(CenterPeer.NAME_SHORT));
 
         super.addPersistTasks(tasks);
+    }
+
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        super.addDeleteTasks(tasks);
+    }
+
+    // TODO: remove this override when all persist()-s are like this!
+    @Override
+    public void persist() throws Exception {
+        WrapperTransaction.persist(this, appService);
+    }
+
+    @Override
+    public void delete() throws Exception {
+        WrapperTransaction.delete(this, appService);
     }
 
     // TODO: remove if allowing bi-direcitonal links.
