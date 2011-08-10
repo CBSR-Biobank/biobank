@@ -482,6 +482,10 @@ public class TestSpecimen extends TestDatabase {
         sample2.setInventoryId("qwerty");
         sample2.persist();
         Assert.assertTrue(parentSpc.compareTo(sample2) < 0);
+
+        Assert.fail("should test when not a specimenwrapper");
+
+        Assert.fail("should test when has a position"); // ??!!??
     }
 
     @Test
@@ -503,6 +507,8 @@ public class TestSpecimen extends TestDatabase {
             childSpc.getInventoryId());
         Assert.assertNotNull(foundSpecimen);
         Assert.assertEquals(foundSpecimen, childSpc);
+        Assert.fail("test with no result (return null)");
+        Assert.fail("how to test the exception throwing?");
     }
 
     @Test
@@ -738,5 +744,76 @@ public class TestSpecimen extends TestDatabase {
         Assert.assertEquals(2, specimenDispatches.size());
         Assert.assertTrue(specimenDispatches.contains(d));
         Assert.assertTrue(specimenDispatches.contains(d2));
+    }
+
+    @Test
+    public void testGetCenterString() {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testGetPositionStringInParent() {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testSetQuantityFromType() {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testToString() {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testIsActive() {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testFlagged() {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testGetTop() {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testIsUsedInDispatch() {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testUpdateChildren() {
+        Assert.fail("to be implemented");
+        // see persist dependencies
+    }
+
+    @Test
+    public void testSetTopParent() {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testToSpecimen() {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testGetCollectionInfo() {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testHasUnknownImportType() {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testCanUpdate() {
+        Assert.fail("to be implemented");
     }
 }

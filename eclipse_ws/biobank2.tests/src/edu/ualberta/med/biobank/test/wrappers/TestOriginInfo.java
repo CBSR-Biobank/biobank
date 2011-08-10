@@ -33,10 +33,58 @@ public class TestOriginInfo extends TestDatabase {
             .addShippingMethod(name);
 
         CollectionEventHelper.addCollectionEvent(clinic, patient, 1, spc);
-        ShipmentInfoWrapper shipInfo = ShipmentInfoHelper.addShipmentInfo(clinic,
-            method, Utils.getRandomString(20), Utils.getRandomDate(), spc);
+        ShipmentInfoWrapper shipInfo = ShipmentInfoHelper.addShipmentInfo(
+            clinic, method, Utils.getRandomString(20), Utils.getRandomDate(),
+            spc);
 
         Assert.assertEquals(method, shipInfo.getShippingMethod());
+    }
+
+    @Test
+    public void testGetPatientCollection() throws Exception {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testDeleteDepenciesCheck() throws Exception {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testPersistChecks() throws Exception {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testGetTodayShipments() throws Exception {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testGetShipmentsByWaybill() throws Exception {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testGetShipmentsByDateReceived() throws Exception {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testGetShipmentsByDateSent() throws Exception {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testGetSecuritySpecificCenter() throws Exception {
+        Assert.fail("to be implemented");
+        // ?????. need user ?
+    }
+
+    @Test
+    public void testGetLog() throws Exception {
+        Assert.fail("to be implemented");
+        // need to persist or update with a shipmentinfo
     }
 
 }

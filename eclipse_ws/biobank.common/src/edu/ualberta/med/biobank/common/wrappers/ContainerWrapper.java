@@ -731,21 +731,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     @Override
-    public boolean checkIntegrity() {
-        /*
-         * outdated? if (wrappedObject != null) if (((getContainerType() !=
-         * null) && (getContainerType().getRowCapacity() != null) &&
-         * (getContainerType() .getColCapacity() != null)) ||
-         * (getContainerType() == null)) if (((getPosition() != null) &&
-         * (getPosition().row != null) && (getPosition().col != null)) ||
-         * (getPosition() == null)) if (wrappedObject.getSite() != null) return
-         * true; return false;
-         */
-        return true;
-
-    }
-
-    @Override
     protected void deleteChecks() throws BiobankDeleteException,
         ApplicationException {
         if (hasSpecimens()) {

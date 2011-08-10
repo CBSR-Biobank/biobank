@@ -267,13 +267,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         }
     }
 
-    @Override
-    public void loadAttributes() throws Exception {
-        super.loadAttributes();
-        getPositionString();
-        wrappedObject.getSpecimenType().getName();
-    }
-
     private static final String Specimen_QRY = "from "
         + Specimen.class.getName() + " where "
         + SpecimenPeer.INVENTORY_ID.getName() + " = ?";

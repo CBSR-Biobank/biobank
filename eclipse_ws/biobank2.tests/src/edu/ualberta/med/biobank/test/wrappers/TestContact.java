@@ -52,7 +52,7 @@ public class TestContact extends TestDatabase {
 
         List<StudyWrapper> studiesSorted = contact.getStudyCollection(true);
         if (studiesSorted.size() > 1) {
-            for (int i = 0; i < studiesSorted.size() - 1; i++) {
+            for (int i = 0; i < (studiesSorted.size() - 1); i++) {
                 StudyWrapper s1 = studiesSorted.get(i);
                 StudyWrapper s2 = studiesSorted.get(i + 1);
                 Assert.assertTrue(s1.compareTo(s2) <= 0);
@@ -92,6 +92,8 @@ public class TestContact extends TestDatabase {
         contact1.setName("stuff");
         contact2.setName("stuff1");
         Assert.assertTrue(contact1.compareTo(contact2) < 0);
+        Assert
+            .fail("should compare with something different from a ContactWraper");
     }
 
     @Test(expected = ValueNotSetException.class)
@@ -182,4 +184,15 @@ public class TestContact extends TestDatabase {
         contact.reset();
         Assert.assertEquals(null, contact.getName());
     }
+
+    @Test
+    public void testGetAllContacts() throws Exception {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testToString() throws Exception {
+        Assert.fail("to be implemented");
+    }
+
 }

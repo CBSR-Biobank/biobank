@@ -205,6 +205,8 @@ public class TestAliquotedSpecimen extends TestDatabase {
 
         Assert.assertTrue(aliquotedSpec1.compareTo(aliquotedSpec2) > 0);
         Assert.assertTrue(aliquotedSpec2.compareTo(aliquotedSpec1) < 0);
+
+        Assert.fail("test with something that is not AliquotSpecimenWrapper");
     }
 
     @Test
@@ -254,4 +256,5 @@ public class TestAliquotedSpecimen extends TestDatabase {
         String s = aliquotedSpec.toString();
         Assert.assertTrue((s != null) && !s.isEmpty());
     }
+
 }
