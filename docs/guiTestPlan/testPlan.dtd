@@ -7,7 +7,7 @@
   name CDATA #REQUIRED
   xsi:noNamespaceSchemaLocation NMTOKEN #REQUIRED>
 
-<!ELEMENT test_section (test_case)+>
+<!ELEMENT test_section (test_section,test_case)+>
 <!ATTLIST test_section
   xmlns CDATA #FIXED ''
   id CDATA #REQUIRED
