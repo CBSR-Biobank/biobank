@@ -1,0 +1,41 @@
+default namespace = ""
+namespace xsi = "http://www.w3.org/2001/XMLSchema-instance"
+
+test_suite = element test_suite { attlist.test_suite, test_section+ }
+attlist.test_suite &=
+  attribute name { text },
+  attribute xsi:noNamespaceSchemaLocation { xsd:NMTOKEN }
+test_section = element test_section { attlist.test_section, test_case+ }
+attlist.test_section &=
+  attribute id { text },
+  attribute name { text }
+test_case =
+  element test_case {
+    attlist.test_case,
+    description,
+    precondition,
+    expected_result,
+    note,
+    dependency,
+    steps
+  }
+attlist.test_case &=
+  attribute id { text },
+  attribute name { text },
+  attribute variety { xsd:NMTOKEN }
+description = element description { attlist.description, text }
+attlist.description &= empty
+precondition = element precondition { attlist.precondition, text }
+attlist.precondition &= empty
+expected_result =
+  element expected_result { attlist.expected_result, text }
+attlist.expected_result &= empty
+note = element note { attlist.note, text }
+attlist.note &= empty
+dependency = element dependency { attlist.dependency, empty }
+attlist.dependency &= empty
+steps = element steps { attlist.steps, step+ }
+attlist.steps &= empty
+step = element step { attlist.step, text }
+attlist.step &= empty
+start = test_suite

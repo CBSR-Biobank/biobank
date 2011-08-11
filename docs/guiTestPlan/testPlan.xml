@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test_suite name="BioBank GUI Test Plan" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="testPlan.xsd">
+  <test_section id="1" name="Activity Status">
+    <test_case id="1" name="Activity Status menu item disabled" variety="positive">
+      <description>
+        Open the client software and do not log in. The application's main
+        window is visible.
+      </description>
+      <precondition>
+        Using latest client software, computer connected to network, server
+        reachable, initialized database, account of user exists
+      </precondition>
+      <expected_result>
+        No items displayed related to activity status are present in the sub
+        menu.
+      </expected_result>
+      <note>
+        None.
+      </note>
+      <dependency>
+      </dependency>
+      <steps>
+        <step>Start client software.</step>
+        <step>Select "Administration" from main menu.</step>
+      </steps>
+    </test_case>
+    <test_case id="1" name="Activity Status menu item disabled" variety="positive">
+      <description>
+        Open the client software and do not log in. The application's main
+        window is visible.
+      </description>
+      <precondition>
+        Using latest client software, computer connected to network, server
+        reachable, initialized database, account of user exists
+      </precondition>
+      <expected_result>
+        No items displayed related to activity status are present in the sub
+        menu.
+      </expected_result>
+      <note>
+        None.
+      </note>
+      <dependency>
+      </dependency>
+      <steps>
+        <step>Start client software.</step>
+        <step>Select "Administration" from main menu.</step>
+      </steps>
+    </test_case>
+  </test_section>
+  <test_section id="2" name="Activity Status">
+    <test_case id="1" name="Activity Status menu item disabled" variety="positive">
+      <description>
+        Open the client software and do not log in. The application's main
+        window is visible.
+      </description>
+      <precondition>
+        Using latest client software, computer connected to network, server
+        reachable, initialized database, account of user exists
+      </precondition>
+      <expected_result>
+        No items displayed related to activity status are present in the sub
+        menu.
+      </expected_result>
+      <note>
+        None.
+      </note>
+      <dependency>
+      </dependency>
+      <steps>
+        <step>Start client software.</step>
+        <step>Select "Administration" from main menu.</step>
+      </steps>
+    </test_case>
+    <test_case id="1" name="Activity Status menu item disabled" variety="positive">
+      <description>
+        Open the client software and do not log in. The application's main
+        window is visible.
+      </description>
+      <precondition>
+        Using latest client software, computer connected to network, server
+        reachable, initialized database, account of user exists
+      </precondition>
+      <expected_result>
+        No items displayed related to activity status are present in the sub
+        menu.
+      </expected_result>
+      <note>
+        None.
+      </note>
+      <dependency>
+      </dependency>
+      <steps>
+        <step>Start client software.</step>
+        <step>Select "Administration" from main menu.</step>
+      </steps>
+    </test_case>
+  </test_section>
+</test_suite>

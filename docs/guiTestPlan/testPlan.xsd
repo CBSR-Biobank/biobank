@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:element name="test_suite">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="test_section"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="test_section">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="test_case"/>
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="xs:integer"/>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="test_case">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="description"/>
+        <xs:element ref="precondition"/>
+        <xs:element ref="expected_result"/>X
+        <xs:element ref="note"/>
+        <xs:element ref="dependency"/>
+        <xs:element ref="steps"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:integer" use="required" />
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="variety" use="required">
+        <xs:simpleType>
+          <xs:restriction base='xs:string'>
+            <xs:enumeration value='positive'/>
+            <xs:enumeration value='negative'/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="description" type="xs:string"/>
+  <xs:element name="precondition" type="xs:string"/>
+  <xs:element name="expected_result" type="xs:string"/>
+  <xs:element name="note" type="xs:string"/>
+  <xs:element name="dependency" type="xs:string"/>
+  <xs:element name="steps">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="step"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="step" type="xs:string"/>
+
+</xs:schema>
