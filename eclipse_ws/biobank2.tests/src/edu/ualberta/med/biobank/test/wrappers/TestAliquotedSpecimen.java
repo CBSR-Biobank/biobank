@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.AliquotedSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
@@ -205,6 +206,11 @@ public class TestAliquotedSpecimen extends TestDatabase {
 
         Assert.assertTrue(aliquotedSpec1.compareTo(aliquotedSpec2) > 0);
         Assert.assertTrue(aliquotedSpec2.compareTo(aliquotedSpec1) < 0);
+
+        AliquotedSpecimenBaseWrapper as = new AliquotedSpecimenBaseWrapper(
+            appService);
+        as.setSpecimenType(typeWrapperHair);
+        Assert.assertEquals(0, aliquotedSpec2.compareTo(as));
     }
 
     @Test
@@ -254,4 +260,5 @@ public class TestAliquotedSpecimen extends TestDatabase {
         String s = aliquotedSpec.toString();
         Assert.assertTrue((s != null) && !s.isEmpty());
     }
+
 }

@@ -291,7 +291,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     public void setParent(ContainerWrapper container)
         throws BiobankFailedQueryException, BiobankCheckException {
-        objectWithPositionManagement.setParent(container);
+        objectWithPositionManagement.setParentContainer(container);
 
         setPath();
         for (ContainerWrapper child : getChildren().values()) {
@@ -306,7 +306,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     private void persistSpecimens() throws Exception {
         for (SpecimenWrapper specimen : addedSpecimens) {
-            specimen.setParent(this);
+            specimen.setParentContainer(this);
             specimen.persist();
         }
     }
@@ -515,7 +515,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             }
         }
         specimen.setPosition(new RowColPos(row, col));
-        specimen.setParent(this);
+        specimen.setParentContainer(this);
         specimens.put(new RowColPos(row, col), specimen);
         addedSpecimens.add(specimen);
     }
@@ -728,21 +728,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 e.getValue());
         }
         destination.persist();
-    }
-
-    @Override
-    public boolean checkIntegrity() {
-        /*
-         * outdated? if (wrappedObject != null) if (((getContainerType() !=
-         * null) && (getContainerType().getRowCapacity() != null) &&
-         * (getContainerType() .getColCapacity() != null)) ||
-         * (getContainerType() == null)) if (((getPosition() != null) &&
-         * (getPosition().row != null) && (getPosition().col != null)) ||
-         * (getPosition() == null)) if (wrappedObject.getSite() != null) return
-         * true; return false;
-         */
-        return true;
-
     }
 
     @Override

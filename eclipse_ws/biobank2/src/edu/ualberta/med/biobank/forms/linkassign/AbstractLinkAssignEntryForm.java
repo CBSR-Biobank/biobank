@@ -701,7 +701,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                     singleSpecimen.setSpecimenPositionFromString(
                         positionString, parentContainers.get(0));
                     if (singleSpecimen.isPositionFree(parentContainers.get(0))) {
-                        singleSpecimen.setParent(parentContainers.get(0));
+                        singleSpecimen.setParentContainer(parentContainers.get(0));
                         displaySinglePositions(true);
                         canSaveSingleSpecimen.setValue(true);
                         cancelConfirmWidget.setFocus();

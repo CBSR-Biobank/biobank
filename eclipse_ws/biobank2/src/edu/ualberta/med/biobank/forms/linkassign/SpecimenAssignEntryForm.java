@@ -969,7 +969,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         SpecimenWrapper specimen = cell.getSpecimen();
                         if (specimen != null) {
                             specimen.setPosition(rcp);
-                            specimen.setParent(currentMultipleContainer);
+                            specimen.setParentContainer(currentMultipleContainer);
                             specimen.persist();
                             String posStr = specimen.getPositionString(true,
                                 false);

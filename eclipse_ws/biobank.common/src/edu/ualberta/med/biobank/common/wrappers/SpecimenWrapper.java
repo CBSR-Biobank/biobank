@@ -117,8 +117,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return objectWithPositionManagement.getParentContainer();
     }
 
-    public void setParent(ContainerWrapper container) {
-        objectWithPositionManagement.setParent(container);
+    public void setParentContainer(ContainerWrapper container) {
+        objectWithPositionManagement.setParentContainer(container);
     }
 
     public boolean hasParent() {
@@ -131,7 +131,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
     public void setPosition(RowColPos rcp) {
         if (rcp == null) {
-            setParent(null);
+            setParentContainer(null);
         }
         objectWithPositionManagement.setPosition(rcp);
     }
@@ -257,21 +257,12 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         StudyWrapper study = cevent.getPatient().getStudy();
         Collection<AliquotedSpecimenWrapper> aliquotedSpecimenCollection = study
             .getAliquotedSpecimenCollection(false);
-        if (aliquotedSpecimenCollection != null) {
-            for (AliquotedSpecimenWrapper ss : aliquotedSpecimenCollection) {
-                if (getSpecimenType().equals(ss.getSpecimenType())) {
-                    setQuantity(ss.getVolume());
-                    return;
-                }
+        for (AliquotedSpecimenWrapper as : aliquotedSpecimenCollection) {
+            if (getSpecimenType().equals(as.getSpecimenType())) {
+                setQuantity(as.getVolume());
+                return;
             }
         }
-    }
-
-    @Override
-    public void loadAttributes() throws Exception {
-        super.loadAttributes();
-        getPositionString();
-        wrappedObject.getSpecimenType().getName();
     }
 
     private static final String Specimen_QRY = "from "

@@ -102,7 +102,7 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
     /**
      * Set the parent of this object
      */
-    public void setParent(ContainerWrapper container) {
+    public void setParentContainer(ContainerWrapper container) {
         this.parent = container;
         // AbstractContainerWrapper<?, ?> oldValue = getParent();
         AbstractPositionWrapper<T> pos = getPositionWrapper(true);
