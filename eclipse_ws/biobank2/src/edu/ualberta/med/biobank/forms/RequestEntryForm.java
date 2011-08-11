@@ -318,6 +318,7 @@ public class RequestEntryForm extends BiobankViewForm {
         }
         dispatch.addSpecimens(dispatchSpecimens, DispatchSpecimenState.NONE);
         dispatch.persist();
+
     }
 
     @Override

@@ -29,6 +29,8 @@ public class Messages extends NLS {
     public static String DispatchReceiveScanDialog_flagging_error_title;
     public static String DispatchReceiveScanDialog_notInDispatch_error_msg;
     public static String DispatchReceiveScanDialog_notInDispatch_error_title;
+    public static String ReceiveScanDialog_0;
+    public static String ReceiveScanDialog_1;
     public static String ReceiveScanDialog_description;
     public static String ReceiveScanDialog_proceed_button_label;
     public static String ModifyStateDispatchDialog_comment_label;
