@@ -26,10 +26,6 @@ public class Messages extends NLS {
 
     public static String ComboAndQuantityWidget_qunatity_label;
 
-    public static String FileBrowser_browse_label;
-
-    public static String FileBrowser_open_label;
-
     public static String PlateSelectionWidget_plate_label;
 
     public static String PlateSelectionWidget_select_label;
