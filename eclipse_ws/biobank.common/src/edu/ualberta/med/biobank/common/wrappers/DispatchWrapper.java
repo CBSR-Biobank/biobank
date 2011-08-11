@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
@@ -141,7 +142,22 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
         // FIXME: temporary fix - this should be converted to a batch update
         for (DispatchSpecimenWrapper rds : toBePersistedDispatchedSpecimens) {
-            rds.getSpecimen().persist();
+            SpecimenWrapper spec = rds.getSpecimen();
+            // save things the dispatch could modify:
+            ActivityStatusWrapper as = spec.getActivityStatus();
+            String comment = spec.getComment();
+            CenterWrapper<?> center = spec.getCurrentCenter();
+            RowColPos pos = spec.getPosition();
+            // reload because spec might have been modified. This should avoid
+            // concurrency problems
+            spec.reload();
+            // set values back:
+            spec.setActivityStatus(as);
+            spec.setComment(comment);
+            spec.setCurrentCenter(center);
+            if (pos == null)
+                spec.setPosition(null);
+            spec.persist();
         }
     }
 

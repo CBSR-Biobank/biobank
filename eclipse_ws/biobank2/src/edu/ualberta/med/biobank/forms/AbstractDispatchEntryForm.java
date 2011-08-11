@@ -70,7 +70,8 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         boolean setAsFirstControl) {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
-        toolkit.createLabel(addComposite, Messages.AbstractDispatchEntryForm_add_spec_label);
+        toolkit.createLabel(addComposite,
+            Messages.AbstractDispatchEntryForm_add_spec_label);
         final BgcBaseText newSpecimenText = new BgcBaseText(addComposite,
             SWT.NONE, toolkit);
         GridData gd = new GridData();
@@ -98,7 +99,8 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
                 newSpecimenText.setText(""); //$NON-NLS-1$
             }
         });
-        toolkit.createLabel(addComposite, Messages.AbstractDispatchEntryForm_scanDialog_label);
+        toolkit.createLabel(addComposite,
+            Messages.AbstractDispatchEntryForm_scanDialog_label);
         Button openScanButton = toolkit
             .createButton(addComposite, "", SWT.PUSH); //$NON-NLS-1$
         openScanButton.setImage(BgcPlugin.getDefault().getImageRegistry()
