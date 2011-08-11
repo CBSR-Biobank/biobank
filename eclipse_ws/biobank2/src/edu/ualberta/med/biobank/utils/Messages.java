@@ -12,7 +12,6 @@ public class Messages extends NLS {
     public static String FilePromptUtil_path_error_title;
     public static String FilePromptUtil_path_write_error_msg;
     public static String SearchType_barcode_cont_label;
-    public static String SearchType_form_open_error_msg;
     public static String SearchType_inventoryid_label;
     public static String SearchType_label_cont_label;
     public static String SearchType_nonactive_spec_label;
