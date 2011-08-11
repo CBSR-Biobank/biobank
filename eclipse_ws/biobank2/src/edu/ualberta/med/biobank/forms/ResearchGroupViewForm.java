@@ -28,11 +28,13 @@ import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcFileBrowser;
+import edu.ualberta.med.biobank.gui.common.widgets.IBgcFileBrowserListener;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
-import edu.ualberta.med.biobank.widgets.FileBrowser;
 
-public class ResearchGroupViewForm extends AddressViewFormCommon {
+public class ResearchGroupViewForm extends AddressViewFormCommon implements
+    IBgcFileBrowserListener {
     public static final String ID = "edu.ualberta.med.biobank.forms.ResearchGroupViewForm"; //$NON-NLS-1$
 
     private ResearchGroupAdapter researchGroupAdapter;
@@ -51,7 +53,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
 
     private BgcBaseText studyLabel;
 
-    private FileBrowser csvSelector;
+    private BgcFileBrowser csvSelector;
 
     @Override
     protected void init() throws Exception {
@@ -80,27 +82,35 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
     }
 
     private void createUploadSection() {
-        Composite client = createSectionWithClient("Request Upload");
+        Composite client = createSectionWithClient(Messages.ResearchGroupViewForm_request_upload_title);
         client.setLayout(new GridLayout(3, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
         toolkit.createLabel(client,
             "Submit a request on behalf of this research group:");
-        csvSelector = new FileBrowser(client, "CSV File", SWT.NONE);
+        csvSelector = new BgcFileBrowser(client, "CSV File", SWT.NONE,
+            new String[] { ".csv" }); //$NON-NLS-1$
+        csvSelector.addFileSelectedListener(this);
         csvSelector.adaptToToolkit(toolkit, true);
         Button b = new Button(client, SWT.PUSH);
-        b.setText("Upload Request");
+        b.setText(Messages.ResearchGroupViewForm_upload_button);
         b.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 try {
                     saveRequest();
                 } catch (Exception e1) {
-                    BgcPlugin.openAsyncError("Error Uploading", e1);
+                    BgcPlugin.openAsyncError(
+                        Messages.ResearchGroupViewForm_error_title, e1);
                 }
             }
         });
         // b.setEnabled(false);
+    }
+
+    @Override
+    public void fileSelected(String filename) {
+        // do nothing
     }
 
     public void saveRequest() throws Exception {
@@ -118,22 +128,25 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
             CsvPreference.STANDARD_PREFERENCE);
 
         final CellProcessor[] processors = new CellProcessor[] { null, null,
-            new ParseDate("yyyy-MM-dd"), null, null, null };
+            new ParseDate("yyyy-MM-dd"), null, null, null }; //$NON-NLS-1$
 
         List<RequestInput> requests = new ArrayList<RequestInput>();
 
         try {
-            String[] header = new String[] { "pnumber", "inventoryID",
-                "dateDrawn", "specimenTypeNameShort", "location",
-                "activityStatus" };
+            // Peer class not used because this refers to RequestInput fields
+            String[] header = new String[] { "pnumber", "inventoryID", //$NON-NLS-1$ //$NON-NLS-2$
+                "dateDrawn", "specimenTypeNameShort", "location", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                "activityStatus" }; //$NON-NLS-1$
             RequestInput srequest;
             while ((srequest = reader.read(RequestInput.class, header,
                 processors)) != null) {
                 requests.add(srequest);
             }
         } catch (SuperCSVException e) {
-            throw new Exception("Parse error at line " + reader.getLineNumber()
-                + "\n" + e.getCsvContext());
+            throw new Exception(NLS.bind(
+                Messages.ResearchGroupViewForm_parse_error_msg,
+                reader.getLineNumber())
+                + "\n" + e.getCsvContext()); //$NON-NLS-1$
         } finally {
             reader.close();
         }
@@ -159,11 +172,12 @@ public class ResearchGroupViewForm extends AddressViewFormCommon {
 
         request.persist();
 
-        BgcPlugin.openMessage("Success", "Request successfully uploaded");
+        BgcPlugin.openMessage(Messages.ResearchGroupViewForm_success_title,
+            Messages.ResearchGroupViewForm_success_msg);
         SpecimenTransitView.reloadCurrent();
     }
 
-    private void createResearchGroupSection() throws Exception {
+    private void createResearchGroupSection() {
         Composite client = toolkit.createComposite(page);
         client.setLayout(new GridLayout(2, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

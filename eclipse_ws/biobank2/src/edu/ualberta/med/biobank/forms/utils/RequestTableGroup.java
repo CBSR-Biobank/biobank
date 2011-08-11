@@ -34,25 +34,20 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
         super(ds, request);
     }
 
-    public static final String TREE_QUERY = "select ra, concat(c.path, concat('/', c.id)), c.id, a.id, st.id, sp.id from "
-        + RequestSpecimen.class.getName()
-        + " ra inner join fetch ra."
-        + RequestSpecimenPeer.SPECIMEN.getName()
-        + " a inner join fetch a."
-        + SpecimenPeer.SPECIMEN_TYPE.getName()
-        + " st inner join fetch a."
-        + SpecimenPeer.SPECIMEN_POSITION.getName()
-        + " sp inner join fetch sp."
-        + SpecimenPositionPeer.CONTAINER.getName()
-        + " c where ra."
-        + RequestSpecimenPeer.REQUEST.getName()
-        + ".id=? order by ra."
+    public static final String TREE_QUERY = "select ra, concat(c.path, concat('/', c.id)), c.id, a.id, st.id, sp.id from " //$NON-NLS-1$
+        + RequestSpecimen.class.getName() + " ra inner join fetch ra." //$NON-NLS-1$
+        + RequestSpecimenPeer.SPECIMEN.getName() + " a inner join fetch a." //$NON-NLS-1$
+        + SpecimenPeer.SPECIMEN_TYPE.getName() + " st inner join fetch a." //$NON-NLS-1$
+        + SpecimenPeer.SPECIMEN_POSITION.getName() + " sp inner join fetch sp." //$NON-NLS-1$
+        + SpecimenPositionPeer.CONTAINER.getName() + " c where ra." //$NON-NLS-1$
+        + RequestSpecimenPeer.REQUEST.getName() + ".id=? order by ra." //$NON-NLS-1$
         + RequestSpecimenPeer.STATE.getName();
 
     public static List<RequestTableGroup> getGroupsForRequest(
         RequestWrapper ship) {
         ArrayList<RequestTableGroup> groups = new ArrayList<RequestTableGroup>();
-        groups.add(new RequestTableGroup(null, "All", ship));
+        groups.add(new RequestTableGroup(null,
+            Messages.RequestTableGroup_all_node_label, ship));
         groups.add(new RequestTableGroup(RequestSpecimenState.PULLED_STATE,
             ship));
         return groups;
@@ -68,8 +63,8 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
         try {
             results = SessionManager.getAppService().query(query);
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error",
-                "Unable to retrieve data from server", e);
+            BgcPlugin.openAsyncError(Messages.RequestTableGroup_error_title,
+                Messages.RequestTableGroup_data_error_msg, e);
         }
 
         HashSet<Integer> containers = new HashSet<Integer>();

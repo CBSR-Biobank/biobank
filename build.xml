@@ -16,8 +16,9 @@
     <arg value="-f" />
   </exec>
 
-  <property name="server.version.num" value="3.1.0.rc1" />
-  <property name="java.client.version.num" value="3.1.0.rc1" />
+  <property name="server.version.num" value="3.1.1.rc1" />
+  <property name="java.client.version.num" value="3.1.1.rc1" />
+
   <property environment="env" />
   <property name="host" value="aicml-med.cs.ualberta.ca" />
   <!--property name="${host}/" value="" /-->
@@ -526,6 +527,7 @@
       <transaction src="${data.sql.dir}/specimenTypes.sql" />
       <transaction src="${data.sql.dir}/containerLabelingScheme.sql" />
       <transaction src="${data.sql.dir}/shippingMethod.sql" />
+      <transaction src="${data.sql.dir}/patientLabels.sql" />
       <transaction src="${data.sql.dir}/advancedReportsData.sql" />
       <transaction src="${secu-log.dir}/schemaSecurity.sql" />
       <transaction>commit;</transaction>

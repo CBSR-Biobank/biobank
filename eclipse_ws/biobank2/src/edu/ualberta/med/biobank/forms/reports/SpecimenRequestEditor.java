@@ -18,23 +18,34 @@ import org.supercsv.io.CsvBeanReader;
 import org.supercsv.io.ICsvBeanReader;
 import org.supercsv.prefs.CsvPreference;
 
+import edu.ualberta.med.biobank.gui.common.widgets.BgcFileBrowser;
+import edu.ualberta.med.biobank.gui.common.widgets.IBgcFileBrowserListener;
 import edu.ualberta.med.biobank.server.reports.SpecimenRequest;
-import edu.ualberta.med.biobank.widgets.FileBrowser;
 
-public class SpecimenRequestEditor extends ReportsEditor {
+public class SpecimenRequestEditor extends ReportsEditor implements
+    IBgcFileBrowserListener {
 
     public static String ID = "edu.ualberta.med.biobank.editors.AliquotRequestEditor"; //$NON-NLS-1$
 
-    private FileBrowser csvSelector;
+    private BgcFileBrowser csvSelector;
 
     @Override
     protected void createOptionSection(Composite parent) {
         parent.setLayout(new GridLayout(1, false));
         parent.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true,
             false));
-        csvSelector = new FileBrowser(parent,
-            Messages.SpecimenRequestEditor_browse_label, SWT.NONE);
+        csvSelector = new BgcFileBrowser(parent,
+            Messages.SpecimenRequestEditor_browse_label, SWT.NONE,
+            new String[] { "*.csv" }); //$NON-NLS-1$
+        csvSelector.addFileSelectedListener(this);
         csvSelector.adaptToToolkit(toolkit, true);
+        generateButton.setEnabled(false);
+    }
+
+    @Override
+    public void fileSelected(String filename) {
+        // enable the button once a file has been selected
+        generateButton.setEnabled(true);
     }
 
     @Override

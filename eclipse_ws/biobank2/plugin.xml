@@ -205,12 +205,16 @@
             name="%Print.command">
       </command>
       <command
+            id="edu.ualberta.med.biobank.commands.scanner.scanPlate"
+            name="%ScanPlate.command">
+      </command>
+      <command
             id="edu.ualberta.med.biobank.commands.scanner.decodePlate"
             name="%DecodePlate.command">
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.scanner.scanPlate"
-            name="%ScanPlate.command">
+            id="edu.ualberta.med.biobank.commands.scanner.decodeImage"
+            name="%DecodeImage.command">
       </command>
       <command
             categoryId="org.eclipse.ui.category.window"
@@ -641,6 +645,15 @@
          </activeWhen>
       </handler>
       <handler
+            class="edu.ualberta.med.biobank.handlers.ScanPlateHandler"
+            commandId="edu.ualberta.med.biobank.commands.scanner.scanPlate">
+         <activeWhen>
+            <reference
+                  definitionId="scannerConfigPlugin.platesEnabled">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
             class="edu.ualberta.med.biobank.handlers.DecodePlateHandler"
             commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate">
          <activeWhen>
@@ -650,13 +663,8 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.ScanPlateHandler"
-            commandId="edu.ualberta.med.biobank.commands.scanner.scanPlate">
-         <activeWhen>
-            <reference
-                  definitionId="scannerConfigPlugin.platesEnabled">
-            </reference>
-         </activeWhen>
+            class="edu.ualberta.med.biobank.handlers.DecodeImageHandler"
+            commandId="edu.ualberta.med.biobank.commands.scanner.decodeImage">
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.LoggingHandler"
@@ -1132,6 +1140,11 @@
                   commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate"
                   id="edu.ualberta.med.biobank.menu.scanner.decodePlate"
                   style="push">
+            </command>
+            <command
+                commandId="edu.ualberta.med.biobank.commands.scanner.decodeImage"
+                id="edu.ualberta.med.biobank.menu.scanner.decodeImage"
+                style="push">
             </command>
          </menu>
          <menu
@@ -1800,6 +1813,13 @@
             icon="icons/scanLink.png"
             id="edu.ualberta.med.biobank.forms.DecodePlateForm"
             name="%DecodePlate.editor">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.DecodeImageForm"
+            default="false"
+            icon="icons/scanLink.png"
+            id="edu.ualberta.med.biobank.forms.DecodeImageForm"
+            name="%DecodeImage.editor">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.SpecimenListViewForm"

@@ -1,0 +1,112 @@
+\chapter{Reports}
+\label{chap:reports}
+
+\section{Advanced Reports}
+
+Advanced Reports allow for the creation of custom reports that can be easily modified, saved for later reuse, and shared between users.
+
+\subsection{Creating an Advanced Report}
+
+An advanced report can be created for one of several possible entities: Collection Event, Container, Patient, Processing Event, Specimen. There are two ways to create an advanced report:
+
+\begin{description}
+\item[Create a New Report] Double-click on an entity, such as, "Specimen," under the "My Reports" node in the "Advanced Reports" administration view.
+\item[Copy an Existing Report] Open an existing advanced report and save it as a new advanced report.
+\end{description}
+
+A name must be entered to identify the report. A description can be added if necessary to help describe the purpose of the report.
+
+\subsection{Sharing}
+
+To share an advanced report, check the checkbox labeled 'Share report' then save the report. Note that reports are shared only with users who have the \emph{exact} same set of user groups as the user that created the report. This is to prevent confusion as report resuts may vary depending on a user's access rights (which are determined by their user groups). For example, an administrative user with access to all data might see a list of Specimens across all Sites, whereas a user with site-specific access might see a list of Specimens from their site only. This may lead to confusion.
+
+\subsection{Columns}
+
+Each entity has a number of possible columns to display. Columns allow you to choose a subset of the information available for each entity. Select columns from the "Available Columns" list and click the right arrow button to move them to the "Displayed Columns" list. Use the left arrow button to remove a column from the results. The order of columns can be changed by selecting "Displayed Columns" rows and clicking either the up arrow or the down arrow.
+
+Date-time columns, such as, "Creation Time," can be displayed in a number of ways: as a full date and time (e.g. 2010-01-01 12:00:00), as a year (e.g. 2010), as a year and month (e.g. 2010-01), as a year and quater (e.g. 2010-01), and more. To choose a specific format, expand the options by clicking on the plus sign next to any date-time column.
+
+\subsection{Filters}
+
+Filters allow you to choose a subset of the entities to display, such as, displaying only the specimens from a particular site or study. Add a filter to an advanced report by selecting one from the drop-down list of possible filters to the right of "Add filter." To remove a filter, uncheck the checkbox to the left of the listed filter you want to remove.
+
+\begin{figure}[H]
+  \centering
+  \scalebox{0.5}
+	   { \includegraphics*{screenshots/advanced_reports/filters} }
+	   \caption{Filters in an Advanced Report}
+	   \label{fig:filters}
+\end{figure}
+
+\begin{enumerate}
+  \item Show or hide filters.
+  \item List of filters that can be used.
+  \item A filter on "Activity Status". Uncheck the checkbox to remove the filter.
+  \item Filter operator: describes how to filter the activity status. In this case (1) the activity status must be "Closed" or "Flagged" (2) the inventory ID must start with AA (3) the quantity must be greater than or equal to 4 and (4) the creation time must be between the given dates.
+  \item Enter a value into the set-value entry widget. Note that this only appears for certain operators which can accept multiple values. Add a value to the list by clicking the green plus icon (or pressing the enter key). Remove a value from the list by clicking the red minus icon (or pressing the delete key).
+  \item Hide the set-value entry widget.
+  \item Auto-suggest possible values for this filter.
+\end{enumerate}
+
+\subsubsection{Filter Operators and Values}
+
+Most filters have one or more operators to choose from as well as a field or widget to insert one or more values. The operator chosen can determine the number of values you may enter. Figure \ref{fig:filters} shows that "Activity Status" can match any value in a given set, specifically "Closed" or "Flagged." If "matches" had been chosen then only one value could have been entered. If "is not set" was chosen then no value is required as only specimens with no activity status would be in the result.
+
+\subsubsection{Filter Types}
+
+Different filter types have different possible operators. Some filter types offer special behaviours:
+
+\begin{description}
+  \item[Word Filters] The percent character (\%) is a wildcard and will match any number of any character. For example, in Figure \ref{fig:filters} Inventory Id will include only specimens whose inventory ID starts with "AA". If the percent character were not included, only specimens with the inventory "AA" would be included in the report result.
+  \item[Number and Date Filters] Both specific numbers, sets of numbers, ranges, and sets of ranges can be specified. Date filters also allow for a specific or the current day, week, month, or year to be matched against.
+\end{description}
+
+\subsubsection{Value Sets}
+
+Some filters allow multiple values to be specified, such as, filtering for specimens with either a flagged or closed activity status. Figure \ref{fig:filters} shows this for "Activity Status."
+
+\subsubsection{Auto Suggest}
+
+Sometimes it is easier to select from a list of possible values rather than typing a value in. Click the auto-suggest button (a wand) to see if a list of values can be recommended. However, sometimes there are too many possible values to suggest, or it takes too long to find suggestions, and you will be notified.
+
+Note that the suggestions take into account the values of the other filters. Using Figure \ref{fig:filters} as an example, if the auto-suggest want icon was clicked for quantity then "4" would be replaced with a drop-down list of all the possible quantity values for specimens that are "Closed" or "Flagged," have an inventory ID that starts with "AA" and were created between the specified dates.
+
+\subsection{Count}
+
+Sometimes it is useful to count the number of certain entities. Results can be grouped by the displayed columns by checking the 'Show count' checkbox. Then the last column will show the number of entities that have the same values for the previous columns.
+
+Say we want to count the number of specimens with each activity status. Assume a report on specimens showing columns "Inventory Id" and "Activity Status" generates the following result:
+
+\begin{tabular}{| l | l |}
+  \hline
+  Inventory Id & Activity Status \\ \hline
+  001 & Active \\ \hline
+  002 & Closed \\ \hline
+  003 & Flagged \\ \hline
+  004 & Active \\ \hline
+  005 & Active \\ \hline
+  006 & Closed \\ \hline
+\end{tabular}
+
+To count the number of specimens with each activity status, remove the "Inventory Id" column from the displayed columns and check the 'Show count' checkbox. After generating the report, the results should look like:
+
+\begin{tabular}{| l | l |}
+  \hline
+  Activity Status & Count \\ \hline
+  Active & 3 \\ \hline
+  Closed & 2 \\ \hline
+  Flagged & 1 \\ \hline
+\end{tabular}
+
+Note that the count will always be for the entity that the report is created on. A report on specimens will show the count of specimens and a report on patients would show the count of patients. The count is for the number of entities (e.g. specimen) that have the shown values within the same row.
+
+\subsection{Running and Exporting}
+
+To view the results of a report click the \fbox{Generate} button. Results can also be exported to CSV, PDF, or printed by clicking the corresponding button.
+
+\subsection{Viewing Results}
+
+Advanced report results are broken into a number of pages. If the report does \emph{not} count an entity then each row in a result can be double-clicked to open up a form to view/ edit the corresponding entity.
+
+\newpage
+\section{Logging}

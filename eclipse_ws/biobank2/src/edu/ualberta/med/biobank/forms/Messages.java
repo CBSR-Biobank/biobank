@@ -351,6 +351,7 @@ public class Messages extends NLS {
     public static String ProcessingEventEntryForm_worksheet_validation_msg;
 
     public static String DecodePlate_tabTitle;
+
     public static String DecodePlate_dialog_scanError_title;
 
     public static String DecodePlateForm_button_scan_decode_label;
@@ -364,6 +365,11 @@ public class Messages extends NLS {
     public static String DecodePlateForm_noplate_error_msg;
 
     public static String DecodePlateForm_scanning_decoding;
+
+    public static String DecodeImageForm_decoding;
+
+    public static String DecodeImage_dialog_scanError_title;
+
     public static String DispatchReceivingEntryForm_already_accepted_msg;
 
     public static String DispatchReceivingEntryForm_already_accepted_title;
@@ -763,14 +769,68 @@ public class Messages extends NLS {
 
     public static String SpecimenViewForm_worksheet_string;
 
+    public static String RequestEntryForm_add_error_msg;
+
+    public static String RequestEntryForm_claim_error_msg;
+
+    public static String RequestEntryForm_comments_label;
+
+    public static String RequestEntryForm_creation_error_msg;
+
     public static String RequestEntryForm_dispatch_add_title;
+
+    public static String RequestEntryForm_dispatches_section;
+
+    public static String RequestEntryForm_error_title;
+
+    public static String RequestEntryForm_id_add_label;
+
+    public static String RequestEntryForm_not_found_error_msg;
+
+    public static String RequestEntryForm_number_label;
+
+    public static String RequestEntryForm_pallet_add_label;
+
+    public static String RequestEntryForm_processed_error_msg;
+
+    public static String RequestEntryForm_requestedOn_date_studyName;
+
+    public static String RequestEntryForm_rgroup_Label;
+
+    public static String RequestEntryForm_scan_id_label;
+
+    public static String RequestEntryForm_search_valid_error_msg;
+
+    public static String RequestEntryForm_specimens_section;
+
+    public static String RequestEntryForm_study_label;
+
+    public static String RequestEntryForm_submitted_label;
+
+    public static String RequestEntryForm_title;
 
     public static String ResearchGroup_field_label_sendsShipments;
     public static String ResearchGroup_contact_title;
+    public static String ResearchGroupViewForm_csvFile_label;
+
+    public static String ResearchGroupViewForm_error_title;
+
     public static String ResearchGroupViewForm_title;
     public static String ResearchGroupViewForm_field_label_totalPatients;
     public static String ResearchGroupViewForm_field_label_totalCollectionEvents;
+
+    public static String ResearchGroupViewForm_parse_error_msg;
+    public static String ResearchGroupViewForm_request_description;
+
+    public static String ResearchGroupViewForm_request_upload_title;
+
     public static String ResearchGroupViewForm_studies_title;
+    public static String ResearchGroupViewForm_success_msg;
+
+    public static String ResearchGroupViewForm_success_title;
+
+    public static String ResearchGroupViewForm_upload_button;
+
     public static String ResearchGroupEntryForm_creation_msg;
     public static String ResearchGroupEntryForm_msg_ok;
     public static String ResearchGroupEntryForm_msg_noResearchGroupName;
@@ -784,6 +844,9 @@ public class Messages extends NLS {
     public static String ResearchGroupEntryForm_study_label;
 
     public static String ResearchGroupEntryForm_study_validator_msg;
+
+    public static String DecodeImage_tabTitle;
+    public static String DecodeImage_browse_label;
 
     static {
         // initialize resource bundle

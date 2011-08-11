@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms.utils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -97,9 +98,10 @@ public class PalletScanManagement {
                             plateToScan));
                 return;
             } else {
-                ScanCell[][] scanCells = null;
+                List<ScanCell> scanCells = null;
                 try {
-                    scanCells = ScannerConfigPlugin.scan(plateNum, profile);
+                    scanCells = ScannerConfigPlugin.decodePlate(plateNum,
+                        profile);
                     cells = PalletCell.convertArray(scanCells);
                 } catch (Exception ex) {
                     BgcPlugin.openAsyncError(
@@ -132,10 +134,10 @@ public class PalletScanManagement {
                         && !oldScannedCell.getValue().equals(
                             newScannedCell.getValue())) {
                         // Different values at same position
-                        oldScannedCell.setInformation((oldScannedCell
-                            .getInformation() != null ? oldScannedCell
-                            .getInformation() : "") //$NON-NLS-1$
-                            + " " + Messages.PalletScanManagement_rescan_differnt_msg); //$NON-NLS-1$
+                        oldScannedCell
+                            .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
+                                .getInformation() : "") //$NON-NLS-1$
+                                + " " + Messages.PalletScanManagement_rescan_differnt_msg); //$NON-NLS-1$
                         oldScannedCell.setStatus(CellStatus.ERROR);
                         rescanDifferent = true;
 

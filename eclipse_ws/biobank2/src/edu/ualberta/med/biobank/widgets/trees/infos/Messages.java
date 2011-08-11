@@ -19,6 +19,7 @@ public class Messages extends NLS {
     public static String SpecimenTypeEntryInfoTree_delete_error_title;
     public static String SpecimenTypeEntryInfoTree_delete_question_msg;
     public static String SpecimenTypeEntryInfoTree_delete_question_title;
+    public static String SpecimenTypeEntryInfoTree_delete_type_error_msg;
     public static String SpecimenTypeEntryInfoTree_refresh_error_title;
     public static String SpecimenTypeEntryInfoTree_save_error_title;
     public static String SpecimenTypeEntryInfoTree_unaivalable_error_title;

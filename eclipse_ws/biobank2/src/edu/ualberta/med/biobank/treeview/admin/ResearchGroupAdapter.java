@@ -27,25 +27,25 @@ public class ResearchGroupAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         ResearchGroupWrapper wrapper = getWrapper();
-        Assert.isNotNull(wrapper, "client is null");
+        Assert.isNotNull(wrapper, "client is null"); //$NON-NLS-1$
         return wrapper.getNameShort();
     }
 
     @Override
     public String getTooltipText() {
-        return getTooltipText("Research Group");
+        return getTooltipText(Messages.ResearchGroupAdapter_tooltip);
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Research Group");
-        addViewMenu(menu, "Research Group");
-        addDeleteMenu(menu, "Research Group");
+        addEditMenu(menu, Messages.ResearchGroupAdapter_menu_label);
+        addViewMenu(menu, Messages.ResearchGroupAdapter_menu_label);
+        addDeleteMenu(menu, Messages.ResearchGroupAdapter_menu_label);
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this research group?";
+        return Messages.ResearchGroupAdapter_delete_confirm_msg;
     }
 
     @Override

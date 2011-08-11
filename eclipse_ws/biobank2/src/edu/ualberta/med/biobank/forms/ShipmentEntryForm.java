@@ -90,6 +90,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private Label boxLabel;
 
+    @SuppressWarnings("unused")
     private NonEmptyStringValidator boxValidator;
 
     @Override

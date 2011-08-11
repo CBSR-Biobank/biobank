@@ -14,7 +14,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
-import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.dmscanlib.ScanCellPos;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileSettings;
 
 /**
@@ -27,8 +27,8 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     /**
      * Pallets are always 8*12 = fixed size
      */
-    public static final int PALLET_WIDTH = SAMPLE_WIDTH * ScanCell.COL_MAX;
-    public static final int PALLET_HEIGHT = SAMPLE_WIDTH * ScanCell.ROW_MAX;
+    public static final int PALLET_WIDTH = SAMPLE_WIDTH * ScanCellPos.COL_MAX;
+    public static final int PALLET_HEIGHT = SAMPLE_WIDTH * ScanCellPos.ROW_MAX;
 
     public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT
         + LEGEND_HEIGHT + 4;
@@ -64,7 +64,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     }
 
     public void setDefaultStorageSize() {
-        setStorageSize(ScanCell.ROW_MAX, ScanCell.COL_MAX);
+        setStorageSize(ScanCellPos.ROW_MAX, ScanCellPos.COL_MAX);
     }
 
     protected void setProfile(ProfileSettings profile) {

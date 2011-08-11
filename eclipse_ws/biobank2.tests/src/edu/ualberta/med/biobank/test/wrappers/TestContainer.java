@@ -337,6 +337,7 @@ public class TestContainer extends TestDatabase {
         Assert.assertEquals("05 ("
             + container2.getContainerType().getNameShort() + ")",
             container2.getFullInfoLabel());
+        Assert.fail("test ctype null or nameshort null");
 
         // test getFullInfoLabel(): short name is null
         ContainerTypeWrapper topType2 = ContainerTypeHelper.addContainerType(
@@ -648,7 +649,7 @@ public class TestContainer extends TestDatabase {
             break;
         }
         case 2: {
-            int index = maxRows * col + row;
+            int index = (maxRows * col) + row;
             label = String.format("%c%c",
                 ContainerLabelingSchemeWrapper.CBSR_2_CHAR_LABELLING_PATTERN
                     .charAt(index / len),
@@ -657,7 +658,7 @@ public class TestContainer extends TestDatabase {
             break;
         }
         case 3: {
-            int index = maxRows * col + row + 1;
+            int index = (maxRows * col) + row + 1;
             label = String.format("%02d", index);
             break;
         }
@@ -698,6 +699,8 @@ public class TestContainer extends TestDatabase {
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
+
+        Assert.fail("check with negative values");
     }
 
     @Test
@@ -976,6 +979,8 @@ public class TestContainer extends TestDatabase {
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
+
+        Assert.fail("check also with fast = true");
     }
 
     @Test
@@ -1054,13 +1059,13 @@ public class TestContainer extends TestDatabase {
                     label = String.format("%c%d", 'A' + row, col + 1);
                     break;
                 case 2:
-                    int sum = row + col * maxRow;
+                    int sum = row + (col * maxRow);
                     label = "" + CBSR_ALPHA.charAt(sum / CBSR_ALPHA.length())
                         + CBSR_ALPHA.charAt(sum % CBSR_ALPHA.length());
                     break;
                 case 3:
                 default:
-                    label = String.format("%02d", row + col * maxRow + 1);
+                    label = String.format("%02d", row + (col * maxRow) + 1);
                 }
                 child = container.getChild(row, col);
                 Assert.assertEquals(child, container.getChildByLabel(label));
@@ -1156,8 +1161,8 @@ public class TestContainer extends TestDatabase {
         top.reload();
 
         Collection<ContainerWrapper> children = top.getChildren().values();
-        Assert.assertTrue(children.size() == CONTAINER_TOP_ROWS
-            * CONTAINER_TOP_COLS);
+        Assert
+            .assertTrue(children.size() == (CONTAINER_TOP_ROWS * CONTAINER_TOP_COLS));
         for (ContainerWrapper container : children) {
             if (container.getPositionAsRowCol().equals(0, 0)) {
                 Assert.assertTrue(container.getContainerType().equals(
@@ -1498,6 +1503,8 @@ public class TestContainer extends TestDatabase {
         top.getChildren(); // need to load into property map
         Assert.assertEquals(2, top.getChildCount(false));
         Assert.assertEquals(2, top.getChildCount(true));
+
+        Assert.fail("test if not cached ?");
     }
 
     @Test
@@ -1713,4 +1720,38 @@ public class TestContainer extends TestDatabase {
         Assert.assertEquals(newLabel, child.getLabel());
     }
 
+    @Test
+    public void testGetSpecificPositionWrapper() {
+        Assert.fail("to be implemented");
+        // internal but see why this is never called
+    }
+
+    @Test
+    public void testCheckHasPosition() {
+        Assert.fail("to be implemented");
+        // see persist checks
+    }
+
+    @Test
+    public void testCheckContainerTypeSameSite() {
+        Assert.fail("to be implemented");
+        // see persist checks
+    }
+
+    @Test
+    public void testGetPositionString() {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testSetTopContainer() {
+        Assert.fail("to be implemented");
+        // 2 methods
+    }
+
+    @Test
+    public void testMisc() {
+        Assert
+            .fail("see tests made after getSpecimens to check if it is null in addSpecimen and getSpecimen");
+    }
 }
