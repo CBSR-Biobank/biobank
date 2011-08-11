@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -12,6 +14,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
@@ -26,6 +29,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModificationConcurrencyException;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
@@ -54,6 +58,10 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     private SpecimenEntryWidget specimenEntryWidget;
 
+    private ActivityStatusWrapper closedActivityStatus;
+
+    protected List<SpecimenWrapper> removedSpecimens;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ProcessingEventAdapter,
@@ -78,6 +86,9 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     Messages.ProcessingEventEntryForm_title_edit_noworksheet,
                     pEvent.getFormattedCreatedAt());
         }
+        closedActivityStatus = ActivityStatusWrapper.getActivityStatus(
+            appService, ActivityStatusWrapper.CLOSED_STATUS_STRING);
+        removedSpecimens = new ArrayList<SpecimenWrapper>();
         setPartName(tabName);
     }
 
@@ -162,6 +173,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             .addDoubleClickListener(collectionDoubleClickListener);
 
         VetoListener<ItemAction, SpecimenWrapper> vetoListener = new VetoListener<ItemAction, SpecimenWrapper>() {
+
             @Override
             public void handleEvent(Event<ItemAction, SpecimenWrapper> event)
                 throws VetoException {
@@ -228,6 +240,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     break;
                 case POST_ADD:
                     specimen.setProcessingEvent(pEvent);
+                    specimen.setActivityStatus(closedActivityStatus);
                     pEvent.addToSpecimenCollection(Arrays.asList(specimen));
                     break;
                 case PRE_DELETE:
@@ -240,6 +253,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     }
                     break;
                 case POST_DELETE:
+                    removedSpecimens.add(specimen);
                     pEvent
                         .removeFromSpecimenCollection(Arrays.asList(specimen));
                     break;
@@ -262,11 +276,46 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        ActivityStatusWrapper a = ActivityStatusWrapper.getActivityStatus(
-            appService, ActivityStatusWrapper.CLOSED_STATUS_STRING);
-        for (SpecimenWrapper ss : pEvent.getSpecimenCollection(false))
-            ss.setActivityStatus(a);
-        pEvent.persist();
+        try {
+            pEvent.persist();
+        } catch (ModificationConcurrencyException mc) {
+            Display.getDefault().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        // can be very annoying to start over, so reload
+                        // everything and try again (only once!)
+                        List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>(
+                            pEvent.getSpecimenCollection(false));
+                        ActivityStatusWrapper as = pEvent.getActivityStatus();
+                        CenterWrapper<?> center = pEvent.getCenter();
+                        String comment = pEvent.getComment();
+                        Date createdAt = pEvent.getCreatedAt();
+                        String worksheet = pEvent.getWorksheet();
+                        pEvent.reset();
+                        pEvent.setActivityStatus(as);
+                        pEvent.setCenter(center);
+                        pEvent.setComment(comment);
+                        pEvent.setCreatedAt(createdAt);
+                        pEvent.setWorksheet(worksheet);
+                        for (SpecimenWrapper spec : removedSpecimens) {
+                            spec.reload();
+                        }
+                        pEvent.removeFromSpecimenCollection(removedSpecimens);
+                        for (SpecimenWrapper spec : specs) {
+                            spec.reload();
+                            spec.setProcessingEvent(pEvent);
+                            spec.setActivityStatus(closedActivityStatus);
+                        }
+                        pEvent.addToSpecimenCollection(specs);
+                        pEvent.persist();
+                    } catch (Exception ex) {
+                        saveErrorCatch(ex, null, true);
+                    }
+                }
+            });
+        }
+        removedSpecimens.clear();
         SessionManager.updateAllSimilarNodes(pEventAdapter, true);
     }
 
@@ -291,5 +340,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         }
         GuiUtil.reset(activityStatusComboViewer, pEvent.getActivityStatus());
         specimenEntryWidget.setSpecimens(pEvent.getSpecimenCollection(true));
+        removedSpecimens.clear();
     }
 }

@@ -41,7 +41,7 @@ public class Messages extends NLS {
 
     public static String BiobankEntryForm_access_denied_error_msg;
 
-    public static String BiobankEntryForm_save_error_title;
+    public static String BiobankFormBase_save_error_title;
 
     public static String BiobankEntryForm_saving;
 
