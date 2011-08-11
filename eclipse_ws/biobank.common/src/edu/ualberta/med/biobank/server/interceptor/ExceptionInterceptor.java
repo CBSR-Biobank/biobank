@@ -3,13 +3,16 @@ package edu.ualberta.med.biobank.server.interceptor;
 import java.sql.BatchUpdateException;
 
 import org.hibernate.PropertyValueException;
+import org.hibernate.StaleStateException;
 import org.hibernate.validator.InvalidStateException;
 import org.springframework.aop.ThrowsAdvice;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
+import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException;
 
 import edu.ualberta.med.biobank.common.exception.ExceptionUtils;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModificationConcurrencyException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.StringValueLengthServerException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
@@ -79,5 +82,16 @@ public class ExceptionInterceptor implements ThrowsAdvice {
                 throw new StringValueLengthServerException(bue.getMessage());
             }
         }
+        throw idarue;
+    }
+
+    public void afterThrowing(HibernateOptimisticLockingFailureException holfe)
+        throws BiobankServerException {
+        Throwable cause = ExceptionUtils.findCausesInThrowable(holfe,
+            StaleStateException.class);
+        if (cause != null && cause instanceof StaleStateException) {
+            throw new ModificationConcurrencyException(holfe);
+        }
+        throw holfe;
     }
 }

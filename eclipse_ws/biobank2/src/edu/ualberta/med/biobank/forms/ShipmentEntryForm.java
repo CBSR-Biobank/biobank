@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,6 +36,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModificationConcurrencyException;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
@@ -378,14 +380,49 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             && originInfo.getShipmentInfo().getWaybill().isEmpty()) {
             originInfo.getShipmentInfo().setWaybill(null);
         }
-
-        originInfo.persist();
+        try {
+            originInfo.persist();
+        } catch (ModificationConcurrencyException mc) {
+            Display.getDefault().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        // can be very annoying to start over, so reload
+                        // everything and try again (only once!)
+                        List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>(
+                            originInfo.getSpecimenCollection());
+                        CenterWrapper<?> center = originInfo.getCenter();
+                        SiteWrapper receiverSite = originInfo.getReceiverSite();
+                        ShipmentInfoWrapper si = originInfo.getShipmentInfo();
+                        originInfo.reset();
+                        originInfo.setCenter(center);
+                        originInfo.setReceiverSite(receiverSite);
+                        originInfo.setShipmentInfo(si);
+                        for (SpecimenWrapper spec : specs) {
+                            spec.reload();
+                            spec.setOriginInfo(originInfo);
+                        }
+                        originInfo.addToSpecimenCollection(specs);
+                        originInfo.persist();
+                    } catch (Exception ex) {
+                        saveErrorCatch(ex, null, true);
+                    }
+                }
+            });
+        }
 
         for (SpecimenWrapper s : specimensToPersist) {
+            // to avoid concurrency problems
+            s.reload();
+            // when remove a specimen, ask for the origin center. Then create a
+            // new origin info with this center and the deleted specimen only
+            // the origin info needs to be saved:
             OriginInfoWrapper origin = s.getOriginInfo();
             origin.persist();
-
+            // then we set back the originfo to the specimen to be sure it has
+            // the right modelObject
             s.setOriginInfo(origin);
+            // then we save the specimen
             s.persist();
         }
 
