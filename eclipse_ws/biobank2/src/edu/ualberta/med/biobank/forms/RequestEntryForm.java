@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -135,7 +136,7 @@ public class RequestEntryForm extends BiobankViewForm {
                     specimen = (RequestSpecimenWrapper) specNode.getSpecimen();
                     if (specimen != null) {
                         addToDispatch(getDispatchSelection(),
-                            Arrays.asList(specimen));
+                            Arrays.asList((ItemWrapper) specimen));
                         specimensTree.dispatch(specNode);
                     }
                 } catch (Exception e1) {
@@ -262,7 +263,11 @@ public class RequestEntryForm extends BiobankViewForm {
             request, SessionManager.getUser().getCurrentWorkingCenter());
         dialog.open();
         if (dialog.hasReceivedSpecimens()) {
-            // setDirty(true);
+            try {
+                addToDispatch(getDispatchSelection(), dialog.getSpecimens());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         specimensTree.refresh();
     }
@@ -304,14 +309,15 @@ public class RequestEntryForm extends BiobankViewForm {
     }
 
     protected void addToDispatch(DispatchWrapper dispatch,
-        List<RequestSpecimenWrapper> specs) throws Exception {
+        List<ItemWrapper> specs) throws Exception {
         // FIXME: SHOULD BE IN ONE TRANSACTION
         List<SpecimenWrapper> dispatchSpecimens = new ArrayList<SpecimenWrapper>();
-        for (RequestSpecimenWrapper rspec : specs) {
+        for (ItemWrapper rspec : specs) {
             if (rspec.getSpecimenState().equals(
                 RequestSpecimenState.PULLED_STATE)) {
-                rspec.setState(RequestSpecimenState.DISPATCHED_STATE);
-                rspec.persist();
+                ((RequestSpecimenWrapper) rspec)
+                    .setState(RequestSpecimenState.DISPATCHED_STATE);
+                ((RequestSpecimenWrapper) rspec).persist();
                 dispatchSpecimens.add(rspec.getSpecimen());
             } else
                 throw new Exception(Messages.RequestEntryForm_add_error_msg);
