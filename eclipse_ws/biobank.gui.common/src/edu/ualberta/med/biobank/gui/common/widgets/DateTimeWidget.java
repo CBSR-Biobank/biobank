@@ -38,6 +38,8 @@ public class DateTimeWidget extends BgcBaseWidget {
 
     private TimeZone timeZone;
 
+    private boolean zeroOutTime = false;
+
     public DateTimeWidget(Composite parent, int style, Date date,
         TimeZone timeZone) {
         super(parent, style);
@@ -69,11 +71,7 @@ public class DateTimeWidget extends BgcBaseWidget {
             dateEntry.setPattern(DateFormatter.TIME_FORMAT);
         else {
             dateEntry.setPattern(DateFormatter.DATE_FORMAT);
-            Calendar c = Calendar.getInstance();
-            c.set(Calendar.HOUR, 0);
-            c.set(Calendar.MINUTE, 0);
-            c.set(Calendar.SECOND, 0);
-            dateEntry.setSelection(c.getTime());
+            zeroOutTime = true;
         }
 
         dateEntry.addListener(SWT.Modify, dataEntryModifyListener);
@@ -100,6 +98,14 @@ public class DateTimeWidget extends BgcBaseWidget {
 
     public Date getDate() {
         if (dateEntry.getSelection() != null) {
+            if (zeroOutTime) {
+                Calendar c = Calendar.getInstance();
+                c.setTime(dateEntry.getSelection());
+                c.set(Calendar.HOUR, 0);
+                c.set(Calendar.MINUTE, 0);
+                c.set(Calendar.SECOND, 0);
+                return c.getTime();
+            }
             return dateEntry.getSelection();
         }
         return null;

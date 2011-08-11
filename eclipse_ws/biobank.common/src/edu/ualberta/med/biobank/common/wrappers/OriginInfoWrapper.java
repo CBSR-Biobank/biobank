@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -163,10 +164,14 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return shipments;
     }
 
+    // Don't run this on the server unless you take into account timezones in
+    // your inputs
     private static final String SHIPMENTS_BY_DATE_RECEIVED_QRY = SHIPMENT_HQL_STRING
-        + " where DATE(s."
+        + " where s."
         + ShipmentInfoPeer.RECEIVED_AT.getName()
-        + ") = DATE(?) and (o."
+        + " >= ? and s."
+        + ShipmentInfoPeer.RECEIVED_AT.getName()
+        + " <= ? and (o."
         + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
         + "= ? or o."
         + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
@@ -183,7 +188,8 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
         Integer centerId = center.getId();
         HQLCriteria criteria = new HQLCriteria(SHIPMENTS_BY_DATE_RECEIVED_QRY,
-            Arrays.asList(new Object[] { dateReceived, centerId, centerId }));
+            Arrays.asList(new Object[] { dateReceived, endOfDay(dateReceived),
+                centerId, centerId }));
 
         List<OriginInfo> origins = appService.query(criteria);
         List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
@@ -192,10 +198,14 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return shipments;
     }
 
+    // Don't run this on the server unless you take into account timezones in
+    // your inputs
     private static final String SHIPMENTS_BY_DATE_SENT_QRY = SHIPMENT_HQL_STRING
-        + " where DATE(s."
+        + " where s."
         + ShipmentInfoPeer.PACKED_AT.getName()
-        + ") = DATE(?) and (o."
+        + " >= ? and s."
+        + ShipmentInfoPeer.PACKED_AT.getName()
+        + " <= ? and (o."
         + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
         + "= ? or o."
         + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
@@ -204,11 +214,10 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     public static List<OriginInfoWrapper> getShipmentsByDateSent(
         WritableApplicationService appService, Date dateSent,
         CenterWrapper<?> center) throws ApplicationException {
-
         Integer centerId = center.getId();
         HQLCriteria criteria = new HQLCriteria(SHIPMENTS_BY_DATE_SENT_QRY,
-            Arrays.asList(new Object[] { dateSent, centerId, centerId }));
-
+            Arrays.asList(new Object[] { dateSent, endOfDay(dateSent),
+                centerId, centerId }));
         List<OriginInfo> origins = appService.query(criteria);
         List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
             appService, origins, OriginInfoWrapper.class);
@@ -227,6 +236,14 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         if (getReceiverSite() != null)
             centers.add(getReceiverSite());
         return centers;
+    }
+
+    // Date should input with no hour/minute/seconds
+    public static Date endOfDay(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.add(Calendar.DAY_OF_MONTH, 1);
+        return c.getTime();
     }
 
     @Override
