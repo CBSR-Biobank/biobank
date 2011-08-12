@@ -37,11 +37,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
     IBgcFileBrowserListener {
     public static final String ID = "edu.ualberta.med.biobank.forms.ResearchGroupViewForm"; //$NON-NLS-1$
 
-    private ResearchGroupAdapter researchGroupAdapter;
-
     private ResearchGroupWrapper researchGroup;
-
-    // private ResearchGroupStudyInfoTable studiesTable;
 
     private BgcBaseText nameLabel;
 
@@ -61,9 +57,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        researchGroupAdapter = (ResearchGroupAdapter) adapter;
-        researchGroup = researchGroupAdapter.getWrapper();
-        researchGroup.reload();
+        researchGroup = (ResearchGroupWrapper) getModelObject();
         setPartName(NLS.bind(Messages.ResearchGroupViewForm_title,
             researchGroup.getNameShort()));
     }

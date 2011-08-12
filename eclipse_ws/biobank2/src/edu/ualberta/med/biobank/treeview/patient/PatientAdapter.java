@@ -25,8 +25,8 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class PatientAdapter extends AdapterBase {
 
-    private static BgcLogger logger = BgcLogger
-        .getLogger(PatientAdapter.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(PatientAdapter.class
+        .getName());
 
     public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper) {
         super(parent, patientWrapper);
@@ -41,24 +41,25 @@ public class PatientAdapter extends AdapterBase {
         }
     }
 
-    public PatientWrapper getWrapper() {
-        return (PatientWrapper) modelObject;
+    private PatientWrapper getPatientWrapper() {
+        return (PatientWrapper) getModelObject();
     }
 
     @Override
     protected String getLabelInternal() {
-        PatientWrapper patientWrapper = getWrapper();
+        PatientWrapper patientWrapper = getPatientWrapper();
         Assert.isNotNull(patientWrapper, "patient is null"); //$NON-NLS-1$
         return patientWrapper.getPnumber();
     }
 
     @Override
     public String getTooltipText() {
-        PatientWrapper patient = getWrapper();
+        PatientWrapper patient = getPatientWrapper();
         if (patient != null) {
             StudyWrapper study = patient.getStudy();
             if (study != null)
-                return study.getName() + " - " + getTooltipText(Messages.PatientAdapter_patient_label); //$NON-NLS-1$
+                return study.getName()
+                    + " - " + getTooltipText(Messages.PatientAdapter_patient_label); //$NON-NLS-1$
         }
         return getTooltipText(Messages.PatientAdapter_patient_label);
     }
@@ -82,11 +83,12 @@ public class PatientAdapter extends AdapterBase {
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    CollectionEventAdapter adapter = new CollectionEventAdapter(
+                    CollectionEventAdapter ceventAdapter = new CollectionEventAdapter(
                         PatientAdapter.this, new CollectionEventWrapper(
                             getAppService()));
-                    adapter.getWrapper().setPatient(getWrapper());
-                    adapter.openEntryForm();
+                    ((CollectionEventWrapper) ceventAdapter.getModelObject())
+                        .setPatient(getPatientWrapper());
+                    ceventAdapter.openEntryForm();
                 }
             });
         }
@@ -111,7 +113,7 @@ public class PatientAdapter extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return getWrapper().getCollectionEventCollection(true);
+        return getPatientWrapper().getCollectionEventCollection(true);
     }
 
     @Override

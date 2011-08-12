@@ -29,13 +29,9 @@ public class DispatchCenterAdapter extends AdapterBase {
         this.addChild(inc);
     }
 
-    public CenterWrapper<?> getWrapper() {
-        return (CenterWrapper<?>) modelObject;
-    }
-
     @Override
     protected String getLabelInternal() {
-        CenterWrapper<?> site = getWrapper();
+        CenterWrapper<?> site = (CenterWrapper<?>) getModelObject();
         Assert.isNotNull(site, "site is null"); //$NON-NLS-1$
         return site.getNameShort();
     }

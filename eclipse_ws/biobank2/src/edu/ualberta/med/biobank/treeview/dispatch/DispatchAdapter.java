@@ -34,23 +34,23 @@ public class DispatchAdapter extends AdapterBase {
         super(parent, ship);
     }
 
-    public DispatchWrapper getWrapper() {
-        return (DispatchWrapper) modelObject;
+    private DispatchWrapper getDispatchWrapper() {
+        return (DispatchWrapper) getModelObject();
     }
 
     @Override
     public boolean isEditable() {
         boolean editable = super.isEditable();
-        if (getWrapper() != null) {
+        if (getDispatchWrapper() != null) {
             return editable
-                && ((getWrapper().getSenderCenter().equals(
-                    SessionManager.getUser().getCurrentWorkingCenter()) && (getWrapper()
+                && ((getDispatchWrapper().getSenderCenter().equals(
+                    SessionManager.getUser().getCurrentWorkingCenter()) && (getDispatchWrapper()
                     .isNew()
-                    || getWrapper().isInCreationState()
-                    || getWrapper().isInTransitState() || getWrapper()
-                    .isInLostState())) || (getWrapper().getReceiverCenter()
-                    .equals(SessionManager.getUser().getCurrentWorkingCenter()) && (getWrapper()
-                    .isInReceivedState() || getWrapper().isInLostState() || getWrapper()
+                    || getDispatchWrapper().isInCreationState()
+                    || getDispatchWrapper().isInTransitState() || getDispatchWrapper()
+                    .isInLostState())) || (getDispatchWrapper().getReceiverCenter()
+                    .equals(SessionManager.getUser().getCurrentWorkingCenter()) && (getDispatchWrapper()
+                    .isInReceivedState() || getDispatchWrapper().isInLostState() || getDispatchWrapper()
                     .isInClosedState())));
         }
         return editable;
@@ -58,7 +58,7 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        DispatchWrapper dispatch = getWrapper();
+        DispatchWrapper dispatch = getDispatchWrapper();
         Assert.isNotNull(dispatch, "Dispatch is null"); //$NON-NLS-1$
         String label = ""; //$NON-NLS-1$
         if (dispatch.getSenderCenter() != null
@@ -82,9 +82,9 @@ public class DispatchAdapter extends AdapterBase {
         if (SessionManager.getInstance().isConnected()
             && SessionManager.getUser().getCurrentWorkingCenter() != null)
             return SessionManager.getUser().getCurrentWorkingCenter()
-                .equals(getWrapper().getSenderCenter())
-                && getWrapper().canDelete(SessionManager.getUser())
-                && getWrapper().isInCreationState();
+                .equals(getDispatchWrapper().getSenderCenter())
+                && getDispatchWrapper().canDelete(SessionManager.getUser())
+                && getDispatchWrapper().isInCreationState();
         else
             return false;
     }
@@ -98,9 +98,9 @@ public class DispatchAdapter extends AdapterBase {
             if (isDeletable()) {
                 addDeleteMenu(menu, Messages.DispatchAdapter_dispatch_label);
             }
-            if (siteParent.equals(getWrapper().getSenderCenter())
-                && getWrapper().canUpdate(SessionManager.getUser())
-                && getWrapper().isInTransitState()) {
+            if (siteParent.equals(getDispatchWrapper().getSenderCenter())
+                && getDispatchWrapper().canUpdate(SessionManager.getUser())
+                && getDispatchWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
                 mi.setText(Messages.DispatchAdapter_move_creation_label);
                 mi.addSelectionListener(new SelectionAdapter() {
@@ -110,8 +110,8 @@ public class DispatchAdapter extends AdapterBase {
                     }
                 });
             }
-            if (siteParent.equals(getWrapper().getReceiverCenter())
-                && getWrapper().isInTransitState()) {
+            if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
+                && getDispatchWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
                 mi.setText(Messages.DispatchAdapter_receive_label);
                 mi.addSelectionListener(new SelectionAdapter() {
@@ -160,32 +160,32 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     public void doClose() {
-        getWrapper().setState(DispatchState.CLOSED);
+        getDispatchWrapper().setState(DispatchState.CLOSED);
         persistDispatch();
         openViewForm();
     }
 
     public void doSetAsLost() {
-        getWrapper().setState(DispatchState.LOST);
+        getDispatchWrapper().setState(DispatchState.LOST);
         persistDispatch();
         openViewForm();
     }
 
     private void setDispatchAsReceived() {
-        getWrapper().getShipmentInfo().setReceivedAt(new Date());
-        getWrapper().setState(DispatchState.RECEIVED);
+        getDispatchWrapper().getShipmentInfo().setReceivedAt(new Date());
+        getDispatchWrapper().setState(DispatchState.RECEIVED);
         persistDispatch();
     }
 
     private void setDispatchAsCreation() {
-        getWrapper().setState(DispatchState.CREATION);
-        getWrapper().getShipmentInfo().setPackedAt(null);
+        getDispatchWrapper().setState(DispatchState.CREATION);
+        getDispatchWrapper().getShipmentInfo().setPackedAt(null);
         persistDispatch();
     }
 
     private void persistDispatch() {
         try {
-            getWrapper().persist();
+            getDispatchWrapper().persist();
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (final RemoteAccessException exp) {
@@ -193,7 +193,8 @@ public class DispatchAdapter extends AdapterBase {
         } catch (final AccessDeniedException ade) {
             BgcPlugin.openAccessDeniedErrorMessage(ade);
         } catch (Exception ex) {
-            BgcPlugin.openAsyncError(Messages.DispatchAdapter_save_error_title, ex);
+            BgcPlugin.openAsyncError(Messages.DispatchAdapter_save_error_title,
+                ex);
         }
         SpecimenTransitView.getCurrent().reload();
     }
@@ -226,10 +227,10 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        if (getWrapper().isInCreationState()
-            || (getWrapper().isInTransitState() && SessionManager.getUser()
+        if (getDispatchWrapper().isInCreationState()
+            || (getDispatchWrapper().isInTransitState() && SessionManager.getUser()
                 .getCurrentWorkingCenter()
-                .equals(getWrapper().getSenderCenter())))
+                .equals(getDispatchWrapper().getSenderCenter())))
             return DispatchSendingEntryForm.ID;
         return DispatchReceivingEntryForm.ID;
     }

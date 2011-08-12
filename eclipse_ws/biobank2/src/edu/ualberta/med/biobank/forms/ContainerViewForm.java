@@ -38,6 +38,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -108,7 +109,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         containerAdapter = (ContainerAdapter) adapter;
-        container = containerAdapter.getContainer();
+        container = (ContainerWrapper) getModelObject();
         container.reload();
         setPartName(NLS.bind(Messages.ContainerViewForm_title,
             container.getLabel(), container.getContainerType().getNameShort()));
@@ -473,8 +474,10 @@ public class ContainerViewForm extends BiobankViewForm {
                     if (containerToOpen == null) {
                         containerToOpen = new ContainerWrapper(appService);
                     }
-                    containerToOpen.setSite(containerAdapter
-                        .getParentFromClass(SiteAdapter.class).getWrapper());
+                    containerToOpen
+                        .setSite((SiteWrapper) containerAdapter
+                            .getParentFromClass(SiteAdapter.class)
+                            .getModelObject());
                     containerToOpen.setParent(container);
                     containerToOpen.setPositionAsRowCol(new RowColPos(cell
                         .getRow(), cell.getCol()));

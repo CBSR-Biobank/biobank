@@ -258,8 +258,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
                 && ((object instanceof ContainerAdapter) || (object instanceof ContainerTypeAdapter))) {
                 String ctName;
                 if (object instanceof ContainerAdapter) {
-                    ContainerWrapper container = ((ContainerAdapter) object)
-                        .getContainer();
+                    ContainerWrapper container = (ContainerWrapper) ((ContainerAdapter) object)
+                        .getModelObject();
                     if (container == null
                         || container.getContainerType() == null)
                         return null;

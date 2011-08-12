@@ -116,7 +116,8 @@ public class ContainerGroup extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        SiteWrapper parentSite = ((SiteAdapter) getParent()).getWrapper();
+        SiteWrapper parentSite = (SiteWrapper) ((SiteAdapter) getParent())
+            .getModelObject();
         Assert.isNotNull(parentSite, "site null"); //$NON-NLS-1$
         parentSite.reload();
         return parentSite.getTopContainerCollection();
@@ -134,16 +135,17 @@ public class ContainerGroup extends AdapterBase {
 
     public void addContainer(SiteAdapter siteAdapter, boolean hasPreviousForm) {
         try {
+            SiteWrapper site = (SiteWrapper) siteAdapter.getModelObject();
             List<ContainerTypeWrapper> top = ContainerTypeWrapper
                 .getTopContainerTypesInSite(SessionManager.getAppService(),
-                    siteAdapter.getWrapper());
+                    site);
             if (top.size() == 0) {
                 BgcPlugin.openError(Messages.ContainerGroup_create_error_title,
                     Messages.ContainerGroup_create_error_msg);
             } else {
                 ContainerWrapper c = new ContainerWrapper(
                     SessionManager.getAppService());
-                c.setSite(siteAdapter.getWrapper());
+                c.setSite(site);
                 ContainerAdapter adapter = new ContainerAdapter(
                     siteAdapter.getContainersGroupNode(), c);
                 adapter.openEntryForm(hasPreviousForm);

@@ -34,10 +34,6 @@ public class SiteAdapter extends AdapterBase {
         createNodes();
     }
 
-    public SiteWrapper getWrapper() {
-        return (SiteWrapper) modelObject;
-    }
-
     public ContainerTypeGroup getContainerTypesGroupNode() {
         AdapterBase adapter = getChild(nodeIdOffset
             + CONTAINER_TYPES_BASE_NODE_ID);
@@ -53,7 +49,7 @@ public class SiteAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        SiteWrapper site = getWrapper();
+        SiteWrapper site = (SiteWrapper) getModelObject();
         Assert.isNotNull(site, "site is null"); //$NON-NLS-1$
         return site.getNameShort();
     }

@@ -20,10 +20,6 @@ public class RequestAdapter extends AdapterBase {
         super(parent, ship);
     }
 
-    public RequestWrapper getWrapper() {
-        return (RequestWrapper) modelObject;
-    }
-
     @Override
     public boolean isEditable() {
         return false;
@@ -31,7 +27,7 @@ public class RequestAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        RequestWrapper shipment = getWrapper();
+        RequestWrapper shipment = (RequestWrapper) getModelObject();
         Assert.isNotNull(shipment, "Request is null"); //$NON-NLS-1$
         StudyWrapper study = shipment.getStudy();
         String label = shipment.getId() + " - "; //$NON-NLS-1$
