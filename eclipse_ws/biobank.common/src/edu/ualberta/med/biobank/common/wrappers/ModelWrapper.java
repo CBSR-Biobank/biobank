@@ -900,16 +900,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
-        Property<? extends Collection<R>, ? super E> property,
-        Collection<W> wrappers) {
+        Property<Collection<R>, ? super E> property, Collection<W> wrappers) {
         setWrapperCollection(this, property, wrappers);
     }
 
     // TODO: make methods static that take a ModelWrapper instance
     private <W extends ModelWrapper<? extends R>, R, M> void setWrapperCollection(
         ModelWrapper<M> modelWrapper,
-        Property<? extends Collection<R>, ? super M> property,
-        Collection<W> wrappers) {
+        Property<Collection<R>, ? super M> property, Collection<W> wrappers) {
         Collection<R> newValues = new HashSet<R>();
         for (W element : wrappers) {
             newValues.add(element.getWrappedObject());
@@ -965,8 +963,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     protected <W extends ModelWrapper<? extends R>, R> void addToWrapperCollection(
-        Property<? extends Collection<R>, ? super E> property,
-        List<W> newWrappers) {
+        Property<Collection<R>, ? super E> property, List<W> newWrappers) {
         if (newWrappers == null || newWrappers.isEmpty()) {
             return;
         }
@@ -992,8 +989,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     protected <W extends ModelWrapper<? extends R>, R> void removeFromWrapperCollection(
-        Property<? extends Collection<R>, ? super E> property,
-        List<W> wrappersToRemove) {
+        Property<Collection<R>, ? super E> property, List<W> wrappersToRemove) {
         if (wrappersToRemove == null || wrappersToRemove.isEmpty()) {
             return;
         }
@@ -1013,8 +1009,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public <W extends ModelWrapper<? extends R>, R> void removeFromWrapperCollectionWithCheck(
-        Property<? extends Collection<R>, ? super E> property,
-        List<W> wrappersToRemove) throws BiobankCheckException {
+        Property<Collection<R>, ? super E> property, List<W> wrappersToRemove)
+        throws BiobankCheckException {
         if (wrappersToRemove == null || wrappersToRemove.isEmpty()) {
             return;
         }
@@ -1065,21 +1061,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     private static <T, M> T getModelProperty(ModelWrapper<M> modelWrapper,
         Property<T, ? super M> property) {
-        T value = null;
-
-        try {
-            M model = modelWrapper.getWrappedObject();
-
-            Class<?> modelKlazz = model.getClass();
-            Method getter = modelKlazz.getMethod("get"
-                + capitalizeFirstLetter(property.getName()));
-
-            @SuppressWarnings("unchecked")
-            T tmp = (T) getter.invoke(model);
-            value = tmp;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        M model = modelWrapper.getWrappedObject();
+        T value = property.get(model);
 
         return value;
     }
@@ -1125,33 +1108,20 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     private <T, M> void setModelProperty(ModelWrapper<M> modelWrapper,
-        Property<? extends T, ? super M> property, T newValue) {
-        try {
-            M model = modelWrapper.getWrappedObject();
-            Class<?> modelKlazz = model.getClass();
+        Property<T, ? super M> property, T newValue) {
+        M model = modelWrapper.getWrappedObject();
 
-            Method getter = modelKlazz.getMethod("get"
-                + capitalizeFirstLetter(property.getName()));
+        // TODO: whenever a property is set, the old value is retrieved from
+        // the database (or memory if already loaded) to send the
+        // information for the change to listeners. This should be changed
+        // to either (1) only get if there are listeners or (2) remember all
+        // old values so they can be removed (see cascade().persistAdded()).
+        T oldValue = property.get(model);
 
-            // TODO: whenever a property is set, the old value is retrieved from
-            // the database (or memory if already loaded) to send the
-            // information for the change to listeners. This should be changed
-            // to either (1) only get if there are listeners or (2) remember all
-            // old values so they can be removed (see cascade().persistAdded()).
-            @SuppressWarnings("unchecked")
-            T oldValue = (T) getter.invoke(model);
+        property.set(model, newValue);
 
-            Method setter = modelKlazz.getMethod("set"
-                + capitalizeFirstLetter(property.getName()),
-                getter.getReturnType());
-
-            setter.invoke(model, newValue);
-
-            propertyChangeSupport.firePropertyChange(property.getName(),
-                oldValue, newValue);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        propertyChangeSupport.firePropertyChange(property.getName(), oldValue,
+            newValue);
     }
 
     private void cacheProperty(Property<?, ?> property, Object value) {
