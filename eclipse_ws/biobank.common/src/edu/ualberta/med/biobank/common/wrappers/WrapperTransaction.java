@@ -154,6 +154,8 @@ public class WrapperTransaction {
 
     // TODO: should share the map/ list for ALL wrappers?
     // TODO: move out!
+    // TODO: should rebuild the modelWrapperMap since the model objects sent to
+    // the server that came back are now invalid?
     public static class RebindWrappersQueryTask implements QueryTask {
         private final ModelWrapper<?> wrapper;
         private final List<ModelWrapper<?>> wrappersToRebind = new ArrayList<ModelWrapper<?>>();

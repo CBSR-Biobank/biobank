@@ -52,6 +52,10 @@ public class TestModelWrapper extends TestDatabase {
             super(appService);
         }
 
+        public TestSiteWrapper(WritableApplicationService appService, Site site) {
+            super(appService, site);
+        }
+
         @Override
         protected List<Property<?, ? super Site>> getProperties() {
             return null;
@@ -142,7 +146,11 @@ public class TestModelWrapper extends TestDatabase {
 
         // call to equals should handle null IDs
         TestSiteWrapper wrapper2 = new TestSiteWrapper(appService);
-        Assert.assertTrue(wrapper.equals(wrapper2));
+        Assert.assertFalse(wrapper.equals(wrapper2));
+
+        TestSiteWrapper wrapper3 = new TestSiteWrapper(appService,
+            wrapper.getWrappedObject());
+        Assert.assertTrue(wrapper.equals(wrapper3));
     }
 
     @Test
