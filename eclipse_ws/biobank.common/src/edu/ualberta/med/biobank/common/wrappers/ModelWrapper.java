@@ -790,7 +790,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private <W extends ModelWrapper<? extends R>, R, M> void setWrappedProperty(
         ModelWrapper<M> modelWrapper, Property<R, ? super M> property, W wrapper) {
         R newValue = (wrapper == null ? null : wrapper.getWrappedObject());
-        setProperty(modelWrapper, property, newValue);
+        setProperty(modelWrapper, property, newValue, wrapper);
         modelWrapper.cacheProperty(property, wrapper);
     }
 
@@ -939,12 +939,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     protected <T> void setProperty(Property<T, ? super E> property, T newValue) {
-        setProperty(this, property, newValue);
+        setProperty(this, property, newValue, newValue);
     }
 
     private <T, M> void setProperty(ModelWrapper<M> modelWrapper,
-        Property<T, ? super M> property, T newValue) {
-        setModelProperty(modelWrapper, property, newValue, newValue);
+        Property<T, ? super M> property, T newValue, Object valueToCache) {
+        setModelProperty(modelWrapper, property, newValue, valueToCache);
     }
 
     private static <T, M> T getModelProperty(ModelWrapper<M> modelWrapper,
