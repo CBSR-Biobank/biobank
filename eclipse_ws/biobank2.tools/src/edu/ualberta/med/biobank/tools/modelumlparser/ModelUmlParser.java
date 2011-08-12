@@ -551,8 +551,8 @@ public class ModelUmlParser {
 
             int typeNodesCount = typeNodes.getLength();
             if (typeNodesCount != 1) {
-                throw new Exception(
-                    "attribute node does not have a type or more than one type");
+                throw new Exception("attribute of node named '" + attrName
+                    + "' does not have a type or more than one type");
             }
 
             String xmiIdRef = typeNodes.item(0).getNodeValue();
