@@ -134,10 +134,9 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
                     output.add(cell);
                 }
                 Data data = new Data();
-                data.setColumnNames(Arrays
-                    .asList(
-                        "Location", "Inventory Id", "Patient", "Sample Type", "Date Drawn")); //$NON-NLS-2$
-                data.setDescription(Arrays.asList("Barcode:" + productBarcode));
+                data.setColumnNames(Arrays.asList(Messages.ReceiveScanDialog_2, Messages.ReceiveScanDialog_3,
+                    Messages.ReceiveScanDialog_4, Messages.ReceiveScanDialog_5, Messages.ReceiveScanDialog_6));
+                data.setDescription(Arrays.asList(Messages.ReceiveScanDialog_7 + productBarcode));
                 data.setRows(output);
                 data.setTitle("Pallet Info Sheet"); //$NON-NLS-1$
 

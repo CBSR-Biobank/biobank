@@ -807,6 +807,10 @@ public class Messages extends NLS {
 
     public static String RequestEntryForm_title;
 
+    public static String ResearchGroupViewForm_0;
+
+    public static String ResearchGroupViewForm_1;
+
     public static String ResearchGroupViewForm_error_title;
 
     public static String ResearchGroupViewForm_title;

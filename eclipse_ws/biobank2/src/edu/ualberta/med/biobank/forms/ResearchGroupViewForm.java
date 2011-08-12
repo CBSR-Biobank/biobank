@@ -81,8 +81,8 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
         toolkit.createLabel(client,
-            "Submit a request on behalf of this research group:");
-        csvSelector = new BgcFileBrowser(client, "CSV File", SWT.NONE,
+            Messages.ResearchGroupViewForm_0);
+        csvSelector = new BgcFileBrowser(client, Messages.ResearchGroupViewForm_1, SWT.NONE,
             new String[] { ".csv" }); //$NON-NLS-1$
         csvSelector.addFileSelectedListener(this);
         csvSelector.adaptToToolkit(toolkit, true);

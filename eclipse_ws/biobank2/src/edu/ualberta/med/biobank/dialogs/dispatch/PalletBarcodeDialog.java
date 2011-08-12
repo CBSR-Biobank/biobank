@@ -16,28 +16,28 @@ public class PalletBarcodeDialog extends BgcBaseDialog {
         super(parentShell);
     }
 
-    IObservableValue barcode = new WritableValue("", String.class);
+    IObservableValue barcode = new WritableValue("", String.class); //$NON-NLS-1$
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Enter pallet barcode";
+        return Messages.PalletBarcodeDialog_0;
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return "Product Barcode Required";
+        return Messages.PalletBarcodeDialog_1;
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return "Product Barcode";
+        return Messages.PalletBarcodeDialog_2;
     }
 
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         widgetCreator.createBoundWidgetWithLabel(parent, BgcBaseText.class,
-            SWT.NONE, "Barcode", new String[] {}, barcode,
-            new NonEmptyStringValidator("Barcode cannot be empty"));
+            SWT.NONE, Messages.PalletBarcodeDialog_3, new String[] {}, barcode,
+            new NonEmptyStringValidator(Messages.PalletBarcodeDialog_4));
     }
 
     public String getBarcode() {
