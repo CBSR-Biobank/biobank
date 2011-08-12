@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.dialogs.dispatch;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -27,6 +28,7 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
     public RequestReceiveScanDialog(Shell parentShell,
         final RequestWrapper currentShipment, CenterWrapper<?> centerWrapper) {
         super(parentShell, currentShipment, centerWrapper);
+        dispatchSpecimens = new ArrayList<SpecimenWrapper>();
     }
 
     @Override

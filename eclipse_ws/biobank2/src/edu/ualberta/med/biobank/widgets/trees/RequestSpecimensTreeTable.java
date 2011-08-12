@@ -247,6 +247,10 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
         return getWrappers(getAdapterSelection());
     }
 
+    public List<RequestSpecimenWrapper> getWrappers() {
+        return getWrappers(groups.get(0));
+    }
+
     public List<RequestSpecimenWrapper> getWrappers(Node parent) {
         List<RequestSpecimenWrapper> list = new ArrayList<RequestSpecimenWrapper>();
         if (parent instanceof TreeItemAdapter) {
@@ -269,6 +273,10 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
 
     public void refresh() {
         tv.refresh(true);
+    }
+
+    public void rebuild() {
+        tv.setInput(new RootNode());
     }
 
     public Node search(String text) {
