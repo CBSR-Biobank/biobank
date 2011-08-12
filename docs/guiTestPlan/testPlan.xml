@@ -1,6 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <test_suite name="BioBank GUI Test Plan" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="testPlan.xsd">
-  <test_section id="1" name="Activity Status">
+  <test_section id="1" name="General">
+    <test_section id="1" name="Server Menu">
+    <test_case id="1" name="Server submenu contents" variety="positive">
+      <description>
+        Validates the "Server" sub-menu contents.
+      </description>
+      <precondition>
+        Using latest client software, computer connected to network, server
+        reachable, initialized database, user account exists.
+      </precondition>
+      <expected_result>
+        The following items in the submenu: Login, Logout, Quit.
+      </expected_result>
+      <note>
+        None.
+      </note>
+      <dependency>
+        None.
+      </dependency>
+      <steps>
+        <step>Start client software.</step>
+        <step>Select "Server" from main menu.</step>
+      </steps>
+    </test_case>
+    <test_case id="" name="" variety="positive">
+      <description>
+      </description>
+      <precondition>
+      </precondition>
+      <expected_result>
+      </expected_result>
+      <note>
+      </note>
+      <dependency>
+      </dependency>
+      <steps>
+        <step></step>
+        <step></step>
+      </steps>
+    </test_case>
+    </test_section>
+    <test_section id="2" name="Configuration Menu">
+    </test_section>
+    <test_section id="3" name="Help Menu">
+    </test_section>
+  </test_section>
+  <test_section id="1" name="Super Administrator">
+  </test_section>
+  <test_section id="2" name="Administration View">
     <test_case id="1" name="Activity Status menu item disabled" variety="positive">
       <description>
         Open the client software and do not log in. The application's main
@@ -8,7 +56,7 @@
       </description>
       <precondition>
         Using latest client software, computer connected to network, server
-        reachable, initialized database, account of user exists
+        reachable, initialized database, user account exists.
       </precondition>
       <expected_result>
         No items displayed related to activity status are present in the sub

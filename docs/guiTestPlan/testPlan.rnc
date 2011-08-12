@@ -5,7 +5,10 @@ test_suite = element test_suite { attlist.test_suite, test_section+ }
 attlist.test_suite &=
   attribute name { text },
   attribute xsi:noNamespaceSchemaLocation { xsd:NMTOKEN }
-test_section = element test_section { attlist.test_section, test_case+ }
+test_section =
+  element test_section {
+    attlist.test_section, (test_section, test_case)+
+  }
 attlist.test_section &=
   attribute id { text },
   attribute name { text }
