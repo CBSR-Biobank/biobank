@@ -144,16 +144,12 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         for (DispatchSpecimenWrapper rds : toBePersistedDispatchedSpecimens) {
             SpecimenWrapper spec = rds.getSpecimen();
             // save things the dispatch could modify:
-            ActivityStatusWrapper as = spec.getActivityStatus();
-            String comment = spec.getComment();
             CenterWrapper<?> center = spec.getCurrentCenter();
             RowColPos pos = spec.getPosition();
             // reload because spec might have been modified. This should avoid
             // concurrency problems
             spec.reload();
             // set values back:
-            spec.setActivityStatus(as);
-            spec.setComment(comment);
             spec.setCurrentCenter(center);
             if (pos == null)
                 spec.setPosition(null);
