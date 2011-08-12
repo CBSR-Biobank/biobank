@@ -136,7 +136,7 @@ public class RequestEntryForm extends BiobankViewForm {
                     specimen = (RequestSpecimenWrapper) specNode.getSpecimen();
                     if (specimen != null) {
                         addToDispatch(getDispatchSelection(),
-                            Arrays.asList((ItemWrapper) specimen));
+                            Arrays.asList(specimen));
                         specimensTree.dispatch(specNode);
                     }
                 } catch (Exception e1) {
@@ -264,7 +264,15 @@ public class RequestEntryForm extends BiobankViewForm {
         dialog.open();
         if (dialog.hasReceivedSpecimens()) {
             try {
-                addToDispatch(getDispatchSelection(), dialog.getSpecimens());
+                List<RequestSpecimenWrapper> rspecs = new ArrayList<RequestSpecimenWrapper>();
+                for (SpecimenWrapper spec : dialog.getSpecimens()) {
+                    for (RequestSpecimenWrapper rs : request
+                        .getNonProcessedRequestSpecimenCollection())
+                        if (rs.getSpecimen().equals(spec))
+                            rspecs.add(rs);
+
+                }
+                addToDispatch(getDispatchSelection(), rspecs);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -309,7 +317,7 @@ public class RequestEntryForm extends BiobankViewForm {
     }
 
     protected void addToDispatch(DispatchWrapper dispatch,
-        List<ItemWrapper> specs) throws Exception {
+        List<RequestSpecimenWrapper> specs) throws Exception {
         // FIXME: SHOULD BE IN ONE TRANSACTION
         List<SpecimenWrapper> dispatchSpecimens = new ArrayList<SpecimenWrapper>();
         for (ItemWrapper rspec : specs) {

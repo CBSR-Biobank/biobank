@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.export.Data;
@@ -91,10 +90,10 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
 
     @Override
     protected void doProceed() {
-        List<ItemWrapper> specimens = new ArrayList<ItemWrapper>();
+        List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
         for (PalletCell cell : getCells().values()) {
             if (cell.getStatus() == UICellStatus.IN_SHIPMENT_EXPECTED) {
-                specimens.add((ItemWrapper) cell.getSpecimen());
+                specimens.add(cell.getSpecimen());
                 cell.setStatus(UICellStatus.IN_SHIPMENT_RECEIVED);
             }
         }
@@ -156,7 +155,7 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
         }
     }
 
-    protected abstract void receiveSpecimens(List<ItemWrapper> specimens);
+    protected abstract void receiveSpecimens(List<SpecimenWrapper> specimens);
 
     @Override
     protected abstract List<UICellStatus> getPalletCellStatus();
