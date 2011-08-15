@@ -5,6 +5,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.forms.messages"; //$NON-NLS-1$
 
+    public static String LoggingForm_date_label;
+
     public static String AbstractDispatchEntryForm_add_spec_label;
 
     public static String AbstractDispatchEntryForm_scanDialog_label;
@@ -487,6 +489,10 @@ public class Messages extends NLS {
     public static String DispatchViewForm_title;
 
     public static String DispatchViewForm_waybill_label;
+
+    public static String LoggingForm_0;
+
+    public static String LoggingForm_1;
 
     public static String LoggingForm_action_label;
 
