@@ -1136,19 +1136,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return propertyCache.get(property);
     }
 
-    private static String capitalizeFirstLetter(String name) {
-        StringBuilder sb = new StringBuilder();
-
-        if (name.length() > 0) {
-            sb.append(Character.toUpperCase(name.charAt(0)));
-            if (name.length() > 1) {
-                sb.append(name.substring(1));
-            }
-        }
-
-        return sb.toString();
-    }
-
     @SuppressWarnings("unchecked")
     public ModelWrapper<E> getDatabaseClone() throws Exception {
         ModelWrapper<E> wrapper = null;
