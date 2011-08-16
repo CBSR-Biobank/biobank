@@ -73,4 +73,10 @@ public class SwVersion {
         this.qualifier = qualifier;
     }
 
+    @Override
+    public String toString() {
+        return getMajor() + "." + getMinor() + "." + getService() + "."
+            + getQualifier();
+    }
+
 }
