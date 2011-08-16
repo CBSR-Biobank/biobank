@@ -186,7 +186,7 @@ public class GroupEditDialog extends BgcBaseDialog {
                 .getSelected());
             modifiedGroup.setCenterFeaturesEnabled(centerFeaturesWidget
                 .getSelected());
-            Group groupeResult = SessionManager.getAppService().persistGroup(
+            Group groupeResult = SessionManager.getAppService().persistGroupOld(
                 SessionManager.getUser(), modifiedGroup);
             originalGroup.copy(groupeResult);
             close();

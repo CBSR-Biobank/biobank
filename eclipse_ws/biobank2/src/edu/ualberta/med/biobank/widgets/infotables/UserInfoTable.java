@@ -192,7 +192,7 @@ public abstract class UserInfoTable extends InfoTableWidget<User> {
             }
 
             if (BgcPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
-                SessionManager.getAppService().deleteUser(
+                SessionManager.getAppService().deleteUserOld(
                     SessionManager.getUser(), loginName);
 
                 // remove the user from the collection

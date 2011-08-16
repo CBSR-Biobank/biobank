@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
+import edu.ualberta.med.biobank.test.internal.UserHelper;
 
 public class TestDatabase {
     protected static BiobankApplicationService appService;
@@ -66,6 +67,7 @@ public class TestDatabase {
             ClinicHelper.deleteCreatedClinics();
             SpecimenTypeHelper.deleteCreatedSpecimenTypes();
             ShippingMethodHelper.deleteCreateShippingMethods();
+            UserHelper.deleteCreatedUsers();
         } catch (Exception e) {
             e.printStackTrace(System.err);
             Assert.fail();
@@ -158,6 +160,8 @@ public class TestDatabase {
                     parameter = new Boolean(r.nextBoolean());
                 } else if (returnType.equals(java.lang.Integer.class)) {
                     parameter = new Integer(r.nextInt(Integer.MAX_VALUE));
+                } else if (returnType.equals(java.lang.Long.class)) {
+                    parameter = new Long(r.nextLong());
                 } else if (returnType.equals(java.lang.Double.class)) {
                     parameter = new Double(r.nextDouble());
                 } else if (returnType.equals(java.lang.String.class)) {

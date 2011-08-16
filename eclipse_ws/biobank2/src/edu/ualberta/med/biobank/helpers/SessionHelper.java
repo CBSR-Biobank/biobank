@@ -80,7 +80,7 @@ public class SessionHelper implements Runnable {
             logger.debug(Messages.SessionHelper_clientVersion_debug_msg
                 + clientVersion);
             appService.checkVersion(clientVersion);
-            user = appService.getCurrentUser();
+            user = appService.getCurrentUserOld();
         } catch (ApplicationException exp) {
             if (exp instanceof ServerVersionInvalidException) {
                 BgcPlugin.openError(

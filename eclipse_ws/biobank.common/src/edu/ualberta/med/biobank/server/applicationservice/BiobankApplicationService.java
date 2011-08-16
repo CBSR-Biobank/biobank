@@ -43,24 +43,31 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void modifyPassword(String oldPassword, String newPassword)
         throws ApplicationException;
 
+    @Deprecated
     public List<Group> getSecurityGroups(User currentUser,
         boolean includeSuperAdmin) throws ApplicationException;
 
+    @Deprecated
     public List<User> getSecurityUsers(User currentUser)
         throws ApplicationException;
 
-    public User persistUser(User currentUser, User userToPersist)
+    @Deprecated
+    public User persistUserOld(User currentUser, User userToPersist)
         throws ApplicationException;
 
-    public void deleteUser(User currentUser, String loginToDelete)
+    @Deprecated
+    public void deleteUserOld(User currentUser, String loginToDelete)
         throws ApplicationException;
 
-    public User getCurrentUser() throws ApplicationException;
+    @Deprecated
+    public User getCurrentUserOld() throws ApplicationException;
 
-    public Group persistGroup(User currentUser, Group group)
+    @Deprecated
+    public Group persistGroupOld(User currentUser, Group group)
         throws ApplicationException;
 
-    public void deleteGroup(User currentUser, Group group)
+    @Deprecated
+    public void deleteGroupOld(User currentUser, Group group)
         throws ApplicationException;
 
     public void unlockUser(User currentUser, String userNameToUnlock)
@@ -96,4 +103,11 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public List<String> executeGetSourceSpecimenUniqueInventoryIds(int numIds)
         throws ApplicationException;
 
+    public Long persistUser(edu.ualberta.med.biobank.model.User user,
+        String password) throws ApplicationException;
+
+    public void deleteUser(edu.ualberta.med.biobank.model.User user)
+        throws ApplicationException;
+
+    public String getUserPassword(String login) throws ApplicationException;;
 }

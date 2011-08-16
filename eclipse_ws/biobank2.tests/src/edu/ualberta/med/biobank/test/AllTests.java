@@ -47,14 +47,22 @@ public class AllTests {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        appService = ServiceConnection.getAppService(
-            System.getProperty("server", "http://localhost:8080") + "/biobank",
-            "testuser", "test");
+        connectTestUser();
         DbHelper.setAppService(appService);
     }
 
     @AfterClass
     public static void tearDown() throws Exception {
+    }
+
+    public static void connectTestUser() throws Exception {
+        connect("testuser", "test");
+    }
+
+    public static void connect(String user, String password) throws Exception {
+        appService = ServiceConnection.getAppService(
+            System.getProperty("server", "http://localhost:8080") + "/biobank",
+            user, password);
     }
 
 }

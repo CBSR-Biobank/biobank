@@ -132,7 +132,7 @@ public abstract class GroupInfoTable extends InfoTableWidget<Group> {
 
             if (BgcPlugin.openConfirm(
                 Messages.GroupInfoTable_delete_confirm_title, message)) {
-                SessionManager.getAppService().deleteGroup(
+                SessionManager.getAppService().deleteGroupOld(
                     SessionManager.getUser(), group);
                 // remove the group from the collection
                 getCollection().remove(group);

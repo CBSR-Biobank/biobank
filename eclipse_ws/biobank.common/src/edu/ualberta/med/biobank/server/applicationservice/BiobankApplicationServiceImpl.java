@@ -155,36 +155,36 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public User persistUser(User currentUser, User userToPersist)
+    public User persistUserOld(User currentUser, User userToPersist)
         throws ApplicationException {
         currentUser.initCurrentWorkingCenter(this);
-        return BiobankSecurityUtil.persistUser(currentUser, userToPersist);
+        return BiobankSecurityUtil.persistUserOld(currentUser, userToPersist);
     }
 
     @Override
-    public void deleteUser(User currentUser, String loginToDelete)
+    public void deleteUserOld(User currentUser, String loginToDelete)
         throws ApplicationException {
         currentUser.initCurrentWorkingCenter(this);
-        BiobankSecurityUtil.deleteUser(currentUser, loginToDelete);
+        BiobankSecurityUtil.deleteUserOld(currentUser, loginToDelete);
     }
 
     @Override
-    public User getCurrentUser() throws ApplicationException {
-        return BiobankSecurityUtil.getCurrentUser();
+    public User getCurrentUserOld() throws ApplicationException {
+        return BiobankSecurityUtil.getCurrentUserOld();
     }
 
     @Override
-    public Group persistGroup(User currentUser, Group group)
+    public Group persistGroupOld(User currentUser, Group group)
         throws ApplicationException {
         currentUser.initCurrentWorkingCenter(this);
-        return BiobankSecurityUtil.persistGroup(currentUser, group);
+        return BiobankSecurityUtil.persistGroupOld(currentUser, group);
     }
 
     @Override
-    public void deleteGroup(User currentUser, Group group)
+    public void deleteGroupOld(User currentUser, Group group)
         throws ApplicationException {
         currentUser.initCurrentWorkingCenter(this);
-        BiobankSecurityUtil.deleteGroup(currentUser, group);
+        BiobankSecurityUtil.deleteGroupOld(currentUser, group);
     }
 
     @Override
@@ -309,5 +309,22 @@ public class BiobankApplicationServiceImpl extends
 
         }
         return result;
+    }
+
+    @Override
+    public Long persistUser(edu.ualberta.med.biobank.model.User user,
+        String password) throws ApplicationException {
+        return BiobankSecurityUtil.persistUser(user, password);
+    }
+
+    @Override
+    public void deleteUser(edu.ualberta.med.biobank.model.User user)
+        throws ApplicationException {
+        BiobankSecurityUtil.deleteUser(user);
+    }
+
+    @Override
+    public String getUserPassword(String login) throws ApplicationException {
+        return BiobankSecurityUtil.getUserPassword(login);
     }
 }

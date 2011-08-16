@@ -25,6 +25,7 @@ import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
 import gov.nih.nci.security.exceptions.CSTransactionException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -80,6 +81,7 @@ public class BiobankSecurityUtil {
         }
     }
 
+    @Deprecated
     public static List<edu.ualberta.med.biobank.common.security.Group> getSecurityGroups(
         edu.ualberta.med.biobank.common.security.User currentUser,
         boolean includeSuperAdmin) throws ApplicationException {
@@ -94,7 +96,7 @@ public class BiobankSecurityUtil {
                     if (includeSuperAdmin
                         || !edu.ualberta.med.biobank.common.security.Group.GROUP_SUPER_ADMIN_ID
                             .equals(g.getGroupId())) {
-                        edu.ualberta.med.biobank.common.security.Group createGroup = createGroup(
+                        edu.ualberta.med.biobank.common.security.Group createGroup = createGroupOld(
                             upm, (Group) object);
                         // If is only center admin (not super admin), then
                         // return only groups of the same center
@@ -117,7 +119,7 @@ public class BiobankSecurityUtil {
         }
     }
 
-    private static edu.ualberta.med.biobank.common.security.Group createGroup(
+    private static edu.ualberta.med.biobank.common.security.Group createGroupOld(
         UserProvisioningManager upm, Group group)
         throws CSObjectNotFoundException {
         edu.ualberta.med.biobank.common.security.Group biobankGroup = new edu.ualberta.med.biobank.common.security.Group(
@@ -182,6 +184,7 @@ public class BiobankSecurityUtil {
         return biobankGroup;
     }
 
+    @Deprecated
     public static List<edu.ualberta.med.biobank.common.security.User> getSecurityUsers(
         edu.ualberta.med.biobank.common.security.User currentUser)
         throws ApplicationException {
@@ -201,7 +204,7 @@ public class BiobankSecurityUtil {
                     for (Object u : upm.getUsers(groupId.toString())) {
                         User serverUser = (User) u;
                         if (!allUsers.containsKey(serverUser.getUserId())) {
-                            edu.ualberta.med.biobank.common.security.User newUser = createUser(
+                            edu.ualberta.med.biobank.common.security.User newUser = createUserOld(
                                 upm, serverUser, allGroups);
                             // If is only center admin (not super admin), then
                             // return only users of the same center
@@ -228,7 +231,8 @@ public class BiobankSecurityUtil {
         }
     }
 
-    public static edu.ualberta.med.biobank.common.security.User persistUser(
+    @Deprecated
+    public static edu.ualberta.med.biobank.common.security.User persistUserOld(
         edu.ualberta.med.biobank.common.security.User currentUser,
         edu.ualberta.med.biobank.common.security.User newUser)
         throws ApplicationException {
@@ -302,7 +306,8 @@ public class BiobankSecurityUtil {
         }
     }
 
-    public static void deleteUser(
+    @Deprecated
+    public static void deleteUserOld(
         edu.ualberta.med.biobank.common.security.User currentUser,
         String loginToDelete) throws ApplicationException {
         if (canPerformCenterAdminAction(currentUser)) {
@@ -336,7 +341,8 @@ public class BiobankSecurityUtil {
         }
     }
 
-    public static edu.ualberta.med.biobank.common.security.User getCurrentUser()
+    @Deprecated
+    public static edu.ualberta.med.biobank.common.security.User getCurrentUserOld()
         throws ApplicationException {
         try {
             UserProvisioningManager upm = SecurityServiceProvider
@@ -350,7 +356,7 @@ public class BiobankSecurityUtil {
                 throw new ApplicationException(
                     Messages
                         .getString("BiobankSecurityUtil.user.retrieve.error.msg")); //$NON-NLS-1$
-            return createUser(upm, serverUser, null);
+            return createUserOld(upm, serverUser, null);
         } catch (ApplicationException ae) {
             log.error("Error getting current user", ae); //$NON-NLS-1$
             throw ae;
@@ -360,7 +366,7 @@ public class BiobankSecurityUtil {
         }
     }
 
-    private static edu.ualberta.med.biobank.common.security.User createUser(
+    private static edu.ualberta.med.biobank.common.security.User createUserOld(
         UserProvisioningManager upm, User serverUser,
         Map<Long, edu.ualberta.med.biobank.common.security.Group> allGroups)
         throws CSObjectNotFoundException {
@@ -380,7 +386,7 @@ public class BiobankSecurityUtil {
         List<edu.ualberta.med.biobank.common.security.Group> userGroups = new ArrayList<edu.ualberta.med.biobank.common.security.Group>();
         for (Object o : upm.getGroups(serverUser.getUserId().toString())) {
             if (allGroups == null) {
-                userGroups.add(createGroup(upm, (Group) o));
+                userGroups.add(createGroupOld(upm, (Group) o));
             } else {
                 edu.ualberta.med.biobank.common.security.Group userGroup = allGroups
                     .get(((Group) o).getGroupId());
@@ -400,7 +406,8 @@ public class BiobankSecurityUtil {
         }
     }
 
-    public static edu.ualberta.med.biobank.common.security.Group persistGroup(
+    @Deprecated
+    public static edu.ualberta.med.biobank.common.security.Group persistGroupOld(
         edu.ualberta.med.biobank.common.security.User currentUser,
         edu.ualberta.med.biobank.common.security.Group group)
         throws ApplicationException {
@@ -423,7 +430,7 @@ public class BiobankSecurityUtil {
                 edu.ualberta.med.biobank.common.security.Group oldGroup = null;
                 if (group.getId() != null) {
                     serverGroup = upm.getGroupById(group.getId().toString());
-                    oldGroup = createGroup(upm, serverGroup);
+                    oldGroup = createGroupOld(upm, serverGroup);
                 }
                 if (serverGroup == null) {
                     serverGroup = new Group();
@@ -470,7 +477,7 @@ public class BiobankSecurityUtil {
                 modifyFeatures(upm, serverGroup,
                     oldGroup.getCenterFeaturesEnabled(),
                     group.getCenterFeaturesEnabled());
-                return createGroup(upm, serverGroup);
+                return createGroupOld(upm, serverGroup);
             } catch (ApplicationException ae) {
                 log.error("Error persisting security group", ae); //$NON-NLS-1$
                 throw ae;
@@ -561,7 +568,8 @@ public class BiobankSecurityUtil {
                 .toString() });
     }
 
-    public static void deleteGroup(
+    @Deprecated
+    public static void deleteGroupOld(
         edu.ualberta.med.biobank.common.security.User currentUser,
         edu.ualberta.med.biobank.common.security.Group group)
         throws ApplicationException {
@@ -595,18 +603,21 @@ public class BiobankSecurityUtil {
         }
     }
 
+    @Deprecated
     public static List<ProtectionGroupPrivilege> getSecurityGlobalFeatures(
         edu.ualberta.med.biobank.common.security.User currentUser)
         throws ApplicationException {
         return getSecurityFeatures(currentUser, GLOBAL_FEATURE_START_NAME);
     }
 
+    @Deprecated
     public static List<ProtectionGroupPrivilege> getSecurityCenterFeatures(
         edu.ualberta.med.biobank.common.security.User currentUser)
         throws ApplicationException {
         return getSecurityFeatures(currentUser, CENTER_FEATURE_START_NAME);
     }
 
+    @Deprecated
     private static List<ProtectionGroupPrivilege> getSecurityFeatures(
         edu.ualberta.med.biobank.common.security.User currentUser,
         String protectionGroupNameStart) throws ApplicationException {
@@ -637,6 +648,7 @@ public class BiobankSecurityUtil {
         }
     }
 
+    @Deprecated
     private static boolean canPerformCenterAdminAction(
         edu.ualberta.med.biobank.common.security.User currentUser)
         throws ApplicationException {
@@ -646,6 +658,7 @@ public class BiobankSecurityUtil {
             || currentUser.isSuperAdministrator();
     }
 
+    @Deprecated
     private static boolean isSuperAdministrator() throws ApplicationException {
         try {
             String userLogin = SecurityContextHolder.getContext()
@@ -678,6 +691,7 @@ public class BiobankSecurityUtil {
         }
     }
 
+    @Deprecated
     public static void newCenterSecurity(Integer centerId,
         String centerNameShort, Class<?> centerClass) {
         try {
@@ -713,6 +727,7 @@ public class BiobankSecurityUtil {
         }
     }
 
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static void deleteCenterSecurity(Integer centerId, String nameShort,
         Class<?> centerClass) {
@@ -752,5 +767,120 @@ public class BiobankSecurityUtil {
                 + ":" + nameShort + " security: " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
+    }
+
+    public static Long persistUser(edu.ualberta.med.biobank.model.User user,
+        String password) throws ApplicationException {
+        try {
+            UserProvisioningManager upm = SecurityServiceProvider
+                .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
+            if (user.getLogin() == null)
+                throw new ApplicationException(
+                    Messages
+                        .getString("BiobankSecurityUtil.login.set.error.msg")); //$NON-NLS-1$
+            boolean newUser = (user.getId() == null);
+            User serverUser;
+            if (newUser) {
+                serverUser = upm.getUser(user.getLogin());
+                if (serverUser == null) {
+                    serverUser = new User();
+                } else
+                    throw new ApplicationException(MessageFormat.format(
+                        "Login {0} alreday exists.", user.getLogin()));
+            } else {
+                if (user.getCsmUserId() == null)
+                    throw new ApplicationException(
+                        MessageFormat.format(
+                            "User with id {0} is missing a csmUserId",
+                            user.getId()));
+                serverUser = null;
+                try {
+                    serverUser = upm
+                        .getUserById(user.getCsmUserId().toString());
+                } catch (CSObjectNotFoundException confe) {
+                    throw new ApplicationException(MessageFormat.format(
+                        "CSM Security user with id {0} not found.",
+                        user.getCsmUserId()), confe);
+                }
+            }
+            serverUser.setLoginName(user.getLogin());
+            if (password != null && !password.isEmpty()) {
+                serverUser.setPassword(password);
+            }
+            if (newUser) {
+                upm.createUser(serverUser);
+                serverUser = upm.getUser(user.getLogin());
+            } else
+                upm.modifyUser(serverUser);
+
+            // add association of protection group/csm role to the user
+            // protection group with id '1' contains all database objects.
+            // csm role with id '8' (Object Full Access) contains privileges
+            // read, delete, create, update
+            if (newUser)
+                upm.assignUserRoleToProtectionGroup(serverUser.getUserId()
+                    .toString(), new String[] { String.valueOf(8) }, String
+                    .valueOf(1));
+
+            return serverUser.getUserId();
+        } catch (ApplicationException ae) {
+            log.error("Error persisting csm security user", ae); //$NON-NLS-1$
+            throw ae;
+        } catch (Exception ex) {
+            log.error("Error persisting csm security user", ex); //$NON-NLS-1$
+            throw new ApplicationException(ex.getMessage(), ex);
+        }
+    }
+
+    public static void deleteUser(edu.ualberta.med.biobank.model.User user)
+        throws ApplicationException {
+        try {
+            UserProvisioningManager upm = SecurityServiceProvider
+                .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
+            String currentLogin = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+            if (currentLogin.equals(user.getLogin())) {
+                throw new ApplicationException(
+                    Messages
+                        .getString("BiobankSecurityUtil.delete.self.error.msg")); //$NON-NLS-1$
+            }
+            if (user.getCsmUserId() == null)
+                throw new ApplicationException(MessageFormat.format(
+                    "User with id {0} is missing a csmUserId", user.getId()));
+            User serverUser = upm.getUserById(user.getCsmUserId().toString());
+            if (serverUser == null) {
+                throw new ApplicationException(MessageFormat.format(
+                    "CSM security user with id {0} not found.",
+                    user.getCsmUserId()));
+            }
+            upm.removeUser(serverUser.getUserId().toString());
+        } catch (ApplicationException ae) {
+            log.error("Error deleting security user", ae); //$NON-NLS-1$
+            throw ae;
+        } catch (Exception ex) {
+            log.error("Error deleting security user", ex); //$NON-NLS-1$
+            throw new ApplicationException(ex.getMessage(), ex);
+        }
+    }
+
+    public static String getUserPassword(String login)
+        throws ApplicationException {
+        try {
+            UserProvisioningManager upm = SecurityServiceProvider
+                .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
+            User serverUser = upm.getUser(login);
+            if (serverUser == null) {
+                throw new ApplicationException("Security user " + login
+                    + " not found.");
+            }
+            // FIXME how safe is this?
+            return serverUser.getPassword();
+        } catch (ApplicationException ae) {
+            log.error("Error retrieving csm security user password", ae); //$NON-NLS-1$
+            throw ae;
+        } catch (Exception ex) {
+            log.error("Error retrieving csm security user password", ex); //$NON-NLS-1$
+            throw new ApplicationException(ex.getMessage(), ex);
+        }
     }
 }

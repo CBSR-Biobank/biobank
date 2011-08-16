@@ -139,7 +139,7 @@ public class UserEditDialog extends BgcBaseDialog {
         // try saving or updating the user inside this dialog so that if there
         // is an error the entered information is not lost
         try {
-            originalUser.copy(SessionManager.getAppService().persistUser(
+            originalUser.copy(SessionManager.getAppService().persistUserOld(
                 SessionManager.getUser(), modifiedUser));
 
             if (SessionManager.getUser().getId().equals(originalUser.getId())) {
