@@ -11,7 +11,6 @@ public class Messages extends NLS {
     public static String GroupEditDialog_msg_persit_error;
     public static String GroupEditDialog_property_title_name;
     public static String GroupEditDialog_center_administrator_title;
-    public static String GroupEditDialog_center_administrator_tooltip;
     public static String GroupEditDialog_center_list_available;
     public static String GroupEditDialog_center_list_working;
     public static String GroupEditDialog_title_add;
@@ -24,8 +23,6 @@ public class Messages extends NLS {
     public static String GroupEditDialog_filter_centers;
 
     public static String GroupsPage_page_title;
-
-    public static String TemplatesPage_page_title;
 
     public static String UserEditDialog_deleteRight_confirm_msg;
 
@@ -75,10 +72,6 @@ public class Messages extends NLS {
 
     public static String UserEditDialog_user_persist_title;
 
-    public static String UserManagementDialog_addGroup_label;
-
-    public static String UserManagementDialog_addUser_label;
-
     public static String UserManagementDialog_description;
 
     public static String UserManagementDialog_get_users_groups_error_title;
@@ -86,8 +79,6 @@ public class Messages extends NLS {
     public static String UserManagementDialog_group_added_msg;
 
     public static String UserManagementDialog_group_added_title;
-
-    public static String UserManagementDialog_groups_label;
 
     public static String UserManagementDialog_groups_load_error_title;
 
@@ -98,8 +89,6 @@ public class Messages extends NLS {
     public static String UserManagementDialog_user_added_msg;
 
     public static String UserManagementDialog_user_added_title;
-
-    public static String UserManagementDialog_users_label;
 
     public static String UserManagementDialog_users_load_error_title;
 

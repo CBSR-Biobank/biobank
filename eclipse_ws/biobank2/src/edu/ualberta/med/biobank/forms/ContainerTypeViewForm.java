@@ -23,8 +23,6 @@ import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 public class ContainerTypeViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeViewForm"; //$NON-NLS-1$
 
-    private ContainerTypeAdapter containerTypeAdapter;
-
     private ContainerTypeWrapper containerType;
 
     private BgcBaseText siteLabel;
@@ -61,15 +59,9 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        containerTypeAdapter = (ContainerTypeAdapter) adapter;
-        containerType = containerTypeAdapter.getContainerType();
-        retrieveContainerType();
+        containerType = (ContainerTypeWrapper) getModelObject();
         setPartName(NLS.bind(Messages.ContainerTypeViewForm_title,
             containerType.getName()));
-    }
-
-    private void retrieveContainerType() throws Exception {
-        containerType.reload();
     }
 
     @Override
@@ -233,7 +225,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     @Override
     public void reload() throws Exception {
-        retrieveContainerType();
+        containerType.reload();
         setPartName(NLS.bind(Messages.ContainerTypeViewForm_title,
             containerType.getName()));
         form.setText(NLS.bind(Messages.ContainerTypeViewForm_title,

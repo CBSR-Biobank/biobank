@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
@@ -49,8 +50,9 @@ public class ContainerTypeInfoTable extends
     private SiteAdapter siteAdapter;
 
     public ContainerTypeInfoTable(Composite parent, SiteAdapter site) {
-        super(parent, site.getWrapper().getContainerTypeCollection(), HEADINGS,
-            10, ContainerTypeWrapper.class);
+        super(parent, ((SiteWrapper) site.getModelObject())
+            .getContainerTypeCollection(), HEADINGS, 10,
+            ContainerTypeWrapper.class);
         siteAdapter = site;
     }
 

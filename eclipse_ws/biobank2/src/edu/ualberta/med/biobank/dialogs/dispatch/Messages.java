@@ -29,6 +29,14 @@ public class Messages extends NLS {
     public static String DispatchReceiveScanDialog_flagging_error_title;
     public static String DispatchReceiveScanDialog_notInDispatch_error_msg;
     public static String DispatchReceiveScanDialog_notInDispatch_error_title;
+    public static String ReceiveScanDialog_0;
+    public static String ReceiveScanDialog_1;
+    public static String ReceiveScanDialog_2;
+    public static String ReceiveScanDialog_3;
+    public static String ReceiveScanDialog_4;
+    public static String ReceiveScanDialog_5;
+    public static String ReceiveScanDialog_6;
+    public static String ReceiveScanDialog_7;
     public static String ReceiveScanDialog_description;
     public static String ReceiveScanDialog_proceed_button_label;
     public static String ModifyStateDispatchDialog_comment_label;
@@ -37,6 +45,11 @@ public class Messages extends NLS {
     public static String ModifyStateDispatchDialog_description_newState;
     public static String ModifyStateDispatchDialog_title_comment_only;
     public static String ModifyStateDispatchDialog_title_state;
+    public static String PalletBarcodeDialog_0;
+    public static String PalletBarcodeDialog_1;
+    public static String PalletBarcodeDialog_2;
+    public static String PalletBarcodeDialog_3;
+    public static String PalletBarcodeDialog_4;
     public static String RequestReceiveScanDialog_extra_msg;
     public static String RequestReceiveScanDialog_extra_title;
     public static String RequestReceiveScanDialog_receiveError_title;

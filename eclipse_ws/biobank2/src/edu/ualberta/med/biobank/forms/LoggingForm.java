@@ -1,12 +1,24 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.peer.LogPeer;
+import edu.ualberta.med.biobank.export.CsvDataExporter;
+import edu.ualberta.med.biobank.export.Data;
+import edu.ualberta.med.biobank.export.DataExporter;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.logs.LogQuery;
@@ -28,6 +40,8 @@ public class LoggingForm extends BiobankViewForm {
     private BgcBaseText endDateLabel;
 
     private BgcBaseText centerLabel;
+
+    private LoggingInfoTable loggingTable;
 
     // private BiobankText containerTypeLabel;
     // private BiobankText containerLabelLabel;
@@ -69,8 +83,10 @@ public class LoggingForm extends BiobankViewForm {
         /* a grid might make this easier */
         centerLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
             Messages.LoggingForm_center_label);
-        userLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, Messages.LoggingForm_user_label);
-        typeLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, Messages.LoggingForm_type_label);
+        userLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
+            Messages.LoggingForm_user_label);
+        typeLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
+            Messages.LoggingForm_type_label);
         actionLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
             Messages.LoggingForm_action_label);
         startDateLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
@@ -96,12 +112,136 @@ public class LoggingForm extends BiobankViewForm {
         LogQuery.getInstance().queryDatabase();
 
         Composite client = createSectionWithClient(Messages.LoggingForm_search_title);
-        LoggingInfoTable loggingTable = new LoggingInfoTable(client, LogQuery
-            .getInstance().getDatabaseResults());
+        client.setLayout(new GridLayout(1, false));
+        Button button = new Button(client, SWT.PUSH);
+        button.setText(Messages.LoggingForm_1);
+        button.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                export(new CsvDataExporter());
+            }
+        });
+
+        loggingTable = new LoggingInfoTable(client, LogQuery.getInstance()
+            .getDatabaseResults());
         loggingTable.adaptToToolkit(toolkit, true);
         loggingTable.setVisible(true);
         loggingTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(loggingTable);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void export(final DataExporter exporter) {
+        final Data data = new Data();
+        try {
+            data.setColumnNames(Arrays.asList(
+                Messages.LoggingForm_center_label,
+                Messages.LoggingForm_user_label,
+                Messages.LoggingForm_date_label,
+                Messages.LoggingForm_action_label,
+                Messages.LoggingForm_type_label,
+                Messages.LoggingForm_pnumber_label,
+                Messages.LoggingForm_inventoryid_label,
+                Messages.LoggingForm_location_label,
+                Messages.LoggingForm_details_label));
+            data.setTitle(Messages.LoggingForm_0);
+            data.setDescription(Arrays.asList("test"));
+
+            data.setRows((List<Object>) (List<?>) LogQuery.getInstance()
+                .getDatabaseResults());
+
+            // check if the exporter can export this data
+            exporter.canExport(data);
+        } catch (Exception e) {
+            MessageDialog.openError(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(),
+                Messages.ReportEntryForm_export_error_title, e.getMessage());
+            return;
+        }
+
+        // confirm exporting
+        if (!MessageDialog.openQuestion(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+            Messages.ReportEntryForm_confirm_title,
+            NLS.bind(Messages.ReportEntryForm_export_question,
+                exporter.getName()))) {
+            return;
+        }
+
+        // export
+        try {
+            exporter.export(data, loggingTable.getLabelProvider());
+        } catch (Exception e) {
+            MessageDialog.openError(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(),
+                Messages.ReportEntryForm_exporting_error_title, e.getMessage());
+            return;
+        }
+    }
+
+    private List<String> getParams() throws Exception {
+        List<String> params = new ArrayList<String>();
+        StringBuffer sb = new StringBuffer();
+        sb.append(LogPeer.CENTER.getName());
+        sb.append(": "); //$NON-NLS-1$
+        sb.append(LogQuery.getInstance().getSearchQueryItem(
+            LogPeer.CENTER.getName()));
+        params.add(sb.toString());
+        sb = new StringBuffer();
+        sb.append(LogPeer.USERNAME.getName());
+        sb.append(": "); //$NON-NLS-1$
+        sb.append(LogQuery.getInstance().getSearchQueryItem(
+            LogPeer.CENTER.getName()));
+        params.add(sb.toString());
+        sb = new StringBuffer();
+        sb.append(LogPeer.TYPE.getName());
+        sb.append(": "); //$NON-NLS-1$
+        sb.append(LogQuery.getInstance().getSearchQueryItem(
+            LogPeer.CENTER.getName()));
+        params.add(sb.toString());
+        sb = new StringBuffer();
+        sb.append(LogPeer.ACTION.getName());
+        sb.append(": "); //$NON-NLS-1$
+        sb.append(LogQuery.getInstance().getSearchQueryItem(
+            LogPeer.CENTER.getName()));
+        params.add(sb.toString());
+        sb = new StringBuffer();
+        sb.append(LogPeer.PATIENT_NUMBER.getName());
+        sb.append(": "); //$NON-NLS-1$
+        sb.append(LogQuery.getInstance().getSearchQueryItem(
+            LogPeer.CENTER.getName()));
+        params.add(sb.toString());
+        sb = new StringBuffer();
+        sb.append(LogPeer.INVENTORY_ID.getName());
+        sb.append(": "); //$NON-NLS-1$
+        sb.append(LogQuery.getInstance().getSearchQueryItem(
+            LogPeer.CENTER.getName()));
+        params.add(sb.toString());
+        sb = new StringBuffer();
+        sb.append(LogPeer.LOCATION_LABEL.getName());
+        sb.append(": "); //$NON-NLS-1$
+        sb.append(LogQuery.getInstance().getSearchQueryItem(
+            LogPeer.CENTER.getName()));
+        params.add(sb.toString());
+        sb = new StringBuffer();
+        sb.append(LogPeer.DETAILS.getName());
+        sb.append(": "); //$NON-NLS-1$
+        sb.append(LogQuery.getInstance().getSearchQueryItem(
+            LogPeer.CENTER.getName()));
+        params.add(sb.toString());
+        sb = new StringBuffer();
+        sb.append("Start Date"); //$NON-NLS-1$
+        sb.append(": "); //$NON-NLS-1$
+        sb.append(LogQuery.getInstance().getSearchQueryItem(
+            LogPeer.CENTER.getName()));
+        params.add(sb.toString());
+        sb = new StringBuffer();
+        sb.append("End Date"); //$NON-NLS-1$
+        sb.append(": "); //$NON-NLS-1$
+        sb.append(LogQuery.getInstance().getSearchQueryItem(
+            LogPeer.CENTER.getName()));
+        params.add(sb.toString());
+        return params;
     }
 
     private void getSearchRequestFields() throws Exception {

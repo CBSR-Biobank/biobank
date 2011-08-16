@@ -21,20 +21,16 @@ public class ContainerTypeAdapter extends AdapterBase {
         super(parent, containerType);
     }
 
-    public ContainerTypeWrapper getContainerType() {
-        return (ContainerTypeWrapper) modelObject;
-    }
-
     @Override
     protected String getLabelInternal() {
-        ContainerTypeWrapper containerType = getContainerType();
+        ContainerTypeWrapper containerType = (ContainerTypeWrapper) getModelObject();
         Assert.isNotNull(containerType, "container type is null"); //$NON-NLS-1$
         return containerType.getName();
     }
 
     @Override
     public String getTooltipText() {
-        ContainerTypeWrapper type = getContainerType();
+        ContainerTypeWrapper type = (ContainerTypeWrapper) getModelObject();
         if (type != null) {
             SiteWrapper site = type.getSite();
             if (site != null) {

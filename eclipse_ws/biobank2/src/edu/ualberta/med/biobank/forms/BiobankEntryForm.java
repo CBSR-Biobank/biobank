@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
-import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.observable.ChangeEvent;
@@ -45,12 +44,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.services.ISourceProviderService;
-import org.springframework.remoting.RemoteAccessException;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -62,7 +57,6 @@ import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.sourceproviders.ConfirmState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -161,61 +155,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                             IProgressMonitor.UNKNOWN);
                         saveForm();
                         monitor.done();
-                    } catch (final RemoteConnectFailureException exp) {
-                        BgcPlugin.openRemoteConnectErrorMessage(exp);
-                        Display.getDefault().syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                setDirty(true);
-                            }
-                        });
-                        monitor.setCanceled(true);
-                    } catch (final RemoteAccessException exp) {
-                        BgcPlugin.openRemoteAccessErrorMessage(exp);
-                        Display.getDefault().syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                setDirty(true);
-                            }
-                        });
-                        monitor.setCanceled(true);
-                    } catch (final AccessDeniedException ade) {
-                        BgcPlugin.openAccessDeniedErrorMessage(ade);
-                        Display.getDefault().syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                setDirty(true);
-                            }
-                        });
-                        monitor.setCanceled(true);
-                    } catch (BiobankException bce) {
-                        Display.getDefault().syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                setDirty(true);
-                            }
-                        });
-                        monitor.setCanceled(true);
-                        BgcPlugin.openAsyncError(
-                            Messages.BiobankEntryForm_save_error_title, bce);
-                    } catch (BiobankServerException bse) {
-                        Display.getDefault().syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                setDirty(true);
-                            }
-                        });
-                        monitor.setCanceled(true);
-                        BgcPlugin.openAsyncError(
-                            Messages.BiobankEntryForm_save_error_title, bse);
-                    } catch (Exception e) {
-                        Display.getDefault().syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                setDirty(true);
-                            }
-                        });
-                        throw new RuntimeException(e);
+                    } catch (Exception ex) {
+                        saveErrorCatch(ex, monitor, true);
                     }
                 }
             });
@@ -224,6 +165,17 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
             setDirty(true);
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    protected void cancelSave(IProgressMonitor monitor) {
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                setDirty(true);
+            }
+        });
+        super.cancelSave(monitor);
     }
 
     /**
@@ -522,16 +474,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     }
 
     protected abstract void onReset() throws Exception;
-
-    protected ModelWrapper<?> getModelObject() throws Exception {
-        ModelWrapper<?> modelObject = adapter.getModelObject();
-
-        if (!modelObject.isNew()) {
-            modelObject = modelObject.getDatabaseClone();
-        }
-
-        return modelObject;
-    }
 
     /**
      * Return the ID of the form that should be opened after the save action is

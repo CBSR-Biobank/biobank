@@ -19,13 +19,9 @@ public class StudyAdapter extends AdapterBase {
         setEditable(parent instanceof StudyMasterGroup || parent == null);
     }
 
-    public StudyWrapper getWrapper() {
-        return (StudyWrapper) modelObject;
-    }
-
     @Override
     protected String getLabelInternal() {
-        StudyWrapper study = getWrapper();
+        StudyWrapper study = (StudyWrapper) getModelObject();
         return study.getNameShort();
     }
 

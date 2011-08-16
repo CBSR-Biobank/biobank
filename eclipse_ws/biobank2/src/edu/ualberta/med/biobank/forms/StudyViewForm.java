@@ -27,7 +27,6 @@ public class StudyViewForm extends BiobankViewForm {
 
     private static final String DATE_PROCESSED_INFO_FIELD_NAME = Messages.study_visit_info_dateProcessed;
 
-    private StudyAdapter studyAdapter;
     private StudyWrapper study;
 
     private BgcBaseText nameLabel;
@@ -53,11 +52,7 @@ public class StudyViewForm extends BiobankViewForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        studyAdapter = (StudyAdapter) adapter;
-        study = studyAdapter.getWrapper();
-        // retrieve info from database because study could have been modified
-        // after first opening
-        study.reload();
+        study = (StudyWrapper) getModelObject();
         setPartName(NLS
             .bind(Messages.StudyViewForm_title, study.getNameShort()));
         pvCustomInfoList = new ArrayList<StudyPvCustomInfo>();

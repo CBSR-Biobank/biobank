@@ -17,15 +17,15 @@ public class SpecimenListViewForm extends BiobankViewForm {
 
     private SpecimenInfoTable specimensWidget;
 
-    private List<SpecimenWrapper> speicmens;
+    private List<SpecimenWrapper> specimens;
 
     @SuppressWarnings("unchecked")
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter == null, "adapter should be null"); //$NON-NLS-1$
         FormInput input = (FormInput) getEditorInput();
-        speicmens = (List<SpecimenWrapper>) input.getAdapter(ArrayList.class);
-        Assert.isNotNull(speicmens, "specimens are null"); //$NON-NLS-1$
+        specimens = (List<SpecimenWrapper>) input.getAdapter(ArrayList.class);
+        Assert.isNotNull(specimens, "specimens are null"); //$NON-NLS-1$
         setPartName(Messages.SpecimenListViewForm_title);
     }
 
@@ -36,7 +36,7 @@ public class SpecimenListViewForm extends BiobankViewForm {
         form.setImage(BiobankPlugin.getDefault().getImage(
             BgcPlugin.IMG_SPECIMEN));
 
-        specimensWidget = new SpecimenInfoTable(page, speicmens,
+        specimensWidget = new SpecimenInfoTable(page, specimens,
             SpecimenInfoTable.ColumnsShown.ALL, 20);
         specimensWidget.adaptToToolkit(toolkit, true);
         specimensWidget.addClickListener(collectionDoubleClickListener);

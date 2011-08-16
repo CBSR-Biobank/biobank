@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.dialogs.dispatch;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -22,9 +23,12 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> {
 
+    private List<SpecimenWrapper> dispatchSpecimens;
+
     public RequestReceiveScanDialog(Shell parentShell,
         final RequestWrapper currentShipment, CenterWrapper<?> centerWrapper) {
         super(parentShell, currentShipment, centerWrapper);
+        dispatchSpecimens = new ArrayList<SpecimenWrapper>();
     }
 
     @Override
@@ -49,7 +53,7 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
     @Override
     protected void receiveSpecimens(List<SpecimenWrapper> specimens) {
         try {
-            currentShipment.receiveSpecimens(specimens);
+            dispatchSpecimens.addAll(specimens);
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
                 Messages.RequestReceiveScanDialog_receiveError_title, e);
@@ -81,6 +85,10 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
             }
         }
         return palletScanned;
+    }
+
+    public List<SpecimenWrapper> getSpecimens() {
+        return dispatchSpecimens;
     }
 
 }

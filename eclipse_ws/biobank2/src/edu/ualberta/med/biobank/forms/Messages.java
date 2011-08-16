@@ -5,6 +5,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.forms.messages"; //$NON-NLS-1$
 
+    public static String LoggingForm_date_label;
+
     public static String AbstractDispatchEntryForm_add_spec_label;
 
     public static String AbstractDispatchEntryForm_scanDialog_label;
@@ -31,8 +33,6 @@ public class Messages extends NLS {
 
     public static String AddressEntryFormCommon_postalCode_label;
 
-    public static String AddressEntryFormCommon_postalCode_validation_msg;
-
     public static String AddressEntryFormCommon_province_label;
 
     public static String AddressEntryFormCommon_street1_label;
@@ -43,7 +43,7 @@ public class Messages extends NLS {
 
     public static String BiobankEntryForm_access_denied_error_msg;
 
-    public static String BiobankEntryForm_save_error_title;
+    public static String BiobankFormBase_save_error_title;
 
     public static String BiobankEntryForm_saving;
 
@@ -490,6 +490,10 @@ public class Messages extends NLS {
 
     public static String DispatchViewForm_waybill_label;
 
+    public static String LoggingForm_0;
+
+    public static String LoggingForm_1;
+
     public static String LoggingForm_action_label;
 
     public static String LoggingForm_center_label;
@@ -809,22 +813,18 @@ public class Messages extends NLS {
 
     public static String RequestEntryForm_title;
 
-    public static String ResearchGroup_field_label_sendsShipments;
-    public static String ResearchGroup_contact_title;
-    public static String ResearchGroupViewForm_csvFile_label;
+    public static String ResearchGroupViewForm_0;
+
+    public static String ResearchGroupViewForm_1;
 
     public static String ResearchGroupViewForm_error_title;
 
     public static String ResearchGroupViewForm_title;
-    public static String ResearchGroupViewForm_field_label_totalPatients;
-    public static String ResearchGroupViewForm_field_label_totalCollectionEvents;
 
     public static String ResearchGroupViewForm_parse_error_msg;
-    public static String ResearchGroupViewForm_request_description;
 
     public static String ResearchGroupViewForm_request_upload_title;
 
-    public static String ResearchGroupViewForm_studies_title;
     public static String ResearchGroupViewForm_success_msg;
 
     public static String ResearchGroupViewForm_success_title;
@@ -840,7 +840,6 @@ public class Messages extends NLS {
     public static String ResearchGroupEntryForm_main_title;
     public static String ResearchGroupEntryForm_main_description;
     public static String ResearchGroupEntryForm_activity_validator_msg;
-    public static String ResearchGroupEntryForm_contact_button_add;
     public static String ResearchGroupEntryForm_study_label;
 
     public static String ResearchGroupEntryForm_study_validator_msg;

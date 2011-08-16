@@ -30,13 +30,9 @@ public class CollectionEventAdapter extends AdapterBase {
         setEditable(parent instanceof PatientAdapter || parent == null);
     }
 
-    public CollectionEventWrapper getWrapper() {
-        return (CollectionEventWrapper) modelObject;
-    }
-
     @Override
     protected String getLabelInternal() {
-        CollectionEventWrapper cevent = getWrapper();
+        CollectionEventWrapper cevent = (CollectionEventWrapper) getModelObject();
         Assert.isNotNull(cevent, "collection event is null"); //$NON-NLS-1$
         long count = -1;
         try {
@@ -55,11 +51,12 @@ public class CollectionEventAdapter extends AdapterBase {
     @Override
     public String getTooltipText() {
         String tabName = null;
-        if (modelObject != null)
-            if (modelObject.isNew()) {
+        CollectionEventWrapper cEvent = (CollectionEventWrapper) getModelObject();
+        if (cEvent != null)
+            if (cEvent.isNew()) {
                 tabName = Messages.CollectionEventEntryForm_title_new;
                 try {
-                    ((CollectionEventWrapper) modelObject)
+                    cEvent
                         .setActivityStatus(ActivityStatusWrapper
                             .getActiveActivityStatus(SessionManager
                                 .getAppService()));
@@ -71,7 +68,7 @@ public class CollectionEventAdapter extends AdapterBase {
             } else {
                 tabName = NLS.bind(
                     Messages.CollectionEventEntryForm_title_edit,
-                    ((CollectionEventWrapper) modelObject).getVisitNumber());
+                    cEvent.getVisitNumber());
             }
         return tabName;
     }

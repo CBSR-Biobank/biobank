@@ -26,10 +26,6 @@ public class ProcessingEventAdapter extends AdapterBase {
         super(parent, pEvent);
     }
 
-    public ProcessingEventWrapper getWrapper() {
-        return (ProcessingEventWrapper) modelObject;
-    }
-
     @Override
     public void executeDoubleClick() {
         performExpand();
@@ -38,7 +34,7 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        ProcessingEventWrapper pevent = getWrapper();
+        ProcessingEventWrapper pevent = (ProcessingEventWrapper) getModelObject();
         Assert.isNotNull(pevent, "processing event is null"); //$NON-NLS-1$
         String worksheet = pevent.getWorksheet();
         String name = pevent.getFormattedCreatedAt()
@@ -55,10 +51,11 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        if (getWrapper() == null)
+        ProcessingEventWrapper pevent = (ProcessingEventWrapper) getModelObject();
+        if (pevent == null)
             return Messages.ProvessingEventAdapter_tooltiptext;
         return NLS.bind(Messages.ProvessingEventAdapter_tooltiptext_withdate,
-            getWrapper().getFormattedCreatedAt());
+            pevent.getFormattedCreatedAt());
     }
 
     @Override
