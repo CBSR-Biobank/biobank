@@ -16,6 +16,8 @@ public class ModelClass {
 
     private Map<String, ClassAssociation> assocMap;
 
+    private boolean isParentClass;
+
     public ModelClass(String name) {
         this.name = name;
         extendsClass = null;
@@ -61,6 +63,14 @@ public class ModelClass {
 
     public void addAssoc(String assocName, ClassAssociation assoc) {
         assocMap.put(assocName, assoc);
+    }
+
+    public void setIsParentClass(boolean isParentClass) {
+        this.isParentClass = isParentClass;
+    }
+
+    public boolean getIsParentClass() {
+        return isParentClass;
     }
 
 }

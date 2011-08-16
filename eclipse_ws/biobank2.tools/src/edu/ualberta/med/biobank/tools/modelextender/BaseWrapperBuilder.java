@@ -387,14 +387,15 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
-        // fix warnings
-        if (mc.getName().equals("ShippingMethod")) {
-            result
-                .append("   @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
+        String genericString = "";
+        if (assoc.getToClass().getIsParentClass()) {
+            // fix warnings for generics
+            result.append("   ").append(SUPPRESS_WARNING_UNCHECKED)
+                .append("\n");
+            genericString = "<?>";
         }
-
         result.append("   public List<").append(assocClassName)
-            .append("Wrapper> get")
+            .append("Wrapper").append(genericString).append("> get")
             .append(CamelCase.toCamelCase(assocName, true))
             .append("(boolean sort) {\n")
             .append("      return getWrapperCollection(").append(mc.getName())
@@ -425,15 +426,16 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
-        // fix warnings
-        if (mc.getName().equals("ShippingMethod")) {
-            result
-                .append("   @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
+        String collectionExtends = "";
+        String genericString = "";
+        if (assoc.getToClass().getIsParentClass()) {
+            collectionExtends = "? extends ";
+            genericString = "<?>";
         }
-
         result.append("   public void addTo")
             .append(CamelCase.toCamelCase(assocName, true)).append("(List<")
-            .append(assocClassName).append("Wrapper> ").append(assocName)
+            .append(collectionExtends).append(assocClassName).append("Wrapper")
+            .append(genericString).append("> ").append(assocName)
             .append(") {\n").append("      addToWrapperCollection(")
             .append(mc.getName()).append("Peer.")
             .append(CamelCase.toTitleCase(assocName)).append(", ")
@@ -462,15 +464,16 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
-        // fix warnings
-        if (mc.getName().equals("ShippingMethod")) {
-            result
-                .append("   @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
+        String collectionExtends = "";
+        String genericString = "";
+        if (assoc.getToClass().getIsParentClass()) {
+            collectionExtends = "? extends ";
+            genericString = "<?>";
         }
-
         result.append("   public void removeFrom")
             .append(CamelCase.toCamelCase(assocName, true)).append("(List<")
-            .append(assocClassName).append("Wrapper> ").append(assocName)
+            .append(collectionExtends).append(assocClassName).append("Wrapper")
+            .append(genericString).append("> ").append(assocName)
             .append(") {\n").append("      removeFromWrapperCollection(")
             .append(mc.getName()).append("Peer.")
             .append(CamelCase.toTitleCase(assocName)).append(", ")
@@ -499,16 +502,17 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
-        // fix warnings
-        if (mc.getName().equals("ShippingMethod")) {
-            result
-                .append("   @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
+        String collectionExtends = "";
+        String genericString = "";
+        if (assoc.getToClass().getIsParentClass()) {
+            collectionExtends = "? extends ";
+            genericString = "<?>";
         }
-
         result.append("   public void removeFrom")
             .append(CamelCase.toCamelCase(assocName, true))
-            .append("WithCheck(List<").append(assocClassName)
-            .append("Wrapper> ").append(assocName)
+            .append("WithCheck(List<").append(collectionExtends)
+            .append(assocClassName).append("Wrapper").append(genericString)
+            .append("> ").append(assocName)
             .append(") throws BiobankCheckException {\n")
             .append("      removeFromWrapperCollectionWithCheck(")
             .append(mc.getName()).append("Peer.")

@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.model.Site;
@@ -17,6 +18,7 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankSecurityUtil;
 import edu.ualberta.med.biobank.test.AllTests;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.GroupHelper;
+import edu.ualberta.med.biobank.test.internal.MembershipHelper;
 import edu.ualberta.med.biobank.test.internal.RoleHelper;
 import edu.ualberta.med.biobank.test.internal.UserHelper;
 import gov.nih.nci.security.SecurityServiceProvider;
@@ -144,17 +146,15 @@ public class TestUser extends TestDatabase {
 
         RoleWrapper role = RoleHelper.addRole(name, true);
 
-        // MembershipWrapper mw = MembershipHelper.newMembership(user, null,
-        // null);
-        // mw.addToMembershipObjectCollection(Arrays.asList(role));
-        // user.persist();
-        //
-        // user.reload();
-        // Assert.assertEquals(1, user.getMembershipCollection(false).size());
-        // mw = user.getMembershipCollection(false).get(0);
-        // Assert.assertEquals(1,
-        // mw.getMembershipObjectCollection(false).size());
-        // Assert.assertEquals(RoleWrapper.class, mw
-        // .getMembershipObjectCollection(false).get(0).getClass());
+        MembershipWrapper mw = MembershipHelper.newMembership(user, null, null);
+        mw.addToMembershipObjectCollection(Arrays.asList(role));
+        user.persist();
+
+        user.reload();
+        Assert.assertEquals(1, user.getMembershipCollection(false).size());
+        mw = user.getMembershipCollection(false).get(0);
+        Assert.assertEquals(1, mw.getMembershipObjectCollection(false).size());
+        Assert.assertEquals(RoleWrapper.class, mw
+            .getMembershipObjectCollection(false).get(0).getClass());
     }
 }
