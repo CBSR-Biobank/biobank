@@ -8,12 +8,16 @@ import org.acegisecurity.AccessDeniedException;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankSecurityUtil;
 import edu.ualberta.med.biobank.test.AllTests;
 import edu.ualberta.med.biobank.test.TestDatabase;
+import edu.ualberta.med.biobank.test.internal.GroupHelper;
+import edu.ualberta.med.biobank.test.internal.RoleHelper;
 import edu.ualberta.med.biobank.test.internal.UserHelper;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
@@ -100,4 +104,57 @@ public class TestUser extends TestDatabase {
             Arrays.asList("getPassword", "getCsmUserId"));
     }
 
+    @Test
+    public void deleteWhenHasGroupRelation() throws Exception {
+        String name = "deleteWhenHasGroupRelation" + r.nextInt();
+        UserWrapper user1 = UserHelper.addUser(name + "_1", null, false);
+        UserWrapper user2 = UserHelper.addUser(name + "_2", null, true);
+
+        BbGroupWrapper group = GroupHelper.addGroup(name, true);
+        group.addToUserCollection(Arrays.asList(user1, user2));
+        group.persist();
+        user1.reload();
+        user2.reload();
+
+        Assert.assertEquals(2, group.getUserCollection(false).size());
+
+        // deletedependencies should remove the relation in the correlation
+        // table
+        user1.delete();
+
+        group.reload();
+        Assert.assertEquals(1, group.getUserCollection(false).size());
+    }
+
+    @Test
+    public void addMembershipsWithNoObject() throws Exception {
+        String name = "addMembershipsWithNoObject" + r.nextInt();
+        UserWrapper user = UserHelper.addUser(name, null, true);
+
+        UserHelper.addMembership(user, null, null);
+
+        user.reload();
+        Assert.assertEquals(1, user.getMembershipCollection(false).size());
+    }
+
+    @Test
+    public void addMembershipsWithRole() throws Exception {
+        String name = "addMembershipsWithRole" + r.nextInt();
+        UserWrapper user = UserHelper.addUser(name, null, true);
+
+        RoleWrapper role = RoleHelper.addRole(name, true);
+
+        // MembershipWrapper mw = MembershipHelper.newMembership(user, null,
+        // null);
+        // mw.addToMembershipObjectCollection(Arrays.asList(role));
+        // user.persist();
+        //
+        // user.reload();
+        // Assert.assertEquals(1, user.getMembershipCollection(false).size());
+        // mw = user.getMembershipCollection(false).get(0);
+        // Assert.assertEquals(1,
+        // mw.getMembershipObjectCollection(false).size());
+        // Assert.assertEquals(RoleWrapper.class, mw
+        // .getMembershipObjectCollection(false).get(0).getClass());
+    }
 }

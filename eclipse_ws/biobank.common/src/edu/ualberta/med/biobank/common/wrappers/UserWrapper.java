@@ -1,5 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.Arrays;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.base.UserBaseWrapper;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -57,5 +61,39 @@ public class UserWrapper extends UserBaseWrapper {
     protected void resetInternalFields() {
         super.resetInternalFields();
         password = null;
+    }
+
+    /**
+     * Should use group.addToUserCollection
+     */
+    @Override
+    @Deprecated
+    public void addToGroupCollection(List<BbGroupWrapper> groupCollection) {
+    }
+
+    /**
+     * Should use group.removeFromUserCollection
+     */
+    @Override
+    @Deprecated
+    public void removeFromGroupCollection(List<BbGroupWrapper> groupCollection) {
+    }
+
+    /**
+     * Should use group.removeFromUserCollectionWithCheck
+     */
+    @Override
+    @Deprecated
+    public void removeFromGroupCollectionWithCheck(
+        List<BbGroupWrapper> groupCollection) throws BiobankCheckException {
+    }
+
+    @Override
+    public void deleteDependencies() throws Exception {
+        // should remove this user from its groups
+        for (BbGroupWrapper group : getGroupCollection(false)) {
+            group.removeFromUserCollection(Arrays.asList(this));
+            group.persist();
+        }
     }
 }

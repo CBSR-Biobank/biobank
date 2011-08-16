@@ -5,7 +5,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 
-public class UserHelper extends DbHelper {
+public class UserHelper extends PrincipalHelper {
 
     public static List<UserWrapper> createdUsers = new ArrayList<UserWrapper>();
 

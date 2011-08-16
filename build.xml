@@ -539,7 +539,9 @@
       <transaction src="${data.sql.dir}/shippingMethod.sql" />
       <transaction src="${data.sql.dir}/patientLabels.sql" />
       <transaction src="${data.sql.dir}/advancedReportsData.sql" />
-      <transaction src="${secu-log.dir}/schemaSecurity.sql" />
+      <transaction src="${data.sql.dir}/privileges.sql" />
+    	<transaction src="${data.sql.dir}/rights.sql" />
+      <transaction src="${secu-log.dir}/schemaSecurity.sql" />    	
       <transaction>commit;</transaction>
       <classpath>
         <fileset dir="${cacore.sdk.dir}/system/lib">
