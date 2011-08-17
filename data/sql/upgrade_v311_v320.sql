@@ -213,8 +213,13 @@ CREATE TABLE `user` (
 -- convert users from csm to users from biobank:
 insert into principal (id, version)  
 select user_id, 0 from csm_user;
-insert into user (principal_id, login, csm_user_id, bulk_emails, first_name, last_name, email, need_change_pwd) 
-select user_id, login_name, user_id, 1, first_name, last_name, email_id, 0 from csm_user;
+
+insert into user (principal_id, login, csm_user_id, bulk_emails, first_name, last_name, email, need_change_pwd, is_super_admin) 
+select user_id, login_name, user_id, 1, first_name, last_name, email_id, 0, 0 from csm_user;
+-- group_id = 5 is 'Super Admin Group'
+update user as u, csm_user_group as ug
+set u.is_super_admin = 1
+where ug.group_id = 5 and ug.user_id = u.csm_user_id;
 
 -- give access to all object to all users:
 insert into csm_user_group_role_pg (user_id, role_id, protection_group_id, update_date)
@@ -234,7 +239,7 @@ delete from csm_protection_element where object_id = 'edu.ualberta.med.biobank.m
 
 -- delete old csm_role
 delete from csm_role where role_id = 7;
-delete from csm_role where role_id = 8;
+delete from csm_role where role_id = 9;
 
 
 
