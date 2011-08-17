@@ -7,6 +7,7 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -116,6 +117,15 @@ public class DbHelper {
             clinic.reload();
             deleteFromList(clinic.getOriginInfoCollection(false));
             clinic.delete();
+        }
+    }
+
+    public static void deleteResearchGroups(
+        List<ResearchGroupWrapper> researchGroups) throws Exception {
+        Assert.assertNotNull("appService is null", appService);
+        for (ResearchGroupWrapper rg : researchGroups) {
+            rg.reload();
+            rg.delete();
         }
     }
 

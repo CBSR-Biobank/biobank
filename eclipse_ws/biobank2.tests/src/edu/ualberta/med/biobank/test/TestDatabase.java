@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.StringValueLengthServerException;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
+import edu.ualberta.med.biobank.test.internal.ResearchGroupHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentInfoHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -61,11 +62,13 @@ public class TestDatabase {
         try {
             DispatchHelper.deleteCreatedDispatches();
             SiteHelper.deleteCreatedSites();
+            ResearchGroupHelper.deleteCreatedResearchGroups();
             StudyHelper.deleteCreatedStudies();
             ShipmentInfoHelper.deleteCreatedShipInfos();
             ClinicHelper.deleteCreatedClinics();
             SpecimenTypeHelper.deleteCreatedSpecimenTypes();
             ShippingMethodHelper.deleteCreateShippingMethods();
+
         } catch (Exception e) {
             e.printStackTrace(System.err);
             Assert.fail();

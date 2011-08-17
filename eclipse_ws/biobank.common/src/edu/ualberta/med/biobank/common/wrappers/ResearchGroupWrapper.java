@@ -88,8 +88,17 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
 
     @Override
     public Long getPatientCount() throws Exception {
-        // TODO Auto-generated method stub
-        return null;
+        return (long) 0;
+    }
+
+    @Override
+    public int compareTo(ModelWrapper<ResearchGroup> wrapper) {
+        if (wrapper instanceof ResearchGroupWrapper) {
+            String myName = wrappedObject.getName();
+            String wrapperName = wrapper.wrappedObject.getName();
+            return myName.compareTo(wrapperName);
+        }
+        return 0;
     }
 
 }
