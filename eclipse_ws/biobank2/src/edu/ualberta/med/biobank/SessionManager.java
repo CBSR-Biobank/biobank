@@ -246,31 +246,31 @@ public class SessionManager {
     @Deprecated
     public static boolean canCreate(Class<?> clazz) {
         // return getUser().hasPrivilegeOnObject(Privilege.CREATE, clazz);
-        return false;
+        return true;
     }
 
     @Deprecated
     public static boolean canDelete(Class<?> clazz) {
         // return getUser().hasPrivilegeOnObject(Privilege.DELETE, clazz);
-        return false;
+        return true;
     }
 
     @Deprecated
     public static boolean canDelete(ModelWrapper<?> wrapper) {
         // return wrapper.canDelete(getUser());
-        return false;
+        return true;
     }
 
     @Deprecated
     public static boolean canView(Class<?> clazz) {
         // return getUser().hasPrivilegeOnObject(Privilege.READ, clazz);
-        return false;
+        return true;
     }
 
     @Deprecated
     public static boolean canUpdate(Class<?> clazz) {
         // return getUser().hasPrivilegeOnObject(Privilege.UPDATE, clazz);
-        return false;
+        return true;
     }
 
     public boolean isConnected() {
