@@ -197,6 +197,7 @@ INSERT INTO `csm_pg_pe` VALUES (1480,1,198,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (1481,1,171,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (1482,1,4,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (1483,1,202,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1484,1,207,'0000-00-00');
 /*!40000 ALTER TABLE `csm_pg_pe` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -316,11 +317,12 @@ INSERT INTO `csm_protection_element` VALUES (198,'edu.ualberta.med.biobank.model
 INSERT INTO `csm_protection_element` VALUES (199,'edu.ualberta.med.biobank.model.BbGroup','','edu.ualberta.med.biobank.model.BbGroup','','','',2,'2011-08-15');
 INSERT INTO `csm_protection_element` VALUES (200,'edu.ualberta.med.biobank.model.Principal','','edu.ualberta.med.biobank.model.Principal','','','',2,'2011-08-15');
 INSERT INTO `csm_protection_element` VALUES (201,'edu.ualberta.med.biobank.model.Membership','','edu.ualberta.med.biobank.model.Membership','','','',2,'2011-08-15');
-INSERT INTO `csm_protection_element` VALUES (202,'edu.ualberta.med.biobank.model.MembershipObject','','edu.ualberta.med.biobank.model.MembershipObject','','','',2,'2011-08-15');
-INSERT INTO `csm_protection_element` VALUES (203,'edu.ualberta.med.biobank.model.RightPrivilege','','edu.ualberta.med.biobank.model.RightPrivilege','','','',2,'2011-08-15');
-INSERT INTO `csm_protection_element` VALUES (204,'edu.ualberta.med.biobank.model.BbRight','','edu.ualberta.med.biobank.model.BbRight','','','',2,'2011-08-15');
-INSERT INTO `csm_protection_element` VALUES (205,'edu.ualberta.med.biobank.model.Privilege','','edu.ualberta.med.biobank.model.Privilege','','','',2,'2011-08-15');
-INSERT INTO `csm_protection_element` VALUES (206,'edu.ualberta.med.biobank.model.Role','','edu.ualberta.med.biobank.model.Role','','','',2,'2011-08-15');
+INSERT INTO `csm_protection_element` VALUES (202,'edu.ualberta.med.biobank.model.MembershipRole','','edu.ualberta.med.biobank.model.MembershipRole','','','',2,'2011-08-15');
+INSERT INTO `csm_protection_element` VALUES (203,'edu.ualberta.med.biobank.model.MembershipRight','','edu.ualberta.med.biobank.model.MembershipRight','','','',2,'2011-08-15');
+INSERT INTO `csm_protection_element` VALUES (204,'edu.ualberta.med.biobank.model.RightPrivilege','','edu.ualberta.med.biobank.model.RightPrivilege','','','',2,'2011-08-15');
+INSERT INTO `csm_protection_element` VALUES (205,'edu.ualberta.med.biobank.model.BbRight','','edu.ualberta.med.biobank.model.BbRight','','','',2,'2011-08-15');
+INSERT INTO `csm_protection_element` VALUES (206,'edu.ualberta.med.biobank.model.Privilege','','edu.ualberta.med.biobank.model.Privilege','','','',2,'2011-08-15');
+INSERT INTO `csm_protection_element` VALUES (207,'edu.ualberta.med.biobank.model.Role','','edu.ualberta.med.biobank.model.Role','','','',2,'2011-08-15');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
 

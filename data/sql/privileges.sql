@@ -4,6 +4,5 @@ INSERT INTO `PRIVILEGE` (ID, VERSION, NAME) VALUES
 ( 2, 0, 'update'),
 ( 3, 0, 'delete'),
 ( 4, 0, 'create');
-
 UNLOCK TABLES;
 

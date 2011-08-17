@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.MembershipRoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
@@ -133,7 +134,7 @@ public class TestUser extends TestDatabase {
         String name = "addMembershipsWithNoObject" + r.nextInt();
         UserWrapper user = UserHelper.addUser(name, null, true);
 
-        UserHelper.addMembership(user, null, null);
+        UserHelper.addMembershipRole(user, null, null);
 
         user.reload();
         Assert.assertEquals(1, user.getMembershipCollection(false).size());
@@ -146,15 +147,16 @@ public class TestUser extends TestDatabase {
 
         RoleWrapper role = RoleHelper.addRole(name, true);
 
-        MembershipWrapper mw = MembershipHelper.newMembership(user, null, null);
-        mw.addToMembershipObjectCollection(Arrays.asList(role));
+        MembershipRoleWrapper mwr = MembershipHelper.newMembershipRole(user,
+            null, null);
+        mwr.addToRoleCollection(Arrays.asList(role));
         user.persist();
 
         user.reload();
         Assert.assertEquals(1, user.getMembershipCollection(false).size());
-        mw = user.getMembershipCollection(false).get(0);
-        Assert.assertEquals(1, mw.getMembershipObjectCollection(false).size());
-        Assert.assertEquals(RoleWrapper.class, mw
-            .getMembershipObjectCollection(false).get(0).getClass());
+        MembershipWrapper<?> mw = user.getMembershipCollection(false).get(0);
+        Assert.assertTrue(mw instanceof MembershipRoleWrapper);
+        Assert.assertEquals(1,
+            ((MembershipRoleWrapper) mw).getRoleCollection(false).size());
     }
 }
