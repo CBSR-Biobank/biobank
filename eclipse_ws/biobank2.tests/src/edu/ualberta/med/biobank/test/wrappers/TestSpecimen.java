@@ -654,9 +654,11 @@ public class TestSpecimen extends TestDatabase {
                 appService, site.getId()).size() > 0);
             Assert.assertTrue(DebugUtil.getRandomAssignedSpecimens(appService,
                 site.getId()).size() > 0);
-            Assert.assertTrue(DebugUtil
+            List<SpecimenWrapper> randomNonAssociatedNonDispatchedSpecimens = DebugUtil
                 .getRandomNonAssignedNonDispatchedSpecimens(appService,
-                    site.getId(), 10).size() > 0);
+                    site.getId(), 10);
+            Assert
+                .assertTrue(randomNonAssociatedNonDispatchedSpecimens.size() > 0);
         } catch (Exception e) {
             Assert.fail(e.getCause().getMessage());
         }

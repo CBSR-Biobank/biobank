@@ -95,9 +95,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         if (wrappedObject != null) {
             // TODO: extract into method that unproxies for us so not repeated
             // here and in wrap*Smarter()
-            @SuppressWarnings("unchecked")
-            E unproxiedModel = (E) ProxyUtil
-                .convertProxyToObject(wrappedObject);
+            E unproxiedModel = ProxyUtil.convertProxyToObject(wrappedObject);
 
             modelWrapperMap.put(unproxiedModel, this);
         }
@@ -699,8 +697,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private <W extends ModelWrapper<? extends M>, M> W wrapModelSmarter(
         M model, Class<W> wrapperKlazz) throws Exception {
 
-        @SuppressWarnings("unchecked")
-        M unproxiedModel = (M) ProxyUtil.convertProxyToObject(model);
+        M unproxiedModel = ProxyUtil.convertProxyToObject(model);
 
         // several proxies exist for the exact same model object? okay...
         @SuppressWarnings("unchecked")
@@ -895,6 +892,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private <W extends ModelWrapper<? extends R>, R, M> void setWrappedProperty(
         ModelWrapper<M> modelWrapper, Property<R, ? super M> property, W wrapper) {
         R newValue = (wrapper == null ? null : wrapper.getWrappedObject());
+
+        modelWrapper.elementTracker.trackProperty(property);
+
         setProperty(modelWrapper, property, newValue);
         modelWrapper.cacheProperty(property, wrapper);
     }
@@ -913,7 +913,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             newValues.add(element.getWrappedObject());
         }
 
-        modelWrapper.elementTracker.track(property);
+        modelWrapper.elementTracker.trackCollection(property);
 
         setModelProperty(modelWrapper, property, newValues);
         modelWrapper.cacheProperty(property, wrappers);

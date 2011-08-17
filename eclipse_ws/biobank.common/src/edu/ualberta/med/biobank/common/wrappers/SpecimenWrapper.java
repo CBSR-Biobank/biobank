@@ -504,7 +504,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         tasks.add(check().uniqueAndNotNull(SpecimenPeer.INVENTORY_ID));
         tasks.add(check().notNull(SpecimenPeer.SPECIMEN_TYPE));
 
-        tasks.deleteRemovedUnchecked(this, SpecimenPeer.SPECIMEN_POSITION);
+        tasks.deleteRemovedValue(this, SpecimenPeer.SPECIMEN_POSITION);
 
         super.addPersistTasks(tasks);
 

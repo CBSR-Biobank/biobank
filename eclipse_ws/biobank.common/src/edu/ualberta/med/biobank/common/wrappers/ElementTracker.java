@@ -3,10 +3,8 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Helper class to {@link ModelWrapper} to track the original set of collection
@@ -22,7 +20,8 @@ import java.util.Set;
 // and removed were actually added and removed (as this could be wrong if the
 // underlying model object was modified then given to the wrapper).
 public class ElementTracker<E> {
-    private final Map<Property<? extends Collection<?>, ? super E>, Object> map = new HashMap<Property<? extends Collection<?>, ? super E>, Object>();
+    private final Map<Property<? extends Collection<?>, ? super E>, Object> originalElementsMap = new HashMap<Property<? extends Collection<?>, ? super E>, Object>();
+    private final Map<Property<?, ? super E>, Object> originalValueMap = new HashMap<Property<?, ? super E>, Object>();
     private final ModelWrapper<E> wrapper;
 
     /**
@@ -39,42 +38,40 @@ public class ElementTracker<E> {
      * @param <T>
      * @param property
      */
-    public <T> void track(Property<? extends Collection<T>, ? super E> property) {
-        if (!map.containsKey(property)) {
-            Collection<ModelWrapper<T>> originalValues = getCurrentValues(property);
-            map.put(property, originalValues);
+    public <T> void trackProperty(Property<T, ? super E> property) {
+        if (!originalValueMap.containsKey(property)) {
+            ModelWrapper<T> originalValue = wrapper.getWrappedProperty(
+                property, null);
+            originalValueMap.put(property, originalValue);
         }
     }
 
-    /**
-     * Gets a {@link Set} of all collection {@link Property}-s that were changed
-     * through the associated {@link ModelWrapper}.
-     * 
-     * @param <T>
-     * @param property
-     * @return
-     */
-    public Set<Property<? extends Collection<?>, ? super E>> getProperties() {
-        return new HashSet<Property<? extends Collection<?>, ? super E>>(
-            map.keySet());
+    public <T> ModelWrapper<T> getRemovedValue(Property<T, ? super E> property) {
+        ModelWrapper<T> removedValue = null;
+
+        ModelWrapper<T> oldValue = getOldValue(property);
+        ModelWrapper<T> newValue = getCurrentValue(property);
+
+        if (oldValue != null && !oldValue.equals(newValue)) {
+            removedValue = oldValue;
+        }
+
+        return removedValue;
     }
 
     /**
-     * Gets a list of all {@link ModelWrapper}-ed elements that were added to
-     * the any tracked collection {@link Property}.
+     * This method only does something the first time it is called for any given
+     * property.
      * 
      * @param <T>
      * @param property
-     * @return
      */
-    public Collection<ModelWrapper<?>> getAllAddedElements() {
-        Collection<ModelWrapper<?>> allAddedElements = new ArrayList<ModelWrapper<?>>();
-
-        for (Property<? extends Collection<?>, ? super E> key : map.keySet()) {
-            allAddedElements.addAll(getAddedElements(key));
+    public <T> void trackCollection(
+        Property<? extends Collection<T>, ? super E> property) {
+        if (!originalElementsMap.containsKey(property)) {
+            Collection<ModelWrapper<T>> originalValues = getCurrentElements(property);
+            originalElementsMap.put(property, originalValues);
         }
-
-        return allAddedElements;
     }
 
     /**
@@ -89,9 +86,9 @@ public class ElementTracker<E> {
         Property<? extends Collection<? extends T>, ? super E> property) {
         Collection<ModelWrapper<T>> addedElements = new ArrayList<ModelWrapper<T>>();
 
-        if (map.containsKey(property)) {
-            Collection<ModelWrapper<T>> originalValues = getOriginalValues(property);
-            Collection<ModelWrapper<T>> newValues = getCurrentValues(property);
+        if (originalElementsMap.containsKey(property)) {
+            Collection<ModelWrapper<T>> originalValues = getOriginalElements(property);
+            Collection<ModelWrapper<T>> newValues = getCurrentElements(property);
 
             addedElements.addAll(newValues);
             addedElements.removeAll(originalValues);
@@ -119,9 +116,9 @@ public class ElementTracker<E> {
         Property<? extends Collection<? extends T>, ? super E> property) {
         Collection<ModelWrapper<T>> removedElements = new ArrayList<ModelWrapper<T>>();
 
-        if (map.containsKey(property)) {
-            Collection<ModelWrapper<T>> originalValues = getOriginalValues(property);
-            Collection<ModelWrapper<T>> newValues = getCurrentValues(property);
+        if (originalElementsMap.containsKey(property)) {
+            Collection<ModelWrapper<T>> originalValues = getOriginalElements(property);
+            Collection<ModelWrapper<T>> newValues = getCurrentElements(property);
 
             removedElements.addAll(originalValues);
             removedElements.removeAll(newValues);
@@ -141,10 +138,31 @@ public class ElementTracker<E> {
      * Clears the tracked collection {@link Property} list.
      */
     public void clear() {
-        map.clear();
+        originalElementsMap.clear();
+        originalValueMap.clear();
     }
 
-    private <T> Collection<ModelWrapper<T>> getCurrentValues(
+    private <T> ModelWrapper<T> getCurrentValue(Property<T, ? super E> property) {
+        @SuppressWarnings("unchecked")
+        ModelWrapper<T> currentValue = (ModelWrapper<T>) wrapper
+            .getWrappedProperty(property, null);
+        return currentValue;
+    }
+
+    private <T> ModelWrapper<T> getOldValue(Property<T, ? super E> property) {
+        ModelWrapper<T> oldValue = null;
+
+        if (originalValueMap.containsKey(property)) {
+            @SuppressWarnings("unchecked")
+            ModelWrapper<T> tmp = (ModelWrapper<T>) originalValueMap
+                .get(property);
+            oldValue = tmp;
+        }
+
+        return oldValue;
+    }
+
+    private <T> Collection<ModelWrapper<T>> getCurrentElements(
         Property<? extends Collection<? extends T>, ? super E> property) {
         Collection<ModelWrapper<T>> current = new ArrayList<ModelWrapper<T>>();
 
@@ -155,13 +173,13 @@ public class ElementTracker<E> {
         return current;
     }
 
-    private <T> Collection<ModelWrapper<T>> getOriginalValues(
+    private <T> Collection<ModelWrapper<T>> getOriginalElements(
         Property<? extends Collection<? extends T>, ? super E> property) {
         Collection<ModelWrapper<T>> original = new ArrayList<ModelWrapper<T>>();
 
-        if (map.containsKey(property)) {
+        if (originalElementsMap.containsKey(property)) {
             @SuppressWarnings("unchecked")
-            Collection<ModelWrapper<T>> tmp = (Collection<ModelWrapper<T>>) map
+            Collection<ModelWrapper<T>> tmp = (Collection<ModelWrapper<T>>) originalElementsMap
                 .get(property);
             original.addAll(tmp);
         }
