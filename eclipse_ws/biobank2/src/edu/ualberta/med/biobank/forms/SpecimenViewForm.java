@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
@@ -24,12 +23,7 @@ import edu.ualberta.med.biobank.widgets.infotables.DispatchInfoTable;
 
 public class SpecimenViewForm extends BiobankViewForm {
 
-    private static BgcLogger logger = BgcLogger
-        .getLogger(SpecimenViewForm.class.getName());
-
     public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenViewForm"; //$NON-NLS-1$
-
-    private SpecimenAdapter specimenAdapter;
 
     private SpecimenWrapper specimen;
 
@@ -73,20 +67,10 @@ public class SpecimenViewForm extends BiobankViewForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        specimenAdapter = (SpecimenAdapter) adapter;
-        specimen = specimenAdapter.getSpecimen();
-        retrieveSpecimen();
+        specimen = (SpecimenWrapper) getModelObject();
         SessionManager.logLookup(specimen);
         setPartName(NLS.bind(Messages.SpecimenViewForm_title,
             specimen.getInventoryId()));
-    }
-
-    private void retrieveSpecimen() {
-        try {
-            specimen.reload();
-        } catch (Exception e) {
-            logger.error("Can't reload specimen with id " + specimen.getId()); //$NON-NLS-1$
-        }
     }
 
     @Override
@@ -238,16 +222,18 @@ public class SpecimenViewForm extends BiobankViewForm {
                 new StringBuilder(topPevent.getFormattedCreatedAt())
                     .append(" (") //$NON-NLS-1$
                     .append(
-                        NLS.bind(Messages.SpecimenViewForm_worksheet_string, topPevent.getWorksheet()))
-                    .append(")").toString()); //$NON-NLS-1$
+                        NLS.bind(Messages.SpecimenViewForm_worksheet_string,
+                            topPevent.getWorksheet())).append(")").toString()); //$NON-NLS-1$
         }
 
         ProcessingEventWrapper pevent = specimen.getProcessingEvent();
         if (pevent != null) {
-            setTextValue(peventLabel,
+            setTextValue(
+                peventLabel,
                 new StringBuilder(pevent.getFormattedCreatedAt()).append(" (") //$NON-NLS-1$
-                    .append(NLS.bind(Messages.SpecimenViewForm_worksheet_string, pevent.getWorksheet()))
-                    .append(")").toString()); //$NON-NLS-1$
+                    .append(
+                        NLS.bind(Messages.SpecimenViewForm_worksheet_string,
+                            pevent.getWorksheet())).append(")").toString()); //$NON-NLS-1$
         }
 
         setTextValue(childrenLabel, specimen.getChildSpecimenCollection(false)
@@ -264,8 +250,8 @@ public class SpecimenViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void reload() {
-        retrieveSpecimen();
+    public void reload() throws Exception {
+        specimen.reload();
         setValues();
         setPartName(NLS.bind(Messages.SpecimenViewForm_title,
             specimen.getInventoryId()));

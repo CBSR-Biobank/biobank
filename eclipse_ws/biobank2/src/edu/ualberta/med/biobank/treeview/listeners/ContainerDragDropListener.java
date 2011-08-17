@@ -38,12 +38,13 @@ public class ContainerDragDropListener implements DropTargetListener,
         if (ts.getFirstElement() instanceof ContainerAdapter) {
             if (ts.size() != 1)
                 BgcPlugin
-                    .openError(Messages.ContainerDragDropListener_move_multiple_error_title,
+                    .openError(
+                        Messages.ContainerDragDropListener_move_multiple_error_title,
                         Messages.ContainerDragDropListener_move_multiple_error_msg);
 
             srcContainerAdapter = (ContainerAdapter) ts.getFirstElement();
             if (srcContainerAdapter != null)
-                return srcContainerAdapter.getContainer();
+                return (ContainerWrapper) srcContainerAdapter.getModelObject();
 
         }
         return null;
@@ -82,7 +83,10 @@ public class ContainerDragDropListener implements DropTargetListener,
                         }
                     }
                 } catch (Exception ex) {
-                    BgcPlugin.openAsyncError(Messages.ContainerDragDropListener_drag_error_title, ex);
+                    BgcPlugin
+                        .openAsyncError(
+                            Messages.ContainerDragDropListener_drag_error_title,
+                            ex);
                 }
             }
         }
@@ -140,7 +144,10 @@ public class ContainerDragDropListener implements DropTargetListener,
 
                     }
                 } catch (Exception ex) {
-                    BgcPlugin.openAsyncError(Messages.ContainerDragDropListener_drop_error_title, ex);
+                    BgcPlugin
+                        .openAsyncError(
+                            Messages.ContainerDragDropListener_drop_error_title,
+                            ex);
                 }
             }
         }

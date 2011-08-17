@@ -108,6 +108,15 @@ public class ReportEntryForm extends BiobankEntryForm {
     private PrintPdfDataExporter printPdfDataExporter;
 
     @Override
+    protected void init() throws Exception {
+        reportAdapter = (ReportAdapter) adapter;
+        report = (ReportWrapper) getModelObject();
+        report.reload();
+
+        updatePartName();
+    }
+
+    @Override
     protected void doAfterSave() {
         AdvancedReportsView.getCurrent().reload();
     }
@@ -145,15 +154,6 @@ public class ReportEntryForm extends BiobankEntryForm {
     @Override
     public String getNextOpenedFormID() {
         return ReportEntryForm.ID;
-    }
-
-    @Override
-    protected void init() throws Exception {
-        reportAdapter = (ReportAdapter) adapter;
-        report = reportAdapter.getWrapper();
-        report.reload();
-
-        updatePartName();
     }
 
     private void updatePartName() {

@@ -20,8 +20,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class PatientViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientViewForm"; //$NON-NLS-1$
 
-    private PatientAdapter patientAdapter;
-
     private PatientWrapper patient;
 
     private BgcBaseText studyLabel;
@@ -42,16 +40,10 @@ public class PatientViewForm extends BiobankViewForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        patientAdapter = (PatientAdapter) adapter;
-        patient = patientAdapter.getWrapper();
-        retrievePatient();
+        patient = (PatientWrapper) getModelObject();
         SessionManager.logLookup(patient);
         setPartName(NLS.bind(Messages.PatientViewForm_title,
             patient.getPnumber()));
-    }
-
-    private void retrievePatient() throws Exception {
-        patient.reload();
     }
 
     @Override
@@ -110,8 +102,8 @@ public class PatientViewForm extends BiobankViewForm {
 
     @Override
     public void reload() throws Exception {
+        patient.reload();
         setValues();
-        retrievePatient();
         setPartName(NLS.bind(Messages.PatientViewForm_title,
             patient.getPnumber()));
         form.setText(NLS.bind(Messages.PatientViewForm_title,

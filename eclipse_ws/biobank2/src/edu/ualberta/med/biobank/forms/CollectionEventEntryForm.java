@@ -282,7 +282,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         PatientAdapter patientAdapter = (PatientAdapter) ceventAdapter
             .getParent();
         if (patientAdapter != null)
-            cevent.setPatient(patientAdapter.getWrapper());
+            cevent.setPatient((PatientWrapper) patientAdapter.getModelObject());
         cevent.addToOriginalSpecimenCollection(specimensTable
             .getAddedOrModifiedSpecimens());
         cevent.removeFromOriginalSpecimenCollection(specimensTable

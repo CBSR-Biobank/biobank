@@ -24,15 +24,11 @@ public class ReportAdapter extends AdapterBase {
         super(parent, report);
     }
 
-    public ReportWrapper getWrapper() {
-        return (ReportWrapper) modelObject;
-    }
-
     @Override
     protected String getLabelInternal() {
         String label = ""; //$NON-NLS-1$
 
-        ReportWrapper report = getWrapper();
+        ReportWrapper report = (ReportWrapper) getModelObject();
         if (report != null && report.getName() != null) {
             label = report.getName();
         }
@@ -62,13 +58,12 @@ public class ReportAdapter extends AdapterBase {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 boolean delete = BgcPlugin.openConfirm(
-                    Messages.ReportAdapter_delete_confirm_title,
-                    NLS.bind(
+                    Messages.ReportAdapter_delete_confirm_title, NLS.bind(
                         Messages.ReportAdapter_delete_confirm_msg,
-                        ((ReportWrapper) modelObject).getName()));
+                        ((ReportWrapper) getModelObject()).getName()));
                 if (delete) {
                     try {
-                        modelObject.delete();
+                        getModelObject().delete();
                         parent.removeChild(ReportAdapter.this);
                         AdvancedReportsView.getCurrent().reload();
                     } catch (Exception e) {
@@ -81,8 +76,9 @@ public class ReportAdapter extends AdapterBase {
     private void copyReport() {
         if (SessionManager.getInstance().isConnected()) {
             ReportWrapper report = new ReportWrapper(
-                (ReportWrapper) modelObject);
-            report.setName(report.getName() + " " + Messages.ReportAdapter_copy_naming); //$NON-NLS-1$
+                (ReportWrapper) getModelObject());
+            report.setName(report.getName()
+                + " " + Messages.ReportAdapter_copy_naming); //$NON-NLS-1$
 
             int userId = SessionManager.getUser().getId().intValue();
             report.setUserId(userId);

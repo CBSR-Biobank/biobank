@@ -104,6 +104,16 @@ public abstract class BiobankFormBase extends BgcFormBase {
         getSite().setSelectionProvider(this);
     }
 
+    protected ModelWrapper<?> getModelObject() throws Exception {
+        ModelWrapper<?> modelObject = adapter.getModelObject();
+
+        if (!modelObject.isNew()) {
+            modelObject = modelObject.getDatabaseClone();
+        }
+
+        return modelObject;
+    }
+
     @Override
     protected void performDoubleClick(DoubleClickEvent event) {
         Object selection = event.getSelection();

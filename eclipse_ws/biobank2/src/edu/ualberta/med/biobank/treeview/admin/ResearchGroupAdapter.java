@@ -20,13 +20,9 @@ public class ResearchGroupAdapter extends AdapterBase {
         super(parent, researchGroupWrapper);
     }
 
-    public ResearchGroupWrapper getWrapper() {
-        return (ResearchGroupWrapper) modelObject;
-    }
-
     @Override
     protected String getLabelInternal() {
-        ResearchGroupWrapper wrapper = getWrapper();
+        ResearchGroupWrapper wrapper = (ResearchGroupWrapper) getModelObject();
         Assert.isNotNull(wrapper, "client is null"); //$NON-NLS-1$
         return wrapper.getNameShort();
     }

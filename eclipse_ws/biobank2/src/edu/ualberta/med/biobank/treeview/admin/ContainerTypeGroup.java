@@ -23,7 +23,8 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public class ContainerTypeGroup extends AdapterBase {
 
     public ContainerTypeGroup(SiteAdapter parent, int id) {
-        super(parent, id, Messages.ContainerTypeGroup_types_node_label, true, true);
+        super(parent, id, Messages.ContainerTypeGroup_types_node_label, true,
+            true);
     }
 
     @Override
@@ -75,7 +76,8 @@ public class ContainerTypeGroup extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        SiteWrapper currentSite = ((SiteAdapter) getParent()).getWrapper();
+        SiteWrapper currentSite = (SiteWrapper) ((SiteAdapter) getParent())
+            .getModelObject();
         Assert.isNotNull(currentSite, "null site"); //$NON-NLS-1$
         currentSite.reload();
         return new ArrayList<ContainerTypeWrapper>(
@@ -96,7 +98,7 @@ public class ContainerTypeGroup extends AdapterBase {
         boolean hasPreviousForm) {
         ContainerTypeWrapper ct = new ContainerTypeWrapper(
             siteAdapter.getAppService());
-        ct.setSite(siteAdapter.getWrapper());
+        ct.setSite((SiteWrapper) siteAdapter.getModelObject());
         ContainerTypeAdapter adapter = new ContainerTypeAdapter(
             siteAdapter.getContainerTypesGroupNode(), ct);
         adapter.openEntryForm(hasPreviousForm);

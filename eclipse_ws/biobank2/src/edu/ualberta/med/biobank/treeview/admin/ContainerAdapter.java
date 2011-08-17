@@ -50,8 +50,8 @@ public class ContainerAdapter extends AdapterBase {
         setHasChildren(true);
     }
 
-    public ContainerWrapper getContainer() {
-        return (ContainerWrapper) modelObject;
+    private ContainerWrapper getContainer() {
+        return (ContainerWrapper) getModelObject();
     }
 
     @Override
@@ -136,10 +136,13 @@ public class ContainerAdapter extends AdapterBase {
                             // newContainer.persist();
                             newContainer.reload();
                             monitor.done();
-                            BgcPlugin.openAsyncInformation(Messages.ContainerAdapter_spec_moved_info_title,
-                                NLS.bind(Messages.ContainerAdapter_spec_moved_info_msg,
-                                    newContainer.getSpecimens().size(),
-                                    newContainer.getFullInfoLabel()));
+                            BgcPlugin
+                                .openAsyncInformation(
+                                    Messages.ContainerAdapter_spec_moved_info_title,
+                                    NLS.bind(
+                                        Messages.ContainerAdapter_spec_moved_info_msg,
+                                        newContainer.getSpecimens().size(),
+                                        newContainer.getFullInfoLabel()));
                         } catch (Exception e) {
                             monitor.setCanceled(true);
                             BgcPlugin.openAsyncError(
@@ -213,8 +216,8 @@ public class ContainerAdapter extends AdapterBase {
         List<ContainerWrapper> newParentContainers = container
             .getPossibleParents(newLabel);
         if (newParentContainers.size() == 0) {
-            BgcPlugin.openError(Messages.ContainerAdapter_move_error_title, NLS
-                .bind(Messages.ContainerAdapter_move_parent_error_msg,
+            BgcPlugin.openError(Messages.ContainerAdapter_move_error_title,
+                NLS.bind(Messages.ContainerAdapter_move_parent_error_msg,
                     newLabel));
             return false;
         }
@@ -235,10 +238,8 @@ public class ContainerAdapter extends AdapterBase {
         ContainerWrapper currentChild = newParent.getChildByLabel(newLabel);
         if (currentChild != null) {
             BgcPlugin
-                .openError(
-                    Messages.ContainerAdapter_move_error_title,
-                    NLS.bind(
-                        Messages.ContainerAdapter_move_empty_error_msg,
+                .openError(Messages.ContainerAdapter_move_error_title, NLS
+                    .bind(Messages.ContainerAdapter_move_empty_error_msg,
                         newLabel));
             return false;
         }
@@ -251,8 +252,8 @@ public class ContainerAdapter extends AdapterBase {
         context.run(true, false, new IRunnableWithProgress() {
             @Override
             public void run(final IProgressMonitor monitor) {
-                monitor.beginTask(
-                    NLS.bind(Messages.ContainerAdapter_moving_cont, oldLabel, newLabel),
+                monitor.beginTask(NLS.bind(
+                    Messages.ContainerAdapter_moving_cont, oldLabel, newLabel),
                     IProgressMonitor.UNKNOWN);
                 try {
                     container.persist();
@@ -300,8 +301,8 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        Assert.isNotNull(modelObject, "site null"); //$NON-NLS-1$
-        ((ContainerWrapper) modelObject).reload();
+        Assert.isNotNull(getContainer(), "site null"); //$NON-NLS-1$
+        getContainer().reload();
         return getContainer().getChildren().values();
     }
 

@@ -266,18 +266,17 @@ public class RequestEntryForm extends BiobankViewForm {
             try {
                 List<RequestSpecimenWrapper> rspecs = new ArrayList<RequestSpecimenWrapper>();
                 for (SpecimenWrapper spec : dialog.getSpecimens()) {
-                    for (RequestSpecimenWrapper rs : request
-                        .getNonProcessedRequestSpecimenCollection())
+                    for (RequestSpecimenWrapper rs : specimensTree
+                        .getWrappers())
                         if (rs.getSpecimen().equals(spec))
                             rspecs.add(rs);
-
                 }
                 addToDispatch(getDispatchSelection(), rspecs);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        specimensTree.refresh();
+        specimensTree.rebuild();
     }
 
     @Override

@@ -46,7 +46,6 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -475,16 +474,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     }
 
     protected abstract void onReset() throws Exception;
-
-    protected ModelWrapper<?> getModelObject() throws Exception {
-        ModelWrapper<?> modelObject = adapter.getModelObject();
-
-        if (!modelObject.isNew()) {
-            modelObject = modelObject.getDatabaseClone();
-        }
-
-        return modelObject;
-    }
 
     /**
      * Return the ID of the form that should be opened after the save action is

@@ -17,8 +17,6 @@ import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 public class ClinicViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.ClinicViewForm"; //$NON-NLS-1$
 
-    private ClinicAdapter clinicAdapter;
-
     private ClinicWrapper clinic;
 
     private ContactInfoTable contactsTable;
@@ -45,9 +43,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        clinicAdapter = (ClinicAdapter) adapter;
-        clinic = clinicAdapter.getWrapper();
-        clinic.reload();
+        clinic = (ClinicWrapper) getModelObject();
         setPartName(NLS.bind(Messages.ClinicViewForm_title,
             clinic.getNameShort()));
     }

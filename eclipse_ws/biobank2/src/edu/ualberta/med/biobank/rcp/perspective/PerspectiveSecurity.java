@@ -20,8 +20,6 @@ public class PerspectiveSecurity {
      */
     private static Map<String, Map<String, List<SecurityFeature>>> featureEnablements;
 
-    private static Map<String, Boolean> centerNeeded;
-
     private static Map<String, String> preferredViews;
 
     static {

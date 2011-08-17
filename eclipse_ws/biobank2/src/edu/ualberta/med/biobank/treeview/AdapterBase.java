@@ -51,7 +51,7 @@ public abstract class AdapterBase {
     protected IDeltaListener deltaListener = NullDeltaListener
         .getSoleInstance();
 
-    protected ModelWrapper<?> modelObject;
+    private ModelWrapper<?> modelObject;
 
     private Integer id;
 
@@ -330,7 +330,9 @@ public abstract class AdapterBase {
         if (modelObject != null) {
             return modelObject.getAppService();
         }
-        return parent.getAppService();
+        if (parent != null)
+            return parent.getAppService();
+        return null;
     }
 
     public void addListener(IDeltaListener listener) {
@@ -780,7 +782,7 @@ public abstract class AdapterBase {
     protected List<AdapterBase> searchChildContainers(Object searchedObject,
         ContainerAdapter container, final List<ContainerWrapper> parents) {
         List<AdapterBase> res = new ArrayList<AdapterBase>();
-        if (parents.contains(container.getContainer())) {
+        if (parents.contains(container.getModelObject())) {
             AdapterBase child = container.getChild(
                 (ModelWrapper<?>) searchedObject, true);
             if (child == null) {
