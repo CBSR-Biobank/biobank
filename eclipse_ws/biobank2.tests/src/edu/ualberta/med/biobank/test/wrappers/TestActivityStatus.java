@@ -159,9 +159,13 @@ public class TestActivityStatus extends TestDatabase {
         as.persist();
         as.reload();
 
-        Method setActivityMethod = wrapper.getClass().getMethod(
-            "setActivityStatus", ActivityStatusWrapper.class);
-        setActivityMethod.invoke(wrapper, as);
+        try {
+            Method setActivityMethod = wrapper.getClass().getMethod(
+                "setActivityStatus", ActivityStatusWrapper.class);
+            setActivityMethod.invoke(wrapper, as);
+        } catch (NoSuchMethodException e) {
+            return;
+        }
         wrapper.persist();
         wrapper.reload();
 
