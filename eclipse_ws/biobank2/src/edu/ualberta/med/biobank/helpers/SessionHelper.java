@@ -9,7 +9,7 @@ import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -32,7 +32,7 @@ public class SessionHelper implements Runnable {
 
     private BiobankApplicationService appService;
 
-    private User user;
+    private UserWrapper user;
 
     private static final String DOWNLOAD_URL = "http://aicml-med.cs.ualberta.ca/CBSR/latest.html"; //$NON-NLS-1$
 
@@ -80,7 +80,7 @@ public class SessionHelper implements Runnable {
             logger.debug(Messages.SessionHelper_clientVersion_debug_msg
                 + clientVersion);
             appService.checkVersion(clientVersion);
-            user = appService.getCurrentUserOld();
+            user = UserWrapper.getUser(appService, userName);
         } catch (ApplicationException exp) {
             if (exp instanceof ServerVersionInvalidException) {
                 BgcPlugin.openError(
@@ -126,7 +126,7 @@ public class SessionHelper implements Runnable {
         return appService;
     }
 
-    public User getUser() {
+    public UserWrapper getUser() {
         return user;
     }
 }

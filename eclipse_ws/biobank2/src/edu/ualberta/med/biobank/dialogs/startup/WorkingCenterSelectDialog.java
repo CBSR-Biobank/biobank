@@ -9,19 +9,19 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class WorkingCenterSelectDialog extends BgcBaseDialog {
 
-    private User user;
+    private UserWrapper user;
     private CenterWrapper<?> currentCenter;
     private List<CenterWrapper<?>> availableCenters;
 
-    public WorkingCenterSelectDialog(Shell parentShell, User user,
+    public WorkingCenterSelectDialog(Shell parentShell, UserWrapper user,
         List<CenterWrapper<?>> availableCenters) {
         super(parentShell);
         this.user = user;

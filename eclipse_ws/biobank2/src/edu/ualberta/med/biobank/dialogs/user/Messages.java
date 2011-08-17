@@ -25,7 +25,11 @@ public class Messages extends NLS {
 
     public static String GroupsPage_page_title;
 
+    public static String RolesPage_title;
+
     public static String TemplatesPage_page_title;
+
+    public static String UserEditDialog_bulkemail_label;
 
     public static String UserEditDialog_deleteRight_confirm_msg;
 
@@ -66,6 +70,8 @@ public class Messages extends NLS {
     public static String UserEditDialog_passwords_match_error_msg;
 
     public static String UserEditDialog_save_error_title;
+
+    public static String UserEditDialog_superAdmin_label;
 
     public static String UserEditDialog_title_add;
 

@@ -16,9 +16,9 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcSessionState;
@@ -80,7 +80,7 @@ public class SessionManager {
     }
 
     public void addSession(final BiobankApplicationService appService,
-        String serverName, User user) {
+        String serverName, UserWrapper user) {
         logger.debug("addSession: " + serverName + ", user/" + user.getLogin()); //$NON-NLS-1$ //$NON-NLS-2$
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, user);
@@ -231,32 +231,46 @@ public class SessionManager {
         getInstance().currentAdministrationViewId = view.getId();
     }
 
-    public static User getUser() {
+    public static UserWrapper getUser() {
         return getInstance().getSession().getUser();
+    }
+
+    public static User getUserOld() {
+        return null;
     }
 
     public static String getServer() {
         return getInstance().getSession().getServerName();
     }
 
+    @Deprecated
     public static boolean canCreate(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.CREATE, clazz);
+        // return getUser().hasPrivilegeOnObject(Privilege.CREATE, clazz);
+        return false;
     }
 
+    @Deprecated
     public static boolean canDelete(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.DELETE, clazz);
+        // return getUser().hasPrivilegeOnObject(Privilege.DELETE, clazz);
+        return false;
     }
 
+    @Deprecated
     public static boolean canDelete(ModelWrapper<?> wrapper) {
-        return wrapper.canDelete(getUser());
+        // return wrapper.canDelete(getUser());
+        return false;
     }
 
+    @Deprecated
     public static boolean canView(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.READ, clazz);
+        // return getUser().hasPrivilegeOnObject(Privilege.READ, clazz);
+        return false;
     }
 
+    @Deprecated
     public static boolean canUpdate(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.UPDATE, clazz);
+        // return getUser().hasPrivilegeOnObject(Privilege.UPDATE, clazz);
+        return false;
     }
 
     public boolean isConnected() {

@@ -20,8 +20,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
+import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
@@ -37,26 +37,30 @@ public class GroupEditDialog extends BgcBaseDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
 
-    private Group originalGroup, modifiedGroup;
+    private BbGroupWrapper originalGroup, modifiedGroup;
     private MultiSelectWidget workingCentersWidget;
     private List<CenterWrapper<?>> allCenters;
     private MultiSelectWidget centerFeaturesWidget;
     private Text centersFilterText;
     private LinkedHashMap<Integer, String> allFeaturesMap;
 
-    public GroupEditDialog(Shell parent, Group originalGroup, boolean isNewGroup) {
+    public GroupEditDialog(Shell parent, BbGroupWrapper originalGroup) {
         super(parent);
         Assert.isNotNull(originalGroup);
         this.originalGroup = originalGroup;
-        this.modifiedGroup = new Group();
-        this.modifiedGroup.copy(originalGroup);
-        if (isNewGroup) {
+        this.modifiedGroup = new BbGroupWrapper(null);
+        copyGroup(originalGroup, modifiedGroup);
+        if (originalGroup.isNew()) {
             currentTitle = Messages.GroupEditDialog_title_add;
             titleAreaMessage = Messages.GroupEditDialog_titlearea_add;
         } else {
             currentTitle = Messages.GroupEditDialog_title_edit;
             titleAreaMessage = Messages.GroupEditDialog_titlearea_modify;
         }
+    }
+
+    private void copyGroup(BbGroupWrapper src, BbGroupWrapper dest) {
+        dest.setName(src.getName());
     }
 
     @Override
@@ -137,7 +141,7 @@ public class GroupEditDialog extends BgcBaseDialog {
         centerFeaturesWidget = createFeaturesSelectionWidget(
             parent,
             SessionManager.getAppService().getSecurityCenterFeatures(
-                SessionManager.getUser()),
+                SessionManager.getUserOld()),
             modifiedGroup.getCenterFeaturesEnabled(),
             BiobankSecurityUtil.CENTER_FEATURE_START_NAME,
             Messages.GroupEditDialog_feature_center_list_available,
@@ -161,7 +165,7 @@ public class GroupEditDialog extends BgcBaseDialog {
 
     private List<CenterWrapper<?>> getAllCenters() {
         if (allCenters == null) {
-            if (!SessionManager.getUser().isSuperAdministrator())
+            if (!SessionManager.getUser().isSuperAdmin())
                 allCenters = Arrays
                     .asList(new CenterWrapper<?>[] { SessionManager.getUser()
                         .getCurrentWorkingCenter() });
@@ -186,11 +190,10 @@ public class GroupEditDialog extends BgcBaseDialog {
                 .getSelected());
             modifiedGroup.setCenterFeaturesEnabled(centerFeaturesWidget
                 .getSelected());
-            Group groupeResult = SessionManager.getAppService().persistGroupOld(
-                SessionManager.getUser(), modifiedGroup);
-            originalGroup.copy(groupeResult);
+            copyGroup(modifiedGroup, originalGroup);
+            originalGroup.persist();
             close();
-        } catch (ApplicationException e) {
+        } catch (Exception e) {
             if (e.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
                 BgcPlugin.openAsyncError(
                     Messages.GroupEditDialog_msg_persit_error,

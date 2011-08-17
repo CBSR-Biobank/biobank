@@ -283,7 +283,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
             sumOfMaxTextWidths += width;
         }
 
-        // need to give default max=500 when can't know the size of the table
+        // need to give default max=500 when can't know the size of
+        // the table
         // yet (see UserManagementDialog)
         int tableWidth = Math.max(500, tableViewer.getTable().getSize().x);
 

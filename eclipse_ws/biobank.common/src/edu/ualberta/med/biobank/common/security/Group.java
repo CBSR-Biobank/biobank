@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankSecurityUtil;
 
+@Deprecated
 public class Group implements Serializable, NotAProxy {
 
     private static final long serialVersionUID = 1L;

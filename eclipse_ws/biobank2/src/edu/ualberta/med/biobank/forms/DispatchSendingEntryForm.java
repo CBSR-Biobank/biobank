@@ -238,7 +238,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         try {
             CellProcessResult res = appService.processCellStatus(new Cell(-1,
                 -1, inventoryId, null), new ShipmentProcessData(null, dispatch,
-                true, true), SessionManager.getUser(), Locale.getDefault());
+                true, true), SessionManager.getUserOld(), Locale.getDefault());
             switch (res.getProcessStatus()) {
             case FILLED:
                 // ok

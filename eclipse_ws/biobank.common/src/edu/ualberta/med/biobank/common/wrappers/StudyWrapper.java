@@ -23,7 +23,6 @@ import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.security.Privilege;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
@@ -497,8 +496,9 @@ public class StudyWrapper extends StudyBaseWrapper {
         return cEvents;
     }
 
+    @Deprecated
     @Override
-    public boolean canUpdate(User user) {
+    public boolean canUpdate(UserWrapper user) {
         return user.isInSuperAdminMode()
             && user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass(),
                 getSecuritySpecificCenters());

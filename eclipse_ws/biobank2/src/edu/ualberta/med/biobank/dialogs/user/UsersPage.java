@@ -12,8 +12,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.common.security.Group;
-import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogWithPages;
@@ -38,9 +38,9 @@ public abstract class UsersPage extends BgcDialogPage {
         Composite content = new Composite(parent, SWT.NONE);
         content.setLayout(new GridLayout(1, false));
 
-        new TableFilter<User>(content) {
+        new TableFilter<UserWrapper>(content) {
             @Override
-            protected boolean accept(User user, String text) {
+            protected boolean accept(UserWrapper user, String text) {
                 return contains(user.getLogin(), text)
                     || contains(user.getEmail(), text)
                     || contains(user.getFirstName(), text)
@@ -48,19 +48,19 @@ public abstract class UsersPage extends BgcDialogPage {
             }
 
             @Override
-            public List<User> getAllCollection() {
+            public List<UserWrapper> getAllCollection() {
                 return getCurrentAllUsersList();
             }
 
             @Override
-            public void setFilteredList(List<User> filteredObjects) {
+            public void setFilteredList(List<UserWrapper> filteredObjects) {
                 userInfoTable.reloadCollection(filteredObjects);
             }
         };
 
         userInfoTable = new UserInfoTable(content, null) {
             @Override
-            protected int editUser(User user) {
+            protected int editUser(UserWrapper user) {
                 int res = super.editUser(user);
                 // when user modify itself. Close everything to log again
                 if (res == UserEditDialog.CLOSE_PARENT_RETURN_CODE) {
@@ -70,21 +70,16 @@ public abstract class UsersPage extends BgcDialogPage {
             }
 
             @Override
-            protected boolean deleteUser(User user) {
+            protected boolean deleteUser(UserWrapper user) {
                 boolean deleted = super.deleteUser(user);
                 if (deleted)
                     getCurrentAllUsersList().remove(user);
                 return deleted;
             }
-
-            @Override
-            protected List<Group> getGroups() {
-                return UsersPage.this.getGroups();
-            }
         };
-        List<User> tmpUsers = new ArrayList<User>();
+        List<UserWrapper> tmpUsers = new ArrayList<UserWrapper>();
         for (int i = 0; i < UserInfoTable.ROWS_PER_PAGE + 1; i++) {
-            User user = new User();
+            UserWrapper user = new UserWrapper(null);
             user.setLogin(Messages.UserManagementDialog_loading);
             tmpUsers.add(user);
         }
@@ -93,7 +88,8 @@ public abstract class UsersPage extends BgcDialogPage {
             @Override
             public void run() {
                 try {
-                    final List<User> users = getCurrentAllUsersList();
+                    final List<UserWrapper> users = getCurrentAllUsersList();
+                    sleep(200);
                     getShell().getDisplay().syncExec(new Runnable() {
                         @Override
                         public void run() {
@@ -117,18 +113,19 @@ public abstract class UsersPage extends BgcDialogPage {
         setControl(content);
     }
 
-    protected abstract List<User> getCurrentAllUsersList();
+    protected abstract List<UserWrapper> getCurrentAllUsersList();
 
     protected void addUser() {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
-                final User user = new User();
-                final List<Group> groups = getGroups();
+                final UserWrapper user = new UserWrapper(SessionManager
+                    .getAppService());
+                user.setBulkEmails(true);
 
                 UserEditDialog dlg = new UserEditDialog(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    user, groups, true);
+                    user, null, true);
                 int res = dlg.open();
                 if (res == Status.OK) {
                     BgcPlugin.openAsyncInformation(
@@ -143,8 +140,6 @@ public abstract class UsersPage extends BgcDialogPage {
             }
         });
     }
-
-    protected abstract List<Group> getGroups();
 
     @Override
     public void runAddAction() {

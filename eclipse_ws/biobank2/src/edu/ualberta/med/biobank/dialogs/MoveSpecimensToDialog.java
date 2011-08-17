@@ -85,7 +85,7 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
             Messages.MoveSpecimensToDialog_site_label);
         siteLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_CENTER));
         buildContainersMap();
-        if (!SessionManager.getUser().isSuperAdministrator()) {
+        if (!SessionManager.getUser().isSuperAdmin()) {
             siteLabel
                 .setToolTipText(Messages.MoveSpecimensToDialog_site_tooltip);
         }

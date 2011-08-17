@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
@@ -306,8 +305,9 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     /**
      * return true if the user can delete this object
      */
+    @Deprecated
     @Override
-    public boolean canDelete(User user) {
+    public boolean canDelete(UserWrapper user) {
         return super.canDelete(user)
             && (getCenter() == null || user.getCurrentWorkingCenter().equals(
                 getCenter()));
@@ -316,8 +316,9 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     /**
      * return true if the user can edit this object
      */
+    @Deprecated
     @Override
-    public boolean canUpdate(User user) {
+    public boolean canUpdate(UserWrapper user) {
         return super.canUpdate(user)
             && (getCenter() == null || user.getCurrentWorkingCenter().equals(
                 getCenter()));

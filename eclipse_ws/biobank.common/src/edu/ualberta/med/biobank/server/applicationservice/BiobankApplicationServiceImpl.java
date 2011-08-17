@@ -139,6 +139,7 @@ public class BiobankApplicationServiceImpl extends
         BiobankSecurityUtil.modifyPassword(oldPassword, newPassword);
     }
 
+    @Deprecated
     @Override
     public List<Group> getSecurityGroups(User currentUser,
         boolean includeSuperAdmin) throws ApplicationException {
@@ -147,6 +148,7 @@ public class BiobankApplicationServiceImpl extends
             includeSuperAdmin);
     }
 
+    @Deprecated
     @Override
     public List<User> getSecurityUsers(User currentUser)
         throws ApplicationException {
@@ -154,6 +156,7 @@ public class BiobankApplicationServiceImpl extends
         return BiobankSecurityUtil.getSecurityUsers(currentUser);
     }
 
+    @Deprecated
     @Override
     public User persistUserOld(User currentUser, User userToPersist)
         throws ApplicationException {
@@ -161,6 +164,7 @@ public class BiobankApplicationServiceImpl extends
         return BiobankSecurityUtil.persistUserOld(currentUser, userToPersist);
     }
 
+    @Deprecated
     @Override
     public void deleteUserOld(User currentUser, String loginToDelete)
         throws ApplicationException {
@@ -168,11 +172,13 @@ public class BiobankApplicationServiceImpl extends
         BiobankSecurityUtil.deleteUserOld(currentUser, loginToDelete);
     }
 
+    @Deprecated
     @Override
     public User getCurrentUserOld() throws ApplicationException {
         return BiobankSecurityUtil.getCurrentUserOld();
     }
 
+    @Deprecated
     @Override
     public Group persistGroupOld(User currentUser, Group group)
         throws ApplicationException {
@@ -180,6 +186,7 @@ public class BiobankApplicationServiceImpl extends
         return BiobankSecurityUtil.persistGroupOld(currentUser, group);
     }
 
+    @Deprecated
     @Override
     public void deleteGroupOld(User currentUser, Group group)
         throws ApplicationException {
@@ -188,12 +195,11 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public void unlockUser(User currentUser, String userNameToUnlock)
-        throws ApplicationException {
-        currentUser.initCurrentWorkingCenter(this);
-        BiobankSecurityUtil.unlockUser(currentUser, userNameToUnlock);
+    public void unlockUser(String userNameToUnlock) throws ApplicationException {
+        BiobankSecurityUtil.unlockUser(userNameToUnlock);
     }
 
+    @Deprecated
     @Override
     public List<ProtectionGroupPrivilege> getSecurityGlobalFeatures(
         User currentUser) throws ApplicationException {
@@ -201,6 +207,7 @@ public class BiobankApplicationServiceImpl extends
         return BiobankSecurityUtil.getSecurityGlobalFeatures(currentUser);
     }
 
+    @Deprecated
     @Override
     public List<ProtectionGroupPrivilege> getSecurityCenterFeatures(
         User currentUser) throws ApplicationException {
@@ -326,5 +333,9 @@ public class BiobankApplicationServiceImpl extends
     @Override
     public String getUserPassword(String login) throws ApplicationException {
         return BiobankSecurityUtil.getUserPassword(login);
+    }
+
+    public boolean isUserLockedOut(Long csmUserId) throws ApplicationException {
+        return BiobankSecurityUtil.isUserLockedOut(csmUserId);
     }
 }

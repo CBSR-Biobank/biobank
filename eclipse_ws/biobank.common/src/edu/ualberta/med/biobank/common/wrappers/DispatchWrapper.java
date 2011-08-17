@@ -20,7 +20,6 @@ import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.DispatchSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
@@ -366,7 +365,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return sb.toString();
     }
 
-    public boolean canBeSentBy(User user) {
+    @Deprecated
+    public boolean canBeSentBy(UserWrapper user) {
         return canUpdate(user)
             && getSenderCenter().equals(user.getCurrentWorkingCenter())
             && isInCreationState() && hasDispatchSpecimens();
@@ -377,7 +377,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             && !getSpecimenCollection(false).isEmpty();
     }
 
-    public boolean canBeReceivedBy(User user) {
+    @Deprecated
+    public boolean canBeReceivedBy(UserWrapper user) {
         return canUpdate(user)
             && getReceiverCenter().equals(user.getCurrentWorkingCenter())
             && isInTransitState();
@@ -436,7 +437,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return getDispatchSpecimenCollection(false);
     }
 
-    public boolean canBeClosedBy(User user) {
+    @Deprecated
+    public boolean canBeClosedBy(UserWrapper user) {
         return isInReceivedState() && canUpdate(user);
     }
 

@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -519,8 +518,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     /**
      * return true if the user can edit this object
      */
+    @Deprecated
     @Override
-    public boolean canUpdate(User user) {
+    public boolean canUpdate(UserWrapper user) {
         return super.canUpdate(user)
             && (user.getCurrentWorkingCenter().getStudyCollection()
                 .contains(getCollectionEvent().getPatient().getStudy()));

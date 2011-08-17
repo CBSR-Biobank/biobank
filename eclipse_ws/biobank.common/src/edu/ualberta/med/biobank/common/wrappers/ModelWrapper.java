@@ -8,7 +8,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankRuntimeException;
 import edu.ualberta.med.biobank.common.exception.CheckFieldLimitsException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.security.Privilege;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
@@ -558,14 +557,16 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if the user can view this object
      */
-    public boolean canRead(User user) {
+    @Deprecated
+    public boolean canRead(UserWrapper user) {
         return user.hasPrivilegeOnObject(Privilege.READ, getWrappedClass());
     }
 
     /**
      * return true if the user can edit this object
      */
-    public boolean canUpdate(User user) {
+    @Deprecated
+    public boolean canUpdate(UserWrapper user) {
         return user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass(),
             getSecuritySpecificCenters());
     }
@@ -573,7 +574,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if the user can delete this object
      */
-    public boolean canDelete(User user) {
+    @Deprecated
+    public boolean canDelete(UserWrapper user) {
         return user.hasPrivilegeOnObject(Privilege.DELETE, getWrappedClass(),
             getSecuritySpecificCenters());
     }

@@ -469,7 +469,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         beforeScanTubeAlone();
         CellProcessResult res = appService.processCellStatus(
             palletCell.transformIntoServerCell(), getProcessData(),
-            SessionManager.getUser(), Locale.getDefault());
+            SessionManager.getUserOld(), Locale.getDefault());
         palletCell.merge(appService, res.getCell());
         appendLogs(res.getLogs());
         processCellResult(palletCell.getRowColPos(), palletCell);
@@ -566,7 +566,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         }
         // server side call
         ScanProcessResult res = appService.processScanResult(serverCells,
-            getProcessData(), isRescanMode(), SessionManager.getUser(),
+            getProcessData(), isRescanMode(), SessionManager.getUserOld(),
             Locale.getDefault());
         // print result logs
         appendLogs(res.getLogs());

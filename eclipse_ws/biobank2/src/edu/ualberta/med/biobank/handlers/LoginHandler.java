@@ -19,7 +19,7 @@ public class LoginHandler extends AbstractHandler implements IHandler {
             .getActiveWorkbenchWindow().getShell());
         if (loginDialog.open() == Dialog.OK)
             if (SessionManager.getInstance().getSession().getUser()
-                .passwordChangeRequired()) {
+                .needChangePassword()) {
                 ChangePasswordDialog dlg = new ChangePasswordDialog(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell(), true);
                 dlg.open();

@@ -7,8 +7,8 @@ import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
 import edu.ualberta.med.biobank.common.security.SecurityFeature;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 
 public class SessionState extends AbstractSourceProvider {
     public final static String SESSION_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.loginState"; //$NON-NLS-1$
@@ -125,7 +125,7 @@ public class SessionState extends AbstractSourceProvider {
             currentCenterType);
     }
 
-    public void setUser(User user) {
+    public void setUser(UserWrapper user) {
         setSuperAdminMode(user != null && user.isInSuperAdminMode());
         setHasWorkingCenter(user != null
             && user.getCurrentWorkingCenter() != null);

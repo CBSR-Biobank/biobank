@@ -25,11 +25,11 @@ import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -144,7 +144,7 @@ public class DispatchViewForm extends BiobankViewForm {
         setDispatchValues();
 
         if (canSeeEverything) {
-            User user = SessionManager.getUser();
+            UserWrapper user = SessionManager.getUser();
             if (dispatch.canBeSentBy(user))
                 createSendButton();
             else if (dispatch.canBeReceivedBy(user))

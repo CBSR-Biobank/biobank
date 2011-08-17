@@ -7,7 +7,6 @@ import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
 import gov.nih.nci.security.authentication.LockoutManager;
-import gov.nih.nci.security.authorization.domainobjects.Application;
 import gov.nih.nci.security.authorization.domainobjects.Group;
 import gov.nih.nci.security.authorization.domainobjects.Privilege;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
@@ -20,14 +19,12 @@ import gov.nih.nci.security.dao.GroupSearchCriteria;
 import gov.nih.nci.security.dao.ProtectionElementSearchCriteria;
 import gov.nih.nci.security.dao.ProtectionGroupSearchCriteria;
 import gov.nih.nci.security.dao.RoleSearchCriteria;
-import gov.nih.nci.security.dao.SearchCriteria;
 import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
 import gov.nih.nci.security.exceptions.CSTransactionException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -119,6 +116,7 @@ public class BiobankSecurityUtil {
         }
     }
 
+    @Deprecated
     private static edu.ualberta.med.biobank.common.security.Group createGroupOld(
         UserProvisioningManager upm, Group group)
         throws CSObjectNotFoundException {
@@ -366,6 +364,7 @@ public class BiobankSecurityUtil {
         }
     }
 
+    @Deprecated
     private static edu.ualberta.med.biobank.common.security.User createUserOld(
         UserProvisioningManager upm, User serverUser,
         Map<Long, edu.ualberta.med.biobank.common.security.Group> allGroups)
@@ -398,12 +397,10 @@ public class BiobankSecurityUtil {
         return userDTO;
     }
 
-    public static void unlockUser(
-        edu.ualberta.med.biobank.common.security.User currentUser,
-        String userNameToUnlock) throws ApplicationException {
-        if (canPerformCenterAdminAction(currentUser)) {
-            LockoutManager.getInstance().unLockUser(userNameToUnlock);
-        }
+    public static void unlockUser(String userNameToUnlock) {
+        // FIXME do we want to check here that the user launching this action
+        // can actually do it ?
+        LockoutManager.getInstance().unLockUser(userNameToUnlock);
     }
 
     @Deprecated
@@ -492,6 +489,7 @@ public class BiobankSecurityUtil {
         }
     }
 
+    @Deprecated
     private static void modifyFeatures(UserProvisioningManager upm,
         Group serverGroup, List<Integer> oldFeatures, List<Integer> newFeatures)
         throws ApplicationException, CSTransactionException {
@@ -691,84 +689,6 @@ public class BiobankSecurityUtil {
         }
     }
 
-    @Deprecated
-    public static void newCenterSecurity(Integer centerId,
-        String centerNameShort, Class<?> centerClass) {
-        try {
-            UserProvisioningManager upm = SecurityServiceProvider
-                .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
-            Application currentApplication = upm
-                .getApplication(APPLICATION_CONTEXT_NAME);
-            // Create protection element for the center
-            ProtectionElement pe = new ProtectionElement();
-            pe.setApplication(currentApplication);
-            pe.setProtectionElementName(centerClass.getSimpleName() + "/" //$NON-NLS-1$
-                + centerNameShort);
-            pe.setProtectionElementDescription(centerNameShort);
-            pe.setObjectId(centerClass.getName());
-            pe.setAttribute("id"); //$NON-NLS-1$
-            pe.setValue(centerId.toString());
-            upm.createProtectionElement(pe);
-
-            // Create a new protection group for this protection element only
-            ProtectionGroup pg = new ProtectionGroup();
-            pg.setApplication(currentApplication);
-            pg.setProtectionGroupName(centerClass.getSimpleName() + " " //$NON-NLS-1$
-                + centerNameShort);
-            pg.setProtectionGroupDescription("Protection group for center " //$NON-NLS-1$
-                + centerNameShort + " (id=" + centerId + ")"); //$NON-NLS-1$ //$NON-NLS-2$
-            pg.setProtectionElements(new HashSet<ProtectionElement>(Arrays
-                .asList(pe)));
-            upm.createProtectionGroup(pg);
-        } catch (Exception e) {
-            log.error("error adding new center security", e); //$NON-NLS-1$
-            throw new RuntimeException("Error adding new center " + centerId //$NON-NLS-1$
-                + ":" + centerNameShort + " security:" + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-    }
-
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static void deleteCenterSecurity(Integer centerId, String nameShort,
-        Class<?> centerClass) {
-        try {
-            UserProvisioningManager upm = SecurityServiceProvider
-                .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
-            ProtectionElement searchPE = new ProtectionElement();
-            searchPE.setObjectId(centerClass.getName());
-            searchPE.setAttribute("id"); //$NON-NLS-1$
-            searchPE.setValue(centerId.toString());
-            SearchCriteria sc = new ProtectionElementSearchCriteria(searchPE);
-            List<ProtectionElement> peToDelete = upm.getObjects(sc);
-            if (peToDelete == null || peToDelete.size() == 0) {
-                return;
-            }
-            List<String> pgIdsToDelete = new ArrayList<String>();
-            for (ProtectionElement pe : peToDelete) {
-                Set<ProtectionGroup> pgs = upm.getProtectionGroups(pe
-                    .getProtectionElementId().toString());
-                for (ProtectionGroup pg : pgs) {
-                    // remove the protection group only if it contains only
-                    // this protection element
-                    String pgId = pg.getProtectionGroupId().toString();
-                    if (upm.getProtectionElements(pgId).size() == 1) {
-                        pgIdsToDelete.add(pgId);
-                    }
-                }
-                upm.removeProtectionElement(pe.getProtectionElementId()
-                    .toString());
-            }
-            for (String pgId : pgIdsToDelete) {
-                upm.removeProtectionGroup(pgId);
-            }
-        } catch (Exception e) {
-            log.error("error deleting center security", e); //$NON-NLS-1$
-            throw new RuntimeException("Error deleting center " + centerId //$NON-NLS-1$
-                + ":" + nameShort + " security: " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-
-    }
-
     public static Long persistUser(edu.ualberta.med.biobank.model.User user,
         String password) throws ApplicationException {
         try {
@@ -875,6 +795,28 @@ public class BiobankSecurityUtil {
             }
             // FIXME how safe is this?
             return serverUser.getPassword();
+        } catch (ApplicationException ae) {
+            log.error("Error retrieving csm security user password", ae); //$NON-NLS-1$
+            throw ae;
+        } catch (Exception ex) {
+            log.error("Error retrieving csm security user password", ex); //$NON-NLS-1$
+            throw new ApplicationException(ex.getMessage(), ex);
+        }
+    }
+
+    public static boolean isUserLockedOut(Long csmUserId)
+        throws ApplicationException {
+        try {
+            UserProvisioningManager upm = SecurityServiceProvider
+                .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
+            try {
+                User serverUser = upm.getUserById(csmUserId.toString());
+                return LockoutManager.getInstance().isUserLockedOut(
+                    serverUser.getLoginName());
+            } catch (CSObjectNotFoundException onfe) {
+                throw new ApplicationException(MessageFormat.format(
+                    "Security user with id {0} not found.", csmUserId), onfe);
+            }
         } catch (ApplicationException ae) {
             log.error("Error retrieving csm security user password", ae); //$NON-NLS-1$
             throw ae;

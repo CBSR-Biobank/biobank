@@ -11,7 +11,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.common.security.SecurityFeature;
-import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 
 public class PerspectiveSecurity {
 
@@ -33,7 +33,7 @@ public class PerspectiveSecurity {
         ReportsPerspective.appendPreferredView(preferredViews);
     }
 
-    public static synchronized void updateVisibility(User user,
+    public static synchronized void updateVisibility(UserWrapper user,
         IWorkbenchPage page) throws PartInitException {
         String perspectiveId = page.getPerspective().getId();
         Map<String, List<SecurityFeature>> map = featureEnablements

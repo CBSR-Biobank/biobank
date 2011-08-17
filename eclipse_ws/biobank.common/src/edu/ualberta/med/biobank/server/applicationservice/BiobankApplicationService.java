@@ -70,8 +70,7 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void deleteGroupOld(User currentUser, Group group)
         throws ApplicationException;
 
-    public void unlockUser(User currentUser, String userNameToUnlock)
-        throws ApplicationException;
+    public void unlockUser(String userNameToUnlock) throws ApplicationException;
 
     public List<Object> runReport(Report report, int maxResults, int firstRow,
         int timeout) throws ApplicationException;
@@ -80,9 +79,11 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public String getServerVersion();
 
+    @Deprecated
     public List<ProtectionGroupPrivilege> getSecurityGlobalFeatures(
         User currentUser) throws ApplicationException;
 
+    @Deprecated
     public List<ProtectionGroupPrivilege> getSecurityCenterFeatures(
         User currentUser) throws ApplicationException;
 
@@ -109,5 +110,7 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void deleteUser(edu.ualberta.med.biobank.model.User user)
         throws ApplicationException;
 
-    public String getUserPassword(String login) throws ApplicationException;;
+    public String getUserPassword(String login) throws ApplicationException;
+
+    public boolean isUserLockedOut(Long csmUserId) throws ApplicationException;
 }

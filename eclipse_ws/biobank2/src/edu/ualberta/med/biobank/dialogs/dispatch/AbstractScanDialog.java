@@ -175,7 +175,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             // server side call
             ScanProcessResult res = SessionManager.getAppService()
                 .processScanResult(serverCells, getProcessData(),
-                    isRescanMode(), SessionManager.getUser(),
+                    isRescanMode(), SessionManager.getUserOld(),
                     Locale.getDefault());
 
             if (cells != null) {
@@ -274,7 +274,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             Boolean.class), scanHasBeenLaunchedValue,
             Messages.AbstractScanDialog_scan_validation_msg, IStatus.ERROR);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), hasValues, Messages.AbstractScanDialog_no_values, IStatus.ERROR);
+            Boolean.class), hasValues, Messages.AbstractScanDialog_no_values,
+            IStatus.ERROR);
 
     }
 
@@ -460,10 +461,10 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     }
 
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-        CellProcessResult res = SessionManager
-            .getAppService()
+        CellProcessResult res = SessionManager.getAppService()
             .processCellStatus(cell.transformIntoServerCell(),
-                getProcessData(), SessionManager.getUser(), Locale.getDefault());
+                getProcessData(), SessionManager.getUserOld(),
+                Locale.getDefault());
         cell.merge(SessionManager.getAppService(), res.getCell());
         if (res.getProcessStatus() == CellStatus.ERROR) {
             Button okButton = getButton(IDialogConstants.PROCEED_ID);
