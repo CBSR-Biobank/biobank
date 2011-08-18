@@ -50,6 +50,22 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     @Override
+    public int compareTo(ModelWrapper<E> wrapper) {
+        if (wrapper instanceof CenterWrapper) {
+            String name1 = wrappedObject.getName();
+            String name2 = wrapper.wrappedObject.getName();
+            return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
+                : -1));
+        }
+        return 0;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+
+    @Override
     protected List<Property<?, ? super E>> getProperties() {
         List<Property<?, ? super E>> aList = new ArrayList<Property<?, ? super E>>();
 

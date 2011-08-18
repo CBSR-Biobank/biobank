@@ -168,7 +168,7 @@ public class TestActivityStatus extends TestDatabase {
         }
 
         if (wrapper instanceof StudyWrapper)
-            StudyHelper.deleteStudyAndDependencies((StudyWrapper) wrapper);
+            StudyHelper.deleteStudyDependencies();
         else if (wrapper instanceof SiteWrapper) {
             SiteHelper.deleteSiteAndDependencies(((SiteWrapper) wrapper));
         } else {
@@ -239,7 +239,7 @@ public class TestActivityStatus extends TestDatabase {
 
         statuses = ActivityStatusWrapper.getAllActivityStatuses(appService);
         after = statuses.size();
-        Assert.assertEquals(before - 5 + 3, after);
+        Assert.assertEquals((before - 5) + 3, after);
         Assert.assertTrue(statuses.containsAll(toAdd));
 
         addedstatus.addAll(toAdd);

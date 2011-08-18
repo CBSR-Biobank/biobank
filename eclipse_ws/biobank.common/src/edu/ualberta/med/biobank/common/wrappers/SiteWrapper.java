@@ -58,7 +58,7 @@ public class SiteWrapper extends SiteBaseWrapper {
     protected void deleteChecks() throws BiobankDeleteException,
         ApplicationException {
         if (!getContainerCollection(false).isEmpty()
-            || !getContainerTypeCollection(false).isEmpty()
+            || !getContainerTypeCollection().isEmpty()
             || !getProcessingEventCollection(false).isEmpty()) {
             throw new BiobankDeleteException(
                 "Unable to delete site "
@@ -132,17 +132,6 @@ public class SiteWrapper extends SiteBaseWrapper {
         cache.put(TOP_CONTAINER_COLLECTION_CACHE_KEY, null);
     }
 
-    @Override
-    public int compareTo(ModelWrapper<Site> wrapper) {
-        if (wrapper instanceof SiteWrapper) {
-            String name1 = wrappedObject.getName();
-            String name2 = wrapper.wrappedObject.getName();
-            return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
-                : -1));
-        }
-        return 0;
-    }
-
     /**
      * get all site existing
      */
@@ -176,13 +165,8 @@ public class SiteWrapper extends SiteBaseWrapper {
         return wrappers;
     }
 
-    @Override
-    public String toString() {
-        return getName();
-    }
-
     public Set<ClinicWrapper> getWorkingClinicCollection() {
-        List<StudyWrapper> studies = getStudyCollection(false);
+        List<StudyWrapper> studies = getStudyCollection();
         Set<ClinicWrapper> clinics = new HashSet<ClinicWrapper>();
         for (StudyWrapper study : studies) {
             clinics.addAll(study.getClinicCollection());

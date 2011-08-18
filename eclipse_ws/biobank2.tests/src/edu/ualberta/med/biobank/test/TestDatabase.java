@@ -61,6 +61,7 @@ public class TestDatabase {
         Assert.assertNotNull("appService is null", appService);
         try {
             DispatchHelper.deleteCreatedDispatches();
+            StudyHelper.deleteStudyDependencies();
             SiteHelper.deleteCreatedSites();
             ResearchGroupHelper.deleteCreatedResearchGroups();
             StudyHelper.deleteCreatedStudies();
