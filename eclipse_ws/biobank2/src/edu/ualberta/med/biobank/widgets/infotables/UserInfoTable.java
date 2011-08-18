@@ -22,25 +22,27 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.dialogs.user.UserEditDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class UserInfoTable extends InfoTableWidget<User> {
-    public static final int ROWS_PER_PAGE = 10;
-    private static final String[] HEADINGS = new String[] { "Login", "Email",
-        "First Name", "Last Name" };
-    private static final String LOADING_ROW = "loading...";
-    private static final String GROUPS_LOADING_ERROR = "Unable to load groups.";
-    private static final String USER_DELETE_ERROR = "Unable to delete user.";
-    private static final String CANNOT_UNLOCK_USER = "Cannot unlock user {0}.";
-    private static final String CONFIRM_DELETE_TITLE = "Confirm Deletion";
-    private static final String CONFIRM_DELETE_MESSAGE = "Are you certain you want to delete \"{0}\"?";
-    private static final String CONFIRM_SUICIDE_MESSAGE = "Are you certain you want to delete yourself as a user?";
+public abstract class UserInfoTable extends InfoTableWidget<User> {
+    public static final int ROWS_PER_PAGE = 12;
+    private static final String[] HEADINGS = new String[] {
+        Messages.UserInfoTable_login_label, Messages.UserInfoTable_email_label,
+        Messages.UserInfoTable_firstname_label,
+        Messages.UserInfoTable_lastname_label };
+    private static final String LOADING_ROW = Messages.UserInfoTable_loading;
+    private static final String USER_DELETE_ERROR = Messages.UserInfoTable_delete_error_msg;
+    private static final String CANNOT_UNLOCK_USER = Messages.UserInfoTable_unlock_error_msg;
+    private static final String CONFIRM_DELETE_TITLE = Messages.UserInfoTable_confirm_delete_title;
+    private static final String CONFIRM_DELETE_MESSAGE = Messages.UserInfoTable_confirm_delete_msg;
+    private static final String CONFIRM_SUICIDE_MESSAGE = Messages.UserInfoTable_confirm_delete_suicide_msg;
 
     private MenuItem unlockMenuItem;
 
     public UserInfoTable(Composite parent, List<User> collection) {
-        super(parent, collection, HEADINGS, ROWS_PER_PAGE);
+        super(parent, collection, HEADINGS, ROWS_PER_PAGE, User.class);
 
         addEditItemListener(new IInfoTableEditItemListener() {
             @Override
@@ -57,7 +59,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
         });
 
         unlockMenuItem = new MenuItem(menu, SWT.PUSH);
-        unlockMenuItem.setText("Unlock User");
+        unlockMenuItem.setText(Messages.UserInfoTable_unlock_label);
         unlockMenuItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -65,11 +67,12 @@ public class UserInfoTable extends InfoTableWidget<User> {
                 String userName = selectedUser.getLogin();
                 try {
                     SessionManager.getAppService().unlockUser(
+                        SessionManager.getUser(),
                         ((User) getSelection()).getLogin());
                     selectedUser.setLockedOut(false);
                     reloadCollection(getCollection(), selectedUser);
                 } catch (ApplicationException e) {
-                    BiobankPlugin.openAsyncError(MessageFormat.format(
+                    BgcPlugin.openAsyncError(MessageFormat.format(
                         CANNOT_UNLOCK_USER, new Object[] { userName }), e);
                 }
             }
@@ -111,7 +114,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
 
         User user = (User) o;
         return StringUtils.join(Arrays.asList(user.getLogin(), user.getEmail(),
-            user.getFirstName(), user.getLastName()), "\t");
+            user.getFirstName(), user.getLastName()), "\t"); //$NON-NLS-1$
     }
 
     @Override
@@ -122,7 +125,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                 User user = (User) ((BiobankCollectionModel) element).o;
                 if (user != null && user.isLockedOut() && columnIndex == 0) {
                     return BiobankPlugin.getDefault().getImage(
-                        BiobankPlugin.IMG_LOCK);
+                        BgcPlugin.IMG_LOCK);
                 }
                 return null;
             }
@@ -134,7 +137,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                     if (columnIndex == 0) {
                         return LOADING_ROW;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
 
                 switch (columnIndex) {
@@ -147,7 +150,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                 case 3:
                     return user.getLastName();
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };
@@ -157,11 +160,10 @@ public class UserInfoTable extends InfoTableWidget<User> {
      * return an integer representing the type of result
      */
     protected int editUser(User user) {
-        List<Group> groups = null;
-        try {
-            groups = SessionManager.getAppService().getSecurityGroups(true);
-        } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError(GROUPS_LOADING_ERROR, e);
+        List<Group> groups = getGroups();
+        if (groups == null) {
+            BgcPlugin.openAsyncError(Messages.UserInfoTable_error_title,
+                Messages.UserInfoTable_nogroups_msg);
             return Dialog.CANCEL;
         }
 
@@ -175,6 +177,8 @@ public class UserInfoTable extends InfoTableWidget<User> {
         return res;
     }
 
+    protected abstract List<Group> getGroups();
+
     protected boolean deleteUser(User user) {
         try {
             String loginName = user.getLogin();
@@ -187,8 +191,9 @@ public class UserInfoTable extends InfoTableWidget<User> {
                     new Object[] { loginName });
             }
 
-            if (BiobankPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
-                SessionManager.getAppService().deleteUser(loginName);
+            if (BgcPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
+                SessionManager.getAppService().deleteUser(
+                    SessionManager.getUser(), loginName);
 
                 // remove the user from the collection
                 getCollection().remove(user);
@@ -198,7 +203,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                 return true;
             }
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError(USER_DELETE_ERROR, e);
+            BgcPlugin.openAsyncError(USER_DELETE_ERROR, e);
         }
         return false;
     }

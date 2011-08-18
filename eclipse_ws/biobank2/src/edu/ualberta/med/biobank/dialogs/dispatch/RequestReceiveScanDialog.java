@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.dialogs.dispatch;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -7,7 +8,6 @@ import java.util.TreeMap;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
@@ -16,15 +16,19 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> {
 
+    private List<SpecimenWrapper> dispatchSpecimens;
+
     public RequestReceiveScanDialog(Shell parentShell,
         final RequestWrapper currentShipment, CenterWrapper<?> centerWrapper) {
         super(parentShell, currentShipment, centerWrapper);
+        dispatchSpecimens = new ArrayList<SpecimenWrapper>();
     }
 
     @Override
@@ -38,9 +42,9 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    BiobankPlugin.openInformation("Extra specimens",
-                        "Some of the specimens in this pallet were not supposed"
-                            + " to be in this shipment.");
+                    BgcPlugin.openInformation(
+                        Messages.RequestReceiveScanDialog_extra_title,
+                        Messages.RequestReceiveScanDialog_extra_msg);
                 }
             });
         }
@@ -49,9 +53,10 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
     @Override
     protected void receiveSpecimens(List<SpecimenWrapper> specimens) {
         try {
-            currentShipment.receiveSpecimens(specimens);
+            dispatchSpecimens.addAll(specimens);
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error receiving request", e);
+            BgcPlugin.openAsyncError(
+                Messages.RequestReceiveScanDialog_receiveError_title, e);
         }
     }
 
@@ -80,6 +85,10 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
             }
         }
         return palletScanned;
+    }
+
+    public List<SpecimenWrapper> getSpecimens() {
+        return dispatchSpecimens;
     }
 
 }

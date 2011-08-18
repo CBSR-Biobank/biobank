@@ -12,24 +12,24 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
 public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(AbstractDispatchEntryForm.class.getName());
 
     protected DispatchWrapper dispatch;
 
-    protected BiobankEntryFormWidgetListener biobankListener = new BiobankEntryFormWidgetListener() {
+    protected BgcEntryFormWidgetListener biobankListener = new BgcEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
             reloadSpecimens();
@@ -39,9 +39,9 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     @Override
     protected void init() throws Exception {
-        Assert.isNotNull(adapter, "Adapter should be no null");
+        Assert.isNotNull(adapter, "Adapter should be no null"); //$NON-NLS-1$
         Assert.isTrue((adapter instanceof DispatchAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         dispatch = (DispatchWrapper) getModelObject();
@@ -55,7 +55,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         try {
             dispatch.reload();
         } catch (Exception ex) {
-            logger.error("Error while retrieving shipment "
+            logger.error("Error while retrieving shipment " //$NON-NLS-1$
                 + dispatch.getShipmentInfo().getWaybill(), ex);
         }
     }
@@ -70,8 +70,9 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         boolean setAsFirstControl) {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
-        toolkit.createLabel(addComposite, "Enter inventory ID to add:");
-        final BiobankText newSpecimenText = new BiobankText(addComposite,
+        toolkit.createLabel(addComposite,
+            Messages.AbstractDispatchEntryForm_add_spec_label);
+        final BgcBaseText newSpecimenText = new BgcBaseText(addComposite,
             SWT.NONE, toolkit);
         GridData gd = new GridData();
         gd.widthHint = 100;
@@ -81,28 +82,29 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             public void handleEvent(Event e) {
                 doSpecimenTextAction(newSpecimenText.getText());
                 newSpecimenText.setFocus();
-                newSpecimenText.setText("");
+                newSpecimenText.setText(""); //$NON-NLS-1$
             }
         });
         if (setAsFirstControl) {
             setFirstControl(newSpecimenText);
         }
-        Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
-        addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_ADD));
+        Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH); //$NON-NLS-1$
+        addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 doSpecimenTextAction(newSpecimenText.getText());
                 newSpecimenText.setFocus();
-                newSpecimenText.setText("");
+                newSpecimenText.setText(""); //$NON-NLS-1$
             }
         });
-        toolkit.createLabel(addComposite, "or open scan dialog:");
+        toolkit.createLabel(addComposite,
+            Messages.AbstractDispatchEntryForm_scanDialog_label);
         Button openScanButton = toolkit
-            .createButton(addComposite, "", SWT.PUSH);
-        openScanButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
+            .createButton(addComposite, "", SWT.PUSH); //$NON-NLS-1$
+        openScanButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

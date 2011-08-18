@@ -9,13 +9,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class WorkingCenterSelectDialog extends BiobankDialog {
+public class WorkingCenterSelectDialog extends BgcBaseDialog {
 
     private User user;
     private CenterWrapper<?> currentCenter;
@@ -30,17 +30,17 @@ public class WorkingCenterSelectDialog extends BiobankDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.getString("WorkingCenterSelectDialog.description"); //$NON-NLS-1$
+        return Messages.WorkingCenterSelectDialog_description;
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.getString("WorkingCenterSelectDialog.title"); //$NON-NLS-1$
+        return Messages.WorkingCenterSelectDialog_title;
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.getString("WorkingCenterSelectDialog.title"); //$NON-NLS-1$
+        return Messages.WorkingCenterSelectDialog_title;
     }
 
     @Override
@@ -50,11 +50,13 @@ public class WorkingCenterSelectDialog extends BiobankDialog {
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         List<Object> objectList = new ArrayList<Object>(availableCenters);
-        String noCenterString = "-- no center selection --";
+        String noCenterString = "-- " //$NON-NLS-1$ 
+            + Messages.WorkingCenterSelectDialog_no_center_selection_text
+            + " --"; //$NON-NLS-1$ 
         if (user.isInSuperAdminMode())
             objectList.add(noCenterString);
-        widgetCreator.createComboViewer(contents, Messages
-            .getString("WorkingCenterSelectDialog.available.centers.label"), //$NON-NLS-1$
+        widgetCreator.createComboViewer(contents,
+            Messages.WorkingCenterSelectDialog_available_centers_label,
             objectList, noCenterString, null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -62,6 +64,14 @@ public class WorkingCenterSelectDialog extends BiobankDialog {
                         currentCenter = (CenterWrapper<?>) selectedObject;
                     else
                         currentCenter = null;
+                }
+            }, new BiobankLabelProvider() {
+                @Override
+                public String getText(Object element) {
+                    if (element instanceof CenterWrapper) {
+                        return ((CenterWrapper<?>) element).getNameShort();
+                    }
+                    return super.getText(element);
                 }
             });
     }

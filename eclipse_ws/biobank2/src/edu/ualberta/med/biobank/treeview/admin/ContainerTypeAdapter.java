@@ -21,41 +21,37 @@ public class ContainerTypeAdapter extends AdapterBase {
         super(parent, containerType);
     }
 
-    public ContainerTypeWrapper getContainerType() {
-        return (ContainerTypeWrapper) modelObject;
-    }
-
     @Override
     protected String getLabelInternal() {
-        ContainerTypeWrapper containerType = getContainerType();
-        Assert.isNotNull(containerType, "container type is null");
+        ContainerTypeWrapper containerType = (ContainerTypeWrapper) getModelObject();
+        Assert.isNotNull(containerType, "container type is null"); //$NON-NLS-1$
         return containerType.getName();
     }
 
     @Override
     public String getTooltipText() {
-        ContainerTypeWrapper type = getContainerType();
+        ContainerTypeWrapper type = (ContainerTypeWrapper) getModelObject();
         if (type != null) {
             SiteWrapper site = type.getSite();
             if (site != null) {
-                return site.getNameShort() + " - "
-                    + getTooltipText("Container Type");
+                return site.getNameShort() + " - " //$NON-NLS-1$
+                    + getTooltipText(Messages.ContainerTypeAdapter_type_label);
             }
         }
-        return getTooltipText("Container Type");
+        return getTooltipText(Messages.ContainerTypeAdapter_type_label);
 
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Container Type");
-        addViewMenu(menu, "Container Type");
-        addDeleteMenu(menu, "Container Type");
+        addEditMenu(menu, Messages.ContainerTypeAdapter_type_label);
+        addViewMenu(menu, Messages.ContainerTypeAdapter_type_label);
+        addDeleteMenu(menu, Messages.ContainerTypeAdapter_type_label);
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this container type?";
+        return Messages.ContainerTypeAdapter_delete_confirm_msg;
     }
 
     @Override

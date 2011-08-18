@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,12 +12,17 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
+import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.base.CenterBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Request;
+import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -57,6 +63,7 @@ public abstract class CenterWrapper<E extends Center> extends
         aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.PHONE_NUMBER));
         aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.FAX_NUMBER));
         aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.EMAIL_ADDRESS));
+        aList.add(CenterPeer.ADDRESS.wrap(AddressPeer.COUNTRY));
 
         return aList;
     }
@@ -132,6 +139,14 @@ public abstract class CenterWrapper<E extends Center> extends
 
     public void setEmailAddress(String emailAddress) {
         initAddress().setProperty(AddressPeer.EMAIL_ADDRESS, emailAddress);
+    }
+
+    public String getCountry() {
+        return getProperty(getAddress(), AddressPeer.COUNTRY);
+    }
+
+    public void setCountry(String country) {
+        initAddress().setProperty(AddressPeer.COUNTRY, country);
     }
 
     public static final String PROCESSING_EVENT_COUNT_QRY = "select count(proc) from "
@@ -439,4 +454,37 @@ public abstract class CenterWrapper<E extends Center> extends
     // ProcessingEventPeer.CENTER, ProcessingEvent.class,
     // ProcessingEventWrapper.class, sort);
     // }
+
+    private static final String PENDING_REQUEST_STRING = "select distinct(ra."
+        + RequestSpecimenPeer.REQUEST.getName()
+        + ") from "
+        + RequestSpecimen.class.getName()
+        + " ra where ra."
+        + Property.concatNames(RequestSpecimenPeer.SPECIMEN,
+            SpecimenPeer.CURRENT_CENTER) + " = ? and ra.state = "
+        + RequestSpecimenState.AVAILABLE_STATE.getId() + " or ra.state = "
+        + RequestSpecimenState.PULLED_STATE.getId();
+
+    public static Collection<? extends ModelWrapper<?>> getRequestCollection(
+        WritableApplicationService appService, CenterWrapper<?> center)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(PENDING_REQUEST_STRING,
+            Arrays.asList(new Object[] { center.getWrappedObject() }));
+        List<Request> requests = appService.query(criteria);
+        if (requests.size() == 0)
+            return null;
+        else
+            return wrapModelCollection(appService, requests,
+                RequestWrapper.class);
+    }
+
+    public List<StudyWrapper> getStudyCollection() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public boolean canUpdate(User user) {
+        return user.isInSuperAdminMode()
+            || user.isAdministratorForCurrentCenter();
+    }
 }

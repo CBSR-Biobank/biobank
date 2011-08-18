@@ -25,7 +25,7 @@ public abstract class AbstractDispatchGroup extends AdapterBase {
 
     @Override
     public void openViewForm() {
-        Assert.isTrue(false, "should not be called");
+        Assert.isTrue(false, "should not be called"); //$NON-NLS-1$
     }
 
     @Override
@@ -45,7 +45,7 @@ public abstract class AbstractDispatchGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-
+        //
     }
 
     @Override

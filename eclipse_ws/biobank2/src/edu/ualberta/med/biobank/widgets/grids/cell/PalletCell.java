@@ -20,7 +20,7 @@ public class PalletCell extends AbstractUICell {
 
     private String information;
 
-    private String title = "";
+    private String title = ""; //$NON-NLS-1$
 
     private SpecimenWrapper sourceSpecimen;
 
@@ -34,16 +34,12 @@ public class PalletCell extends AbstractUICell {
         this.scanCell = scanCell;
     }
 
-    public static Map<RowColPos, PalletCell> convertArray(ScanCell[][] scancells) {
+    public static Map<RowColPos, PalletCell> convertArray(
+        List<ScanCell> scancells) {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
-        for (int i = 0; i < ScanCell.ROW_MAX; i++) {
-            for (int j = 0; j < ScanCell.COL_MAX; j++) {
-                ScanCell scanCell = scancells[i][j];
-                if (scanCell != null && scanCell.getValue() != null) {
-                    palletScanned.put(new RowColPos(i, j), new PalletCell(
-                        scanCell));
-                }
-            }
+        for (ScanCell cell : scancells) {
+            palletScanned.put(new RowColPos(cell.getRow(), cell.getColumn()),
+                new PalletCell(cell));
         }
         return palletScanned;
     }
@@ -160,7 +156,7 @@ public class PalletCell extends AbstractUICell {
             }
             return type.getName();
         }
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     public SpecimenTypeWrapper getType() {
@@ -276,11 +272,12 @@ public class PalletCell extends AbstractUICell {
             getStatus() == null ? null : CellStatus.valueOf(getStatus().name()));
         serverCell.setExpectedSpecimenId(getExpectedSpecimen() == null ? null
             : getExpectedSpecimen().getId());
+        if (getStatus() != null)
+            serverCell.setStatus(CellStatus.valueOf(getStatus().name()));
         serverCell.setInformation(getInformation());
         serverCell.setSpecimenId(getSpecimen() == null ? null : getSpecimen()
             .getId());
         serverCell.setTitle(getTitle());
         return serverCell;
     }
-
 }

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms.utils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -8,16 +9,18 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
@@ -27,11 +30,11 @@ import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManage
 
 public class PalletScanManagement {
 
-    protected Map<RowColPos, PalletCell> cells;
-    private int successfulScansCount = 0;
+    protected Map<RowColPos, PalletCell> cells = new HashMap<RowColPos, PalletCell>();
+    private int scansCount = 0;
     private boolean useScanner = true;
 
-    private boolean scanTubeAloneMode = false;
+    private boolean scanTubeAloneMode = true;
 
     public void launchScanAndProcessResult(final String plateToScan) {
         launchScanAndProcessResult(plateToScan,
@@ -43,25 +46,26 @@ public class PalletScanManagement {
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) {
-                monitor.beginTask("Scan and process...",
+                monitor.beginTask(Messages.PalletScanManagement_scan_progress,
                     IProgressMonitor.UNKNOWN);
                 try {
                     launchScan(monitor, plateToScan, profile, isRescanMode);
                     processScanResult(monitor);
                     afterScanAndProcess();
                 } catch (RemoteConnectFailureException exp) {
-                    BiobankPlugin.openRemoteConnectErrorMessage(exp);
+                    BgcPlugin.openRemoteConnectErrorMessage(exp);
                     scanAndProcessError(null);
                 } catch (Exception e) {
-                    BiobankPlugin
-                        .openAsyncError(Messages
-                            .getString("linkAssign.dialog.scanError.title"), //$NON-NLS-1$
+                    BgcPlugin
+                        .openAsyncError(
+                            Messages.PalletScanManagement_dialog_scanError_title,
                             e);
                     String msg = e.getMessage();
                     if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
                         msg = e.getCause().getMessage();
                     }
-                    scanAndProcessError("ERROR: " + msg);
+                    scanAndProcessError(Messages.PalletScanManagement_error_title
+                        + msg);
                 }
                 monitor.done();
             }
@@ -77,7 +81,7 @@ public class PalletScanManagement {
 
     private void launchScan(IProgressMonitor monitor, String plateToScan,
         String profile, boolean rescanMode) throws Exception {
-        monitor.subTask("Launching scan");
+        monitor.subTask(Messages.PalletScanManagement_launching);
         beforeScan();
         Map<RowColPos, PalletCell> oldCells = cells;
         if (BiobankPlugin.isRealScanEnabled()) {
@@ -85,73 +89,81 @@ public class PalletScanManagement {
                 plateToScan);
             if (plateNum == -1) {
                 plateError();
-                BiobankPlugin.openAsyncError("Scan error",
-                    "Plate with barcode " + plateToScan + " is not enabled");
+                BgcPlugin
+                    .openAsyncError(
+                        Messages.PalletScanManagement_scan_error_title,
+                        NLS.bind(
+                            Messages.PalletScanManagement_scan_error_msg_notenabled,
+                            plateToScan));
                 return;
             } else {
-                ScanCell[][] scanCells = null;
+                List<ScanCell> scanCells = null;
                 try {
-                    scanCells = ScannerConfigPlugin.scan(plateNum, profile);
+                    scanCells = ScannerConfigPlugin.decodePlate(plateNum,
+                        profile);
                     cells = PalletCell.convertArray(scanCells);
-                    successfulScansCount++;
                 } catch (Exception ex) {
-                    BiobankPlugin
-                        .openAsyncError(
-                            "Scan error", //$NON-NLS-1$
-                            ex,
-                            "Barcodes can still be scanned with the handheld 2D scanner.");
+                    BgcPlugin.openAsyncError(
+                        Messages.PalletScanManagement_scan_error_title, ex,
+                        Messages.PalletScanManagement_scan_error_msg_2dScanner);
                     return;
+                } finally {
+                    scansCount++;
+                    afterScanBeforeMerge();
                 }
             }
         } else {
             cells = getFakeScanCells();
-            successfulScansCount++;
+            scansCount++;
+            afterScanBeforeMerge();
         }
-        beforeScanMerge();
-        if (cells == null) {
-            cells = new HashMap<RowColPos, PalletCell>();
-        } else {
-            Map<String, PalletCell> cellValues = getValuesMap(cells);
-            if (rescanMode && oldCells != null) {
-                // rescan: merge previous scan with new in case the scanner
-                // wasn't able to scan well
-                for (Entry<RowColPos, PalletCell> entry : oldCells.entrySet()) {
-                    RowColPos rcp = entry.getKey();
-                    PalletCell oldScannedCell = entry.getValue();
-                    PalletCell newScannedCell = cells.get(rcp);
-                    boolean copyOldValue = false;
-                    if (PalletCell.hasValue(oldScannedCell)) {
-                        copyOldValue = true;
-                        if (PalletCell.hasValue(newScannedCell)
-                            && !oldScannedCell.getValue().equals(
-                                newScannedCell.getValue())) {
-                            // Different values at same position
-                            cells = oldCells;
-                            throw new Exception(
-                                "Scan Aborted: previously scanned specimens has been replaced. "
-                                    + "If this is not a re-scan, reset and start again.");
-                        } else if (!PalletCell.hasValue(newScannedCell)) {
-                            // previous position has value - new has none
-                            PalletCell newPosition = cellValues
-                                .get(oldScannedCell.getValue());
-                            if (newPosition != null) {
-                                // still there but moved to another position, so
-                                // don't copy previous scanned position
-                                copyOldValue = false;
-                            }
+        Map<String, PalletCell> cellValues = getValuesMap(cells);
+        if (rescanMode && oldCells != null) {
+            // rescan: merge previous scan with new in case the scanner
+            // wasn't able to scan well
+            boolean rescanDifferent = false;
+            for (Entry<RowColPos, PalletCell> entry : oldCells.entrySet()) {
+                RowColPos rcp = entry.getKey();
+                PalletCell oldScannedCell = entry.getValue();
+                PalletCell newScannedCell = cells.get(rcp);
+                boolean copyOldValue = false;
+                if (PalletCell.hasValue(oldScannedCell)) {
+                    copyOldValue = true;
+                    if (PalletCell.hasValue(newScannedCell)
+                        && !oldScannedCell.getValue().equals(
+                            newScannedCell.getValue())) {
+                        // Different values at same position
+                        oldScannedCell
+                            .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
+                                .getInformation() : "") //$NON-NLS-1$
+                                + " " + Messages.PalletScanManagement_rescan_differnt_msg); //$NON-NLS-1$
+                        oldScannedCell.setStatus(CellStatus.ERROR);
+                        rescanDifferent = true;
+
+                    } else if (!PalletCell.hasValue(newScannedCell)) {
+                        // previous position has value - new has none
+                        PalletCell newPosition = cellValues.get(oldScannedCell
+                            .getValue());
+                        if (newPosition != null) {
+                            // still there but moved to another position, so
+                            // don't copy previous scanned position
+                            copyOldValue = false;
                         }
                     }
-                    if (copyOldValue) {
-                        cells.put(rcp, oldScannedCell);
-                    }
+                }
+                if (copyOldValue) {
+                    cells.put(rcp, oldScannedCell);
                 }
             }
-            afterScan();
+            if (rescanDifferent)
+                throw new Exception(
+                    Messages.PalletScanManagement_scan_error_previous_different_msg);
         }
+        afterSuccessfulScan();
     }
 
     public void scanTubeAlone(MouseEvent e) {
-        if (scanTubeAloneMode) {
+        if (isScanTubeAloneMode()) {
             RowColPos rcp = ((ScanPalletWidget) e.widget)
                 .getPositionAtCoordinates(e.x, e.y);
             if (rcp != null) {
@@ -169,7 +181,9 @@ public class PalletScanManagement {
                         try {
                             postprocessScanTubeAlone(cell);
                         } catch (Exception ex) {
-                            BiobankPlugin.openAsyncError("Scan tube error", ex);
+                            BgcPlugin.openAsyncError(
+                                Messages.PalletScanManagement_tube_error_title,
+                                ex);
                         }
                     }
                 }
@@ -202,11 +216,11 @@ public class PalletScanManagement {
     }
 
     protected void beforeThreadStart() {
-
+        // default does nothing
     }
 
     protected void beforeScan() {
-
+        // default does nothing
     }
 
     @SuppressWarnings("unused")
@@ -216,62 +230,59 @@ public class PalletScanManagement {
 
     @SuppressWarnings("unused")
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
-
+        // default does nothing
     }
 
     @SuppressWarnings("unused")
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-
+        // default does nothing
     }
 
-    protected void beforeScanMerge() {
-
+    protected void afterScanBeforeMerge() {
+        // default does nothing
     }
 
-    protected void afterScan() {
-
+    protected void afterSuccessfulScan() {
+        // default does nothing
     }
 
     protected void afterScanAndProcess() {
-
+        // default does nothing
     }
 
     protected void plateError() {
-
+        // default does nothing
     }
 
     protected void scanAndProcessError(
         @SuppressWarnings("unused") String errorMsg) {
-
+        // default does nothing
     }
 
     public Map<RowColPos, PalletCell> getCells() {
         return cells;
     }
 
-    public void reset() {
-        successfulScansCount = 0;
+    public void onReset() {
+        scansCount = 0;
         initCells();
     }
 
     public void setUseScanner(boolean useScanner) {
         this.useScanner = useScanner;
-        initCells();
     }
 
     private void initCells() {
-        if (useScanner)
-            cells = null;
-        else
-            cells = new HashMap<RowColPos, PalletCell>();
+        cells = new HashMap<RowColPos, PalletCell>();
     }
 
-    public int getSuccessfulScansCount() {
-        return successfulScansCount;
+    public int getScansCount() {
+        return scansCount;
     }
 
     public void toggleScanTubeAloneMode() {
-        scanTubeAloneMode = !scanTubeAloneMode;
+        // might want to remove this toggle thing if users don't ask for it back
+        // scanTubeAloneMode = !scanTubeAloneMode;
     }
 
     public boolean isScanTubeAloneMode() {

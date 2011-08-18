@@ -7,6 +7,8 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
+
 public class PalletLabelValidator extends AbstractValidator {
 
     /**
@@ -14,7 +16,7 @@ public class PalletLabelValidator extends AbstractValidator {
      * Need at least 3 repetitions
      */
     private static final Pattern PATTERN = Pattern
-        .compile("^(([A-Z]{2})|([A-Z][0-9])|([0-9]{2})){3,}");
+        .compile("^(([A-Z]{2})|([A-Z][0-9])|([0-9]{2})){3,}"); //$NON-NLS-1$
 
     public PalletLabelValidator(String message) {
         super(message);
@@ -24,7 +26,7 @@ public class PalletLabelValidator extends AbstractValidator {
     public IStatus validate(Object value) {
         if (value != null && !(value instanceof String)) {
             throw new RuntimeException(
-                "Not supposed to be called for non-strings.");
+                Messages.PalletLabelValidator_nonstring_error_msg);
         }
 
         if (value != null) {

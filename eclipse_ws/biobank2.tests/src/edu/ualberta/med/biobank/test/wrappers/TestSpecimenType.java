@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -8,16 +9,32 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropertyException;
 import edu.ualberta.med.biobank.test.TestDatabase;
+import edu.ualberta.med.biobank.test.internal.AliquotedSpecimenHelper;
+import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
+import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
+import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SourceSpecimenHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
+import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestSpecimenType extends TestDatabase {
 
@@ -76,7 +93,7 @@ public class TestSpecimenType extends TestDatabase {
         List<ContainerTypeWrapper> containerTypesSorted = type
             .getContainerTypeCollection(true);
         if (containerTypesSorted.size() > 1) {
-            for (int i = 0; i < containerTypesSorted.size() - 1; i++) {
+            for (int i = 0; i < (containerTypesSorted.size() - 1); i++) {
                 ContainerTypeWrapper cType1 = containerTypesSorted.get(i);
                 ContainerTypeWrapper cType2 = containerTypesSorted.get(i + 1);
                 Assert.assertTrue(cType1.compareTo(cType2) <= 0);
@@ -127,7 +144,8 @@ public class TestSpecimenType extends TestDatabase {
             .getSpecimenTypeForContainerTypes(appService, site, "YPE");
         // We've got a sample type in 2 different container. The method return a
         // set, so we have only one occurrence of this sample type
-        Assert.assertEquals(type1Size + type2Size - 1, sampleTypesFound.size());
+        Assert.assertEquals((type1Size + type2Size) - 1,
+            sampleTypesFound.size());
     }
 
     @Test
@@ -149,7 +167,7 @@ public class TestSpecimenType extends TestDatabase {
         List<SpecimenTypeWrapper> types = SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, true);
         if (types.size() > 1) {
-            for (int i = 0; i < types.size() - 1; i++) {
+            for (int i = 0; i < (types.size() - 1); i++) {
                 SpecimenTypeWrapper cType1 = types.get(i);
                 SpecimenTypeWrapper cType2 = types.get(i + 1);
                 Assert.assertTrue(cType1.compareTo(cType2) <= 0);
@@ -261,6 +279,144 @@ public class TestSpecimenType extends TestDatabase {
             id);
         // object is not anymore in database
         Assert.assertNull(typeInDB);
+    }
+
+    @Test
+    public void testDeleteUsedInSourceSpecimen() throws Exception {
+        String name = "testDeleteUsedInSourceSpecimen" + r.nextInt();
+        SpecimenTypeWrapper type = SpecimenTypeHelper.addSpecimenType(name,
+            false);
+
+        StudyWrapper study = StudyHelper.addStudy(name);
+
+        // test used with Source Specimen
+        SourceSpecimenWrapper ssw = SourceSpecimenHelper.addSourceSpecimen(
+            study, type, true, true);
+        type.reload();
+        try {
+            type.delete();
+            Assert
+                .fail("Should not be able to delete it - deleteCheck should fail");
+        } catch (BiobankDeleteException bde) {
+            Assert.assertTrue(true);
+        }
+
+        ssw.delete();
+        // can remove once it is not used anymore
+        type.reload();
+        type.delete();
+    }
+
+    @Test
+    public void testDeleteUsedInAliquotedSpecimen() throws Exception {
+        String name = "testDeleteUsedInAliquotedSpecimen" + r.nextInt();
+        SpecimenTypeWrapper type = SpecimenTypeHelper.addSpecimenType(name,
+            false);
+
+        StudyWrapper study = StudyHelper.addStudy(name);
+
+        // test used with Aliquoted Specimen
+        AliquotedSpecimenWrapper asw = AliquotedSpecimenHelper
+            .addAliquotedSpecimen(study, type);
+        type.reload();
+        try {
+            type.delete();
+            Assert
+                .fail("Should not be able to delete it - deleteCheck should fail");
+        } catch (BiobankDeleteException bde) {
+            Assert.assertTrue(true);
+        }
+
+        asw.delete();
+        // can remove once it is not used anymore
+        type.reload();
+        type.delete();
+    }
+
+    @Test
+    public void testDeleteUsedInSpecimen() throws Exception {
+        String name = "testDeleteUsedInSpecimen" + r.nextInt();
+        SpecimenTypeWrapper type = SpecimenTypeHelper.addSpecimenType(name,
+            false);
+
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        StudyWrapper study = StudyHelper.newStudy(name);
+        study.addToContactCollection(Arrays.asList(contact));
+        study.persist();
+        StudyHelper.createdStudies.add(study);
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+
+        CollectionEventWrapper cevent = CollectionEventHelper
+            .addCollectionEvent(clinic, patient, 1,
+                SpecimenHelper.newSpecimen(type));
+
+        // test used with Specimen
+        type.reload();
+        try {
+            type.delete();
+            Assert
+                .fail("Should not be able to delete it - deleteCheck should fail");
+        } catch (BiobankDeleteException bde) {
+            Assert.assertTrue(true);
+        }
+
+        cevent.getOriginalSpecimenCollection(false).get(0).delete();
+        // can remove once it is not used anymore
+        type.reload();
+        type.delete();
+    }
+
+    @Test
+    public void testDeleteHasChildren() throws Exception {
+        String name = "testDeleteHasChildren" + r.nextInt();
+        SpecimenTypeWrapper parent = SpecimenTypeHelper.addSpecimenType(name
+            + "_parent", false);
+        SpecimenTypeWrapper child = SpecimenTypeHelper.addSpecimenType(name
+            + "_child", true);
+
+        parent.addToChildSpecimenTypeCollection(Arrays.asList(child));
+        parent.persist();
+
+        child.reload();
+        parent.reload();
+        Integer parentId = parent.getId();
+        Integer childId = child.getId();
+        parent.delete();
+
+        // parent should be deleted but not the child
+        SpecimenType parentInDB = ModelUtils.getObjectWithId(appService,
+            SpecimenType.class, parentId);
+        Assert.assertNull(parentInDB);
+        SpecimenType childInDB = ModelUtils.getObjectWithId(appService,
+            SpecimenType.class, childId);
+        Assert.assertNotNull(childInDB);
+    }
+
+    @Test
+    public void testDeleteHasParent() throws Exception {
+        String name = "testDeleteHasParent" + r.nextInt();
+        SpecimenTypeWrapper parent = SpecimenTypeHelper.addSpecimenType(name
+            + "_parent", true);
+        SpecimenTypeWrapper child = SpecimenTypeHelper.addSpecimenType(name
+            + "_child", false);
+
+        parent.addToChildSpecimenTypeCollection(Arrays.asList(child));
+        parent.persist();
+
+        child.reload();
+        parent.reload();
+        Integer parentId = parent.getId();
+        Integer childId = child.getId();
+        child.delete();
+
+        // child should be deleted but not the parent
+        SpecimenType parentInDB = ModelUtils.getObjectWithId(appService,
+            SpecimenType.class, parentId);
+        Assert.assertNotNull(parentInDB);
+        SpecimenType childInDB = ModelUtils.getObjectWithId(appService,
+            SpecimenType.class, childId);
+        Assert.assertNull(childInDB);
     }
 
     @Test

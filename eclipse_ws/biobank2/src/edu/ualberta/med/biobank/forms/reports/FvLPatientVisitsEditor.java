@@ -7,16 +7,19 @@ import org.eclipse.swt.widgets.Composite;
 
 public class FvLPatientVisitsEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.FvLPatientVisitsEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.FvLPatientVisitsEditor"; //$NON-NLS-1$
 
     @Override
     protected void createOptionSection(Composite parent) {
+        //
     }
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Study", "Center", "First Specimen Time Drawn",
-            "Last Specimen Time Drawn" };
+        return new String[] { Messages.FvLPatientVisitsEditor_study_label,
+            Messages.FvLPatientVisitsEditor_center_label,
+            Messages.FvLPatientVisitsEditor_first_spec_time_label,
+            Messages.FvLPatientVisitsEditor_last_spec_time_label };
     }
 
     @Override
@@ -26,6 +29,7 @@ public class FvLPatientVisitsEditor extends ReportsEditor {
 
     @Override
     protected void initReport() throws Exception {
+        //
     }
 
     @Override

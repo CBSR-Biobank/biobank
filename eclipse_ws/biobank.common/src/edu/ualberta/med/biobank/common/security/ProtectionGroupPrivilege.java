@@ -78,13 +78,13 @@ public class ProtectionGroupPrivilege implements Serializable, NotAProxy {
 
     @Override
     public int hashCode() {
-        assert false : "hashCode not designed";
+        assert false : "hashCode not designed"; //$NON-NLS-1$
         return 42; // any arbitrary constant will do
     }
 
     @Override
     public String toString() {
-        return getName() + "/" + getPrivileges();
+        return getName() + "/" + getPrivileges(); //$NON-NLS-1$
     }
 
 }

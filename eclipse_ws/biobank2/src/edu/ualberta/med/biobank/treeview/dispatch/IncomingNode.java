@@ -10,15 +10,17 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.request.ReceivingRequestGroup;
 
 public class IncomingNode extends AdapterBase {
 
     private ReceivingInTransitDispatchGroup receivedTransitNode;
     private ReceivingNoErrorsDispatchGroup receivingNode;
     private ReceivingWithErrorsDispatchGroup receivingWithErrorsNode;
+    private ReceivingRequestGroup requestNode;
 
     public IncomingNode(AdapterBase parent, int id, CenterWrapper<?> center) {
-        super(parent, id, "Incoming", true, false);
+        super(parent, id, Messages.IncomingNode_incoming_node_label, true, false);
         receivedTransitNode = new ReceivingInTransitDispatchGroup(this, 0,
             center);
         receivedTransitNode.setParent(this);
@@ -32,6 +34,10 @@ public class IncomingNode extends AdapterBase {
             center);
         receivingWithErrorsNode.setParent(this);
         addChild(receivingWithErrorsNode);
+
+        requestNode = new ReceivingRequestGroup(this, 3, center);
+        requestNode.setParent(this);
+        addChild(requestNode);
 
     }
 
@@ -47,7 +53,7 @@ public class IncomingNode extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-
+        //
     }
 
     @Override

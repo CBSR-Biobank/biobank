@@ -6,15 +6,15 @@ import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.views.CollectionView;
 
 public class CollectionEventAddHandler extends AbstractHandler {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(CollectionEventAddHandler.class.getName());
 
     @Override
@@ -23,12 +23,13 @@ public class CollectionEventAddHandler extends AbstractHandler {
             PatientAdapter patientAdapter = CollectionView.getCurrentPatient();
             CollectionEventWrapper ceWrapper = new CollectionEventWrapper(
                 SessionManager.getAppService());
-            ceWrapper.setPatient(patientAdapter.getWrapper());
+            ceWrapper.setPatient((PatientWrapper) patientAdapter
+                .getModelObject());
             CollectionEventAdapter adapter = new CollectionEventAdapter(
                 patientAdapter, ceWrapper);
             adapter.openEntryForm();
         } catch (Exception exp) {
-            logger.error("Error while opening the collection event entry form",
+            logger.error("Error while opening the collection event entry form", //$NON-NLS-1$
                 exp);
         }
         return null;
@@ -36,6 +37,6 @@ public class CollectionEventAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(ProcessingEventWrapper.class);
+        return SessionManager.canCreate(CollectionEventWrapper.class);
     }
 }

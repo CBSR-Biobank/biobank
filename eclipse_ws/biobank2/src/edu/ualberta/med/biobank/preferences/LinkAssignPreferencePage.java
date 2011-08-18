@@ -30,19 +30,19 @@ public class LinkAssignPreferencePage extends FieldEditorPreferencePage
     @Override
     public void createFieldEditors() {
         addField(new StringFieldEditor(PreferenceConstants.GENERAL_CONFIRM,
-            "Confirm barcode:", getFieldEditorParent()));
+            Messages.LinkAssignPreferencePage_confirm_barcode_label, getFieldEditorParent()));
         addField(new StringFieldEditor(PreferenceConstants.GENERAL_CANCEL,
-            "Cancel barcode:", getFieldEditorParent()));
+            Messages.LinkAssignPreferencePage_cancel_barcode_label, getFieldEditorParent()));
         addField(new BooleanFieldEditor(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE,
-            "Save activity logs into a file", getFieldEditorParent()));
+            Messages.LinkAssignPreferencePage_save_logs_label, getFieldEditorParent()));
         logPath = new DirectoryFieldEditor(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
-            "Path for activity logs files", getFieldEditorParent());
+            Messages.LinkAssignPreferencePage_logs_path_label, getFieldEditorParent());
         addField(logPath);
         addField(new BooleanFieldEditor(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_ASK_PRINT,
-            "Ask to print activity log", getFieldEditorParent()));
+            Messages.LinkAssignPreferencePage_ask_print_label, getFieldEditorParent()));
     }
 
     /*
@@ -53,6 +53,7 @@ public class LinkAssignPreferencePage extends FieldEditorPreferencePage
      */
     @Override
     public void init(IWorkbench workbench) {
+        //
     }
 
     @Override

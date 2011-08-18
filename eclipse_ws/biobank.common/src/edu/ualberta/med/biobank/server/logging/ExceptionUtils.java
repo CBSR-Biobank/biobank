@@ -7,7 +7,7 @@ import java.io.StringWriter;
 
 public class ExceptionUtils {
 
-    private static final String FILE_PREFIX_DEFAULT = "biobanklogappender";
+    private static final String FILE_PREFIX_DEFAULT = "biobanklogappender"; //$NON-NLS-1$
 
     public static void writeMsgToTmpFile(Throwable t) {
         // print into server logs but save in a file anyway
@@ -23,7 +23,7 @@ public class ExceptionUtils {
     public static void writeMsgToTmpFile(String fileprefix, Throwable t) {
         FileWriter writer = null;
         try {
-            File f = new File(fileprefix + System.currentTimeMillis() + ".log");
+            File f = new File(fileprefix + System.currentTimeMillis() + ".log"); //$NON-NLS-1$
             writer = new FileWriter(f);
             writer.write(getErrorAndStack(t));
             writer.flush();
@@ -41,7 +41,7 @@ public class ExceptionUtils {
         if (t == null) {
             return null;
         }
-        return t.getMessage() + System.getProperty("line.separator")
+        return t.getMessage() + System.getProperty("line.separator") //$NON-NLS-1$
             + getStackTrace(t).toString();
     }
 

@@ -5,6 +5,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 
 public class ScannerBarcodeValidator extends AbstractValidator {
 
@@ -16,7 +17,7 @@ public class ScannerBarcodeValidator extends AbstractValidator {
     public IStatus validate(Object value) {
         if (!(value instanceof String)) {
             throw new RuntimeException(
-                "Not supposed to be called for non-strings.");
+                Messages.ScannerBarcodeValidator_nonstring_error_msg);
         }
 
         String barcode = (String) value;

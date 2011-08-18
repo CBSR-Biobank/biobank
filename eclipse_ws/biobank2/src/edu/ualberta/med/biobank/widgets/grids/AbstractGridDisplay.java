@@ -185,8 +185,8 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         super.setContainerType(type);
         Integer rowCap = containerType.getRowCapacity();
         Integer colCap = containerType.getColCapacity();
-        Assert.isNotNull(rowCap, "row capacity is null");
-        Assert.isNotNull(colCap, "column capacity is null");
+        Assert.isNotNull(rowCap, "row capacity is null"); //$NON-NLS-1$
+        Assert.isNotNull(colCap, "column capacity is null"); //$NON-NLS-1$
         setStorageSize(rowCap, colCap);
         if (colCap <= 1) {
             // single dimension size

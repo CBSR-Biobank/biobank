@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
@@ -20,19 +21,18 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.PeListViewForm;
 import edu.ualberta.med.biobank.forms.SpecimenListViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
 public enum SearchType {
-    INVENTORY_ID("Inventory ID") {
+    INVENTORY_ID(Messages.SearchType_inventoryid_label) {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
             List<SpecimenWrapper> res = new ArrayList<SpecimenWrapper>();
             SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
-                SessionManager.getAppService(), searchString,
-                SessionManager.getUser());
+                SessionManager.getAppService(), searchString);
             if (specimen != null) {
                 res.add(specimen);
             }
@@ -41,7 +41,7 @@ public enum SearchType {
 
     },
 
-    SPECIMEN_POSITION("Specimen position") {
+    SPECIMEN_POSITION(Messages.SearchType_position_spec_label) {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -53,7 +53,7 @@ public enum SearchType {
         }
     },
 
-    SPECIMEN_NON_ACTIVE("Specimens - non active") {
+    SPECIMEN_NON_ACTIVE(Messages.SearchType_nonactive_spec_label) {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -66,14 +66,15 @@ public enum SearchType {
         @Override
         public void processResults(List<? extends ModelWrapper<?>> res) {
             Assert.isNotNull(res);
-            FormInput input = new FormInput(res, "Specimen List");
+            FormInput input = new FormInput(res,
+                Messages.SearchType_specimens_list_label);
             try {
                 PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                     .getActivePage()
                     .openEditor(input, SpecimenListViewForm.ID, false);
             } catch (PartInitException e) {
-                logger.error("Can't open form with id "
-                    + SpecimenListViewForm.ID, e);
+                logger.error(NLS.bind(CAN_T_OPEN_FORM_WITH_ID_MSG,
+                    SpecimenListViewForm.ID), e);
             }
         }
 
@@ -82,7 +83,7 @@ public enum SearchType {
         }
     },
 
-    CONTAINER_LABEL("Container label") {
+    CONTAINER_LABEL(Messages.SearchType_label_cont_label) {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -94,7 +95,7 @@ public enum SearchType {
         }
     },
 
-    CONTAINER_PRODUCT_BARCODE("Container product barcode") {
+    CONTAINER_PRODUCT_BARCODE(Messages.SearchType_barcode_cont_label) {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -111,7 +112,7 @@ public enum SearchType {
         }
     },
 
-    WORKSHEET("Worksheet") {
+    WORKSHEET(Messages.SearchType_worksheet_label) {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -128,20 +129,24 @@ public enum SearchType {
         @Override
         public void processResults(List<? extends ModelWrapper<?>> res) {
             Assert.isNotNull(res);
-            FormInput input = new FormInput(res, "Patient Visit List");
+            FormInput input = new FormInput(res,
+                Messages.SearchType_pEvent_list_title);
             try {
-                // FIXME result is processing event and we display CEvent ???
                 PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                     .getActivePage()
                     .openEditor(input, PeListViewForm.ID, false);
             } catch (PartInitException e) {
-                logger.error("Can't open form with id " + PeListViewForm.ID, e);
+                logger
+                    .error(NLS.bind(CAN_T_OPEN_FORM_WITH_ID_MSG,
+                        PeListViewForm.ID), e);
             }
         }
     };
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(SearchType.class.getName());
+    private static final String CAN_T_OPEN_FORM_WITH_ID_MSG = "Can''t open form with id {0}"; //$NON-NLS-1$
+
+    private static BgcLogger logger = BgcLogger.getLogger(SearchType.class
+        .getName());
 
     private String label;
 
@@ -163,11 +168,10 @@ public enum SearchType {
         if (size == 1) {
             openResult(res.get(0));
         } else {
-            boolean open = MessageDialog
-                .openQuestion(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(), "Search Result",
-                    "Found " + size
-                        + " results. Do you want to open all of them ?");
+            boolean open = MessageDialog.openQuestion(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(),
+                Messages.SearchType_question_title,
+                NLS.bind(Messages.SearchType_question_msg, size));
             if (open) {
                 for (ModelWrapper<?> wrapper : res) {
                     openResult(wrapper);

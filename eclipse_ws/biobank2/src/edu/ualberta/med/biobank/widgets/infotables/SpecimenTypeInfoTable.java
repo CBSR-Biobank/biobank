@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -10,12 +9,15 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> {
 
-    private static final String[] HEADINGS = new String[] { "Name",
-        "Short Name" };
+    private static final int PAGE_SIZE_ROWS = 10;
+
+    private static final String[] HEADINGS = new String[] { Messages.SpecimenTypeInfoTable_type_label,
+        Messages.SpecimenTypeInfoTable_shortname_label };
 
     public SpecimenTypeInfoTable(Composite parent,
-        List<SpecimenTypeWrapper> specimenCollection) {
-        super(parent, specimenCollection, HEADINGS, 20);
+        List<SpecimenTypeWrapper> sampleTypeCollection) {
+        super(parent, sampleTypeCollection, HEADINGS, PAGE_SIZE_ROWS,
+            SpecimenTypeWrapper.class);
     }
 
     @Override
@@ -26,9 +28,9 @@ public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> 
                 SpecimenTypeWrapper item = (SpecimenTypeWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.SpecimenTypeInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
@@ -36,7 +38,7 @@ public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> 
                 case 1:
                     return item.getNameShort();
                 default:
-                    return null;
+                    return ""; //$NON-NLS-1$
                 }
             }
         };
@@ -44,24 +46,15 @@ public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> 
 
     @Override
     protected String getCollectionModelObjectToString(Object o) {
-        // if (o == null)
-        // return null;
-        // return ((SourceVesselWrapper) o).getSourceVesselType().getName();
-        return null;
-    }
-
-    @Override
-    public SpecimenTypeWrapper getSelection() {
-        BiobankCollectionModel item = getSelectionInternal();
-        if (item == null)
+        if (o == null)
             return null;
-        SpecimenTypeWrapper source = (SpecimenTypeWrapper) item.o;
-        Assert.isNotNull(source);
-        return source;
+        SpecimenTypeWrapper type = (SpecimenTypeWrapper) o;
+        return type.getName() + "\t" + type.getNameShort(); //$NON-NLS-1$
     }
 
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
     }
+
 }

@@ -25,19 +25,19 @@
 #       biobank.ico
 #       ...ETC
 #
-#  biobank2_exported
+#  biobank_exported
 #       |
-#       biobank2.exe
-#       biobank2.ini
+#       biobank.exe
+#       biobank.ini
 #       ..ETC
 #
 #  createInstaller.pl
 #
 # Example:
-#       ./createInstaller.pl biobank2_exported nsis
+#       ./createInstaller.pl biobank_exported nsis
 #
 # This will create:
-#       BioBank2Installer-$VERSION.exe
+#       BioBankInstaller-$VERSION.exe
 #
 ################################################################################
 
@@ -76,7 +76,7 @@ mkdir "tmp";
 
 
 #get version number
-`./7zip/7z.exe e $EXPORT_DIR/plugins/biobank2_*.jar META-INF/MANIFEST.MF -otmp`;
+`./7zip/7z.exe e $EXPORT_DIR/plugins/biobank_*.jar META-INF/MANIFEST.MF -otmp`;
 -e "tmp/MANIFEST.MF" or die "failed to extract manifest file";
 
 open(FH, "tmp/MANIFEST.MF") or die "could not open tmp/MANIFEST.MF";
@@ -84,7 +84,7 @@ while($line = <FH>){
         if($line =~ m/Bundle-Version: (.*)/ ){
                 $VERSION = $1;
                 $VERSION =~ s/\s+$//;
-                $BIOBANK_FOLDER = "BioBank2_v${VERSION}_win32";
+                $BIOBANK_FOLDER = "BioBank_v${VERSION}_win32";
                 print "Found biobank version: $VERSION\n";
                 last;
         }
@@ -101,7 +101,7 @@ print "Copying the exported biobank folder...\n";
 `cp -R $NSIS_DIR tmp/nsis`;
 -d "tmp/nsis" or die "could not create nsis directory";
 
-open(FH, "tmp/nsis/BioBank2.nsi") or die "failed to open tmp/nsis/Biobank.nsi";
+open(FH, "tmp/nsis/BioBank.nsi") or die "failed to open tmp/nsis/Biobank.nsi";
 open(FHA, ">tmp/nsis/BiobankTMP.nsi") or die "failed to create tmp/nsis/BiobankTMP.nsi";
 while($line = <FH>){
         if($line =~ m/define VERSION_STR/ ){
@@ -116,14 +116,14 @@ close(FH);
 
 print "Compiling nsis script...\n";
 `\"$NSIS_PROGRAM\" tmp/nsis/BiobankTMP.nsi`;
--e "tmp/BioBank2Installer-${VERSION}.exe" or die "nsis could not create installer";
+-e "tmp/BioBankInstaller-${VERSION}.exe" or die "nsis could not create installer";
 
 print "Moving installer...\n";
-`mv tmp/BioBank2Installer-${VERSION}.exe .`;
--e "BioBank2Installer-${VERSION}.exe" or die "could not move installer";
+`mv tmp/BioBankInstaller-${VERSION}.exe .`;
+-e "BioBankInstaller-${VERSION}.exe" or die "could not move installer";
 
 print "Cleaning up....\n";
 `rm -rf tmp`;
 !(-d "tmp") or die "temp directory could not be removed";
 
-print "Successfully created: BioBank2Installer-${VERSION}.exe\n";
+print "Successfully created: BioBankInstaller-${VERSION}.exe\n";

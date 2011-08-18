@@ -23,7 +23,7 @@ public class ReportsHandler extends AbstractHandler {
                     workbench.getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
             throw new ExecutionException(
-                "Perspective could not be initialized", e);
+                Messages.ReportsHandler_init_error, e);
         }
         return null;
 

@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -157,6 +158,42 @@ public class SpecimenHelper extends DbHelper {
      * If specified, the aliquoted specimens are liked to the container starting
      * at the position specified.
      * 
+     * @param site The site for the processing events
+     * @param parentSpc The parent specimens
+     * @param spcCount the number of specimens to create.
+     * @param spcTypes the specimen types to use (chosen randomly)
+     * @return A list of the aliquoted specimens that were created.
+     * @throws Exception
+     */
+    public static List<SpecimenWrapper> addSpecimens(SiteWrapper site,
+        SpecimenWrapper parentSpc, int spcCount,
+        List<SpecimenTypeWrapper> spcTypes) throws Exception {
+
+        CollectionEventWrapper ce = parentSpc.getCollectionEvent();
+
+        ProcessingEventWrapper pe = ProcessingEventHelper.addProcessingEvent(
+            site, ce.getPatient(), Utils.getRandomDate());
+
+        parentSpc.setProcessingEvent(pe);
+        parentSpc.persist();
+
+        List<SpecimenWrapper> spcs = new ArrayList<SpecimenWrapper>();
+
+        for (int i = 0; i < spcCount; ++i) {
+            SpecimenWrapper childSpc = SpecimenHelper.addSpecimen(parentSpc,
+                DbHelper.chooseRandomlyInList(spcTypes), ce, pe);
+            spcs.add(childSpc);
+        }
+
+        return spcs;
+    }
+
+    /**
+     * Creates aliquoted specimens and adds them to a newly created processing
+     * event. A source specimen is also created along with a collection event.
+     * If specified, the aliquoted specimens are liked to the container starting
+     * at the position specified.
+     * 
      * @param patient The patient the samples are from.
      * @param clinic The clinic the collection event is from.
      * @param container The container where to link the specimens to.
@@ -183,7 +220,7 @@ public class SpecimenHelper extends DbHelper {
 
         int posOffset = (rowStart * colCap) + colCap;
 
-        if (posOffset + spcCount >= rowCap * colCap) {
+        if ((posOffset + spcCount) >= (rowCap * colCap)) {
             throw new Exception("cannot fit number of specimens: " + spcCount);
         }
 

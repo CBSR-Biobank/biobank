@@ -31,7 +31,7 @@ import edu.ualberta.med.biobank.server.LocalInfo;
  */
 public class BiobankJDBCAppender extends AppenderSkeleton {
 
-    public static final String MYSQL_DIALECT = "org.hibernate.dialect.MySQLDialect";
+    public static final String MYSQL_DIALECT = "org.hibernate.dialect.MySQLDialect"; //$NON-NLS-1$
 
     private String application = null;
     private String dbUrl = null;
@@ -56,7 +56,7 @@ public class BiobankJDBCAppender extends AppenderSkeleton {
         }
 
         // Determine Log Type
-        String msg = "";
+        String msg = ""; //$NON-NLS-1$
         if (le.getMessage() != null) {
             msg = le.getMessage().toString();
         }
@@ -87,14 +87,14 @@ public class BiobankJDBCAppender extends AppenderSkeleton {
         Log log = new Log();
 
         StringTokenizer stringTokenizer = new StringTokenizer(
-            objectAttributeMessage, "&");
+            objectAttributeMessage, "&"); //$NON-NLS-1$
         while (stringTokenizer.hasMoreElements()) {
             String messagetemp = (String) stringTokenizer.nextElement();
-            if (messagetemp.indexOf("=") <= 0)
+            if (messagetemp.indexOf("=") <= 0) //$NON-NLS-1$
                 continue;
             String attributeName = messagetemp.substring(0,
-                messagetemp.indexOf("="));
-            String value = messagetemp.substring(messagetemp.indexOf("=") + 1);
+                messagetemp.indexOf("=")); //$NON-NLS-1$
+            String value = messagetemp.substring(messagetemp.indexOf("=") + 1); //$NON-NLS-1$
             LogWrapper logW = new LogWrapper(null, log);
             logW.setLogStringValue(attributeName, value);
         }
@@ -108,14 +108,14 @@ public class BiobankJDBCAppender extends AppenderSkeleton {
      */
     private Properties getJDBCProperties() {
         Properties props = new Properties();
-        props.setProperty("hibernate.connection.driver_class",
+        props.setProperty("hibernate.connection.driver_class", //$NON-NLS-1$
             getDbDriverClass());
-        props.setProperty("hibernate.connection.url", getDbUrl());
-        props.setProperty("hibernate.connection.username", getDbUser());
-        props.setProperty("hibernate.connection.password", getDbPwd());
+        props.setProperty("hibernate.connection.url", getDbUrl()); //$NON-NLS-1$
+        props.setProperty("hibernate.connection.username", getDbUser()); //$NON-NLS-1$
+        props.setProperty("hibernate.connection.password", getDbPwd()); //$NON-NLS-1$
 
-        if (getDbUrl().indexOf(":mysql") > -1) {
-            props.setProperty("hibernate.dialect", MYSQL_DIALECT);
+        if (getDbUrl().indexOf(":mysql") > -1) { //$NON-NLS-1$
+            props.setProperty("hibernate.dialect", MYSQL_DIALECT); //$NON-NLS-1$
         }
         return props;
     }

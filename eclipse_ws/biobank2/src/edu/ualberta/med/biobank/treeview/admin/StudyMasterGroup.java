@@ -18,14 +18,14 @@ import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 public class StudyMasterGroup extends AbstractStudyGroup {
 
     public StudyMasterGroup(SessionAdapter parent, int id) {
-        super(parent, id, "All Studies");
+        super(parent, id, Messages.StudyMasterGroup_studies_node_label);
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (SessionManager.canCreate(StudyWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add Study");
+            mi.setText(Messages.StudyMasterGroup_add_label);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

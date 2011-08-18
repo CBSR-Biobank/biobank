@@ -12,12 +12,12 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
 
     public SearchResultsInfoTable(Composite parent, List<Object> collection,
         String[] headings, int rows) {
-        super(parent, collection, headings, rows);
+        super(parent, collection, headings, rows, Object.class);
     }
 
     public SearchResultsInfoTable(Composite parent, List<Object> collection,
         String[] headings) {
-        super(parent, collection, headings);
+        super(parent, collection, headings, Object.class);
     }
 
     @Override
@@ -30,12 +30,12 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
                     if (m.o != null) {
                         return getColumnText(m.o, columnIndex);
                     } else if (columnIndex == 0) {
-                        return "loading ...";
+                        return Messages.SearchResultsInfoTable_loading;
                     }
                 } else if (element instanceof Object[]) {
                     Object[] castedVals = (Object[]) element;
                     if (castedVals[columnIndex] == null)
-                        return "";
+                        return ""; //$NON-NLS-1$
                     else {
                         if (castedVals[columnIndex] instanceof Date)
                             return DateFormatter
@@ -44,7 +44,7 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
                             return castedVals[columnIndex].toString();
                     }
                 }
-                return "no label provider";
+                return "no label provider"; //$NON-NLS-1$
             }
         };
     }
@@ -61,7 +61,7 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
         int count = 0;
         for (Object field : row) {
             if (count > 0) {
-                sb.append("\t");
+                sb.append("\t"); //$NON-NLS-1$
             }
             sb.append(field.toString());
             ++count;

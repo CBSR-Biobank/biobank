@@ -87,12 +87,12 @@ public abstract class AbstractContainerDisplay {
         if (containerType != null) {
             return parentLabel + containerType.getPositionString(rowcol);
         }
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     @SuppressWarnings("unused")
     public void setStorageSize(int rows, int columns) {
-
+        //
     }
 
     public Point getSizeToApply() {

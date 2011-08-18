@@ -7,18 +7,20 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(ReportTableWidget.class.getName());
 
     public ReportTableWidget(Composite parent, List<T> collection,
@@ -50,22 +52,29 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     @Override
     public BiobankLabelProvider getLabelProvider() {
+        return getLabelProvider(true);
+    }
+
+    public BiobankLabelProvider getLabelProvider(final boolean formatNumbers) {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 if (element instanceof Object[]) {
                     Object[] castedVals = (Object[]) element;
                     if (castedVals[columnIndex] == null)
-                        return "";
+                        return ""; //$NON-NLS-1$
                     else {
                         if (castedVals[columnIndex] instanceof Date)
                             return DateFormatter
                                 .formatAsDate((Date) castedVals[columnIndex]);
-                        else
-                            return castedVals[columnIndex].toString();
+                        if (formatNumbers
+                            && castedVals[columnIndex] instanceof Number)
+                            return NumberFormatter
+                                .format((Number) castedVals[columnIndex]);
+                        return castedVals[columnIndex].toString();
                     }
                 }
-                return "no label provider";
+                return "no label provider"; //$NON-NLS-1$
             }
         };
     }
@@ -150,7 +159,7 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
                 }
             });
         } catch (Exception e) {
-            logger.error("setCollection error", e);
+            logger.error("setCollection error", e); //$NON-NLS-1$
         }
 
     }
@@ -203,11 +212,13 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     @Override
     protected void setPageLabelText() {
+        String total;
         if (pageInfo.pageTotal > 0)
-            pageLabel.setText("Page: " + (pageInfo.page + 1) + " of "
-                + pageInfo.pageTotal);
+            total = String.valueOf(pageInfo.pageTotal);
         else
-            pageLabel.setText("Page: " + (pageInfo.page + 1) + " of " + "?");
+            total = "?"; //$NON-NLS-1$
+        pageLabel.setText(NLS.bind(Messages.ReportTableWidget_pages_label,
+            (pageInfo.page + 1), total));
     }
 
     @Override
@@ -217,10 +228,11 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
                 int realSize = ((AbstractBiobankListProxy<?>) collection)
                     .getRealSize();
                 if (realSize != -1)
-                    pageInfo.pageTotal = realSize / pageInfo.rowsPerPage + 1;
+                    pageInfo.pageTotal = (realSize - 1) / pageInfo.rowsPerPage
+                        + 1;
             } else
-                pageInfo.pageTotal = collection.size() / pageInfo.rowsPerPage
-                    + 1;
+                pageInfo.pageTotal = (collection.size() - 1)
+                    / pageInfo.rowsPerPage + 1;
         }
     }
 

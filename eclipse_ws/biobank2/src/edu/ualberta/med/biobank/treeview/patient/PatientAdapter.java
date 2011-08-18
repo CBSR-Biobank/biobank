@@ -20,13 +20,13 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class PatientAdapter extends AdapterBase {
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(PatientAdapter.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(PatientAdapter.class
+        .getName());
 
     public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper) {
         super(parent, patientWrapper);
@@ -35,32 +35,33 @@ public class PatientAdapter extends AdapterBase {
             try {
                 hasChildren = patientWrapper.getCollectionEventCount(true) > 0;
             } catch (Exception e) {
-                logger.error("error counting events in patient", e);
+                logger.error("error counting events in patient", e); //$NON-NLS-1$
             }
             setHasChildren(hasChildren);
         }
     }
 
-    public PatientWrapper getWrapper() {
-        return (PatientWrapper) modelObject;
+    private PatientWrapper getPatientWrapper() {
+        return (PatientWrapper) getModelObject();
     }
 
     @Override
     protected String getLabelInternal() {
-        PatientWrapper patientWrapper = getWrapper();
-        Assert.isNotNull(patientWrapper, "patient is null");
+        PatientWrapper patientWrapper = getPatientWrapper();
+        Assert.isNotNull(patientWrapper, "patient is null"); //$NON-NLS-1$
         return patientWrapper.getPnumber();
     }
 
     @Override
     public String getTooltipText() {
-        PatientWrapper patient = getWrapper();
+        PatientWrapper patient = getPatientWrapper();
         if (patient != null) {
             StudyWrapper study = patient.getStudy();
             if (study != null)
-                return study.getName() + " - " + getTooltipText("Patient");
+                return study.getName()
+                    + " - " + getTooltipText(Messages.PatientAdapter_patient_label); //$NON-NLS-1$
         }
-        return getTooltipText("Patient");
+        return getTooltipText(Messages.PatientAdapter_patient_label);
     }
 
     @Override
@@ -71,22 +72,23 @@ public class PatientAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Patient");
-        addViewMenu(menu, "Patient");
-        addDeleteMenu(menu, "Patient");
+        addEditMenu(menu, Messages.PatientAdapter_patient_label);
+        addViewMenu(menu, Messages.PatientAdapter_patient_label);
+        addDeleteMenu(menu, Messages.PatientAdapter_patient_label);
 
         if (isEditable()
             && SessionManager.canCreate(CollectionEventWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add Collection Event");
+            mi.setText(Messages.PatientAdapter_add_cevent_label);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    CollectionEventAdapter adapter = new CollectionEventAdapter(
+                    CollectionEventAdapter ceventAdapter = new CollectionEventAdapter(
                         PatientAdapter.this, new CollectionEventWrapper(
                             getAppService()));
-                    adapter.getWrapper().setPatient(getWrapper());
-                    adapter.openEntryForm();
+                    ((CollectionEventWrapper) ceventAdapter.getModelObject())
+                        .setPatient(getPatientWrapper());
+                    ceventAdapter.openEntryForm();
                 }
             });
         }
@@ -111,8 +113,7 @@ public class PatientAdapter extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        getWrapper().reload();
-        return getWrapper().getCollectionEventCollection(true);
+        return getPatientWrapper().getCollectionEventCollection(true);
     }
 
     @Override
@@ -132,7 +133,7 @@ public class PatientAdapter extends AdapterBase {
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this patient?";
+        return Messages.PatientAdapter_delete_confirm_msg;
     }
 
     @Override

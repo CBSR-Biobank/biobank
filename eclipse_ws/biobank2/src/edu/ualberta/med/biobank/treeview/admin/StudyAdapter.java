@@ -19,31 +19,27 @@ public class StudyAdapter extends AdapterBase {
         setEditable(parent instanceof StudyMasterGroup || parent == null);
     }
 
-    public StudyWrapper getWrapper() {
-        return (StudyWrapper) modelObject;
-    }
-
     @Override
     protected String getLabelInternal() {
-        StudyWrapper study = getWrapper();
+        StudyWrapper study = (StudyWrapper) getModelObject();
         return study.getNameShort();
     }
 
     @Override
     public String getTooltipText() {
-        return getTooltipText("Study");
+        return getTooltipText(Messages.StudyAdapter_study_label);
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Study");
-        addViewMenu(menu, "Study");
-        addDeleteMenu(menu, "Study");
+        addEditMenu(menu, Messages.StudyAdapter_study_label);
+        addViewMenu(menu, Messages.StudyAdapter_study_label);
+        addDeleteMenu(menu, Messages.StudyAdapter_study_label);
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this study?";
+        return Messages.StudyAdapter_delete_confirm_msg;
     }
 
     @Override

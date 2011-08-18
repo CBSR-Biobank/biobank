@@ -5,15 +5,16 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectStudyDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
@@ -27,10 +28,12 @@ public class StudyAddInfoTable extends StudyInfoTable {
 
     private SiteWrapper site;
 
-    public StudyAddInfoTable(Composite parent, SiteWrapper site) {
+    public StudyAddInfoTable(Composite parent, SiteWrapper site,
+        boolean createDeleteSupport) {
         super(parent, site.getStudyCollection(true));
         this.site = site;
-        addDeleteSupport();
+        if (createDeleteSupport)
+            addDeleteCreateSupport();
     }
 
     @Override
@@ -61,12 +64,12 @@ public class StudyAddInfoTable extends StudyInfoTable {
                 }
             }
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError(
-                "Unable to retrieve available contacts", e);
+            BgcPlugin.openAsyncError(
+                Messages.StudyAddInfoTable_retrieve_error_title, e);
         }
     }
 
-    private void addDeleteSupport() {
+    private void addDeleteCreateSupport() {
         addAddItemListener(new IInfoTableAddItemListener() {
             @Override
             public void addItem(InfoTableEvent event) {
@@ -81,10 +84,10 @@ public class StudyAddInfoTable extends StudyInfoTable {
                 if (study == null)
                     return;
 
-                if (!BiobankPlugin.openConfirm(
-                    "Remove Study",
-                    "Are you sure you want to remove study \""
-                        + study.getName() + "\"")) {
+                if (!BgcPlugin.openConfirm(
+                    Messages.StudyAddInfoTable_remove_confirm_title, NLS.bind(
+                        Messages.StudyAddInfoTable_remove_confirm_msg,
+                        study.getName()))) {
                     return;
                 }
 
@@ -94,7 +97,8 @@ public class StudyAddInfoTable extends StudyInfoTable {
                     setCollection(site.getStudyCollection(true));
                     notifyListeners();
                 } catch (BiobankCheckException e) {
-                    BiobankPlugin.openAsyncError("Delete failed", e);
+                    BgcPlugin.openAsyncError(
+                        Messages.StudyAddInfoTable_delete_error_title, e);
                 }
             }
         });

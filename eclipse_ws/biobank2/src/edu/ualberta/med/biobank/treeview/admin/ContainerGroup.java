@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -13,26 +12,26 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public class ContainerGroup extends AdapterBase {
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(ContainerGroup.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(ContainerGroup.class
+        .getName());
 
     public ContainerGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Containers", true, true);
+        super(parent, id, Messages.ContainerGroup_containers_node_label, true,
+            true);
     }
 
     @Override
@@ -49,7 +48,7 @@ public class ContainerGroup extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (SessionManager.canCreate(ContainerWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add a Container");
+            mi.setText(Messages.ContainerGroup_add_label);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -117,8 +116,9 @@ public class ContainerGroup extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        SiteWrapper parentSite = ((SiteAdapter) getParent()).getWrapper();
-        Assert.isNotNull(parentSite, "site null");
+        SiteWrapper parentSite = (SiteWrapper) ((SiteAdapter) getParent())
+            .getModelObject();
+        Assert.isNotNull(parentSite, "site null"); //$NON-NLS-1$
         parentSite.reload();
         return parentSite.getTopContainerCollection();
     }
@@ -135,27 +135,25 @@ public class ContainerGroup extends AdapterBase {
 
     public void addContainer(SiteAdapter siteAdapter, boolean hasPreviousForm) {
         try {
+            SiteWrapper site = (SiteWrapper) siteAdapter.getModelObject();
             List<ContainerTypeWrapper> top = ContainerTypeWrapper
                 .getTopContainerTypesInSite(SessionManager.getAppService(),
-                    siteAdapter.getWrapper());
+                    site);
             if (top.size() == 0) {
-                MessageDialog
-                    .openError(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getShell(),
-                        "Unable to create container",
-                        "You must define a top-level container type before initializing storage.");
+                BgcPlugin.openError(Messages.ContainerGroup_create_error_title,
+                    Messages.ContainerGroup_create_error_msg);
             } else {
                 ContainerWrapper c = new ContainerWrapper(
                     SessionManager.getAppService());
-                c.setSite(siteAdapter.getWrapper());
+                c.setSite(site);
                 ContainerAdapter adapter = new ContainerAdapter(
                     siteAdapter.getContainersGroupNode(), c);
                 adapter.openEntryForm(hasPreviousForm);
             }
         } catch (final RemoteConnectFailureException exp) {
-            BiobankPlugin.openRemoteConnectErrorMessage(exp);
+            BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (Exception e) {
-            logger.error("BioBankFormBase.createPartControl Error", e);
+            logger.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$
         }
     }
 

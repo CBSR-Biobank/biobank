@@ -3,28 +3,27 @@ package edu.ualberta.med.biobank.dialogs;
 import java.util.Collection;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class StudyAliquotedSpecimenDialog extends PagedDialog {
 
@@ -38,9 +37,9 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
 
     private Collection<SpecimenTypeWrapper> availableSpecimenTypes;
 
-    private BiobankText quantity;
+    private BgcBaseText quantity;
 
-    private BiobankText volume;
+    private BgcBaseText volume;
 
     private ComboViewer activityStatus;
 
@@ -62,8 +61,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         this.newAliquotedSpecimen.setActivityStatus(origAliquotedSpecimen
             .getActivityStatus());
         if (origAliquotedSpecimen.getSpecimenType() == null) {
-            currentTitle = Messages
-                .getString("AliquotedSpecimenDialog.add.title");
+            currentTitle = Messages.StudyAliquotedSpecimenDialog_add_title;
 
             try {
                 this.newAliquotedSpecimen
@@ -71,12 +69,11 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
                         .getActiveActivityStatus(origAliquotedSpecimen
                             .getAppService()));
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Database Error",
-                    "Error while retrieving activity status");
+                BgcPlugin.openAsyncError(Messages.StudyAliquotedSpecimenDialog_activityStatus_retrieve_error_title,
+                    Messages.StudyAliquotedSpecimenDialog_activityStatus_retrieve_error_msg);
             }
         } else {
-            currentTitle = Messages
-                .getString("AliquotedSpecimenDialog.edit.title");
+            currentTitle = Messages.StudyAliquotedSpecimenDialog_edit_title;
         }
     }
 
@@ -87,19 +84,23 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.getString("AliquotedSpecimenDialog.msg");
+        if (availableSpecimenTypes.size() > 0)
+            return Messages.StudyAliquotedSpecimenDialog_msg;
+        else
+            return Messages.StudyAliquotedSpecimenDialog_available_nomore_msg;
+    }
+
+    @Override
+    protected int getTitleAreaMessageType() {
+        if (availableSpecimenTypes.size() > 0)
+            return IMessageProvider.NONE;
+        else
+            return IMessageProvider.INFORMATION;
     }
 
     @Override
     protected String getTitleAreaTitle() {
         return currentTitle;
-    }
-
-    @Override
-    protected Image getTitleAreaImage() {
-        // FIXME should use another icon
-        return BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_COMPUTER_KEY);
     }
 
     @Override
@@ -112,16 +113,16 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         specimenTypeComboViewer = getWidgetCreator().createComboViewer(
-            contents, Messages.getString("AliquotedSpecimen.field.type.label"),
+            contents, Messages.StudyAliquotedSpecimenDialog_field_type_label,
             availableSpecimenTypes, newAliquotedSpecimen.getSpecimenType(),
-            Messages.getString("AliquotedSpecimen.field.type.validation.msg"),
+            Messages.StudyAliquotedSpecimenDialog_field_type_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     newAliquotedSpecimen
                         .setSpecimenType((SpecimenTypeWrapper) selectedObject);
                 }
-            });
+            }, new BiobankLabelProvider());
         specimenTypeComboViewer.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {
@@ -131,10 +132,10 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
 
         activityStatus = getWidgetCreator().createComboViewer(
             contents,
-            Messages.getString("label.activity"),
+            Messages.StudyAliquotedSpecimenDialog_label_activity,
             ActivityStatusWrapper.getAllActivityStatuses(SessionManager
                 .getAppService()), newAliquotedSpecimen.getActivityStatus(),
-            Messages.getString("validation.activity"),
+            Messages.StudyAliquotedSpecimenDialog_validation_activity,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -142,31 +143,29 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
                         newAliquotedSpecimen
                             .setActivityStatus((ActivityStatusWrapper) selectedObject);
                     } catch (Exception e) {
-                        BiobankPlugin.openAsyncError(
-                            "Error setting activity status", e);
+                        BgcPlugin.openAsyncError(
+                            Messages.StudyAliquotedSpecimenDialog_activityStatus_error_title, e);
                     }
                 }
-            });
+            }, new BiobankLabelProvider());
 
-        volume = (BiobankText) createBoundWidgetWithLabel(contents,
-            BiobankText.class, SWT.BORDER,
-            Messages.getString("AliquotedSpecimen.field.volume.label"),
-            new String[0], newAliquotedSpecimen,
-            AliquotedSpecimenPeer.VOLUME.getName(), new DoubleNumberValidator(
-                Messages.getString("AliquotedSpecimen.field.validation.msg"),
-                false));
+        volume = (BgcBaseText) createBoundWidgetWithLabel(contents,
+            BgcBaseText.class, SWT.BORDER,
+            Messages.StudyAliquotedSpecimenDialog_volume_label, new String[0],
+            newAliquotedSpecimen, AliquotedSpecimenPeer.VOLUME.getName(),
+            new DoubleNumberValidator(
+                Messages.StudyAliquotedSpecimenDialog_volume_validation_msg, false));
 
-        quantity = (BiobankText) createBoundWidgetWithLabel(
+        quantity = (BgcBaseText) createBoundWidgetWithLabel(
             contents,
-            BiobankText.class,
+            BgcBaseText.class,
             SWT.BORDER,
-            Messages.getString("AliquotedSpecimen.field.quantity.label"),
+            Messages.StudyAliquotedSpecimenDialog_quantity_label,
             new String[0],
             newAliquotedSpecimen,
             AliquotedSpecimenPeer.QUANTITY.getName(),
-            new IntegerNumberValidator(Messages
-                .getString("AliquotedSpecimen.field.quantity.validation.msg"),
-                false));
+            new IntegerNumberValidator(
+                Messages.StudyAliquotedSpecimenDialog_quantity_validation_msg, false));
     }
 
     @Override
@@ -204,11 +203,11 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         try {
             newAliquotedSpecimen.reset();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error", e);
+            BgcPlugin.openAsyncError(Messages.StudyAliquotedSpecimenDialog_error_title, e);
         }
         specimenTypeComboViewer.getCombo().deselectAll();
-        quantity.setText("");
-        volume.setText("");
+        quantity.setText(""); //$NON-NLS-1$
+        volume.setText(""); //$NON-NLS-1$
         activityStatus.getCombo().deselectAll();
     }
 }

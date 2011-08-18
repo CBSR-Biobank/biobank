@@ -9,21 +9,21 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.forms.DecodePlateForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 
 public class DecodePlateHandler extends AbstractHandler implements IHandler {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(DecodePlateHandler.class.getName());
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        FormInput input = new FormInput(null, "Decode Plate");
+        FormInput input = new FormInput(null, Messages.DecodePlateHandler_decode_label);
         try {
             return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, DecodePlateForm.ID, false);
         } catch (PartInitException e) {
-            logger.error("Can't open form with id " + DecodePlateForm.ID, e);
+            logger.error("Can't open form with id " + DecodePlateForm.ID, e); //$NON-NLS-1$
             return null;
         }
     }

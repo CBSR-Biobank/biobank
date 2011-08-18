@@ -6,7 +6,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -28,18 +27,18 @@ public class SourceSpecimenInfoTable extends
             return StringUtils.join(new String[] {
                 name,
                 (needOriginalVolume != null) ? needOriginalVolume.toString()
-                    : "" }, "\t");
+                    : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
     private final static String[] HEADINGS = new String[] {
-        Messages.getString("SourceSpecimen.field.type.label"),
-        Messages.getString("SourceSpecimen.field.timeDrawn.label"),
-        Messages.getString("SourceSpecimen.field.originalVolume.label") };
+        Messages.SourceSpecimen_field_type_label,
+        Messages.SourceSpecimen_field_originalVolume_label };
 
     public SourceSpecimenInfoTable(Composite parent,
         List<SourceSpecimenWrapper> collection) {
-        super(parent, collection, HEADINGS, PAGE_SIZE_ROWS);
+        super(parent, collection, HEADINGS, PAGE_SIZE_ROWS,
+            SourceSpecimenWrapper.class);
     }
 
     @Override
@@ -50,9 +49,9 @@ public class SourceSpecimenInfoTable extends
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.SourceSpecimenInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
@@ -60,7 +59,7 @@ public class SourceSpecimenInfoTable extends
                 case 1:
                     return info.needOriginalVolume;
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };
@@ -72,10 +71,10 @@ public class SourceSpecimenInfoTable extends
         TableRowData info = new TableRowData();
         info.studySourceVessel = studySourceVessel;
         Assert.isNotNull(studySourceVessel.getSpecimenType(),
-            "study specimen type is null");
+            "study specimen type is null"); //$NON-NLS-1$
         info.name = studySourceVessel.getSpecimenType().getName();
         info.needOriginalVolume = (studySourceVessel.getNeedOriginalVolume() != null) ? (studySourceVessel
-            .getNeedOriginalVolume() ? "Yes" : "No") : "No";
+            .getNeedOriginalVolume() ? Messages.SourceSpecimenInfoTable_yes_label : Messages.SourceSpecimenInfoTable_no_label) : Messages.SourceSpecimenInfoTable_no_label;
         return info;
     }
 

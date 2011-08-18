@@ -41,7 +41,7 @@ public class DefaultTopPreferencePage extends PreferencePage implements
     protected Control createContents(Composite parent) {
         Composite composite = createScrolledComposite(parent);
 
-        String description = "Expand the tree to edit preferences for a specific feature.";
+        String description = Messages.DefaultTopPreferencePage_description;
         Text text = new Text(composite, 8);
 
         text.setBackground(composite.getBackground());
@@ -63,6 +63,7 @@ public class DefaultTopPreferencePage extends PreferencePage implements
 
     @Override
     public void init(IWorkbench workbench) {
+        //
     }
 
     private void setSize(Composite composite) {

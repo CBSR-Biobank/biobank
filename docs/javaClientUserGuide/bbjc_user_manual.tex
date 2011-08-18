@@ -1,0 +1,71 @@
+\documentclass[10pt,twoside,letterpaper]{book}
+\usepackage[T1]{fontenc}
+\usepackage{bookman}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage[active]{srcltx}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{verbatim}
+\usepackage[small,bf]{caption}
+\usepackage{wrapfig}
+
+%\usepackage[colorlinks]{hyperref}
+\usepackage[colorinlistoftodos, textwidth=3cm, textsize=tiny, shadow]{todonotes}
+\usepackage[pdftex,
+  pdfauthor={AICML},
+  pdftitle={BioBank2 Java Client User Manual},
+  colorlinks,
+  linkcolor=blue,
+  bookmarks=true,
+  bookmarksopen=true,
+  pdfstartview=FitH]
+	   {hyperref}
+
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+
+% no indentation at beginning of paragraph, and 1 line separating paragraphs
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1ex}
+
+\oddsidemargin  0.0in
+\evensidemargin 0.0in
+\textwidth      6.0in
+\headheight     0.0in
+\topmargin      0.0in
+\textheight     9.0in
+\setlength{\marginparwidth}{0.8in}
+\let\oldmarginpar\marginpar
+
+\setcounter{secnumdepth}{3}
+
+\begin{document}
+\frontmatter
+
+\title{BioBank2 Java Client User Manual}
+\author{\Large{Prepared for the Canadian BioSample Repository}\\
+by the Alberta Ingenuity Centre for Machine Learning}
+\maketitle
+\clearpage
+\tableofcontents
+\clearpage
+\listoffigures
+\clearpage
+\listoftodos
+\clearpage
+
+\mainmatter
+\include{overview}
+\include{configuration}
+\include{patient_processing}
+\include{sample_order}
+\include{dispatch}
+\include{administration}
+\include{reports}
+\include{notdone}
+\include{printer_labels}
+
+\backmatter
+\end{document}

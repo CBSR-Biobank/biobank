@@ -12,12 +12,12 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MenuItem;
@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Table;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
@@ -72,8 +72,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
      * .html for how to set row height.
      */
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(InfoTableWidget.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(InfoTableWidget.class
+        .getName());
 
     protected List<BiobankCollectionModel> model;
 
@@ -87,15 +87,19 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     private MenuItem editItem;
 
+    private final Class<T> wrapperClass;
+
     public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings) {
+        String[] headings, Class<T> wrapperClass) {
         super(parent, collection, headings, null, 5);
+        this.wrapperClass = wrapperClass;
         addTableClickListener();
     }
 
     public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int rowsPerPage) {
+        String[] headings, int rowsPerPage, Class<T> wrapperClass) {
         super(parent, collection, headings, null, rowsPerPage);
+        this.wrapperClass = wrapperClass;
         addTableClickListener();
     }
 
@@ -162,7 +166,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     protected BiobankCollectionModel getSelectionInternal() {
         Assert.isTrue(!tableViewer.getTable().isDisposed(),
-            "widget is disposed");
+            "widget is disposed"); //$NON-NLS-1$
         IStructuredSelection stSelection = (IStructuredSelection) tableViewer
             .getSelection();
 
@@ -281,7 +285,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
                 }
             });
         } catch (Exception e) {
-            logger.error("setCollection error", e);
+            logger.error("setCollection error", e); //$NON-NLS-1$
         }
     }
 
@@ -294,31 +298,29 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
-        Object type = item.o;
-        Assert.isNotNull(type);
-        return type;
+        Object object = item.o;
+        Assert.isNotNull(object);
+        return object;
     }
 
     public void addClickListener(IDoubleClickListener listener) {
         doubleClickListeners.add(listener);
-        editItem = new MenuItem(getMenu(), SWT.PUSH);
-        editItem.setText("Edit");
-        editItem.addSelectionListener(new SelectionListener() {
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ModelWrapper<?> selection = (ModelWrapper<?>) InfoTableWidget.this
-                    .getSelection();
-                if (selection != null) {
-                    AdapterBase adapter = AdapterFactory.getAdapter(selection);
-                    adapter.openEntryForm();
+        if (SessionManager.canUpdate(wrapperClass)) {
+            editItem = new MenuItem(getMenu(), SWT.PUSH);
+            editItem.setText(Messages.InfoTableWidget_edit_label);
+            editItem.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    ModelWrapper<?> selection = (ModelWrapper<?>) InfoTableWidget.this
+                        .getSelection();
+                    if (selection != null) {
+                        AdapterBase adapter = AdapterFactory
+                            .getAdapter(selection);
+                        adapter.openEntryForm();
+                    }
                 }
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-        });
+            });
+        }
     }
 
     public void doubleClick() {
@@ -344,7 +346,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Add");
+        item.setText(Messages.InfoTableWidget_add_label);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -358,7 +360,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Edit");
+        item.setText(Messages.InfoTableWidget_edit_label);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -372,7 +374,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Delete");
+        item.setText(Messages.InfoTableWidget_delete_label);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -501,8 +503,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     @Override
     protected void setPageLabelText() {
-        pageLabel.setText("Page: " + (pageInfo.page + 1) + " of "
-            + pageInfo.pageTotal);
+        pageLabel.setText(NLS.bind(Messages.InfoTableWidget_pages_label,
+            (pageInfo.page + 1), +pageInfo.pageTotal));
     }
 
 }

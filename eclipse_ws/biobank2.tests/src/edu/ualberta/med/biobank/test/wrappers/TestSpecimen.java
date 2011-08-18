@@ -503,7 +503,7 @@ public class TestSpecimen extends TestDatabase {
             childSpc.getParentContainer(), 3, 3);
 
         SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(appService,
-            childSpc.getInventoryId(), null);
+            childSpc.getInventoryId());
         Assert.assertNotNull(foundSpecimen);
         Assert.assertEquals(foundSpecimen, childSpc);
     }

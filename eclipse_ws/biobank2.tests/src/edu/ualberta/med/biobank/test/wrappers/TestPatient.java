@@ -513,6 +513,7 @@ public class TestPatient extends TestDatabase {
             }
 
             for (SpecimenWrapper parentSpc : parentSpcs) {
+                parentSpc.reload();
                 CollectionEventWrapper cevent = parentSpc.getCollectionEvent();
                 cevent.reload();
                 Assert.assertEquals(patient1, cevent.getPatient());

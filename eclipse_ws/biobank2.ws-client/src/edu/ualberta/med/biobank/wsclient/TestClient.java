@@ -30,7 +30,7 @@ public class TestClient {
     public void testSearch() throws Exception {
         Collection<Class<?>> classList = getClasses();
 
-        String url = "http://localhost:8080/biobank2/services/biobank2Service";
+        String url = "http://localhost:8080/biobank/services/biobankService";
         Service service = new Service();
         Call call = null;
 
@@ -63,8 +63,7 @@ public class TestClient {
                     + getInversePackageName(klass), klass.getSimpleName());
 
                 call.setTargetEndpointAddress(new java.net.URL(url));
-                call.setOperationName(new QName("biobank2Service",
-                    "queryObject"));
+                call.setOperationName(new QName("biobankService", "queryObject"));
                 call.addParameter("arg1",
                     org.apache.axis.encoding.XMLType.XSD_STRING,
                     ParameterMode.IN);
@@ -90,7 +89,7 @@ public class TestClient {
                 Object[] results = (Object[]) call.invoke(new Object[] {
                     klass.getName(), o });
 
-                if (results != null && results.length > 0) {
+                if ((results != null) && (results.length > 0)) {
                     for (Object obj : results) {
                         printObject(obj, klass);
 
@@ -100,9 +99,9 @@ public class TestClient {
                                 && !method.getName().equals("getClass")) {
                                 if (!(method.getReturnType().getName()
                                     .startsWith("java")
-                                    || method.getReturnType().isPrimitive() || method
+                                    || method.getReturnType().isPrimitive() || (method
                                     .getReturnType().getName()
-                                    .indexOf("Collection") > 0)) {
+                                    .indexOf("Collection") > 0))) {
                                     System.out
                                         .println("Testing getAssociation() call for Class: "
                                             + klass.getName()
@@ -144,7 +143,7 @@ public class TestClient {
         Object containingObj, Class<?> associationClass, String rolename)
         throws Exception {
         // Sample Scenario:
-        // http://localhost:8080/biobank2/GetHTML?query=Bank&Credit[@id=3]&roleName=issuingBank
+        // http://localhost:8080/biobank/GetHTML?query=Bank&Credit[@id=3]&roleName=issuingBank
 
         Call call = (Call) service.createCall();
 
@@ -163,7 +162,7 @@ public class TestClient {
             associationClass.getSimpleName());
 
         call.setTargetEndpointAddress(new java.net.URL(url));
-        call.setOperationName(new QName("biobank2Service", "getAssociation"));
+        call.setOperationName(new QName("biobankService", "getAssociation"));
         call.addParameter("arg1", searchClassQName, ParameterMode.IN);
         call.addParameter("arg2", org.apache.axis.encoding.XMLType.XSD_STRING,
             ParameterMode.IN);
@@ -186,7 +185,7 @@ public class TestClient {
         Object[] results = (Object[]) call.invoke(new Object[] { containingObj,
             rolename, 0 });
 
-        if (results != null && results.length > 0) {
+        if ((results != null) && (results.length > 0)) {
             for (Object obj : results) {
                 printObject(obj, associationClass);
                 break;
@@ -237,7 +236,7 @@ public class TestClient {
 
         Enumeration<JarEntry> e = file.entries();
         while (e.hasMoreElements()) {
-            JarEntry o = (JarEntry) e.nextElement();
+            JarEntry o = e.nextElement();
             if (!o.isDirectory()) {
                 String name = o.getName();
                 if (name.endsWith(".class")) {
@@ -256,7 +255,7 @@ public class TestClient {
             return null;
 
         Class<?> klass = bean.getClass();
-        while (klass != null && klass != Object.class) {
+        while ((klass != null) && (klass != Object.class)) {
             try {
                 field = klass.getDeclaredField(fieldName);
             } catch (SecurityException e) {

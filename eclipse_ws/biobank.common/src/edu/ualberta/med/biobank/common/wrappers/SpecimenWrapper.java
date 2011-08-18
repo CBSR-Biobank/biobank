@@ -193,7 +193,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     /**
      * search in all Specimens list. No matter which site added it.
      */
-    protected static SpecimenWrapper getSpecimen(
+    public static SpecimenWrapper getSpecimen(
         WritableApplicationService appService, String inventoryId)
         throws ApplicationException, BiobankCheckException {
         HQLCriteria criteria = new HQLCriteria(Specimen_QRY,
@@ -205,33 +205,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             return new SpecimenWrapper(appService, specimens.get(0));
         throw new BiobankCheckException("Error retrieving specimens: found "
             + specimens.size() + " results.");
-    }
-
-    /**
-     * search in all Specimens list. No matter which site added it. If user is
-     * not null, will return only Specimen that is linked to a visit which site
-     * can be read by the user
-     * 
-     * @throws Exception
-     */
-    public static SpecimenWrapper getSpecimen(
-        WritableApplicationService appService, String inventoryId, User user)
-        throws Exception {
-        SpecimenWrapper specimen = getSpecimen(appService, inventoryId);
-        if (specimen != null && user != null) {
-            CenterWrapper<?> center = specimen.getCurrentCenter();
-            if (center != null
-                && !user.getWorkingCenters(appService).contains(center)) {
-                String name = "none";
-                if (center != null)
-                    name = center.getNameShort();
-                throw new ApplicationException("Specimen " + inventoryId
-                    + " exists but you don't have access to it."
-                    + " Its current center location (" + name
-                    + ") should be a center you can access.");
-            }
-        }
-        return specimen;
     }
 
     private static final String SPECIMENS_NON_ACTIVE_QRY = "from "
@@ -289,8 +262,13 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     @Override
     public int compareTo(ModelWrapper<Specimen> o) {
         if (o instanceof SpecimenWrapper) {
-            return getInventoryId().compareTo(
-                ((SpecimenWrapper) o).getInventoryId());
+            String s1 = getPositionString(true, true);
+            String s2 = ((SpecimenWrapper) o).getPositionString(true, true);
+            if (s1 == null || s2 == null)
+                return getInventoryId().compareTo(
+                    ((SpecimenWrapper) o).getInventoryId());
+            else
+                return s1.compareTo(s2);
         }
         return 0;
     }
@@ -554,5 +532,29 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         public void afterExecute(SDKQueryResult result) {
             getWrapper().topSpecimenChanged = false;
         }
+    }
+
+    /**
+     * return a string with collection date (different from created at if it is
+     * an aliquoted specimen) + the collection center
+     */
+    public String getCollectionInfo() {
+        return getTopSpecimen().getFormattedCreatedAt() + " in "
+            + getTopSpecimen().getOriginInfo().getCenter().getNameShort()
+            + " (visit #" + getCollectionEvent().getVisitNumber() + ")";
+    }
+
+    public boolean hasUnknownImportType() {
+        return getSpecimenType() != null && getSpecimenType().isUnknownImport();
+    }
+
+    /**
+     * return true if the user can edit this object
+     */
+    @Override
+    public boolean canUpdate(User user) {
+        return super.canUpdate(user)
+            && (user.getCurrentWorkingCenter().getStudyCollection()
+                .contains(getCollectionEvent().getPatient().getStudy()));
     }
 }

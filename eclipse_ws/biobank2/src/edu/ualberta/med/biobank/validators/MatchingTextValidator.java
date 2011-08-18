@@ -7,12 +7,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
 public class MatchingTextValidator extends AbstractValidator {
-    private BiobankText text;
+    private BgcBaseText text;
 
-    public MatchingTextValidator(String message, BiobankText text) {
+    public MatchingTextValidator(String message, BgcBaseText text) {
         super(message);
         this.text = text;
     }
@@ -38,13 +39,13 @@ public class MatchingTextValidator extends AbstractValidator {
      * @param originalText
      * @param confirmationText
      */
-    public static void addListener(BiobankText originalText,
-        final BiobankText confirmationText) {
+    public static void addListener(BgcBaseText originalText,
+        final BgcBaseText confirmationText) {
         originalText.getTextBox().addListener(SWT.Modify, new Listener() {
             @Override
             public void handleEvent(Event event) {
                 String originalText = confirmationText.getText();
-                confirmationText.setText(originalText + "+1");
+                confirmationText.setText(originalText + "+1"); //$NON-NLS-1$
                 confirmationText.setText(originalText);
             }
         });

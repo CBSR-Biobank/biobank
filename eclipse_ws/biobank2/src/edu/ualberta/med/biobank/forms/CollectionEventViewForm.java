@@ -4,72 +4,64 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 
 public class CollectionEventViewForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventViewForm";
-
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(CollectionEventViewForm.class.getName());
-
-    private CollectionEventAdapter ceventAdapter;
+    public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventViewForm"; //$NON-NLS-1$
 
     private CollectionEventWrapper cevent;
 
-    private BiobankText studyLabel;
+    private BgcBaseText studyLabel;
 
     private List<FormPvCustomInfo> pvCustomInfoList;
 
-    private BiobankText patientLabel;
+    private BgcBaseText patientLabel;
 
-    private BiobankText visitNumberLabel;
+    private BgcBaseText visitNumberLabel;
 
-    private BiobankText commentLabel;
+    private BgcBaseText commentLabel;
 
     private SpecimenInfoTable sourceSpecimenTable;
 
-    private BiobankText activityStatusLabel;
+    private BgcBaseText activityStatusLabel;
 
     private SpecimenInfoTable aliquotedSpecimenTable;
 
     private static class FormPvCustomInfo extends PvAttrCustom {
-        BiobankText widget;
+        BgcBaseText widget;
     }
 
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof CollectionEventAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        ceventAdapter = (CollectionEventAdapter) adapter;
-        cevent = ceventAdapter.getWrapper();
-        retrievePatientVisit();
+        cevent = (CollectionEventWrapper) getModelObject();
         SessionManager.logLookup(cevent);
 
-        setPartName(Messages.getString("CollectionEventViewForm.title",
+        setPartName(NLS.bind(Messages.CollectionEventViewForm_title,
             cevent.getVisitNumber()));
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("CollectionEventViewForm.main.title",
+        form.setText(NLS.bind(Messages.CollectionEventViewForm_main_title,
             +cevent.getVisitNumber()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -86,17 +78,19 @@ public class CollectionEventViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
-        patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
+        studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.CollectionEventViewForm_study_label);
+        patientLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.CollectionEventViewForm_patient_label);
         visitNumberLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Visit#");
+            Messages.CollectionEventViewForm_visitNber_label);
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.activity"));
+            Messages.label_activity);
 
         createPvDataSection(client);
 
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.getString("label.comments"));
+            Messages.label_comments);
 
         setCollectionEventValues();
     }
@@ -149,45 +143,36 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void createSourceSpecimensSection() {
-        Composite client = createSectionWithClient(Messages
-            .getString("CollectionEventViewForm.sourcespecimens.title"));
+        Composite client = createSectionWithClient(Messages.CollectionEventViewForm_sourcespecimens_title);
         sourceSpecimenTable = new SpecimenInfoTable(client,
             cevent.getOriginalSpecimenCollection(true),
             ColumnsShown.SOURCE_SPECIMENS, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
+        sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
     }
 
     private void createAliquotedSpecimensSection() {
         // FIXME should we show that to clinics ?
-        Composite client = createSectionWithClient(Messages
-            .getString("CollectionEventViewForm.aliquotedspecimens.title"));
+        Composite client = createSectionWithClient(Messages.CollectionEventViewForm_aliquotedspecimens_title);
         aliquotedSpecimenTable = new SpecimenInfoTable(client,
-            cevent.getAliquotedSpecimenCollection(true),
-            ColumnsShown.ALIQUOTS, 10);
+            cevent.getAliquotedSpecimenCollection(true), ColumnsShown.ALIQUOTS,
+            10);
         aliquotedSpecimenTable.adaptToToolkit(toolkit, true);
+        aliquotedSpecimenTable.addClickListener(collectionDoubleClickListener);
     }
 
     @Override
-    public void reload() {
-        retrievePatientVisit();
-        setPartName(Messages.getString("CollectionEventViewForm.title",
+    public void reload() throws Exception {
+        cevent.reload();
+        setPartName(NLS.bind(Messages.CollectionEventViewForm_title,
             cevent.getVisitNumber()));
-        form.setText(Messages.getString("CollectionEventViewForm.main.title",
+        form.setText(NLS.bind(Messages.CollectionEventViewForm_main_title,
             +cevent.getVisitNumber()));
         setCollectionEventValues();
         sourceSpecimenTable.setCollection(cevent
             .getOriginalSpecimenCollection(true));
-    }
-
-    private void retrievePatientVisit() {
-        try {
-            cevent.reload();
-        } catch (Exception ex) {
-            logger.error(
-                "Error while retrieving patient visit "
-                    + cevent.getVisitNumber() + "(patient "
-                    + cevent.getPatient() + ")", ex);
-        }
+        aliquotedSpecimenTable.setCollection(cevent
+            .getAliquotedSpecimenCollection(true));
     }
 
 }

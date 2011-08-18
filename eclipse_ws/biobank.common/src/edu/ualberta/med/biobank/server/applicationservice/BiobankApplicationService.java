@@ -17,6 +17,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -42,22 +43,28 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void modifyPassword(String oldPassword, String newPassword)
         throws ApplicationException;
 
-    public List<Group> getSecurityGroups(boolean includeSuperAdmin)
+    public List<Group> getSecurityGroups(User currentUser,
+        boolean includeSuperAdmin) throws ApplicationException;
+
+    public List<User> getSecurityUsers(User currentUser)
         throws ApplicationException;
 
-    public List<User> getSecurityUsers() throws ApplicationException;
+    public User persistUser(User currentUser, User userToPersist)
+        throws ApplicationException;
 
-    public User persistUser(User user) throws ApplicationException;
-
-    public void deleteUser(String login) throws ApplicationException;
+    public void deleteUser(User currentUser, String loginToDelete)
+        throws ApplicationException;
 
     public User getCurrentUser() throws ApplicationException;
 
-    public Group persistGroup(Group group) throws ApplicationException;
+    public Group persistGroup(User currentUser, Group group)
+        throws ApplicationException;
 
-    public void deleteGroup(Group group) throws ApplicationException;
+    public void deleteGroup(User currentUser, Group group)
+        throws ApplicationException;
 
-    public void unlockUser(String userName) throws ApplicationException;
+    public void unlockUser(User currentUser, String userNameToUnlock)
+        throws ApplicationException;
 
     public List<Object> runReport(Report report, int maxResults, int firstRow,
         int timeout) throws ApplicationException;
@@ -66,11 +73,11 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public String getServerVersion();
 
-    public List<ProtectionGroupPrivilege> getSecurityGlobalFeatures()
-        throws ApplicationException;
+    public List<ProtectionGroupPrivilege> getSecurityGlobalFeatures(
+        User currentUser) throws ApplicationException;
 
-    public List<ProtectionGroupPrivilege> getSecurityCenterFeatures()
-        throws ApplicationException;
+    public List<ProtectionGroupPrivilege> getSecurityCenterFeatures(
+        User currentUser) throws ApplicationException;
 
     public QueryHandle createQuery(QueryCommand qc) throws Exception;
 
@@ -79,10 +86,14 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void stopQuery(QueryHandle qh) throws Exception;
 
     public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
-        ProcessData processData, boolean rescanMode, User user)
+        ProcessData processData, boolean rescanMode, User user, Locale locale)
         throws ApplicationException;
 
     public CellProcessResult processCellStatus(Cell cell,
-        ProcessData processData, User user) throws ApplicationException;
+        ProcessData processData, User user, Locale locale)
+        throws ApplicationException;
+
+    public List<String> executeGetSourceSpecimenUniqueInventoryIds(int numIds)
+        throws ApplicationException;
 
 }

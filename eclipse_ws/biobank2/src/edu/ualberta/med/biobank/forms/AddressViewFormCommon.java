@@ -5,11 +5,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
 
 public abstract class AddressViewFormCommon extends BiobankViewForm {
 
     protected void createAddressSection(ModelWrapper<?> wrapperObject) {
-        Composite client = createSectionWithClient("Address");
+        Composite client = createSectionWithClient(Messages.AddressViewFormCommon_address_label);
         Section section = (Section) client.getParent();
         section.setExpanded(false);
         createAddressArea(client, wrapperObject);
@@ -23,10 +24,10 @@ public abstract class AddressViewFormCommon extends BiobankViewForm {
             addWidget(widgetName, createReadOnlyLabelledField(parent, SWT.NONE,
                 field.label));
         }
-        setAdressValues(wrapperObject);
+        setAddressValues(wrapperObject);
     }
 
-    protected void setAdressValues(ModelWrapper<?> wrapperObject) {
+    protected void setAddressValues(ModelWrapper<?> wrapperObject) {
         setWidgetValues(AddressEntryFormCommon.ADDRESS_FIELDS, wrapperObject);
     }
 

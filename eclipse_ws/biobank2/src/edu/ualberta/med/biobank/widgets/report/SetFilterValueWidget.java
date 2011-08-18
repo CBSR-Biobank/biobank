@@ -23,9 +23,9 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
-import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 /**
  * Decorates a <code>FilterValueWidget</code> to allow a set of values to be
@@ -262,7 +262,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
             setGridLayout(2, this);
 
             readOnlyText = new Text(this, SWT.BORDER | SWT.READ_ONLY);
-            readOnlyText.setBackground(WidgetCreator.READ_ONLY_TEXT_BGR);
+            readOnlyText.setBackground(BgcWidgetCreator.READ_ONLY_TEXT_BGR);
             readOnlyText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL
                 | GridData.GRAB_HORIZONTAL));
 
@@ -276,10 +276,10 @@ public class SetFilterValueWidget implements FilterValueWidget {
             for (ReportFilterValue value : getValues()) {
                 strings.add(SetFilterValueWidget.this.toString(value));
             }
-            String list = StringUtils.join(strings, ", ");
+            String list = StringUtils.join(strings, ", "); //$NON-NLS-1$
 
             if (list.isEmpty()) {
-                list = "<no values added>";
+                list = Messages.SetFilterValueWidget_novalue_label;
             }
 
             readOnlyText.setText(list);
@@ -287,9 +287,9 @@ public class SetFilterValueWidget implements FilterValueWidget {
 
         private void createEditModeButton() {
             editModeButton = new Button(this, SWT.NONE);
-            editModeButton.setImage(BiobankPlugin.getDefault()
-                .getImageRegistry().get(BiobankPlugin.IMG_DOWN));
-            editModeButton.setToolTipText("Expand to add values");
+            editModeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+                .get(BgcPlugin.IMG_DOWN));
+            editModeButton.setToolTipText(Messages.SetFilterValueWidget_expand_label);
             editModeButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {
@@ -331,9 +331,9 @@ public class SetFilterValueWidget implements FilterValueWidget {
 
         private void createAddButton() {
             addButton = new Button(this, SWT.NONE);
-            addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-                .get(BiobankPlugin.IMG_ADD));
-            addButton.setToolTipText("Add value to list");
+            addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+                .get(BgcPlugin.IMG_ADD));
+            addButton.setToolTipText(Messages.SetFilterValueWidget_add_label);
             addButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {
@@ -380,7 +380,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
                         ReportFilterValue value = ((ReportFilterValue) element);
                         return SetFilterValueWidget.this.toString(value);
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             });
             listViewer.setComparator(COMPARATOR);
@@ -398,9 +398,9 @@ public class SetFilterValueWidget implements FilterValueWidget {
 
         private void createRemoveButton() {
             removeButton = new Button(this, SWT.NONE);
-            removeButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-                .get(BiobankPlugin.IMG_REMOVE));
-            removeButton.setToolTipText("Remove selected value(s) from list");
+            removeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+                .get(BgcPlugin.IMG_REMOVE));
+            removeButton.setToolTipText(Messages.SetFilterValueWidget_remove_label);
             removeButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {
@@ -416,9 +416,9 @@ public class SetFilterValueWidget implements FilterValueWidget {
 
         private void createViewModeButton() {
             viewModeButton = new Button(this, SWT.NONE);
-            viewModeButton.setImage(BiobankPlugin.getDefault()
-                .getImageRegistry().get(BiobankPlugin.IMG_UP));
-            viewModeButton.setToolTipText("Collapse");
+            viewModeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+                .get(BgcPlugin.IMG_UP));
+            viewModeButton.setToolTipText(Messages.SetFilterValueWidget_collapse_label);
             viewModeButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {

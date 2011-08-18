@@ -23,7 +23,8 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public class ContainerTypeGroup extends AdapterBase {
 
     public ContainerTypeGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Container Types", true, true);
+        super(parent, id, Messages.ContainerTypeGroup_types_node_label, true,
+            true);
     }
 
     @Override
@@ -40,7 +41,7 @@ public class ContainerTypeGroup extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (SessionManager.canCreate(ContainerTypeWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add Container Type");
+            mi.setText(Messages.ContainerTypeGroup_add_label);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -75,8 +76,9 @@ public class ContainerTypeGroup extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        SiteWrapper currentSite = ((SiteAdapter) getParent()).getWrapper();
-        Assert.isNotNull(currentSite, "null site");
+        SiteWrapper currentSite = (SiteWrapper) ((SiteAdapter) getParent())
+            .getModelObject();
+        Assert.isNotNull(currentSite, "null site"); //$NON-NLS-1$
         currentSite.reload();
         return new ArrayList<ContainerTypeWrapper>(
             currentSite.getContainerTypeCollection());
@@ -96,7 +98,7 @@ public class ContainerTypeGroup extends AdapterBase {
         boolean hasPreviousForm) {
         ContainerTypeWrapper ct = new ContainerTypeWrapper(
             siteAdapter.getAppService());
-        ct.setSite(siteAdapter.getWrapper());
+        ct.setSite((SiteWrapper) siteAdapter.getModelObject());
         ContainerTypeAdapter adapter = new ContainerTypeAdapter(
             siteAdapter.getContainerTypesGroupNode(), ct);
         adapter.openEntryForm(hasPreviousForm);

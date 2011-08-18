@@ -7,15 +7,18 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class SpecimenOriginSelectDialog extends BiobankDialog {
+public class SpecimenOriginSelectDialog extends BgcBaseDialog {
     private SpecimenWrapper specimen;
     private CenterWrapper<?> selectedCenter;
     private List<CenterWrapper<?>> centers;
@@ -29,17 +32,17 @@ public class SpecimenOriginSelectDialog extends BiobankDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.getString("SpecimenOriginSelectDialog.description"); //$NON-NLS-1$
+        return Messages.SpecimenOriginSelectDialog_description;
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.getString("SpecimenOriginSelectDialog.title"); //$NON-NLS-1$
+        return Messages.SpecimenOriginSelectDialog_title;
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.getString("SpecimenOriginSelectDialog.title"); //$NON-NLS-1$
+        return Messages.SpecimenOriginSelectDialog_title;
     }
 
     @Override
@@ -48,11 +51,19 @@ public class SpecimenOriginSelectDialog extends BiobankDialog {
         GridLayout layout = new GridLayout(2, false);
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        Label l = new Label(contents, SWT.WRAP);
+        GridData gd = new GridData(GridData.FILL, SWT.TOP, true, true, 2, 1);
+        gd.widthHint = 400;
+        l.setLayoutData(gd);
+        l.setText(Messages.SpecimenOriginSelectDialog_details);
+
+        selectedCenter = SessionManager.getUser().getCurrentWorkingCenter();
+
         List<Object> objectList = new ArrayList<Object>(centers);
-        String noCenterString = "-- no center selection --";
         widgetCreator.createComboViewer(contents,
-            Messages.getString("SpecimenOriginSelectDialog.centers.label"), //$NON-NLS-1$
-            objectList, noCenterString, null, new ComboSelectionUpdate() {
+            Messages.SpecimenOriginSelectDialog_centers_label, objectList,
+            selectedCenter, null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     if (selectedObject instanceof CenterWrapper<?>)
@@ -60,7 +71,7 @@ public class SpecimenOriginSelectDialog extends BiobankDialog {
                     else
                         selectedCenter = null;
                 }
-            });
+            }, new BiobankLabelProvider());
     }
 
     @Override

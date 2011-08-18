@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -26,20 +27,24 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { clinicNameShort,
-                (patientCount != null) ? patientCount.toString() : "",
-                (ceventCount != null) ? ceventCount.toString() : "",
-                contactName, contactTitle }, "\t");
+                (patientCount != null) ? patientCount.toString() : "", //$NON-NLS-1$
+                (ceventCount != null) ? ceventCount.toString() : "", //$NON-NLS-1$
+                contactName, contactTitle }, "\t"); //$NON-NLS-1$
 
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Clinic",
-        "#Patients", "#Collection Events", "Contact Name", "Title" };
+    private static final String[] HEADINGS = new String[] {
+        Messages.StudyContactInfoTable_clinic_label,
+        Messages.StudyContactInfoTable_patient_count_label,
+        Messages.StudyContactInfoTable_cEvent_count_label,
+        Messages.StudyContactInfoTable_contact_name_label,
+        Messages.StudyContactInfoTable_contact_title_label };
 
     private StudyWrapper study;
 
     public StudyContactInfoTable(Composite parent, StudyWrapper study) {
-        super(parent, null, HEADINGS, 10);
+        super(parent, null, HEADINGS, 10, ContactWrapper.class);
         this.study = study;
         this.setCollection(study.getContactCollection(true));
     }
@@ -62,25 +67,23 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.StudyContactInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
                     return item.clinicNameShort;
                 case 1:
-                    return (item.patientCount != null) ? item.patientCount
-                        .toString() : "";
+                    return NumberFormatter.format(item.patientCount);
                 case 2:
-                    return (item.ceventCount != null) ? item.ceventCount
-                        .toString() : "";
+                    return NumberFormatter.format(item.ceventCount);
                 case 3:
                     return item.contactName;
                 case 4:
                     return item.contactTitle;
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };

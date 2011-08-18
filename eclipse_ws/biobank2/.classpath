@@ -7,20 +7,10 @@
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/mailapi.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smtp.jar"/>
-	<classpathentry kind="lib" path="lib/jasperreports-3.7.0.jar"/>
-	<classpathentry kind="lib" path="lib/commons-digester-1.7.jar"/>
-	<classpathentry kind="lib" path="lib/iText-2.1.0.jar"/>
-	<classpathentry kind="lib" path="lib/commons-beanutils-1.8.0.jar"/>
-	<classpathentry kind="lib" path="lib/jdt-compiler-3.1.1.jar"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/gluegen.jar"/>
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
-	<classpathentry kind="lib" path="lib/DynamicJasper-3.0.14.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/biobank2/lib/commons-lang-2.4.jar!/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="lib/SuperCSV-1.52.jar"/>
 	<classpathentry kind="lib" path="lib/spiffy-all-0.05.jar"/>
 	<classpathentry kind="output" path="bin"/>

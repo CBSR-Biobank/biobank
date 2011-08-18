@@ -8,45 +8,47 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ShippingMethodEntryInfoTable;
 
 public class ShippingMethodViewForm extends BiobankFormBase {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ShippingMethodViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ShippingMethodViewForm"; //$NON-NLS-1$
 
-    public static final String OK_MESSAGE = "Add or edit a shipping method";
+    public static final String OK_MESSAGE = Messages.ShippingMethodViewForm_ok_msg;
 
     private ShippingMethodEntryInfoTable statusWidget;
 
     @Override
     public void init() throws Exception {
-        setPartName("Shipping Method");
+        setPartName(Messages.ShippingMethodViewForm_title);
+        checkEditAccess();
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Shipping Method");
+        form.setText(Messages.ShippingMethodViewForm_title);
         page.setLayout(new GridLayout(1, false));
         createGlobalSampleTypeSection();
     }
 
     private void createGlobalSampleTypeSection() throws Exception {
-        Section section = createSection("Shipping Method");
+        Section section = createSection(Messages.ShippingMethodViewForm_title);
         List<ShippingMethodWrapper> globalShippingMethod = ShippingMethodWrapper
             .getShippingMethods(appService);
         if (globalShippingMethod == null) {
             globalShippingMethod = new ArrayList<ShippingMethodWrapper>();
         }
         statusWidget = new ShippingMethodEntryInfoTable(section,
-            globalShippingMethod, "Add a new global shipping method",
-            "Edit the global shipping method");
+            globalShippingMethod, Messages.ShippingMethodViewForm_add_msg,
+            Messages.ShippingMethodViewForm_edit_msg);
         statusWidget.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(statusWidget);
 
-        addSectionToolbar(section, "Add a shipping method",
+        addSectionToolbar(section,
+            Messages.ShippingMethodViewForm_add_button_label,
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -60,9 +62,9 @@ public class ShippingMethodViewForm extends BiobankFormBase {
         if (!SessionManager.canUpdate(ShippingMethodWrapper.class)
             && !SessionManager.canCreate(ShippingMethodWrapper.class)
             && !SessionManager.canDelete(ShippingMethodWrapper.class)) {
-            BiobankPlugin.openAccessDeniedErrorMessage();
+            BgcPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
-                "Cannot access  Shipping Method editor. Access Denied.");
+                Messages.ShippingMethodViewForm_access_denied_error_msg);
         }
     }
 

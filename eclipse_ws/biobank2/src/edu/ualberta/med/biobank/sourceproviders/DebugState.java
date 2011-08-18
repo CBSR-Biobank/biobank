@@ -7,9 +7,9 @@ import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
 public class DebugState extends AbstractSourceProvider {
-    public final static String SESSION_STATE = "edu.ualberta.med.biobank.sourceprovider.debugState";
-    private final static String DEBUG = "debug";
-    private final static String NON_DEBUG = "nonDebug";
+    public final static String SESSION_STATE = "edu.ualberta.med.biobank.sourceprovider.debugState"; //$NON-NLS-1$
+    private final static String DEBUG = "debug"; //$NON-NLS-1$
+    private final static String NON_DEBUG = "nonDebug"; //$NON-NLS-1$
 
     // true for debug, false for non-debug
     boolean state;
@@ -29,6 +29,7 @@ public class DebugState extends AbstractSourceProvider {
 
     @Override
     public void dispose() {
+        //
     }
 
     public void setState(boolean state) {

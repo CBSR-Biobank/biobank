@@ -4,13 +4,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
@@ -27,26 +23,22 @@ public class ShipmentAdapter extends AdapterBase {
 
         if (originInfo.getShipmentInfo() == null) {
             throw new NullPointerException(
-                "No shipment information is associated with the given origin information.");
+                Messages.ShipmentAdapter_noShipment_error_msg);
         }
 
         setHasChildren(false);
     }
 
-    public OriginInfoWrapper getWrapper() {
-        return (OriginInfoWrapper) modelObject;
-    }
-
     @Override
     protected String getLabelInternal() {
-        OriginInfoWrapper originInfo = getWrapper();
+        OriginInfoWrapper originInfo = (OriginInfoWrapper) getModelObject();
         ShipmentInfoWrapper shipmentInfo = originInfo.getShipmentInfo();
 
-        String label = "";
-        if (shipmentInfo.getId() != null)
-            label += shipmentInfo.getId().toString();
+        String label = ""; //$NON-NLS-1$
+        if (shipmentInfo.getReceivedAt() != null)
+            label += shipmentInfo.getFormattedDateReceived();
         if (shipmentInfo.getWaybill() != null) {
-            label += " (" + shipmentInfo.getWaybill() + ")";
+            label += " (" + shipmentInfo.getWaybill() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         return label;
@@ -54,25 +46,26 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        OriginInfoWrapper originInfo = getWrapper();
+        OriginInfoWrapper originInfo = (OriginInfoWrapper) getModelObject();
         if (originInfo != null) {
             CenterWrapper<?> center = originInfo.getCenter();
             if (center != null)
-                return center.getName() + " - " + getTooltipText("Shipment");
+                return center.getName()
+                    + " - " + getTooltipText(Messages.ShipmentAdapter_tooltip_no_origin); //$NON-NLS-1$ 
         }
-        return getTooltipText("Shipment");
+        return getTooltipText(Messages.ShipmentAdapter_tooltip_no_origin);
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Shipment");
-        addViewMenu(menu, "Shipment");
-        addDeleteMenu(menu, "Shipment");
+        addEditMenu(menu, Messages.ShipmentAdapter_shipment_label);
+        addViewMenu(menu, Messages.ShipmentAdapter_shipment_label);
+        addDeleteMenu(menu, Messages.ShipmentAdapter_shipment_label);
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this shipment?";
+        return Messages.ShipmentAdapter_delete_confirm;
     }
 
     @Override
@@ -117,34 +110,8 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public void deleteWithConfirm() {
-        String msg = getConfirmDeleteMessage();
-        if (msg == null) {
-            throw new RuntimeException("adapter has no confirm delete msg: "
-                + getClass().getName());
-        }
-        boolean doDelete = true;
-        if (msg != null)
-            doDelete = BiobankPlugin.openConfirm("Confirm Delete", msg);
-        if (doDelete) {
-            BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        getParent().removeChild(ShipmentAdapter.this);
-                        if (modelObject != null) {
-                            modelObject.delete();
-                            notifyListeners();
-                            getParent().getParent().rebuild();
-                        }
-                    } catch (BiobankCheckException bce) {
-                        BiobankPlugin.openAsyncError("Delete failed", bce);
-                    } catch (Exception e) {
-                        BiobankPlugin.openAsyncError("Delete failed", e);
-                    }
-                }
-            });
-        }
+    protected void additionalRefreshAfterDelete() {
+        getParent().getParent().rebuild();
     }
 
 }

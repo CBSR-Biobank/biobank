@@ -14,11 +14,14 @@ import org.apache.commons.lang.StringUtils;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.base.CollectionEventBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrWrapper;
@@ -247,18 +250,37 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return aliquotedSpecimens;
     }
 
+    private static String SOURCE_SPEC_IN_PROCESS_NOT_FLAGGED_QRY = "select spec from "
+        + Specimen.class.getName()
+        + " as spec where spec."
+        + Property.concatNames(SpecimenPeer.ORIGINAL_COLLECTION_EVENT,
+            CollectionEventPeer.ID)
+        + " = ? and spec."
+        + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
+            ProcessingEventPeer.ID)
+        + " = ? and spec."
+        + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
+            ActivityStatusPeer.NAME) + " != 'Flagged'";
+
     /**
      * source specimen that are in a process event
+     * 
+     * @throws ApplicationException
      */
-    public List<SpecimenWrapper> getSourceSpecimenCollectionInProcess(
-        ProcessingEventWrapper pEvent, boolean sort) {
-        List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
-        for (SpecimenWrapper specimen : getOriginalSpecimenCollection(sort)) {
-            if (specimen.getProcessingEvent() != null
-                && specimen.getProcessingEvent().equals(pEvent))
-                specimens.add(specimen);
+    public List<SpecimenWrapper> getSourceSpecimenCollectionInProcessNotFlagged(
+        ProcessingEventWrapper pEvent, boolean sort)
+        throws ApplicationException {
+        List<Specimen> raw = appService.query(new HQLCriteria(
+            SOURCE_SPEC_IN_PROCESS_NOT_FLAGGED_QRY, Arrays.asList(new Object[] {
+                getId(), pEvent.getId() })));
+        if (raw == null) {
+            return new ArrayList<SpecimenWrapper>();
         }
-        return specimens;
+        List<SpecimenWrapper> specs = wrapModelCollection(appService, raw,
+            SpecimenWrapper.class);
+        if (sort)
+            Collections.sort(specs);
+        return specs;
     }
 
     private Map<String, StudyEventAttrWrapper> getStudyEventAttrMap() {
@@ -509,5 +531,47 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     @Override
     public void delete() throws Exception {
         WrapperTransaction.delete(this, appService);
+	}
+
+    public void merge(CollectionEventWrapper p2event) throws Exception {
+        List<SpecimenWrapper> ospecs = p2event
+            .getOriginalSpecimenCollection(false);
+        List<SpecimenWrapper> aspecs = p2event.getAllSpecimenCollection(false);
+        for (SpecimenWrapper aspec : aspecs) {
+            if (ospecs.contains(aspec))
+                aspec.setOriginalCollectionEvent(this);
+            aspec.setCollectionEvent(this);
+            aspec.persist();
+        }
+        p2event.delete();
+    }
+
+    /**
+     * return true if the user can delete this object
+     */
+    @Override
+    public boolean canDelete(User user) {
+        return super.canDelete(user)
+            && (getPatient() == null || getPatient().getStudy() == null || user
+                .getCurrentWorkingCenter().getStudyCollection()
+                .contains(getPatient().getStudy()));
+    }
+
+    /**
+     * return true if the user can edit this object
+     */
+    @Override
+    public boolean canUpdate(User user) {
+        return super.canUpdate(user)
+            && (getPatient() == null || getPatient().getStudy() == null || user
+                .getCurrentWorkingCenter().getStudyCollection()
+                .contains(getPatient().getStudy()));
+    }
+
+    public Date getMinSourceSpecimenDate() {
+        Date min = new Date();
+        for (SpecimenWrapper spec : getOriginalSpecimenCollection(false))
+            min = min.before(spec.getCreatedAt()) ? min : spec.getCreatedAt();
+        return min;
     }
 }

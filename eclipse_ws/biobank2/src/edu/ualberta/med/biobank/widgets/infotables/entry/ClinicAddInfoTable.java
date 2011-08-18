@@ -5,14 +5,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectClinicContactDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
@@ -56,8 +57,8 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
                 }
             }
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError(
-                "Unable to retrieve available contacts", e);
+            BgcPlugin.openAsyncError(
+                Messages.ClinicAddInfoTable_retrieve_error_title, e);
         }
     }
 
@@ -74,10 +75,11 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
             public void deleteItem(InfoTableEvent event) {
                 ContactWrapper contact = getSelection();
                 if (contact != null) {
-                    if (!BiobankPlugin.openConfirm(
-                        "Delete Contact",
-                        "Are you sure you want to delete contact \""
-                            + contact.getName() + "\"")) {
+                    if (!BgcPlugin.openConfirm(
+                        Messages.ClinicAddInfoTable_delete_confirm_title,
+                        NLS.bind(
+                            Messages.ClinicAddInfoTable_delete_confirm_msg,
+                            contact.getName()))) {
                         return;
                     }
 

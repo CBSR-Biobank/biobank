@@ -9,14 +9,19 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 
 public class ContainerAddHandler extends AbstractHandler {
-    public static final String ID = "edu.ualberta.med.biobank.commands.containerAdd";
+    public static final String ID = "edu.ualberta.med.biobank.commands.containerAdd"; //$NON-NLS-1$
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         ContainerAdapter containerAdapter = new ContainerAdapter(null,
             new ContainerWrapper(SessionManager.getAppService()));
-        containerAdapter.getContainer().setSite(
-            SessionManager.getUser().getCurrentWorkingSite());
+        try {
+            SessionManager.getUser().getCurrentWorkingSite().reload();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ((ContainerWrapper) containerAdapter.getModelObject())
+            .setSite(SessionManager.getUser().getCurrentWorkingSite());
         containerAdapter.openEntryForm(false);
         return null;
     }
@@ -24,7 +29,8 @@ public class ContainerAddHandler extends AbstractHandler {
     @Override
     public boolean isEnabled() {
         return SessionManager.getUser() != null
-            && SessionManager.getUser().getCurrentWorkingCenter() != null
+            // only for sites, not all centers
+            && SessionManager.getUser().getCurrentWorkingSite() != null
             && SessionManager.canCreate(ContainerWrapper.class);
     }
 }

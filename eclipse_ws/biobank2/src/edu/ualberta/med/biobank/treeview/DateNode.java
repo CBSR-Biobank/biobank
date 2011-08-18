@@ -18,7 +18,7 @@ public class DateNode extends AdapterBase {
     private Date date;
 
     public DateNode(AdapterBase parent, String text, Date date) {
-        super(parent, (int) date.getTime() + text.hashCode(), text + ": "
+        super(parent, (int) date.getTime() + text.hashCode(), text + ": " //$NON-NLS-1$
             + DateFormatter.formatAsDate(date), true, false);
         this.setDate(date);
     }
@@ -71,6 +71,7 @@ public class DateNode extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+        //
     }
 
     public void setDate(Date date) {

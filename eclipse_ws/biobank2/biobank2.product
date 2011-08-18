@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="BioBank2" uid="biobank2.product" id="biobank2.product" application="biobank2.biobank2" version="1.4.0.rc6" useFeatures="true" includeLaunchers="false">
+<product name="BioBank" uid="biobank.product" id="biobank.product" application="biobank.biobank" version="3.1.1.rc1" useFeatures="true" includeLaunchers="false">
+
 
    <aboutInfo>
       <image path="/biobank2/icons/about.png"/>
       <text>
-         BioBank2 Java Client
+         BioBank Java Client
 Version {0}
 
 Developed for the Canadian BioSample Repository by AICML .
@@ -27,16 +28,13 @@ AICML: http://aicml.cs.ualberta.ca
 
    <windowImages/>
 
-   <splash
-      location="biobank2" />
-   <launcher name="BioBank2">
+   <splash location="biobank"/>
+   <launcher name="BioBank">
       <linux icon="/biobank2/icons/biobank_launcher.xpm"/>
       <macosx icon="/biobank2/icons/biobank_launcher.icns"/>
       <solaris/>
       <win useIco="false">
-         <bmp
-            winSmallHigh="/biobank2/icons/biobank_launcher_16.bmp"
-            winMediumHigh="/biobank2/icons/biobank_launcher_32.bmp"/>
+         <bmp winSmallHigh="/biobank2/icons/biobank_launcher_16.bmp" winMediumHigh="/biobank2/icons/biobank_launcher_32.bmp"/>
       </win>
    </launcher>
 
@@ -54,6 +52,5 @@ AICML: http://aicml.cs.ualberta.ca
       <feature id="biobank2.feature.core"/>
       <feature id="biobank2.feature.platform"/>
    </features>
-
 
 </product>

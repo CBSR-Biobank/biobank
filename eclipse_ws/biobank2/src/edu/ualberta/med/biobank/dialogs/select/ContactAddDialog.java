@@ -9,15 +9,15 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
-import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
-public class ContactAddDialog extends BiobankDialog {
-
-    private static final String TITLE = "Contact Information";
+public class ContactAddDialog extends BgcBaseDialog {
 
     private ContactWrapper contactWrapper;
+    private String currentTitle;
 
     public ContactAddDialog(Shell parent) {
         this(parent, new ContactWrapper(SessionManager.getAppService()));
@@ -27,34 +27,26 @@ public class ContactAddDialog extends BiobankDialog {
         super(parent);
         Assert.isNotNull(contactWrapper);
         this.contactWrapper = contactWrapper;
+        currentTitle = contactWrapper.getName() == null ? Messages.ContactAddDialog_title_add
+            : Messages.ContactAddDialog_title_edit;
     }
 
     @Override
     protected String getDialogShellTitle() {
-        String title;
-        if (contactWrapper.getName() == null) {
-            title = "Add";
-        } else {
-            title = "Edit ";
-        }
-        title += TITLE;
-        return title;
+        return currentTitle;
     }
 
     @Override
     protected String getTitleAreaMessage() {
         if (contactWrapper.getName() == null) {
-            return "Add a contact person to this clinic";
+            return Messages.ContactAddDialog_description_add;
         }
-        return "Edit contact person for this clinic";
+        return Messages.ContactAddDialog_description_edit;
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        if (contactWrapper.getName() == null) {
-            return "Add Contact";
-        }
-        return "Edit Contact";
+        return currentTitle;
     }
 
     @Override
@@ -63,29 +55,36 @@ public class ContactAddDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        Control c = createBoundWidgetWithLabel(contents, BiobankText.class,
-            SWT.BORDER, "Name", new String[0], contactWrapper, "name", null);
+        Control c = createBoundWidgetWithLabel(contents, BgcBaseText.class,
+            SWT.BORDER, Messages.ContactAddDialog_name_label, new String[0],
+            contactWrapper, ContactPeer.NAME.getName(), null);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 250;
         c.setLayoutData(gd);
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
-            "Title", new String[0], contactWrapper, "title", null);
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
+            Messages.ContactAddDialog_title_label, new String[0],
+            contactWrapper, ContactPeer.TITLE.getName(), null);
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
-            "email", new String[0], contactWrapper, "emailAddress", null);
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
+            Messages.ContactAddDialog_email_label, new String[0],
+            contactWrapper, ContactPeer.EMAIL_ADDRESS.getName(), null);
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
-            "Mobile #", new String[0], contactWrapper, "mobileNumber", null);
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
+            Messages.ContactAddDialog_mobile_label, new String[0],
+            contactWrapper, ContactPeer.MOBILE_NUMBER.getName(), null);
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
-            "Pager #", new String[0], contactWrapper, "pagerNumber", null);
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
+            Messages.ContactAddDialog_pager_label, new String[0],
+            contactWrapper, ContactPeer.PAGER_NUMBER.getName(), null);
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
-            "Office #", new String[0], contactWrapper, "officeNumber", null);
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
+            Messages.ContactAddDialog_office_label, new String[0],
+            contactWrapper, ContactPeer.OFFICE_NUMBER.getName(), null);
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
-            "Fax #", new String[0], contactWrapper, "faxNumber", null);
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
+            Messages.ContactAddDialog_fax_label, new String[0], contactWrapper,
+            ContactPeer.FAX_NUMBER.getName(), null);
     }
 
     public ContactWrapper getContactWrapper() {

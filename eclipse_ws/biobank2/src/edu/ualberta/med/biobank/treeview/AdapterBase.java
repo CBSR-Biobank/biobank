@@ -23,12 +23,12 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
@@ -43,15 +43,15 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  */
 public abstract class AdapterBase {
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(AdapterBase.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(AdapterBase.class
+        .getName());
 
-    protected static final String BGR_LOADING_LABEL = "loading...";
+    protected static final String BGR_LOADING_LABEL = Messages.AdapterBase_loading;
 
     protected IDeltaListener deltaListener = NullDeltaListener
         .getSoleInstance();
 
-    protected ModelWrapper<?> modelObject;
+    private ModelWrapper<?> modelObject;
 
     private Integer id;
 
@@ -88,7 +88,7 @@ public abstract class AdapterBase {
             addListener(parent.deltaListener);
         }
         listeners = new ArrayList<AdapterChangedListener>();
-        Assert.isTrue(checkIntegrity(), "integrity checks failed");
+        Assert.isTrue(checkIntegrity(), "integrity checks failed"); //$NON-NLS-1$
     }
 
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
@@ -183,9 +183,10 @@ public abstract class AdapterBase {
     protected String getTooltipText(String string) {
         String name = getLabel();
         if (name == null) {
-            return new StringBuilder("New ").append(string).toString();
+            return new StringBuilder(Messages.AdapterBase_new_label).append(
+                string).toString();
         }
-        return new StringBuilder(string).append(" ").append(name).toString();
+        return new StringBuilder(string).append(" ").append(name).toString(); //$NON-NLS-1$
     }
 
     public List<AdapterBase> getItems() {
@@ -213,7 +214,7 @@ public abstract class AdapterBase {
             ModelWrapper<?> childModelObject = child.getModelObject();
             if ((childModelObject != null)
                 && childModelObject.getClass().equals(wrapperClass)
-                && child.getId().equals(wrapperId))
+                && child.getId() != null && child.getId().equals(wrapperId))
                 return child;
         }
         return null;
@@ -254,7 +255,7 @@ public abstract class AdapterBase {
     public void insertAfter(AdapterBase existingNode, AdapterBase newNode) {
         int pos = children.indexOf(existingNode);
         Assert.isTrue(pos >= 0,
-            "existing node not found: " + existingNode.getLabel());
+            "existing node not found: " + existingNode.getLabel()); //$NON-NLS-1$
         newNode.setParent(this);
         children.add(pos + 1, newNode);
         newNode.addListener(deltaListener);
@@ -270,8 +271,9 @@ public abstract class AdapterBase {
             return;
         AdapterBase itemToRemove = null;
         for (AdapterBase child : children) {
-            if ((child.getId().equals(item.getId()))
-                && child.getLabel().equals(item.getLabel()))
+            if ((child.getId() == null && item.getId() == null)
+                || (child.getId().equals(item.getId()) && child.getLabel()
+                    .equals(item.getLabel())))
                 itemToRemove = child;
         }
         if (itemToRemove != null) {
@@ -328,7 +330,9 @@ public abstract class AdapterBase {
         if (modelObject != null) {
             return modelObject.getAppService();
         }
-        return parent.getAppService();
+        if (parent != null)
+            return parent.getAppService();
+        return null;
     }
 
     public void addListener(IDeltaListener listener) {
@@ -379,7 +383,7 @@ public abstract class AdapterBase {
         try {
             loadChildrenSemaphore.acquire();
         } catch (InterruptedException e) {
-            BiobankPlugin.openAsyncError("Could not load children", e);
+            BgcPlugin.openAsyncError(Messages.AdapterBase_load_error_title, e);
         }
 
         if (loadChildrenInBackground) {
@@ -403,13 +407,13 @@ public abstract class AdapterBase {
                 SessionManager.refreshTreeNode(AdapterBase.this);
             }
         } catch (final RemoteAccessException exp) {
-            BiobankPlugin.openRemoteAccessErrorMessage(exp);
+            BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
             String text = getClass().getName();
             if (modelObject != null) {
                 text = modelObject.toString();
             }
-            logger.error("Error while loading children of node " + text, e);
+            logger.error("Error while loading children of node " + text, e); //$NON-NLS-1$
         } finally {
             loadChildrenSemaphore.release();
         }
@@ -426,10 +430,8 @@ public abstract class AdapterBase {
             int childCount = getWrapperChildCount();
             if (childCount == 0) {
                 setHasChildren(false);
-                loadChildrenSemaphore.release();
-                return;
-            }
-            setHasChildren(true);
+            } else
+                setHasChildren(true);
             final List<AdapterBase> newNodes = new ArrayList<AdapterBase>();
             for (int i = 0, n = childCount - children.size(); i < n; ++i) {
                 final AdapterBase node = createChildNode(-i);
@@ -473,14 +475,14 @@ public abstract class AdapterBase {
                             });
                         }
                     } catch (final RemoteAccessException exp) {
-                        BiobankPlugin.openRemoteAccessErrorMessage(exp);
+                        BgcPlugin.openRemoteAccessErrorMessage(exp);
                     } catch (Exception e) {
-                        String modelString = "'unknown'";
+                        String modelString = Messages.AdapterBase_unknow;
                         if (modelObject != null) {
                             modelString = modelObject.toString();
                         }
-                        logger.error("Error while loading children of node "
-                            + modelString + " in background", e);
+                        logger.error("Error while loading children of node " //$NON-NLS-1$
+                            + modelString + " in background", e); //$NON-NLS-1$
                     } finally {
                         loadChildrenSemaphore.release();
                     }
@@ -488,12 +490,12 @@ public abstract class AdapterBase {
             };
             childUpdateThread.start();
         } catch (Exception e) {
-            String nodeString = "null";
+            String nodeString = "null"; //$NON-NLS-1$
             if (modelObject != null) {
                 nodeString = modelObject.toString();
             }
             logger.error(
-                "Error while expanding children of node " + nodeString, e);
+                "Error while expanding children of node " + nodeString, e); //$NON-NLS-1$
             loadChildrenSemaphore.release();
         }
     }
@@ -503,7 +505,7 @@ public abstract class AdapterBase {
     protected void addEditMenu(Menu menu, String objectName) {
         if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Edit " + objectName);
+            mi.setText(Messages.AdapterBase_edit_label + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -515,7 +517,7 @@ public abstract class AdapterBase {
 
     protected void addViewMenu(Menu menu, String objectName) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("View " + objectName);
+        mi.setText(Messages.AdapterBase_view_label + objectName);
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -527,7 +529,7 @@ public abstract class AdapterBase {
     protected void addDeleteMenu(Menu menu, String objectName) {
         if (isDeletable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Delete " + objectName);
+            mi.setText(Messages.AdapterBase_delete_label + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -591,7 +593,7 @@ public abstract class AdapterBase {
                 .openEditor(input, id, focusOnEditor);
             return part;
         } catch (PartInitException e) {
-            logger.error("Can't open form with id " + id, e);
+            logger.error("Can't open form with id " + id, e); //$NON-NLS-1$
             return null;
         }
 
@@ -690,12 +692,13 @@ public abstract class AdapterBase {
     public void deleteWithConfirm() {
         String msg = getConfirmDeleteMessage();
         if (msg == null) {
-            throw new RuntimeException("adapter has no confirm delete msg: "
+            throw new RuntimeException("adapter has no confirm delete msg: " //$NON-NLS-1$
                 + getClass().getName());
         }
         boolean doDelete = true;
         if (msg != null)
-            doDelete = BiobankPlugin.openConfirm("Confirm Delete", msg);
+            doDelete = BgcPlugin.openConfirm(
+                Messages.AdapterBase_confirm_delete_title, msg);
         if (doDelete) {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
@@ -711,16 +714,23 @@ public abstract class AdapterBase {
                             modelObject.delete();
                             page.closeEditor(part, true);
                         } catch (Exception e) {
-                            BiobankPlugin.openAsyncError("Delete failed", e);
+                            BgcPlugin.openAsyncError(
+                                Messages.AdapterBase_delete_error_title, e);
                             getParent().addChild(AdapterBase.this);
                             return;
                         }
+                        getParent().rebuild();
                         getParent().notifyListeners();
                         notifyListeners();
+                        additionalRefreshAfterDelete();
                     }
                 }
             });
         }
+    }
+
+    protected void additionalRefreshAfterDelete() {
+        // default does nothing
     }
 
     public boolean isDeletable() {
@@ -735,7 +745,8 @@ public abstract class AdapterBase {
     }
 
     public boolean isEditable() {
-        return editable && modelObject.canUpdate(SessionManager.getUser());
+        return editable && SessionManager.getInstance().isConnected()
+            && modelObject.canUpdate(SessionManager.getUser());
     }
 
     public void setEditable(boolean editable) {
@@ -771,7 +782,7 @@ public abstract class AdapterBase {
     protected List<AdapterBase> searchChildContainers(Object searchedObject,
         ContainerAdapter container, final List<ContainerWrapper> parents) {
         List<AdapterBase> res = new ArrayList<AdapterBase>();
-        if (parents.contains(container.getContainer())) {
+        if (parents.contains(container.getModelObject())) {
             AdapterBase child = container.getChild(
                 (ModelWrapper<?>) searchedObject, true);
             if (child == null) {

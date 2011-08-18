@@ -28,10 +28,10 @@ public class TopContainerFilterType implements FilterType, SelectableFilterType 
     // Probably should be a property on EntityFilter that is an optional HQL
     // string to select valid options. Do this after merged in with others since
     // it will require additional model changes?
-    private static final String OPTIONS_HQL = "select"
-        + " id, label || ' (' || containerType.nameShort || ') ' || site.nameShort"
-        + " from " + Container.class.getName()
-        + " where containerType.topLevel <> 0";
+    private static final String OPTIONS_HQL = "select" //$NON-NLS-1$
+        + " id, label || ' (' || containerType.nameShort || ') ' || site.nameShort" //$NON-NLS-1$
+        + " from " + Container.class.getName() //$NON-NLS-1$
+        + " where containerType.topLevel <> 0"; //$NON-NLS-1$
 
     @Override
     public void addCriteria(Criteria criteria, String aliasedProperty,

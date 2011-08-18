@@ -9,14 +9,17 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
+/**
+ * Used to edit PVInfos (see PvInfoWidget)
+ */
 public class ListAddDialog extends Dialog {
 
     private String title;
     private String prompt;
     private String helpText;
-    private BiobankText items;
+    private BgcBaseText items;
     private String[] result;
 
     public ListAddDialog(Shell parentShell, String title, String prompt,
@@ -47,7 +50,7 @@ public class ListAddDialog extends Dialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         Label label = new Label(contents, SWT.NONE);
         label.setText(prompt);
-        items = new BiobankText(contents, SWT.NONE);
+        items = new BgcBaseText(contents, SWT.NONE);
         items.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         label = new Label(contents, SWT.NONE);
         label.setText(helpText);
@@ -56,7 +59,7 @@ public class ListAddDialog extends Dialog {
 
     @Override
     protected void okPressed() {
-        result = items.getText().split(";");
+        result = items.getText().split(";"); //$NON-NLS-1$
         super.okPressed();
     }
 

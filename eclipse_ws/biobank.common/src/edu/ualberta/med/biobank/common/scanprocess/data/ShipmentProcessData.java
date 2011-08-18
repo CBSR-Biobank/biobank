@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.scanprocess.data;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.security.User;
@@ -57,10 +58,10 @@ public class ShipmentProcessData extends ProcessWithPallet {
 
     @Override
     public ServerProcess getProcessInstance(
-        WritableApplicationService appService, User user) {
+        WritableApplicationService appService, User user, Locale locale) {
         if (isCreation())
-            return new DispatchCreateProcess(appService, this, user);
-        return new ShipmentReceiveProcess(appService, this, user);
+            return new DispatchCreateProcess(appService, this, user, locale);
+        return new ShipmentReceiveProcess(appService, this, user, locale);
     }
 
     public Map<Integer, ItemState> getCurrentDispatchSpecimenIds() {

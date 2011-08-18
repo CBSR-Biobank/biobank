@@ -26,7 +26,7 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
 
     public ShipmentTodayNode(AdapterBase parent, int id) {
         super(parent, id);
-        setName("Today's shipments");
+        setName(Messages.ShipmentTodayNode_today_label);
     }
 
     @Override
@@ -43,9 +43,11 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
     @Override
     protected List<OriginInfoWrapper> getTodayElements()
         throws ApplicationException {
-        if (SessionManager.getInstance().isConnected())
+        if (SessionManager.getInstance().isConnected()
+            && SessionManager.getUser().getCurrentWorkingCenter() != null)
             return OriginInfoWrapper.getTodayShipments(SessionManager
-                .getAppService());
+                .getAppService(), SessionManager.getUser()
+                .getCurrentWorkingCenter());
         else
             return null;
     }
@@ -72,7 +74,7 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (SessionManager.canCreate(OriginInfoWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add Shipment");
+            mi.setText(Messages.ShipmentTodayNode_add_label);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

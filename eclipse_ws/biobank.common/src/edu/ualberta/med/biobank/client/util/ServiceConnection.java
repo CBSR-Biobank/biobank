@@ -11,13 +11,13 @@ import gov.nih.nci.system.client.ApplicationServiceProvider;
 
 public class ServiceConnection {
 
-    private static String TRUST_STORE_PROPERTY_NAME = "javax.net.ssl.trustStore";
+    private static String TRUST_STORE_PROPERTY_NAME = "javax.net.ssl.trustStore"; //$NON-NLS-1$
 
-    private static String KEYSTORE_FILE_PATH = "cert/all.keystore";
+    private static String KEYSTORE_FILE_PATH = "cert/all.keystore"; //$NON-NLS-1$
 
     public static BiobankApplicationService getAppService(String serverUrl,
         String userName, String password) throws Exception {
-        if (serverUrl.startsWith("https")
+        if (serverUrl.startsWith("https") //$NON-NLS-1$
             && System.getProperty(TRUST_STORE_PROPERTY_NAME) == null) {
             setTrustStore();
         }
@@ -30,7 +30,7 @@ public class ServiceConnection {
                 .getApplicationServiceFromUrl(serverUrl, userName, password);
         }
         Log logMessage = new Log();
-        logMessage.action = "login";
+        logMessage.action = "login"; //$NON-NLS-1$
         appService.logActivity(logMessage);
         return appService;
     }
@@ -38,7 +38,7 @@ public class ServiceConnection {
     private static void setTrustStore() throws Exception {
         // export the keystore into a temporary file (can't use it from inside a
         // jar)
-        File tf = File.createTempFile("biobank2", ".keystore");
+        File tf = File.createTempFile("biobank", ".keystore"); //$NON-NLS-1$ //$NON-NLS-2$
         tf.deleteOnExit();
         byte buffer[] = new byte[0x1000];
         InputStream is = ServiceConnection.class
@@ -61,7 +61,7 @@ public class ServiceConnection {
         throws Exception {
         if (appService != null) {
             Log logMessage = new Log();
-            logMessage.action = "logout";
+            logMessage.action = "logout"; //$NON-NLS-1$
             ((BiobankApplicationService) appService).logActivity(logMessage);
         }
     }

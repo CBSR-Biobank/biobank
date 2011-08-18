@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.SpecimenEntryForm;
 import edu.ualberta.med.biobank.forms.SpecimenViewForm;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SpecimenAdapter extends AdapterBase {
 
@@ -19,35 +18,25 @@ public class SpecimenAdapter extends AdapterBase {
         super(parent, sample);
     }
 
-    public SpecimenWrapper getSpecimen() {
-        return (SpecimenWrapper) modelObject;
-    }
-
     @Override
     public void addChild(AdapterBase child) {
-        Assert.isTrue(false, "Cannot add children to this adapter");
+        Assert.isTrue(false, "Cannot add children to this adapter"); //$NON-NLS-1$
     }
 
     @Override
     protected String getLabelInternal() {
-        SpecimenWrapper specimen = getSpecimen();
-        Assert.isNotNull(specimen, "specimen is null");
-        return specimen.getInventoryId();
+        Assert.isNotNull(getModelObject(), "specimen is null"); //$NON-NLS-1$
+        return ((SpecimenWrapper) getModelObject()).getInventoryId();
     }
 
     @Override
     public String getTooltipText() {
-        return getTooltipText("Specimen");
-    }
-
-    @Override
-    public WritableApplicationService getAppService() {
-        return modelObject.getAppService();
+        return getTooltipText(Messages.SpecimenAdapter_specimen_label);
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addViewMenu(menu, "Specimen");
+        addViewMenu(menu, Messages.SpecimenAdapter_specimen_label);
     }
 
     @Override

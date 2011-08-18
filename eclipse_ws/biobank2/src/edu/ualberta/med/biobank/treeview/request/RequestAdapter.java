@@ -2,31 +2,22 @@ package edu.ualberta.med.biobank.treeview.request;
 
 import java.util.Collection;
 
-import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
-import org.springframework.remoting.RemoteAccessException;
-import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.RequestEntryForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.views.RequestAdministrationView;
 
 public class RequestAdapter extends AdapterBase {
 
     public RequestAdapter(AdapterBase parent, RequestWrapper ship) {
         super(parent, ship);
-    }
-
-    public RequestWrapper getWrapper() {
-        return (RequestWrapper) modelObject;
     }
 
     @Override
@@ -36,11 +27,11 @@ public class RequestAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        RequestWrapper shipment = getWrapper();
-        Assert.isNotNull(shipment, "Request is null");
+        RequestWrapper shipment = (RequestWrapper) getModelObject();
+        Assert.isNotNull(shipment, "Request is null"); //$NON-NLS-1$
         StudyWrapper study = shipment.getStudy();
-        String label = shipment.getId() + " - ";
-        label += study.getNameShort() + " - ";
+        String label = shipment.getId() + " - "; //$NON-NLS-1$
+        label += study.getNameShort() + " - "; //$NON-NLS-1$
         label += DateFormatter.formatAsDate(shipment.getCreated());
         return label;
 
@@ -48,17 +39,7 @@ public class RequestAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return getTooltipText("Request");
-    }
-
-    public void persistAndRebuild() {
-        try {
-            persistRequest();
-        } catch (Exception e1) {
-            BiobankPlugin.openAsyncError("Unable to save", e1);
-        }
-        getParent().getParent().rebuild();
-        openViewForm();
+        return getTooltipText(Messages.RequestAdapter_tooltip);
     }
 
     @Override
@@ -68,22 +49,7 @@ public class RequestAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addViewMenu(menu, "Request");
-    }
-
-    private void persistRequest() {
-        try {
-            getWrapper().persist();
-        } catch (final RemoteConnectFailureException exp) {
-            BiobankPlugin.openRemoteConnectErrorMessage(exp);
-        } catch (final RemoteAccessException exp) {
-            BiobankPlugin.openRemoteAccessErrorMessage(exp);
-        } catch (final AccessDeniedException ade) {
-            BiobankPlugin.openAccessDeniedErrorMessage(ade);
-        } catch (Exception ex) {
-            BiobankPlugin.openAsyncError("Save error", ex);
-        }
-        RequestAdministrationView.getCurrent().reload();
+        addViewMenu(menu, Messages.RequestAdapter_add_text);
     }
 
     @Override

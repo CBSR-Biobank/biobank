@@ -15,17 +15,18 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class ContainerEmptyLocationsImpl extends AbstractReport {
 
     // @formatter:off 
-    private static final String QUERY = "SELECT c"
-        + " FROM " + Container.class.getName() + " c "
-        + "    inner join fetch c.containerType"
-        + "    ," + Container.class.getName() + " parent "
-        + " WHERE parent.id in (" + CONTAINER_LIST + ")"
-        + "     and (c.path LIKE parent.path || '/%' OR c.id=parent.id) "
-        + "     and c.label LIKE ? || '%' "
-        + "     and c.containerType.specimenTypeCollection.size > 0"
-        + "     and (c.containerType.capacity.rowCapacity " 
-        + "          * c.containerType.capacity.colCapacity)"
-        + "     > c.container.specimenPositionCollection.size";
+    private static final String QUERY = "SELECT c" //$NON-NLS-1$
+        + " FROM " + Container.class.getName() + " c " //$NON-NLS-1$ //$NON-NLS-2$
+        + "    inner join fetch c.containerType" //$NON-NLS-1$
+        + "    ," + Container.class.getName() + " parent " //$NON-NLS-1$ //$NON-NLS-2$
+        + " WHERE parent.id in (" + CONTAINER_LIST + ")" //$NON-NLS-1$ //$NON-NLS-2$
+        + "    and (c.path LIKE if(length(parent.path),parent.path || '/','') || parent.id || '/%' "  //$NON-NLS-1$
+        + "         OR c.id=parent.id) " //$NON-NLS-1$
+        + "    and c.label LIKE ? || '%' " //$NON-NLS-1$
+        + "    and c.containerType.specimenTypeCollection.size > 0" //$NON-NLS-1$
+        + "    and (c.containerType.capacity.rowCapacity "  //$NON-NLS-1$
+        + "         * c.containerType.capacity.colCapacity)" //$NON-NLS-1$
+        + "        > c.specimenPositionCollection.size"; //$NON-NLS-1$
     // @formatter:on 
 
     public ContainerEmptyLocationsImpl(BiobankReport report) {
@@ -37,12 +38,17 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
         List<Object> results) {
         List<Object> processedResults = new ArrayList<Object>();
         for (Object c : results) {
+
+            ContainerWrapper container = new ContainerWrapper(appService,
+                (Container) c);
             try {
-                ContainerWrapper container = new ContainerWrapper(appService,
-                    (Container) c);
                 container.reload();
-                int rows = container.getRowCapacity();
-                int cols = container.getColCapacity();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            int rows = container.getRowCapacity();
+            int cols = container.getColCapacity();
+            try {
                 Map<RowColPos, SpecimenWrapper> aliquots = container
                     .getSpecimens();
 
@@ -62,9 +68,9 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
                     }
                 }
             } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
+
         }
         return processedResults;
     }

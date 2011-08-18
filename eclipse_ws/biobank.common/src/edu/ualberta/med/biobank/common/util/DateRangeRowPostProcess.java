@@ -20,7 +20,7 @@ public class DateRangeRowPostProcess extends AbstractRowPostProcess {
                 rowObject[initialYearPosition] = castOb[initialYearPosition];
             } else {
                 rowObject[initialYearPosition] = castOb[initialYearPosition + 1]
-                    + "-" + castOb[initialYearPosition];
+                    + "-" + castOb[initialYearPosition]; //$NON-NLS-1$
             }
             for (int i = 0; i < castOb.length; i++) {
                 if (i < initialYearPosition) {

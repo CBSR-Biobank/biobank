@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.HibernateException;
-import org.hibernate.JDBCException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -87,64 +86,52 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
     }
 
     protected Response query(@SuppressWarnings("unused") Request request,
-        QueryHandleRequest queryHandleRequest) throws DAOException {
+        QueryHandleRequest qhr) throws DAOException {
 
-        CommandType command = queryHandleRequest.getCommandType();
+        CommandType command = qhr.getCommandType();
 
         if (command.equals(CommandType.CREATE)) {
             QueryHandle handle = new QueryHandle(nextHandleId.incrementAndGet());
             try {
-                queryMap.put(handle,
-                    new QueryProcess(queryHandleRequest.getQueryCommand(),
-                        queryHandleRequest.getAppService()));
+                queryMap.put(handle, new QueryProcess(qhr.getQueryCommand(),
+                    qhr.getAppService()));
             } catch (DataAccessResourceFailureException e) {
-                log.error("DataAccessResourceFailureException in ORMDAOImpl ",
-                    e);
+                log.error(
+                    "DataAccessResourceFailureException in ORMDAOImpl ", e); //$NON-NLS-1$
                 throw new DAOException(
-                    "DataAccessResourceFailureException in ORMDAOImpl ", e);
+                    "DataAccessResourceFailureException in ORMDAOImpl ", e); //$NON-NLS-1$
             } catch (IllegalStateException e) {
-                log.error("IllegalStateException in ORMDAOImpl ", e);
-                throw new DAOException("IllegalStateException in ORMDAOImpl ",
-                    e);
+                log.error("IllegalStateException in ORMDAOImpl ", e); //$NON-NLS-1$
+                throw new DAOException(
+                    "IllegalStateException in ORMDAOImpl ", e); //$NON-NLS-1$
             }
             return new Response(handle);
         } else if (command.equals(CommandType.STOP)) {
-            QueryHandle handle = queryHandleRequest.getQueryHandle();
-            queryMap.get(handle).stop();
+            queryMap.get(qhr.getQueryHandle()).stop();
             return new Response();
         } else if (command.equals(CommandType.START)) {
             try {
-                QueryHandle handle = queryHandleRequest.getQueryHandle();
-                return queryMap.get(handle).start(getSession());
+                return queryMap.get(qhr.getQueryHandle()).start(getSession());
             } catch (ApplicationException e) {
                 throw new DAOException(e);
             } finally {
-                queryMap.remove(queryHandleRequest.getQueryHandle());
+                queryMap.remove(qhr.getQueryHandle());
             }
         }
 
         return null;
     }
 
-    protected Response query(Request request, BiobankSQLCriteria sqlCriteria)
-        throws DAOException {
-        try {
-            log.info("SQL Query :" + sqlCriteria.getSqlString());
-            Response rsp = new Response();
-            HibernateCallback callBack = getExecuteSQLQueryHibernateCallback(
-                sqlCriteria.getSqlString(), request.getFirstRow() == null ? -1
-                    : request.getFirstRow(), getResultCountPerQuery());
-            List<?> rs = (List<?>) getHibernateTemplate().execute(callBack);
-            rsp.setRowCount(rs.size());
-            rsp.setResponse(rs);
-            return rsp;
-        } catch (JDBCException ex) {
-            log.error("JDBC Exception in ORMDAOImpl ", ex);
-            throw new DAOException("JDBC Exception in ORMDAOImpl ", ex);
-        } catch (Exception e) {
-            log.error("Exception ", e);
-            throw new DAOException("Exception in ORMDAOImpl ", e);
-        }
+    protected Response query(Request request, BiobankSQLCriteria sqlCriteria) {
+        log.info("SQL Query :" + sqlCriteria.getSqlString()); //$NON-NLS-1$
+        Response rsp = new Response();
+        HibernateCallback callBack = getExecuteSQLQueryHibernateCallback(
+            sqlCriteria.getSqlString(), request.getFirstRow() == null ? -1
+                : request.getFirstRow(), getResultCountPerQuery());
+        List<?> rs = (List<?>) getHibernateTemplate().execute(callBack);
+        rsp.setRowCount(rs.size());
+        rsp.setResponse(rs);
+        return rsp;
     }
 
     protected HibernateCallback getExecuteSQLQueryHibernateCallback(

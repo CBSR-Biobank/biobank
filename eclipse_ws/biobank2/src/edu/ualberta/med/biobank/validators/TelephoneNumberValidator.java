@@ -4,6 +4,8 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
+
 public class TelephoneNumberValidator extends AbstractValidator {
 
     public TelephoneNumberValidator(String message) {
@@ -14,7 +16,7 @@ public class TelephoneNumberValidator extends AbstractValidator {
     public IStatus validate(Object value) {
         if (!(value instanceof String)) {
             throw new RuntimeException(
-                "Not supposed to be called for non-strings.");
+                Messages.TelephoneNumberValidator_nonstring_error_msg);
         }
 
         String v = (String) value;

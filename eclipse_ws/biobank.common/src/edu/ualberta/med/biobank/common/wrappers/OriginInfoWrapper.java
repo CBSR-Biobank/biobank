@@ -2,11 +2,16 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
+import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
@@ -52,6 +57,19 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return patients;
     }
 
+    @Override
+    protected void deleteDependencies() throws Exception {
+        // all specimen should be linked to another origin info. This origin
+        // info center will be the specimen current center.
+        for (SpecimenWrapper spc : getSpecimenCollection()) {
+            OriginInfoWrapper oi = new OriginInfoWrapper(appService);
+            oi.setCenter(spc.getCurrentCenter());
+            oi.persist();
+            spc.setOriginInfo(oi);
+            spc.persist();
+        }
+    }
+
     public void checkAtLeastOneSpecimen() {
         // FIXME don't want that when create from collection event
         // List<SpecimenWrapper> spc = getSpecimenCollection(false);
@@ -62,9 +80,13 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     }
 
     public static List<OriginInfoWrapper> getTodayShipments(
-        BiobankApplicationService appService) throws ApplicationException {
-        return getShipmentsByDateReceived(appService, new Date());
+        BiobankApplicationService appService, CenterWrapper<?> center)
+        throws ApplicationException {
+        return getShipmentsByDateReceived(appService, new Date(), center);
     }
+
+    private static final String SHIPMENTS_BY_WAYBILL_QRY = SHIPMENT_HQL_STRING
+        + " where s." + ShipmentInfoPeer.WAYBILL.getName() + " = ?";
 
     /**
      * Search for shipments in the site with the given waybill
@@ -72,9 +94,8 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     public static List<OriginInfoWrapper> getShipmentsByWaybill(
         WritableApplicationService appService, String waybill)
         throws ApplicationException {
-        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING + " where s."
-            + ShipmentInfoPeer.WAYBILL.getName() + " = ?");
-        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+
+        HQLCriteria criteria = new HQLCriteria(SHIPMENTS_BY_WAYBILL_QRY,
             Arrays.asList(new Object[] { waybill }));
 
         List<OriginInfo> origins = appService.query(criteria);
@@ -84,19 +105,32 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return shipments;
     }
 
+    // Don't run this on the server unless you take into account timezones in
+    // your inputs
+    private static final String SHIPMENTS_BY_DATE_RECEIVED_QRY = SHIPMENT_HQL_STRING
+        + " where s."
+        + ShipmentInfoPeer.RECEIVED_AT.getName()
+        + " >= ? and s."
+        + ShipmentInfoPeer.RECEIVED_AT.getName()
+        + " <= ? and (o."
+        + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
+        + "= ? or o."
+        + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
+        + " = ?)";
+
     /**
      * Search for shipments in the site with the given date received. Don't use
-     * hour and minute.
+     * hour and minute. Will check the given center is either the sender or the
+     * receiver.
      */
     public static List<OriginInfoWrapper> getShipmentsByDateReceived(
-        WritableApplicationService appService, Date dateReceived)
-        throws ApplicationException {
+        WritableApplicationService appService, Date dateReceived,
+        CenterWrapper<?> center) throws ApplicationException {
 
-        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING
-            + " where DATE(s." + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + ") = DATE(?)");
-        HQLCriteria criteria = new HQLCriteria(qry.toString(),
-            Arrays.asList(new Object[] { dateReceived }));
+        Integer centerId = center.getId();
+        HQLCriteria criteria = new HQLCriteria(SHIPMENTS_BY_DATE_RECEIVED_QRY,
+            Arrays.asList(new Object[] { dateReceived, endOfDay(dateReceived),
+                centerId, centerId }));
 
         List<OriginInfo> origins = appService.query(criteria);
         List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
@@ -104,17 +138,27 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
         return shipments;
     }
+
+    // Don't run this on the server unless you take into account timezones in
+    // your inputs
+    private static final String SHIPMENTS_BY_DATE_SENT_QRY = SHIPMENT_HQL_STRING
+        + " where s."
+        + ShipmentInfoPeer.PACKED_AT.getName()
+        + " >= ? and s."
+        + ShipmentInfoPeer.PACKED_AT.getName()
+        + " <= ? and (o."
+        + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
+        + "= ? or o."
+        + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
+        + " = ?)";
 
     public static List<OriginInfoWrapper> getShipmentsByDateSent(
-        WritableApplicationService appService, Date dateSent)
-        throws ApplicationException {
-
-        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING
-            + " where DATE(s." + ShipmentInfoPeer.PACKED_AT.getName()
-            + ") = DATE(?)");
-        HQLCriteria criteria = new HQLCriteria(qry.toString(),
-            Arrays.asList(new Object[] { dateSent }));
-
+        WritableApplicationService appService, Date dateSent,
+        CenterWrapper<?> center) throws ApplicationException {
+        Integer centerId = center.getId();
+        HQLCriteria criteria = new HQLCriteria(SHIPMENTS_BY_DATE_SENT_QRY,
+            Arrays.asList(new Object[] { dateSent, endOfDay(dateSent),
+                centerId, centerId }));
         List<OriginInfo> origins = appService.query(criteria);
         List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
             appService, origins, OriginInfoWrapper.class);
@@ -122,15 +166,26 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return shipments;
     }
 
-    // @SuppressWarnings("unchecked")
-    // @Override
-    // jmf: Cannot just return the origin center becaus then the receivers
-    // cannot edit the shipment
-    // public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
-    // if (getCenter() != null)
-    // return Arrays.asList(getCenter());
-    // return super.getSecuritySpecificCenters();
-    // }
+    /**
+     * security specific to the 2 centers involved in the shipment
+     */
+    @Override
+    public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
+        List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>();
+        if (getCenter() != null)
+            centers.add(getCenter());
+        if (getReceiverSite() != null)
+            centers.add(getReceiverSite());
+        return centers;
+    }
+
+    // Date should input with no hour/minute/seconds
+    public static Date endOfDay(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.add(Calendar.DAY_OF_MONTH, 1);
+        return c.getTime();
+    }
 
     @Override
     protected Log getLogMessage(String action, String site, String details) {

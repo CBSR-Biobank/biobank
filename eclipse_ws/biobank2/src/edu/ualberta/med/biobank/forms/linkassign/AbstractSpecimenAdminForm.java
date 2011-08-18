@@ -23,12 +23,23 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.forms.BgcEntryFormActions;
 import edu.ualberta.med.biobank.logs.ActivityLogAppender;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.logs.LogInfo;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
 public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
+
+    private static final String FILE_NAME_SEPARATOR = "_"; //$NON-NLS-1$
+    private static final String LOG_EXTENSION = ".log"; //$NON-NLS-1$
+    private static final String FORM_USERNAME_PARAM = "username"; //$NON-NLS-1$
+    private static final String LOG_ACTION_PRINT = "print"; //$NON-NLS-1$
+    private static final String FORM_NAME_SUFFIX = "EntryForm"; //$NON-NLS-1$
+    private static final String JASPER_FORM_NAME = "ActivityReportForm"; //$NON-NLS-1$
+    private static final SimpleDateFormat fileDateFormatter = new SimpleDateFormat(
+        "yyyy-MM-dd_HHmmss"); //$NON-NLS-1$
 
     protected boolean finished = true;
     protected boolean printed = false;
@@ -36,9 +47,6 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
     private static Logger activityLogger;
     private static ActivityLogAppender appender;
     private static FileAppender fileAppender;
-
-    private static final SimpleDateFormat fileDateFormatter = new SimpleDateFormat(
-        "yyyy-MM-dd_HHmmss");
 
     protected boolean afterInitialization = true;
 
@@ -72,8 +80,10 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
             String path = BiobankPlugin.getActivityLogPath();
             if (path != null) {
                 fileAppender = new FileAppender(ActivityLogAppender.layout,
-                    path + File.separator + getClass().getSimpleName() + "_"
-                        + fileDateFormatter.format(new Date()) + ".log", true);
+                    path + File.separator + getClass().getSimpleName()
+                        + FILE_NAME_SEPARATOR
+                        + fileDateFormatter.format(new Date()) + LOG_EXTENSION,
+                    true);
                 activityLogger.addAppender(fileAppender);
             }
         }
@@ -82,13 +92,25 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
         widgetCreator.setSelectionListener(null);
     }
 
+    @Override
+    protected void addToolbarButtons() {
+        formActions = new BgcEntryFormActions(this);
+        addPrintAction();
+        addResetAction();
+        addConfirmAction();
+        form.updateToolBar();
+    }
+
     public boolean onClose() {
         if (finished) {
             if (!printed && appender.getLogsList().size() > 0) {
                 if (BiobankPlugin.isAskPrintActivityLog()) {
-                    boolean doPrint = MessageDialog.openQuestion(PlatformUI
-                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                        "Print", "Do you want to print information ?");
+                    boolean doPrint = MessageDialog
+                        .openQuestion(
+                            PlatformUI.getWorkbench()
+                                .getActiveWorkbenchWindow().getShell(),
+                            Messages.AbstractSpecimenAdminForm_print_question_title,
+                            Messages.AbstractSpecimenAdminForm_print_question_msg);
                     if (doPrint) {
                         print();
                     }
@@ -109,28 +131,31 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
     @Override
     public boolean print() {
         if (appender == null) {
-            BiobankPlugin.openError("Print error", "Can't print: log error.");
+            BgcPlugin.openError(
+                Messages.AbstractSpecimenAdminForm_print_error_title,
+                Messages.AbstractSpecimenAdminForm_print_error_msg);
         }
         try {
             Map<String, Object> map = new HashMap<String, Object>();
-            map.put("username", SessionManager.getInstance().getSession()
-                .getUser().getLogin());
+            map.put(FORM_USERNAME_PARAM, SessionManager.getInstance()
+                .getSession().getUser().getLogin());
             List<LogInfo> logsList = appender.getLogsList();
 
             JasperPrint jp = ReportingUtils.createStandardReport(
-                "ActivityReportForm", map, logsList);
+                JASPER_FORM_NAME, map, logsList);
 
             ReportingUtils.printReport(jp);
             printed = true;
             String printName = getClass().getSimpleName();
-            int i = printName.indexOf("EntryForm");
+            int i = printName.indexOf(FORM_NAME_SUFFIX);
             if (i > 0) {
                 printName = printName.substring(0, i);
             }
-            SessionManager.log("print", null, printName);
+            SessionManager.log(LOG_ACTION_PRINT, null, printName);
             return true;
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Print error", e);
+            BgcPlugin.openAsyncError(
+                Messages.AbstractSpecimenAdminForm_print_error_title, e);
             printed = false;
             return false;
         }
@@ -158,18 +183,10 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
         this.finished = finished;
     }
 
-    public abstract BiobankLogger getErrorLogger();
+    public abstract BgcLogger getErrorLogger();
 
     public void setPrinted(boolean b) {
         this.printed = b;
-    }
-
-    @Override
-    protected void addToolbarButtons() {
-        addPrintAction();
-        addResetAction();
-        addConfirmAction();
-        form.updateToolBar();
     }
 
     public void setAfterKeyCancel() {

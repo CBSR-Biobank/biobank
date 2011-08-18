@@ -11,22 +11,24 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class FTAReportEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.FTAReportEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.FTAReportEditor"; //$NON-NLS-1$
 
     private ComboViewer studyCombo;
     private DateTimeWidget afterDate;
 
     @Override
     protected void createOptionSection(Composite parent) throws Exception {
-        studyCombo = createStudyComboOption("Study", parent);
+        studyCombo = createStudyComboOption(
+            Messages.FTAReportEditor_study_label, parent);
         afterDate = widgetCreator.createDateTimeWidget(parent,
-            "After Date (Drawn)", null, null, null, SWT.DATE);
+            Messages.FTAReportEditor_drawn_after_label, null, null, null,
+            SWT.DATE);
     }
 
     @Override
@@ -44,7 +46,7 @@ public class FTAReportEditor extends ReportsEditor {
         studyWrappers = StudyWrapper.getAllStudies(SessionManager
             .getAppService());
         ComboViewer combo = widgetCreator.createComboViewer(parent, labelText,
-            studyWrappers, null);
+            studyWrappers, null, new BiobankLabelProvider());
         combo.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {
@@ -57,15 +59,19 @@ public class FTAReportEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Patient Number", "Date Drawn", "Inventory Id",
-            "Sample Type", "Site", "Location" };
+        return new String[] { Messages.FTAReportEditor_pnumber_label,
+            Messages.FTAReportEditor_drawn_label,
+            Messages.FTAReportEditor_inventoryid_label,
+            Messages.FTAReportEditor_specType_label,
+            Messages.FTAReportEditor_site_label,
+            Messages.FTAReportEditor_location_label };
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> names = new ArrayList<String>();
-        names.add("Study");
-        names.add("After Date (Drawn)");
+        names.add(Messages.FTAReportEditor_study_label);
+        names.add(Messages.FTAReportEditor_drawn_after_label);
         return names;
     }
 
@@ -76,5 +82,12 @@ public class FTAReportEditor extends ReportsEditor {
             .getSelection()).getFirstElement()).getNameShort());
         params.add(ReportsEditor.processDate(afterDate.getDate(), true));
         return params;
+    }
+
+    @Override
+    protected void onReset() throws Exception {
+        studyCombo.getCombo().select(0);
+        afterDate.setDate(null);
+        super.onReset();
     }
 }

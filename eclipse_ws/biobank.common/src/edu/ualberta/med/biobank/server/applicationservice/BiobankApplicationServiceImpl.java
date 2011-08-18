@@ -14,8 +14,10 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
 import edu.ualberta.med.biobank.model.Log;
+import edu.ualberta.med.biobank.model.PrintedSsInvItem;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import edu.ualberta.med.biobank.server.scanprocess.ServerProcess;
@@ -24,10 +26,15 @@ import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl
 import gov.nih.nci.system.dao.Request;
 import gov.nih.nci.system.dao.Response;
 import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.util.ClassCache;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -88,8 +95,8 @@ public class BiobankApplicationServiceImpl extends
      */
     @Override
     public void logActivity(Log log) throws Exception {
-        Logger logger = Logger.getLogger("Biobank.Activity");
-        logger.log(Level.toLevel("INFO"),
+        Logger logger = Logger.getLogger("Biobank.Activity"); //$NON-NLS-1$
+        logger.log(Level.toLevel("INFO"), //$NON-NLS-1$
             MessageGenerator.generateStringMessage(log));
     }
 
@@ -147,24 +154,32 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public List<Group> getSecurityGroups(boolean includeSuperAdmin)
+    public List<Group> getSecurityGroups(User currentUser,
+        boolean includeSuperAdmin) throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        return BiobankSecurityUtil.getSecurityGroups(currentUser,
+            includeSuperAdmin);
+    }
+
+    @Override
+    public List<User> getSecurityUsers(User currentUser)
         throws ApplicationException {
-        return BiobankSecurityUtil.getSecurityGroups(includeSuperAdmin);
+        currentUser.initCurrentWorkingCenter(this);
+        return BiobankSecurityUtil.getSecurityUsers(currentUser);
     }
 
     @Override
-    public List<User> getSecurityUsers() throws ApplicationException {
-        return BiobankSecurityUtil.getSecurityUsers();
+    public User persistUser(User currentUser, User userToPersist)
+        throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        return BiobankSecurityUtil.persistUser(currentUser, userToPersist);
     }
 
     @Override
-    public User persistUser(User user) throws ApplicationException {
-        return BiobankSecurityUtil.persistUser(user);
-    }
-
-    @Override
-    public void deleteUser(String login) throws ApplicationException {
-        BiobankSecurityUtil.deleteUser(login);
+    public void deleteUser(User currentUser, String loginToDelete)
+        throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        BiobankSecurityUtil.deleteUser(currentUser, loginToDelete);
     }
 
     @Override
@@ -173,30 +188,38 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public Group persistGroup(Group group) throws ApplicationException {
-        return BiobankSecurityUtil.persistGroup(group);
-    }
-
-    @Override
-    public void deleteGroup(Group group) throws ApplicationException {
-        BiobankSecurityUtil.deleteGroup(group);
-    }
-
-    @Override
-    public void unlockUser(String userName) throws ApplicationException {
-        BiobankSecurityUtil.unlockUser(userName);
-    }
-
-    @Override
-    public List<ProtectionGroupPrivilege> getSecurityGlobalFeatures()
+    public Group persistGroup(User currentUser, Group group)
         throws ApplicationException {
-        return BiobankSecurityUtil.getSecurityGlobalFeatures();
+        currentUser.initCurrentWorkingCenter(this);
+        return BiobankSecurityUtil.persistGroup(currentUser, group);
     }
 
     @Override
-    public List<ProtectionGroupPrivilege> getSecurityCenterFeatures()
+    public void deleteGroup(User currentUser, Group group)
         throws ApplicationException {
-        return BiobankSecurityUtil.getSecurityCenterFeatures();
+        currentUser.initCurrentWorkingCenter(this);
+        BiobankSecurityUtil.deleteGroup(currentUser, group);
+    }
+
+    @Override
+    public void unlockUser(User currentUser, String userNameToUnlock)
+        throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        BiobankSecurityUtil.unlockUser(currentUser, userNameToUnlock);
+    }
+
+    @Override
+    public List<ProtectionGroupPrivilege> getSecurityGlobalFeatures(
+        User currentUser) throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        return BiobankSecurityUtil.getSecurityGlobalFeatures(currentUser);
+    }
+
+    @Override
+    public List<ProtectionGroupPrivilege> getSecurityCenterFeatures(
+        User currentUser) throws ApplicationException {
+        currentUser.initCurrentWorkingCenter(this);
+        return BiobankSecurityUtil.getSecurityCenterFeatures(currentUser);
     }
 
     @Override
@@ -211,11 +234,14 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
-        ProcessData processData, boolean isRescanMode, User user)
+        ProcessData processData, boolean isRescanMode, User user, Locale locale)
         throws ApplicationException {
         try {
-            ServerProcess process = processData.getProcessInstance(this, user);
+            ServerProcess process = processData.getProcessInstance(this, user,
+                locale);
             return process.processScanResult(cells, isRescanMode);
+        } catch (ApplicationException ae) {
+            throw ae;
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
@@ -223,13 +249,79 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public CellProcessResult processCellStatus(Cell cell,
-        ProcessData processData, User user) throws ApplicationException {
+        ProcessData processData, User user, Locale locale)
+        throws ApplicationException {
         try {
-            ServerProcess process = processData.getProcessInstance(this, user);
+            ServerProcess process = processData.getProcessInstance(this, user,
+                locale);
             return process.processCellStatus(cell);
+        } catch (ApplicationException ae) {
+            throw ae;
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
     }
 
+    private static final int SS_INV_ID_LENGTH = 12;
+
+    private static final String SS_INV_ID_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    private static final int SS_INV_ID_ALPHABET_LENGTH = SS_INV_ID_ALPHABET
+        .length();
+
+    private static final int SS_INV_ID_GENERATE_RETRIES = (int) Math.pow(
+        SS_INV_ID_ALPHABET_LENGTH, SS_INV_ID_ALPHABET_LENGTH);
+
+    private static final String SS_INV_ID_UNIQ_BASE_QRY = "SELECT count(*) "
+        + "FROM printed_ss_inv_item where txt=\"{id}\"";
+
+    @Override
+    public List<String> executeGetSourceSpecimenUniqueInventoryIds(int numIds)
+        throws ApplicationException {
+        boolean isUnique;
+        int genRetries;
+        Random r = new Random();
+        StringBuilder newInvId;
+        List<String> result = new ArrayList<String>();
+
+        while (result.size() < numIds) {
+            isUnique = false;
+            genRetries = 0;
+            newInvId = new StringBuilder();
+
+            while (!isUnique && (genRetries < SS_INV_ID_GENERATE_RETRIES)) {
+                for (int j = 0; j < SS_INV_ID_LENGTH; ++j) {
+                    newInvId.append(SS_INV_ID_ALPHABET.charAt(r
+                        .nextInt(SS_INV_ID_ALPHABET_LENGTH)));
+                    genRetries++;
+                }
+
+                // check database if string is unique
+                String potentialInvId = newInvId.toString();
+                String qry = SS_INV_ID_UNIQ_BASE_QRY.replace("{id}",
+                    potentialInvId);
+
+                List<BigInteger> count = privateQuery(new BiobankSQLCriteria(
+                    qry), PrintedSsInvItem.class.getName());
+
+                if (count.get(0).equals(BigInteger.ZERO)) {
+                    // add new inventory id to the database
+                    isUnique = true;
+                    result.add(potentialInvId);
+                    PrintedSsInvItem newInvIdItem = new PrintedSsInvItem();
+                    newInvIdItem.setTxt(potentialInvId);
+                    SDKQuery query = new InsertExampleQuery(newInvIdItem);
+                    executeQuery(query);
+                }
+            }
+
+            if (genRetries >= SS_INV_ID_GENERATE_RETRIES) {
+                // cannot generate any more unique strings
+                throw new BiobankServerException(
+                    "cannot generate any more source specimen inventory IDs");
+            }
+
+        }
+        return result;
+    }
 }

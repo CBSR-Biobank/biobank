@@ -1,10 +1,15 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import edu.ualberta.med.biobank.common.wrappers.base.SourceSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SourceSpecimenWrapper extends SourceSpecimenBaseWrapper {
+
+    private Set<AliquotedSpecimenWrapper> deletedAliquotedSpecimens = new HashSet<AliquotedSpecimenWrapper>();
 
     public SourceSpecimenWrapper(WritableApplicationService appService,
         SourceSpecimen wrappedObject) {

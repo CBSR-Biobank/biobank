@@ -170,16 +170,15 @@ public class TestProcessingEvent extends TestDatabase {
             .addProcessingEvent(site, patient, Utils.getRandomDate());
         pevent.delete();
 
-        // make sure pevent cannot be deleted if it has samples
-        pevent = ProcessingEventHelper.addProcessingEvent(site, patient,
-            Utils.getRandomDate());
-        addContainerTypes();
-        addContainers();
+        List<SpecimenTypeWrapper> allSpcTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, true);
 
+        // make sure pevent cannot be deleted if it has samples
         SpecimenWrapper parentSpc = SpecimenHelper.addParentSpecimen();
-        SpecimenWrapper childSpc = SpecimenHelper.addSpecimens(parentSpc,
-            containerMap.get("ChildL1"), 0, 0, 1).get(0);
-        pevent = childSpc.getProcessingEvent();
+        SpecimenWrapper childSpc = SpecimenHelper.addSpecimens(site, parentSpc,
+            1, allSpcTypes).get(0);
+        parentSpc.reload();
+        pevent = parentSpc.getProcessingEvent();
 
         try {
             pevent.delete();
@@ -190,6 +189,7 @@ public class TestProcessingEvent extends TestDatabase {
         }
 
         // delete aliquot and pevent
+        childSpc.reload();
         childSpc.delete();
         pevent.reload();
         pevent.delete();
@@ -200,14 +200,13 @@ public class TestProcessingEvent extends TestDatabase {
         String name = "testDeleteNoMoreSpecimens" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite("site" + name);
 
+        List<SpecimenTypeWrapper> allSpcTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, true);
         SpecimenWrapper parentSpc = SpecimenHelper.addParentSpecimen();
-
-        ProcessingEventWrapper pevent = ProcessingEventHelper
-            .addProcessingEvent(site, parentSpc.getCollectionEvent()
-                .getPatient(), Utils.getRandomDate());
-        pevent.addToSpecimenCollection(Arrays.asList(parentSpc));
-        parentSpc.setProcessingEvent(pevent);
-        pevent.persist();
+        SpecimenWrapper childSpc = SpecimenHelper.addSpecimens(site, parentSpc,
+            1, allSpcTypes).get(0);
+        parentSpc.reload();
+        ProcessingEventWrapper pevent = parentSpc.getProcessingEvent();
 
         try {
             pevent.delete();
@@ -217,8 +216,8 @@ public class TestProcessingEvent extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        pevent.removeFromSpecimenCollection(Arrays.asList(parentSpc));
-        parentSpc.delete();
+        pevent.removeFromSpecimenCollection(Arrays.asList(childSpc));
+        childSpc.delete();
         pevent.reload();
         pevent.persist();
 
@@ -256,7 +255,8 @@ public class TestProcessingEvent extends TestDatabase {
             for (int col = 0; col < cols; ++col) {
                 if (r.nextGaussian() > 0.0)
                     continue;
-                System.out.println("setting aliquot at: " + row + ", " + col);
+                // System.out.println("setting aliquot at: " + row + ", " +
+                // col);
                 spcMap.put(row + (col * rows),
                     SpecimenHelper.addSpecimen(parentSpc,
                         DbHelper.chooseRandomlyInList(allSpcTypes),

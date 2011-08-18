@@ -19,9 +19,6 @@ import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
-import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.util.Predicate;
-import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.base.SiteBaseWrapper;
 import edu.ualberta.med.biobank.model.Center;
@@ -37,6 +34,7 @@ public class SiteWrapper extends SiteBaseWrapper {
     private static final String TOP_CONTAINER_COLLECTION_CACHE_KEY = "topContainerCollection";
     private static final String EXISTING_CHILDREN_MSG = "Unable to delete site {0}. All defined children (processing events, container types, and containers) must be removed first.";
 
+    @SuppressWarnings("unused")
     private Map<RequestState, List<RequestWrapper>> requestCollectionMap = new HashMap<RequestState, List<RequestWrapper>>();
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
@@ -45,32 +43,6 @@ public class SiteWrapper extends SiteBaseWrapper {
 
     public SiteWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    private List<RequestWrapper> getRequestCollection(final RequestState state) {
-        List<RequestWrapper> requestCollection = requestCollectionMap
-            .get(state);
-
-        if (requestCollection == null) {
-            requestCollection = new ArrayList<RequestWrapper>();
-
-            PredicateUtil.filterInto(requestCollection,
-                new Predicate<RequestWrapper>() {
-                    @Override
-                    public boolean evaluate(RequestWrapper request) {
-                        return state.getId().equals(request.getState());
-                    }
-
-                }, requestCollection);
-
-            requestCollectionMap.put(state, requestCollection);
-        }
-
-        return requestCollection;
-    }
-
-    public List<RequestWrapper> getApprovedRequestCollection() {
-        return getRequestCollection(RequestState.APPROVED);
     }
 
     // due to bug in Hibernate when using elements in query must also use a left
@@ -239,17 +211,9 @@ public class SiteWrapper extends SiteBaseWrapper {
         return getCountResult(appService, criteria);
     }
 
-    /**
-     * Only webadministrator can update the site object itself. To check if a
-     * user can modify data inside a site, use user.canUpdateSite method
-     */
     @Override
-    public boolean canUpdate(User user) {
-        return user.isSuperAdministrator();
-    }
-
     public List<StudyWrapper> getStudyCollection() {
-        return getStudyCollection(false);
+        return getStudyCollection(true);
     }
 
     private static final String COLLECTION_EVENT_COUNT_FOR_STUDY_QRY = "select count(distinct cEvent) from "

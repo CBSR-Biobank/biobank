@@ -25,12 +25,12 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.widgets.BiobankClipboard;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.widgets.utils.BiobankClipboard;
 
-public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
+public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
 
     class PageInformation {
         int page;
@@ -95,7 +95,7 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         table.setLayout(new TableLayout());
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        GridData gd = new GridData(SWT.FILL, SWT.NONE, true, true);
         table.setLayoutData(gd);
 
         setHeadings(headings, columnWidths);
@@ -105,13 +105,19 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
         addPaginationWidget();
 
-        if (collection != null)
-            setCollection(collection);
+        autoSizeColumns = columnWidths == null ? true : false;
 
         menu = new Menu(parent);
         tableViewer.getTable().setMenu(menu);
 
-        autoSizeColumns = columnWidths == null ? true : false;
+        setCollection(collection);
+
+        // need to autosize at creation to be sure the size is well initialized
+        // the first time. (if don't do that, display problems in UserManagement
+        // Dialog):
+        if (autoSizeColumns) {
+            autoSizeColumns();
+        }
 
         BiobankClipboard.addClipboardCopySupport(tableViewer, menu,
             (BiobankLabelProvider) getLabelProvider(), headings.length);
@@ -200,15 +206,14 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
                 init(collection);
                 setPaginationParams(collection);
             }
-
             if (paginationRequired) {
                 showPaginationWidget();
                 setPageLabelText();
                 enablePaginationWidget(false);
             } else if (paginationWidget != null)
                 paginationWidget.setVisible(false);
-
             final Display display = getTableViewer().getTable().getDisplay();
+
             resizeTable();
             backgroundThread = new Thread() {
                 @Override
@@ -226,10 +231,9 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
             };
             backgroundThread.start();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Cannot Load Table Data", e);
+            BgcPlugin.openAsyncError(
+                Messages.AbstractInfoTableWidget_load_error_title, e);
         }
-
-        layout(true, true);
     }
 
     private void autoSizeColumns() {
@@ -279,10 +283,12 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
             sumOfMaxTextWidths += width;
         }
 
+        // need to give default max=500 when can't know the size of the table
+        // yet (see UserManagementDialog)
         int tableWidth = Math.max(500, tableViewer.getTable().getSize().x);
 
         int totalWidths = 0;
-        tableViewer.getTable().setVisible(false);
+        table.setVisible(false);
         for (int i = 0; i < table.getColumnCount(); i++) {
             int width = (int) ((double) maxCellContentsWidths[i]
                 / sumOfMaxTextWidths * tableWidth);
@@ -292,7 +298,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
                 table.getColumn(i).setWidth(width);
             totalWidths += width;
         }
-        tableViewer.getTable().setVisible(true);
+
+        table.setVisible(true);
     }
 
     protected abstract void init(List<T> collection);
@@ -302,9 +309,7 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         GridData gd = (GridData) table.getLayoutData();
         int rows = Math.max(pageInfo.rowsPerPage, 5);
         gd.heightHint = (rows - 1) * table.getItemHeight()
-            + table.getHeaderHeight() + 4;
-        layout(true, true);
-
+            + table.getHeaderHeight() + table.getBorderWidth();
     }
 
     protected abstract void setPaginationParams(List<T> collection);
@@ -321,9 +326,10 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         paginationWidget.setLayout(new GridLayout(5, false));
 
         firstButton = new Button(paginationWidget, SWT.NONE);
-        firstButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_RESULTSET_FIRST));
-        firstButton.setToolTipText("First page");
+        firstButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_RESULTSET_FIRST));
+        firstButton
+            .setToolTipText(Messages.AbstractInfoTableWidget_first_label);
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -332,9 +338,10 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         });
 
         prevButton = new Button(paginationWidget, SWT.NONE);
-        prevButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_RESULTSET_PREV));
-        prevButton.setToolTipText("Previous page");
+        prevButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_RESULTSET_PREV));
+        prevButton
+            .setToolTipText(Messages.AbstractInfoTableWidget_previous_label);
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -345,9 +352,9 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         pageLabel = new Label(paginationWidget, SWT.NONE);
 
         nextButton = new Button(paginationWidget, SWT.NONE);
-        nextButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_RESULTSET_NEXT));
-        nextButton.setToolTipText("Next page");
+        nextButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_RESULTSET_NEXT));
+        nextButton.setToolTipText(Messages.AbstractInfoTableWidget_next_label);
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -356,9 +363,9 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         });
 
         lastButton = new Button(paginationWidget, SWT.NONE);
-        lastButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_RESULTSET_LAST));
-        lastButton.setToolTipText("Last page");
+        lastButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_RESULTSET_LAST));
+        lastButton.setToolTipText(Messages.AbstractInfoTableWidget_last_label);
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -372,7 +379,7 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
         // do not display it yet, wait till collection is added
         paginationWidget.setVisible(false);
-        GridData gd = new GridData(SWT.END, SWT.TOP, true, true);
+        GridData gd = new GridData(SWT.END, SWT.TOP, true, false);
         gd.exclude = false;
         paginationWidget.setLayoutData(gd);
         layout(true, true);
@@ -430,4 +437,5 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
     protected abstract void lastPage();
 
     protected abstract void setPageLabelText();
+
 }

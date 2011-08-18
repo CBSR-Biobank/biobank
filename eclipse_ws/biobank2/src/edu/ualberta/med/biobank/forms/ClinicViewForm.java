@@ -1,24 +1,21 @@
 package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.ClinicViewForm"; //$NON-NLS-1$
-
-    private ClinicAdapter clinicAdapter;
 
     private ClinicWrapper clinic;
 
@@ -26,19 +23,19 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private ClinicStudyInfoTable studiesTable;
 
-    private BiobankText nameLabel;
+    private BgcBaseText nameLabel;
 
-    private BiobankText nameShortLabel;
+    private BgcBaseText nameShortLabel;
 
     private Button hasShipmentsButton;
 
-    private BiobankText activityStatusLabel;
+    private BgcBaseText activityStatusLabel;
 
-    private BiobankText commentLabel;
+    private BgcBaseText commentLabel;
 
-    private BiobankText patientTotal;
+    private BgcBaseText patientTotal;
 
-    private BiobankText ceventTotal;
+    private BgcBaseText ceventTotal;
 
     @Override
     protected void init() throws Exception {
@@ -46,17 +43,14 @@ public class ClinicViewForm extends AddressViewFormCommon {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        clinicAdapter = (ClinicAdapter) adapter;
-        clinic = clinicAdapter.getWrapper();
-        clinic.reload();
-        setPartName(Messages.getString("ClinicViewForm.title", //$NON-NLS-1$
+        clinic = (ClinicWrapper) getModelObject();
+        setPartName(NLS.bind(Messages.ClinicViewForm_title,
             clinic.getNameShort()));
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("ClinicViewForm.title", //$NON-NLS-1$
-            clinic.getName()));
+        form.setText(NLS.bind(Messages.ClinicViewForm_title, clinic.getName()));
 
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
@@ -74,21 +68,19 @@ public class ClinicViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(client);
 
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.name")); //$NON-NLS-1$
+            Messages.label_name);
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.nameShort")); //$NON-NLS-1$
+            Messages.label_nameShort);
         hasShipmentsButton = (Button) createLabelledWidget(client,
-            Button.class, SWT.NONE,
-            Messages.getString("clinic.field.label.sendsShipments")); //$NON-NLS-1$
+            Button.class, SWT.NONE, Messages.clinic_field_label_sendsShipments);
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.activity")); //$NON-NLS-1$
+            Messages.label_activity);
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.getString("label.comments")); //$NON-NLS-1$
+            Messages.label_comments);
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("ClinicViewForm.field.label.totalPatients")); //$NON-NLS-1$
+            Messages.ClinicViewForm_field_label_totalPatients);
         ceventTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages
-                .getString("ClinicViewForm.field.label.totalCollectionEvents")); //$NON-NLS-1$
+            Messages.ClinicViewForm_field_label_totalCollectionEvents);
 
         setClinicValues();
     }
@@ -104,8 +96,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     private void createContactsSection() {
-        Composite client = createSectionWithClient(Messages
-            .getString("clinic.contact.title")); //$NON-NLS-1$
+        Composite client = createSectionWithClient(Messages.clinic_contact_title);
 
         contactsTable = new ContactInfoTable(client,
             clinic.getContactCollection(false));
@@ -113,9 +104,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(contactsTable);
     }
 
-    protected void createStudiesSection() throws ApplicationException {
-        Composite client = createSectionWithClient(Messages
-            .getString("ClinicViewForm.studies.title")); //$NON-NLS-1$
+    protected void createStudiesSection() {
+        Composite client = createSectionWithClient(Messages.ClinicViewForm_studies_title);
 
         studiesTable = new ClinicStudyInfoTable(client, clinic);
         studiesTable.adaptToToolkit(toolkit, true);
@@ -127,12 +117,10 @@ public class ClinicViewForm extends AddressViewFormCommon {
     @Override
     public void reload() throws Exception {
         clinic.reload();
-        setPartName(Messages
-            .getString("ClinicViewForm.title", clinic.getName())); //$NON-NLS-1$
-        form.setText(Messages.getString("ClinicViewForm.title", //$NON-NLS-1$
-            clinic.getName()));
+        setPartName(NLS.bind(Messages.ClinicViewForm_title, clinic.getName()));
+        form.setText(NLS.bind(Messages.ClinicViewForm_title, clinic.getName()));
         setClinicValues();
-        setAdressValues(clinic);
+        setAddressValues(clinic);
         contactsTable.setCollection(clinic.getContactCollection(true));
         studiesTable.setCollection(clinic.getStudyCollection());
     }

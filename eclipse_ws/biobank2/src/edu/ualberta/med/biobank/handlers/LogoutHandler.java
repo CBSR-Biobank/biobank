@@ -8,11 +8,11 @@ import org.eclipse.ui.IWorkbenchPage;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 
 public class LogoutHandler extends AbstractHandler {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(LogoutHandler.class.getName());
 
     @Override
@@ -25,7 +25,7 @@ public class LogoutHandler extends AbstractHandler {
             try {
                 SessionManager.getInstance().deleteSession();
             } catch (Exception e) {
-                logger.error("Error while deleting the session", e);
+                logger.error("Error while deleting the session", e); //$NON-NLS-1$
             }
         return null;
     }

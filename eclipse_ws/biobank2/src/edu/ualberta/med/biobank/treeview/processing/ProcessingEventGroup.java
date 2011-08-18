@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview.processing;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class ProcessingEventGroup extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (SessionManager.getInstance().isConnected()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add processing event");
+            mi.setText(Messages.ProcessingEventGroup_pevent_add_label);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -94,12 +95,16 @@ public class ProcessingEventGroup extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return null;
+        List<AdapterBase> children = getChildren();
+        List<ModelWrapper<?>> wrappers = new ArrayList<ModelWrapper<?>>();
+        for (AdapterBase child : children)
+            wrappers.add(child.getModelObject());
+        return wrappers;
     }
 
     @Override
     protected int getWrapperChildCount() throws Exception {
-        return 0;
+        return getWrapperChildren().size();
     }
 
 }

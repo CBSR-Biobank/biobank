@@ -8,6 +8,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.security.SecurityFeature;
+import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 
 public class ProcessingAdministrationHandler extends AbstractHandler implements
@@ -23,13 +26,20 @@ public class ProcessingAdministrationHandler extends AbstractHandler implements
                     workbench.getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
             throw new ExecutionException(
-                "Error while opening Processing perpective", e);
+                Messages.ProcessingAdministrationHandler_perspective_error, e);
         }
         return null;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return SessionManager.getInstance().isConnected()
+            && SessionManager.getUser().getCurrentWorkingCenter() != null
+            && !(SessionManager.getUser().getCurrentWorkingCenter() instanceof ResearchGroupWrapper)
+            && SessionManager.getUser().canPerformActions(
+                SecurityFeature.ASSIGN, SecurityFeature.CLINIC_SHIPMENT,
+                SecurityFeature.COLLECTION_EVENT,
+                SecurityFeature.DISPATCH_REQUEST, SecurityFeature.LINK,
+                SecurityFeature.PROCESSING_EVENT);
     }
 }

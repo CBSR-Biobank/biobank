@@ -4,16 +4,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
@@ -21,7 +19,7 @@ import edu.ualberta.med.biobank.treeview.patient.StudyWithPatientAdapter;
 
 public class CollectionView extends AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.CollectionView";
+    public static final String ID = "edu.ualberta.med.biobank.views.CollectionView"; //$NON-NLS-1$
 
     private static CollectionView currentInstance;
 
@@ -62,24 +60,19 @@ public class CollectionView extends AbstractAdministrationView {
         composite.setLayout(layout);
 
         radioPnumber = new Button(composite, SWT.RADIO);
-        radioPnumber.setText("Patient Number");
+        radioPnumber.setText(Messages.CollectionView_patient_label);
         radioPnumber.setSelection(true);
-        radioPnumber.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-            }
-        });
-
     }
 
     protected void notFound(String text) {
-        boolean create = BiobankPlugin.openConfirm("Patient not found",
-            "Do you want to create this patient ?");
+        boolean create = BgcPlugin.openConfirm(
+            Messages.CollectionView_patient_error_title,
+            Messages.CollectionView_patient_error_msg);
         if (create) {
             PatientWrapper patient = new PatientWrapper(
                 SessionManager.getAppService());
             patient.setPnumber(text);
-            PatientAdapter adapter = new PatientAdapter(searchedNode, patient);
+            AdapterBase adapter = new PatientAdapter(null, patient);
             adapter.openEntryForm();
         }
     }
@@ -122,10 +115,10 @@ public class CollectionView extends AbstractAdministrationView {
 
     @Override
     protected String getTreeTextToolTip() {
-        return "Enter a patient number";
+        return Messages.CollectionView_patient_tooltip;
     }
 
-    protected void showSearchedObjectsInTree(
+    public void showSearchedObjectsInTree(
         List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
         for (ModelWrapper<?> searchedObject : searchedObjects) {
             List<AdapterBase> nodeRes = rootNode.search(searchedObject);
@@ -187,7 +180,8 @@ public class CollectionView extends AbstractAdministrationView {
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Search error", e);
+            BgcPlugin.openAsyncError(Messages.CollectionView_search_error_msg,
+                e);
         }
     }
 

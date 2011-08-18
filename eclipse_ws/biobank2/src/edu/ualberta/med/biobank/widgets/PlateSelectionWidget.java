@@ -16,9 +16,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
-public class PlateSelectionWidget extends BiobankWidget {
+public class PlateSelectionWidget extends BgcBaseWidget {
 
     private Map<Integer, Button> plateButtons;
 
@@ -61,14 +62,14 @@ public class PlateSelectionWidget extends BiobankWidget {
         setLayoutData(gd);
 
         Label label = new Label(this, SWT.NONE);
-        label.setText("Select plate:");
+        label.setText(Messages.PlateSelectionWidget_select_label);
         plateButtons = new HashMap<Integer, Button>();
 
         List<Integer> enabledPlates = new ArrayList<Integer>();
 
         for (int i = 1, n = ScannerConfigPlugin.getPlatesMax(); i <= n; ++i) {
             Button b = new Button(this, SWT.RADIO);
-            b.setText("PLATE " + i);
+            b.setText(Messages.PlateSelectionWidget_plate_label + i);
             boolean visible =
                 ScannerConfigPlugin.getDefault().getPlateEnabled(i);
             b.setVisible(visible);

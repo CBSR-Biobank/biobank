@@ -12,23 +12,24 @@ public class BiobankPerspectiveListener extends PerspectiveAdapter {
     @Override
     public void perspectiveOpened(IWorkbenchPage page,
         IPerspectiveDescriptor perspective) {
+        //
     }
 
     @Override
     public void perspectiveActivated(IWorkbenchPage page,
         IPerspectiveDescriptor perspective) {
-        BindingContextHelper.deactivateContextInWorkbench("not."
+        BindingContextHelper.deactivateContextInWorkbench("not." //$NON-NLS-1$
             + perspective.getId());
         BindingContextHelper.activateContextInWorkbench(perspective.getId());
 
-        SessionManager.updateVisibility(page);
+        SessionManager.updateViewsVisibility(page, false);
     }
 
     @Override
     public void perspectiveDeactivated(IWorkbenchPage page,
         IPerspectiveDescriptor perspective) {
         BindingContextHelper.deactivateContextInWorkbench(perspective.getId());
-        BindingContextHelper.activateContextInWorkbench("not."
+        BindingContextHelper.activateContextInWorkbench("not." //$NON-NLS-1$
             + perspective.getId());
     }
 }

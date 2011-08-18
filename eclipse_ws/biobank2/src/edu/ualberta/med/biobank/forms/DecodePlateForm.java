@@ -1,8 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -16,9 +15,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.Messages;
-import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
@@ -28,11 +25,9 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public class DecodePlateForm extends PlateForm {
-    public static final String ID = "edu.ualberta.med.biobank.forms.DecodePlateForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.DecodePlateForm"; //$NON-NLS-1$
 
     private ScanPalletWidget spw;
-
-    private Map<RowColPos, PalletCell> cells;
 
     private PlateSelectionWidget plateSelectionWidget;
 
@@ -40,7 +35,7 @@ public class DecodePlateForm extends PlateForm {
 
     @Override
     protected void init() throws Exception {
-        setPartName(Messages.getString("DecodePlate.tabTitle")); //$NON-NLS-1$
+        setPartName(Messages.DecodePlate_tabTitle);
     }
 
     @Override
@@ -51,7 +46,7 @@ public class DecodePlateForm extends PlateForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("DecodePlate.tabTitle"));
+        form.setText(Messages.DecodePlate_tabTitle);
         GridLayout layout = new GridLayout(2, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
@@ -63,8 +58,8 @@ public class DecodePlateForm extends PlateForm {
         gd.grabExcessHorizontalSpace = true;
         plateSelectionWidget.setLayoutData(gd);
 
-        scanButton = toolkit.createButton(page, "Scan && Decode Plate",
-            SWT.PUSH);
+        scanButton = toolkit.createButton(page,
+            Messages.DecodePlateForm_button_scan_decode_label, SWT.PUSH);
         scanButton
             .setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
         scanButton.addSelectionListener(new SelectionAdapter() {
@@ -90,30 +85,30 @@ public class DecodePlateForm extends PlateForm {
 
     @Override
     public void reload() throws Exception {
+        //
     }
 
     protected void scanAndProcessResult() {
         plateToScan = plateSelectionWidget.getSelectedPlate();
 
         if (plateToScan == null) {
-            BiobankPlugin.openAsyncError("Decode Plate Error",
-                "No plate selected");
+            BgcPlugin.openAsyncError(Messages.DecodePlateForm_error_title,
+                Messages.DecodePlateForm_noplate_error_msg);
             return;
         }
 
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) {
-                monitor.beginTask("Scanning and decoding...",
+                monitor.beginTask(Messages.DecodePlateForm_scanning_decoding,
                     IProgressMonitor.UNKNOWN);
                 try {
                     scanAndProcessResult(monitor);
                 } catch (RemoteConnectFailureException exp) {
-                    BiobankPlugin.openRemoteConnectErrorMessage(exp);
+                    BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
-                    BiobankPlugin.openAsyncError(Messages
-                        .getString("DecodePlate.dialog.scanError.title"), //$NON-NLS-1$
-                        e);
+                    BgcPlugin.openAsyncError(
+                        Messages.DecodePlate_dialog_scanError_title, e);
                 }
                 monitor.done();
             }
@@ -129,7 +124,7 @@ public class DecodePlateForm extends PlateForm {
     protected void scanAndProcessResult(IProgressMonitor monitor)
         throws Exception {
         launchScan(monitor);
-        monitor.subTask("Decoding...");
+        monitor.subTask(Messages.DecodePlateForm_decoding);
 
         Display.getDefault().asyncExec(new Runnable() {
             @Override
@@ -140,45 +135,12 @@ public class DecodePlateForm extends PlateForm {
         });
     }
 
-    /**
-     * go through cells retrieved from scan, set status and update the types
-     * combos components
-     */
-    private void processScanResult() {
-        Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
-        for (RowColPos rcp : cells.keySet()) {
-            Integer typesRowsCount = typesRows.get(rcp.getRow());
-            if (typesRowsCount == null) {
-                typesRowsCount = 0;
-            }
-            PalletCell cell = null;
-            cell = cells.get(rcp);
-            processCellStatus(cell);
-            if (PalletCell.hasValue(cell)) {
-                typesRowsCount++;
-                typesRows.put(rcp.getRow(), typesRowsCount);
-            }
-        }
-    }
-
     protected void launchScan(IProgressMonitor monitor) throws Exception {
-        monitor.subTask("Launching scan");
+        monitor.subTask(Messages.DecodePlateForm_launching);
 
-        ScanCell[][] decodedCells = null;
-        decodedCells = ScannerConfigPlugin.scan(plateToScan,
-            ProfileManager.ALL_PROFILE_NAME);
+        List<ScanCell> decodedCells = ScannerConfigPlugin.decodePlate(
+            plateToScan, ProfileManager.ALL_PROFILE_NAME);
         cells = PalletCell.convertArray(decodedCells);
-    }
-
-    /**
-     * Process the cell: apply a status and set correct information
-     */
-    private void processCellStatus(PalletCell cell) {
-        if (cell != null) {
-            cell.setStatus((cell.getValue() != null) ? UICellStatus.FILLED
-                : UICellStatus.EMPTY);
-            cell.setTitle(cell.getValue());
-        }
     }
 
 }

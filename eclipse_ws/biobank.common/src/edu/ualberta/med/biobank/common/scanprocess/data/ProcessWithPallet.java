@@ -26,9 +26,8 @@ public abstract class ProcessWithPallet implements ProcessData {
         throws Exception {
         if (palletId != null && pallet == null) {
             Container c = (Container) appService.query(
-                new HQLCriteria("from " + Container.class.getName()
-                    + " where id=?", Arrays.asList(palletId))).get(0);
-            // System.out.println(c.getSpecimenPositionCollection().size());
+                new HQLCriteria("from " + Container.class.getName() //$NON-NLS-1$
+                    + " where id=?", Arrays.asList(palletId))).get(0); //$NON-NLS-1$
             pallet = new ContainerWrapper(appService, c);
         }
         return pallet;

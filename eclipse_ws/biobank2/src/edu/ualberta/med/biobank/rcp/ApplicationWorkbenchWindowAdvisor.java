@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbench;
@@ -18,23 +19,23 @@ import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
-import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcSessionState;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
-import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.utils.BindingContextHelper;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(ApplicationWorkbenchWindowAdvisor.class.getName());
 
     private IPropertyChangeListener propertyListener;
@@ -58,7 +59,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         String windowTitle = product.getName();
 
         if (BiobankPlugin.getDefault().windowTitleShowVersionEnabled()) {
-            windowTitle += " " + product.getDefiningBundle().getVersion();
+            windowTitle += " " + product.getDefiningBundle().getVersion(); //$NON-NLS-1$
         }
         return windowTitle;
     }
@@ -82,9 +83,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     @Override
     public void postWindowOpen() {
+        P2Util.checkForUpdates();
+
         IStatusLineManager statusline = getWindowConfigurer()
             .getActionBarConfigurer().getStatusLineManager();
-        statusline.setMessage(null, "Application ready");
+        statusline.setMessage(null,
+            Messages.ApplicationWorkbenchWindowAdvisor_ready_msg);
 
         IWorkbench workbench = PlatformUI.getWorkbench();
         IWorkbenchWindow activeWindow = workbench.getActiveWorkbenchWindow();
@@ -95,7 +99,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                 workbench.showPerspective(ProcessingPerspective.ID,
                     activeWindow);
             } catch (WorkbenchException e) {
-                logger.error("Error while opening patients perpective", e);
+                logger.error("Error while opening patients perpective", e); //$NON-NLS-1$
             }
         }
         page.addPartListener(new BiobankPartListener());
@@ -111,26 +115,32 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
         BindingContextHelper.activateContextInWorkbench(currentPerspectiveId);
 
-        ISourceProviderService service = (ISourceProviderService) activeWindow
-            .getService(ISourceProviderService.class);
-        SessionState sessionSourceProvider = (SessionState) service
-            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
+        BgcSessionState sessionSourceProvider = BgcPlugin
+            .getSessionStateSourceProvider();
         sessionSourceProvider
             .addSourceProviderListener(new ISourceProviderListener() {
                 @Override
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
                     if (sourceValue != null) {
-                        if (sourceValue.equals(SessionState.LOGGED_IN)) {
+                        IStatusLineManager statusline = getWindowConfigurer()
+                            .getActionBarConfigurer().getStatusLineManager();
+                        MsgStatusItem serverItem = (MsgStatusItem) statusline
+                            .find(ApplicationActionBarAdvisor.STATUS_SERVER_MSG_ID);
+                        MsgStatusItem superAdminItem = (MsgStatusItem) statusline
+                            .find(ApplicationActionBarAdvisor.SUPER_ADMIN_MSG_ID);
+                        if (sourceValue.equals(BgcSessionState.LOGGED_IN)) {
                             mainWindowUpdateTitle(SessionManager.getUser());
-                            ServerMsgStatusItem.getInstance().setServerName(
-                                new StringBuffer(SessionManager.getUser()
-                                    .getLogin()).append("@")
-                                    .append(SessionManager.getServer())
-                                    .toString());
-                        } else if (sourceValue.equals(SessionState.LOGGED_OUT)) {
+                            serverItem.setText(new StringBuffer(SessionManager
+                                .getUser().getLogin()).append("@") //$NON-NLS-1$
+                                .append(SessionManager.getServer()).toString());
+                            superAdminItem.setVisible(SessionManager.getUser()
+                                .isInSuperAdminMode());
+                        } else if (sourceValue
+                            .equals(BgcSessionState.LOGGED_OUT)) {
                             mainWindowResetTitle();
-                            ServerMsgStatusItem.getInstance().setServerName("");
+                            serverItem.setText(""); //$NON-NLS-1$
+                            superAdminItem.setVisible(false);
                         }
                     }
                 }
@@ -138,6 +148,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                 @Override
                 public void sourceChanged(int sourcePriority,
                     @SuppressWarnings("rawtypes") Map sourceValuesByName) {
+                    //
                 }
             });
 
@@ -148,7 +159,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     private void activateIfNotInPerspective(String currentPerspectiveId,
         String notId) {
         if (!currentPerspectiveId.equals(notId))
-            BindingContextHelper.activateContextInWorkbench("not." + notId);
+            BindingContextHelper.activateContextInWorkbench("not." + notId); //$NON-NLS-1$
     }
 
     private void mainWindowResetTitle() {
@@ -172,7 +183,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         StringBuffer newTitle = new StringBuffer(getWindowTitle());
 
         if (currentCenterText != null) {
-            newTitle.append(" - Center ").append(currentCenterText);
+            newTitle.append(" - ").append( //$NON-NLS-1$
+                NLS.bind(
+                    Messages.ApplicationWorkbenchWindowAdvisor_center_text,
+                    currentCenterText));
         }
 
         String newTitleString = newTitle.toString();

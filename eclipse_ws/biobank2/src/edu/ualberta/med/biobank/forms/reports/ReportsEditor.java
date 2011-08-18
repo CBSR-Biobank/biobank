@@ -30,29 +30,31 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.util.HQLCriteriaListProxy;
-import edu.ualberta.med.biobank.forms.BiobankFormBase;
+import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.forms.BgcEntryFormActions;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 
-public abstract class ReportsEditor extends BiobankFormBase {
+public abstract class ReportsEditor extends BiobankEntryForm {
 
     // Report
     protected ReportTreeNode node;
     protected BiobankReport report;
 
-    public static String ID = "edu.ualberta.med.biobank.editors.ReportsEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.ReportsEditor"; //$NON-NLS-1$
 
     // Sections
     protected Composite buttonSection;
@@ -63,10 +65,10 @@ public abstract class ReportsEditor extends BiobankFormBase {
     private List<Object> reportData;
 
     // Buttons
-    private Button generateButton;
-    private Button printButton;
-    private Button exportPDFButton;
-    private Button exportCSVButton;
+    protected Button generateButton;
+    protected Button printButton;
+    protected Button exportPDFButton;
+    protected Button exportCSVButton;
 
     // Mostly for visibility reasons
     private String path;
@@ -76,7 +78,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
 
     QueryHandle query;
     ProgressMonitorDialogBusyListener listener = new ProgressMonitorDialogBusyListener(
-        "Generating report...");
+        "Generating report..."); //$NON-NLS-1$
 
     @Override
     protected void init() throws Exception {
@@ -89,21 +91,35 @@ public abstract class ReportsEditor extends BiobankFormBase {
 
     @Override
     protected void createFormContent() throws Exception {
-        GridLayout formLayout = new GridLayout();
-        formLayout.marginWidth = 0;
-        page.setLayout(formLayout);
+        form.setText(report.getName());
+        page.setLayout(new GridLayout(1, false));
 
-        form.setText(report.getDescription());
+        Composite topSection = toolkit.createComposite(page, SWT.NONE);
+        topSection.setLayout(new GridLayout(1, false));
+        topSection.setLayoutData(new GridData(GridData.FILL, GridData.FILL,
+            true, false));
+        Label l = toolkit.createLabel(topSection, report.getDescription(),
+            SWT.WRAP);
+        GridData gd = new GridData(GridData.FILL, GridData.FILL, true, true);
+        // FIXME: see https://bugs.eclipse.org/bugs/show_bug.cgi?id=265389
+        // once this gets fixed we can remove the width hint
+        gd.widthHint = 400;
+        l.setLayoutData(gd);
 
         if (parameterSection != null)
             parameterSection.dispose();
 
-        parameterSection = toolkit.createComposite(page, SWT.NONE);
-        GridData pgd = new GridData();
-        GridLayout pgl = new GridLayout(2, false);
-        pgd.grabExcessHorizontalSpace = true;
-        parameterSection.setLayout(pgl);
-        parameterSection.setLayoutData(pgd);
+        parameterSection = toolkit.createComposite(topSection, SWT.NONE);
+        GridLayout layout = new GridLayout(2, false);
+        layout.marginTop = 0;
+        layout.marginBottom = 0;
+        layout.marginLeft = 0;
+        layout.marginRight = 0;
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        parameterSection.setLayout(layout);
+        parameterSection.setLayoutData(new GridData(GridData.FILL,
+            GridData.FILL, true, false));
 
         buttonSection = toolkit.createComposite(page, SWT.NONE);
         GridLayout gl = new GridLayout();
@@ -111,18 +127,19 @@ public abstract class ReportsEditor extends BiobankFormBase {
         buttonSection.setLayout(gl);
         toolkit.adapt(buttonSection);
 
-        generateButton = toolkit.createButton(buttonSection, "Generate",
-            SWT.NONE);
+        generateButton = toolkit.createButton(buttonSection,
+            Messages.ReportsEditor_generate_label, SWT.NONE);
         generateButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 generate();
             }
         });
+        setFirstControl(generateButton);
 
-        printButton = toolkit.createButton(buttonSection, "Print", SWT.NONE);
-        printButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_PRINTER));
+        printButton = toolkit.createButton(buttonSection, "Print", SWT.NONE); //$NON-NLS-1$
+        printButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_PRINTER));
         printButton.setEnabled(false);
         printButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -130,13 +147,13 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 try {
                     printTable(false, false);
                 } catch (Exception ex) {
-                    BiobankPlugin.openAsyncError(
-                        "Error while printing the results", ex);
+                    BgcPlugin.openAsyncError(
+                        "Error while printing the results", ex); //$NON-NLS-1$
                 }
             }
         });
 
-        exportPDFButton = toolkit.createButton(buttonSection, "Export PDF",
+        exportPDFButton = toolkit.createButton(buttonSection, "Export PDF", //$NON-NLS-1$
             SWT.NONE);
         exportPDFButton.setEnabled(false);
         exportPDFButton.addSelectionListener(new SelectionAdapter() {
@@ -145,13 +162,13 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 try {
                     printTable(false, true);
                 } catch (Exception ex) {
-                    BiobankPlugin.openAsyncError(
-                        "Error while exporting the results", ex);
+                    BgcPlugin.openAsyncError(
+                        "Error while exporting the results", ex); //$NON-NLS-1$
                 }
             }
         });
 
-        exportCSVButton = toolkit.createButton(buttonSection, "Export CSV",
+        exportCSVButton = toolkit.createButton(buttonSection, "Export CSV", //$NON-NLS-1$
             SWT.NONE);
         exportCSVButton.setEnabled(false);
         exportCSVButton.addSelectionListener(new SelectionAdapter() {
@@ -160,8 +177,8 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 try {
                     printTable(true, false);
                 } catch (Exception ex) {
-                    BiobankPlugin.openAsyncError(
-                        "Error while exporting the results", ex);
+                    BgcPlugin.openAsyncError(
+                        "Error while exporting the results", ex); //$NON-NLS-1$
                 }
             }
         });
@@ -192,10 +209,10 @@ public abstract class ReportsEditor extends BiobankFormBase {
     }
 
     public static String containerIdsToString(List<Integer> list) {
-        String containerListString = "";
+        String containerListString = ""; //$NON-NLS-1$
         for (Object item : (List<?>) list)
             containerListString = containerListString.concat(item.toString()
-                + ",");
+                + ","); //$NON-NLS-1$
         containerListString = containerListString.substring(0,
             Math.max(containerListString.length() - 1, 0));
         return containerListString;
@@ -206,7 +223,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
         try {
             initReport();
         } catch (Exception e1) {
-            BiobankPlugin.openAsyncError("Failed to load parameters", e1);
+            BgcPlugin.openAsyncError("Failed to load parameters", e1); //$NON-NLS-1$
         }
 
         try {
@@ -217,18 +234,18 @@ public abstract class ReportsEditor extends BiobankFormBase {
             context.run(true, true, new IRunnableWithProgress() {
                 @Override
                 public void run(final IProgressMonitor monitor) {
-                    Thread t = new Thread("Querying") {
+                    Thread t = new Thread("Querying") { //$NON-NLS-1$
                         @Override
                         public void run() {
                             try {
                                 reportData = appService.startQuery(query);
                             } catch (Exception e) {
                                 reportData = new ArrayList<Object>();
-                                BiobankPlugin.openAsyncError("Query Error", e);
+                                BgcPlugin.openAsyncError("Query Error", e); //$NON-NLS-1$
                             }
                         }
                     };
-                    monitor.beginTask("Generating Report...",
+                    monitor.beginTask("Generating Report...", //$NON-NLS-1$
                         IProgressMonitor.UNKNOWN);
                     t.start();
                     while (true) {
@@ -236,7 +253,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                             try {
                                 appService.stopQuery(query);
                             } catch (Exception e) {
-                                BiobankPlugin.openAsyncError("Stop Failed", e);
+                                BgcPlugin.openAsyncError("Stop Failed", e); //$NON-NLS-1$
                             }
                             reportData = new ArrayList<Object>();
                             break;
@@ -251,7 +268,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 };
             });
         } catch (Exception e1) {
-            BiobankPlugin.openAsyncError("Failed to load query", e1);
+            BgcPlugin.openAsyncError("Failed to load query", e1); //$NON-NLS-1$
         }
 
         if (reportData instanceof HQLCriteriaListProxy)
@@ -267,20 +284,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
             exportCSVButton.setEnabled(false);
         }
         reportTable.dispose();
-        // if size > 1000 or unknown, disable print and
-        // export to pdf
-        if ((reportData instanceof HQLCriteriaListProxy && (((HQLCriteriaListProxy<?>) reportData)
-            .getRealSize() == -1 || ((HQLCriteriaListProxy<?>) reportData)
-            .getRealSize() > 1000))
-            || reportData.size() > 1000) {
-            printButton.setEnabled(false);
-            exportPDFButton.setEnabled(false);
-            printButton.setToolTipText("Results exceed 1000 rows");
-            exportPDFButton.setToolTipText("Results exceed 1000 rows");
-        } else {
-            printButton.setToolTipText("Print");
-            exportPDFButton.setToolTipText("Export PDF");
-        }
+
         reportTable = new ReportTableWidget<Object>(page, reportData,
             getColumnNames());
         reportTable.adaptToToolkit(toolkit, true);
@@ -288,12 +292,22 @@ public abstract class ReportsEditor extends BiobankFormBase {
         book.reflow(true);
     }
 
+    @Override
+    public boolean print() {
+        try {
+            printTable(false, false);
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError(Messages.ReportsEditor_print_error_msg, e);
+        }
+        return true;
+    }
+
     private void createEmptyReportTable() {
         if (reportTable != null) {
             reportTable.dispose();
         }
         reportTable = new ReportTableWidget<Object>(page,
-            new ArrayList<Object>(), new String[] { " " });
+            new ArrayList<Object>(), new String[] { " " }); //$NON-NLS-1$
         reportTable.adaptToToolkit(toolkit, true);
         page.layout(true, true);
         book.reflow(true);
@@ -316,28 +330,29 @@ public abstract class ReportsEditor extends BiobankFormBase {
         try {
             bw = new PrintWriter(new FileWriter(path));
         } catch (IOException e) {
-            BiobankPlugin.openAsyncError("Error writing to CSV.", e);
+            BgcPlugin.openAsyncError("Error writing to CSV.", e); //$NON-NLS-1$
             return;
         }
         // write title
-        bw.println("#" + report.getName());
+        bw.println("#" + report.getName()); //$NON-NLS-1$
         // write params
         for (Object[] ob : params)
-            bw.println("#" + ob[0] + ":" + ob[1]);
+            bw.println("#" + ob[0] + ":" + ob[1]); //$NON-NLS-1$ //$NON-NLS-2$
         // write columnnames
-        bw.println("#");
-        bw.print("#" + columnInfo.get(0));
+        bw.println("#"); //$NON-NLS-1$
+        bw.print("#" + columnInfo.get(0)); //$NON-NLS-1$
         for (int j = 1; j < columnInfo.size(); j++) {
-            bw.write("," + columnInfo.get(j));
+            bw.write("," + columnInfo.get(j)); //$NON-NLS-1$
         }
         bw.println();
-        BiobankLabelProvider stringConverter = reportTable.getLabelProvider();
+        BiobankLabelProvider stringConverter = reportTable
+            .getLabelProvider(false);
         for (Object row : reportData) {
             Object[] castOb = (Object[]) row;
-            bw.write("\"" + stringConverter.getColumnText(castOb, 0) + "\"");
+            bw.write("\"" + stringConverter.getColumnText(castOb, 0) + "\""); //$NON-NLS-1$ //$NON-NLS-2$
             for (int j = 1; j < columnInfo.size(); j++) {
-                bw.write(",\"" + stringConverter.getColumnText(castOb, j)
-                    + "\"");
+                bw.write(",\"" + stringConverter.getColumnText(castOb, j) //$NON-NLS-1$
+                    + "\""); //$NON-NLS-1$
             }
             bw.println();
 
@@ -348,7 +363,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
     private String runExportDialog(String name, String[] exts) {
         FileDialog fd = new FileDialog(form.getShell(), SWT.SAVE);
         fd.setOverwrite(true);
-        fd.setText("Export as");
+        fd.setText("Export as"); //$NON-NLS-1$
         fd.setFilterExtensions(exts);
         fd.setFileName(name);
         return fd.open();
@@ -356,15 +371,23 @@ public abstract class ReportsEditor extends BiobankFormBase {
 
     public void printTable(final Boolean exportCSV, final Boolean exportPDF)
         throws Exception {
+
+        if (exportCSV == false
+            && ((reportData instanceof HQLCriteriaListProxy && (((HQLCriteriaListProxy<?>) reportData)
+                .getRealSize() == -1 || ((HQLCriteriaListProxy<?>) reportData)
+                .getRealSize() > 1000)) || reportData.size() > 1000)) {
+            throw new Exception(Messages.ReportsEditor_exceed_1000_msg);
+        }
+
         boolean doPrint;
         if (exportCSV || exportPDF)
             doPrint = MessageDialog.openQuestion(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), "Confirm",
-                "Export table contents?");
+                .getActiveWorkbenchWindow().getShell(), "Confirm", //$NON-NLS-1$
+                "Export table contents?"); //$NON-NLS-1$
         else
             doPrint = MessageDialog.openQuestion(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), "Confirm",
-                "Print table contents?");
+                .getActiveWorkbenchWindow().getShell(), "Confirm", //$NON-NLS-1$
+                "Print table contents?"); //$NON-NLS-1$
         if (doPrint) {
             final List<Object[]> printParams = new ArrayList<Object[]>();
             final List<Object> paramVals = getPrintParams();
@@ -379,34 +402,31 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 columnInfo.add(names[i1]);
             }
 
-            if (exportCSV) {
-                String[] filterExt = { "*.csv" };
-                path = runExportDialog(report.getName().replaceAll(" ", "_")
-                    + "_" + DateFormatter.formatAsDate(new Date()), filterExt);
+            if (exportCSV || exportPDF) {
+                String fileName = report.getName().replaceAll(" ", "_") //$NON-NLS-1$ //$NON-NLS-2$
+                    + "_" + DateFormatter.formatAsDate(new Date()); //$NON-NLS-1$ /
+                String[] filterExt = (exportCSV) ? new String[] { "*.csv" } //$NON-NLS-1$ 
+                    : new String[] { ".pdf" }; //$NON-NLS-1$
+                path = runExportDialog(fileName, filterExt);
                 if (path == null) {
-                    BiobankPlugin.openAsyncError("Exporting canceled.",
-                        "Select a valid path and try again.");
+                    BgcPlugin.openAsyncError("Exporting canceled.", //$NON-NLS-1$
+                        "Select a valid path and try again."); //$NON-NLS-1$
                     return;
                 }
-            } else if (exportPDF) {
-                String[] filterExt = new String[] { ".pdf" };
-                path = runExportDialog(report.getName().replaceAll(" ", "_")
-                    + "_" + DateFormatter.formatAsDate(new Date()), filterExt);
-
             }
             IRunnableContext context = new ProgressMonitorDialog(Display
                 .getDefault().getActiveShell());
             context.run(true, false, new IRunnableWithProgress() {
                 @Override
                 public void run(final IProgressMonitor monitor) {
-                    monitor.beginTask("Preparing Report...",
+                    monitor.beginTask("Preparing Report...", //$NON-NLS-1$
                         IProgressMonitor.UNKNOWN);
                     final List<Map<String, String>> listData = new ArrayList<Map<String, String>>();
                     try {
                         if (exportCSV) {
                             exportCSV(columnInfo, printParams, path);
-                            SessionManager.log("exportCSV", report.getName(),
-                                "report");
+                            SessionManager.log("exportCSV", report.getName(), //$NON-NLS-1$
+                                "report"); //$NON-NLS-1$
                         } else {
                             for (Object object : reportData) {
                                 Map<String, String> map = new HashMap<String, String>();
@@ -422,8 +442,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                                 path, exportPDF);
                         }
                     } catch (Exception e) {
-                        BiobankPlugin.openAsyncError("Error exporting results",
-                            e);
+                        BgcPlugin.openAsyncError("Error exporting results", e); //$NON-NLS-1$
                         return;
                     }
                 }
@@ -436,36 +455,37 @@ public abstract class ReportsEditor extends BiobankFormBase {
 
         List<String> stringParams = new ArrayList<String>();
         for (int i = 0; i < params.size(); i++) {
-            stringParams.add(params.get(i)[0] + " : " + params.get(i)[1]);
+            stringParams.add(params.get(i)[0] + " : " + params.get(i)[1]); //$NON-NLS-1$
         }
 
         if (exportPDF) {
             try {
-                ReportingUtils
-                    .saveReport(ReportingUtils.createDynamicReport(
-                        report.getName(), stringParams, columnInfo, listData),
-                        path);
+                ReportingUtils.saveReport(
+                    ReportingUtils.createDynamicReport(report.getName(),
+                        stringParams, columnInfo, listData, false), path);
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Error saving to PDF", e);
+                BgcPlugin.openAsyncError("Error saving to PDF", e); //$NON-NLS-1$
                 return;
             }
             try {
-                SessionManager.log("exportPDF", report.getName(), "report");
+                SessionManager.log("exportPDF", report.getName(), "report"); //$NON-NLS-1$ //$NON-NLS-2$
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Error logging export", e);
+                BgcPlugin.openAsyncError("Error logging export", e); //$NON-NLS-1$
             }
         } else {
             try {
-                ReportingUtils.printReport(ReportingUtils.createDynamicReport(
-                    report.getName(), stringParams, columnInfo, listData));
+                ReportingUtils
+                    .printReport(ReportingUtils.createDynamicReport(
+                        report.getName(), stringParams, columnInfo, listData,
+                        false));
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Printer Error", e);
+                BgcPlugin.openAsyncError("Printer Error", e); //$NON-NLS-1$
                 return;
             }
             try {
-                SessionManager.log("print", report.getName(), "report");
+                SessionManager.log("print", report.getName(), "report"); //$NON-NLS-1$ //$NON-NLS-2$
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Error logging print", e);
+                BgcPlugin.openAsyncError("Error logging print", e); //$NON-NLS-1$
             }
         }
     }
@@ -526,6 +546,47 @@ public abstract class ReportsEditor extends BiobankFormBase {
             return (c.getTime());
         } else
             return processedDate;
+    }
+
+    @Override
+    protected void addToolbarButtons() {
+        formActions = new BgcEntryFormActions(this);
+        addResetAction();
+        addCancelAction();
+        addPrintAction();
+        form.updateToolBar();
+        setEnablePrintAction(false);
+    }
+
+    @Override
+    protected void saveForm() throws Exception {
+        //
+    }
+
+    @Override
+    protected String getOkMessage() {
+        return ""; //$NON-NLS-1$
+    }
+
+    @Override
+    protected void onReset() throws Exception {
+        createEmptyReportTable();
+        setEnablePrintAction(false);
+
+        printButton.setEnabled(false);
+        exportPDFButton.setEnabled(false);
+        exportCSVButton.setEnabled(false);
+    }
+
+    @Override
+    public void cancel() {
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+            .closeEditor(this, false);
+    }
+
+    @Override
+    public String getNextOpenedFormID() {
+        return ID;
     }
 
 }

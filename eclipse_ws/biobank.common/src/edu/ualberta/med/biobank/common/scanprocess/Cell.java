@@ -16,7 +16,7 @@ public class Cell implements Serializable {
 
     private String information;
 
-    private String title = "";
+    private String title = ""; //$NON-NLS-1$
 
     private Integer expectedSpecimenId;
 

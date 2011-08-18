@@ -14,16 +14,16 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class DateTimeFilterValueWidget implements FilterValueWidget {
     private static final SimpleDateFormat SQL_DATETIME_FORMAT = new SimpleDateFormat(
-        "yyyy-MM-dd HH:mm:ss");
+        "yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
     private static final SimpleDateFormat DISPLAY_DATE_FORMAT = new SimpleDateFormat(
-        "yyyy-MM-dd");
+        "yyyy-MM-dd"); //$NON-NLS-1$
     private static final SimpleDateFormat DISPLAY_TIME_FORMAT = new SimpleDateFormat(
-        "HH:mm:ss");
+        "HH:mm:ss"); //$NON-NLS-1$
     private final DateTimeWidget dateTime;
     private final boolean isDate;
     private final boolean isTime;
@@ -66,6 +66,7 @@ public class DateTimeFilterValueWidget implements FilterValueWidget {
                         Date date = SQL_DATETIME_FORMAT.parse(value.getValue());
                         setDate(date);
                     } catch (ParseException e) {
+                        //
                     }
                 }
                 break;
@@ -103,10 +104,11 @@ public class DateTimeFilterValueWidget implements FilterValueWidget {
         try {
             date = SQL_DATETIME_FORMAT.parse(value.getValue());
         } catch (ParseException e) {
+            //
         }
 
         if (date != null) {
-            string = "";
+            string = ""; //$NON-NLS-1$
 
             if (isDate) {
                 string = DISPLAY_DATE_FORMAT.format(date);
@@ -114,7 +116,7 @@ public class DateTimeFilterValueWidget implements FilterValueWidget {
 
             if (isTime) {
                 if (!string.isEmpty()) {
-                    string += " ";
+                    string += " "; //$NON-NLS-1$
                 }
 
                 string += DISPLAY_TIME_FORMAT.format(date);

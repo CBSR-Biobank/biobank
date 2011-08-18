@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -15,10 +16,12 @@ import org.apache.commons.lang.StringUtils;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
@@ -125,13 +128,20 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     private static final String PROCESSING_EVENT_BY_DATE_QRY = "select pEvent from "
         + ProcessingEvent.class.getName()
-        + " pEvent where DATE(pEvent."
-        + ProcessingEventPeer.CREATED_AT.getName() + ")=DATE(?)";
+        + " pEvent where pEvent."
+        + ProcessingEventPeer.CREATED_AT.getName()
+        + ">=? and pEvent."
+        + ProcessingEventPeer.CREATED_AT.getName()
+        + "<=? and pEvent."
+        + Property.concatNames(ProcessingEventPeer.CENTER, CenterPeer.ID)
+        + "= ?";
 
-    public static List<ProcessingEventWrapper> getProcessingEventsWithDate(
-        WritableApplicationService appService, Date date) throws Exception {
-        HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_BY_DATE_QRY,
-            Arrays.asList(new Object[] { date }));
+    public static List<ProcessingEventWrapper> getProcessingEventsWithDateForCenter(
+        WritableApplicationService appService, Date date,
+        CenterWrapper<?> center) throws Exception {
+        HQLCriteria c = new HQLCriteria(
+            PROCESSING_EVENT_BY_DATE_QRY,
+            Arrays.asList(new Object[] { date, endOfDay(date), center.getId() }));
         List<ProcessingEvent> pvs = appService.query(c);
         List<ProcessingEventWrapper> pvws = new ArrayList<ProcessingEventWrapper>();
         for (ProcessingEvent pv : pvs)
@@ -139,6 +149,14 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         if (pvws.size() == 0)
             return new ArrayList<ProcessingEventWrapper>();
         return pvws;
+    }
+
+    // Date should input with no hour/minute/seconds
+    public static Date endOfDay(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.add(Calendar.DAY_OF_MONTH, 1);
+        return c.getTime();
     }
 
     private static final String PROCESSING_EVENT_BY_WORKSHEET_QRY = "select pEvent from "
@@ -250,5 +268,46 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     @Override
     public void delete() throws Exception {
         WrapperTransaction.delete(this, appService);
+	}
+
+    /**
+     * return true if the user can delete this object
+     */
+    @Override
+    public boolean canDelete(User user) {
+        return super.canDelete(user)
+            && (getCenter() == null || user.getCurrentWorkingCenter().equals(
+                getCenter()));
+    }
+
+    /**
+     * return true if the user can edit this object
+     */
+    @Override
+    public boolean canUpdate(User user) {
+        return super.canUpdate(user)
+            && (getCenter() == null || user.getCurrentWorkingCenter().equals(
+                getCenter()));
+    }
+
+    public static String PE_BY_PATIENT_STRING = "select distinct s."
+        + SpecimenPeer.PROCESSING_EVENT.getName()
+        + " from "
+        + Specimen.class.getName()
+        + " s where s."
+        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
+            CollectionEventPeer.PATIENT, PatientPeer.PNUMBER)
+        + " = ? order by s."
+        + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
+            ProcessingEventPeer.CREATED_AT);
+
+    public static List<ProcessingEventWrapper> getProcessingEventsByPatient(
+        BiobankApplicationService appService, String pnum)
+        throws ApplicationException {
+        HQLCriteria c = new HQLCriteria(PE_BY_PATIENT_STRING,
+            Arrays.asList(pnum));
+        List<ProcessingEvent> res = appService.query(c);
+        return wrapModelCollection(appService, res,
+            ProcessingEventWrapper.class);
     }
 }

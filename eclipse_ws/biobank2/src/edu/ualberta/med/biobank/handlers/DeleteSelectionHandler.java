@@ -6,7 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.runtime.Assert;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
@@ -15,10 +15,10 @@ public class DeleteSelectionHandler extends AbstractHandler implements IHandler 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         AdapterBase adapter = SessionManager.getSelectedNode();
-        Assert.isNotNull(adapter, "adapter is null");
+        Assert.isNotNull(adapter, "adapter is null"); //$NON-NLS-1$
         if (!adapter.isDeletable()) {
-            BiobankPlugin.openError("Delete Error",
-                "this item cannot be deleted");
+            BgcPlugin.openError(Messages.DeleteSelectionHandler_delete_error_title,
+                Messages.DeleteSelectionHandler_delete_error_msg);
             return null;
         }
         adapter.deleteWithConfirm();

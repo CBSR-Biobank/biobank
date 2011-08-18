@@ -10,16 +10,16 @@ import net.sf.jasperreports.engine.JasperPrint;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
 public class PdfDataExporter extends GuiDataExporter {
-    private static final String[] VALID_EXTS = { "*.pdf" };
+    private static final String[] VALID_EXTS = { "*.pdf" }; //$NON-NLS-1$
 
     public PdfDataExporter() {
-        super("Export PDF");
+        super(Messages.PdfDataExporter_name);
     }
 
     protected PdfDataExporter(String name) {
@@ -34,7 +34,8 @@ public class PdfDataExporter extends GuiDataExporter {
             AbstractBiobankListProxy<?> proxy = (AbstractBiobankListProxy<?>) data
                 .getRows();
             if (proxy.getRealSize() == -1) {
-                throw new DataExportException("too many rows to export");
+                throw new DataExportException(
+                    Messages.PdfDataExporter_toomanyrows_error_msg);
             }
         }
     }
@@ -46,47 +47,64 @@ public class PdfDataExporter extends GuiDataExporter {
 
         String path = getPath(data, VALID_EXTS);
         List<Map<String, String>> maps = getPropertyMaps(data, labelProvider,
-            monitor);
+            monitor, true);
 
         try {
             JasperPrint jasperPrint = ReportingUtils.createDynamicReport(
                 data.getTitle(), data.getDescription(), data.getColumnNames(),
-                maps);
+                maps, true);
             ReportingUtils.saveReport(jasperPrint, path);
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error saving to PDF", e);
+            BgcPlugin.openAsyncError(Messages.PdfDataExporter_saving_error_msg,
+                e);
             return;
         }
         try {
-            SessionManager.log("exportPDF", data.getTitle(), "data");
+            SessionManager.log(Messages.PdfDataExporter_log_export,
+                data.getTitle(), LOG_TYPE);
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error Logging Export", e);
+            BgcPlugin.openAsyncError(
+                Messages.PdfDataExporter_logging_error_msg, e);
         }
     }
 
+    /**
+     * if useIntergerProperties is true then the map will contain [{0=value},
+     * {1=value}...] instead of [{name=value}...] (see issue #1312)
+     */
     protected static List<Map<String, String>> getPropertyMaps(Data data,
-        ITableLabelProvider labelProvider, IProgressMonitor monitor)
-        throws DataExportException {
+        ITableLabelProvider labelProvider, IProgressMonitor monitor,
+        boolean useIntegerProperties) throws DataExportException {
         List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
 
         for (Object row : data.getRows()) {
             if (monitor.isCanceled()) {
-                throw new DataExportException("exporting canceled");
+                throw new DataExportException(
+                    Messages.PdfDataExporter_cancel_msg);
             }
 
-            Map<String, String> map = getPropertyMap(data, row, labelProvider);
+            Map<String, String> map = getPropertyMap(data, row, labelProvider,
+                useIntegerProperties);
             maps.add(map);
         }
 
         return maps;
     }
 
+    /**
+     * if useIntergerProperties is true then the map will contain [{0=value},
+     * {1=value}...] instead of [{name=value}...] (see issue #1312)
+     */
     protected static Map<String, String> getPropertyMap(Data data, Object row,
-        ITableLabelProvider labelProvider) {
+        ITableLabelProvider labelProvider, boolean useIntegerProperties) {
         Map<String, String> map = new HashMap<String, String>();
 
         for (int i = 0, n = data.getColumnNames().size(); i < n; i++) {
-            String property = data.getColumnNames().get(i);
+            String property;
+            if (useIntegerProperties)
+                property = String.valueOf(i);
+            else
+                property = data.getColumnNames().get(i);
             String value = labelProvider.getColumnText(row, i);
             map.put(property, value);
         }

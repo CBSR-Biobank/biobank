@@ -3,14 +3,16 @@ package edu.ualberta.med.biobank.server.interceptor;
 import java.sql.BatchUpdateException;
 
 import org.hibernate.PropertyValueException;
+import org.hibernate.StaleStateException;
 import org.hibernate.validator.InvalidStateException;
-import org.hibernate.validator.InvalidValue;
 import org.springframework.aop.ThrowsAdvice;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
+import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException;
 
 import edu.ualberta.med.biobank.common.exception.ExceptionUtils;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModificationConcurrencyException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.StringValueLengthServerException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
@@ -29,16 +31,7 @@ public class ExceptionInterceptor implements ThrowsAdvice {
      */
     public void afterThrowing(InvalidStateException ise)
         throws ValidationException {
-        StringBuffer message = new StringBuffer();
-        for (int i = 0; i < ise.getInvalidValues().length; i++) {
-            InvalidValue iv = ise.getInvalidValues()[i];
-            message.append(iv.getBeanClass().getSimpleName()).append(": ")
-                .append(iv.getPropertyName()).append(" ")
-                .append(iv.getMessage());
-            if (i != ise.getInvalidValues().length - 1)
-                message.append(". ");
-        }
-        throw new ValidationException(message.toString(), ise);
+        throw new ValidationException(ise);
     }
 
     public void afterThrowing(ApplicationException ae)
@@ -47,8 +40,9 @@ public class ExceptionInterceptor implements ThrowsAdvice {
             PropertyValueException.class, ValueNotSetException.class);
         getNotNullPropertyValueException(cause, ae);
         if (cause != null && cause instanceof ValueNotSetException) {
-            ValueNotSetException pve = (ValueNotSetException) cause;
-            throw new ValueNotSetException(pve.getPropertyName(), ae);
+            ValueNotSetException vnse = (ValueNotSetException) cause;
+            throw new ValueNotSetException(vnse.getPropertyName(),
+                vnse.getObjectName(), ae);
         }
         throw ae;
     }
@@ -69,9 +63,12 @@ public class ExceptionInterceptor implements ThrowsAdvice {
         Throwable originalMainEx) throws ValueNotSetException {
         if (cause != null && cause instanceof PropertyValueException) {
             PropertyValueException pve = (PropertyValueException) cause;
-            if (pve.getMessage().startsWith("not-null"))
+            if (pve.getMessage().startsWith("not-null")) { //$NON-NLS-1$
+                String objectName = pve.getEntityName();
+                int i = objectName.lastIndexOf("."); //$NON-NLS-1$
                 throw new ValueNotSetException(pve.getPropertyName(),
-                    originalMainEx);
+                    objectName.substring(i + 1), originalMainEx);
+            }
         }
     }
 
@@ -81,9 +78,20 @@ public class ExceptionInterceptor implements ThrowsAdvice {
             BatchUpdateException.class);
         if (cause != null && cause instanceof BatchUpdateException) {
             BatchUpdateException bue = (BatchUpdateException) cause;
-            if (bue.getMessage().contains("Data too long for column")) {
+            if (bue.getMessage().contains("Data too long for column")) { //$NON-NLS-1$
                 throw new StringValueLengthServerException(bue.getMessage());
             }
         }
+        throw idarue;
+    }
+
+    public void afterThrowing(HibernateOptimisticLockingFailureException holfe)
+        throws BiobankServerException {
+        Throwable cause = ExceptionUtils.findCausesInThrowable(holfe,
+            StaleStateException.class);
+        if (cause != null && cause instanceof StaleStateException) {
+            throw new ModificationConcurrencyException(holfe);
+        }
+        throw holfe;
     }
 }

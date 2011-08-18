@@ -9,11 +9,14 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-public class ComboAndQuantityWidget extends BiobankWidget {
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
+
+public class ComboAndQuantityWidget extends BgcBaseWidget {
 
     private Combo valuesCombo;
 
-    private BiobankText quantitiesText;
+    private BgcBaseText quantitiesText;
 
     public ComboAndQuantityWidget(Composite parent, int style) {
         super(parent, style | SWT.BORDER);
@@ -25,8 +28,8 @@ public class ComboAndQuantityWidget extends BiobankWidget {
 
         valuesCombo = new Combo(this, SWT.NONE);
         Label l = new Label(this, SWT.NONE);
-        l.setText("Quantity:");
-        quantitiesText = new BiobankText(this, SWT.NONE);
+        l.setText(Messages.ComboAndQuantityWidget_qunatity_label);
+        quantitiesText = new BgcBaseText(this, SWT.NONE);
     }
 
     public void addValues(String[] values) {
@@ -37,14 +40,14 @@ public class ComboAndQuantityWidget extends BiobankWidget {
 
     public void setText(String value, int quantity) {
         valuesCombo.setText(value);
-        quantitiesText.setText(String.format("%d", quantity));
+        quantitiesText.setText(String.format("%d", quantity)); //$NON-NLS-1$
     }
 
     public String getText() {
         if ((valuesCombo.getText().length() != 1)
             || (valuesCombo.getText().length() != 1))
             return null;
-        return valuesCombo.getText() + " " + quantitiesText.getText();
+        return valuesCombo.getText() + " " + quantitiesText.getText(); //$NON-NLS-1$
     }
 
     public void addSelectionListener(SelectionListener listener) {

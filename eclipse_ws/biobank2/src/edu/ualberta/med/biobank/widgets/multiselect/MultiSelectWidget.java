@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -22,12 +22,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDragListener;
 import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDropListener;
 
-public class MultiSelectWidget extends BiobankWidget {
+public class MultiSelectWidget extends BgcBaseWidget {
 
     private TreeViewer selTree;
 
@@ -38,10 +38,10 @@ public class MultiSelectWidget extends BiobankWidget {
     private Button moveLeftButton;
 
     private MultiSelectNode selTreeRootNode = new MultiSelectNode(null, 0,
-        "selRoot");
+        "selRoot"); //$NON-NLS-1$
 
     private MultiSelectNode availTreeRootNode = new MultiSelectNode(null, 0,
-        "availRoot");
+        "availRoot"); //$NON-NLS-1$
 
     private int minHeight;
 
@@ -65,13 +65,14 @@ public class MultiSelectWidget extends BiobankWidget {
         moveComposite.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
             false, true));
         moveRightButton = new Button(moveComposite, SWT.PUSH);
-        moveRightButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_ARROW_RIGHT));
-        moveRightButton.setToolTipText("Move to selected");
+        moveRightButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ARROW_RIGHT));
+        moveRightButton.setToolTipText(Messages.MultiSelectWidget_move_tooltip);
         moveLeftButton = new Button(moveComposite, SWT.PUSH);
-        moveLeftButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_ARROW_LEFT));
-        moveLeftButton.setToolTipText("Remove from selected");
+        moveLeftButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ARROW_LEFT));
+        moveLeftButton
+            .setToolTipText(Messages.MultiSelectWidget_remove_tooltip);
 
         selTree = createLabelledTree(this, rightLabel);
         selTree.setInput(selTreeRootNode);
@@ -93,6 +94,12 @@ public class MultiSelectWidget extends BiobankWidget {
                 moveTreeViewerSelection(selTree, availTree);
             }
         });
+    }
+
+    public void setFilter(ViewerFilter filter) {
+        ViewerFilter[] filters = new ViewerFilter[] { filter };
+        availTree.setFilters(filters);
+        selTree.setFilters(filters);
     }
 
     private void moveTreeViewerSelection(TreeViewer srcTree, TreeViewer destTree) {
@@ -129,7 +136,7 @@ public class MultiSelectWidget extends BiobankWidget {
 
         Label l = new Label(selComposite, SWT.NONE);
         l.setText(label);
-        l.setFont(new Font(null, "sans-serif", 8, SWT.BOLD));
+        l.setFont(new Font(null, "sans-serif", 8, SWT.BOLD)); //$NON-NLS-1$
         gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.CENTER;
@@ -233,9 +240,8 @@ public class MultiSelectWidget extends BiobankWidget {
         availTree.getControl().setEnabled(enabled);
     }
 
-    public void setSelection(List<Integer> selected) {
-        availTree.getTree().selectAll();
-        availTree.setSelection(new StructuredSelection(selected));
-        moveTreeViewerSelection(availTree, selTree);
+    public void refreshLists() {
+        availTree.refresh();
+        selTree.refresh();
     }
 }

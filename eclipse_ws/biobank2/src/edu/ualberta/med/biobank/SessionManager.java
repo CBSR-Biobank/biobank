@@ -12,18 +12,20 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcSessionState;
+import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.PerspectiveSecurity;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
-import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
@@ -35,12 +37,12 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
 
-    public static final String BIOBANK2_CONTEXT_LOGGED_OUT = "biobank2.context.loggedOut";
+    public static final String BIOBANK2_CONTEXT_LOGGED_OUT = "biobank.context.loggedOut"; //$NON-NLS-1$
 
-    public static final String BIOBANK2_CONTEXT_LOGGED_IN = "biobank2.context.loggedIn";
+    public static final String BIOBANK2_CONTEXT_LOGGED_IN = "biobank.context.loggedIn"; //$NON-NLS-1$
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(SessionManager.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(SessionManager.class
+        .getName());
 
     private static SessionManager instance = null;
 
@@ -79,22 +81,16 @@ public class SessionManager {
 
     public void addSession(final BiobankApplicationService appService,
         String serverName, User user) {
-        logger.debug("addSession: " + serverName + ", user/" + user.getLogin());
+        logger.debug("addSession: " + serverName + ", user/" + user.getLogin()); //$NON-NLS-1$ //$NON-NLS-2$
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, user);
         rootNode.addChild(sessionAdapter);
         updateSessionState();
 
-        if (sessionAdapter.getUser().passwordChangeRequired()) {
-            ChangePasswordDialog dlg = new ChangePasswordDialog(PlatformUI
-                .getWorkbench().getActiveWorkbenchWindow().getShell(), true);
-            dlg.open();
-        }
-
         IWorkbench workbench = BiobankPlugin.getDefault().getWorkbench();
         IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
             .getActivePage();
-        updateVisibility(page);
+        updateViewsVisibility(page, true);
     }
 
     public void deleteSession() throws Exception {
@@ -112,16 +108,11 @@ public class SessionManager {
     }
 
     public void updateSession() {
-        Assert.isNotNull(sessionAdapter, "session adapter is null");
+        Assert.isNotNull(sessionAdapter, "session adapter is null"); //$NON-NLS-1$
         sessionAdapter.performExpand();
     }
 
     private void updateSessionState() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow();
-        ISourceProviderService service = (ISourceProviderService) window
-            .getService(ISourceProviderService.class);
-
         // for key binding contexts:
         if (sessionAdapter == null) {
             BindingContextHelper
@@ -136,15 +127,19 @@ public class SessionManager {
         }
 
         // assign logged in state
-        SessionState sessionSourceProvider = (SessionState) service
-            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
-        sessionSourceProvider.setLoggedInState(sessionAdapter != null);
-        sessionSourceProvider.setSuperAdminMode(sessionAdapter != null
-            && sessionAdapter.getUser().isInSuperAdminMode());
-        sessionSourceProvider.setHasWorkingCenter(sessionAdapter != null
-            && sessionAdapter.getUser().getCurrentWorkingCenter() != null);
+        BgcSessionState guiCommonSessionState = BgcPlugin
+            .getSessionStateSourceProvider();
+        guiCommonSessionState.setLoggedInState(sessionAdapter != null);
+
+        BiobankPlugin.getSessionStateSourceProvider().setUser(
+            sessionAdapter == null ? null : sessionAdapter.getUser());
 
         // assign debug state
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+
         DebugState debugStateSourceProvider = (DebugState) service
             .getSourceProvider(DebugState.SESSION_STATE);
         debugStateSourceProvider.setState(BiobankPlugin.getDefault()
@@ -153,7 +148,7 @@ public class SessionManager {
 
     public SessionAdapter getSession() {
         Assert.isNotNull(sessionAdapter,
-            "No connection available. Please log in to continue.");
+            Messages.SessionManager_noconnection_error_msg);
         return sessionAdapter;
     }
 
@@ -163,7 +158,7 @@ public class SessionManager {
 
     public static void updateAdapterTreeNode(final AdapterBase node) {
         final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
-        if (view != null) {
+        if ((view != null) && (node != null)) {
             view.getTreeViewer().update(node, null);
         }
     }
@@ -314,13 +309,13 @@ public class SessionManager {
                                     if (ab != adapter)
                                         ab.resetObject();
                                 } catch (Exception ex) {
-                                    logger.error("Problem reseting object", ex);
+                                    logger.error("Problem reseting object", ex); //$NON-NLS-1$
                                 }
                             view.getTreeViewer().update(ab, null);
                         }
                     }
                 } catch (Exception ex) {
-                    logger.error("Error updating tree nodes", ex);
+                    logger.error("Error updating tree nodes", ex); //$NON-NLS-1$
                 }
             }
         });
@@ -334,7 +329,7 @@ public class SessionManager {
         return getUser().isInSuperAdminMode();
     }
 
-    public static void updateVisibility(IWorkbenchPage page) {
+    public static void updateViewsVisibility(IWorkbenchPage page, boolean login) {
         try {
             SessionManager sm = getInstance();
             if (sm.isConnected()) {
@@ -346,8 +341,20 @@ public class SessionManager {
                 }
             }
         } catch (PartInitException e) {
-            BiobankPlugin.openAsyncError("Error displaying available actions",
-                e);
+            BgcPlugin.openAsyncError(
+                Messages.SessionManager_actions_error_title, e);
         }
+        // don't want to switch if was activated by an handler after login
+        // (display is weird otherwise)
+        if (login && page.getViewReferences().length == 0)
+            try {
+                page.getWorkbenchWindow()
+                    .getWorkbench()
+                    .showPerspective(MainPerspective.ID,
+                        page.getWorkbenchWindow());
+            } catch (WorkbenchException e) {
+                logger.error("Error opening main perspective", e); //$NON-NLS-1$
+            }
+
     }
 }

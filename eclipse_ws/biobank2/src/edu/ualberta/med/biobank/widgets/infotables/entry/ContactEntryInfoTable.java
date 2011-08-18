@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.select.ContactAddDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
@@ -64,18 +65,21 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                     ContactWrapper contact = getSelection();
                     if (contact != null) {
                         if (!contact.deleteAllowed()) {
-                            BiobankPlugin
+                            BgcPlugin
                                 .openError(
-                                    "Contact Delete Error",
-                                    "Cannot delete contact \""
-                                        + contact.getName()
-                                        + "\" since it is associated with one or more studies");
+                                    Messages.ContactEntryInfoTable_delete_error_title,
+                                    NLS.bind(
+                                        Messages.ContactEntryInfoTable_delete_error_msg,
+                                        contact.getName()));
                             return;
                         }
 
-                        if (!BiobankPlugin.openConfirm("Delete Contact",
-                            "Are you sure you want to delete contact \""
-                                + contact.getName() + "\"")) {
+                        if (!BgcPlugin
+                            .openConfirm(
+                                Messages.ContactEntryInfoTable_delete_confirm_title,
+                                NLS.bind(
+                                    Messages.ContactEntryInfoTable_delete_confirm_msg,
+                                    contact.getName()))) {
                             return;
                         }
 
@@ -112,7 +116,8 @@ public class ContactEntryInfoTable extends ContactInfoTable {
             try {
                 contactWrapper.reload();
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Cancel error", e);
+                BgcPlugin.openAsyncError(
+                    Messages.ContactEntryInfoTable_cancel_error_title, e);
             }
             reloadCollection(selectedContacts, null);
         }

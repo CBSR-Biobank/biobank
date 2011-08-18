@@ -10,13 +10,13 @@ public class DateFormatter {
 
     public static final TimeZone LOCAL = TimeZone.getDefault();
 
-    public static final TimeZone GMT = TimeZone.getTimeZone("GMT");
+    public static final TimeZone GMT = TimeZone.getTimeZone("GMT"); //$NON-NLS-1$
 
-    public static final String DATE_FORMAT = "yyyy-MM-dd";
+    public static final String DATE_FORMAT = "yyyy-MM-dd"; //$NON-NLS-1$
 
-    public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
+    public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm"; //$NON-NLS-1$
 
-    public static final String TIME_FORMAT = "HH:mm";
+    public static final String TIME_FORMAT = "HH:mm"; //$NON-NLS-1$
 
     public static final SimpleDateFormat dateFormatter = new SimpleDateFormat(
         DATE_FORMAT);

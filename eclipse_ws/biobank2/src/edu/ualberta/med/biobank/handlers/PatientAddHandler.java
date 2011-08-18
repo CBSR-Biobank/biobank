@@ -6,13 +6,13 @@ import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
-import edu.ualberta.med.biobank.views.CollectionView;
 
 public class PatientAddHandler extends AbstractHandler {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(PatientAddHandler.class.getName());
 
     @Override
@@ -20,11 +20,10 @@ public class PatientAddHandler extends AbstractHandler {
         try {
             PatientWrapper patient = new PatientWrapper(
                 SessionManager.getAppService());
-            PatientAdapter adapter = new PatientAdapter(CollectionView
-                .getCurrent().getSearchedNode(), patient);
+            AdapterBase adapter = new PatientAdapter(null, patient);
             adapter.openEntryForm();
         } catch (Exception exp) {
-            logger.error("Error while opening the patient entry form", exp);
+            logger.error(Messages.PatientAddHandler_patient_open_error, exp);
         }
         return null;
     }

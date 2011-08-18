@@ -8,25 +8,26 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     AdapterBase {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(AbstractTodayNode.class.getName());
 
     private List<E> currentTodayElements;
 
     public AbstractTodayNode(AdapterBase parent, int id) {
-        super(parent, id, "Today", true, false);
+        super(parent, id, Messages.AbstractTodayNode_today, true, false);
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+        //
     }
 
     @Override
@@ -99,9 +100,9 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
                 }
             }
         } catch (final RemoteAccessException exp) {
-            BiobankPlugin.openRemoteAccessErrorMessage(exp);
+            BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
-            logger.error("Error while getting " + getLabel(), e);
+            logger.error("Error while getting " + getLabel(), e); //$NON-NLS-1$
         }
     }
 

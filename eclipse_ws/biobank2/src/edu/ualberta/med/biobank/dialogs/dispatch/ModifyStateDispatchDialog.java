@@ -9,14 +9,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
-public class ModifyStateDispatchDialog extends BiobankDialog {
+public class ModifyStateDispatchDialog extends BgcBaseDialog {
 
-    private static final String TITLE_STATE = "Setting {0} state to specimens in current dispatch";
-    private static final String TITLE_COMMENT_ONLY = "Modifying comment of specimens in current dispatch";
+    private static final String TITLE_STATE = Messages.ModifyStateDispatchDialog_title_state;
+    private static final String TITLE_COMMENT_ONLY = Messages.ModifyStateDispatchDialog_title_comment_only;
     private String currentTitle;
     private String message;
 
@@ -40,12 +40,12 @@ public class ModifyStateDispatchDialog extends BiobankDialog {
         commentValue.setValue(oldComment);
         if (newState == null) {
             currentTitle = TITLE_COMMENT_ONLY;
-            message = "Set a comment";
+            message = Messages.ModifyStateDispatchDialog_description_newState;
 
         } else {
             currentTitle = MessageFormat.format(TITLE_STATE,
                 newState.getLabel());
-            message = "Set a comment to explain the state modification";
+            message = Messages.ModifyStateDispatchDialog_description_edit;
         }
     }
 
@@ -70,9 +70,11 @@ public class ModifyStateDispatchDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.MULTI,
-            "Comment", null, commentValue, "value",
-            new NonEmptyStringValidator("Comment should not be empty"));
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.MULTI,
+            Messages.ModifyStateDispatchDialog_comment_label, null,
+            commentValue, "value", //$NON-NLS-1$
+            new NonEmptyStringValidator(
+                Messages.ModifyStateDispatchDialog_comment_validator_msg));
     }
 
     public String getComment() {

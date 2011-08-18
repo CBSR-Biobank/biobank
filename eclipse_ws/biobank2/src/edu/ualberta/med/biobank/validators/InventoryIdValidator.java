@@ -8,7 +8,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -34,7 +35,7 @@ public class InventoryIdValidator extends AbstractValidator {
     public IStatus validate(Object value) {
         if ((value != null) && !(value instanceof String)) {
             throw new RuntimeException(
-                "Not supposed to be called for non-strings.");
+                Messages.InventoryIdValidator_nonstring_error_msg);
         }
 
         if (value == null || (((String) value).length() == 0)) {
@@ -63,7 +64,7 @@ public class InventoryIdValidator extends AbstractValidator {
                 } catch (DuplicateEntryException e) {
                     duplicate = true;
                 } catch (Exception e) {
-                    BiobankPlugin.openAsyncError("Error checking inventory id",
+                    BgcPlugin.openAsyncError(Messages.InventoryIdValidator_checking_error_msg,
                         e);
                 }
             }

@@ -1,38 +1,36 @@
 package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.CollectionEventInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientViewForm"; //$NON-NLS-1$
 
-    private PatientAdapter patientAdapter;
-
     private PatientWrapper patient;
 
-    private BiobankText studyLabel;
+    private BgcBaseText studyLabel;
 
-    private BiobankText createdAtLabel;
+    private BgcBaseText createdAtLabel;
 
-    private BiobankText visitCountLabel;
+    private BgcBaseText visitCountLabel;
 
-    private BiobankText sourceSpecimenCountLabel;
+    private BgcBaseText sourceSpecimenCountLabel;
 
-    private BiobankText aliquotedSpecimenCountLabel;
+    private BgcBaseText aliquotedSpecimenCountLabel;
 
     private CollectionEventInfoTable collectionEventTable;
 
@@ -42,21 +40,15 @@ public class PatientViewForm extends BiobankViewForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        patientAdapter = (PatientAdapter) adapter;
-        patient = patientAdapter.getWrapper();
-        retrievePatient();
+        patient = (PatientWrapper) getModelObject();
         SessionManager.logLookup(patient);
-        setPartName(Messages.getString("PatientViewForm.title", //$NON-NLS-1$
+        setPartName(NLS.bind(Messages.PatientViewForm_title,
             patient.getPnumber()));
-    }
-
-    private void retrievePatient() throws Exception {
-        patient.reload();
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("PatientViewForm.title", //$NON-NLS-1$
+        form.setText(NLS.bind(Messages.PatientViewForm_title,
             patient.getPnumber()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -75,22 +67,19 @@ public class PatientViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("patient.field.label.study")); //$NON-NLS-1$
+            Messages.patient_field_label_study);
         createdAtLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("PatientViewForm.label.createdAt")); //$NON-NLS-1$
+            Messages.PatientViewForm_label_createdAt);
         visitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("PatientViewForm.label.totalVisits")); //$NON-NLS-1$
+            Messages.PatientViewForm_label_totalVisits);
         sourceSpecimenCountLabel = createReadOnlyLabelledField(client,
-            SWT.NONE,
-            Messages.getString("PatientViewForm.label.totalSourceSpecimens")); //$NON-NLS-1$
+            SWT.NONE, Messages.PatientViewForm_label_totalSourceSpecimens);
         aliquotedSpecimenCountLabel = createReadOnlyLabelledField(client,
-            SWT.NONE,
-            Messages.getString("PatientViewForm.label.totalAliquotedSpecimens")); //$NON-NLS-1$
+            SWT.NONE, Messages.PatientViewForm_label_totalAliquotedSpecimens);
     }
 
     private void createCollectionEventSection() {
-        Section section = createSection(Messages
-            .getString("PatientViewForm.visits.title")); //$NON-NLS-1$
+        Section section = createSection(Messages.PatientViewForm_visits_title);
 
         collectionEventTable = new CollectionEventInfoTable(section,
             patient.getCollectionEventCollection(true));
@@ -113,11 +102,11 @@ public class PatientViewForm extends BiobankViewForm {
 
     @Override
     public void reload() throws Exception {
+        patient.reload();
         setValues();
-        retrievePatient();
-        setPartName(Messages.getString("PatientViewForm.title", //$NON-NLS-1$
+        setPartName(NLS.bind(Messages.PatientViewForm_title,
             patient.getPnumber()));
-        form.setText(Messages.getString("PatientViewForm.title", //$NON-NLS-1$
+        form.setText(NLS.bind(Messages.PatientViewForm_title,
             patient.getPnumber()));
         collectionEventTable.setCollection(patient
             .getCollectionEventCollection(true));

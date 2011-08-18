@@ -7,9 +7,9 @@ import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
 public class ConfirmState extends AbstractSourceProvider {
-    public final static String SESSION_STATE = "edu.ualberta.med.biobank.sourceprovider.confirmState";
-    private final static String CONFIRM_ENABLED = "confirmEnabled";
-    private final static String CONFIRM_DISABLED = "confirmDisabled";
+    public final static String SESSION_STATE = "edu.ualberta.med.biobank.sourceprovider.confirmState"; //$NON-NLS-1$
+    private final static String CONFIRM_ENABLED = "confirmEnabled"; //$NON-NLS-1$
+    private final static String CONFIRM_DISABLED = "confirmDisabled"; //$NON-NLS-1$
 
     // true for debug, false for non-debug
     boolean state;
@@ -29,6 +29,7 @@ public class ConfirmState extends AbstractSourceProvider {
 
     @Override
     public void dispose() {
+        //
     }
 
     public void setState(boolean state) {

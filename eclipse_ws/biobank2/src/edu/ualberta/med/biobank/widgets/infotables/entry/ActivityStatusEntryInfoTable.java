@@ -4,17 +4,18 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.dialogs.ActivityStatusDialog;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.infotables.ActivityStatusInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
@@ -29,7 +30,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  */
 public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(ActivityStatusEntryInfoTable.class.getName());
 
     List<ActivityStatusWrapper> selectedActivityStatus;
@@ -84,7 +85,9 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
                 try {
                     activityStatus.persist();
                 } catch (Exception e) {
-                    BiobankPlugin.openAsyncError("Save Failed", e);
+                    BgcPlugin.openAsyncError(
+                        Messages.ActivityStatusEntryInfoTable_save_error_title,
+                        e);
                 }
                 reloadCollection(selectedActivityStatus);
                 return true;
@@ -92,7 +95,10 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
                 try {
                     activityStatus.reload();
                 } catch (Exception e) {
-                    BiobankPlugin.openAsyncError("Refresh Failed", e);
+                    BgcPlugin
+                        .openAsyncError(
+                            Messages.ActivityStatusEntryInfoTable_refresh_error_title,
+                            e);
                 }
                 reloadCollection(selectedActivityStatus);
             }
@@ -124,20 +130,23 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
                 if (type != null) {
                     try {
                         if (!type.isNew() && type.isUsed()) {
-                            BiobankPlugin
+                            BgcPlugin
                                 .openError(
-                                    "Activity Status Delete Error",
-                                    "Cannot delete activity status \""
-                                        + type.getName()
-                                        + "\" since studies and/or patient visits are using it.");
+                                    Messages.ActivityStatusEntryInfoTable_delete_error_title,
+                                    NLS.bind(
+                                        Messages.ActivityStatusEntryInfoTable_delete_error_msg,
+                                        type.getName()));
                             return;
                         }
 
-                        if (!MessageDialog.openConfirm(PlatformUI
-                            .getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(), "Delete Activity Status",
-                            "Are you sure you want to delete activity status \""
-                                + type.getName() + "\"?")) {
+                        if (!MessageDialog
+                            .openConfirm(
+                                PlatformUI.getWorkbench()
+                                    .getActiveWorkbenchWindow().getShell(),
+                                Messages.ActivityStatusEntryInfoTable_delete_confirm_title,
+                                NLS.bind(
+                                    Messages.ActivityStatusEntryInfoTable_delete_confirm_msg,
+                                    type.getName()))) {
                             return;
                         }
 
@@ -147,9 +156,9 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
                         type.delete();
                         setCollection(selectedActivityStatus);
                     } catch (final RemoteConnectFailureException exp) {
-                        BiobankPlugin.openRemoteConnectErrorMessage(exp);
+                        BgcPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
-                        logger.error("BioBankFormBase.createPartControl Error",
+                        logger.error("BioBankFormBase.createPartControl Error", //$NON-NLS-1$
                             e);
                     }
                 }
@@ -163,9 +172,10 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
                 if (!selectedAs.getId().equals(type.getId())
                     && selectedAs.getName().equals(type.getName()))
                     throw new BiobankCheckException(
-                        "That activity status has already been added.");
+                        Messages.ActivityStatusEntryInfoTable_already_added_error_msg);
         } catch (BiobankException bce) {
-            BiobankPlugin.openAsyncError("Check error", bce);
+            BgcPlugin.openAsyncError(
+                Messages.ActivityStatusEntryInfoTable_check_error_title, bce);
             return false;
         }
         return true;
@@ -181,7 +191,8 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
             setLists(ActivityStatusWrapper
                 .getAllActivityStatuses(SessionManager.getAppService()));
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError("AppService unavailable", e);
+            BgcPlugin.openAsyncError(Messages.ActivityStatusEntryInfoTable_11,
+                e);
         }
     }
 

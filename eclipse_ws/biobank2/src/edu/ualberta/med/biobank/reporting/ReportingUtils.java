@@ -30,6 +30,7 @@ import net.sf.jasperreports.engine.export.JRPrintServiceExporterParameter;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.printing.PrintDialog;
 import org.eclipse.swt.printing.PrinterData;
@@ -38,7 +39,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-import ar.com.fdvs.dj.core.DynamicJasperHelper;
 import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
 import ar.com.fdvs.dj.domain.AutoText;
 import ar.com.fdvs.dj.domain.Style;
@@ -47,44 +47,68 @@ import ar.com.fdvs.dj.domain.constants.Border;
 import ar.com.fdvs.dj.domain.constants.Font;
 import ar.com.fdvs.dj.domain.constants.Transparency;
 import ar.com.fdvs.dj.domain.constants.VerticalAlign;
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.Holder;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class ReportingUtils {
 
-    public static Font sansSerif = new Font(Font.MEDIUM, "SansSerif", false);
+    private static final String FILE_URI = "file://"; //$NON-NLS-1$
 
-    public static Font sansSerifBold = new Font(Font.MEDIUM, "SansSerif", true);
+    private static final String CSV_EXTENSION = ".csv"; //$NON-NLS-1$
+
+    private static final String PDF_EXTENSION = ".pdf"; //$NON-NLS-1$
+
+    public static final String SANSSERIF_TXT = "SansSerif"; //$NON-NLS-1$
+
+    public static Font sansSerif = new Font(Font.MEDIUM, SANSSERIF_TXT, false);
+
+    public static Font sansSerifBold = new Font(Font.MEDIUM, SANSSERIF_TXT,
+        true);
+
+    public static final String JASPER_FILE_NAME = "BasicReport.jrxml"; //$NON-NLS-1$
+
+    public static final String JASPER_FILE_EXTENSION = ".jrxml"; //$NON-NLS-1$
 
     public static PrinterData data;
 
+    /**
+     * if userIntegerProperties is set to true, then the map contained inside
+     * 'list' should be contain [{0=value}, {1=value}...] instead of
+     * [{name=value}...] (see issue #1312)
+     */
     public static JasperPrint createDynamicReport(String reportName,
-        List<String> description, List<String> columnInfo, List<?> list)
-        throws Exception {
+        List<String> description, List<String> columnInfo, List<?> list,
+        boolean useIntegerProperties) throws Exception {
 
         FastReportBuilder drb = new FastReportBuilder();
         for (int i = 0; i < columnInfo.size(); i++) {
-            drb.addColumn(columnInfo.get(i), columnInfo.get(i), String.class,
-                40, false).setPrintBackgroundOnOddRows(true)
-                .setUseFullPageWidth(true);
+            String title = columnInfo.get(i);
+            String property = title;
+            if (useIntegerProperties)
+                property = String.valueOf(i);
+            drb.addColumn(title, property, String.class, 40, false)
+                .setPrintBackgroundOnOddRows(true).setUseFullPageWidth(true);
         }
 
         String infos = StringUtils.join(description,
-            System.getProperty("line.separator"));
+            System.getProperty("line.separator")); //$NON-NLS-1$
 
         Map<String, Object> fields = new HashMap<String, Object>();
-        fields.put("title", reportName);
-        fields.put("infos", infos);
-        URL reportURL = ReportingUtils.class.getResource("BasicReport.jrxml");
+        fields.put("title", reportName); //$NON-NLS-1$
+        fields.put("infos", infos); //$NON-NLS-1$
+        URL reportURL = ReportingUtils.class.getResource(JASPER_FILE_NAME);
         if (reportURL == null) {
-            throw new Exception("No report available with name BasicReport");
+            throw new Exception(NLS.bind(
+                Messages.ReportingUtils_jasperfile_error_msg,
+                JASPER_FILE_NAME.replaceAll(JASPER_FILE_EXTENSION, ""))); //$NON-NLS-1$
         }
         drb.setTemplateFile(reportURL.getFile());
         drb.addAutoText(AutoText.AUTOTEXT_PAGE_X_OF_Y,
             AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_RIGHT, 200, 40);
         drb.addAutoText(
-            "Printed on " + DateFormatter.formatAsDateTime(new Date()),
+            NLS.bind(Messages.ReportingUtils_footer_print_msg,
+                DateFormatter.formatAsDateTime(new Date())),
             AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_LEFT, 200);
 
         Style headerStyle = new Style();
@@ -107,9 +131,10 @@ public class ReportingUtils {
     public static JasperPrint createStandardReport(String reportName,
         Map<String, Object> parameters, List<?> list) throws Exception {
         InputStream reportStream = ReportingUtils.class
-            .getResourceAsStream(reportName + ".jrxml");
+            .getResourceAsStream(reportName + JASPER_FILE_EXTENSION);
         if (reportStream == null) {
-            throw new Exception("No report available with name " + reportName);
+            throw new Exception(NLS.bind(
+                Messages.ReportingUtils_jasperfile_error_msg, reportName));
         }
         JasperDesign jdesign = JRXmlLoader.load(reportStream);
         JasperReport report = JasperCompileManager.compileReport(jdesign);
@@ -120,15 +145,14 @@ public class ReportingUtils {
     public static void saveReport(JasperPrint jasperPrint, String path)
         throws Exception {
         if (path == null)
-            throw new Exception("Printing Canceled.");
+            throw new Exception(Messages.ReportingUtils_cancel_error_msg);
 
-        String prefix = "file://";
-        if (path.startsWith(prefix)) {
-            path = path.substring(prefix.length());
+        if (path.startsWith(FILE_URI)) {
+            path = path.substring(FILE_URI.length());
         }
-        if (path.endsWith(".pdf")) {
+        if (path.endsWith(PDF_EXTENSION)) {
             JasperExportManager.exportReportToPdfFile(jasperPrint, path);
-        } else if (path.endsWith(".csv")) {
+        } else if (path.endsWith(CSV_EXTENSION)) {
             JRExporter csvExporter = new JRCsvExporter();
             csvExporter.setParameter(JRExporterParameter.JASPER_PRINT,
                 jasperPrint);
@@ -136,8 +160,7 @@ public class ReportingUtils {
                 path));
             csvExporter.exportReport();
         } else {
-            throw new Exception(
-                "Not a valid extension. Please use 'pdf' or 'csv'.");
+            throw new Exception(Messages.ReportingUtils_extension_error_msg);
         }
     }
 
@@ -176,12 +199,11 @@ public class ReportingUtils {
                 exporter.exportReport();
             } catch (JRException e) {
                 throw new Exception(
-                    "Printing Canceled. Check your printer settings and try again.");
+                    Messages.ReportingUtils_jasper_printing_error_msg);
             }
         } else {
-            throw new Exception(
-                "Error with printer - No Print Service found with name "
-                    + data.name);
+            throw new Exception(NLS.bind(
+                Messages.ReportingUtils_printer_error_msg, data.name));
         }
     }
 
@@ -191,15 +213,15 @@ public class ReportingUtils {
 
         // data.fileName is typically "FILE:" instead of null.
 
-        if (data.fileName != null && data.fileName.endsWith(".pdf")) {
+        if (data.fileName != null && data.fileName.endsWith(PDF_EXTENSION)) {
             fileName = data.fileName;
         } else {
             // on windows a custom dialog is required to print to file.
             FileDialog fd = new FileDialog(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(), SWT.SAVE);
             fd.setOverwrite(true);
-            fd.setText("Print document to Pdf file.");
-            String[] filterExt = { "*.pdf" };
+            fd.setText(Messages.ReportingUtils_pdf_file_msg);
+            String[] filterExt = { "*" + PDF_EXTENSION }; //$NON-NLS-1$
             fd.setFilterExtensions(filterExt);
             fd.setFileName(DateFormatter.formatAsDateTime(new Date()));
             final String path = fd.open();
@@ -210,14 +232,14 @@ public class ReportingUtils {
             return;
         }
 
-        if (fileName.endsWith(".pdf")) {
-            String prefix = "file://";
-            if (fileName.startsWith(prefix)) {
-                fileName = fileName.substring(prefix.length());
+        if (fileName.endsWith(PDF_EXTENSION)) {
+            if (fileName.startsWith(FILE_URI)) {
+                fileName = fileName.substring(FILE_URI.length());
             }
             JasperExportManager.exportReportToPdfFile(jasperPrint, fileName);
         } else {
-            throw new Exception("Can't save to file type " + fileName);
+            throw new Exception(NLS.bind(
+                Messages.ReportingUtils_file_type_error_msg, fileName));
         }
     }
 
@@ -235,7 +257,7 @@ public class ReportingUtils {
                 PrintDialog dialog = new PrintDialog(shell, SWT.NONE);
                 PrinterData data = dialog.open();
 
-                // if data is null : user cancled print.
+                // if data is null : user cancelled print.
 
                 if (data != null) {
                     try {
@@ -245,12 +267,12 @@ public class ReportingUtils {
                             try {
                                 printViaPrinter(data, jasperPrint);
                             } catch (Exception e) {
-                                BiobankPlugin.openAsyncError(
-                                    "Printing Error",
-                                    "Error: "
-                                        + e.toString()
-                                        + "\n\n"
-                                        + "Select a file location to export the printed page.");
+                                BgcPlugin
+                                    .openAsyncError(
+                                        Messages.ReportingUtils_printing_error_title,
+                                        null,
+                                        e,
+                                        Messages.ReportingUtils_printing_error_msg);
                                 printViaFile(data, jasperPrint);
                             }
                         }

@@ -4,8 +4,8 @@ import java.io.File;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -17,11 +17,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.utils.FilePromptUtil;
 
-public class ActivityLogLocationDialog extends BiobankDialog {
+public class ActivityLogLocationDialog extends BgcBaseDialog {
 
     private Text activityLogDirText;
 
@@ -35,17 +35,17 @@ public class ActivityLogLocationDialog extends BiobankDialog {
 
     @Override
     protected String getDialogShellTitle() {
-        return "Activity Logs Location";
+        return Messages.ActivityLogLocationDialog_title;
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Do you wish to save activity logs to files?";
+        return Messages.ActivityLogLocationDialog_description;
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return "Activity Logs Location";
+        return Messages.ActivityLogLocationDialog_title;
     }
 
     @Override
@@ -59,10 +59,10 @@ public class ActivityLogLocationDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         activityLogDirBtn = new Button(contents, SWT.CHECK);
-        activityLogDirBtn.setText("Save activity logs to files");
+        activityLogDirBtn
+            .setText(Messages.ActivityLogLocationDialog_button_save_label);
         activityLogDirBtn.setSelection(true);
-        activityLogDirBtn.addSelectionListener(new SelectionListener() {
-
+        activityLogDirBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
 
@@ -70,12 +70,9 @@ public class ActivityLogLocationDialog extends BiobankDialog {
                 activityLogDirText.setEditable(saveActivityLogs);
                 browseBtn.setEnabled(saveActivityLogs);
             }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
         });
-        createFileLocationSelector(contents, "Folder");
+        createFileLocationSelector(contents,
+            Messages.ActivityLogLocationDialog_folder_selection_label);
     }
 
     private void createFileLocationSelector(final Composite parent,
@@ -88,36 +85,32 @@ public class ActivityLogLocationDialog extends BiobankDialog {
 
         createLabel(fileSelectionComposite, labelText);
 
-        final String biobank2Dir = System.getProperty("user.home")
-            + System.getProperty("file.separator") + "biobank2";
+        final String biobankDir = System.getProperty("user.home") //$NON-NLS-1$
+            + System.getProperty("file.separator") + "biobank"; //$NON-NLS-1$ //$NON-NLS-2$
         activityLogDirText = new Text(fileSelectionComposite, SWT.BORDER
             | SWT.FILL);
         activityLogDirText.setLayoutData(new GridData(GridData.FILL,
             GridData.FILL, true, false));
-        activityLogDirText.setText(biobank2Dir);
+        activityLogDirText.setText(biobankDir);
 
         browseBtn = new Button(fileSelectionComposite, SWT.BUTTON1);
-        browseBtn.setText("  Browse...  ");
-        browseBtn.addSelectionListener(new SelectionListener() {
-
+        browseBtn
+            .setText(Messages.ActivityLogLocationDialog_browse_button_label);
+        browseBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 DirectoryDialog fd = new DirectoryDialog(fileSelectionComposite
                     .getShell(), SWT.SAVE);
-                fd.setText("Select Directory");
-                fd.setFilterPath(biobank2Dir);
+                fd.setText(Messages.ActivityLogLocationDialog_directory_select_label);
+                fd.setFilterPath(biobankDir);
                 String selected = fd.open();
                 if (selected != null) {
                     activityLogDirText.setText(selected);
                     File f = new File(selected);
                     f.canWrite();
                 } else {
-                    activityLogDirText.setText("");
+                    activityLogDirText.setText(""); //$NON-NLS-1$
                 }
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
     }
@@ -152,7 +145,7 @@ public class ActivityLogLocationDialog extends BiobankDialog {
             BiobankPlugin
                 .getDefault()
                 .getPreferenceStore()
-                .setValue(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, "");
+                .setValue(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, ""); //$NON-NLS-1$
             BiobankPlugin
                 .getDefault()
                 .getPreferenceStore()
@@ -166,7 +159,7 @@ public class ActivityLogLocationDialog extends BiobankDialog {
 
     private Label createLabel(Composite parent, String labelText) {
         Label label = new Label(parent, SWT.NONE);
-        label.setText(labelText + ": ");
+        label.setText(labelText + ": "); //$NON-NLS-1$
         label.setLayoutData(new GridData(GridData.END, GridData.CENTER, false,
             false));
         return label;

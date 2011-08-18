@@ -3,20 +3,25 @@ package edu.ualberta.med.biobank.common.scanprocess;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 
 public enum CellStatus implements NotAProxy {
-    NOT_INITIALIZED("Not Initialized"), INITIALIZED("Initialized"), FULL("Full"), FREE_LOCATIONS(
-        "Free locations"), EMPTY("Empty"), FILLED("Filled"), NEW("New"), MOVED(
-        "Moved"), MISSING("Missing"), ERROR("Error"), NO_TYPE("No type"), TYPE(
-        "Type"), IN_SHIPMENT_EXPECTED("Expected"), IN_SHIPMENT_ADDED("Added"), DUPLICATE_SCAN(
-        "Already Scanned"), IN_SHIPMENT_RECEIVED("Received"), EXTRA("Extra");
+    NOT_INITIALIZED,
+    INITIALIZED,
+    FULL,
+    FREE_LOCATIONS,
+    EMPTY,
+    FILLED,
+    NEW,
+    MOVED,
+    MISSING,
+    ERROR,
+    NO_TYPE,
+    TYPE,
+    IN_SHIPMENT_EXPECTED,
+    IN_SHIPMENT_ADDED,
+    DUPLICATE_SCAN,
+    IN_SHIPMENT_RECEIVED,
+    EXTRA;
 
-    private String legend;
-
-    private CellStatus(String legend) {
-        this.legend = legend;
-    }
-
-    public String getLegend() {
-        return legend;
+    private CellStatus() {
     }
 
     public CellStatus mergeWith(CellStatus newStatus) {

@@ -1,19 +1,5 @@
 package edu.ualberta.med.biobank.test;
 
-import edu.ualberta.med.biobank.common.VarCharLengths;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.CheckFieldLimitsException;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.StringValueLengthServerException;
-import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.DispatchHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentInfoHelper;
-import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
-import edu.ualberta.med.biobank.test.internal.SiteHelper;
-import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
-import edu.ualberta.med.biobank.test.internal.StudyHelper;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,8 +12,22 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
+import edu.ualberta.med.biobank.common.VarCharLengths;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.CheckFieldLimitsException;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.StringValueLengthServerException;
+import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.DispatchHelper;
+import edu.ualberta.med.biobank.test.internal.ShipmentInfoHelper;
+import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
+import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
+import edu.ualberta.med.biobank.test.internal.StudyHelper;
+
 public class TestDatabase {
-    protected static WritableApplicationService appService;
+    protected static BiobankApplicationService appService;
 
     protected Random r;
 

@@ -4,23 +4,24 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class CollectionEventAdapter extends AdapterBase {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(CollectionEventAdapter.class.getName());
 
     public CollectionEventAdapter(AdapterBase parent,
@@ -29,55 +30,59 @@ public class CollectionEventAdapter extends AdapterBase {
         setEditable(parent instanceof PatientAdapter || parent == null);
     }
 
-    public CollectionEventWrapper getWrapper() {
-        return (CollectionEventWrapper) modelObject;
-    }
-
     @Override
     protected String getLabelInternal() {
-        CollectionEventWrapper cevent = getWrapper();
-        Assert.isNotNull(cevent, "collection event is null");
-        StringBuilder name = new StringBuilder(cevent.getPatient().getPnumber())
-            .append(" - #").append(cevent.getVisitNumber());
-
+        CollectionEventWrapper cevent = (CollectionEventWrapper) getModelObject();
+        Assert.isNotNull(cevent, "collection event is null"); //$NON-NLS-1$
         long count = -1;
         try {
             count = cevent.getSourceSpecimensCount(false);
         } catch (Exception e) {
-            logger.error("Problem counting specimens", e);
+            logger.error("Problem counting specimens", e); //$NON-NLS-1$
         }
-        return name.append(" [").append(count).append("]").toString();
+        return new StringBuilder("#") //$NON-NLS-1$ 
+            .append(cevent.getVisitNumber()).append(" - ") //$NON-NLS-1$ 
+            .append(
+                DateFormatter.formatAsDateTime(cevent
+                    .getMinSourceSpecimenDate())).append(" [").append(count) //$NON-NLS-1$ 
+            .append("]").toString(); //$NON-NLS-1$ 
     }
 
     @Override
     public String getTooltipText() {
-        String tabName;
-        if (modelObject.isNew()) {
-            tabName = Messages.getString("CollectionEventEntryForm.title.new");
-            try {
-                ((CollectionEventWrapper) modelObject)
-                    .setActivityStatus(ActivityStatusWrapper
-                        .getActiveActivityStatus(SessionManager.getAppService()));
-            } catch (Exception e) {
-                BiobankPlugin.openAsyncError("Error",
-                    "Unable to create collection event.");
+        String tabName = null;
+        CollectionEventWrapper cEvent = (CollectionEventWrapper) getModelObject();
+        if (cEvent != null)
+            if (cEvent.isNew()) {
+                tabName = Messages.CollectionEventEntryForm_title_new;
+                try {
+                    cEvent
+                        .setActivityStatus(ActivityStatusWrapper
+                            .getActiveActivityStatus(SessionManager
+                                .getAppService()));
+                } catch (Exception e) {
+                    BgcPlugin.openAsyncError(
+                        Messages.CollectionEventAdapter_error_title,
+                        Messages.CollectionEventAdapter_create_error_msg);
+                }
+            } else {
+                tabName = NLS.bind(
+                    Messages.CollectionEventEntryForm_title_edit,
+                    cEvent.getVisitNumber());
             }
-        } else
-            tabName = Messages.getString("CollectionEventEntryForm.title.edit",
-                ((CollectionEventWrapper) modelObject).getVisitNumber());
         return tabName;
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Collection Event");
-        addViewMenu(menu, "Collection Event");
-        addDeleteMenu(menu, "Collection Event");
+        addEditMenu(menu, Messages.CollectionEventAdapter_cevent_label);
+        addViewMenu(menu, Messages.CollectionEventAdapter_cevent_label);
+        addDeleteMenu(menu, Messages.CollectionEventAdapter_cevent_label);
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this collection event?";
+        return Messages.CollectionEventAdapter_delete_confirm_msg;
     }
 
     @Override

@@ -30,17 +30,21 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
             return StringUtils.join(
                 new String[] { DateFormatter.formatAsDate(dispatchTime),
                     DateFormatter.formatAsDate(dateReceived), waybill, dstatus,
-                    astatus }, "\t");
+                    astatus }, "\t"); //$NON-NLS-1$
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Dispatch Time",
-        "Date Received", "Waybill", "Dispatch State", "Specimen State" };
+    private static final String[] HEADINGS = new String[] {
+        Messages.DispatchInfoTable_time_label,
+        Messages.DispatchInfoTable_received_label,
+        Messages.DispatchInfoTable_waybill_label,
+        Messages.DispatchInfoTable_state_label,
+        Messages.DispatchInfoTable_spec_state_label };
 
     private boolean editMode = false;
 
     public DispatchInfoTable(Composite parent, SpecimenWrapper a) {
-        super(parent, null, HEADINGS, 15);
+        super(parent, null, HEADINGS, 15, DispatchWrapper.class);
         this.a = a;
         setCollection(a.getDispatches());
     }
@@ -58,9 +62,9 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.DispatchInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
@@ -74,7 +78,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                 case 4:
                     return info.astatus;
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };
@@ -85,12 +89,15 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         throws Exception {
         TableRowData info = new TableRowData();
         info.ds = ds;
-        info.dispatchTime = ds.getShipmentInfo().getPackedAt();
-        info.dateReceived = ds.getShipmentInfo().getReceivedAt();
+        info.dispatchTime = ds.getShipmentInfo() == null ? null : ds
+            .getShipmentInfo().getPackedAt();
+        info.dateReceived = ds.getShipmentInfo() == null ? null : ds
+            .getShipmentInfo().getReceivedAt();
         info.dstatus = ds.getStateDescription();
         info.astatus = ds.getDispatchSpecimen(a.getInventoryId())
             .getStateDescription();
-        info.waybill = ds.getShipmentInfo().getWaybill();
+        info.waybill = ds.getShipmentInfo() == null ? null : ds
+            .getShipmentInfo().getWaybill();
         return info;
     }
 

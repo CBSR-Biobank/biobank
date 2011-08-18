@@ -12,14 +12,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
 
-public class SelectStudyDialog extends BiobankDialog {
+public class SelectStudyDialog extends BgcBaseDialog {
 
     public static final int ADD_BTN_ID = 100;
-
-    private static final String TITLE = "Associated Studies";
 
     private StudyInfoTable studyInfoTable;
 
@@ -34,17 +32,17 @@ public class SelectStudyDialog extends BiobankDialog {
 
     @Override
     protected String getDialogShellTitle() {
-        return TITLE;
+        return Messages.SelectStudyDialog_dialog_title;
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Select a study";
+        return Messages.SelectStudyDialog_main_message;
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return "Add a study to this site";
+        return Messages.SelectStudyDialog_main_title;
     }
 
     @Override

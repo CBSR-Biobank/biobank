@@ -12,14 +12,16 @@ import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.forms.linkassign.AbstractSpecimenAdminForm;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 
-public class CancelConfirmWidget extends BiobankWidget {
+public class CancelConfirmWidget extends BgcBaseWidget {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(CancelConfirmWidget.class.getName());
 
-    private BiobankText confirmCancelText;
+    private BgcBaseText confirmCancelText;
 
     private Button confirmButton;
 
@@ -43,8 +45,9 @@ public class CancelConfirmWidget extends BiobankWidget {
     }
 
     private void createContents() {
-        form.getToolkit().createLabel(this, "Cancel/Confirm barcode:");
-        confirmCancelText = new BiobankText(this, SWT.NONE, form.getToolkit());
+        form.getToolkit().createLabel(this,
+            Messages.CancelConfirmWidget_cancelconfirm_label);
+        confirmCancelText = new BgcBaseText(this, SWT.NONE, form.getToolkit());
         confirmCancelText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         GridData gd = new GridData();
         gd.widthHint = 100;
@@ -72,7 +75,8 @@ public class CancelConfirmWidget extends BiobankWidget {
             }
         });
 
-        cancelButton = form.getToolkit().createButton(this, "Cancel", SWT.PUSH);
+        cancelButton = form.getToolkit().createButton(this,
+            Messages.CancelConfirmWidget_cancel_label, SWT.PUSH);
         cancelButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -84,8 +88,8 @@ public class CancelConfirmWidget extends BiobankWidget {
             }
         });
 
-        confirmButton = form.getToolkit().createButton(this, "Confirm",
-            SWT.PUSH);
+        confirmButton = form.getToolkit().createButton(this,
+            Messages.CancelConfirmWidget_confirm_label, SWT.PUSH);
         confirmButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -114,7 +118,7 @@ public class CancelConfirmWidget extends BiobankWidget {
     }
 
     public void reset() {
-        confirmCancelText.setText("");
+        confirmCancelText.setText(""); //$NON-NLS-1$
     }
 
     @Override

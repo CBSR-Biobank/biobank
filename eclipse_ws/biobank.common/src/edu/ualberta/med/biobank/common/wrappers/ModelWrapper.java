@@ -894,9 +894,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         R newValue = (wrapper == null ? null : wrapper.getWrappedObject());
 
         modelWrapper.elementTracker.trackProperty(property);
-
-        setProperty(modelWrapper, property, newValue);
-        modelWrapper.cacheProperty(property, wrapper);
+        setProperty(modelWrapper, property, newValue, wrapper);
     }
 
     public <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
@@ -914,9 +912,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         modelWrapper.elementTracker.trackCollection(property);
-
-        setModelProperty(modelWrapper, property, newValues);
-        modelWrapper.cacheProperty(property, wrappers);
+        setModelProperty(modelWrapper, property, newValues, wrappers);
     }
 
     protected <W extends ModelWrapper<? extends R>, R> List<W> getWrapperCollection(
@@ -1021,8 +1017,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             false);
 
         if (!currentWrappers.containsAll(wrappersToRemove)) {
-            throw new BiobankCheckException(
-                "studies are not associated with site ");
+            throw new BiobankCheckException("object not in list");
         }
 
         removeFromWrapperCollection(property, wrappersToRemove);
@@ -1050,13 +1045,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     protected <T> void setProperty(Property<T, ? super E> property, T newValue) {
-        setProperty(this, property, newValue);
+        setProperty(this, property, newValue, newValue);
     }
 
     private <T, M> void setProperty(ModelWrapper<M> modelWrapper,
-        Property<T, ? super M> property, T newValue) {
-        setModelProperty(modelWrapper, property, newValue);
-        modelWrapper.cacheProperty(property, newValue);
+        Property<T, ? super M> property, T newValue, Object valueToCache) {
+        setModelProperty(modelWrapper, property, newValue, valueToCache);
     }
 
     private static <T, M> T getModelProperty(ModelWrapper<M> modelWrapper,
@@ -1107,8 +1101,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return Hibernate.isPropertyInitialized(model, property.getName());
     }
 
-    private <T, M> void setModelProperty(ModelWrapper<M> modelWrapper,
-        Property<T, ? super M> property, T newValue) {
+    private <T, M, R> void setModelProperty(ModelWrapper<M> modelWrapper,
+        Property<T, ? super M> property, T newValue, R valueForCache) {
         M model = modelWrapper.getWrappedObject();
 
         // TODO: whenever a property is set, the old value is retrieved from
@@ -1120,6 +1114,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         property.set(model, newValue);
 
+        // need to add into cache before the firePropertyChange is called
+        // because its will call the getters that refers to the cache
+        modelWrapper.cacheProperty(property, valueForCache);
         propertyChangeSupport.firePropertyChange(property.getName(), oldValue,
             newValue);
     }
@@ -1189,5 +1186,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     protected WrapperChecker<E> check() {
         return preChecker;
+    }
+
+    public static <T> void persistBatch(Set<? extends ModelWrapper<T>> wrappers)
+        throws Exception {
+        // FIXME once the persist method is using batch queries, we should use
+        // batch queries here
+        for (ModelWrapper<T> wrapper : wrappers) {
+            wrapper.persist();
+        }
     }
 }

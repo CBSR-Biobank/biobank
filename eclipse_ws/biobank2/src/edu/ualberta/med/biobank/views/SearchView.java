@@ -20,23 +20,20 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISourceProviderListener;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.services.ISourceProviderService;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.sourceproviders.SessionState;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.BgcSessionState;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.utils.SearchType;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class SearchView extends ViewPart {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.SearchView";
+    public static final String ID = "edu.ualberta.med.biobank.views.SearchView"; //$NON-NLS-1$
 
-    private BiobankText searchText;
+    private BgcBaseText searchText;
     private ComboViewer searchTypeCombo;
 
     private Button searchButton;
@@ -46,15 +43,9 @@ public class SearchView extends ViewPart {
     @Override
     public void createPartControl(Composite parent) {
         parent.setLayout(new GridLayout(2, false));
-
-        IWorkbenchWindow window = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow();
-        ISourceProviderService service = (ISourceProviderService) window
-            .getService(ISourceProviderService.class);
-
         // listen to login state
-        SessionState sessionSourceProvider = (SessionState) service
-            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
+        BgcSessionState sessionSourceProvider = BgcPlugin
+            .getSessionStateSourceProvider();
         sessionSourceProvider
             .addSourceProviderListener(new ISourceProviderListener() {
 
@@ -66,8 +57,10 @@ public class SearchView extends ViewPart {
                 @Override
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
-                    if (sourceName.equals(SessionState.LOGIN_STATE_SOURCE_NAME)) {
-                        loggedIn = sourceValue.equals(SessionState.LOGGED_IN);
+                    if (sourceName
+                        .equals(BgcSessionState.SESSION_STATE_SOURCE_NAME)) {
+                        loggedIn = sourceValue
+                            .equals(BgcSessionState.LOGGED_IN);
                         setEnabled();
                     }
                 }
@@ -93,11 +86,11 @@ public class SearchView extends ViewPart {
                         .getFirstElement();
                     searchText
                         .setEnabled(searchType != SearchType.SPECIMEN_NON_ACTIVE);
-                    searchText.setText("");
+                    searchText.setText(""); //$NON-NLS-1$
                 }
             });
 
-        searchText = new BiobankText(parent, SWT.NONE);
+        searchText = new BgcBaseText(parent, SWT.NONE);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;
@@ -112,7 +105,7 @@ public class SearchView extends ViewPart {
         });
 
         searchButton = new Button(parent, SWT.PUSH);
-        searchButton.setText("Search");
+        searchButton.setText(Messages.SearchView_search_label);
         searchButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -121,8 +114,8 @@ public class SearchView extends ViewPart {
         });
 
         loggedIn = sessionSourceProvider.getCurrentState()
-            .get(SessionState.LOGIN_STATE_SOURCE_NAME)
-            .equals(SessionState.LOGGED_IN);
+            .get(BgcSessionState.SESSION_STATE_SOURCE_NAME)
+            .equals(BgcSessionState.LOGGED_IN);
         setEnabled();
 
     }
@@ -152,11 +145,11 @@ public class SearchView extends ViewPart {
                     if (res != null && res.size() > 0) {
                         type.processResults(res);
                     } else {
-                        BiobankPlugin.openInformation("Search Result",
-                            "no result");
+                        BgcPlugin.openInformation(Messages.SearchView_noresult_dialog_title,
+                            Messages.SearchView_noresult__dialog_msg);
                     }
                 } catch (Exception ex) {
-                    BiobankPlugin.openAsyncError("Search error", ex);
+                    BgcPlugin.openAsyncError(Messages.SearchView_search_error_title, ex);
                 }
             }
         });

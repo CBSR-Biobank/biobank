@@ -9,21 +9,20 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 /**
- * Allows the user to move a container and its contents to a new location
+ * Allows the user to select a parent container when more than one is available
  */
 
-public class SelectParentContainerDialog extends BiobankDialog {
+public class SelectParentContainerDialog extends BgcBaseDialog {
     private Collection<ContainerWrapper> containers;
     private ComboViewer comboViewer;
     protected ContainerWrapper selectedContainer;
@@ -37,24 +36,17 @@ public class SelectParentContainerDialog extends BiobankDialog {
 
     @Override
     protected String getDialogShellTitle() {
-        return "Select Parent Container";
+        return Messages.SelectParentContainerDialog_dialog_title;
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Select the appropriate parent container";
+        return Messages.SelectParentContainerDialog_description;
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return "Multiple Parents are Possible";
-    }
-
-    @Override
-    protected Image getTitleAreaImage() {
-        // FIXME shoould use another icon
-        return BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_COMPUTER_KEY);
+        return Messages.SelectParentContainerDialog_main_title;
     }
 
     @Override
@@ -64,8 +56,10 @@ public class SelectParentContainerDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         comboViewer = getWidgetCreator().createComboViewer(contents,
-            "Select parent", containers, null,
-            "A container should be selected", null);
+            Messages.SelectParentContainerDialog_select_label, containers,
+            null,
+            Messages.SelectParentContainerDialog_select_validation_error_msg,
+            null, new BiobankLabelProvider());
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
@@ -75,15 +69,18 @@ public class SelectParentContainerDialog extends BiobankDialog {
                 ContainerWrapper parent = container.getParentContainer();
                 boolean hasParents = parent != null;
                 if (hasParents)
-                    text.append(" (Parents: ");
+                    text.append(" (") //$NON-NLS-1$  
+                        .append(
+                            Messages.SelectParentContainerDialog_parents_list_label)
+                        .append(": "); //$NON-NLS-1$  
                 while (parent != null) {
                     text.append(parent.getFullInfoLabel());
                     parent = parent.getParentContainer();
                     if (parent != null)
-                        text.append("; ");
+                        text.append("; "); //$NON-NLS-1$
                 }
                 if (hasParents)
-                    text.append(")");
+                    text.append(")"); //$NON-NLS-1$
                 return text.toString();
             }
         });

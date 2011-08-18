@@ -4,6 +4,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.FillLayout;
@@ -13,39 +14,36 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
-import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 
 public class ContainerTypeViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeViewForm"; //$NON-NLS-1$
 
-    private ContainerTypeAdapter containerTypeAdapter;
-
     private ContainerTypeWrapper containerType;
 
-    private BiobankText siteLabel;
+    private BgcBaseText siteLabel;
 
-    private BiobankText nameLabel;
+    private BgcBaseText nameLabel;
 
-    private BiobankText nameShortLabel;
+    private BgcBaseText nameShortLabel;
 
     private Button isTopLevelButton;
 
-    private BiobankText rowCapacityLabel;
+    private BgcBaseText rowCapacityLabel;
 
-    private BiobankText colCapacityLabel;
+    private BgcBaseText colCapacityLabel;
 
-    private BiobankText defaultTempLabel;
+    private BgcBaseText defaultTempLabel;
 
-    private BiobankText numSchemeLabel;
+    private BgcBaseText numSchemeLabel;
 
-    private BiobankText activityStatusLabel;
+    private BgcBaseText activityStatusLabel;
 
-    private BiobankText commentLabel;
+    private BgcBaseText commentLabel;
 
     private ListViewer sampleTypesViewer;
 
@@ -61,20 +59,14 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        containerTypeAdapter = (ContainerTypeAdapter) adapter;
-        containerType = containerTypeAdapter.getContainerType();
-        retrieveContainerType();
-        setPartName(Messages.getString("ContainerTypeViewForm.title", //$NON-NLS-1$
+        containerType = (ContainerTypeWrapper) getModelObject();
+        setPartName(NLS.bind(Messages.ContainerTypeViewForm_title,
             containerType.getName()));
-    }
-
-    private void retrieveContainerType() throws Exception {
-        containerType.reload();
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("ContainerTypeViewForm.title", //$NON-NLS-1$
+        form.setText(NLS.bind(Messages.ContainerTypeViewForm_title,
             containerType.getName()));
         page.setLayout(new GridLayout(1, false));
 
@@ -102,25 +94,25 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("containerType.field.label.site")); //$NON-NLS-1$
+            Messages.containerType_field_label_site);
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.name")); //$NON-NLS-1$
+            Messages.label_name);
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.nameShort")); //$NON-NLS-1$
+            Messages.label_nameShort);
         isTopLevelButton = (Button) createLabelledWidget(client, Button.class,
-            SWT.NONE, Messages.getString("containerType.field.label.topLevel")); //$NON-NLS-1$
+            SWT.NONE, Messages.containerType_field_label_topLevel);
         rowCapacityLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("containerType.field.label.rows")); //$NON-NLS-1$
+            Messages.containerType_field_label_rows);
         colCapacityLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("containerType.field.label.cols")); //$NON-NLS-1$
+            Messages.containerType_field_label_cols);
         defaultTempLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("containerType.field.label.temperature")); //$NON-NLS-1$
+            Messages.containerType_field_label_temperature);
         numSchemeLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("containerType.field.label.scheme")); //$NON-NLS-1$
+            Messages.containerType_field_label_scheme);
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("label.activity")); //$NON-NLS-1$
+            Messages.label_activity);
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.getString("label.comments")); //$NON-NLS-1$
+            Messages.label_comments);
 
         setContainerTypeValues();
     }
@@ -133,8 +125,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setTextValue(rowCapacityLabel, containerType.getRowCapacity());
         setTextValue(colCapacityLabel, containerType.getColCapacity());
         setTextValue(defaultTempLabel, containerType.getDefaultTemperature());
-        setTextValue(
-            numSchemeLabel,
+        setTextValue(numSchemeLabel,
             containerType.getChildLabelingScheme() == null ? "" : containerType //$NON-NLS-1$
                 .getChildLabelingSchemeName());
         setTextValue(activityStatusLabel, containerType.getActivityStatus());
@@ -142,15 +133,14 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     private void createSpecimenTypesSection() {
-        Composite client = createSectionWithClient(Messages
-            .getString("ContainerTypeViewForm.specimens.title")); //$NON-NLS-1$
+        Composite client = createSectionWithClient(Messages.ContainerTypeViewForm_specimens_title);
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
         layout.horizontalSpacing = 10;
         toolkit.paintBordersFor(client);
 
         Label label = toolkit.createLabel(client,
-            Messages.getString("ContainerTypeViewForm.specimens.label")); //$NON-NLS-1$
+            Messages.ContainerTypeViewForm_specimens_label);
         label
             .setLayoutData(new GridData(SWT.LEFT, SWT.BEGINNING, false, false));
 
@@ -177,15 +167,14 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     private void createChildContainerTypesSection() {
-        Composite client = createSectionWithClient(Messages
-            .getString("ContainerTypeViewForm.types.title")); //$NON-NLS-1$
+        Composite client = createSectionWithClient(Messages.ContainerTypeViewForm_types_title);
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
         layout.horizontalSpacing = 10;
         toolkit.paintBordersFor(client);
 
         Label label = toolkit.createLabel(client,
-            Messages.getString("ContainerTypeViewForm.types.label")); //$NON-NLS-1$
+            Messages.ContainerTypeViewForm_types_label);
         label
             .setLayoutData(new GridData(SWT.LEFT, SWT.BEGINNING, false, false));
 
@@ -202,8 +191,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     protected void createVisualizeContainer() {
-        Composite containerSection = createSectionWithClient(Messages
-            .getString("ContainerTypeViewForm.visual")); //$NON-NLS-1$
+        Composite containerSection = createSectionWithClient(Messages.ContainerTypeViewForm_visual);
         containerSection.setLayout(new FillLayout());
         ScrolledComposite sc = new ScrolledComposite(containerSection,
             SWT.H_SCROLL);
@@ -237,10 +225,10 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     @Override
     public void reload() throws Exception {
-        retrieveContainerType();
-        setPartName(Messages.getString("ContainerTypeViewForm.title", //$NON-NLS-1$
+        containerType.reload();
+        setPartName(NLS.bind(Messages.ContainerTypeViewForm_title,
             containerType.getName()));
-        form.setText(Messages.getString("ContainerTypeViewForm.title", //$NON-NLS-1$
+        form.setText(NLS.bind(Messages.ContainerTypeViewForm_title,
             containerType.getName()));
         setContainerTypeValues();
         setSpecimenTypesValues();

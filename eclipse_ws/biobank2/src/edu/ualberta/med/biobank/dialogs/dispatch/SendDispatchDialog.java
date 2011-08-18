@@ -13,14 +13,15 @@ import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
-import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class SendDispatchDialog extends BiobankDialog {
+public class SendDispatchDialog extends BgcBaseDialog {
 
-    private static final String TITLE = "Dispatching specimens";
+    private static final String TITLE = Messages.SendDispatchDialog_title;
     private DispatchWrapper shipment;
 
     public SendDispatchDialog(Shell parentShell, DispatchWrapper shipment) {
@@ -30,7 +31,7 @@ public class SendDispatchDialog extends BiobankDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Fill the following fields to complete the shipment";
+        return Messages.SendDispatchDialog_description;
     }
 
     @Override
@@ -55,7 +56,7 @@ public class SendDispatchDialog extends BiobankDialog {
 
         ShippingMethodWrapper selectedShippingMethod = shipInfo
             .getShippingMethod();
-        widgetCreator.createComboViewer(contents, "Shipping Method",
+        widgetCreator.createComboViewer(contents, Messages.SendDispatchDialog_shippingMethod_label,
             ShippingMethodWrapper.getShippingMethods(SessionManager
                 .getAppService()), selectedShippingMethod, null,
             new ComboSelectionUpdate() {
@@ -64,16 +65,16 @@ public class SendDispatchDialog extends BiobankDialog {
                     shipment.getShipmentInfo().setShippingMethod(
                         (ShippingMethodWrapper) selectedObject);
                 }
-            });
+            }, new BiobankLabelProvider());
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.NONE,
-            "Waybill", null, shipInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.NONE,
+            Messages.SendDispatchDialog_waybill_label, null, shipInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
 
         Date date = new Date();
         shipment.getShipmentInfo().setPackedAt(date);
-        createDateTimeWidget(contents, "Time Packed", date, shipInfo,
+        createDateTimeWidget(contents, Messages.SendDispatchDialog_timePacked_label, date, shipInfo,
             ShipmentInfoPeer.PACKED_AT.getName(), new NotNullValidator(
-                "Packed should be set"));
+                Messages.SendDispatchDialog_timePacked_validator_msg));
     }
 
 }

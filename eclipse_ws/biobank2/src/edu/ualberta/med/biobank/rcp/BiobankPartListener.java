@@ -10,13 +10,13 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.linkassign.AbstractSpecimenAdminForm;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 
 public class BiobankPartListener implements IPartListener {
 
-    private static BiobankLogger logger = BiobankLogger
+    private static BgcLogger logger = BgcLogger
         .getLogger(BiobankPartListener.class.getName());
 
     @Override
@@ -45,7 +45,7 @@ public class BiobankPartListener implements IPartListener {
                     workbench.showPerspective(ProcessingPerspective.ID,
                         workbench.getActiveWorkbenchWindow());
                 } catch (WorkbenchException e) {
-                    logger.error("Error while opening patients perpective", e);
+                    logger.error("Error while opening patients perpective", e); //$NON-NLS-1$
                 }
             }
         }
@@ -56,12 +56,13 @@ public class BiobankPartListener implements IPartListener {
             try {
                 ((BiobankEntryForm) part).formClosed();
             } catch (Exception e) {
-                logger.error("Error in formClosed method", e);
+                logger.error("Error in formClosed method", e); //$NON-NLS-1$
             }
     }
 
     @Override
     public void partDeactivated(IWorkbenchPart part) {
+        //
     }
 
     @Override
