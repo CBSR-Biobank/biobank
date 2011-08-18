@@ -1,15 +1,28 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
 import java.util.Arrays;
+import java.util.List;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
+import edu.ualberta.med.biobank.common.wrappers.MembershipRightWrapper;
+import edu.ualberta.med.biobank.common.wrappers.MembershipRoleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
+import edu.ualberta.med.biobank.model.BbGroup;
+import edu.ualberta.med.biobank.model.Membership;
+import edu.ualberta.med.biobank.model.RightPrivilege;
+import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.GroupHelper;
+import edu.ualberta.med.biobank.test.internal.RoleHelper;
 import edu.ualberta.med.biobank.test.internal.UserHelper;
 
 public class TestGroup extends TestDatabase {
@@ -39,5 +52,107 @@ public class TestGroup extends TestDatabase {
         Assert.assertEquals(2, group.getUserCollection(false).size());
         Assert.assertEquals(1, user1.getGroupCollection(false).size());
         Assert.assertEquals(1, user2.getGroupCollection(false).size());
+    }
+
+    @Test
+    public void testCascadeWithMembershipRole() throws Exception {
+        String name = "testCascadeWithMembershipRole" + r.nextInt();
+
+        BbGroupWrapper group = GroupHelper.addGroup(name, false);
+        Assert.assertEquals(0, group.getMembershipCollection(false).size());
+
+        RoleWrapper role = RoleHelper.addRole(name, true);
+        Integer idRole = role.getId();
+
+        MembershipRoleWrapper mrw = new MembershipRoleWrapper(appService);
+        mrw.setPrincipal(group);
+        mrw.addToRoleCollection(Arrays.asList(role));
+        group.addToMembershipCollection(Arrays.asList(mrw));
+        group.persist();
+
+        Assert.assertEquals(1, group.getMembershipCollection(false).size());
+        MembershipWrapper<?> membership = group.getMembershipCollection(false)
+            .get(0);
+        Assert.assertTrue(membership instanceof MembershipRoleWrapper);
+        Integer idMembership = membership.getId();
+        Assert.assertEquals(group, membership.getPrincipal());
+        mrw = (MembershipRoleWrapper) membership;
+        Assert.assertEquals(1, mrw.getRoleCollection(false).size());
+        Assert.assertEquals(role, mrw.getRoleCollection(false).get(0));
+
+        // delete group
+        Integer idGroup = group.getId();
+        group.delete();
+
+        // check group is deleted
+        BbGroup dbGroup = ModelUtils.getObjectWithId(appService, BbGroup.class,
+            idGroup);
+        Assert.assertNull(dbGroup);
+
+        // check membership deleted
+        Membership dbMembership = ModelUtils.getObjectWithId(appService,
+            Membership.class, idMembership);
+        Assert.assertNull(dbMembership);
+
+        // check role no deleted
+        Role dbRole = ModelUtils
+            .getObjectWithId(appService, Role.class, idRole);
+        Assert.assertNotNull(dbRole);
+    }
+
+    @Test
+    public void testCascadeWithMembershipRight() throws Exception {
+        String name = "testCascadeWithMembershipRight" + r.nextInt();
+
+        BbGroupWrapper group = GroupHelper.addGroup(name, false);
+        Assert.assertEquals(0, group.getMembershipCollection(false).size());
+
+        MembershipRightWrapper mrw = new MembershipRightWrapper(appService);
+        mrw.setPrincipal(group);
+
+        RightPrivilegeWrapper rp = new RightPrivilegeWrapper(appService);
+        rp.setMembership(mrw);
+        BbRightWrapper right = BbRightWrapper.getAllRights(appService).get(0);
+        rp.setRight(right);
+        List<PrivilegeWrapper> privileges = PrivilegeWrapper
+            .getAllPrivileges(appService);
+        rp.addToPrivilegeCollection(privileges);
+        mrw.addToRightPrivilegeCollection(Arrays.asList(rp));
+        group.addToMembershipCollection(Arrays.asList(mrw));
+        group.persist();
+
+        // check everything is added
+        Assert.assertEquals(1, group.getMembershipCollection(false).size());
+        MembershipWrapper<?> membership = group.getMembershipCollection(false)
+            .get(0);
+        Assert.assertTrue(membership instanceof MembershipRightWrapper);
+        Integer idMembership = membership.getId();
+        Assert.assertEquals(group, membership.getPrincipal());
+        mrw = (MembershipRightWrapper) membership;
+        Assert.assertEquals(1, mrw.getRightPrivilegeCollection(false).size());
+        rp = mrw.getRightPrivilegeCollection(false).get(0);
+        Integer idRp = rp.getId();
+        Assert.assertEquals(right, rp.getRight());
+        Assert.assertEquals(privileges.size(), rp.getPrivilegeCollection(false)
+            .size());
+
+        // delete group
+        Integer idGroup = group.getId();
+        group.delete();
+
+        // check group is deleted
+        BbGroup dbGroup = ModelUtils.getObjectWithId(appService, BbGroup.class,
+            idGroup);
+        Assert.assertNull(dbGroup);
+
+        // check membership deleted
+        Membership dbMembership = ModelUtils.getObjectWithId(appService,
+            Membership.class, idMembership);
+        Assert.assertNull(dbMembership);
+
+        // check rightprivilege deleted
+        RightPrivilege dbRightPrivilege = ModelUtils.getObjectWithId(
+            appService, RightPrivilege.class, idRp);
+        Assert.assertNull(dbRightPrivilege);
     }
 }
