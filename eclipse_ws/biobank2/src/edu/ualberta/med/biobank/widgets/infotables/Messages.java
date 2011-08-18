@@ -313,6 +313,14 @@ public class Messages extends NLS {
 
     public static String RequestDispatchInfoTable_total_specs_label;
 
+    public static String RoleInfoTable_name_label;
+
+    public static String RoleInfoTable_delete_confirm_msg;
+    public static String RoleInfoTable_delete_confirm_title;
+    public static String RoleInfoTable_delete_error_msg;
+
+    public static String RoleInfoTable_duplicate_label;
+
     public static String UserInfoTable_confirm_delete_msg;
 
     public static String UserInfoTable_confirm_delete_suicide_msg;
@@ -336,6 +344,8 @@ public class Messages extends NLS {
     public static String UserInfoTable_login_label;
 
     public static String UserInfoTable_nogroups_msg;
+
+    public static String UserInfoTable_superadmin_label;
 
     public static String UserInfoTable_unlock_error_msg;
 

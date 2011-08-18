@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
@@ -19,6 +20,7 @@ public class UserManagementDialog extends BgcDialogWithPages {
 
     private List<UserWrapper> currentAllUsersList;
     private List<BbGroupWrapper> currentAllGroupsList;
+    private List<RoleWrapper> currentAllRolesList;
 
     public UserManagementDialog(Shell parentShell) {
         super(parentShell);
@@ -61,7 +63,12 @@ public class UserManagementDialog extends BgcDialogWithPages {
                 return getGroups();
             }
         });
-        nodes.add(new RolesPage(this));
+        nodes.add(new RolesPage(this) {
+            @Override
+            protected List<RoleWrapper> getCurrentAllRolesList() {
+                return getRoles();
+            }
+        });
         return nodes;
     }
 
@@ -93,6 +100,18 @@ public class UserManagementDialog extends BgcDialogWithPages {
                     Messages.UserManagementDialog_groups_load_error_title, e);
             }
         return currentAllGroupsList;
+    }
+
+    protected List<RoleWrapper> getRoles() {
+        if (currentAllRolesList == null)
+            try {
+                currentAllRolesList = RoleWrapper.getAllRoles(SessionManager
+                    .getAppService());
+            } catch (ApplicationException e) {
+                BgcPlugin.openAsyncError(
+                    Messages.UserManagementDialog_groups_load_error_title, e);
+            }
+        return currentAllRolesList;
     }
 
 }

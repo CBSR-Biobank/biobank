@@ -1,14 +1,12 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -70,44 +68,7 @@ public abstract class GroupsPage extends BgcDialogPage {
                 addGroup(newGroup);
             }
         };
-        List<BbGroupWrapper> tmpGroups = new ArrayList<BbGroupWrapper>();
-        for (int i = 0; i < GroupInfoTable.ROWS_PER_PAGE + 1; i++) {
-            BbGroupWrapper group = new BbGroupWrapper(null);
-            group.setName(Messages.UserManagementDialog_loading);
-            tmpGroups.add(group);
-        }
-        groupInfoTable.setCollection(tmpGroups);
-        Thread t = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    final List<BbGroupWrapper> groups = getCurrentAllGroupsList();
-                    sleep(200); // FIXME for some reason, if the group list is
-                                // already loaded and therefore is retrieved
-                                // right away, the setCollection method is not
-                                // working because the current thread is still
-                                // alive (see setCollection implementation).
-                                // With a small pause, it is ok.
-                    Display.getDefault().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            groupInfoTable.setCollection(groups);
-                        }
-                    });
-                } catch (final Exception ex) {
-                    Display.getDefault().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            BgcPlugin
-                                .openAsyncError(
-                                    Messages.UserManagementDialog_get_users_groups_error_title,
-                                    ex);
-                        }
-                    });
-                }
-            }
-        };
-        t.start();
+        groupInfoTable.setCollection(getCurrentAllGroupsList());
         setControl(content);
     }
 

@@ -33,7 +33,7 @@ public class UserInfoTable extends InfoTableWidget<UserWrapper> {
         Messages.UserInfoTable_login_label,
         Messages.UserInfoTable_firstname_label,
         Messages.UserInfoTable_lastname_label,
-        Messages.UserInfoTable_email_label, "Super administrator" };
+        Messages.UserInfoTable_email_label, Messages.UserInfoTable_superadmin_label };
 
     private MenuItem unlockMenuItem;
 

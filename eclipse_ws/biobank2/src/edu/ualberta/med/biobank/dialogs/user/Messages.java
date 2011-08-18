@@ -25,6 +25,24 @@ public class Messages extends NLS {
 
     public static String GroupsPage_page_title;
 
+    public static String RoleEditDialog_msg_error_name_used;
+
+    public static String RoleEditDialog_msg_error_retrieve_centers;
+
+    public static String RoleEditDialog_msg_name_required;
+
+    public static String RoleEditDialog_msg_persit_error;
+
+    public static String RoleEditDialog_property_title_name;
+
+    public static String RoleEditDialog_title_add;
+
+    public static String RoleEditDialog_title_edit;
+
+    public static String RoleEditDialog_titlearea_add;
+
+    public static String RoleEditDialog_titlearea_modify;
+
     public static String RolesPage_title;
 
     public static String TemplatesPage_page_title;

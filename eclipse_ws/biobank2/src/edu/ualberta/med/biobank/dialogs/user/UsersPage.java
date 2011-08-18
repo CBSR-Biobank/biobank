@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Status;
@@ -77,39 +76,7 @@ public abstract class UsersPage extends BgcDialogPage {
                 return deleted;
             }
         };
-        List<UserWrapper> tmpUsers = new ArrayList<UserWrapper>();
-        for (int i = 0; i < UserInfoTable.ROWS_PER_PAGE + 1; i++) {
-            UserWrapper user = new UserWrapper(null);
-            user.setLogin(Messages.UserManagementDialog_loading);
-            tmpUsers.add(user);
-        }
-        userInfoTable.setCollection(tmpUsers);
-        Thread t = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    final List<UserWrapper> users = getCurrentAllUsersList();
-                    sleep(200);
-                    getShell().getDisplay().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            userInfoTable.setCollection(users);
-                        }
-                    });
-                } catch (final Exception ex) {
-                    getShell().getDisplay().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            BgcPlugin
-                                .openAsyncError(
-                                    Messages.UserManagementDialog_get_users_groups_error_title,
-                                    ex);
-                        }
-                    });
-                }
-            }
-        };
-        t.start();
+        userInfoTable.setCollection(getCurrentAllUsersList());
         setControl(content);
     }
 
