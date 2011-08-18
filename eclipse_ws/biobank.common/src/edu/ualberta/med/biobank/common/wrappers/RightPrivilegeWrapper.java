@@ -14,4 +14,16 @@ public class RightPrivilegeWrapper extends RightPrivilegeBaseWrapper {
         RightPrivilege wrappedObject) {
         super(appService, wrappedObject);
     }
+
+    @Override
+    public int compareTo(ModelWrapper<RightPrivilege> rp2) {
+        if (rp2 instanceof RightPrivilegeWrapper) {
+            BbRightWrapper right1 = getRight();
+            BbRightWrapper right2 = ((RightPrivilegeWrapper) rp2).getRight();
+            if (right1 == null || right2 == null)
+                return 0;
+            return right1.compareTo(right2);
+        }
+        return 0;
+    }
 }

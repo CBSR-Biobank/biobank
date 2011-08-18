@@ -1,57 +1,50 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.RolePeer;
-import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
-import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
+import edu.ualberta.med.biobank.widgets.infotables.RightPrivilegeInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class RoleEditDialog extends BgcBaseDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
 
-    private RoleWrapper originalRole, modifiedRole;
-    private MultiSelectWidget workingCentersWidget;
-    private List<CenterWrapper<?>> allCenters;
-    private MultiSelectWidget centerFeaturesWidget;
-    private Text centersFilterText;
-    private LinkedHashMap<Integer, String> allFeaturesMap;
+    private RoleWrapper role;
+    private RightPrivilegeInfoTable rightPrivilegeInfoTable;
 
-    public RoleEditDialog(Shell parent, RoleWrapper originalRole) {
+    public RoleEditDialog(Shell parent, RoleWrapper role) {
         super(parent);
-        Assert.isNotNull(originalRole);
-        this.originalRole = originalRole;
-        this.modifiedRole = new RoleWrapper(null);
-        copyRole(originalRole, modifiedRole);
-        if (originalRole.isNew()) {
+        Assert.isNotNull(role);
+        this.role = role;
+        if (role.isNew()) {
             currentTitle = Messages.RoleEditDialog_title_add;
             titleAreaMessage = Messages.RoleEditDialog_titlearea_add;
         } else {
             currentTitle = Messages.RoleEditDialog_title_edit;
             titleAreaMessage = Messages.RoleEditDialog_titlearea_modify;
         }
-    }
-
-    private void copyRole(RoleWrapper src, RoleWrapper dest) {
-        dest.setName(src.getName());
     }
 
     @Override
@@ -77,113 +70,69 @@ public class RoleEditDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Messages.RoleEditDialog_property_title_name, null, modifiedRole,
+            Messages.RoleEditDialog_property_title_name, null, role,
             RolePeer.NAME.getName(), new NonEmptyStringValidator( //$NON-NLS-1$
                 Messages.RoleEditDialog_msg_name_required));
 
-        // createBoundWidgetWithLabel(contents, Button.class, SWT.CHECK,
-        // Messages.GroupEditDialog_center_administrator_title, null,
-        //            modifiedGroup, "isWorkingCentersAdministrator", null); //$NON-NLS-1$
-
-        // List<String> centerNames = new ArrayList<String>();
-        // final LinkedHashMap<Integer, String> centerMap = new
-        // LinkedHashMap<Integer, String>();
-        // if (getAllCenters() != null)
-        // for (CenterWrapper<?> center : getAllCenters()) {
-        // Integer centerId = center.getId();
-        // String centerName = center.getNameShort();
-        // centerNames.add(centerName);
-        // centerMap.put(centerId, centerName);
-        // }
-        //
-        // workingCentersWidget = new MultiSelectWidget(parent, SWT.NONE,
-        // Messages.GroupEditDialog_center_list_available,
-        // Messages.GroupEditDialog_center_list_working, 110);
-        // workingCentersWidget.setSelections(centerMap,
-        // modifiedRole.getWorkingCenterIds());
-        // workingCentersWidget.setFilter(new ViewerFilter() {
-        // @Override
-        // public boolean select(Viewer viewer, Object parentElement,
-        // Object element) {
-        // if (centersFilterText == null)
-        // return true;
-        // MultiSelectNode node = (MultiSelectNode) element;
-        // return TableFilter.contains(node.getName(),
-        // centersFilterText.getText());
-        // }
-        // });
-        // Label label = new Label(parent, SWT.NONE);
-        // label.setText(Messages.GroupEditDialog_filter_centers);
-        // centersFilterText = new Text(parent, SWT.BORDER);
-        // GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
-        // centersFilterText.setLayoutData(gd);
-        // centersFilterText.addModifyListener(new ModifyListener() {
-        // @Override
-        // public void modifyText(ModifyEvent e) {
-        // workingCentersWidget.refreshLists();
-        // }
-        // });
-        //
-        // Label separator = new Label(parent, SWT.HORIZONTAL | SWT.SEPARATOR);
-        // gd = new GridData();
-        // gd.horizontalAlignment = SWT.CENTER;
-        // gd.widthHint = 250;
-        // separator.setLayoutData(gd);
-        //
-        // centerFeaturesWidget = createFeaturesSelectionWidget(
-        // parent,
-        // SessionManager.getAppService().getSecurityCenterFeatures(
-        // SessionManager.getUserOld()),
-        // modifiedRole.getCenterFeaturesEnabled(),
-        // BiobankSecurityUtil.CENTER_FEATURE_START_NAME,
-        // Messages.GroupEditDialog_feature_center_list_available,
-        // Messages.GroupEditDialog_feature_center_list_selected);
-    }
-
-    private MultiSelectWidget createFeaturesSelectionWidget(Composite parent,
-        List<ProtectionGroupPrivilege> availableFeatures,
-        List<Integer> selectedFeatures, String replaceString,
-        String availableString, String enabledString) {
-        allFeaturesMap = new LinkedHashMap<Integer, String>();
-        for (ProtectionGroupPrivilege pgp : availableFeatures) {
-            allFeaturesMap.put(pgp.getId().intValue(),
-                pgp.getName().replace(replaceString, "")); //$NON-NLS-1$
-        }
-        MultiSelectWidget featuresWidget = new MultiSelectWidget(parent,
-            SWT.NONE, availableString, enabledString, 110);
-        featuresWidget.setSelections(allFeaturesMap, selectedFeatures);
-        return featuresWidget;
-    }
-
-    private List<CenterWrapper<?>> getAllCenters() {
-        if (allCenters == null) {
-            if (!SessionManager.getUser().isSuperAdmin())
-                allCenters = Arrays
-                    .asList(new CenterWrapper<?>[] { SessionManager.getUser()
-                        .getCurrentWorkingCenter() });
-            else
-                try {
-                    allCenters = CenterWrapper.getCenters(SessionManager
-                        .getAppService());
-                } catch (Exception e) {
-                    BgcPlugin.openAsyncError(
-                        Messages.RoleEditDialog_msg_error_retrieve_centers, e);
+        Section rpSection = createSection(contents,
+            "Right/Privileges associations", "Add new association",
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    addRightPrivilege();
                 }
+            });
+
+        rightPrivilegeInfoTable = new RightPrivilegeInfoTable(rpSection, role);
+        rpSection.setClient(rightPrivilegeInfoTable);
+    }
+
+    protected void addRightPrivilege() {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
+            public void run() {
+                RightPrivilegeAddDialog dlg = new RightPrivilegeAddDialog(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                        .getShell(), role);
+                int res = dlg.open();
+                if (res == Status.OK) {
+                    RightPrivilegeWrapper addedRp = dlg.getRightPrivilege();
+                    rightPrivilegeInfoTable.getCollection().add(addedRp);
+                    rightPrivilegeInfoTable.reloadCollection(
+                        role.getRightPrivilegeCollection(true), null);
+                }
+            }
+        });
+    }
+
+    private Section createSection(final Composite contents, String title,
+        String addTooltip, SelectionListener addListener) {
+        Section section = new Section(contents, Section.TWISTIE
+            | Section.TITLE_BAR | Section.EXPANDED);
+        section.setText(title);
+        section.setLayout(new GridLayout(1, false));
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        section.setLayoutData(gd);
+
+        ToolBar tbar = (ToolBar) section.getTextClient();
+        if (tbar == null) {
+            tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
+            section.setTextClient(tbar);
         }
-        return allCenters;
+
+        ToolItem titem = new ToolItem(tbar, SWT.NULL);
+        titem.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ADD));
+        titem.setToolTipText(addTooltip);
+        titem.addSelectionListener(addListener);
+        return section;
     }
 
     @Override
     protected void okPressed() {
-        // try saving or updating the group inside this dialog so that if there
-        // is an error the entered information is not lost
         try {
-            // modifiedRole
-            // .setWorkingCenterIds(workingCentersWidget.getSelected());
-            // modifiedRole.setCenterFeaturesEnabled(centerFeaturesWidget
-            // .getSelected());
-            copyRole(modifiedRole, originalRole);
-            originalRole.persist();
+            role.persist();
             close();
         } catch (Exception e) {
             if (e.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
@@ -195,5 +144,15 @@ public class RoleEditDialog extends BgcBaseDialog {
                     Messages.RoleEditDialog_msg_persit_error, e);
             }
         }
+    }
+
+    @Override
+    protected void cancelPressed() {
+        try {
+            role.reload();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        super.cancelPressed();
     }
 }

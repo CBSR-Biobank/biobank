@@ -51,4 +51,16 @@ public class BbRightWrapper extends BbRightBaseWrapper {
                 "unexpected results from query");
         return new BbRightWrapper(appService, result.get(0));
     }
+
+    @Override
+    public int compareTo(ModelWrapper<BbRight> r2) {
+        if (r2 instanceof BbRightWrapper) {
+            String name1 = getName();
+            String name2 = ((BbRightWrapper) r2).getName();
+            if (name1 == null || name2 == null)
+                return 0;
+            return name1.compareTo(name2);
+        }
+        return 0;
+    }
 }

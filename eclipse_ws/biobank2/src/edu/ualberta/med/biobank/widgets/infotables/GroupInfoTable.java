@@ -10,7 +10,6 @@ import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
@@ -83,11 +82,6 @@ public abstract class GroupInfoTable extends InfoTableWidget<BbGroupWrapper> {
     @Override
     protected IBaseLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
-            @Override
-            public Image getColumnImage(Object element, int columnIndex) {
-                return null;
-            }
-
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 BbGroupWrapper group = (BbGroupWrapper) ((BiobankCollectionModel) element).o;

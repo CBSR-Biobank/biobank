@@ -313,6 +313,16 @@ public class Messages extends NLS {
 
     public static String RequestDispatchInfoTable_total_specs_label;
 
+    public static String RightPrivilegeInfoTable_confirm_delete_msg;
+
+    public static String RightPrivilegeInfoTable_confirm_delete_title;
+
+    public static String RightPrivilegeInfoTable_delete_error;
+
+    public static String RightPrivilegeInfoTable_privileges_label;
+
+    public static String RightPrivilegeInfoTable_right_label;
+
     public static String RoleInfoTable_name_label;
 
     public static String RoleInfoTable_delete_confirm_msg;
