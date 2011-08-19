@@ -446,7 +446,7 @@ public abstract class CenterWrapper<E extends Center> extends
             Arrays.asList(new Object[] { center.getWrappedObject() }));
         List<Request> requests = appService.query(criteria);
         if (requests.size() == 0)
-            return null;
+            return new ArrayList<RequestWrapper>();
         else
             return wrapModelCollection(appService, requests,
                 RequestWrapper.class);

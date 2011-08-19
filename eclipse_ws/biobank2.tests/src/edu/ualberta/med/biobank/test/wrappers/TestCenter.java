@@ -16,8 +16,11 @@ import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
@@ -28,6 +31,7 @@ import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
+import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.ResearchGroupHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -42,6 +46,54 @@ public class TestCenter extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite("testGettersAndSetters"
             + r.nextInt());
         testGettersAndSetters(site);
+    }
+
+    @Test
+    public void testGetRequest() throws Exception {
+        SiteWrapper site = SiteHelper.addSite("testRequest");
+        CollectionEventHelper.addCollectionEvent(site, PatientHelper
+            .addPatient("testP", StudyHelper.addStudy("testStudy")), 0,
+            SpecimenHelper.newSpecimen(
+                SpecimenTypeHelper.addSpecimenType("testType"), "Active",
+                new Date()));
+        Assert.assertEquals(0,
+            CenterWrapper.getRequestCollection(appService, site));
+    }
+
+    @Test
+    public void testGetProcessingEvents() throws Exception {
+        SiteWrapper site = SiteHelper.addSite("testProcessingEvents");
+        ProcessingEventHelper.addProcessingEvent(site,
+            PatientWrapper.getPatient(appService, "testP"), new Date());
+        ProcessingEventHelper.addProcessingEvent(site,
+            PatientWrapper.getPatient(appService, "testP"), new Date());
+        ProcessingEventHelper.addProcessingEvent(site,
+            PatientWrapper.getPatient(appService, "testP"), new Date());
+
+        Assert.assertEquals(3, site.getProcessingEventCount());
+        Assert.assertEquals(3, site.getProcessingEventCount(true));
+    }
+
+    @Test
+    public void testGetAliquotedSpecimens() throws Exception {
+        SiteWrapper site = SiteHelper.addSite("testAliquots");
+        ProcessingEventWrapper pevent = ProcessingEventHelper
+            .addProcessingEvent(site,
+                PatientWrapper.getPatient(appService, "testP"), new Date());
+        SpecimenTypeWrapper testtype = SpecimenTypeHelper
+            .addSpecimenType("testType");
+        SpecimenWrapper parent = SpecimenHelper.newSpecimen(testtype, "Active",
+            new Date());
+        CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
+            site, PatientHelper.addPatient("testP",
+                StudyHelper.addStudy("testStudy")), 0, parent);
+
+        ce.addToAllSpecimenCollection(Arrays.asList(
+            SpecimenHelper.addSpecimen(parent, testtype, ce, pevent),
+            SpecimenHelper.addSpecimen(parent, testtype, ce, pevent),
+            SpecimenHelper.addSpecimen(parent, testtype, ce, pevent)));
+
+        Assert.assertEquals(3, site.getAliquotedSpecimenCount().intValue());
     }
 
     @Test
