@@ -11,12 +11,13 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
+import edu.ualberta.med.biobank.widgets.multiselect.NewMultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class RightPrivilegeAddDialog extends BgcBaseDialog {
@@ -71,12 +72,15 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
                 }
             });
 
-        MultiSelectWidget privilegesWidget = new MultiSelectWidget(contents,
-            SWT.NONE, "Available privileges", "Selected privileges", 80);
+        NewMultiSelectWidget<PrivilegeWrapper> privilegesWidget = new NewMultiSelectWidget<PrivilegeWrapper>(
+            contents, SWT.NONE, "Available privileges", "Selected privileges",
+            110, PrivilegeWrapper.getAllPrivileges(SessionManager
+                .getAppService()));
         GridData gd = (GridData) privilegesWidget.getLayoutData();
         gd.horizontalSpan = 2;
 
-        // privilegesWidget.setSelections(available, selected)
+        privilegesWidget.setSelection(Arrays.asList(PrivilegeWrapper
+            .getAllPrivileges(SessionManager.getAppService()).get(0)));
     }
 
     @Override
