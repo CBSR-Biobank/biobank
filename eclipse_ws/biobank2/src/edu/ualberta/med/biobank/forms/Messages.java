@@ -314,6 +314,8 @@ public class Messages extends NLS {
     public static String ProcessingEventEntryForm_title_new;
     public static String ProcessingEventEntryForm_center_spec_error_msg;
 
+    public static String ProcessingEventEntryForm_concurrency_error_msg;
+
     public static String ProcessingEventEntryForm_confirm_remove_title;
 
     public static String ProcessingEventEntryForm_confirm_remove_msg;
@@ -322,6 +324,12 @@ public class Messages extends NLS {
     public static String ProcessingEventEntryForm_edition_msg;
     public static String ProcessingEventEntryForm_title_edit_worksheet;
     public static String ProcessingEventEntryForm_title_edit_noworksheet;
+
+    public static String ProcessingEventEntryForm_try_again_adding_error_label;
+
+    public static String ProcessingEventEntryForm_try_again_error_msg;
+
+    public static String ProcessingEventEntryForm_try_again_removing_error_label;
     public static String ProcessingEventEntryForm_main_title;
     public static String ProcessingEvent_field_center_label;
     public static String ProcessingEvent_field_date_label;
@@ -333,6 +341,8 @@ public class Messages extends NLS {
     public static String ProcessingEventEntryForm_notfound_spec_error_msg;
 
     public static String ProcessingEventEntryForm_other_pEvent_error_msg;
+
+    public static String ProcessingEventEntryForm_save_error_title;
 
     public static String ProcessingEventEntryForm_spec_active_only_error_msg;
 

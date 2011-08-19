@@ -1,9 +1,10 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -17,6 +18,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -60,7 +62,9 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     private ActivityStatusWrapper closedActivityStatus;
 
-    protected List<SpecimenWrapper> removedSpecimens;
+    protected boolean tryAgain = false;
+
+    private boolean istryingAgain;
 
     @Override
     protected void init() throws Exception {
@@ -88,7 +92,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         }
         closedActivityStatus = ActivityStatusWrapper.getActivityStatus(
             appService, ActivityStatusWrapper.CLOSED_STATUS_STRING);
-        removedSpecimens = new ArrayList<SpecimenWrapper>();
         setPartName(tabName);
     }
 
@@ -194,6 +197,13 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                             NLS.bind(
                                 Messages.ProcessingEventEntryForm_center_spec_error_msg,
                                 centerName));
+                    } else if (specimen.getProcessingEvent() != null) {
+                        throw new VetoException(
+                            NLS.bind(
+                                Messages.ProcessingEventEntryForm_other_pEvent_error_msg,
+                                specimen.getProcessingEvent().getWorksheet(),
+                                specimen.getProcessingEvent()
+                                    .getFormattedCreatedAt()));
                     } else if (!specimen.isActive())
                         throw new VetoException(
                             NLS.bind(
@@ -229,14 +239,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                     .getStudy()))
                         throw new VetoException(
                             Messages.ProcessingEventEntryForm_study_spec_error_msg);
-                    else if (specimen.getProcessingEvent() != null) {
-                        throw new VetoException(
-                            NLS.bind(
-                                Messages.ProcessingEventEntryForm_other_pEvent_error_msg,
-                                specimen.getProcessingEvent().getWorksheet(),
-                                specimen.getProcessingEvent()
-                                    .getFormattedCreatedAt()));
-                    }
                     break;
                 case POST_ADD:
                     specimen.setProcessingEvent(pEvent);
@@ -253,7 +255,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     }
                     break;
                 case POST_DELETE:
-                    removedSpecimens.add(specimen);
                     pEvent
                         .removeFromSpecimenCollection(Arrays.asList(specimen));
                     break;
@@ -279,44 +280,95 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         try {
             pEvent.persist();
         } catch (ModificationConcurrencyException mc) {
+            if (istryingAgain) {
+                // already tried once
+                throw mc;
+            }
             Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
+                    tryAgain = BgcPlugin
+                        .openConfirm(
+                            Messages.ProcessingEventEntryForm_save_error_title,
+                            Messages.ProcessingEventEntryForm_concurrency_error_msg);
+                    setDirty(true);
                     try {
-                        // can be very annoying to start over, so reload
-                        // everything and try again (only once!)
-                        List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>(
-                            pEvent.getSpecimenCollection(false));
-                        ActivityStatusWrapper as = pEvent.getActivityStatus();
-                        CenterWrapper<?> center = pEvent.getCenter();
-                        String comment = pEvent.getComment();
-                        Date createdAt = pEvent.getCreatedAt();
-                        String worksheet = pEvent.getWorksheet();
-                        pEvent.reset();
-                        pEvent.setActivityStatus(as);
-                        pEvent.setCenter(center);
-                        pEvent.setComment(comment);
-                        pEvent.setCreatedAt(createdAt);
-                        pEvent.setWorksheet(worksheet);
-                        for (SpecimenWrapper spec : removedSpecimens) {
-                            spec.reload();
-                        }
-                        pEvent.removeFromSpecimenCollection(removedSpecimens);
-                        for (SpecimenWrapper spec : specs) {
-                            spec.reload();
-                            spec.setProcessingEvent(pEvent);
-                            spec.setActivityStatus(closedActivityStatus);
-                        }
-                        pEvent.addToSpecimenCollection(specs);
-                        pEvent.persist();
-                    } catch (Exception ex) {
-                        saveErrorCatch(ex, null, true);
+                        doTrySettingAgain();
+                        tryAgain = true;
+                    } catch (Exception e) {
+                        saveErrorCatch(e, null, true);
                     }
                 }
             });
         }
-        removedSpecimens.clear();
+    }
+
+    @Override
+    protected void doAfterSave() throws Exception {
+        if (tryAgain) {
+            istryingAgain = true;
+            tryAgain = false;
+            confirm();
+        }
         SessionManager.updateAllSimilarNodes(pEventAdapter, true);
+    }
+
+    protected void doTrySettingAgain() throws Exception {
+        // remove added specimens and add removed specimens and try to
+        // add/remove them again (after reloading them) through the
+        // SpecimenEntryWidget to check again if can perform the action
+
+        List<SpecimenWrapper> addedSpecimens = specimenEntryWidget
+            .getAddedSpecimens();
+
+        List<SpecimenWrapper> removedSpecimens = specimenEntryWidget
+            .getRemovedSpecimens();
+        List<SpecimenWrapper> pEventSpecs = pEvent.getSpecimenCollection(false);
+        pEventSpecs.removeAll(addedSpecimens);
+        pEventSpecs.addAll(removedSpecimens);
+        for (SpecimenWrapper sp : pEventSpecs) {
+            sp.reload();
+        }
+        pEvent.setSpecimenWrapperCollection(pEventSpecs);
+        specimenEntryWidget.setSpecimens(pEventSpecs);
+
+        Map<String, String> problems = new HashMap<String, String>();
+        for (SpecimenWrapper spec : addedSpecimens) {
+            String inventoryId = spec.getInventoryId();
+            try {
+                spec.reload();
+                specimenEntryWidget.addSpecimen(spec);
+            } catch (Exception ex) {
+                problems
+                    .put(
+                        Messages.ProcessingEventEntryForm_try_again_adding_error_label
+                            + " " + inventoryId, ex.getMessage()); //$NON-NLS-1$
+            }
+        }
+        for (SpecimenWrapper spec : removedSpecimens) {
+            String inventoryId = spec.getInventoryId();
+            try {
+                spec.reload();
+                specimenEntryWidget.removeSpecimen(spec);
+            } catch (Exception ex) {
+                problems
+                    .put(
+                        Messages.ProcessingEventEntryForm_try_again_removing_error_label
+                            + " " + inventoryId, ex.getMessage()); //$NON-NLS-1$
+            }
+        }
+        if (problems.size() != 0) {
+            StringBuffer msg = new StringBuffer();
+            for (Entry<String, String> entry : problems.entrySet()) {
+                if (msg.length() > 0)
+                    msg.append("\n"); //$NON-NLS-1$
+                msg.append(entry.getKey()).append(": ") //$NON-NLS-1$
+                    .append(entry.getValue());
+            }
+            throw new BiobankException(
+                Messages.ProcessingEventEntryForm_try_again_error_msg
+                    + msg.toString());
+        }
     }
 
     @Override
@@ -340,6 +392,5 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         }
         GuiUtil.reset(activityStatusComboViewer, pEvent.getActivityStatus());
         specimenEntryWidget.setSpecimens(pEvent.getSpecimenCollection(true));
-        removedSpecimens.clear();
     }
 }
