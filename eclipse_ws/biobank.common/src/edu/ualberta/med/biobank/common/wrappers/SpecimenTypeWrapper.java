@@ -10,6 +10,8 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
+import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
@@ -23,6 +25,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     private static final String HAS_SPECIMENS_MSG = "Unable to delete specimen type {0}. Specimens of this type exists in storage. Remove all instances before deleting this type.";
+    private static final String HAS_SOURCE_SPECIMENS_MSG = "Unable to delete specimen type {0}. Source specimens of this type exists in storage. Remove all instances before deleting this type.";
+    private static final String HAS_ALIQUOTED_SPECIMENS_MSG = "Unable to delete specimen type {0}. Aliquoted specimens of this type exists in storage. Remove all instances before deleting this type.";
 
     private static final String UNKNOWN_IMPORT_NAME = "Unknown / import";
 
@@ -152,11 +156,33 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
     @Override
     protected void addDeleteTasks(TaskList tasks) {
-        String isUsedMsg = MessageFormat.format(HAS_SPECIMENS_MSG, getName());
+        String isUsedBySpecimensMsg = MessageFormat.format(HAS_SPECIMENS_MSG,
+            getName());
         tasks.add(check().notUsedBy(Specimen.class, SpecimenPeer.SPECIMEN_TYPE,
-            isUsedMsg));
+            isUsedBySpecimensMsg));
+
+        String isUsedBySourceSpecimensMsg = MessageFormat.format(
+            HAS_SOURCE_SPECIMENS_MSG, getName());
+        tasks.add(check().notUsedBy(SourceSpecimen.class,
+            SourceSpecimenPeer.SPECIMEN_TYPE, isUsedBySourceSpecimensMsg));
+
+        String isUsedByAliquotedSpecimensMsg = MessageFormat.format(
+            HAS_ALIQUOTED_SPECIMENS_MSG, getName());
+        tasks
+            .add(check().notUsedBy(AliquotedSpecimen.class,
+                AliquotedSpecimenPeer.SPECIMEN_TYPE,
+                isUsedByAliquotedSpecimensMsg));
+
+        removeThisTypeFromParents(tasks);
 
         super.addDeleteTasks(tasks);
+    }
+
+    public void removeThisTypeFromParents(TaskList tasks) {
+        for (SpecimenTypeWrapper parent : getParentSpecimenTypeCollection(false)) {
+            parent.removeFromChildSpecimenTypeCollection(Arrays.asList(this));
+            parent.addPersistTasks(tasks);
+        }
     }
 
     public void checkNameAndShortNameUnique() throws ApplicationException,

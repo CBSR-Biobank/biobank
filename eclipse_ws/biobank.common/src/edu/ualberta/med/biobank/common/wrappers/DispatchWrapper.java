@@ -31,11 +31,13 @@ import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.NotNullPreCheck;
 import edu.ualberta.med.biobank.common.wrappers.checks.UniqueCheck;
+import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Log;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DispatchWrapper extends DispatchBaseWrapper {
@@ -54,7 +56,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private boolean hasSpecimenStatesChanged = false;
 
-    private boolean removeSpecimensPosition = false;
+    // TODO: Not sure if it's a good idea to maintain a list like this
+    // internally. It can result in unwanted changes being persisted.
+    private List<DispatchSpecimenWrapper> dispatchSpecimensToPersist = new ArrayList<DispatchSpecimenWrapper>();
 
     public DispatchWrapper(WritableApplicationService appService) {
         super(appService);
@@ -180,6 +184,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                         // remove position in case it has one in the previous
                         // center.
                         specimen.setParent(null, null);
+                        dispatchSpecimensToPersist.add(dsa);
                     }
                     newDispatchSpecimens.add(dsa);
                     hasNewSpecimens = true;
@@ -237,6 +242,11 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         removeFromDispatchSpecimenCollection(removeDispatchSpecimens);
     }
 
+    // TODO: IMHO methods like this shouldn't even exist in the wrapper. It
+    // should be a static method in some DispatchUtilFunctions class that keeps
+    // track of what was added, then persists them immediately. Having all this
+    // tracking done in the wrapper just creates potential problems if several
+    // methods that do tracking are called without persisting after - JMF
     public void receiveSpecimens(List<SpecimenWrapper> specimensToReceive) {
         List<DispatchSpecimenWrapper> nonProcessedSpecimens = getDispatchSpecimenCollectionWithState(DispatchSpecimenState.NONE);
         for (DispatchSpecimenWrapper ds : nonProcessedSpecimens) {
@@ -244,6 +254,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 hasSpecimenStatesChanged = true;
                 ds.setDispatchSpecimenState(DispatchSpecimenState.RECEIVED);
                 ds.getSpecimen().setCurrentCenter(getReceiverCenter());
+                dispatchSpecimensToPersist.add(ds);
             }
         }
         resetMap();
@@ -277,7 +288,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public void setState(DispatchState ds) {
         setState(ds.getId());
-        removeSpecimensPosition = (ds == DispatchState.IN_TRANSIT);
     }
 
     @Override
@@ -370,7 +380,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         resetMap();
         hasNewSpecimens = false;
         hasSpecimenStatesChanged = false;
-        removeSpecimensPosition = false;
+        dispatchSpecimensToPersist.clear();
     }
 
     public void resetMap() {
@@ -545,6 +555,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
         tasks.deleteRemoved(this, DispatchPeer.DISPATCH_SPECIMEN_COLLECTION);
 
+        removeSpecimensFromParents(tasks);
+        persistSpecimens(tasks);
+
         super.addPersistTasks(tasks);
 
         tasks.persistAdded(this, DispatchPeer.DISPATCH_SPECIMEN_COLLECTION);
@@ -554,6 +567,26 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
         tasks.add(new IfAction<Dispatch>(this, WAYBILL_PROPERTY, Is.NOT_NULL,
             checkWaybill));
+
+        tasks.add(new ResetInternalStateQueryTask(this));
+    }
+
+    private void persistSpecimens(TaskList tasks) {
+        for (DispatchSpecimenWrapper dispatchSpecimen : dispatchSpecimensToPersist) {
+            SpecimenWrapper specimen = dispatchSpecimen.getSpecimen();
+            specimen.addPersistTasks(tasks);
+        }
+    }
+
+    private void removeSpecimensFromParents(TaskList tasks) {
+        if (DispatchState.IN_TRANSIT.equals(getDispatchState())) {
+            Collection<DispatchSpecimenWrapper> dispatchSpecimens = getDispatchSpecimenCollection(false);
+            for (DispatchSpecimenWrapper dispatchSpecimen : dispatchSpecimens) {
+                SpecimenWrapper specimen = dispatchSpecimen.getSpecimen();
+                specimen.setParent(null, null);
+                specimen.addPersistTasks(tasks);
+            }
+        }
     }
 
     // TODO: remove this override when all persist()-s are like this!
@@ -569,5 +602,19 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public boolean hasSpecimenStatesChanged() {
         return hasSpecimenStatesChanged;
+    }
+
+    private static class ResetInternalStateQueryTask extends
+        NoActionWrapperQueryTask<DispatchWrapper> {
+        public ResetInternalStateQueryTask(DispatchWrapper dispatch) {
+            super(dispatch);
+        }
+
+        @Override
+        public void afterExecute(SDKQueryResult result) {
+            getWrapper().hasNewSpecimens = false;
+            getWrapper().hasSpecimenStatesChanged = false;
+            getWrapper().dispatchSpecimensToPersist.clear();
+        }
     }
 }

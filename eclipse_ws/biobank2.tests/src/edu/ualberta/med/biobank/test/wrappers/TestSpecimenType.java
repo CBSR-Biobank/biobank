@@ -9,7 +9,6 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -22,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropertyException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.AliquotedSpecimenHelper;
@@ -297,7 +297,7 @@ public class TestSpecimenType extends TestDatabase {
             type.delete();
             Assert
                 .fail("Should not be able to delete it - deleteCheck should fail");
-        } catch (BiobankDeleteException bde) {
+        } catch (ModelIsUsedException e) {
             Assert.assertTrue(true);
         }
 
@@ -323,7 +323,7 @@ public class TestSpecimenType extends TestDatabase {
             type.delete();
             Assert
                 .fail("Should not be able to delete it - deleteCheck should fail");
-        } catch (BiobankDeleteException bde) {
+        } catch (ModelIsUsedException e) {
             Assert.assertTrue(true);
         }
 
@@ -357,7 +357,7 @@ public class TestSpecimenType extends TestDatabase {
             type.delete();
             Assert
                 .fail("Should not be able to delete it - deleteCheck should fail");
-        } catch (BiobankDeleteException bde) {
+        } catch (ModelIsUsedException e) {
             Assert.assertTrue(true);
         }
 

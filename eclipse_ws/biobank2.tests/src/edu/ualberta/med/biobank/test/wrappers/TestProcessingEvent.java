@@ -191,6 +191,11 @@ public class TestProcessingEvent extends TestDatabase {
         // delete aliquot and pevent
         childSpc.reload();
         childSpc.delete();
+
+        // must delete the parent specimen too as it is associated with the
+        // processing event
+        parentSpc.delete();
+
         pevent.reload();
         pevent.delete();
     }
@@ -220,6 +225,10 @@ public class TestProcessingEvent extends TestDatabase {
         childSpc.delete();
         pevent.reload();
         pevent.persist();
+
+        // must delete the parent specimen too as it is associated with the
+        // processing event
+        parentSpc.delete();
 
         // should be allowed to delete processing event
         pevent.delete();
