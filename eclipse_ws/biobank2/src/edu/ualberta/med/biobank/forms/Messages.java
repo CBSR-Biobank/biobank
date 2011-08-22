@@ -396,6 +396,8 @@ public class Messages extends NLS {
 
     public static String DispatchReceivingEntryForm_ok_msg;
 
+    public static String DispatchReceivingEntryForm_problem_spec_error;
+
     public static String DispatchReceivingEntryForm_receive_error_title;
 
     public static String DispatchReceivingEntryForm_received_label;

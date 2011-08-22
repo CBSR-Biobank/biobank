@@ -309,8 +309,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             isTryingAgain = true;
             tryAgain = false;
             confirm();
-        }
-        SessionManager.updateAllSimilarNodes(pEventAdapter, true);
+        } else
+            SessionManager.updateAllSimilarNodes(pEventAdapter, true);
     }
 
     protected void doTrySettingAgain() throws Exception {

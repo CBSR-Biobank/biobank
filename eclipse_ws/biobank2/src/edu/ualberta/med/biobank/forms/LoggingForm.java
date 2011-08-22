@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,9 +41,6 @@ public class LoggingForm extends BiobankViewForm {
     private BgcBaseText centerLabel;
 
     private LoggingInfoTable loggingTable;
-
-    // private BiobankText containerTypeLabel;
-    // private BiobankText containerLabelLabel;
 
     @Override
     public void init() throws Exception {
@@ -145,7 +141,6 @@ public class LoggingForm extends BiobankViewForm {
                 Messages.LoggingForm_location_label,
                 Messages.LoggingForm_details_label));
             data.setTitle(Messages.LoggingForm_0);
-            data.setDescription(Arrays.asList("test"));
 
             data.setRows((List<Object>) (List<?>) LogQuery.getInstance()
                 .getDatabaseResults());
@@ -179,71 +174,6 @@ public class LoggingForm extends BiobankViewForm {
         }
     }
 
-    private List<String> getParams() throws Exception {
-        List<String> params = new ArrayList<String>();
-        StringBuffer sb = new StringBuffer();
-        sb.append(LogPeer.CENTER.getName());
-        sb.append(": "); //$NON-NLS-1$
-        sb.append(LogQuery.getInstance().getSearchQueryItem(
-            LogPeer.CENTER.getName()));
-        params.add(sb.toString());
-        sb = new StringBuffer();
-        sb.append(LogPeer.USERNAME.getName());
-        sb.append(": "); //$NON-NLS-1$
-        sb.append(LogQuery.getInstance().getSearchQueryItem(
-            LogPeer.CENTER.getName()));
-        params.add(sb.toString());
-        sb = new StringBuffer();
-        sb.append(LogPeer.TYPE.getName());
-        sb.append(": "); //$NON-NLS-1$
-        sb.append(LogQuery.getInstance().getSearchQueryItem(
-            LogPeer.CENTER.getName()));
-        params.add(sb.toString());
-        sb = new StringBuffer();
-        sb.append(LogPeer.ACTION.getName());
-        sb.append(": "); //$NON-NLS-1$
-        sb.append(LogQuery.getInstance().getSearchQueryItem(
-            LogPeer.CENTER.getName()));
-        params.add(sb.toString());
-        sb = new StringBuffer();
-        sb.append(LogPeer.PATIENT_NUMBER.getName());
-        sb.append(": "); //$NON-NLS-1$
-        sb.append(LogQuery.getInstance().getSearchQueryItem(
-            LogPeer.CENTER.getName()));
-        params.add(sb.toString());
-        sb = new StringBuffer();
-        sb.append(LogPeer.INVENTORY_ID.getName());
-        sb.append(": "); //$NON-NLS-1$
-        sb.append(LogQuery.getInstance().getSearchQueryItem(
-            LogPeer.CENTER.getName()));
-        params.add(sb.toString());
-        sb = new StringBuffer();
-        sb.append(LogPeer.LOCATION_LABEL.getName());
-        sb.append(": "); //$NON-NLS-1$
-        sb.append(LogQuery.getInstance().getSearchQueryItem(
-            LogPeer.CENTER.getName()));
-        params.add(sb.toString());
-        sb = new StringBuffer();
-        sb.append(LogPeer.DETAILS.getName());
-        sb.append(": "); //$NON-NLS-1$
-        sb.append(LogQuery.getInstance().getSearchQueryItem(
-            LogPeer.CENTER.getName()));
-        params.add(sb.toString());
-        sb = new StringBuffer();
-        sb.append("Start Date"); //$NON-NLS-1$
-        sb.append(": "); //$NON-NLS-1$
-        sb.append(LogQuery.getInstance().getSearchQueryItem(
-            LogPeer.CENTER.getName()));
-        params.add(sb.toString());
-        sb = new StringBuffer();
-        sb.append("End Date"); //$NON-NLS-1$
-        sb.append(": "); //$NON-NLS-1$
-        sb.append(LogQuery.getInstance().getSearchQueryItem(
-            LogPeer.CENTER.getName()));
-        params.add(sb.toString());
-        return params;
-    }
-
     private void getSearchRequestFields() throws Exception {
         centerLabel.setText(LogQuery.getInstance().getSearchQueryItem(
             LogPeer.CENTER.getName()));
@@ -265,19 +195,6 @@ public class LoggingForm extends BiobankViewForm {
             LogPeer.LOCATION_LABEL.getName()));
         detailsLabel.setText(LogQuery.getInstance().getSearchQueryItem(
             LogPeer.DETAILS.getName()));
-        /*
-         * containerTypeLabel = createReadOnlyLabelledField(client, SWT.NONE,
-         * "Container Type"); containerLabelLabel
-         * =createReadOnlyLabelledField(client, SWT.NONE, "Container Label");
-         */
-        /*
-         * containerTypeLabel.setText(LogQuery.getInstance().getSearchQueryItem
-         * ( "containerType"));
-         * 
-         * containerLabelLabel
-         * .setText(LogQuery.getInstance().getSearchQueryItem(
-         * "containerLabel"));
-         */
     }
 
     @Override

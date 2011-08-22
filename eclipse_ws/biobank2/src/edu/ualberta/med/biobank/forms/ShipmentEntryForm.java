@@ -490,10 +490,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             isTryingAgain = true;
             tryAgain = false;
             confirm();
+        } else {
+            SpecimenTransitView.reloadCurrent();
+            if (!originInfo.getShipmentInfo().isReceivedToday())
+                SpecimenTransitView.showShipment(originInfo);
         }
-        SpecimenTransitView.reloadCurrent();
-        if (!originInfo.getShipmentInfo().isReceivedToday())
-            SpecimenTransitView.showShipment(originInfo);
     }
 
     @Override
