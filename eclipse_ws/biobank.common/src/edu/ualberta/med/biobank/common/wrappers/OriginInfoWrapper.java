@@ -276,4 +276,13 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         log.setType("Shipment");
         return log;
     }
+
+    /**
+     * Should be addToSpecimenCollection most of the time. But can use this
+     * method from tome to tome to reset the collection (used in saving
+     * originInfo when want to try to re-add the specimens)
+     */
+    public void setSpecimenWrapperCollection(List<SpecimenWrapper> specs) {
+        setWrapperCollection(OriginInfoPeer.SPECIMEN_COLLECTION, specs);
+    }
 }

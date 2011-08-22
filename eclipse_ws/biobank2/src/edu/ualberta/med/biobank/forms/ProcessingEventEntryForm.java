@@ -64,7 +64,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     protected boolean tryAgain = false;
 
-    private boolean istryingAgain;
+    private boolean isTryingAgain;
 
     @Override
     protected void init() throws Exception {
@@ -280,7 +280,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         try {
             pEvent.persist();
         } catch (ModificationConcurrencyException mc) {
-            if (istryingAgain) {
+            if (isTryingAgain) {
                 // already tried once
                 throw mc;
             }
@@ -306,7 +306,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     @Override
     protected void doAfterSave() throws Exception {
         if (tryAgain) {
-            istryingAgain = true;
+            isTryingAgain = true;
             tryAgain = false;
             confirm();
         }

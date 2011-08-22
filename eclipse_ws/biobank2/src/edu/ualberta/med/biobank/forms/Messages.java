@@ -593,11 +593,17 @@ public class Messages extends NLS {
 
     public static String ScanPlateForm_scanplate_button;
 
+    public static String ShipmentEntryForm_adding_label;
+
     public static String ShipmentEntryForm_boxNber_label;
 
     public static String ShipmentEntryForm_center_select_msg;
 
     public static String ShipmentEntryForm_comments_label;
+
+    public static String ShipmentEntryForm_concurrency_msg;
+
+    public static String ShipmentEntryForm_concurrency_title;
 
     public static String ShipmentEntryForm_dispatched_specimen_error_msg;
 
@@ -625,6 +631,8 @@ public class Messages extends NLS {
 
     public static String ShipmentEntryForm_receiver_validation_msg;
 
+    public static String ShipmentEntryForm_removing_label;
+
     public static String ShipmentEntryForm_sender_label;
 
     public static String ShipmentEntryForm_sender_validation_msg;
@@ -640,6 +648,8 @@ public class Messages extends NLS {
     public static String ShipmentEntryForm_title_edit;
 
     public static String ShipmentEntryForm_title_new;
+
+    public static String ShipmentEntryForm_tryAgain_error_msg;
 
     public static String ShipmentEntryForm_waybill_label;
 
