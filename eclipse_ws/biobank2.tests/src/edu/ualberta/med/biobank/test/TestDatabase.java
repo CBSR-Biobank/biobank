@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.StringValueLengthServerException;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
+import edu.ualberta.med.biobank.test.internal.RequestHelper;
 import edu.ualberta.med.biobank.test.internal.ResearchGroupHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentInfoHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
@@ -61,6 +62,7 @@ public class TestDatabase {
         Assert.assertNotNull("appService is null", appService);
         try {
             DispatchHelper.deleteCreatedDispatches();
+            RequestHelper.deleteCreatedRequests();
             StudyHelper.deleteStudyDependencies();
             SiteHelper.deleteCreatedSites();
             ResearchGroupHelper.deleteCreatedResearchGroups();

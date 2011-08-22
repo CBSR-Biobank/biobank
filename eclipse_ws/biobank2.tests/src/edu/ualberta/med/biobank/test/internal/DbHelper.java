@@ -7,6 +7,7 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -122,11 +123,7 @@ public class DbHelper {
 
     public static void deleteResearchGroups(
         List<ResearchGroupWrapper> researchGroups) throws Exception {
-        Assert.assertNotNull("appService is null", appService);
-        for (ResearchGroupWrapper rg : researchGroups) {
-            rg.reload();
-            rg.delete();
-        }
+        deleteFromList(researchGroups);
     }
 
     public static void deleteFromList(Collection<? extends ModelWrapper<?>> list)
@@ -138,6 +135,14 @@ public class DbHelper {
             object.reload();
             object.delete();
         }
+    }
+
+    public static void deleteRequests(List<RequestWrapper> createdRequests)
+        throws Exception {
+        for (RequestWrapper r : createdRequests) {
+            deleteFromList(r.getRequestSpecimenCollection(false));
+        }
+        deleteFromList(createdRequests);
     }
 
 }

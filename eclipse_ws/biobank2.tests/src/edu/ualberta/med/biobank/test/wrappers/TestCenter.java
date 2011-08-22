@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
+import edu.ualberta.med.biobank.test.internal.RequestHelper;
 import edu.ualberta.med.biobank.test.internal.ResearchGroupHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -51,13 +52,18 @@ public class TestCenter extends TestDatabase {
     @Test
     public void testGetRequest() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testRequest");
-        CollectionEventHelper.addCollectionEvent(site, PatientHelper
-            .addPatient("testP", StudyHelper.addStudy("testStudy")), 0,
+        StudyWrapper testStudy = StudyHelper.addStudy("testStudy");
+        CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
+            site, PatientHelper.addPatient("testP", testStudy), 0,
             SpecimenHelper.newSpecimen(
-                SpecimenTypeHelper.addSpecimenType("testType"), "Active",
-                new Date()));
-        Assert.assertEquals(0,
-            CenterWrapper.getRequestCollection(appService, site));
+                SpecimenTypeHelper.addSpecimenType("testTypeRequest"),
+                "Active", new Date()));
+        RequestHelper.addRequest(testStudy, true,
+            ce.getAllSpecimenCollection(false)
+                .toArray(new SpecimenWrapper[] {}));
+        site.reload();
+        Assert.assertEquals(1,
+            CenterWrapper.getRequestCollection(appService, site).size());
     }
 
     @Test
@@ -70,29 +76,35 @@ public class TestCenter extends TestDatabase {
         ProcessingEventHelper.addProcessingEvent(site,
             PatientWrapper.getPatient(appService, "testP"), new Date());
 
+        site.reload();
         Assert.assertEquals(3, site.getProcessingEventCount());
         Assert.assertEquals(3, site.getProcessingEventCount(true));
     }
 
     @Test
     public void testGetAliquotedSpecimens() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testAliquots");
+        SiteWrapper site = SiteHelper.addSite("testAliquots" + r.nextInt());
         ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site,
                 PatientWrapper.getPatient(appService, "testP"), new Date());
         SpecimenTypeWrapper testtype = SpecimenTypeHelper
-            .addSpecimenType("testType");
+            .addSpecimenType("testTypeAliquoted");
         SpecimenWrapper parent = SpecimenHelper.newSpecimen(testtype, "Active",
             new Date());
         CollectionEventWrapper ce = CollectionEventHelper.addCollectionEvent(
             site, PatientHelper.addPatient("testP",
                 StudyHelper.addStudy("testStudy")), 0, parent);
+        parent.reload();
+        ce.reload();
+        pevent.reload();
+        site.reload();
 
-        ce.addToAllSpecimenCollection(Arrays.asList(
-            SpecimenHelper.addSpecimen(parent, testtype, ce, pevent),
-            SpecimenHelper.addSpecimen(parent, testtype, ce, pevent),
-            SpecimenHelper.addSpecimen(parent, testtype, ce, pevent)));
+        SpecimenHelper.addSpecimen(parent, testtype, ce, pevent);
 
+        SpecimenHelper.addSpecimen(parent, testtype, ce, pevent);
+        SpecimenHelper.addSpecimen(parent, testtype, ce, pevent);
+
+        site.reload();
         Assert.assertEquals(3, site.getAliquotedSpecimenCount().intValue());
     }
 
