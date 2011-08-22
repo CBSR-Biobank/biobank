@@ -48,9 +48,11 @@ public class DispatchAdapter extends AdapterBase {
                     .isNew()
                     || getDispatchWrapper().isInCreationState()
                     || getDispatchWrapper().isInTransitState() || getDispatchWrapper()
-                    .isInLostState())) || (getDispatchWrapper().getReceiverCenter()
-                    .equals(SessionManager.getUser().getCurrentWorkingCenter()) && (getDispatchWrapper()
-                    .isInReceivedState() || getDispatchWrapper().isInLostState() || getDispatchWrapper()
+                    .isInLostState())) || (getDispatchWrapper()
+                    .getReceiverCenter().equals(
+                        SessionManager.getUser().getCurrentWorkingCenter()) && (getDispatchWrapper()
+                    .isInReceivedState()
+                    || getDispatchWrapper().isInLostState() || getDispatchWrapper()
                     .isInClosedState())));
         }
         return editable;
@@ -166,12 +168,24 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     public void doSetAsLost() {
+        try {
+            // to be sure has last database data.
+            getDispatchWrapper().reload();
+        } catch (Exception ex) {
+            BgcPlugin.openAsyncError(Messages.DispatchAdapter_reload_error, ex);
+        }
         getDispatchWrapper().setState(DispatchState.LOST);
         persistDispatch();
         openViewForm();
     }
 
     private void setDispatchAsReceived() {
+        try {
+            // to be sure has last database data.
+            getDispatchWrapper().reload();
+        } catch (Exception ex) {
+            BgcPlugin.openAsyncError(Messages.DispatchAdapter_reload_error, ex);
+        }
         getDispatchWrapper().getShipmentInfo().setReceivedAt(new Date());
         getDispatchWrapper().setState(DispatchState.RECEIVED);
         persistDispatch();
@@ -228,8 +242,8 @@ public class DispatchAdapter extends AdapterBase {
     @Override
     public String getEntryFormId() {
         if (getDispatchWrapper().isInCreationState()
-            || (getDispatchWrapper().isInTransitState() && SessionManager.getUser()
-                .getCurrentWorkingCenter()
+            || (getDispatchWrapper().isInTransitState() && SessionManager
+                .getUser().getCurrentWorkingCenter()
                 .equals(getDispatchWrapper().getSenderCenter())))
             return DispatchSendingEntryForm.ID;
         return DispatchReceivingEntryForm.ID;

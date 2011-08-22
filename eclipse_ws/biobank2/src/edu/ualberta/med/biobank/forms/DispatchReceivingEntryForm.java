@@ -1,7 +1,12 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -11,6 +16,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
@@ -26,6 +32,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm"; //$NON-NLS-1$
     private DispatchSpecimensTreeTable specimensTree;
+    private List<SpecimenWrapper> receivedOrExtraSpecimens = new ArrayList<SpecimenWrapper>();
 
     @Override
     protected void createFormContent() throws Exception {
@@ -99,6 +106,19 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     @Override
     protected void doSpecimenTextAction(String inventoryId) {
         try {
+            doSpecimenTextAction(inventoryId, true);
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError(Messages.DispatchReceivingEntryForm_problem_spec_error, e);
+        }
+    }
+
+    /**
+     * when called from gui, errors will show a dialog. Otherwise, will throw an
+     * exception
+     */
+    protected void doSpecimenTextAction(String inventoryId, boolean showMessages)
+        throws Exception {
+        try {
             CellProcessResult res = appService.processCellStatus(new Cell(-1,
                 -1, inventoryId, null), new ShipmentProcessData(null, dispatch,
                 false, false), SessionManager.getUser(), Locale.getDefault());
@@ -112,44 +132,59 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             switch (res.getCell().getStatus()) {
             case IN_SHIPMENT_EXPECTED:
                 dispatch.receiveSpecimens(Arrays.asList(specimen));
+                receivedOrExtraSpecimens.add(specimen);
                 reloadSpecimens();
                 setDirty(true);
                 break;
             case IN_SHIPMENT_RECEIVED:
-                BgcPlugin
-                    .openInformation(
-                        Messages.DispatchReceivingEntryForm_already_accepted_title,
-                        NLS.bind(
-                            Messages.DispatchReceivingEntryForm_already_accepted_msg,
-                            inventoryId));
+                if (showMessages)
+                    BgcPlugin
+                        .openInformation(
+                            Messages.DispatchReceivingEntryForm_already_accepted_title,
+                            NLS.bind(
+                                Messages.DispatchReceivingEntryForm_already_accepted_msg,
+                                inventoryId));
                 break;
             case EXTRA:
-                BgcPlugin
-                    .openInformation(
-                        Messages.DispatchReceivingEntryForm_noFound_error_title,
-                        NLS.bind(
-                            Messages.DispatchReceivingEntryForm_notFound_errror_msg,
-                            inventoryId));
-                if (specimen == null) {
+                if (showMessages)
                     BgcPlugin
-                        .openAsyncError(
-                            Messages.DispatchReceivingEntryForm_specimen_pb_error_title,
+                        .openInformation(
+                            Messages.DispatchReceivingEntryForm_noFound_error_title,
+                            NLS.bind(
+                                Messages.DispatchReceivingEntryForm_notFound_errror_msg,
+                                inventoryId));
+                if (specimen == null) {
+                    if (showMessages)
+                        BgcPlugin
+                            .openAsyncError(
+                                Messages.DispatchReceivingEntryForm_specimen_pb_error_title,
+                                Messages.DispatchReceivingEntryForm_specimen_pb_error_msg);
+                    else
+                        throw new Exception(
                             Messages.DispatchReceivingEntryForm_specimen_pb_error_msg);
                     break;
                 }
                 dispatch.addSpecimens(Arrays.asList(specimen),
                     DispatchSpecimenState.EXTRA);
+                receivedOrExtraSpecimens.add(specimen);
                 reloadSpecimens();
                 setDirty(true);
                 break;
             default:
-                BgcPlugin.openInformation(
-                    Messages.DispatchReceivingEntryForm_specimen_pb_er, res
-                        .getCell().getInformation());
+                if (showMessages)
+                    BgcPlugin.openInformation(
+                        Messages.DispatchReceivingEntryForm_specimen_pb_er, res
+                            .getCell().getInformation());
+                else
+                    throw new Exception(
+                        Messages.DispatchReceivingEntryForm_specimen_pb_er);
             }
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(
-                Messages.DispatchReceivingEntryForm_receive_error_title, e);
+            if (showMessages)
+                BgcPlugin.openAsyncError(
+                    Messages.DispatchReceivingEntryForm_receive_error_title, e);
+            else
+                throw e;
         }
     }
 
@@ -174,4 +209,38 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         specimensTree.refresh();
     }
 
+    @Override
+    protected boolean needToTryAgainIfConcurrency() {
+        return true;
+    }
+
+    @Override
+    protected void doTrySettingAgain() throws Exception {
+        dispatch.reloadDispatchSpecimens();
+        Map<String, String> problems = new HashMap<String, String>();
+        // work on a copy of the list to avoid concurrency pb on list
+        List<SpecimenWrapper> receveidOrExtrasCopy = new ArrayList<SpecimenWrapper>(
+            receivedOrExtraSpecimens);
+        receivedOrExtraSpecimens.clear();
+        for (SpecimenWrapper spec : receveidOrExtrasCopy) {
+            try {
+                doSpecimenTextAction(spec.getInventoryId(), false);
+            } catch (Exception ex) {
+                problems.put(spec.getInventoryId(), ex.getMessage());
+            }
+        }
+
+        if (problems.size() != 0) {
+            StringBuffer msg = new StringBuffer();
+            for (Entry<String, String> entry : problems.entrySet()) {
+                if (msg.length() > 0)
+                    msg.append("\n"); //$NON-NLS-1$
+                msg.append(entry.getKey()).append(": ") //$NON-NLS-1$
+                    .append(entry.getValue());
+            }
+            throw new BiobankException(
+                Messages.ProcessingEventEntryForm_try_again_error_msg
+                    + msg.toString());
+        }
+    }
 }
