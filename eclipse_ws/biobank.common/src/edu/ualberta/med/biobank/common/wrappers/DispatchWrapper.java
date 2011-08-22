@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
@@ -550,19 +549,11 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         + ShipmentInfoPeer.RECEIVED_AT.getName()
         + " >=? and s."
         + ShipmentInfoPeer.RECEIVED_AT.getName()
-        + " <=? and (d."
+        + " <? and (d."
         + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
         + "= ? or d."
         + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
         + " = ?)";
-
-    // Date should input with no hour/minute/seconds
-    public static Date endOfDay(Date date) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        c.add(Calendar.DAY_OF_MONTH, 1);
-        return c.getTime();
-    }
 
     /**
      * Search for shipments in the site with the given date received. Don't use
@@ -575,8 +566,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         Integer centerId = center.getId();
         HQLCriteria criteria = new HQLCriteria(
             DISPATCHES_BY_DATE_RECEIVED_QRY.toString(),
-            Arrays.asList(new Object[] { dateReceived, endOfDay(dateReceived),
-                centerId, centerId }));
+            Arrays.asList(new Object[] { startOfDay(dateReceived),
+                endOfDay(dateReceived), centerId, centerId }));
 
         List<Dispatch> origins = appService.query(criteria);
         List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(
@@ -590,7 +581,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         + ShipmentInfoPeer.PACKED_AT.getName()
         + " >= ? and s."
         + ShipmentInfoPeer.PACKED_AT.getName()
-        + " <= ? and (d."
+        + " < ? and (d."
         + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
         + "= ? or d."
         + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
@@ -601,8 +592,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         CenterWrapper<?> center) throws ApplicationException {
         Integer centerId = center.getId();
         HQLCriteria criteria = new HQLCriteria(DISPATCHED_BY_DATE_SENT_QRY,
-            Arrays.asList(new Object[] { dateSent, endOfDay(dateSent),
-                centerId, centerId }));
+            Arrays.asList(new Object[] { startOfDay(dateSent),
+                endOfDay(dateSent), centerId, centerId }));
 
         List<Dispatch> origins = appService.query(criteria);
         List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(

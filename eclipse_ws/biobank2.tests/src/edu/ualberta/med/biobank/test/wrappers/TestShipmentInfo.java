@@ -31,7 +31,7 @@ public class TestShipmentInfo extends TestDatabase {
 
     @Test
     public void testReceivedToday() throws Exception {
-        String name = "testGettersAndSetters" + r.nextInt();
+        String name = "testReceivedToday" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         SpecimenWrapper spc = SpecimenHelper.addParentSpecimen();
 
