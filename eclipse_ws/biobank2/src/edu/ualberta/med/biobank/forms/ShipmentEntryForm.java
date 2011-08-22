@@ -257,6 +257,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             widgetCreator.addBinding(BOX_NUMBER_BINDING);
         } else {
             widgetCreator.removeBinding(BOX_NUMBER_BINDING);
+            boxNumberWidget.setText(""); //$NON-NLS-1$
         }
         form.layout(true, true);
     }
