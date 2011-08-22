@@ -26,7 +26,7 @@ public class CsvDataExporter extends GuiDataExporter {
 
         try {
             writer = new CsvListWriter(new FileWriter(path),
-                CsvPreference.EXCEL_PREFERENCE);
+                CsvPreference.STANDARD_PREFERENCE);
 
             // can only write column names to a CSV, no comments, title, etc.
             // are allowed b/c cannot have comments in the file, only headers

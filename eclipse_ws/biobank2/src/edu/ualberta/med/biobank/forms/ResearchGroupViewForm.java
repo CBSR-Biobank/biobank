@@ -80,10 +80,10 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         client.setLayout(new GridLayout(3, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-        toolkit.createLabel(client,
-            Messages.ResearchGroupViewForm_0);
-        csvSelector = new BgcFileBrowser(client, Messages.ResearchGroupViewForm_1, SWT.NONE,
-            new String[] { ".csv" }); //$NON-NLS-1$
+        toolkit.createLabel(client, Messages.ResearchGroupViewForm_0);
+        csvSelector = new BgcFileBrowser(client,
+            Messages.ResearchGroupViewForm_1, SWT.NONE,
+            new String[] { "*.csv" }); //$NON-NLS-1$
         csvSelector.addFileSelectedListener(this);
         csvSelector.adaptToToolkit(toolkit, true);
         Button b = new Button(client, SWT.PUSH);
