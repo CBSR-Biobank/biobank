@@ -78,9 +78,19 @@ public class DbHelper {
             if (ce.isNew())
                 continue;
             ce.reload();
-            deleteFromList(ce.getAllSpecimenCollection(false));
+            // cannot use all here! otherwise you delete twice
+            deleteSpecimensAndChildren(ce.getOriginalSpecimenCollection(false));
             ce.reload();
             ce.delete();
+        }
+    }
+
+    private static void deleteSpecimensAndChildren(
+        List<SpecimenWrapper> specimenCollection) throws Exception {
+        for (SpecimenWrapper child : specimenCollection) {
+            deleteSpecimensAndChildren(child.getChildSpecimenCollection(false));
+            child.reload();
+            child.delete();
         }
     }
 

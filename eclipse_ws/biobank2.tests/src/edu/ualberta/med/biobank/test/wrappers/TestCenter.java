@@ -99,10 +99,16 @@ public class TestCenter extends TestDatabase {
         pevent.reload();
         site.reload();
 
-        SpecimenHelper.addSpecimen(parent, testtype, ce, pevent);
+        SpecimenHelper.addSpecimen(
+            ce.getOriginalSpecimenCollection(false).get(0), testtype, ce,
+            pevent);
 
-        SpecimenHelper.addSpecimen(parent, testtype, ce, pevent);
-        SpecimenHelper.addSpecimen(parent, testtype, ce, pevent);
+        SpecimenHelper.addSpecimen(
+            ce.getOriginalSpecimenCollection(false).get(0), testtype, ce,
+            pevent);
+        SpecimenHelper.addSpecimen(
+            ce.getOriginalSpecimenCollection(false).get(0), testtype, ce,
+            pevent);
 
         site.reload();
         Assert.assertEquals(3, site.getAliquotedSpecimenCount().intValue());

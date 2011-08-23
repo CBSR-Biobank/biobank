@@ -250,13 +250,13 @@ public class SiteWrapper extends SiteBaseWrapper {
         + Site.class.getName()
         + " as site join site."
         + SitePeer.SPECIMEN_COLLECTION.getName()
-        + " as specimens where site."
-        + SitePeer.ID.getName()
-        + "=? and "
-        + "specimens."
+        + " as specimens join specimens."
         + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-            CollectionEventPeer.PATIENT, PatientPeer.STUDY, StudyPeer.ID)
-        + "=?";
+            CollectionEventPeer.PATIENT)
+        + " as patient where site."
+        + SitePeer.ID.getName()
+        + "=? and patient."
+        + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID) + "=?";
 
     @Override
     public long getPatientCountForStudy(StudyWrapper study)
