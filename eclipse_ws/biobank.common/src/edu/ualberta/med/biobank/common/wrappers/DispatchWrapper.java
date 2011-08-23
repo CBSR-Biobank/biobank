@@ -150,20 +150,23 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
         + "=? and "
         + Property.concatNames(DispatchPeer.SHIPMENT_INFO,
+            ShipmentInfoPeer.WAYBILL)
+        + "!= '' and "
+        + Property.concatNames(DispatchPeer.SHIPMENT_INFO,
             ShipmentInfoPeer.WAYBILL) + "=?";
 
     private boolean checkWaybillUniqueForSender() throws ApplicationException,
         BiobankCheckException {
+        if (getShipmentInfo() == null)
+            // no waybill test since there is no shipmentInfo set
+            return true;
         List<Object> params = new ArrayList<Object>();
         CenterWrapper<?> sender = getSenderCenter();
         if (sender == null) {
             throw new BiobankCheckException("sender site cannot be null");
         }
         params.add(sender.getId());
-        if (getShipmentInfo() == null)
-            params.add("");
-        else
-            params.add(getShipmentInfo().getWaybill());
+        params.add(getShipmentInfo().getWaybill());
 
         StringBuilder qry = new StringBuilder(WAYBILL_UNIQUE_FOR_SENDER_QRY);
         if (!isNew()) {
