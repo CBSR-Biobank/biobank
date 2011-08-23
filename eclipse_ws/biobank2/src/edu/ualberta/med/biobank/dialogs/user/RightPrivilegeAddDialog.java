@@ -25,6 +25,7 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
     private final String titleAreaMessage;
     private RoleWrapper role;
     private RightPrivilegeWrapper rp;
+    private NewMultiSelectWidget<PrivilegeWrapper> privilegesWidget;
 
     public RightPrivilegeAddDialog(Shell parent, RoleWrapper role) {
         super(parent);
@@ -62,8 +63,7 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
             "Please select a right", new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    getRightPrivilege().setRight(
-                        (BbRightWrapper) selectedObject);
+                    rp.setRight((BbRightWrapper) selectedObject);
                 }
             }, new BiobankLabelProvider() {
                 @Override
@@ -72,10 +72,9 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
                 }
             });
 
-        NewMultiSelectWidget<PrivilegeWrapper> privilegesWidget = new NewMultiSelectWidget<PrivilegeWrapper>(
-            contents, SWT.NONE, "Available privileges", "Selected privileges",
-            110, PrivilegeWrapper.getAllPrivileges(SessionManager
-                .getAppService()));
+        privilegesWidget = new NewMultiSelectWidget<PrivilegeWrapper>(contents,
+            SWT.NONE, "Available privileges", "Selected privileges", 110,
+            PrivilegeWrapper.getAllPrivileges(SessionManager.getAppService()));
         GridData gd = (GridData) privilegesWidget.getLayoutData();
         gd.horizontalSpan = 2;
 
@@ -85,7 +84,10 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
 
     @Override
     protected void okPressed() {
-        role.addToRightPrivilegeCollection(Arrays.asList(getRightPrivilege()));
+        rp.addToPrivilegeCollection(privilegesWidget.getAddedToSelection());
+        rp.removeFromPrivilegeCollection(privilegesWidget
+            .getRemovedToSelection());
+        role.addToRightPrivilegeCollection(Arrays.asList(rp));
         super.okPressed();
     }
 

@@ -1,13 +1,13 @@
 package edu.ualberta.med.biobank.widgets.listeners;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 
-import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNode;
-import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNodeTransfer;
 import edu.ualberta.med.biobank.widgets.multiselect.NewMultiSelectWidget;
 
 /**
@@ -24,36 +24,26 @@ public class ListViewerDropListener<T> extends ViewerDropAdapter {
         this.multiSelect = multiSelect;
 
         viewer.addDropSupport(DND.DROP_MOVE | DND.DROP_COPY,
-            new Transfer[] { MultiSelectNodeTransfer.getInstance() }, this);
+            new Transfer[] { multiSelect.getDndTransfer() }, this);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean performDrop(Object data) {
         ListViewer viewer = (ListViewer) getViewer();
-        MultiSelectNode target = (MultiSelectNode) getCurrentTarget();
-        // MultiSelectNode targetParent;
-        //
-        // if (target != null) {
-        // targetParent = target.getParent();
-        // } else {
-        // targetParent = (MultiSelectNode) getViewer().getInput();
-        // }
-        //
-        // for (MultiSelectNode node : (MultiSelectNode[]) data) {
-        // targetParent.addChild(node);
-        // viewer.reveal(node);
-        // }
-        // multiSelect.notifyListeners();
+
+        List<T> list = (List<T>) viewer.getInput();
+        multiSelect.dropInto(viewer, list);
+        multiSelect.notifyListeners();
         return true;
     }
 
     @Override
     public boolean validateDrop(Object target, int operation,
         TransferData transferType) {
-        if (target != null && target == this.getSelectedObject())
+        if (target != null && target == this.getSelectedObject()) {
             return false;
-        else
-            return MultiSelectNodeTransfer.getInstance().isSupportedType(
-                transferType);
+        } else
+            return multiSelect.getDndTransfer().isSupportedType(transferType);
     }
 }

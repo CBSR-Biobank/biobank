@@ -1,19 +1,17 @@
 package edu.ualberta.med.biobank.widgets.listeners;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.Transfer;
 
-import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNodeTransfer;
-
 /**
- * Drag support for moving items between TreeViewers in this widget.
+ * Drag support for moving items between ListViewers in this widget.
  * 
  */
 public class ListViewerDragListener<T> implements DragSourceListener {
@@ -21,11 +19,11 @@ public class ListViewerDragListener<T> implements DragSourceListener {
 
     private List<T> dragData;
 
-    public ListViewerDragListener(ListViewer viewer) {
+    public ListViewerDragListener(ListViewer viewer, ByteArrayTransfer transfer) {
         this.viewer = viewer;
 
         viewer.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY,
-            new Transfer[] { MultiSelectNodeTransfer.getInstance() }, this);
+            new Transfer[] { transfer }, this);
     }
 
     @Override
@@ -39,10 +37,9 @@ public class ListViewerDragListener<T> implements DragSourceListener {
         List<T> selections = ((IStructuredSelection) viewer.getSelection())
             .toList();
 
-        List<T> copy = new ArrayList<T>();
-        copy.addAll(selections);
-        event.data = copy;
-        dragData = copy;
+        T[] array = (T[]) selections.toArray();
+        event.data = array;
+        dragData = selections;
         dragFinished(event);
     }
 

@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -58,7 +57,7 @@ public class MultiSelectWidget extends BgcBaseWidget {
 
         availTree = createLabelledTree(this, leftLabel);
         availTree.setInput(availTreeRootNode);
-        availTree.setComparator(new ViewerComparator());
+        // availTree.setComparator(new ViewerComparator());
 
         Composite moveComposite = new Composite(this, SWT.NONE);
         moveComposite.setLayout(new GridLayout(1, false));
@@ -76,7 +75,7 @@ public class MultiSelectWidget extends BgcBaseWidget {
 
         selTree = createLabelledTree(this, rightLabel);
         selTree.setInput(selTreeRootNode);
-        selTree.setComparator(new ViewerComparator());
+        // selTree.setComparator(new ViewerComparator());
 
         dragAndDropSupport(availTree, selTree);
         dragAndDropSupport(selTree, availTree);

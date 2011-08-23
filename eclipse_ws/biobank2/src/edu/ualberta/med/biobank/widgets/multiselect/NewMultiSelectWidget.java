@@ -10,6 +10,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -22,6 +23,8 @@ import org.eclipse.swt.widgets.Label;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.listeners.ListViewerDragListener;
+import edu.ualberta.med.biobank.widgets.listeners.ListViewerDropListener;
 
 public class NewMultiSelectWidget<T> extends BgcBaseWidget {
 
@@ -40,6 +43,13 @@ public class NewMultiSelectWidget<T> extends BgcBaseWidget {
     private int minHeight;
 
     protected boolean ctrl;
+
+    /**
+     * Default will be for ModelWrapper. Can set another one for this multi
+     * select widget
+     */
+    private ByteArrayTransfer dndTransfer = NewMultiSelectNodeTransfer
+        .getInstance();
 
     public NewMultiSelectWidget(Composite parent, int style, String leftLabel,
         String rightLabel, int minHeight, List<T> allObjects) {
@@ -158,8 +168,8 @@ public class NewMultiSelectWidget<T> extends BgcBaseWidget {
     private void dragAndDropSupport(ListViewer fromList, ListViewer toList) {
         // FIXME need to understand more. Maybe need to come back to TreeViewers
         // after all.
-        // new ListViewerDragListener<T>(fromList);
-        // new ListViewerDropListener<T>(toList, this);
+        new ListViewerDragListener<T>(fromList, getDndTransfer());
+        new ListViewerDropListener<T>(toList, this);
     }
 
     public void addSelection(List<T> newSelection) {
@@ -208,5 +218,17 @@ public class NewMultiSelectWidget<T> extends BgcBaseWidget {
     public void refreshLists() {
         availLv.refresh();
         selLv.refresh();
+    }
+
+    public ByteArrayTransfer getDndTransfer() {
+        return dndTransfer;
+    }
+
+    public void setDndTransfer(ByteArrayTransfer dndTransfer) {
+        this.dndTransfer = dndTransfer;
+    }
+
+    public void dropInto(ListViewer viewer, List<T> list) {
+        // TODO
     }
 }
