@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.eclipse.core.runtime.Assert;
@@ -17,7 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.multiselect.NewMultiSelectWidget;
+import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class RightPrivilegeAddDialog extends BgcBaseDialog {
@@ -25,7 +26,7 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
     private final String titleAreaMessage;
     private RoleWrapper role;
     private RightPrivilegeWrapper rp;
-    private NewMultiSelectWidget<PrivilegeWrapper> privilegesWidget;
+    private MultiSelectWidget<PrivilegeWrapper> privilegesWidget;
 
     public RightPrivilegeAddDialog(Shell parent, RoleWrapper role) {
         super(parent);
@@ -72,14 +73,19 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
                 }
             });
 
-        privilegesWidget = new NewMultiSelectWidget<PrivilegeWrapper>(contents,
-            SWT.NONE, "Available privileges", "Selected privileges", 110,
-            PrivilegeWrapper.getAllPrivileges(SessionManager.getAppService()));
+        privilegesWidget = new MultiSelectWidget<PrivilegeWrapper>(contents,
+            SWT.NONE, "Available privileges", "Selected privileges", 110) {
+            @Override
+            protected String getTextForObject(PrivilegeWrapper nodeObject) {
+                return nodeObject.getName();
+            }
+        };
         GridData gd = (GridData) privilegesWidget.getLayoutData();
         gd.horizontalSpan = 2;
 
-        privilegesWidget.setSelection(Arrays.asList(PrivilegeWrapper
-            .getAllPrivileges(SessionManager.getAppService()).get(0)));
+        privilegesWidget.setSelections(
+            PrivilegeWrapper.getAllPrivileges(SessionManager.getAppService()),
+            new ArrayList<PrivilegeWrapper>());
     }
 
     @Override
