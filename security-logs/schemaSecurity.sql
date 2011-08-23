@@ -112,8 +112,8 @@ CREATE TABLE `csm_group` (
 LOCK TABLES `csm_group` WRITE;
 /*!40000 ALTER TABLE `csm_group` DISABLE KEYS */;
 INSERT INTO `csm_group` VALUES (5,'Super Administrator','Super administrator of the application','2011-03-11',2);
-INSERT INTO `csm_group` VALUES (6,'CBSR Technician Level 1','','2010-01-28',2);
-INSERT INTO `csm_group` VALUES (7,'CBSR Technician Level 2','','2010-01-28',2);
+INSERT INTO `csm_group` VALUES (6,'CBSR Technician Level 1','','2011-08-23',2);
+INSERT INTO `csm_group` VALUES (7,'CBSR Technician Level 2','','2011-08-23',2);
 INSERT INTO `csm_group` VALUES (8,'Calgary Technicians','','2010-04-20',2);
 INSERT INTO `csm_group` VALUES (9,'Calgary Administrator','','2010-04-20',2);
 /*!40000 ALTER TABLE `csm_group` ENABLE KEYS */;
@@ -376,7 +376,7 @@ CREATE TABLE `csm_protection_group` (
   KEY `idx_PARENT_PROTECTION_GROUP_ID` (`PARENT_PROTECTION_GROUP_ID`),
   CONSTRAINT `FK_PG_APPLICATION` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PROTECTION_GROUP` FOREIGN KEY (`PARENT_PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -403,6 +403,7 @@ INSERT INTO `csm_protection_group` VALUES (74,'Center Feature: Printer Labels','
 INSERT INTO `csm_protection_group` VALUES (75,'Internal: Clinic Administrator','** DO NOT RENAME **\r\ncontains specific classes that a clinic admin can work with\r\nIs a child of Center Admin',2,0,'2011-07-20',45);
 INSERT INTO `csm_protection_group` VALUES (76,'Internal: Site Administrator','** DO NOT RENAME **\r\ncontains specific classes that a site admin can work with\r\nIs a child of Center Admin',2,0,'2011-07-20',45);
 INSERT INTO `csm_protection_group` VALUES (77,'Internal: Research Group Administrator','** DO NOT RENAME **\r\ncontains specific classes that a RG admin can work with\r\nIs a child of Center Admin',2,0,'2011-07-20',45);
+INSERT INTO `csm_protection_group` VALUES (78,'Center Feature: Logging','Represents the reports feature',2,0,'2011-08-23',NULL);
 /*!40000 ALTER TABLE `csm_protection_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -587,7 +588,7 @@ CREATE TABLE `csm_user_group_role_pg` (
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_PROTECTION_GROUP` FOREIGN KEY (`PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_ROLE` FOREIGN KEY (`ROLE_ID`) REFERENCES `csm_role` (`ROLE_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_USER` FOREIGN KEY (`USER_ID`) REFERENCES `csm_user` (`USER_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=220 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=222 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -628,6 +629,8 @@ INSERT INTO `csm_user_group_role_pg` VALUES (216,NULL,9,8,48,'2011-07-20');
 INSERT INTO `csm_user_group_role_pg` VALUES (217,NULL,9,8,50,'2011-07-20');
 INSERT INTO `csm_user_group_role_pg` VALUES (218,NULL,9,8,67,'2011-07-20');
 INSERT INTO `csm_user_group_role_pg` VALUES (219,NULL,9,8,66,'2011-07-20');
+INSERT INTO `csm_user_group_role_pg` VALUES (220,NULL,6,8,78,'2011-08-23');
+INSERT INTO `csm_user_group_role_pg` VALUES (221,NULL,7,8,78,'2011-08-23');
 /*!40000 ALTER TABLE `csm_user_group_role_pg` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -671,4 +674,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-07-20 17:15:05
+-- Dump completed on 2011-08-23 13:07:39
