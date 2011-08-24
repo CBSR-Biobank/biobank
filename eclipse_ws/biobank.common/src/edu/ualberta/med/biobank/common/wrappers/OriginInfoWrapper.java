@@ -6,17 +6,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
-import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.OriginInfoFromClinicCheck;
-import edu.ualberta.med.biobank.model.Log;
+import edu.ualberta.med.biobank.common.wrappers.loggers.OriginInfoLogProvider;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -24,7 +20,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class OriginInfoWrapper extends OriginInfoBaseWrapper {
-
+    private static final OriginInfoLogProvider LOG_PROVIDER = new OriginInfoLogProvider();
     private static final String SHIPMENT_HQL_STRING = "from "
         + OriginInfo.class.getName() + " as o inner join fetch o."
         + OriginInfoPeer.SHIPMENT_INFO.getName() + " as s ";
@@ -188,34 +184,8 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details) {
-        ShipmentInfoWrapper shipInfo = getShipmentInfo();
-        if (shipInfo == null) {
-            // nothing to log since origin info does not yet point to any
-            // shipping information
-            return null;
-        }
-
-        Log log = new Log();
-        log.setAction(action);
-        if (site == null) {
-            log.setCenter(getCenter().getNameShort());
-        } else {
-            log.setCenter(site);
-        }
-
-        List<String> detailsList = new ArrayList<String>();
-        if (details.length() > 0) {
-            detailsList.add(details);
-        }
-
-        detailsList.add(new StringBuilder("waybill:").append(
-            shipInfo.getWaybill()).toString());
-        detailsList.add(new StringBuilder("specimens:").append(
-            getSpecimenCollection(false).size()).toString());
-        log.setDetails(StringUtils.join(detailsList, ", "));
-        log.setType("Shipment");
-        return log;
+    public OriginInfoLogProvider getLogProvider() {
+        return LOG_PROVIDER;
     }
 
     @Override

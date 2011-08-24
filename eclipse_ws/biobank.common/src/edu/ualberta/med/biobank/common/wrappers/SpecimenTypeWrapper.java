@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
@@ -148,8 +149,11 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().uniqueAndNotNull(SpecimenTypePeer.NAME));
-        tasks.add(check().uniqueAndNotNull(SpecimenTypePeer.NAME_SHORT));
+        tasks.add(check().notNull(SpecimenTypePeer.NAME));
+        tasks.add(check().notNull(SpecimenTypePeer.NAME_SHORT));
+
+        tasks.add(check().unique(SpecimenTypePeer.NAME));
+        tasks.add(check().unique(SpecimenTypePeer.NAME_SHORT));
 
         super.addPersistTasks(tasks);
     }

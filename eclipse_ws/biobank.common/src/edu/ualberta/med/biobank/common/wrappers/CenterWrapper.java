@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.CenterBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Center;
@@ -402,8 +403,11 @@ public abstract class CenterWrapper<E extends Center> extends
 
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().uniqueAndNotNull(CenterPeer.NAME));
-        tasks.add(check().uniqueAndNotNull(CenterPeer.NAME_SHORT));
+        tasks.add(check().notNull(CenterPeer.NAME));
+        tasks.add(check().notNull(CenterPeer.NAME_SHORT));
+
+        tasks.add(check().unique(CenterPeer.NAME));
+        tasks.add(check().unique(CenterPeer.NAME_SHORT));
 
         super.addPersistTasks(tasks);
     }

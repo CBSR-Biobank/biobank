@@ -20,11 +20,12 @@ import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.PatientBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.CollectionIsEmptyCheck;
 import edu.ualberta.med.biobank.common.wrappers.checks.NotUsedCheck;
+import edu.ualberta.med.biobank.common.wrappers.loggers.PatientLogProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -34,6 +35,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientWrapper extends PatientBaseWrapper {
+    private static final PatientLogProvider LOG_PROVIDER = new PatientLogProvider();
     private static final String HAS_SPECIMENS_MSG = "Unable to delete patient {0} because patient has specimens stored in database.";
     private static final String HAS_COLLECTION_EVENTS_MSG = "Collection events are still linked to this patient. Delete them before attempting to remove the patient.";
 
@@ -203,14 +205,8 @@ public class PatientWrapper extends PatientBaseWrapper {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details) {
-        Log log = new Log();
-        log.setAction(action);
-        log.setCenter(site);
-        log.setPatientNumber(getPnumber());
-        log.setDetails(details);
-        log.setType("Patient");
-        return log;
+    public PatientLogProvider getLogProvider() {
+        return LOG_PROVIDER;
     }
 
     /**
@@ -317,7 +313,8 @@ public class PatientWrapper extends PatientBaseWrapper {
 
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().uniqueAndNotNull(PatientPeer.PNUMBER));
+        tasks.add(check().notNull(PatientPeer.PNUMBER));
+        tasks.add(check().unique(PatientPeer.PNUMBER));
 
         super.addPersistTasks(tasks);
     }
@@ -345,7 +342,7 @@ public class PatientWrapper extends PatientBaseWrapper {
     @Override
     public void delete() throws Exception {
         WrapperTransaction.delete(this, appService);
-	}
+    }
 
     /**
      * return true if the user can delete this object

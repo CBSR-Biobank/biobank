@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.checks.LegalOptionCheck;
 import edu.ualberta.med.biobank.common.wrappers.checks.NotNullPreCheck;
 import edu.ualberta.med.biobank.common.wrappers.checks.NotUsedCheck;
 import edu.ualberta.med.biobank.common.wrappers.checks.UniquePreCheck;
+import edu.ualberta.med.biobank.common.wrappers.tasks.PreQueryTask;
 import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage;
 
 public class WrapperChecker<E> {
@@ -39,15 +40,6 @@ public class WrapperChecker<E> {
     public NotNullPreCheck<E> notNull(Property<?, ? super E> property) {
         // TODO: check on the client and on the server?
         return new NotNullPreCheck<E>(wrapper, property);
-    }
-
-    public TaskList uniqueAndNotNull(Property<?, ? super E> property) {
-        TaskList tasks = new TaskList();
-
-        tasks.add(notNull(property));
-        tasks.add(unique(property));
-
-        return tasks;
     }
 
     public CollectionIsEmptyCheck<E> empty(
@@ -86,11 +78,7 @@ public class WrapperChecker<E> {
         return new IfAction<E>(wrapper, property, is, action);
     }
 
-    public TaskList stringLengths() {
-        TaskList tasks = new TaskList();
-
-        tasks.add(new CheckStringLengthsPreQueryTask<E>(wrapper));
-
-        return tasks;
+    public PreQueryTask stringLengths() {
+        return new CheckStringLengthsPreQueryTask<E>(wrapper);
     }
 }

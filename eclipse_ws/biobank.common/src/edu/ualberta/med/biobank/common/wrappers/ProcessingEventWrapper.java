@@ -11,8 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -22,9 +20,10 @@ import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.loggers.ProcessingEventLogProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -33,6 +32,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
+    private static final ProcessingEventLogProvider LOG_PROVIDER = new ProcessingEventLogProvider();
     private static final String HAS_DERIVED_SPECIMENS_MSG = "Unable to delete processing event '{0}' ({1}) since some of its specimens have already been derived into others specimens.";
     private Set<SpecimenWrapper> removedSpecimens = new HashSet<SpecimenWrapper>();
 
@@ -100,30 +100,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details)
-        throws Exception {
-        Log log = new Log();
-        log.setAction(action);
-        if (site == null) {
-            log.setCenter(getCenter().getNameShort());
-        } else {
-            log.setCenter(site);
-        }
-        List<String> detailsList = new ArrayList<String>();
-        if (details.length() > 0) {
-            detailsList.add(details);
-        }
-
-        detailsList.add(new StringBuilder("Source Specimens: ").append(
-            getSpecimenCount(false)).toString());
-        String worksheet = getWorksheet();
-        if (worksheet != null) {
-            detailsList.add(new StringBuilder("Worksheet: ").append(worksheet)
-                .toString());
-        }
-        log.setDetails(StringUtils.join(detailsList, ", "));
-        log.setType("ProcessingEvent");
-        return log;
+    public ProcessingEventLogProvider getLogProvider() {
+        return LOG_PROVIDER;
     }
 
     private static final String PROCESSING_EVENT_BY_DATE_QRY = "select pEvent from "
@@ -236,7 +214,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().uniqueAndNotNull(ProcessingEventPeer.WORKSHEET));
+        tasks.add(check().notNull(ProcessingEventPeer.WORKSHEET));
+        tasks.add(check().unique(ProcessingEventPeer.WORKSHEET));
 
         super.addPersistTasks(tasks);
 
@@ -268,7 +247,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     @Override
     public void delete() throws Exception {
         WrapperTransaction.delete(this, appService);
-	}
+    }
 
     /**
      * return true if the user can delete this object

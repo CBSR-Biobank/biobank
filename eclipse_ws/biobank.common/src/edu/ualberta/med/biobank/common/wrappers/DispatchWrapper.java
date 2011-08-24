@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
@@ -24,6 +22,7 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
 import edu.ualberta.med.biobank.common.wrappers.actions.IfAction;
 import edu.ualberta.med.biobank.common.wrappers.actions.IfAction.Is;
@@ -31,16 +30,17 @@ import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.NotNullPreCheck;
 import edu.ualberta.med.biobank.common.wrappers.checks.UniqueCheck;
+import edu.ualberta.med.biobank.common.wrappers.loggers.DispatchLogProvider;
 import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
-import edu.ualberta.med.biobank.model.Log;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DispatchWrapper extends DispatchBaseWrapper {
+    private static final DispatchLogProvider LOG_PROVIDER = new DispatchLogProvider();
     private static final Property<String, Dispatch> WAYBILL_PROPERTY = DispatchPeer.SHIPMENT_INFO
         .to(ShipmentInfoPeer.WAYBILL);
     private static final Collection<Property<?, ? super Dispatch>> UNIQUE_WAYBILL_PER_SENDER_PROPERTIES = new ArrayList<Property<?, ? super Dispatch>>();
@@ -388,59 +388,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details) {
-        Log log = new Log();
-        log.setAction(action);
-
-        DispatchState state = getDispatchState();
-
-        if (site != null) {
-            log.setCenter(site);
-        } else if (state != null) {
-            if (state.equals(DispatchState.CREATION)
-                || state.equals(DispatchState.IN_TRANSIT)) {
-                log.setCenter(getSenderCenter().getNameShort());
-            } else {
-                log.setCenter(getReceiverCenter().getNameShort());
-            }
-        }
-
-        List<String> detailsList = new ArrayList<String>();
-        if (details.length() > 0) {
-            detailsList.add(details);
-        }
-
-        detailsList.add(new StringBuilder("state: ").append(
-            getStateDescription()).toString());
-
-        if ((state != null)
-            && ((state.equals(DispatchState.CREATION)
-                || state.equals(DispatchState.IN_TRANSIT) || state
-                    .equals(DispatchState.LOST)))) {
-            String packedAt = getFormattedPackedAt();
-            if ((packedAt != null) && (packedAt.length() > 0)) {
-                detailsList.add(new StringBuilder("packed at: ").append(
-                    packedAt).toString());
-            }
-        }
-
-        ShipmentInfoWrapper shipInfo = getShipmentInfo();
-        if (shipInfo != null) {
-            String receivedAt = shipInfo.getFormattedDateReceived();
-            if ((receivedAt != null) && (receivedAt.length() > 0)) {
-                detailsList.add(new StringBuilder("received at: ").append(
-                    receivedAt).toString());
-            }
-
-            String waybill = shipInfo.getWaybill();
-            if (waybill != null) {
-                detailsList.add(new StringBuilder(", waybill: ")
-                    .append(waybill).toString());
-            }
-        }
-        log.setDetails(StringUtils.join(detailsList, ", "));
-        log.setType("Dispatch");
-        return log;
+    public DispatchLogProvider getLogProvider() {
+        return LOG_PROVIDER;
     }
 
     private static final String DISPATCH_HQL_STRING = "from "

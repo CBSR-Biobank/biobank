@@ -1,11 +1,11 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.wrappers.actions.WrapperAction;
+import edu.ualberta.med.biobank.common.wrappers.loggers.LogGroup;
+import edu.ualberta.med.biobank.common.wrappers.tasks.InactiveQueryTask;
 import edu.ualberta.med.biobank.common.wrappers.tasks.PreQueryTask;
 import edu.ualberta.med.biobank.common.wrappers.tasks.QueryTask;
 import edu.ualberta.med.biobank.common.wrappers.tasks.RebindableWrapperQueryTask;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
@@ -15,12 +15,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-
-import org.hibernate.Session;
 
 /**
  * Maintains an internal list of actions to perform on given
@@ -72,10 +70,10 @@ public class WrapperTransaction {
         for (Action action : actions) {
             switch (action.type) {
             case PERSIST:
-                action.wrapper.addPersistTasks(tasks);
+                action.wrapper.addPersistAndLogTasks(tasks);
                 break;
             case DELETE:
-                action.wrapper.addDeleteTasks(tasks);
+                action.wrapper.addDeleteAndLogTasks(tasks);
             }
         }
 
@@ -152,131 +150,246 @@ public class WrapperTransaction {
         }
     }
 
-    // TODO: should share the map/ list for ALL wrappers?
-    // TODO: move out!
-    // TODO: should rebuild the modelWrapperMap since the model objects sent to
-    // the server that came back are now invalid?
-    public static class RebindWrappersQueryTask implements QueryTask {
-        private final ModelWrapper<?> wrapper;
-        private final List<ModelWrapper<?>> wrappersToRebind = new ArrayList<ModelWrapper<?>>();
-        private final List<Object> oldModels = new ArrayList<Object>();
+    /**
+     * Manages several {@link List}-s of tasks, such as {@link QueryTask}-s and
+     * {@link PreQueryTask}-s used by a {@link ModelWrapperTransaction} to
+     * persist or delete a {@link ModelWrapper<?>}.
+     * 
+     * @author jferland
+     * 
+     * @see ModelWrapper
+     * @see QueryTask
+     * @see PreQueryTask
+     * @see WrapperTransaction
+     * 
+     */
+    public static class TaskList {
+        private final Map<ModelWrapper<?>, ModelWrapper<?>> cascaded = new IdentityHashMap<ModelWrapper<?>, ModelWrapper<?>>();
+        private final LinkedList<QueryTask> queryTasks = new LinkedList<QueryTask>();
+        private final List<PreQueryTask> preQueryTasks = new ArrayList<PreQueryTask>();
+        private final LogGroup logGroup;
 
-        public RebindWrappersQueryTask(Set<ModelWrapper<?>> wrappers) {
-            // arbitrarily pick the first wrapper to use for security checks
-            this.wrapper = wrappers.iterator().next();
-            init(wrappers);
+        private TaskList() {
+            this(new LogGroup());
         }
 
-        @Override
-        public SDKQuery getSDKQuery() {
-            return new ReturnAction(wrapper, oldModels);
+        private TaskList(LogGroup logGroup) {
+            this.logGroup = logGroup;
         }
 
-        @Override
-        public void afterExecute(SDKQueryResult result) {
-            // TODO: If we reattach here, no need to do so in Delete or
-            // Persist!! :-)
-            @SuppressWarnings("unchecked")
-            List<Object> newModels = (List<Object>) result.getObjectResult();
-
-            updateWrappedObjects(newModels);
-            updateWrapperMap(newModels);
+        /**
+         * Add a {@link QueryTask} to the end of the {@link QueryTask} list.
+         * 
+         * @param task
+         */
+        public void add(QueryTask task) {
+            queryTasks.add(task);
         }
 
-        private void updateWrappedObjects(List<Object> newModels) {
-            for (int i = 0, n = wrappersToRebind.size(); i < n; i++) {
-                setWrappedObject(wrappersToRebind.get(i), newModels.get(i));
-                // TODO: only thing that may have changed is the id, notify
-                // listeners?
-                // TODO: direct properties may have changed, but not
-                // associations (e.g. label if container rename) so should do
-                // some sort of notification.
-            }
+        /**
+         * Wrap a {@link SDKQuery} in an actionless {@link QueryTask} (e.g.
+         * {@link InactiveQueryTask}) and add it to the end of the
+         * {@link QueryTask} list.
+         * 
+         * @param task
+         */
+        public void add(SDKQuery query) {
+            QueryTask task = new InactiveQueryTask(query);
+            queryTasks.add(task);
         }
 
-        private void updateWrapperMap(List<Object> newModels) {
-            // TODO:
-            // TODO: NEED NEED NEED to clean up the ModelWrapper.wrappersMap
-            // because it will contain model objects (as keys) that no longer
-            // exist.
-            // TODO:
-            // TODO: this is unnecessarily slow, mostly because almost all of
-            // the given wrappers will share the same wrapeprsMap. Could be
-            // optimized.
-            for (ModelWrapper<?> wrapper : wrappersToRebind) {
-                for (int i = 0, n = oldModels.size(); i < n; i++) {
-                }
-            }
+        /**
+         * Add a {@link PreQueryTask} to the end of the {@link PreQueryTask}
+         * list.
+         * 
+         * @param task
+         */
+        public void add(PreQueryTask task) {
+            preQueryTasks.add(task);
         }
 
-        private static <E> void setWrappedObject(ModelWrapper<E> wrapper,
-            Object object) {
-            wrapper.wrappedObject = wrapper.getWrappedClass().cast(object);
+        /**
+         * Adds all of the given {@link TaskList}'s internal lists into this
+         * {@link TaskList}.
+         * 
+         * @param list
+         */
+        public void add(TaskList list) {
+            queryTasks.addAll(list.queryTasks);
+            preQueryTasks.addAll(list.preQueryTasks);
         }
 
-        private void init(Collection<ModelWrapper<?>> wrappers) {
-            Map<ModelWrapper<?>, Object> map = new IdentityHashMap<ModelWrapper<?>, Object>();
-
-            for (ModelWrapper<?> wrapper : wrappers) {
-                readCache(wrapper, map);
-            }
-
-            for (Entry<ModelWrapper<?>, Object> entry : map.entrySet()) {
-                wrappersToRebind.add(entry.getKey());
-                oldModels.add(entry.getValue());
-            }
+        /**
+         * Get the {@link LogGroup} that is associated with this transaction.
+         * 
+         * @return
+         */
+        public LogGroup getLogGroup() {
+            return logGroup;
         }
 
-        private void readCache(ModelWrapper<?> wrapper,
-            Map<ModelWrapper<?>, Object> map) {
-            if (!map.containsKey(wrapper)) {
-                map.put(wrapper, wrapper.wrappedObject);
-                for (Object o : wrapper.propertyCache.values()) {
-                    if (o instanceof Collection) {
-                        for (Object e : (Collection<?>) o) {
-                            if (e instanceof ModelWrapper<?>) {
-                                readCache((ModelWrapper<?>) e, map);
-                            }
-                        }
-                    } else if (o instanceof ModelWrapper<?>) {
-                        readCache((ModelWrapper<?>) o, map);
+        public List<QueryTask> getQueryTasks() {
+            return queryTasks;
+        }
+
+        public List<PreQueryTask> getPreQueryTasks() {
+            return preQueryTasks;
+        }
+
+        //
+        // START CASCADE METHODS
+        //
+
+        /**
+         * Adds the tasks to persist a {@link ModelWrapper}'s {@link Property}.
+         * This is only done if the given {@link Property} has been set (even if
+         * it has only been loaded), even if it has not been modified.
+         * 
+         * @param wrapper which has the property
+         * @param property to persist
+         */
+        public <M, P> void persist(ModelWrapper<M> wrapper,
+            Property<P, M> property) {
+            // If the property is initialised (in the wrapped object) but not in
+            // the wrapper, then persist it anyways since the data will be sent
+            // anyways and a Hibernate cascade may take place and we may as well
+            // be aware of it.
+            if (wrapper.isPropertyCached(property)
+                || wrapper.isInitialized(property)) {
+                if (property.isCollection()) {
+                    @SuppressWarnings("unchecked")
+                    Property<? extends Collection<P>, ? super M> tmp = (Property<? extends Collection<P>, ? super M>) property;
+                    Collection<ModelWrapper<P>> list = wrapper
+                        .getWrapperCollection(tmp, null, false);
+                    for (ModelWrapper<?> wrappedProperty : list) {
+                        addPersistTasks(wrappedProperty);
+                    }
+                } else {
+                    ModelWrapper<P> wrappedProperty = wrapper
+                        .getWrappedProperty(property, null);
+                    if (wrappedProperty != null) {
+                        addPersistTasks(wrappedProperty);
                     }
                 }
             }
         }
 
         /**
-         * Simply returns the given action. This is useful because we can pass a
-         * list of wrapped objects, then get "new" references back after
-         * deserialization.
+         * Adds the tasks to delete a {@link ModelWrapper}'s {@link Property}.
+         * This will load the {@link Property} to delete it, whether it has
+         * already been loaded or not.
+         * <p>
+         * This method is <em>potentially network expensive</em> since it may
+         * require information to be lazily loaded from the database when
+         * called. Consider using {@link deleteRemovedUnchecked()} if checks and
+         * persists are unnecessary.
          * 
-         * @author jferland
-         * 
+         * @param wrapper which has the property
+         * @param property to delete
          */
-        @SuppressWarnings("rawtypes")
-        public static class ReturnAction extends WrapperAction {
-            private static final long serialVersionUID = 1L;
-
-            private Object result;
-
-            @SuppressWarnings("unchecked")
-            public ReturnAction(ModelWrapper<?> wrapper, Object result) {
-                super(wrapper);
-                this.result = result;
+        public <M, P> void delete(ModelWrapper<M> wrapper,
+            Property<P, M> property) {
+            if (property.isCollection()) {
+                @SuppressWarnings("unchecked")
+                Property<? extends Collection<P>, ? super M> tmp = (Property<? extends Collection<P>, ? super M>) property;
+                Collection<ModelWrapper<P>> list = wrapper
+                    .getWrapperCollection(tmp, null, false);
+                for (ModelWrapper<?> wrappedProperty : list) {
+                    addDeleteTasks(wrappedProperty);
+                }
+            } else {
+                ModelWrapper<P> wrappedProperty = wrapper.getWrappedProperty(
+                    property, null);
+                if (wrappedProperty != null) {
+                    addDeleteTasks(wrappedProperty);
+                }
             }
+        }
 
-            public void setResult(Object result) {
-                this.result = result;
+        /**
+         * Adds tasks to persist all newly added elements in the collection for
+         * the given {@link ModelWrapper}'s {@link Property}.
+         * <p>
+         * This is <em>dangerous</em> because if a property is added and
+         * modified then <em>all</em> changes will be persisted, not just it
+         * being added to the collection (e.g. if the name was changed, the name
+         * change will be persisted as well).
+         * 
+         * @param wrapper which has the property
+         * @param property to persist the added elements of
+         */
+        public <M, P> void persistAdded(ModelWrapper<M> wrapper,
+            Property<? extends Collection<P>, M> property) {
+            Collection<ModelWrapper<P>> elements = wrapper.getElementTracker()
+                .getAddedElements(property);
+            for (ModelWrapper<P> element : elements) {
+                addPersistTasks(element);
             }
+        }
 
-            public Object getResult() {
-                return result;
+        /**
+         * Adds tasks to persist all newly removed elements in the collection
+         * for the given {@link ModelWrapper}'s {@link Property}.
+         * 
+         * @param wrapper which has the property
+         * @param property to persist the removed elements of
+         */
+        public <M, P> void persistRemoved(ModelWrapper<M> wrapper,
+            Property<? extends Collection<P>, M> property) {
+            Collection<ModelWrapper<P>> elements = wrapper.getElementTracker()
+                .getRemovedElements(property);
+            for (ModelWrapper<P> element : elements) {
+                addPersistTasks(element);
             }
+        }
 
-            @Override
-            public Object doAction(Session session)
-                throws BiobankSessionException {
-                return result;
+        /**
+         * Adds tasks to remove elements from the given {@link ModelWrapper}'s
+         * {@link Property} for a collection.
+         * 
+         * @param wrapper which has the property
+         * @param property to persist the removed elements of
+         */
+        public <M, P> void deleteRemoved(ModelWrapper<M> wrapper,
+            Property<? extends Collection<P>, M> property) {
+            Collection<ModelWrapper<P>> elements = wrapper.getElementTracker()
+                .getRemovedElements(property);
+            for (ModelWrapper<P> element : elements) {
+                addDeleteTasks(element);
+            }
+        }
+
+        /**
+         * Adds tasks to delete a removed wrapped property value from the given
+         * {@link ModelWrapper}'s {@link Property}.
+         * 
+         * @param wrapper which has the property
+         * @param property to delete
+         */
+        public <M, P> void deleteRemovedValue(ModelWrapper<M> wrapper,
+            Property<P, M> property) {
+            ModelWrapper<P> removedValue = wrapper.getElementTracker()
+                .getRemovedValue(property);
+            if (removedValue != null) {
+                addDeleteTasks(removedValue);
+            }
+        }
+
+        //
+        // END CASCADE METHODS
+        //
+
+        private void addPersistTasks(ModelWrapper<?> wrapper) {
+            if (!cascaded.containsKey(wrapper)) {
+                cascaded.put(wrapper, wrapper);
+                wrapper.addPersistAndLogTasks(this);
+            }
+        }
+
+        private void addDeleteTasks(ModelWrapper<?> wrapper) {
+            if (!cascaded.containsKey(wrapper)) {
+                cascaded.put(wrapper, wrapper);
+                wrapper.addDeleteAndLogTasks(this);
             }
         }
     }

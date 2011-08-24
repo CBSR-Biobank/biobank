@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.actions.LoadModelAction;
 import edu.ualberta.med.biobank.common.wrappers.util.ProxyUtil;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
@@ -26,7 +27,7 @@ import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
-public class ContainerTypePostPersistChecks extends LoadCheck<ContainerType> {
+public class ContainerTypePostPersistChecks extends LoadModelAction<ContainerType> {
     private static final long serialVersionUID = 1L;
 
     private static final String CANNOT_REMOVE_CHILD_CONTAINER_TYPE_MSG = "Unable to remove child type. This parent/child relationship exists in database. Remove all instances before attempting to delete a child type.";
@@ -61,7 +62,7 @@ public class ContainerTypePostPersistChecks extends LoadCheck<ContainerType> {
     }
 
     @Override
-    public void doCheck(Session session, ContainerType freshObject)
+    public void doLoadModelAction(Session session, ContainerType freshObject)
         throws BiobankSessionException {
         checkLabelingScheme(freshObject);
         checkRemovedChildContainerTypes(session);

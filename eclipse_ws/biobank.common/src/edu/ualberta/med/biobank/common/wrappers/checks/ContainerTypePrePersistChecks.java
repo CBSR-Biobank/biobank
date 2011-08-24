@@ -5,12 +5,13 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.actions.CountUsesAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.LoadModelAction;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
-public class ContainerTypePrePersistChecks extends LoadCheck<ContainerType> {
+public class ContainerTypePrePersistChecks extends LoadModelAction<ContainerType> {
     private static final long serialVersionUID = 1L;
     private static final String CANNOT_CHANGE_CAPACITY_MSG = "Unable to alter dimensions. A container of this type exists in storage. Remove all instances before attempting to modify this container type.";
     private static final String CANNOT_CHANGE_TOP_LEVEL_MSG = "Unable to change the \"Top Level\" property. A container requiring this property exists in storage. Remove all instances before attempting to modify this container type.";
@@ -26,7 +27,7 @@ public class ContainerTypePrePersistChecks extends LoadCheck<ContainerType> {
     }
 
     @Override
-    public void doCheck(Session session, ContainerType oldContainerType)
+    public void doLoadModelAction(Session session, ContainerType oldContainerType)
         throws BiobankSessionException {
         if (oldContainerType == null) {
             return;

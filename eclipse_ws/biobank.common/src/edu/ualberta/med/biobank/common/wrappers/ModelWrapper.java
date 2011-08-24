@@ -9,9 +9,13 @@ import edu.ualberta.med.biobank.common.exception.CheckFieldLimitsException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
+import edu.ualberta.med.biobank.common.wrappers.loggers.LogAction;
+import edu.ualberta.med.biobank.common.wrappers.loggers.LogGroup;
+import edu.ualberta.med.biobank.common.wrappers.loggers.WrapperLogProvider;
 import edu.ualberta.med.biobank.common.wrappers.util.ModelWrapperHelper;
 import edu.ualberta.med.biobank.common.wrappers.util.ProxyUtil;
 import edu.ualberta.med.biobank.model.Log;
@@ -209,6 +213,34 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     protected void addDeleteTasks(TaskList tasks) {
         tasks.add(new DeleteModelWrapperQueryTask<E>(this));
+    }
+
+    /**
+     * Same as addPersistTasks() excepts includes logging.
+     * 
+     * @param tasks
+     */
+    protected final void addPersistAndLogTasks(TaskList tasks) {
+        addPersistTasks(tasks);
+        log(LogAction.Type.PERSIST, tasks);
+    }
+
+    /**
+     * Same as addDeleteTasks() excepts includes logging.
+     * 
+     * @param tasks
+     */
+    protected final void addDeleteAndLogTasks(TaskList tasks) {
+        log(LogAction.Type.DELETE, tasks);
+        addDeleteTasks(tasks);
+    }
+
+    private void log(LogAction.Type type, TaskList tasks) {
+        WrapperLogProvider<E> logProvider = getLogProvider();
+        if (logProvider != null) {
+            LogGroup logGroup = tasks.getLogGroup();
+            tasks.add(new LogAction<E>(type, this, logProvider, logGroup));
+        }
     }
 
     /**
@@ -683,8 +715,30 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     @SuppressWarnings("unused")
-    protected Log getLogMessage(String action, String site, String details)
+    protected final Log getLogMessage(String action, String site, String details)
         throws Exception {
+        Log log = null;
+        WrapperLogProvider<E> logProvider = getLogProvider();
+
+        if (logProvider != null) {
+            log = logProvider.getLog(getWrappedObject());
+
+            log.setAction(action);
+            log.setCenter(site);
+            log.setType(getWrappedClass().getSimpleName());
+
+            if (details != null) {
+                if (log.getDetails() != null) {
+                    details += log.getDetails();
+                }
+                log.setDetails(details);
+            }
+        }
+
+        return log;
+    }
+
+    protected WrapperLogProvider<E> getLogProvider() {
         return null;
     }
 

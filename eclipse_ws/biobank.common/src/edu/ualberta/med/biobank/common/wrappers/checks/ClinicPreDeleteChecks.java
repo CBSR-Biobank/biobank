@@ -8,11 +8,12 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.actions.UncachedAction;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
-public class ClinicPreDeleteChecks extends WrapperCheck<Clinic> {
+public class ClinicPreDeleteChecks extends UncachedAction<Clinic> {
     private static final long serialVersionUID = 1L;
     private static final String HAS_STUDIES_MSG = "Unable to delete clinic {0}. No more study reference should exist.";
 
@@ -29,7 +30,7 @@ public class ClinicPreDeleteChecks extends WrapperCheck<Clinic> {
     }
 
     @Override
-    public void doCheck(Session session) throws BiobankSessionException {
+    public void doUncachedAction(Session session) throws BiobankSessionException {
         checkHasStudies(session);
     }
 

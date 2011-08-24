@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -22,12 +20,13 @@ import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.CollectionEventBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
+import edu.ualberta.med.biobank.common.wrappers.loggers.CollectionEventLogProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -35,6 +34,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 @SuppressWarnings("unused")
 public class CollectionEventWrapper extends CollectionEventBaseWrapper {
+    private static final CollectionEventLogProvider LOG_PROVIDER = new CollectionEventLogProvider();
     private static final String HAS_SPECIMENS_MSG = "Specimens are still linked to this Collection Event. Delete them before attempting to remove this Collection Event";
     private static final Collection<Property<?, ? super CollectionEvent>> UNIQUE_VISIT_NUMBER_PROPS;
     static {
@@ -104,35 +104,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details)
-        throws Exception {
-        Log log = new Log();
-        log.setAction(action);
-        if (site == null) {
-            log.setCenter(null);
-        } else {
-            log.setCenter(site);
-        }
-        log.setPatientNumber(getPatient().getPnumber());
-        List<String> detailsList = new ArrayList<String>();
-        if (details.length() > 0) {
-            detailsList.add(details);
-        }
-
-        detailsList.add(new StringBuilder("visit:").append(getVisitNumber())
-            .toString());
-
-        try {
-            detailsList.add(new StringBuilder("specimens:").append(
-                getSourceSpecimensCount(false)).toString());
-        } catch (BiobankException e) {
-            e.printStackTrace();
-        } catch (ApplicationException e) {
-            e.printStackTrace();
-        }
-        log.setDetails(StringUtils.join(detailsList, ", "));
-        log.setType("CollectionEvent");
-        return log;
+    public CollectionEventLogProvider getLogProvider() {
+        return LOG_PROVIDER;
     }
 
     private static final String COLLECTION_EVENTS_BY_WAYBILL_QRY = "from "
@@ -531,7 +504,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     @Override
     public void delete() throws Exception {
         WrapperTransaction.delete(this, appService);
-	}
+    }
 
     public void merge(CollectionEventWrapper p2event) throws Exception {
         List<SpecimenWrapper> ospecs = p2event

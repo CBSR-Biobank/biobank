@@ -7,6 +7,7 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.actions.CountUsesAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.UncachedAction;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 
@@ -20,7 +21,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsed
  * @throws ModelIsUsedException if the wrapped object is used by the specific
  *             {@link Property}.
  */
-public class NotUsedCheck<E> extends WrapperCheck<E> {
+public class NotUsedCheck<E> extends UncachedAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String EXCEPTION_MESSAGE = "{0} {1} is still in use by {2}.";
 
@@ -47,7 +48,7 @@ public class NotUsedCheck<E> extends WrapperCheck<E> {
     }
 
     @Override
-    public void doCheck(Session session) throws BiobankSessionException {
+    public void doUncachedAction(Session session) throws BiobankSessionException {
         Long count = countAction.doAction(session);
 
         if (count > 0) {

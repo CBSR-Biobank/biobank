@@ -20,15 +20,16 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
 import edu.ualberta.med.biobank.common.wrappers.actions.IfAction.Is;
 import edu.ualberta.med.biobank.common.wrappers.actions.UpdateChildrensTopSpecimenAction;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.loggers.SpecimenLogProvider;
 import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
 import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage;
 import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage.LazyArg;
-import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -39,6 +40,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class SpecimenWrapper extends SpecimenBaseWrapper {
     private static final String BAD_SAMPLE_TYPE_MSG = "Container {0} does not allow inserts of sample type {1}.";
     private static final String DISPATCHS_CACHE_KEY = "dispatchs";
+    private static final SpecimenLogProvider LOG_PROVIDER = new SpecimenLogProvider();
 
     private boolean topSpecimenChanged = false;
 
@@ -122,6 +124,11 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         // FIXME should never see that ? should never retrieve a Specimen which
         // site cannot be displayed ?
         return "CANNOT DISPLAY INFORMATION";
+    }
+
+    @Override
+    public SpecimenLogProvider getLogProvider() {
+        return LOG_PROVIDER;
     }
 
     /**
@@ -295,33 +302,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return dispatchs;
     }
 
-    @Override
-    protected Log getLogMessage(String action, String center, String details) {
-        Log log = new Log();
-        log.setAction(action);
-        if (center == null) {
-            CenterWrapper<?> c = getCurrentCenter();
-            if (c != null) {
-                center = c.getNameShort();
-            }
-        }
-        log.setCenter(center);
-
-        CollectionEventWrapper cevent = getCollectionEvent();
-        if (cevent != null) {
-            PatientWrapper patient = cevent.getPatient();
-            if (patient != null) {
-                log.setPatientNumber(patient.getPnumber());
-            }
-        }
-
-        log.setInventoryId(getInventoryId());
-        log.setLocationLabel(getPositionString(true, true));
-        log.setDetails(details);
-        log.setType("Specimen");
-        return log;
-    }
-
     public boolean isActive() {
         ActivityStatusWrapper status = getActivityStatus();
         return status != null && status.isActive();
@@ -422,7 +402,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         }
     }
 
-    private TaskList postCheckLegalSampleType() {
+    private void addTasksToPostCheckLegalSampleType(TaskList tasks) {
         LazyArg containerLabel = LazyMessage.newArg(this,
             SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.CONTAINER
                 .to(ContainerPeer.LABEL)));
@@ -437,8 +417,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             .to(SpecimenPositionPeer.CONTAINER.to(ContainerPeer.CONTAINER_TYPE
                 .to(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION)));
 
-        TaskList tasks = new TaskList();
-
         BiobankSessionAction checkLegalSampleType = check().legalOption(
             pathToLegalSpecimenTypeOptions, SpecimenPeer.SPECIMEN_TYPE,
             badSampleTypeMsg);
@@ -446,8 +424,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         tasks.add(check().ifProperty(
             SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.ID),
             Is.NOT_NULL, checkLegalSampleType));
-
-        return tasks;
     }
 
     private void addTasksToUpdateChildren(TaskList tasks) {
@@ -479,8 +455,10 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().uniqueAndNotNull(SpecimenPeer.INVENTORY_ID));
         tasks.add(check().notNull(SpecimenPeer.SPECIMEN_TYPE));
+        tasks.add(check().notNull(SpecimenPeer.INVENTORY_ID));
+
+        tasks.add(check().unique(SpecimenPeer.INVENTORY_ID));
 
         tasks.deleteRemovedValue(this, SpecimenPeer.SPECIMEN_POSITION);
 
@@ -488,7 +466,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
         tasks.persist(this, SpecimenPeer.SPECIMEN_POSITION);
 
-        tasks.add(postCheckLegalSampleType());
+        addTasksToPostCheckLegalSampleType(tasks);
 
         addTasksToUpdateChildren(tasks);
     }

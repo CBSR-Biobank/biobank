@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShippingMethodPeer;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ShippingMethodBaseWrapper;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
@@ -99,7 +100,8 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
 
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().uniqueAndNotNull(ShippingMethodPeer.NAME));
+        tasks.add(check().notNull(ShippingMethodPeer.NAME));
+        tasks.add(check().unique(ShippingMethodPeer.NAME));
 
         super.addPersistTasks(tasks);
     }

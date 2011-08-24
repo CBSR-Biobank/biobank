@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.GlobalEventAttrBaseWrapper;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import gov.nih.nci.system.applicationservice.ApplicationException;

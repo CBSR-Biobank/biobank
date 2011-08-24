@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
@@ -395,8 +396,11 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().uniqueAndNotNull(StudyPeer.NAME));
-        tasks.add(check().uniqueAndNotNull(StudyPeer.NAME_SHORT));
+        tasks.add(check().notNull(StudyPeer.NAME));
+        tasks.add(check().notNull(StudyPeer.NAME_SHORT));
+
+        tasks.add(check().unique(StudyPeer.NAME));
+        tasks.add(check().unique(StudyPeer.NAME_SHORT));
 
         tasks.deleteRemoved(this, StudyPeer.STUDY_EVENT_ATTR_COLLECTION);
         tasks.deleteRemoved(this, StudyPeer.SOURCE_SPECIMEN_COLLECTION);
