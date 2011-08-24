@@ -318,6 +318,8 @@ public class TestDispatch extends TestDatabase {
                 sampleTypes.get(r.nextInt(numSampletypes)), cevent, pevent,
                 container, row, i));
         }
+        cevent.addToOriginalSpecimenCollection(Arrays.asList(parentSpc));
+        cevent.persist();
         container.reload();
         cevent.reload();
         return spcs;
