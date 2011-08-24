@@ -19,6 +19,7 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -27,7 +28,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
@@ -256,6 +260,30 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
 
     protected BgcWidgetCreator getWidgetCreator() {
         return widgetCreator;
+    }
+
+    protected Section createSection(final Composite contents, String title,
+        String addTooltip, SelectionListener addListener) {
+        Section section = new Section(contents, Section.TWISTIE
+            | Section.TITLE_BAR | Section.EXPANDED);
+        section.setText(title);
+        section.setLayout(new GridLayout(1, false));
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        gd.horizontalSpan = 2;
+        section.setLayoutData(gd);
+
+        ToolBar tbar = (ToolBar) section.getTextClient();
+        if (tbar == null) {
+            tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
+            section.setTextClient(tbar);
+        }
+
+        ToolItem titem = new ToolItem(tbar, SWT.NULL);
+        titem.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ADD));
+        titem.setToolTipText(addTooltip);
+        titem.addSelectionListener(addListener);
+        return section;
     }
 
 }

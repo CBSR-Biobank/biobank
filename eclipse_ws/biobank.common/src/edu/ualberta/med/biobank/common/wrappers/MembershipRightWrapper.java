@@ -15,4 +15,10 @@ public class MembershipRightWrapper extends MembershipRightBaseWrapper {
         super(appService, m);
     }
 
+    @Override
+    public String getMembershipObjectsListString() {
+        // TODO Auto-generated method stub
+        return "";
+    }
+
 }

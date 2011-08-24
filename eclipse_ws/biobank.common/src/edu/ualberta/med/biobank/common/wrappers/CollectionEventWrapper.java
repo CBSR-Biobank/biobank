@@ -571,7 +571,6 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     /**
      * return true if the user can delete this object
      */
-    @Deprecated
     @Override
     public boolean canDelete(UserWrapper user) {
         return super.canDelete(user)
@@ -583,7 +582,6 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     /**
      * return true if the user can edit this object
      */
-    @Deprecated
     @Override
     public boolean canUpdate(UserWrapper user) {
         return super.canUpdate(user)

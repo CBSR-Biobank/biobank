@@ -113,7 +113,7 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
             .getAddedToSelection());
         origSpecimenType
             .removeFromChildSpecimenTypeCollection(multiSelectChildren
-                .getRemovedToSelection());
+                .getRemovedFromSelection());
         super.okPressed();
     }
 }

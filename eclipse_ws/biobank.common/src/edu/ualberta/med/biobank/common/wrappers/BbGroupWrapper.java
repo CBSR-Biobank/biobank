@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.base.BbGroupBaseWrapper;
@@ -32,28 +31,6 @@ public class BbGroupWrapper extends BbGroupBaseWrapper {
         List<BbGroup> groups = appService.query(criteria);
         return ModelWrapper.wrapModelCollection(appService, groups,
             BbGroupWrapper.class);
-    }
-
-    @Deprecated
-    public List<Integer> getWorkingCenterIds() {
-        // FIXME comes from all Group object
-        return Collections.emptyList();
-    }
-
-    @Deprecated
-    public List<Integer> getCenterFeaturesEnabled() {
-        // FIXME comes from all Group object
-        return null;
-    }
-
-    @Deprecated
-    public void setWorkingCenterIds(List<Integer> selected) {
-
-    }
-
-    @Deprecated
-    public void setCenterFeaturesEnabled(List<Integer> selected) {
-
     }
 
     @Override

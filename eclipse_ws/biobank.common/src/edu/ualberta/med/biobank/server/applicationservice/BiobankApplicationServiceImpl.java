@@ -335,6 +335,7 @@ public class BiobankApplicationServiceImpl extends
         return BiobankSecurityUtil.getUserPassword(login);
     }
 
+    @Override
     public boolean isUserLockedOut(Long csmUserId) throws ApplicationException {
         return BiobankSecurityUtil.isUserLockedOut(csmUserId);
     }

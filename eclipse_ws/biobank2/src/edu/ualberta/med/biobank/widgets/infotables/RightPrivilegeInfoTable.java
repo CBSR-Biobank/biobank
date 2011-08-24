@@ -5,12 +5,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
+import edu.ualberta.med.biobank.dialogs.user.RightPrivilegeAddDialog;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class RightPrivilegeInfoTable extends
@@ -35,13 +38,28 @@ public class RightPrivilegeInfoTable extends
         super(parent, role.getRightPrivilegeCollection(true), HEADINGS,
             ROWS_PER_PAGE, RightPrivilegeWrapper.class);
 
+        addEditItemListener(new IInfoTableEditItemListener() {
+            @Override
+            public void editItem(InfoTableEvent event) {
+                RightPrivilegeWrapper rp = ((TableRowData) getSelection()).rp;
+                RightPrivilegeAddDialog dlg = new RightPrivilegeAddDialog(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                        .getShell(), role);
+                int res = dlg.edit(rp);
+                if (res == Dialog.OK) {
+                    reloadCollection(getCollection(), rp);
+                    notifyListeners();
+                }
+            }
+        });
+
         addDeleteItemListener(new IInfoTableDeleteItemListener() {
             @Override
             public void deleteItem(InfoTableEvent event) {
                 RightPrivilegeWrapper rp = ((TableRowData) getSelection()).rp;
                 role.removeFromRightPrivilegeCollection(Arrays.asList(rp));
                 getCollection().remove(rp);
-                reloadCollection(role.getRightPrivilegeCollection(true));
+                reloadCollection(getCollection());
             }
         });
     }
@@ -74,7 +92,6 @@ public class RightPrivilegeInfoTable extends
         }
         info.privileges = StringUtils.join(privileNames, ","); //$NON-NLS-1$
         info.rp = rp;
-        rp.reload();
         return info;
     }
 

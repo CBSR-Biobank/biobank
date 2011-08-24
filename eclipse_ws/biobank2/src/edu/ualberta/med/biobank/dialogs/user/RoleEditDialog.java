@@ -6,19 +6,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.common.peer.RolePeer;
-import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
@@ -96,37 +92,13 @@ public class RoleEditDialog extends BgcBaseDialog {
                         .getShell(), role);
                 int res = dlg.open();
                 if (res == Status.OK) {
-                    RightPrivilegeWrapper addedRp = dlg.getRightPrivilege();
-                    rightPrivilegeInfoTable.getCollection().add(addedRp);
+                    rightPrivilegeInfoTable.getCollection().addAll(
+                        dlg.getRightPrivilegeList());
                     rightPrivilegeInfoTable.reloadCollection(
                         role.getRightPrivilegeCollection(true), null);
                 }
             }
         });
-    }
-
-    private Section createSection(final Composite contents, String title,
-        String addTooltip, SelectionListener addListener) {
-        Section section = new Section(contents, Section.TWISTIE
-            | Section.TITLE_BAR | Section.EXPANDED);
-        section.setText(title);
-        section.setLayout(new GridLayout(1, false));
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.horizontalSpan = 2;
-        section.setLayoutData(gd);
-
-        ToolBar tbar = (ToolBar) section.getTextClient();
-        if (tbar == null) {
-            tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
-            section.setTextClient(tbar);
-        }
-
-        ToolItem titem = new ToolItem(tbar, SWT.NULL);
-        titem.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_ADD));
-        titem.setToolTipText(addTooltip);
-        titem.addSelectionListener(addListener);
-        return section;
     }
 
     @Override

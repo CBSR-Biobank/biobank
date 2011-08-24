@@ -518,7 +518,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     /**
      * return true if the user can edit this object
      */
-    @Deprecated
     @Override
     public boolean canUpdate(UserWrapper user) {
         return super.canUpdate(user)

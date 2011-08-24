@@ -91,8 +91,7 @@ public abstract class UsersPage extends BgcDialogPage {
                 user.setBulkEmails(true);
 
                 UserEditDialog dlg = new UserEditDialog(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    user, null, true);
+                    .getWorkbench().getActiveWorkbenchWindow().getShell(), user);
                 int res = dlg.open();
                 if (res == Status.OK) {
                     BgcPlugin.openAsyncInformation(

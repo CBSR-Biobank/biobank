@@ -15,4 +15,13 @@ public class MembershipRoleWrapper extends MembershipRoleBaseWrapper {
         super(appService, m);
     }
 
+    @Override
+    public String getMembershipObjectsListString() {
+        StringBuffer sb = new StringBuffer();
+        for (RoleWrapper r : getRoleCollection(true)) {
+            sb.append(r.getName());
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
 }

@@ -92,8 +92,7 @@ public class PatientWrapper extends PatientBaseWrapper {
             List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>(
                 study.getSiteCollection(false));
             centers.addAll(study.getClinicCollection());
-            if (Collections.disjoint(centers,
-                user.getWorkingCenters(appService))) {
+            if (Collections.disjoint(centers, user.getWorkingCenters())) {
                 throw new ApplicationException(
                     "Patient "
                         + patientNumber
@@ -366,7 +365,6 @@ public class PatientWrapper extends PatientBaseWrapper {
     /**
      * return true if the user can delete this object
      */
-    @Deprecated
     @Override
     public boolean canDelete(UserWrapper user) {
         return super.canDelete(user)
@@ -377,7 +375,6 @@ public class PatientWrapper extends PatientBaseWrapper {
     /**
      * return true if the user can edit this object
      */
-    @Deprecated
     @Override
     public boolean canUpdate(UserWrapper user) {
         return super.canUpdate(user)

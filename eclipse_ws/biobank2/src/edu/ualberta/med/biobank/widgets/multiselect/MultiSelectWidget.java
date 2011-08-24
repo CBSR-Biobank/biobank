@@ -251,7 +251,7 @@ public abstract class MultiSelectWidget<T> extends BgcBaseWidget {
         return result;
     }
 
-    public List<T> getRemovedToSelection() {
+    public List<T> getRemovedFromSelection() {
         List<T> result = new ArrayList<T>();
         for (MultiSelectNode<T> node : selTreeRootNode.getRemovedChildren()) {
             result.add(node.getNodeObject());

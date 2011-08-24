@@ -1,8 +1,8 @@
 LOCK TABLES `PRIVILEGE` WRITE;
 INSERT INTO `PRIVILEGE` (ID, VERSION, NAME) VALUES
-( 1, 0, 'read'),
-( 2, 0, 'update'),
-( 3, 0, 'delete'),
-( 4, 0, 'create');
+( 1, 0, 'Read'),
+( 2, 0, 'Update'),
+( 3, 0, 'Delete'),
+( 4, 0, 'Create');
 UNLOCK TABLES;
 

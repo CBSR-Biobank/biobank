@@ -1,13 +1,15 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -16,8 +18,6 @@ import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
-import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -25,16 +25,22 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
     private RoleWrapper role;
-    private RightPrivilegeWrapper rp;
     private MultiSelectWidget<PrivilegeWrapper> privilegesWidget;
+    private MultiSelectWidget<BbRightWrapper> rightsWidget;
+    List<RightPrivilegeWrapper> rpList = new ArrayList<RightPrivilegeWrapper>();
+    private RightPrivilegeWrapper editRp;
 
     public RightPrivilegeAddDialog(Shell parent, RoleWrapper role) {
         super(parent);
         Assert.isNotNull(role);
         this.role = role;
-        this.rp = new RightPrivilegeWrapper(SessionManager.getAppService());
-        currentTitle = "Add right/privileges association";
-        titleAreaMessage = "Add a new right/privileges association";
+        currentTitle = "Add right/privileges associations";
+        titleAreaMessage = "Add new right/privileges associations";
+    }
+
+    public int edit(RightPrivilegeWrapper rp) {
+        this.editRp = rp;
+        return open();
     }
 
     @Override
@@ -56,22 +62,28 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
     protected void createDialogAreaInternal(Composite parent)
         throws ApplicationException {
         Composite contents = new Composite(parent, SWT.NONE);
-        contents.setLayout(new GridLayout(2, false));
+        contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createComboViewer(contents, "Right",
-            BbRightWrapper.getAllRights(SessionManager.getAppService()), null,
-            "Please select a right", new ComboSelectionUpdate() {
+        if (editRp == null) {
+            rightsWidget = new MultiSelectWidget<BbRightWrapper>(contents,
+                SWT.NONE, "Available rights", "Selected rights", 110) {
                 @Override
-                public void doSelection(Object selectedObject) {
-                    rp.setRight((BbRightWrapper) selectedObject);
+                protected String getTextForObject(BbRightWrapper nodeObject) {
+                    return nodeObject.getName();
                 }
-            }, new BiobankLabelProvider() {
-                @Override
-                public String getText(Object element) {
-                    return ((BbRightWrapper) element).getName();
-                }
-            });
+            };
+            List<BbRightWrapper> allRights = BbRightWrapper
+                .getAllRights(SessionManager.getAppService());
+            allRights.removeAll(role.getRightsinUse());
+            rightsWidget.setSelections(allRights,
+                new ArrayList<BbRightWrapper>());
+        } else {
+            Label label = new Label(contents, SWT.NONE);
+            label.setText(NLS.bind(
+                "Editing privileges associated with right ''{0}'''", editRp
+                    .getRight().getName()));
+        }
 
         privilegesWidget = new MultiSelectWidget<PrivilegeWrapper>(contents,
             SWT.NONE, "Available privileges", "Selected privileges", 110) {
@@ -80,25 +92,37 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
                 return nodeObject.getName();
             }
         };
-        GridData gd = (GridData) privilegesWidget.getLayoutData();
-        gd.horizontalSpan = 2;
-
+        List<PrivilegeWrapper> selection = new ArrayList<PrivilegeWrapper>();
+        if (editRp != null)
+            selection = editRp.getPrivilegeCollection(true);
         privilegesWidget.setSelections(
             PrivilegeWrapper.getAllPrivileges(SessionManager.getAppService()),
-            new ArrayList<PrivilegeWrapper>());
+            selection);
     }
 
     @Override
     protected void okPressed() {
-        rp.addToPrivilegeCollection(privilegesWidget.getAddedToSelection());
-        rp.removeFromPrivilegeCollection(privilegesWidget
-            .getRemovedToSelection());
-        role.addToRightPrivilegeCollection(Arrays.asList(rp));
+        if (editRp == null) {
+            for (BbRightWrapper right : rightsWidget.getAddedToSelection()) {
+                RightPrivilegeWrapper rp = new RightPrivilegeWrapper(
+                    SessionManager.getAppService());
+                rp.setRight(right);
+                rp.addToPrivilegeCollection(privilegesWidget
+                    .getAddedToSelection());
+                rpList.add(rp);
+            }
+            role.addToRightPrivilegeCollection(rpList);
+        } else {
+            editRp.addToPrivilegeCollection(privilegesWidget
+                .getAddedToSelection());
+            editRp.removeFromPrivilegeCollection(privilegesWidget
+                .getRemovedFromSelection());
+        }
         super.okPressed();
     }
 
-    public RightPrivilegeWrapper getRightPrivilege() {
-        return rp;
+    public List<RightPrivilegeWrapper> getRightPrivilegeList() {
+        return rpList;
     }
 
 }

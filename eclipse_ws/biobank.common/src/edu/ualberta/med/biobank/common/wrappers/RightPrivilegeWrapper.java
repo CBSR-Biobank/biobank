@@ -26,4 +26,12 @@ public class RightPrivilegeWrapper extends RightPrivilegeBaseWrapper {
         }
         return 0;
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!isNew())
+            return super.equals(object);
+        else
+            return this == object;
+    }
 }

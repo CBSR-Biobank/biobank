@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.wrappers.MembershipRoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
+import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankSecurityUtil;
@@ -158,5 +159,32 @@ public class TestUser extends TestDatabase {
         Assert.assertTrue(mw instanceof MembershipRoleWrapper);
         Assert.assertEquals(1,
             ((MembershipRoleWrapper) mw).getRoleCollection(false).size());
+    }
+
+    @Test
+    public void removeMembershipWithRole() throws Exception {
+        String name = "removeMembershipWithRole" + r.nextInt();
+        UserWrapper user = UserHelper.addUser(name, null, true);
+
+        RoleWrapper role = RoleHelper.addRole(name, true);
+        MembershipRoleWrapper mwr = MembershipHelper.newMembershipRole(user,
+            null, null);
+        mwr.addToRoleCollection(Arrays.asList(role));
+        user.persist();
+
+        user.reload();
+        Assert.assertEquals(1, user.getMembershipCollection(false).size());
+
+        mwr = (MembershipRoleWrapper) user.getMembershipCollection(false)
+            .get(0);
+        Integer mwrId = mwr.getId();
+        user.removeFromMembershipCollection(Arrays.asList(mwr));
+        user.persist();
+        user.reload();
+        Assert.assertEquals(0, user.getMembershipCollection(false).size());
+
+        Membership msDB = ModelUtils.getObjectWithId(appService,
+            Membership.class, mwrId);
+        Assert.assertNull(msDB);
     }
 }

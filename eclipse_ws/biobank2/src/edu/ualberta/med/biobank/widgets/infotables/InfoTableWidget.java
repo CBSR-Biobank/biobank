@@ -87,7 +87,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     private MenuItem editItem;
 
-    private final Class<T> wrapperClass;
+    private final Class<?> wrapperClass;
 
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings, Class<T> wrapperClass) {
@@ -97,7 +97,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
     }
 
     public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int rowsPerPage, Class<T> wrapperClass) {
+        String[] headings, int rowsPerPage, Class<?> wrapperClass) {
         super(parent, collection, headings, null, rowsPerPage);
         this.wrapperClass = wrapperClass;
         addTableClickListener();

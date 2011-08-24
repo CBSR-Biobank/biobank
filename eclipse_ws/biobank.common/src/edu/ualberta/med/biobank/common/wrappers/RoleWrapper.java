@@ -52,4 +52,12 @@ public class RoleWrapper extends RoleBaseWrapper {
         return newRole;
     }
 
+    public List<BbRightWrapper> getRightsinUse() {
+        List<BbRightWrapper> rights = new ArrayList<BbRightWrapper>();
+        for (RightPrivilegeWrapper rp : getRightPrivilegeCollection(false)) {
+            rights.add(rp.getRight());
+        }
+        return rights;
+    }
+
 }

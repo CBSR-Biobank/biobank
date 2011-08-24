@@ -33,7 +33,8 @@ public class UserInfoTable extends InfoTableWidget<UserWrapper> {
         Messages.UserInfoTable_login_label,
         Messages.UserInfoTable_firstname_label,
         Messages.UserInfoTable_lastname_label,
-        Messages.UserInfoTable_email_label, Messages.UserInfoTable_superadmin_label };
+        Messages.UserInfoTable_email_label,
+        Messages.UserInfoTable_superadmin_label };
 
     private MenuItem unlockMenuItem;
 
@@ -167,7 +168,7 @@ public class UserInfoTable extends InfoTableWidget<UserWrapper> {
         }
 
         UserEditDialog dlg = new UserEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), user, groups, false);
+            .getActiveWorkbenchWindow().getShell(), user);
         int res = dlg.open();
         if (res == Dialog.OK) {
             reloadCollection(getCollection(), user);

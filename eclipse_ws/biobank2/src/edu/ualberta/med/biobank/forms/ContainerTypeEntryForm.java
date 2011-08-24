@@ -342,7 +342,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             List<SpecimenTypeWrapper> addedSpcTypes = specimensMultiSelect
                 .getAddedToSelection();
             List<SpecimenTypeWrapper> removedSpcTypes = specimensMultiSelect
-                .getRemovedToSelection();
+                .getRemovedFromSelection();
             containerType.addToSpecimenTypeCollection(addedSpcTypes);
             containerType.removeFromSpecimenTypeCollection(removedSpcTypes);
         } else {
@@ -356,7 +356,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             List<ContainerTypeWrapper> addedTypes = childContainerTypesMultiSelect
                 .getAddedToSelection();
             List<ContainerTypeWrapper> removedTypes = childContainerTypesMultiSelect
-                .getRemovedToSelection();
+                .getRemovedFromSelection();
             containerType.addToChildContainerTypeCollection(addedTypes);
             containerType.removeFromChildContainerTypeCollection(removedTypes);
         } else {

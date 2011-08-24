@@ -1,12 +1,13 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
-import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.SecurityFeature;
 import edu.ualberta.med.biobank.common.wrappers.base.UserBaseWrapper;
 import edu.ualberta.med.biobank.model.User;
@@ -16,6 +17,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class UserWrapper extends UserBaseWrapper {
+
+    private static final String WORKING_CENTERS_KEY = "workingCenters";
 
     private String password;
 
@@ -37,6 +40,7 @@ public class UserWrapper extends UserBaseWrapper {
             getWrappedObject(), password);
         if (isNew())
             setCsmUserId(csmId);
+        super.persistDependencies(origObject);
     }
 
     @Override
@@ -70,6 +74,7 @@ public class UserWrapper extends UserBaseWrapper {
     protected void resetInternalFields() {
         super.resetInternalFields();
         password = null;
+        lockedOut = null;
     }
 
     /**
@@ -137,34 +142,33 @@ public class UserWrapper extends UserBaseWrapper {
         return null;
     }
 
-    @Deprecated
     public CenterWrapper<?> getCurrentWorkingCenter() {
-        // FIXME this method was used in old User object. What should be done
-        // now ?
-        currentWorkingCenter = null;
         return currentWorkingCenter;
     }
 
-    @SuppressWarnings("unused")
-    @Deprecated
-    public List<CenterWrapper<?>> getWorkingCenters(
-        WritableApplicationService appService) throws Exception {
-        // FIXME this method was used in old User object. What should be done
-        // now ?
-        return null;
+    public void setCurrentWorkingCenter(CenterWrapper<?> currentWorkingCenter) {
+        this.currentWorkingCenter = currentWorkingCenter;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<CenterWrapper<?>> getWorkingCenters() {
+        List<CenterWrapper<?>> workingCenters = (List<CenterWrapper<?>>) cache
+            .get(WORKING_CENTERS_KEY);
+        if (workingCenters == null) {
+            workingCenters = new ArrayList<CenterWrapper<?>>();
+            for (MembershipWrapper<?> ms : getMembershipCollection(false)) {
+                if (ms.getCenter() != null)
+                    workingCenters.add(ms.getCenter());
+            }
+            cache.put(WORKING_CENTERS_KEY, workingCenters);
+        }
+        return workingCenters;
     }
 
     public boolean isSuperAdmin() {
         if (getIsSuperAdmin() == null)
             return false;
         return getIsSuperAdmin();
-    }
-
-    @SuppressWarnings("unused")
-    @Deprecated
-    public void setCurrentWorkingCenter(CenterWrapper<?> centerWrapper) {
-        // FIXME this method was used in old User object. What should be done
-        // now ?
     }
 
     @Deprecated
@@ -187,19 +191,52 @@ public class UserWrapper extends UserBaseWrapper {
         return false;
     }
 
-    @Deprecated
-    public boolean hasPrivilegeOnObject(Privilege privilege,
+    @SuppressWarnings("unused")
+    public boolean hasPrivilegeOnObject(PrivilegeWrapper privilege,
         Class<?> objectClazz) {
-        return hasPrivilegeOnObject(privilege, objectClazz, null);
+        String type = objectClazz.getName();
+        if (ModelWrapper.class.isAssignableFrom(objectClazz)) {
+            ModelWrapper<?> wrapper = null;
+            try {
+                Constructor<?> constructor = objectClazz
+                    .getConstructor(WritableApplicationService.class);
+                wrapper = (ModelWrapper<?>) constructor
+                    .newInstance((WritableApplicationService) null);
+            } catch (NoSuchMethodException e) {
+                return false;
+            } catch (InvocationTargetException e) {
+                return false;
+            } catch (IllegalAccessException e) {
+                return false;
+            } catch (InstantiationException e) {
+                return false;
+            }
+            type = wrapper.getWrappedClass().getName();
+        }
+        boolean currentCenterRights = true;
+        CenterWrapper<?> currentCenter = getCurrentWorkingCenter();
+        return currentCenterRights && hasPrivilegeOnObject(privilege, type);
     }
 
-    @SuppressWarnings("unused")
-    @Deprecated
-    public boolean hasPrivilegeOnObject(Privilege privilege,
-        Class<?> objectClazz, List<? extends CenterWrapper<?>> specificCenters) {
-        // FIXME this method was used in old User object. What should be done
-        // now ?
-        return true;
+    private boolean hasPrivilegeOnObject(PrivilegeWrapper privilege, String type) {
+        try {
+            // add a class information to the right ?
+            BbRightWrapper right = BbRightWrapper.getRight(appService, type);
+            List<PrivilegeWrapper> userPrivileges = getPrivilegesForRight(right);
+        } catch (Exception e) {
+            return false;
+        }
+        // for (Group group : groups) {
+        // if (group.hasPrivilegeOnObject(privilege, type)) {
+        // return true;
+        // }
+        // }
+        return false;
+    }
+
+    private List<PrivilegeWrapper> getPrivilegesForRight(BbRightWrapper right) {
+        // TODO Auto-generated method stub
+        return new ArrayList<PrivilegeWrapper>();
     }
 
     public boolean isCBSRCenter() {
