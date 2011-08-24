@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.wrappers.internal;
 import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
 import edu.ualberta.med.biobank.common.wrappers.actions.IfAction.Is;
@@ -68,16 +67,5 @@ public class ContainerPositionWrapper extends ContainerPositionBaseWrapper {
             Is.NOT_NULL, checkBounds));
 
         tasks.persist(this, ContainerPositionPeer.CONTAINER);
-    }
-
-    // TODO: remove this override when all persist()-s are like this!
-    @Override
-    public void persist() throws Exception {
-        WrapperTransaction.persist(this, appService);
-    }
-
-    @Override
-    public void delete() throws Exception {
-        WrapperTransaction.delete(this, appService);
     }
 }

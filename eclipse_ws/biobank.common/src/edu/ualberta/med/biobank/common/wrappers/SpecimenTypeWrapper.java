@@ -201,15 +201,4 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     public boolean isUnknownImport() {
         return getName() != null && UNKNOWN_IMPORT_NAME.equals(getName());
     }
-
-    // TODO: remove this override when all persist()-s are like this!
-    @Override
-    public void persist() throws Exception {
-        WrapperTransaction.persist(this, appService);
-    }
-
-    @Override
-    public void delete() throws Exception {
-        WrapperTransaction.delete(this, appService);
-    }
 }

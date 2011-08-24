@@ -424,17 +424,6 @@ public class StudyWrapper extends StudyBaseWrapper {
         super.addDeleteTasks(tasks);
     }
 
-    // TODO: remove this override when all persist()-s are like this!
-    @Override
-    public void persist() throws Exception {
-        WrapperTransaction.persist(this, appService);
-    }
-
-    @Override
-    public void delete() throws Exception {
-        WrapperTransaction.delete(this, appService);
-    }
-
     // public List<PatientWrapper> getPatientCollection(boolean sort) {
     // return HQLAccessor.getCachedCollection(this, PatientPeer.STUDY,
     // Patient.class, PatientWrapper.class, sort);

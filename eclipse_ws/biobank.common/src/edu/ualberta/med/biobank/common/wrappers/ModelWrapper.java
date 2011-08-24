@@ -1,17 +1,13 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
-import edu.ualberta.med.biobank.common.exception.BiobankRuntimeException;
-import edu.ualberta.med.biobank.common.exception.CheckFieldLimitsException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
-import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
 import edu.ualberta.med.biobank.common.wrappers.loggers.LogAction;
 import edu.ualberta.med.biobank.common.wrappers.loggers.LogGroup;
@@ -22,17 +18,11 @@ import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.SDKQueryResult;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
-import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
@@ -157,6 +147,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     public WritableApplicationService getAppService() {
         return appService;
+    }
+
+    public final void persist() throws Exception {
+        WrapperTransaction.persist(this, appService);
+    }
+
+    public final void delete() throws Exception {
+        WrapperTransaction.delete(this, appService);
     }
 
     public void reload() throws Exception {
@@ -324,143 +322,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public abstract Class<E> getWrappedClass();
-
-    /**
-     * insert or update the object into the database
-     */
-    @SuppressWarnings("unchecked")
-    public void persist() throws Exception {
-        checkFieldLimits();
-        persistChecks();
-        SDKQuery query;
-        E origObject = null;
-        WrapperEventType eventType;
-        if (isNew()) {
-            query = new InsertExampleQuery(wrappedObject);
-            eventType = WrapperEventType.INSERT;
-        } else {
-            query = new UpdateExampleQuery(wrappedObject);
-            origObject = getObjectFromDatabase();
-            eventType = WrapperEventType.UPDATE;
-        }
-        persistDependencies(origObject);
-        SDKQueryResult result = ((BiobankApplicationService) appService)
-            .executeQuery(query);
-        wrappedObject = ((E) result.getObjectResult());
-        Log logMessage = null;
-        try {
-            logMessage = getLogMessage(eventType.name().toLowerCase(), null, "");
-        } catch (Exception ex) {
-            // Don't want the logs to affect persist
-            // FIXME save somewhere this information
-            ex.printStackTrace();
-        }
-        if (logMessage != null) {
-            ((BiobankApplicationService) appService).logActivity(logMessage);
-        }
-
-        clear();
-
-        notifyListeners(new WrapperEvent(eventType, this));
-    }
-
-    /**
-     * should redefine this method if others updates (or deletes) need to be
-     * done when this object is update origObject can be null in the case of an
-     * insert
-     */
-    @SuppressWarnings("unused")
-    protected void persistDependencies(E origObject) throws Exception {
-    }
-
-    @SuppressWarnings("unused")
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-
-    }
-
-    protected void checkFieldLimits() throws BiobankCheckException,
-        CheckFieldLimitsException {
-        String fieldValue = "";
-        for (Property<?, ? super E> property : getProperties()) {
-            // TODO: use accessor instead!
-            String field = property.getPropertyChangeName();
-
-            Integer maxLen = VarCharLengths
-                .getMaxSize(getWrappedClass(), field);
-            if (maxLen == null)
-                continue;
-
-            Method method;
-            try {
-                method = this.getClass().getMethod(
-                    "get" + Character.toUpperCase(field.charAt(0))
-                        + field.substring(1));
-                if (method.getReturnType().equals(String.class)) {
-                    fieldValue = (String) method.invoke(this);
-                    if ((fieldValue != null) && (fieldValue.length() > maxLen)) {
-                        throw new CheckFieldLimitsException(field, maxLen,
-                            fieldValue);
-                    }
-                }
-            } catch (BiobankRuntimeException e) {
-            } catch (SecurityException e) {
-                throwBiobankException(field, e);
-            } catch (NoSuchMethodException e) {
-                throwBiobankException(field, e);
-            } catch (IllegalArgumentException e) {
-                throwBiobankException(field, e);
-            } catch (IllegalAccessException e) {
-                throwBiobankException(field, e);
-            } catch (InvocationTargetException e) {
-                // do nothing this - this method is meant to not be used by the
-                // user
-            }
-        }
-    }
-
-    private void throwBiobankException(String field, Exception e)
-        throws BiobankCheckException {
-        throw new BiobankCheckException("Cannot get max length for field "
-            + field, e);
-    }
-
-    /**
-     * delete the object into the database
-     * 
-     * @throws ApplicationException
-     */
-    public void delete() throws Exception {
-        if (isNew()) {
-            throw new Exception("Can't delete an object not yet persisted");
-        }
-        reload();
-        deleteChecks();
-        deleteDependencies();
-        Log logMessage = null;
-        try {
-            logMessage = getLogMessage("delete", null, "");
-        } catch (Exception ex) {
-            // Don't want the logs to affect delete
-            // FIXME save somewhere this information
-            ex.printStackTrace();
-        }
-        appService.executeQuery(new DeleteExampleQuery(wrappedObject));
-        if (logMessage != null) {
-            ((BiobankApplicationService) appService).logActivity(logMessage);
-        }
-        notifyListeners(new WrapperEvent(WrapperEventType.DELETE, this));
-    }
-
-    @SuppressWarnings("unused")
-    protected void deleteDependencies() throws Exception {
-
-    }
-
-    @SuppressWarnings("unused")
-    protected void deleteChecks() throws BiobankException, ApplicationException {
-
-    }
 
     public void reset() throws Exception {
         clear();
@@ -1240,14 +1101,5 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     protected WrapperChecker<E> check() {
         return preChecker;
-    }
-
-    public static <T> void persistBatch(Set<? extends ModelWrapper<T>> wrappers)
-        throws Exception {
-        // FIXME once the persist method is using batch queries, we should use
-        // batch queries here
-        for (ModelWrapper<T> wrapper : wrappers) {
-            wrapper.persist();
-        }
     }
 }

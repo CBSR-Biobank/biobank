@@ -56,9 +56,23 @@ public class WrapperTransaction {
         actions.add(new Action(Action.Type.PERSIST, wrapper));
     }
 
+    public void persist(Collection<? extends ModelWrapper<?>> wrappers) {
+        // TODO: check that wrapper not already added?
+        for (ModelWrapper<?> wrapper : wrappers) {
+            actions.add(new Action(Action.Type.PERSIST, wrapper));
+        }
+    }
+
     public void delete(ModelWrapper<?> Wrapper) {
         // TODO: check that wrapper not already added?
         actions.add(new Action(Action.Type.DELETE, Wrapper));
+    }
+
+    public void delete(Collection<? extends ModelWrapper<?>> wrappers) {
+        // TODO: check that wrapper not already added?
+        for (ModelWrapper<?> wrapper : wrappers) {
+            actions.add(new Action(Action.Type.DELETE, wrapper));
+        }
     }
 
     public void commit() throws BiobankException, ApplicationException {

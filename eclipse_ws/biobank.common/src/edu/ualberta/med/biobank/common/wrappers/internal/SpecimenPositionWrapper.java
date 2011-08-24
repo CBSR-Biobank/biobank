@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.wrappers.internal;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenPositionBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.ContainerPositionAvailableCheck;
@@ -52,16 +51,5 @@ public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {
         tasks.persist(this, SpecimenPositionPeer.SPECIMEN);
 
         // tasks.log(SomeClassThatSaysHowToLog<E>(this));
-    }
-
-    // TODO: remove this override when all persist()-s are like this!
-    @Override
-    public void persist() throws Exception {
-        WrapperTransaction.persist(this, appService);
-    }
-
-    @Override
-    public void delete() throws Exception {
-        WrapperTransaction.delete(this, appService);
     }
 }

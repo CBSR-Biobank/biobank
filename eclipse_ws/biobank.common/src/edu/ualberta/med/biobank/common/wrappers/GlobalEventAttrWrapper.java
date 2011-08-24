@@ -60,15 +60,4 @@ public class GlobalEventAttrWrapper extends GlobalEventAttrBaseWrapper {
         // FIXME if used by any study then it cannot be deleted
         super.addDeleteTasks(tasks);
     }
-
-    // TODO: remove this override when all persist()-s are like this!
-    @Override
-    public void persist() throws Exception {
-        WrapperTransaction.persist(this, appService);
-    }
-
-    @Override
-    public void delete() throws Exception {
-        WrapperTransaction.delete(this, appService);
-    }
 }

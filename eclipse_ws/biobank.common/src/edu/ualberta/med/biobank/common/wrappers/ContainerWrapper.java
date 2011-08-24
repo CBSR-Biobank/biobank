@@ -981,17 +981,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         super.addDeleteTasks(tasks);
     }
 
-    // TODO: remove this override when all persist()-s are like this!
-    @Override
-    public void persist() throws Exception {
-        WrapperTransaction.persist(this, appService);
-    }
-
-    @Override
-    public void delete() throws Exception {
-        WrapperTransaction.delete(this, appService);
-    }
-
     /**
      * For updating children {@link Container}'s: (1) label, (2) path, and (3)
      * top {@link Container} whenever the parent or label is changed.

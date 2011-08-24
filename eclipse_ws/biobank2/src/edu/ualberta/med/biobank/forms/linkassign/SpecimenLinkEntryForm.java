@@ -37,10 +37,10 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.CEventComboCallback;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.PatientTextCallback;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
@@ -534,7 +534,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             }
         }
         // persist of parent will automatically persist children
-        ModelWrapper.persistBatch(modifiedSources);
+
+        WrapperTransaction tx = new WrapperTransaction(appService);
+        tx.persist(modifiedSources);
+        tx.commit();
+
         // display logs only if persist succeeds.
         appendLog(sb.toString());
 
