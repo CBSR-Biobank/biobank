@@ -257,11 +257,9 @@ public class TestProcessingEvent extends TestDatabase {
                     continue;
                 // System.out.println("setting aliquot at: " + row + ", " +
                 // col);
-                spcMap.put(row + (col * rows),
-                    SpecimenHelper.addSpecimen(parentSpc,
-                        DbHelper.chooseRandomlyInList(allSpcTypes),
-                        parentSpc.getCollectionEvent(), pevent, container, row,
-                        col));
+                spcMap.put(row + (col * rows), SpecimenHelper.addSpecimen(
+                    parentSpc, DbHelper.chooseRandomlyInList(allSpcTypes),
+                    pevent, container, row, col));
             }
         }
         pevent.reload();
@@ -324,11 +322,9 @@ public class TestProcessingEvent extends TestDatabase {
                     continue;
                 // System.out.println("setting aliquot at: " + row + ", " +
                 // col);
-                spcMap.put(row + (col * rows),
-                    SpecimenHelper.addSpecimen(parentSpc,
-                        DbHelper.chooseRandomlyInList(allSpcTypes),
-                        parentSpc.getCollectionEvent(), pevent, container, row,
-                        col));
+                spcMap.put(row + (col * rows), SpecimenHelper.addSpecimen(
+                    parentSpc, DbHelper.chooseRandomlyInList(allSpcTypes),
+                    pevent, container, row, col));
             }
         }
         pevent.reload();

@@ -1347,7 +1347,7 @@ public class TestContainer extends TestDatabase {
             site, patient, Utils.getRandomDate());
 
         SpecimenWrapper spc = SpecimenHelper.addSpecimen(parentSpc, spcType,
-            ce, pe, childL4, 3, 3);
+            pe, childL4, 3, 3);
 
         // attempt to delete the containers - should fail
         String[] cnames = new String[] { "ChildL4", "ChildL3", "ChildL2",

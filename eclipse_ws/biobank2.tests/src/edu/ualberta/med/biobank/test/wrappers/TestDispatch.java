@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -315,8 +316,8 @@ public class TestDispatch extends TestDatabase {
         List<SpecimenWrapper> spcs = new ArrayList<SpecimenWrapper>();
         for (int i = 0; i < colCapacity; ++i) {
             spcs.add(SpecimenHelper.addSpecimen(parentSpc,
-                sampleTypes.get(r.nextInt(numSampletypes)), cevent, pevent,
-                container, row, i));
+                sampleTypes.get(r.nextInt(numSampletypes)), pevent, container,
+                row, i));
         }
         cevent.addToOriginalSpecimenCollection(Arrays.asList(parentSpc));
         cevent.persist();
@@ -394,8 +395,82 @@ public class TestDispatch extends TestDatabase {
     }
 
     @Test
-    public void testRemoveDispatchAliquots() {
-        Assert.fail("testRemoveDispatchAliquots needs implementation");
+    public void testRemoveDispatchAliquots() throws Exception {
+        String name = "testRemoveSpecs" + r.nextInt();
+        StudyWrapper study = StudyHelper.addStudy(name);
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+
+        DispatchWrapper dispatch = DispatchHelper.addDispatch(senderSite,
+            receiverSite, ShippingMethodWrapper.getShippingMethods(appService)
+                .get(0));
+        List<SpecimenTypeWrapper> sampleTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, false);
+        ContainerTypeWrapper containerType = ContainerTypeHelper
+            .addContainerType(senderSite, name, name, 1, 8, 12, false);
+        containerType.addToSpecimenTypeCollection(sampleTypes);
+        containerType.persist();
+        containerType.reload();
+        ContainerTypeWrapper topContainerType = ContainerTypeHelper
+            .addContainerTypeRandom(senderSite, name + "top", true);
+        topContainerType.addToChildContainerTypeCollection(Arrays
+            .asList(containerType));
+        topContainerType.persist();
+        topContainerType.reload();
+        ContainerWrapper topContainer = ContainerHelper.addContainer(
+            String.valueOf(r.nextInt()), name + "top", null, senderSite,
+            topContainerType);
+        ContainerWrapper container = ContainerHelper.addContainer(null, name,
+            topContainer, senderSite, containerType, 0, 0);
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.addToContactCollection(Arrays.asList(contact));
+        study.persist();
+        study.reload();
+        CollectionEventWrapper cevent = CollectionEventHelper
+            .addCollectionEvent(clinic, patient, 1);
+
+        List<SpecimenWrapper> spcSet1 = addSpecimensToContainerRow(cevent,
+            container, 0, sampleTypes);
+
+        dispatch.addSpecimens(spcSet1, DispatchSpecimenState.NONE);
+        dispatch.persist();
+        dispatch.reload();
+
+        List<DispatchSpecimenWrapper> dispatchSpcs = dispatch
+            .getDispatchSpecimenCollection(false);
+        Assert.assertEquals(spcSet1.size(), dispatchSpcs.size());
+
+        dispatch.removeDispatchSpecimens(dispatchSpcs);
+        dispatch.persist();
+        dispatch.reload();
+
+        dispatchSpcs = dispatch.getDispatchSpecimenCollection(false);
+        Assert.assertEquals(0, dispatchSpcs.size());
+    }
+
+    @Test
+    public void testRandomGetters() throws Exception {
+        String name = "testRandomGetters" + r.nextInt();
+        StudyWrapper study = StudyHelper.addStudy(name);
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+
+        DispatchWrapper dispatch = DispatchHelper.addDispatch(senderSite,
+            receiverSite, ShippingMethodWrapper.getShippingMethods(appService)
+                .get(0));
+
+        dispatch.isInClosedState();
+        dispatch.isInCreationState();
+        dispatch.isInLostState();
+        dispatch.isInReceivedState();
+        dispatch.isInTransitState();
+        dispatch.hasSpecimenStatesChanged();
+        dispatch.hasNewSpecimens();
+        dispatch.hasErrors();
+        dispatch.hasBeenReceived();
+        dispatch.hasDispatchSpecimens();
     }
 
     @Test

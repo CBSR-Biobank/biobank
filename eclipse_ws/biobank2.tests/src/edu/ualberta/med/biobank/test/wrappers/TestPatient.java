@@ -186,7 +186,7 @@ public class TestPatient extends TestDatabase {
             ProcessingEventWrapper pe = ProcessingEventHelper
                 .addProcessingEvent(site, patient, Utils.getRandomDate());
             SpecimenHelper.addSpecimen(parentSpc,
-                DbHelper.chooseRandomlyInList(contSampleTypes), cevent, pe,
+                DbHelper.chooseRandomlyInList(contSampleTypes), pe,
                 containerMap.get("ChildL1"), 0, i);
             pevents.add(pe);
         }
@@ -195,8 +195,8 @@ public class TestPatient extends TestDatabase {
 
         pevents = patient.getProcessingEventCollection(false);
         SpecimenWrapper spc = SpecimenHelper.addSpecimen(parentSpc,
-            DbHelper.chooseRandomlyInList(contSampleTypes), cevent,
-            pevents.get(0), containerMap.get("ChildL1"), 1, 0);
+            DbHelper.chooseRandomlyInList(contSampleTypes), pevents.get(0),
+            containerMap.get("ChildL1"), 1, 0);
         patient.reload();
 
         try {
@@ -400,9 +400,8 @@ public class TestPatient extends TestDatabase {
                 .getProcessingEventCollection(false)) {
                 for (int i = 0; i < 2; ++i) {
                     samples.add(SpecimenHelper.addSpecimen(parentSpc,
-                        DbHelper.chooseRandomlyInList(spcTypes), cevent,
-                        pevent, childL1, sampleCount / maxCols, sampleCount
-                            % maxCols));
+                        DbHelper.chooseRandomlyInList(spcTypes), pevent,
+                        childL1, sampleCount / maxCols, sampleCount % maxCols));
                     patient.reload();
                     patientSampleCount.put(patient,
                         patientSampleCount.get(patient) + 1);

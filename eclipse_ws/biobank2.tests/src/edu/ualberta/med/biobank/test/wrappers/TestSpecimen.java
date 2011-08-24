@@ -114,8 +114,7 @@ public class TestSpecimen extends TestDatabase {
         SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
             childSpc.getSpecimenType(),
             ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
-            childSpc.getParentContainer(), 2, 2);
+            childSpc.getProcessingEvent(), childSpc.getParentContainer(), 2, 2);
 
         duplicate.setInventoryId(parentSpc.getInventoryId());
         try {
@@ -135,8 +134,7 @@ public class TestSpecimen extends TestDatabase {
         SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
             childSpc.getSpecimenType(),
             ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
-            childSpc.getParentContainer(), 2, 2);
+            childSpc.getProcessingEvent(), childSpc.getParentContainer(), 2, 2);
 
         duplicate.setInventoryId("TOTO" + i);
         try {
@@ -154,8 +152,7 @@ public class TestSpecimen extends TestDatabase {
         SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
             childSpc.getSpecimenType(),
             ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
-            childSpc.getParentContainer(), 2, 2);
+            childSpc.getProcessingEvent(), childSpc.getParentContainer(), 2, 2);
         duplicate.setInventoryId(parentSpc.getInventoryId());
 
         try {
@@ -187,8 +184,7 @@ public class TestSpecimen extends TestDatabase {
         SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
             childSpc.getSpecimenType(),
             ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
-            childSpc.getParentContainer(), 2, 2);
+            childSpc.getProcessingEvent(), childSpc.getParentContainer(), 2, 2);
         duplicate.setInventoryId("toto" + i);
 
         try {
@@ -211,8 +207,8 @@ public class TestSpecimen extends TestDatabase {
         SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
             childSpc.getSpecimenType(),
             ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
-            childSpc.getParentContainer(), pos.row, pos.col);
+            childSpc.getProcessingEvent(), childSpc.getParentContainer(),
+            pos.row, pos.col);
 
         try {
             duplicate.persist();
@@ -491,8 +487,7 @@ public class TestSpecimen extends TestDatabase {
         SpecimenWrapper sample2 = SpecimenHelper.newSpecimen(parentSpc,
             childSpc.getSpecimenType(),
             ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            parentSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
-            childSpc.getParentContainer(), 2, 3);
+            childSpc.getProcessingEvent(), childSpc.getParentContainer(), 2, 3);
         sample2.setInventoryId("awert");
         sample2.persist();
         Assert.assertTrue(parentSpc.compareTo(sample2) > 0);
@@ -550,14 +545,14 @@ public class TestSpecimen extends TestDatabase {
             activeSpecimens.add(SpecimenHelper.newSpecimen(parentSpc,
                 childSpc.getSpecimenType(),
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-                childSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
-                childSpc.getParentContainer(), 0, i));
+                childSpc.getProcessingEvent(), childSpc.getParentContainer(),
+                0, i));
 
             SpecimenWrapper a = SpecimenHelper.newSpecimen(parentSpc,
                 childSpc.getSpecimenType(),
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-                childSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
-                childSpc.getParentContainer(), 1, i);
+                childSpc.getProcessingEvent(), childSpc.getParentContainer(),
+                1, i);
             a.setActivityStatus(activityStatusNonActive);
             a.persist();
             nonActiveSpecimens.add(a);
@@ -582,19 +577,16 @@ public class TestSpecimen extends TestDatabase {
 
         SpecimenHelper.newSpecimen(childSpc, childSpc.getSpecimenType(),
             ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            childSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
-            childSpc.getParentContainer(), 0, 1);
+            childSpc.getProcessingEvent(), childSpc.getParentContainer(), 0, 1);
 
         SpecimenHelper.newSpecimen(childSpc, childSpc.getSpecimenType(),
             ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            childSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
-            childSpc.getParentContainer(), 1, 0);
+            childSpc.getProcessingEvent(), childSpc.getParentContainer(), 1, 0);
 
         childSpc = SpecimenHelper.newSpecimen(childSpc,
             childSpc.getSpecimenType(),
             ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            childSpc.getCollectionEvent(), childSpc.getProcessingEvent(),
-            childSpc.getParentContainer(), 0, 2);
+            childSpc.getProcessingEvent(), childSpc.getParentContainer(), 0, 2);
         childSpc.setInventoryId(Utils.getRandomString(5));
         childSpc.persist();
 
