@@ -6,14 +6,22 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
 
-    private static final String[] HEADINGS = new String[] { Messages.LoggingInfoTable_site_label, Messages.LoggingInfoTable_user_label,
-        Messages.LoggingInfoTable_date_label, Messages.LoggingInfoTable_action_label, Messages.LoggingInfoTable_type_label, Messages.LoggingInfoTable_pnumber_label, Messages.LoggingInfoTable_inventoryid_label, Messages.LoggingInfoTable_location_label,
+    private static final String[] HEADINGS = new String[] {
+        Messages.LoggingInfoTable_site_label,
+        Messages.LoggingInfoTable_user_label,
+        Messages.LoggingInfoTable_date_label,
+        Messages.LoggingInfoTable_action_label,
+        Messages.LoggingInfoTable_type_label,
+        Messages.LoggingInfoTable_pnumber_label,
+        Messages.LoggingInfoTable_inventoryid_label,
+        Messages.LoggingInfoTable_location_label,
         Messages.LoggingInfoTable_details_label };
 
     private static final int PAGE_SIZE_ROWS = 20;
@@ -100,6 +108,10 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
         }
 
         return info;
+    }
+
+    public Table getTable() {
+        return tableViewer.getTable();
     }
 
     @Override

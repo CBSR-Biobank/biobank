@@ -6,10 +6,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizardPage;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
-public class EnterCommentPage extends BiobankWizardPage {
+public class EnterCommentPage extends BgcWizardPage {
     public static final String PAGE_NAME = EnterCommentPage.class
         .getCanonicalName();
     private static final String COMMENT_REQUIRED = Messages.EnterCommentPage_required_msg;

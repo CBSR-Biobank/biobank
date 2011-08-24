@@ -9,11 +9,15 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-@SuppressWarnings("nls")
 public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
-    private static final String[] HEADINGS = new String[] { "Sender",
-        "Receiver", "Total Specimens", "Date Packed", "Date Received", "State" };
+    private static final String[] HEADINGS = new String[] {
+        Messages.RequestDispatchInfoTable_sender_label,
+        Messages.RequestDispatchInfoTable_receiver_label,
+        Messages.RequestDispatchInfoTable_total_specs_label,
+        Messages.RequestDispatchInfoTable_packed_label,
+        Messages.RequestDispatchInfoTable_received_label,
+        Messages.RequestDispatchInfoTable_state_label };
 
     public RequestDispatchInfoTable(Composite parent,
         List<DispatchWrapper> dispatchCollection) {
@@ -28,9 +32,9 @@ public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                 DispatchWrapper item = (DispatchWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.RequestDispatchInfoTable_loading;
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
@@ -47,7 +51,7 @@ public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                 case 5:
                     return item.getStateDescription();
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };

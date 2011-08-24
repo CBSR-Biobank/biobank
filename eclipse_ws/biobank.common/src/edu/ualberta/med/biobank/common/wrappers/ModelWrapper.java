@@ -32,8 +32,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -790,7 +792,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private <W extends ModelWrapper<? extends R>, R, M> void setWrappedProperty(
         ModelWrapper<M> modelWrapper, Property<R, ? super M> property, W wrapper) {
         R newValue = (wrapper == null ? null : wrapper.getWrappedObject());
-        setProperty(modelWrapper, property, newValue);
+        setProperty(modelWrapper, property, newValue, wrapper);
         modelWrapper.cacheProperty(property, wrapper);
     }
 
@@ -911,8 +913,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             false);
 
         if (!currentWrappers.containsAll(wrappersToRemove)) {
-            throw new BiobankCheckException(
-                "studies are not associated with site ");
+            throw new BiobankCheckException("object not in list");
         }
 
         removeFromWrapperCollection(property, wrappersToRemove);
@@ -940,12 +941,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     protected <T> void setProperty(Property<T, ? super E> property, T newValue) {
-        setProperty(this, property, newValue);
+        setProperty(this, property, newValue, newValue);
     }
 
     private <T, M> void setProperty(ModelWrapper<M> modelWrapper,
-        Property<T, ? super M> property, T newValue) {
-        setModelProperty(modelWrapper, property, newValue, newValue);
+        Property<T, ? super M> property, T newValue, Object valueToCache) {
+        setModelProperty(modelWrapper, property, newValue, valueToCache);
     }
 
     private static <T, M> T getModelProperty(ModelWrapper<M> modelWrapper,
@@ -1049,5 +1050,30 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         for (ModelWrapper<T> wrapper : wrappers) {
             wrapper.persist();
         }
+    }
+
+    /**
+     * Will consider the date and not the time.
+     */
+    public static Date endOfDay(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        c.add(Calendar.DAY_OF_MONTH, 1);
+        return c.getTime();
+    }
+
+    /**
+     * Remove time on this date to get time set to 00:00
+     */
+    public static Date startOfDay(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        return c.getTime();
     }
 }

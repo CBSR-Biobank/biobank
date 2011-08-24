@@ -8,7 +8,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
@@ -18,10 +17,6 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ProcessingEventViewForm"; //$NON-NLS-1$
 
-    private static BgcLogger logger = BgcLogger
-        .getLogger(ProcessingEventViewForm.class.getName());
-
-    private ProcessingEventAdapter pEventAdapter;
     private ProcessingEventWrapper pEvent;
 
     private BgcBaseText centerLabel;
@@ -42,9 +37,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        pEventAdapter = (ProcessingEventAdapter) adapter;
-        pEvent = pEventAdapter.getWrapper();
-        retrieveProcessingEvent();
+        pEvent = (ProcessingEventWrapper) getModelObject();
         setPartName(NLS.bind(Messages.ProcessingEventViewForm_title,
             pEvent.getFormattedCreatedAt()));
     }
@@ -100,8 +93,8 @@ public class ProcessingEventViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void reload() {
-        retrieveProcessingEvent();
+    public void reload() throws Exception {
+        pEvent.reload();
         setPartName(NLS.bind(Messages.ProcessingEventViewForm_title,
             pEvent.getFormattedCreatedAt()));
         form.setText(NLS.bind(Messages.ProcessingEventViewForm_title,
@@ -110,14 +103,4 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         sourceSpecimenTable.setCollection(pEvent.getSpecimenCollection(true));
     }
 
-    private void retrieveProcessingEvent() {
-        try {
-            pEvent.reload();
-        } catch (Exception ex) {
-            logger.error(Messages.format(
-                "Error while retrieving processing event {0}/{1}/{2}", pEvent //$NON-NLS-1$
-                    .getFormattedCreatedAt(),
-                pEvent.getCenter().getNameShort(), pEvent.getWorksheet()), ex);
-        }
-    }
 }

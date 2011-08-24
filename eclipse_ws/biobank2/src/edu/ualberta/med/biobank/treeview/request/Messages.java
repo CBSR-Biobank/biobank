@@ -12,4 +12,8 @@ public class Messages extends NLS {
 
     private Messages() {
     }
+
+    public static String ReceivingRequestGroup_node_label;
+    public static String RequestAdapter_add_text;
+    public static String RequestAdapter_tooltip;
 }

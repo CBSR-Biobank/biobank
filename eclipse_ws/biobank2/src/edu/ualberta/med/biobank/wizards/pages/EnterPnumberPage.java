@@ -7,10 +7,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizardPage;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
-public class EnterPnumberPage extends BiobankWizardPage {
+public class EnterPnumberPage extends BgcWizardPage {
     public static final String PAGE_NAME = EnterPnumberPage.class
         .getCanonicalName();
     private static final String PATIENT_NUMBER_REQUIRED = Messages.EnterPnumberPage_pnber_required_msg;

@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.forms;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -17,16 +18,21 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
+import org.springframework.remoting.RemoteAccessException;
+import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.forms.BgcFormBase;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
@@ -96,6 +102,16 @@ public abstract class BiobankFormBase extends BgcFormBase {
         }
         super.init(editorSite, formInput);
         getSite().setSelectionProvider(this);
+    }
+
+    protected ModelWrapper<?> getModelObject() throws Exception {
+        ModelWrapper<?> modelObject = adapter.getModelObject();
+
+        if (!modelObject.isNew()) {
+            modelObject = modelObject.getDatabaseClone();
+        }
+
+        return modelObject;
     }
 
     @Override
@@ -183,5 +199,39 @@ public abstract class BiobankFormBase extends BgcFormBase {
         if (adapter != null)
             return new StructuredSelection(adapter);
         return null;
+    }
+
+    protected void saveErrorCatch(Exception ex, IProgressMonitor monitor,
+        boolean lastThrowException) {
+        if (ex instanceof RemoteConnectFailureException) {
+            BgcPlugin.openRemoteConnectErrorMessage(ex);
+            cancelSave(monitor);
+        } else if (ex instanceof RemoteAccessException) {
+            BgcPlugin.openRemoteAccessErrorMessage(ex);
+            cancelSave(monitor);
+        } else if (ex instanceof AccessDeniedException) {
+            BgcPlugin.openAccessDeniedErrorMessage(ex);
+            cancelSave(monitor);
+        } else if (ex instanceof BiobankException) {
+            BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
+                ex);
+            cancelSave(monitor);
+        } else if (ex instanceof BiobankServerException) {
+            BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
+                ex);
+            cancelSave(monitor);
+        } else {
+            cancelSave(monitor);
+            if (lastThrowException)
+                throw new RuntimeException(ex);
+            else
+                BgcPlugin.openAsyncError(
+                    Messages.BiobankFormBase_save_error_title, ex);
+        }
+    }
+
+    protected void cancelSave(IProgressMonitor monitor) {
+        if (monitor != null)
+            monitor.setCanceled(true);
     }
 }

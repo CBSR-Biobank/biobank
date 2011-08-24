@@ -11,16 +11,11 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.SpecimenEntryForm;
 import edu.ualberta.med.biobank.forms.SpecimenViewForm;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SpecimenAdapter extends AdapterBase {
 
     public SpecimenAdapter(AdapterBase parent, SpecimenWrapper sample) {
         super(parent, sample);
-    }
-
-    public SpecimenWrapper getSpecimen() {
-        return (SpecimenWrapper) modelObject;
     }
 
     @Override
@@ -30,19 +25,13 @@ public class SpecimenAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        SpecimenWrapper specimen = getSpecimen();
-        Assert.isNotNull(specimen, "specimen is null"); //$NON-NLS-1$
-        return specimen.getInventoryId();
+        Assert.isNotNull(getModelObject(), "specimen is null"); //$NON-NLS-1$
+        return ((SpecimenWrapper) getModelObject()).getInventoryId();
     }
 
     @Override
     public String getTooltipText() {
         return getTooltipText(Messages.SpecimenAdapter_specimen_label);
-    }
-
-    @Override
-    public WritableApplicationService getAppService() {
-        return modelObject.getAppService();
     }
 
     @Override

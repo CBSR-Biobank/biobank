@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.forms.ResearchGroupEntryForm;
 import edu.ualberta.med.biobank.forms.ResearchGroupViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-@SuppressWarnings("nls")
 public class ResearchGroupAdapter extends AdapterBase {
 
     public ResearchGroupAdapter(AdapterBase parent,
@@ -21,32 +20,28 @@ public class ResearchGroupAdapter extends AdapterBase {
         super(parent, researchGroupWrapper);
     }
 
-    public ResearchGroupWrapper getWrapper() {
-        return (ResearchGroupWrapper) modelObject;
-    }
-
     @Override
     protected String getLabelInternal() {
-        ResearchGroupWrapper wrapper = getWrapper();
-        Assert.isNotNull(wrapper, "client is null");
+        ResearchGroupWrapper wrapper = (ResearchGroupWrapper) getModelObject();
+        Assert.isNotNull(wrapper, "client is null"); //$NON-NLS-1$
         return wrapper.getNameShort();
     }
 
     @Override
     public String getTooltipText() {
-        return getTooltipText("ResearchGroup");
+        return getTooltipText(Messages.ResearchGroupAdapter_tooltip);
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "ResearchGroup");
-        addViewMenu(menu, "ResearchGroup");
-        addDeleteMenu(menu, "ResearchGroup");
+        addEditMenu(menu, Messages.ResearchGroupAdapter_menu_label);
+        addViewMenu(menu, Messages.ResearchGroupAdapter_menu_label);
+        addDeleteMenu(menu, Messages.ResearchGroupAdapter_menu_label);
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this researchGroup?";
+        return Messages.ResearchGroupAdapter_delete_confirm_msg;
     }
 
     @Override

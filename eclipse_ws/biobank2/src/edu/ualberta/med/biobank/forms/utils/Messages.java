@@ -29,6 +29,12 @@ public class Messages extends NLS {
 
     public static String PalletScanManagement_tube_error_title;
 
+    public static String RequestTableGroup_all_node_label;
+
+    public static String RequestTableGroup_data_error_msg;
+
+    public static String RequestTableGroup_error_title;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

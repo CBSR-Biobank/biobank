@@ -11,9 +11,10 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
-import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -73,10 +74,21 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
-        if (isUsedBySpecimens()) {
-            throw new BiobankDeleteException("Unable to delete specimen type "
-                + getName() + ". Specimens of this type exists in storage."
-                + " Remove all instances before deleting this type.");
+        if (isUsed()) {
+            throw new BiobankDeleteException(
+                "Unable to delete specimen type "
+                    + getName()
+                    + ". Specimens of this type exists in storage, or studies are using it in their definition."
+                    + " Remove all references to this type before deleting it.");
+        }
+    }
+
+    @Override
+    public void deleteDependencies() throws Exception {
+        // should remove this type from its parents
+        for (SpecimenTypeWrapper parent : getParentSpecimenTypeCollection(false)) {
+            parent.removeFromChildSpecimenTypeCollection(Arrays.asList(this));
+            parent.persist();
         }
     }
 
@@ -160,16 +172,23 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return getName();
     }
 
-    public static final String IS_USED_BY_SPECIMENS_QRY = "select count(s) from "
-        + Specimen.class.getName()
-        + " as s where s."
-        + SpecimenPeer.SPECIMEN_TYPE.getName() + "=?)";
+    private static final String IS_USED_QRY_START = "select count(x) from ";
+    private static final String IS_USED_QRY_END = " as x where x.specimenType.id=?";
+    private static final Class<?>[] isUsedCheckClasses = new Class[] {
+        Specimen.class, SourceSpecimen.class, AliquotedSpecimen.class };
 
-    public boolean isUsedBySpecimens() throws ApplicationException,
+    public boolean isUsed() throws ApplicationException,
         BiobankQueryResultSizeException {
-        HQLCriteria c = new HQLCriteria(IS_USED_BY_SPECIMENS_QRY,
-            Arrays.asList(new Object[] { wrappedObject }));
-        return getCountResult(appService, c) > 0;
+        long usedCount = 0;
+        for (Class<?> clazz : isUsedCheckClasses) {
+            StringBuilder sb = new StringBuilder(IS_USED_QRY_START).append(
+                clazz.getName()).append(IS_USED_QRY_END);
+            HQLCriteria c = new HQLCriteria(sb.toString(),
+                Arrays.asList(new Object[] { wrappedObject.getId() }));
+            usedCount += getCountResult(appService, c);
+        }
+
+        return usedCount > 0;
     }
 
     @Override
@@ -188,6 +207,49 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
     public boolean isUnknownImport() {
         return getName() != null && UNKNOWN_IMPORT_NAME.equals(getName());
+    }
+
+    /**
+     * @deprecated instead of
+     *             child.addToParentSpecimenTypeCollection(Arrays.asList
+     *             (parent)), do
+     *             parent.addToChildSpecimenTypeCollection(Arrays.asList(child))
+     *             (this hibernate mapping with correlation table works only in
+     *             one way)
+     */
+    @Override
+    @Deprecated
+    public void addToParentSpecimenTypeCollection(
+        List<SpecimenTypeWrapper> parentSpecimenTypeCollection) {
+    }
+
+    /**
+     * @deprecated instead of
+     *             child.removeFromParentSpecimenTypeCollection(Arrays
+     *             .asList(parent)), do
+     *             parent.removeFromChildSpecimenTypeCollection
+     *             (Arrays.asList(child)) (this hibernate mapping with
+     *             correlation table works only in one way)
+     */
+    @Override
+    @Deprecated
+    public void removeFromParentSpecimenTypeCollection(
+        List<SpecimenTypeWrapper> parentSpecimenTypeCollection) {
+    }
+
+    /**
+     * @deprecated instead of
+     *             child.removeFromParentSpecimenTypeCollectionWithCheck
+     *             (Arrays.asList (parent)), do
+     *             parent.removeFromChildSpecimenTypeCollectionWithCheck(Arrays
+     *             .asList(child)) (this hibernate mapping with correlation
+     *             table works only in one way)
+     */
+    @Override
+    @Deprecated
+    public void removeFromParentSpecimenTypeCollectionWithCheck(
+        List<SpecimenTypeWrapper> parentSpecimenTypeCollection)
+        throws BiobankCheckException {
     }
 
 }

@@ -163,10 +163,14 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return shipments;
     }
 
+    // Don't run this on the server unless you take into account timezones in
+    // your inputs
     private static final String SHIPMENTS_BY_DATE_RECEIVED_QRY = SHIPMENT_HQL_STRING
-        + " where DATE(s."
+        + " where s."
         + ShipmentInfoPeer.RECEIVED_AT.getName()
-        + ") = DATE(?) and (o."
+        + " >= ? and s."
+        + ShipmentInfoPeer.RECEIVED_AT.getName()
+        + " < ? and (o."
         + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
         + "= ? or o."
         + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
@@ -183,7 +187,8 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
         Integer centerId = center.getId();
         HQLCriteria criteria = new HQLCriteria(SHIPMENTS_BY_DATE_RECEIVED_QRY,
-            Arrays.asList(new Object[] { dateReceived, centerId, centerId }));
+            Arrays.asList(new Object[] { startOfDay(dateReceived),
+                endOfDay(dateReceived), centerId, centerId }));
 
         List<OriginInfo> origins = appService.query(criteria);
         List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
@@ -192,10 +197,14 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return shipments;
     }
 
+    // Don't run this on the server unless you take into account timezones in
+    // your inputs
     private static final String SHIPMENTS_BY_DATE_SENT_QRY = SHIPMENT_HQL_STRING
-        + " where DATE(s."
+        + " where s."
         + ShipmentInfoPeer.PACKED_AT.getName()
-        + ") = DATE(?) and (o."
+        + " >= ? and s."
+        + ShipmentInfoPeer.PACKED_AT.getName()
+        + " < ? and (o."
         + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
         + "= ? or o."
         + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
@@ -204,11 +213,10 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     public static List<OriginInfoWrapper> getShipmentsByDateSent(
         WritableApplicationService appService, Date dateSent,
         CenterWrapper<?> center) throws ApplicationException {
-
         Integer centerId = center.getId();
         HQLCriteria criteria = new HQLCriteria(SHIPMENTS_BY_DATE_SENT_QRY,
-            Arrays.asList(new Object[] { dateSent, centerId, centerId }));
-
+            Arrays.asList(new Object[] { startOfDay(dateSent),
+                endOfDay(dateSent), centerId, centerId }));
         List<OriginInfo> origins = appService.query(criteria);
         List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
             appService, origins, OriginInfoWrapper.class);
@@ -258,5 +266,14 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         log.setDetails(StringUtils.join(detailsList, ", "));
         log.setType("Shipment");
         return log;
+    }
+
+    /**
+     * Should be addToSpecimenCollection most of the time. But can use this
+     * method from tome to tome to reset the collection (used in saving
+     * originInfo when want to try to re-add the specimens)
+     */
+    public void setSpecimenWrapperCollection(List<SpecimenWrapper> specs) {
+        setWrapperCollection(OriginInfoPeer.SPECIMEN_COLLECTION, specs);
     }
 }

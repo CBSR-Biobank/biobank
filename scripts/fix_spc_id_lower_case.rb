@@ -22,7 +22,7 @@ require 'choice'
 class FixSpcIdLowerCase < ScriptBase
 
   LOWER_CASE_SPC_ID_QRY = <<LOWER_CASE_SPC_ID_QRY_END
-select inventory_id
+select id,inventory_id
 from specimen spc
 where lower(spc.inventory_id)=spc.inventory_id
 and length(spc.inventory_id)=10
@@ -72,7 +72,7 @@ SPC_INSERT_QRY
     lower_case_spcs = Array.new
     res = @dbh.query(LOWER_CASE_SPC_ID_QRY)
     res.each_hash do |row|
-      lower_case_spcs << row['inventory_id']
+      lower_case_spcs << { 'id' => row['id'], 'inventory_id' => row['inventory_id'] }
     end
 
     # this hash has a value of 'true' if there is an upper case equivalent in
@@ -80,14 +80,9 @@ SPC_INSERT_QRY
     lc_spc_id_info = Hash.new
 
     lower_case_spcs.each do |inv_id|
-      res = @dbh.query(SPC_ID_QRY.gsub('{inventory_id}', inv_id.upcase))
+      res = @dbh.query(SPC_ID_QRY.gsub('{inventory_id}', inv_id['inventory_id'].upcase))
       has_upper = (res.num_rows == 1)
-      lc_spc_id_info[inv_id] = { 'has_upper' => has_upper }
-
-      if has_upper
-        row = res.fetch_hash
-        lc_spc_id_info[inv_id]['id'] = row['id']
-      end
+      lc_spc_id_info[inv_id['inventory_id']] = { 'has_upper' => has_upper, 'id' => inv_id['id'] }
     end
 
     date_str = Time.new.strftime("%Y-%m-%d")
@@ -113,9 +108,7 @@ and uc_spc.inventory_id='#{lc_inv_id.upcase}'")
 
         #  the inventory ID will be set to the upper case one.
         print "setting #{lc_inv_id.upcase} created at time\n"
-        @dbh.query("update specimen spc
-set spc.inventory_id='#{lc_inv_id.upcase}'
-where spc.id='#{value['id']}'")
+        @dbh.query("update specimen spc set spc.inventory_id='#{lc_inv_id.upcase}' where spc.id=#{value['id']}")
 
       end
     end

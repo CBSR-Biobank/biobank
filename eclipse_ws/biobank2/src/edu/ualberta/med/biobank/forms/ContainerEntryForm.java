@@ -83,13 +83,20 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 container.getLabel());
             oldContainerLabel = container.getLabel();
         }
+
+        if (adapter.getParent() == null)
+            adapter
+                .setParent(((SiteAdapter) SessionManager
+                    .searchFirstNode(container.getSite()))
+                    .getContainersGroupNode());
+
         setPartName(tabName);
     }
 
     @Override
     protected void createFormContent() throws Exception {
         form.setText(Messages.ContainerEntryForm_form_title);
-
+        setDirty(true);
         page.setLayout(new GridLayout(1, false));
         createContainerSection();
         createButtonsSection();
@@ -115,11 +122,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
             containerTypes = container.getParentContainer().getContainerType()
                 .getChildContainerTypeCollection();
         }
-        if (container.isNew())
-            adapter
-                .setParent(((SiteAdapter) SessionManager
-                    .searchFirstNode(container.getSite()))
-                    .getContainersGroupNode());
 
         setFirstControl(client);
 

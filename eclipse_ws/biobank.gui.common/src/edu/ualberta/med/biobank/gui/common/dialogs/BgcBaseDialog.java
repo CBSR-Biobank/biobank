@@ -31,7 +31,6 @@ import org.eclipse.swt.widgets.Widget;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
@@ -99,6 +98,11 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
 
     @Override
     protected Control createDialogArea(Composite parent) {
+        // add a separator below the title area (look better that way)
+        Label separator1 = new Label(parent, SWT.HORIZONTAL | SWT.SEPARATOR);
+        separator1.setLayoutData(new GridData(GridData.FILL_HORIZONTAL
+            | GridData.GRAB_HORIZONTAL));
+
         Composite contents = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout();
         layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
@@ -116,12 +120,15 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
             BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (final AccessDeniedException ade) {
             BgcPlugin.openAccessDeniedErrorMessage(ade);
-        } catch (BiobankCheckException bce) {
-            BgcPlugin.openAsyncError(Messages.BgcBaseDialog_save_error_title,
-                bce);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        // Build the separator line
+        Label bottomSeparator = new Label(parent, SWT.HORIZONTAL
+            | SWT.SEPARATOR);
+        bottomSeparator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL
+            | GridData.GRAB_HORIZONTAL));
 
         bindChangeListener();
         setupFinished = true;

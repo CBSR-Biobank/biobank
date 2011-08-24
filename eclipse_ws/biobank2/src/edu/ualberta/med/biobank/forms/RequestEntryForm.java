@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -25,6 +26,7 @@ import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -38,10 +40,9 @@ import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.infotables.RequestDispatchInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.RequestSpecimensTreeTable;
 
-@SuppressWarnings("nls")
 public class RequestEntryForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.RequestEntryFormBase";
+    public static final String ID = "edu.ualberta.med.biobank.forms.RequestEntryFormBase"; //$NON-NLS-1$
     private RequestWrapper request;
     private RequestSpecimensTreeTable specimensTree;
     private RequestDispatchInfoTable dispatchTable;
@@ -51,15 +52,15 @@ public class RequestEntryForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Requested on "
-            + DateFormatter.formatAsDateTime(request.getSubmitted()) + " "
-            + request.getStudy().getNameShort());
+        form.setText(NLS.bind(
+            Messages.RequestEntryForm_requestedOn_date_studyName, DateFormatter
+                .formatAsDateTime(request.getSubmitted()), request.getStudy()
+                .getNameShort()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();
     }
 
-    @SuppressWarnings("unused")
     private void createMainSection() {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -69,24 +70,26 @@ public class RequestEntryForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         BgcBaseText orderNumberLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Request Number");
+            SWT.NONE, Messages.RequestEntryForm_number_label);
         setTextValue(orderNumberLabel, request.getId());
 
         BgcBaseText studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Study");
+            Messages.RequestEntryForm_study_label);
         setTextValue(studyLabel, request.getStudy().getNameShort());
 
         BgcBaseText researchGroupLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Research Group");
+            SWT.NONE, Messages.RequestEntryForm_rgroup_Label);
 
-        request.getStudy().getResearchGroup().getNameShort();
+        setTextValue(researchGroupLabel, request.getStudy().getResearchGroup()
+            .getNameShort());
 
         BgcBaseText submittedLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Date Submitted");
+            SWT.NONE, Messages.RequestEntryForm_submitted_label);
         setTextValue(submittedLabel,
             DateFormatter.formatAsDateTime(request.getSubmitted()));
-        createReadOnlyLabelledField(client, SWT.NONE, "Comments");
-        Section s = createSection("Specimens");
+        createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.RequestEntryForm_comments_label);
+        Section s = createSection(Messages.RequestEntryForm_specimens_section);
         Composite c = toolkit.createComposite(s);
         s.setClient(c);
         c.setLayout(new GridLayout());
@@ -102,7 +105,7 @@ public class RequestEntryForm extends BiobankViewForm {
             }
         });
 
-        Section s2 = createSection("Dispatches");
+        Section s2 = createSection(Messages.RequestEntryForm_dispatches_section);
         Composite dispatchCreation = toolkit.createComposite(s2);
         s2.setClient(dispatchCreation);
         addSectionToolbar(s2, Messages.RequestEntryForm_dispatch_add_title,
@@ -113,10 +116,10 @@ public class RequestEntryForm extends BiobankViewForm {
                 }
             });
         dispatchCreation.setLayout(new GridLayout(5, false));
-        toolkit
-            .createLabel(dispatchCreation, "Enter/Scan inventory ID to add:");
+        toolkit.createLabel(dispatchCreation,
+            Messages.RequestEntryForm_scan_id_label);
         newSpecimenText = new BgcBaseText(dispatchCreation, SWT.NONE, toolkit);
-        addButton = toolkit.createButton(dispatchCreation, "", SWT.PUSH);
+        addButton = toolkit.createButton(dispatchCreation, "", SWT.PUSH); //$NON-NLS-1$
         addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -128,7 +131,8 @@ public class RequestEntryForm extends BiobankViewForm {
                     specNode = (TreeItemAdapter) specimensTree
                         .search(newSpecimenText.getText());
                     if (specNode == null)
-                        throw new Exception("Specimen not found");
+                        throw new Exception(
+                            Messages.RequestEntryForm_not_found_error_msg);
                     specimen = (RequestSpecimenWrapper) specNode.getSpecimen();
                     if (specimen != null) {
                         addToDispatch(getDispatchSelection(),
@@ -136,17 +140,19 @@ public class RequestEntryForm extends BiobankViewForm {
                         specimensTree.dispatch(specNode);
                     }
                 } catch (Exception e1) {
-                    BgcPlugin.openAsyncError("Error", e1.getMessage());
+                    BgcPlugin.openAsyncError(
+                        Messages.RequestEntryForm_error_title, e1.getMessage());
                 }
-                newSpecimenText.setText("");
+                newSpecimenText.setText(""); //$NON-NLS-1$
                 dispatchTable.reloadCollection(
                     request.getDispatchCollection(false),
                     getDispatchSelection());
             }
         });
 
-        toolkit.createLabel(dispatchCreation, "Add Pallet:");
-        openScanButton = toolkit.createButton(dispatchCreation, "", SWT.PUSH);
+        toolkit.createLabel(dispatchCreation,
+            Messages.RequestEntryForm_pallet_add_label);
+        openScanButton = toolkit.createButton(dispatchCreation, "", SWT.PUSH); //$NON-NLS-1$
         openScanButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
@@ -205,10 +211,11 @@ public class RequestEntryForm extends BiobankViewForm {
         boolean setAsFirstControl) {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
-        toolkit.createLabel(addComposite, "Enter inventory ID to add:");
+        toolkit.createLabel(addComposite,
+            Messages.RequestEntryForm_id_add_label);
         final BgcBaseText newSpecimenText = new BgcBaseText(addComposite,
             SWT.NONE, toolkit);
-        Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
+        Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH); //$NON-NLS-1$
         addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -218,9 +225,9 @@ public class RequestEntryForm extends BiobankViewForm {
                     Node updateNode = specimensTree.search(newSpecimenText
                         .getText());
                     if (updateNode == null)
-                        throw new Exception("Specimen "
-                            + newSpecimenText.getText()
-                            + " is not a valid choice.");
+                        throw new Exception(NLS.bind(
+                            Messages.RequestEntryForm_search_valid_error_msg,
+                            newSpecimenText.getText()));
                     else if (((TreeItemAdapter) updateNode).getSpecimen()
                         .getSpecimenState()
                         .equals(RequestSpecimenState.AVAILABLE_STATE)) {
@@ -232,19 +239,20 @@ public class RequestEntryForm extends BiobankViewForm {
                                 || !spec.getClaimedBy().equals(
                                     SessionManager.getUser().getFirstName()))
                                 throw new Exception(
-                                    "You must claim this specimen before pulling is permitted.");
+                                    Messages.RequestEntryForm_claim_error_msg);
                             request.flagSpecimens(Arrays.asList(spec));
                             specimensTree.pull(updateNode);
                         }
                     } else
                         throw new Exception(
-                            "This specimen has been already been processed.");
+                            Messages.RequestEntryForm_processed_error_msg);
 
                 } catch (Exception e1) {
-                    BgcPlugin.openAsyncError("Error", e1.getMessage());
+                    BgcPlugin.openAsyncError(
+                        Messages.RequestEntryForm_error_title, e1.getMessage());
                 }
                 newSpecimenText.setFocus();
-                newSpecimenText.setText("");
+                newSpecimenText.setText(""); //$NON-NLS-1$
             }
         });
     }
@@ -255,19 +263,31 @@ public class RequestEntryForm extends BiobankViewForm {
             request, SessionManager.getUser().getCurrentWorkingCenter());
         dialog.open();
         if (dialog.hasReceivedSpecimens()) {
-            // setDirty(true);
+            try {
+                List<RequestSpecimenWrapper> rspecs = new ArrayList<RequestSpecimenWrapper>();
+                for (SpecimenWrapper spec : dialog.getSpecimens()) {
+                    for (RequestSpecimenWrapper rs : specimensTree
+                        .getWrappers())
+                        if (rs.getSpecimen().equals(spec))
+                            rspecs.add(rs);
+                }
+                addToDispatch(getDispatchSelection(), rspecs);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        specimensTree.refresh();
+        specimensTree.rebuild();
     }
 
     @Override
     protected void init() throws Exception {
-        Assert.isNotNull(adapter, "Adapter should be no null");
+        Assert.isNotNull(adapter, "Adapter should be no null"); //$NON-NLS-1$
         Assert.isTrue((adapter instanceof RequestAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
         this.request = (RequestWrapper) adapter.getModelObject();
-        setPartName("Request " + request.getId().toString());
+        setPartName(Messages.RequestEntryForm_title
+            + request.getId().toString());
     }
 
     protected void buildNewDispatch() {
@@ -290,7 +310,8 @@ public class RequestEntryForm extends BiobankViewForm {
                 request.getDispatchCollection(false), getDispatchSelection());
             SpecimenTransitView.reloadCurrent();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Unable to create dispatch", e);
+            BgcPlugin.openAsyncError(
+                Messages.RequestEntryForm_creation_error_msg, e);
         }
     }
 
@@ -298,18 +319,19 @@ public class RequestEntryForm extends BiobankViewForm {
         List<RequestSpecimenWrapper> specs) throws Exception {
         // FIXME: SHOULD BE IN ONE TRANSACTION
         List<SpecimenWrapper> dispatchSpecimens = new ArrayList<SpecimenWrapper>();
-        for (RequestSpecimenWrapper rspec : specs) {
+        for (ItemWrapper rspec : specs) {
             if (rspec.getSpecimenState().equals(
                 RequestSpecimenState.PULLED_STATE)) {
-                rspec.setState(RequestSpecimenState.DISPATCHED_STATE);
-                rspec.persist();
+                ((RequestSpecimenWrapper) rspec)
+                    .setState(RequestSpecimenState.DISPATCHED_STATE);
+                ((RequestSpecimenWrapper) rspec).persist();
                 dispatchSpecimens.add(rspec.getSpecimen());
             } else
-                throw new Exception(
-                    "Error Adding: Specimen has not been pulled.");
+                throw new Exception(Messages.RequestEntryForm_add_error_msg);
         }
         dispatch.addSpecimens(dispatchSpecimens, DispatchSpecimenState.NONE);
         dispatch.persist();
+
     }
 
     @Override

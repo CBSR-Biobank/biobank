@@ -65,7 +65,15 @@ public class WorkingCenterSelectDialog extends BgcBaseDialog {
                     else
                         currentCenter = null;
                 }
-            }, new BiobankLabelProvider());
+            }, new BiobankLabelProvider() {
+                @Override
+                public String getText(Object element) {
+                    if (element instanceof CenterWrapper) {
+                        return ((CenterWrapper<?>) element).getNameShort();
+                    }
+                    return super.getText(element);
+                }
+            });
     }
 
     @Override

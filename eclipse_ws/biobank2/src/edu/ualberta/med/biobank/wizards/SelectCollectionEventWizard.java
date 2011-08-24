@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.wizards;
 
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizard;
 import edu.ualberta.med.biobank.wizards.pages.EnterCommentPage;
 import edu.ualberta.med.biobank.wizards.pages.EnterPnumberPage;
 import edu.ualberta.med.biobank.wizards.pages.SelectCollectionEventPage;
@@ -10,7 +11,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import org.eclipse.jface.wizard.IWizardPage;
 
-public class SelectCollectionEventWizard extends BiobankWizard {
+public class SelectCollectionEventWizard extends BgcWizard {
     private final WritableApplicationService appService;
     private EnterPnumberPage pnumberPage;
     private SelectCollectionEventPage cePage;

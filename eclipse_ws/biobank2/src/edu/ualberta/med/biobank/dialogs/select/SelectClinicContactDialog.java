@@ -23,7 +23,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
 
-@SuppressWarnings("nls")
 public class SelectClinicContactDialog extends BgcBaseDialog {
 
     public static final int ADD_BTN_ID = 100;
@@ -77,7 +76,8 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
             }
         };
 
-        clinicCombo = widgetCreator.createComboViewer(contents, "Clinic",
+        clinicCombo = widgetCreator.createComboViewer(contents,
+            Messages.SelectClinicContactDialog_clinic_label,
             new ArrayList<ClinicWrapper>(clinics), null, labelProvider);
         clinicCombo
             .addSelectionChangedListener(new ISelectionChangedListener() {

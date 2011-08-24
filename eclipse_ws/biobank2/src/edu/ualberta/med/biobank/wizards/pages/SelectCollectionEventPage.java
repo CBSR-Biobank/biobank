@@ -14,10 +14,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizardPage;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.infotables.CollectionEventInfoTable;
 
-public class SelectCollectionEventPage extends BiobankWizardPage {
+public class SelectCollectionEventPage extends BgcWizardPage {
     public static final String PAGE_NAME = SelectCollectionEventPage.class
         .getCanonicalName();
     private static final String CEVENT_REQUIRED = Messages.SelectCollectionEventPage_required_msg;

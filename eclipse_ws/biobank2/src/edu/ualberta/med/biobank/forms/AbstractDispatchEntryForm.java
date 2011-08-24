@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModificationConcurrencyException;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
@@ -36,6 +37,10 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             setDirty(true);
         }
     };
+
+    private boolean isTryingAgain;
+
+    protected boolean tryAgain;
 
     @Override
     protected void init() throws Exception {
@@ -70,7 +75,8 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         boolean setAsFirstControl) {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
-        toolkit.createLabel(addComposite, Messages.AbstractDispatchEntryForm_add_spec_label);
+        toolkit.createLabel(addComposite,
+            Messages.AbstractDispatchEntryForm_add_spec_label);
         final BgcBaseText newSpecimenText = new BgcBaseText(addComposite,
             SWT.NONE, toolkit);
         GridData gd = new GridData();
@@ -98,7 +104,8 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
                 newSpecimenText.setText(""); //$NON-NLS-1$
             }
         });
-        toolkit.createLabel(addComposite, Messages.AbstractDispatchEntryForm_scanDialog_label);
+        toolkit.createLabel(addComposite,
+            Messages.AbstractDispatchEntryForm_scanDialog_label);
         Button openScanButton = toolkit
             .createButton(addComposite, "", SWT.PUSH); //$NON-NLS-1$
         openScanButton.setImage(BgcPlugin.getDefault().getImageRegistry()
@@ -123,14 +130,52 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        dispatch.persist();
+        try {
+            dispatch.persist();
+        } catch (ModificationConcurrencyException mc) {
+            if (needToTryAgainIfConcurrency()) {
+                if (isTryingAgain) {
+                    // already tried once
+                    throw mc;
+                }
+                Display.getDefault().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        tryAgain = BgcPlugin
+                            .openConfirm(
+                                Messages.ProcessingEventEntryForm_save_error_title,
+                                Messages.ProcessingEventEntryForm_concurrency_error_msg);
+                        setDirty(true);
+                        try {
+                            doTrySettingAgain();
+                            tryAgain = true;
+                        } catch (Exception e) {
+                            saveErrorCatch(e, null, true);
+                        }
+                    }
+                });
+            } else
+                throw mc;
+        }
+    }
 
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                SpecimenTransitView.getCurrent().reload();
-            }
-        });
+    protected boolean needToTryAgainIfConcurrency() {
+        return false;
+    }
+
+    @SuppressWarnings("unused")
+    protected void doTrySettingAgain() throws Exception {
+        // default does nothing
+    }
+
+    @Override
+    protected void doAfterSave() throws Exception {
+        if (tryAgain) {
+            isTryingAgain = true;
+            tryAgain = false;
+            confirm();
+        } else
+            SpecimenTransitView.getCurrent().reload();
     }
 
     protected abstract void reloadSpecimens();

@@ -64,6 +64,8 @@ public class SessionAdapter extends AdapterBase {
             if (SessionManager.isSuperAdminMode()) {
                 addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
                 addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
+                addChild(new ResearchGroupMasterGroup(this,
+                    RESEARCH_GROUPS_BASE_NODE_ID));
                 SiteGroup siteGroup = new SiteGroup(this, SITES_NODE_ID);
                 addChild(siteGroup);
                 siteGroup.performExpand();
@@ -133,7 +135,6 @@ public class SessionAdapter extends AdapterBase {
         return (ClinicMasterGroup) adapter;
     }
 
-    @SuppressWarnings("unused")
     private ResearchGroupMasterGroup getResearchGroupGroupNode() {
         AdapterBase adapter = getChild(RESEARCH_GROUPS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
@@ -234,15 +235,10 @@ public class SessionAdapter extends AdapterBase {
     }
 
     public void addResearchGroup() {
-        ResearchGroupMasterGroup g = getResearchGroupNode();
+        ResearchGroupMasterGroup g = getResearchGroupGroupNode();
         if (g != null) {
             g.addResearchGroup();
         }
-    }
-
-    private ResearchGroupMasterGroup getResearchGroupNode() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }

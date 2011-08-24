@@ -16,6 +16,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -111,6 +112,13 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
 
         setCollection(collection);
 
+        // need to autosize at creation to be sure the size is well initialized
+        // the first time. (if don't do that, display problems in UserManagement
+        // Dialog):
+        if (autoSizeColumns) {
+            autoSizeColumns();
+        }
+
         BiobankClipboard.addClipboardCopySupport(tableViewer, menu,
             (BiobankLabelProvider) getLabelProvider(), headings.length);
 
@@ -204,21 +212,27 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
                 enablePaginationWidget(false);
             } else if (paginationWidget != null)
                 paginationWidget.setVisible(false);
+            final Display display = getTableViewer().getTable().getDisplay();
 
             resizeTable();
             backgroundThread = new Thread() {
                 @Override
                 public void run() {
                     tableLoader(collection, selection);
+                    if (autoSizeColumns) {
+                        display.syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                autoSizeColumns();
+                            }
+                        });
+                    }
                 }
             };
             backgroundThread.start();
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
                 Messages.AbstractInfoTableWidget_load_error_title, e);
-        }
-        if (autoSizeColumns) {
-            autoSizeColumns();
         }
     }
 
@@ -269,6 +283,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
             sumOfMaxTextWidths += width;
         }
 
+        // need to give default max=500 when can't know the size of the table
+        // yet (see UserManagementDialog)
         int tableWidth = Math.max(500, tableViewer.getTable().getSize().x);
 
         int totalWidths = 0;

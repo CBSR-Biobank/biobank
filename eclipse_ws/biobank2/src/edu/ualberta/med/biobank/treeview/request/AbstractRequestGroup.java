@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
-@SuppressWarnings("nls")
 public abstract class AbstractRequestGroup extends AdapterBase {
 
     protected CenterWrapper<?> center;
@@ -26,7 +25,7 @@ public abstract class AbstractRequestGroup extends AdapterBase {
 
     @Override
     public void openViewForm() {
-        Assert.isTrue(false, "should not be called");
+        Assert.isTrue(false, "should not be called"); //$NON-NLS-1$
     }
 
     @Override

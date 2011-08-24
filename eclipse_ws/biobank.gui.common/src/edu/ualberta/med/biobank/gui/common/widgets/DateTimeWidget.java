@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.gui.common.widgets;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -29,13 +30,15 @@ public class DateTimeWidget extends BgcBaseWidget {
     private Listener dataEntryModifyListener = new Listener() {
         @Override
         public void handleEvent(Event event) {
-            if (event.type == SWT.Modify || event.type == SWT.Selection) {
+            if ((event.type == SWT.Modify) || (event.type == SWT.Selection)) {
                 fireModifyListeners();
             }
         }
     };
 
     private TimeZone timeZone;
+
+    private boolean zeroOutTime = false;
 
     public DateTimeWidget(Composite parent, int style, Date date,
         TimeZone timeZone) {
@@ -61,12 +64,15 @@ public class DateTimeWidget extends BgcBaseWidget {
 
         dateEntry = new CDateTime(this, CDT.BORDER | CDT.COMPACT
             | CDT.TIME_SHORT | CDT.CLOCK_24_HOUR | CDT.BORDER | style);
-        if ((style & SWT.TIME) != 0 && (style & SWT.DATE) != 0)
+
+        if (((style & SWT.TIME) != 0) && ((style & SWT.DATE) != 0))
             dateEntry.setPattern(DateFormatter.DATE_TIME_FORMAT);
         else if ((style & SWT.TIME) != 0)
             dateEntry.setPattern(DateFormatter.TIME_FORMAT);
-        else
+        else {
             dateEntry.setPattern(DateFormatter.DATE_FORMAT);
+            zeroOutTime = true;
+        }
 
         dateEntry.addListener(SWT.Modify, dataEntryModifyListener);
         dateEntry.addListener(SWT.Selection, dataEntryModifyListener);
@@ -91,8 +97,15 @@ public class DateTimeWidget extends BgcBaseWidget {
     }
 
     public Date getDate() {
-        // dirty hax to covert times by timezone
         if (dateEntry.getSelection() != null) {
+            if (zeroOutTime) {
+                Calendar c = Calendar.getInstance();
+                c.setTime(dateEntry.getSelection());
+                c.set(Calendar.HOUR, 0);
+                c.set(Calendar.MINUTE, 0);
+                c.set(Calendar.SECOND, 0);
+                return c.getTime();
+            }
             return dateEntry.getSelection();
         }
         return null;

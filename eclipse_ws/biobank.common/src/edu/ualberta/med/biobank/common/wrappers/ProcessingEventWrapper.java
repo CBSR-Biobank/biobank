@@ -208,9 +208,11 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     private static final String PROCESSING_EVENT_BY_DATE_QRY = "select pEvent from "
         + ProcessingEvent.class.getName()
-        + " pEvent where DATE(pEvent."
+        + " pEvent where pEvent."
         + ProcessingEventPeer.CREATED_AT.getName()
-        + ")=DATE(?) and pEvent."
+        + ">=? and pEvent."
+        + ProcessingEventPeer.CREATED_AT.getName()
+        + "<? and pEvent."
         + Property.concatNames(ProcessingEventPeer.CENTER, CenterPeer.ID)
         + "= ?";
 
@@ -218,7 +220,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         WritableApplicationService appService, Date date,
         CenterWrapper<?> center) throws Exception {
         HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_BY_DATE_QRY,
-            Arrays.asList(new Object[] { date, center.getId() }));
+            Arrays.asList(new Object[] { startOfDay(date), endOfDay(date),
+                center.getId() }));
         List<ProcessingEvent> pvs = appService.query(c);
         List<ProcessingEventWrapper> pvws = new ArrayList<ProcessingEventWrapper>();
         for (ProcessingEvent pv : pvs)
@@ -342,5 +345,14 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         List<ProcessingEvent> res = appService.query(c);
         return wrapModelCollection(appService, res,
             ProcessingEventWrapper.class);
+    }
+
+    /**
+     * Should be addToSpecimenCollection most of the time. But can use this
+     * method from tome to tome to reset the collection (used in saving pEvent
+     * when want to try to re-add the specimens)
+     */
+    public void setSpecimenWrapperCollection(List<SpecimenWrapper> specs) {
+        setWrapperCollection(ProcessingEventPeer.SPECIMEN_COLLECTION, specs);
     }
 }

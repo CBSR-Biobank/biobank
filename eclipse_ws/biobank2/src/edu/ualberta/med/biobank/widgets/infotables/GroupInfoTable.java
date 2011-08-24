@@ -7,8 +7,12 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -18,13 +22,9 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class GroupInfoTable extends InfoTableWidget<Group> {
-    public static final int ROWS_PER_PAGE = 8;
+public abstract class GroupInfoTable extends InfoTableWidget<Group> {
+    public static final int ROWS_PER_PAGE = 12;
     private static final String[] HEADINGS = new String[] { Messages.GroupInfoTable_name_label };
-    private static final String LOADING_ROW = Messages.GroupInfoTable_loading;
-    private static final String GROUP_DELETE_ERROR = Messages.GroupInfoTable_delete_error_msg;
-    private static final String CONFIRM_DELETE_TITLE = Messages.GroupInfoTable_delete_confirm_title;
-    private static final String CONFIRM_DELETE_MESSAGE = Messages.GroupInfoTable_delete_confirm_msg;
 
     public GroupInfoTable(Composite parent, List<Group> collection) {
         super(parent, collection, HEADINGS, ROWS_PER_PAGE, Group.class);
@@ -42,7 +42,18 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
                 deleteGroup((Group) getSelection());
             }
         });
+
+        MenuItem item = new MenuItem(menu, SWT.PUSH);
+        item.setText(Messages.GroupInfoTable_duplicate);
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                duplicate((Group) getSelection());
+            }
+        });
     }
+
+    protected abstract void duplicate(Group origGroup);
 
     @SuppressWarnings("serial")
     @Override
@@ -87,7 +98,7 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
                 Group group = (Group) ((BiobankCollectionModel) element).o;
                 if (group == null) {
                     if (columnIndex == 0) {
-                        return LOADING_ROW;
+                        return Messages.GroupInfoTable_loading;
                     }
                     return ""; //$NON-NLS-1$
                 }
@@ -115,20 +126,23 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
     protected boolean deleteGroup(Group group) {
         try {
             String name = group.getName();
-            String message = MessageFormat.format(CONFIRM_DELETE_MESSAGE,
+            String message = MessageFormat.format(
+                Messages.GroupInfoTable_delete_confirm_msg,
                 new Object[] { name });
 
-            if (BgcPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
+            if (BgcPlugin.openConfirm(
+                Messages.GroupInfoTable_delete_confirm_title, message)) {
                 SessionManager.getAppService().deleteGroup(
                     SessionManager.getUser(), group);
-                // remove the user from the collection
+                // remove the group from the collection
                 getCollection().remove(group);
                 reloadCollection(getCollection(), null);
                 notifyListeners();
                 return true;
             }
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(GROUP_DELETE_ERROR, e);
+            BgcPlugin.openAsyncError(Messages.GroupInfoTable_delete_error_msg,
+                e);
         }
         return false;
     }

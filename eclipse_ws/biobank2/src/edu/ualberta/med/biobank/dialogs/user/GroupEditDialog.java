@@ -6,12 +6,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
@@ -21,12 +27,13 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.TableFilter;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankSecurityUtil;
+import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNode;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class GroupEditDialog extends BgcBaseDialog {
-    public static final int CLOSE_PARENT_RETURN_CODE = 3;
     private final String currentTitle;
     private final String titleAreaMessage;
 
@@ -34,6 +41,8 @@ public class GroupEditDialog extends BgcBaseDialog {
     private MultiSelectWidget workingCentersWidget;
     private List<CenterWrapper<?>> allCenters;
     private MultiSelectWidget centerFeaturesWidget;
+    private Text centersFilterText;
+    private LinkedHashMap<Integer, String> allFeaturesMap;
 
     public GroupEditDialog(Shell parent, Group originalGroup, boolean isNewGroup) {
         super(parent);
@@ -93,9 +102,37 @@ public class GroupEditDialog extends BgcBaseDialog {
 
         workingCentersWidget = new MultiSelectWidget(parent, SWT.NONE,
             Messages.GroupEditDialog_center_list_available,
-            Messages.GroupEditDialog_center_list_working, 75);
+            Messages.GroupEditDialog_center_list_working, 110);
         workingCentersWidget.setSelections(centerMap,
             modifiedGroup.getWorkingCenterIds());
+        workingCentersWidget.setFilter(new ViewerFilter() {
+            @Override
+            public boolean select(Viewer viewer, Object parentElement,
+                Object element) {
+                if (centersFilterText == null)
+                    return true;
+                MultiSelectNode node = (MultiSelectNode) element;
+                return TableFilter.contains(node.getName(),
+                    centersFilterText.getText());
+            }
+        });
+        Label label = new Label(parent, SWT.NONE);
+        label.setText(Messages.GroupEditDialog_filter_centers);
+        centersFilterText = new Text(parent, SWT.BORDER);
+        GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+        centersFilterText.setLayoutData(gd);
+        centersFilterText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                workingCentersWidget.refreshLists();
+            }
+        });
+
+        Label separator = new Label(parent, SWT.HORIZONTAL | SWT.SEPARATOR);
+        gd = new GridData();
+        gd.horizontalAlignment = SWT.CENTER;
+        gd.widthHint = 250;
+        separator.setLayoutData(gd);
 
         centerFeaturesWidget = createFeaturesSelectionWidget(
             parent,
@@ -105,22 +142,20 @@ public class GroupEditDialog extends BgcBaseDialog {
             BiobankSecurityUtil.CENTER_FEATURE_START_NAME,
             Messages.GroupEditDialog_feature_center_list_available,
             Messages.GroupEditDialog_feature_center_list_selected);
-        centerFeaturesWidget.setSelection(modifiedGroup
-            .getCenterFeaturesEnabled());
     }
 
     private MultiSelectWidget createFeaturesSelectionWidget(Composite parent,
         List<ProtectionGroupPrivilege> availableFeatures,
         List<Integer> selectedFeatures, String replaceString,
         String availableString, String enabledString) {
-        final LinkedHashMap<Integer, String> featuresMap = new LinkedHashMap<Integer, String>();
+        allFeaturesMap = new LinkedHashMap<Integer, String>();
         for (ProtectionGroupPrivilege pgp : availableFeatures) {
-            featuresMap.put(pgp.getId().intValue(),
+            allFeaturesMap.put(pgp.getId().intValue(),
                 pgp.getName().replace(replaceString, "")); //$NON-NLS-1$
         }
         MultiSelectWidget featuresWidget = new MultiSelectWidget(parent,
-            SWT.NONE, availableString, enabledString, 75);
-        featuresWidget.setSelections(featuresMap, selectedFeatures);
+            SWT.NONE, availableString, enabledString, 110);
+        featuresWidget.setSelections(allFeaturesMap, selectedFeatures);
         return featuresWidget;
     }
 

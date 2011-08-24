@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
@@ -47,8 +48,8 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
 
     public ContainerInfoTable(Composite parent, SiteAdapter site)
         throws Exception {
-        super(parent, site.getWrapper().getTopContainerCollection(), HEADINGS,
-            10, ContainerWrapper.class);
+        super(parent, ((SiteWrapper) site.getModelObject())
+            .getTopContainerCollection(), HEADINGS, 10, ContainerWrapper.class);
         siteAdapter = site;
     }
 

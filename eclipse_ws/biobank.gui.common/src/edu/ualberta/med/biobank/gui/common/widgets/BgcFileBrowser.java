@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.gui.common.widgets;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.SafeRunnable;
@@ -13,10 +13,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
-
-public class FileBrowser extends BgcBaseWidget {
+public class BgcFileBrowser extends BgcBaseWidget {
 
     private BgcBaseText textfield;
 
@@ -28,7 +25,7 @@ public class FileBrowser extends BgcBaseWidget {
 
     protected ListenerList fileSelectionListeners = new ListenerList();
 
-    public FileBrowser(Composite parent, String label, int style,
+    public BgcFileBrowser(Composite parent, String label, int style,
         String[] extensions) {
         super(parent, style);
         this.filterExtensions = extensions;
@@ -43,20 +40,20 @@ public class FileBrowser extends BgcBaseWidget {
             true, false));
 
         browse = new Button(this, style);
-        browse.setText(Messages.FileBrowser_browse_label);
+        browse.setText(Messages.BgcFileBrowser_browse);
         browse.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 fileDialog = new FileDialog(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getShell(), SWT.OPEN);
-                fileDialog.setText(Messages.FileBrowser_open_label);
+                fileDialog.setText(Messages.BgcFileBrowser_open);
                 fileDialog.setFilterExtensions(filterExtensions);
                 final String path = fileDialog.open();
                 if (path != null) {
                     textfield.setText(path);
                     Object[] listeners = fileSelectionListeners.getListeners();
                     for (int i = 0; i < listeners.length; ++i) {
-                        final IFileBrowserListener l = (IFileBrowserListener) listeners[i];
+                        final IBgcFileBrowserListener l = (IBgcFileBrowserListener) listeners[i];
                         SafeRunnable.run(new SafeRunnable() {
                             @Override
                             public void run() {
@@ -81,7 +78,7 @@ public class FileBrowser extends BgcBaseWidget {
         return fileDialog;
     }
 
-    public void addFileSelectedListener(IFileBrowserListener listener) {
+    public void addFileSelectedListener(IBgcFileBrowserListener listener) {
         fileSelectionListeners.add(listener);
     }
 

@@ -37,7 +37,6 @@ import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-@SuppressWarnings("nls")
 public class RequestSpecimensTreeTable extends BgcBaseWidget {
 
     private TreeViewer tv;
@@ -62,27 +61,27 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
         tree.setLinesVisible(true);
 
         TreeColumn tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Location");
+        tc.setText(Messages.RequestSpecimensTreeTable_location_label);
         tc.setWidth(300);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Inventory Id");
+        tc.setText(Messages.RequestSpecimensTreeTable_id_label);
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Type");
+        tc.setText(Messages.RequestSpecimensTreeTable_type_label);
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Patient");
+        tc.setText(Messages.RequestSpecimensTreeTable_patient_label);
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Claimed By");
+        tc.setText(Messages.RequestSpecimensTreeTable_claimed_label);
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("State");
+        tc.setText(Messages.RequestSpecimensTreeTable_state_label);
         tc.setWidth(100);
 
         ITreeContentProvider contentProvider = new ITreeContentProvider() {
@@ -126,12 +125,12 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                 if (element instanceof RequestTableGroup) {
                     if (columnIndex == 0)
                         return ((RequestTableGroup) element).getTitle();
-                    return "";
+                    return ""; //$NON-NLS-1$
                 } else if (element instanceof RequestContainerAdapter) {
                     if (columnIndex == 0)
                         return ((RequestContainerAdapter) element)
                             .getLabelInternal();
-                    return "";
+                    return ""; //$NON-NLS-1$
                 } else if (element instanceof Node) {
                     if (columnIndex == 0) {
                         return ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
@@ -148,9 +147,9 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                                 ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
                                     .getSpecimen()).getState()).getLabel();
                     } else
-                        return "";
+                        return ""; //$NON-NLS-1$
                 }
-                return "";
+                return ""; //$NON-NLS-1$
             }
         };
         tv.setLabelProvider(labelProvider);
@@ -197,7 +196,7 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
     protected void addClaimMenu(Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Claim");
+        item.setText(Messages.RequestSpecimensTreeTable_claim_menu);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -214,14 +213,15 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                 spec.persist();
             }
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Failed to claim", e);
+            BgcPlugin.openAsyncError(
+                Messages.RequestSpecimensTreeTable_claim_error_title, e);
         }
     }
 
     private void addSetUnavailableMenu(final Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Flag as unavailable");
+        item.setText(Messages.RequestSpecimensTreeTable_flag_unavailable_menu);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -232,7 +232,10 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                         spec.persist();
                         spec.reload();
                     } catch (Exception e) {
-                        BgcPlugin.openAsyncError("Save Error", e);
+                        BgcPlugin
+                            .openAsyncError(
+                                Messages.RequestSpecimensTreeTable_save_error_title,
+                                e);
                     }
                 }
                 refresh();
@@ -242,6 +245,10 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
 
     public List<RequestSpecimenWrapper> getSelectionWrappers() {
         return getWrappers(getAdapterSelection());
+    }
+
+    public List<RequestSpecimenWrapper> getWrappers() {
+        return getWrappers(groups.get(0));
     }
 
     public List<RequestSpecimenWrapper> getWrappers(Node parent) {
@@ -266,6 +273,10 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
 
     public void refresh() {
         tv.refresh(true);
+    }
+
+    public void rebuild() {
+        tv.setInput(new RootNode());
     }
 
     public Node search(String text) {

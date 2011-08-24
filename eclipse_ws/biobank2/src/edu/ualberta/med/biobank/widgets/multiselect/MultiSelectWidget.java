@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -71,7 +71,8 @@ public class MultiSelectWidget extends BgcBaseWidget {
         moveLeftButton = new Button(moveComposite, SWT.PUSH);
         moveLeftButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ARROW_LEFT));
-        moveLeftButton.setToolTipText(Messages.MultiSelectWidget_remove_tooltip);
+        moveLeftButton
+            .setToolTipText(Messages.MultiSelectWidget_remove_tooltip);
 
         selTree = createLabelledTree(this, rightLabel);
         selTree.setInput(selTreeRootNode);
@@ -93,6 +94,12 @@ public class MultiSelectWidget extends BgcBaseWidget {
                 moveTreeViewerSelection(selTree, availTree);
             }
         });
+    }
+
+    public void setFilter(ViewerFilter filter) {
+        ViewerFilter[] filters = new ViewerFilter[] { filter };
+        availTree.setFilters(filters);
+        selTree.setFilters(filters);
     }
 
     private void moveTreeViewerSelection(TreeViewer srcTree, TreeViewer destTree) {
@@ -233,9 +240,8 @@ public class MultiSelectWidget extends BgcBaseWidget {
         availTree.getControl().setEnabled(enabled);
     }
 
-    public void setSelection(List<Integer> selected) {
-        availTree.getTree().selectAll();
-        availTree.setSelection(new StructuredSelection(selected));
-        moveTreeViewerSelection(availTree, selTree);
+    public void refreshLists() {
+        availTree.refresh();
+        selTree.refresh();
     }
 }

@@ -20,8 +20,8 @@ public class ContainerTypeAddHandler extends AbstractHandler {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        containerTypeAdapter.getContainerType().setSite(
-            SessionManager.getUser().getCurrentWorkingSite());
+        ((ContainerTypeWrapper) containerTypeAdapter.getModelObject())
+            .setSite(SessionManager.getUser().getCurrentWorkingSite());
         containerTypeAdapter.openEntryForm(false);
         return null;
     }

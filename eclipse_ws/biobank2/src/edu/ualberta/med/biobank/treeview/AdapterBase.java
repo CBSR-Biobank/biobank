@@ -51,7 +51,7 @@ public abstract class AdapterBase {
     protected IDeltaListener deltaListener = NullDeltaListener
         .getSoleInstance();
 
-    protected ModelWrapper<?> modelObject;
+    private ModelWrapper<?> modelObject;
 
     private Integer id;
 
@@ -330,7 +330,9 @@ public abstract class AdapterBase {
         if (modelObject != null) {
             return modelObject.getAppService();
         }
-        return parent.getAppService();
+        if (parent != null)
+            return parent.getAppService();
+        return null;
     }
 
     public void addListener(IDeltaListener listener) {
@@ -428,10 +430,8 @@ public abstract class AdapterBase {
             int childCount = getWrapperChildCount();
             if (childCount == 0) {
                 setHasChildren(false);
-                loadChildrenSemaphore.release();
-                return;
-            }
-            setHasChildren(true);
+            } else
+                setHasChildren(true);
             final List<AdapterBase> newNodes = new ArrayList<AdapterBase>();
             for (int i = 0, n = childCount - children.size(); i < n; ++i) {
                 final AdapterBase node = createChildNode(-i);
@@ -719,6 +719,7 @@ public abstract class AdapterBase {
                             getParent().addChild(AdapterBase.this);
                             return;
                         }
+                        getParent().rebuild();
                         getParent().notifyListeners();
                         notifyListeners();
                         additionalRefreshAfterDelete();
@@ -781,7 +782,7 @@ public abstract class AdapterBase {
     protected List<AdapterBase> searchChildContainers(Object searchedObject,
         ContainerAdapter container, final List<ContainerWrapper> parents) {
         List<AdapterBase> res = new ArrayList<AdapterBase>();
-        if (parents.contains(container.getContainer())) {
+        if (parents.contains(container.getModelObject())) {
             AdapterBase child = container.getChild(
                 (ModelWrapper<?>) searchedObject, true);
             if (child == null) {

@@ -125,14 +125,17 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private void createStudySection() {
         Section section = createSection(Messages.SiteEntryForm_studies_title);
-        addSectionToolbar(section, Messages.SiteEntryForm_studies_add,
-            new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    studiesTable.createStudyDlg();
-                }
-            }, ContactWrapper.class);
-        studiesTable = new StudyAddInfoTable(section, site);
+        boolean superAdmin = SessionManager.getUser().isSuperAdministrator();
+        if (superAdmin) {
+            addSectionToolbar(section, Messages.SiteEntryForm_studies_add,
+                new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        studiesTable.createStudyDlg();
+                    }
+                }, ContactWrapper.class);
+        }
+        studiesTable = new StudyAddInfoTable(section, site, superAdmin);
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addClickListener(collectionDoubleClickListener);
         studiesTable.addSelectionChangedListener(listener);

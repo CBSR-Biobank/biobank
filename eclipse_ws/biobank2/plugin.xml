@@ -214,7 +214,7 @@
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.scanner.decodeImage"
-            name="Decode Image">
+            name="%DecodeImage.command">
       </command>
       <command
             categoryId="org.eclipse.ui.category.window"
@@ -1971,6 +1971,20 @@
       default="false"
       id="edu.ualberta.med.biobank.forms.SpecimenAssignEntryForm"
       name="%SpecimenAssign.editor">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"
+      default="false"
+      icon="icons/research_group.png"
+      id="edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"
+      name="Research Group Entry">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.ResearchGroupViewForm"
+      default="false"
+      icon="icons/research_group.png"
+      id="edu.ualberta.med.biobank.forms.ResearchGroupViewForm"
+      name="Research Group View">
 </editor>
    </extension>
    <extension

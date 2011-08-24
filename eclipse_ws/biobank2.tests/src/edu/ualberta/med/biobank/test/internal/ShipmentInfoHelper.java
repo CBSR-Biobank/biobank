@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -29,7 +30,11 @@ public class ShipmentInfoHelper extends DbHelper {
         }
 
         shipInfo.setShippingMethod(method);
-        shipInfo.setWaybill(waybill);
+        boolean setWaybill = !(center instanceof ClinicWrapper)
+            || Boolean.TRUE
+                .equals(((ClinicWrapper) center).getSendsShipments());
+        if (setWaybill)
+            shipInfo.setWaybill(waybill);
         if (dateReceived != null) {
             shipInfo.setReceivedAt(dateReceived);
         }
@@ -58,7 +63,8 @@ public class ShipmentInfoHelper extends DbHelper {
     public static ShipmentInfoWrapper addShipmentInfo(CenterWrapper<?> center,
         ShippingMethodWrapper method, String waybill, SpecimenWrapper... spcs)
         throws Exception {
-        return addShipmentInfo(center, method, waybill, Utils.getRandomDate(), spcs);
+        return addShipmentInfo(center, method, waybill, Utils.getRandomDate(),
+            spcs);
     }
 
     public static ShipmentInfoWrapper addShipmentInfo(CenterWrapper<?> center,
