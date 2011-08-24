@@ -3,11 +3,10 @@ package edu.ualberta.med.biobank.common.wrappers.internal;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.EventAttrPeer;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyEventAttrBaseWrapper;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
@@ -24,16 +23,6 @@ public class StudyEventAttrWrapper extends StudyEventAttrBaseWrapper {
 
     public StudyEventAttrWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankException, ApplicationException {
-        if (isUsedByCollectionEvents()) {
-            throw new BiobankDeleteException(
-                "Unable to delete EventAttr with id " + getId()
-                    + ". A patient visit using it exists in storage."
-                    + " Remove all instances before deleting this type.");
-        }
     }
 
     public static final String IS_USED_BY_COL_EVENTS_QRY = "select count(ea) from "
@@ -63,14 +52,12 @@ public class StudyEventAttrWrapper extends StudyEventAttrBaseWrapper {
         return study.getStudyEventAttrCollection(false);
     }
 
-    // TODO: remove this override when all persist()-s are like this!
     @Override
-    public void persist() throws Exception {
-        WrapperTransaction.persist(this, appService);
-    }
+    protected void addDeleteTasks(TaskList tasks) {
 
-    @Override
-    public void delete() throws Exception {
-        WrapperTransaction.delete(this, appService);
+        tasks.add(check().notUsedBy(EventAttr.class,
+            EventAttrPeer.STUDY_EVENT_ATTR));
+
+        super.addDeleteTasks(tasks);
     }
 }

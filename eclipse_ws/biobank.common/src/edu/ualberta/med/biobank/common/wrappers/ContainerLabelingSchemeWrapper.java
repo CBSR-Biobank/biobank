@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerLabelingSchemeBaseWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
@@ -51,15 +51,6 @@ public class ContainerLabelingSchemeWrapper extends
 
     public ContainerLabelingSchemeWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankDeleteException,
-        ApplicationException {
-        if (hasContainerTypes()) {
-            throw new BiobankDeleteException(
-                "Can't delete this ContainerLabelingScheme: container types are using it.");
-        }
     }
 
     private static final String HAS_CONTAINER_TYPES_QRY = "from "
@@ -597,6 +588,12 @@ public class ContainerLabelingSchemeWrapper extends
         return null;
     }
 
-    // TODO: convert this to use the transactions model? Probably not necessary
-    // since this is mostly a read-only class.
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+
+        tasks.add(check().notUsedBy(ContainerType.class,
+            ContainerTypePeer.CHILD_LABELING_SCHEME));
+
+        super.addPersistTasks(tasks);
+    }
 }

@@ -6,11 +6,20 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
+import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
+import edu.ualberta.med.biobank.common.peer.ClinicPeer;
+import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
+import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.peer.StudyEventAttrPeer;
+import edu.ualberta.med.biobank.common.peer.StudyPeer;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ActivityStatusBaseWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -51,16 +60,6 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
         super(appService);
     }
 
-    @Override
-    public void deleteChecks() throws BiobankException, ApplicationException {
-        if (isUsed()) {
-            throw new BiobankDeleteException(
-                "Unable to delete activity status "
-                    + getName()
-                    + " since it is being used by other objects in the database.");
-        }
-    }
-
     public boolean isUsed() throws ApplicationException,
         BiobankQueryResultSizeException {
         Class<?>[] classes = new Class[] { StudyEventAttr.class, Study.class,
@@ -79,14 +78,6 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
         }
 
         return usedCount > 0;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        checkNoDuplicates(ActivityStatus.class,
-            ActivityStatusPeer.NAME.getName(), getName(),
-            "An activity status with name");
     }
 
     @Override
@@ -199,6 +190,35 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
         return getName();
     }
 
-    // TODO: convert this to use the transactions model? Probably not necessary
-    // since this is mostly a read-only class.
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(check().notNull(ActivityStatusPeer.NAME));
+        tasks.add(check().unique(ActivityStatusPeer.NAME));
+
+        super.addPersistTasks(tasks);
+    }
+
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+
+        tasks.add(check().notUsedBy(StudyEventAttr.class,
+            StudyEventAttrPeer.ACTIVITY_STATUS));
+        tasks.add(check().notUsedBy(Study.class, StudyPeer.ACTIVITY_STATUS));
+        tasks.add(check().notUsedBy(Specimen.class,
+            SpecimenPeer.ACTIVITY_STATUS));
+        tasks.add(check().notUsedBy(ProcessingEvent.class,
+            ProcessingEventPeer.ACTIVITY_STATUS));
+        tasks.add(check().notUsedBy(Clinic.class, ClinicPeer.ACTIVITY_STATUS));
+        tasks.add(check().notUsedBy(ContainerType.class,
+            ContainerTypePeer.ACTIVITY_STATUS));
+        tasks.add(check().notUsedBy(Container.class,
+            ContainerPeer.ACTIVITY_STATUS));
+        tasks.add(check().notUsedBy(CollectionEvent.class,
+            CollectionEventPeer.ACTIVITY_STATUS));
+        tasks.add(check().notUsedBy(AliquotedSpecimen.class,
+            AliquotedSpecimenPeer.ACTIVITY_STATUS));
+        tasks.add(check().notUsedBy(Center.class, CenterPeer.ACTIVITY_STATUS));
+
+        super.addDeleteTasks(tasks);
+    }
 }

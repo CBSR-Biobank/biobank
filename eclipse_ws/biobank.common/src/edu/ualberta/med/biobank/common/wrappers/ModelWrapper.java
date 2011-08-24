@@ -149,11 +149,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return appService;
     }
 
-    public final void persist() throws Exception {
+    public void persist() throws Exception {
         WrapperTransaction.persist(this, appService);
     }
 
-    public final void delete() throws Exception {
+    public void delete() throws Exception {
         WrapperTransaction.delete(this, appService);
     }
 
