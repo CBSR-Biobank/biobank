@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -171,7 +170,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         + ShipmentInfoPeer.RECEIVED_AT.getName()
         + " >= ? and s."
         + ShipmentInfoPeer.RECEIVED_AT.getName()
-        + " <= ? and (o."
+        + " < ? and (o."
         + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
         + "= ? or o."
         + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
@@ -188,8 +187,8 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
         Integer centerId = center.getId();
         HQLCriteria criteria = new HQLCriteria(SHIPMENTS_BY_DATE_RECEIVED_QRY,
-            Arrays.asList(new Object[] { dateReceived, endOfDay(dateReceived),
-                centerId, centerId }));
+            Arrays.asList(new Object[] { startOfDay(dateReceived),
+                endOfDay(dateReceived), centerId, centerId }));
 
         List<OriginInfo> origins = appService.query(criteria);
         List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
@@ -205,7 +204,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         + ShipmentInfoPeer.PACKED_AT.getName()
         + " >= ? and s."
         + ShipmentInfoPeer.PACKED_AT.getName()
-        + " <= ? and (o."
+        + " < ? and (o."
         + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
         + "= ? or o."
         + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
@@ -216,8 +215,8 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         CenterWrapper<?> center) throws ApplicationException {
         Integer centerId = center.getId();
         HQLCriteria criteria = new HQLCriteria(SHIPMENTS_BY_DATE_SENT_QRY,
-            Arrays.asList(new Object[] { dateSent, endOfDay(dateSent),
-                centerId, centerId }));
+            Arrays.asList(new Object[] { startOfDay(dateSent),
+                endOfDay(dateSent), centerId, centerId }));
         List<OriginInfo> origins = appService.query(criteria);
         List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
             appService, origins, OriginInfoWrapper.class);
@@ -236,14 +235,6 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         if (getReceiverSite() != null)
             centers.add(getReceiverSite());
         return centers;
-    }
-
-    // Date should input with no hour/minute/seconds
-    public static Date endOfDay(Date date) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        c.add(Calendar.DAY_OF_MONTH, 1);
-        return c.getTime();
     }
 
     @Override
@@ -275,5 +266,14 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         log.setDetails(StringUtils.join(detailsList, ", "));
         log.setType("Shipment");
         return log;
+    }
+
+    /**
+     * Should be addToSpecimenCollection most of the time. But can use this
+     * method from tome to tome to reset the collection (used in saving
+     * originInfo when want to try to re-add the specimens)
+     */
+    public void setSpecimenWrapperCollection(List<SpecimenWrapper> specs) {
+        setWrapperCollection(OriginInfoPeer.SPECIMEN_COLLECTION, specs);
     }
 }

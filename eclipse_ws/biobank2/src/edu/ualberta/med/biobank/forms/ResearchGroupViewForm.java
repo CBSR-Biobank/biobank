@@ -51,6 +51,8 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
 
     private BgcFileBrowser csvSelector;
 
+    private Button uploadButton;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ResearchGroupAdapter,
@@ -80,15 +82,15 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         client.setLayout(new GridLayout(3, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-        toolkit.createLabel(client,
-            Messages.ResearchGroupViewForm_0);
-        csvSelector = new BgcFileBrowser(client, Messages.ResearchGroupViewForm_1, SWT.NONE,
-            new String[] { ".csv" }); //$NON-NLS-1$
+        toolkit.createLabel(client, Messages.ResearchGroupViewForm_0);
+        csvSelector = new BgcFileBrowser(client,
+            Messages.ResearchGroupViewForm_1, SWT.NONE,
+            new String[] { "*.csv" }); //$NON-NLS-1$
         csvSelector.addFileSelectedListener(this);
         csvSelector.adaptToToolkit(toolkit, true);
-        Button b = new Button(client, SWT.PUSH);
-        b.setText(Messages.ResearchGroupViewForm_upload_button);
-        b.addSelectionListener(new SelectionAdapter() {
+        uploadButton = new Button(client, SWT.PUSH);
+        uploadButton.setText(Messages.ResearchGroupViewForm_upload_button);
+        uploadButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 try {
@@ -99,12 +101,12 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
                 }
             }
         });
-        // b.setEnabled(false);
+        uploadButton.setEnabled(false);
     }
 
     @Override
     public void fileSelected(String filename) {
-        // do nothing
+        uploadButton.setEnabled(true);
     }
 
     public void saveRequest() throws Exception {

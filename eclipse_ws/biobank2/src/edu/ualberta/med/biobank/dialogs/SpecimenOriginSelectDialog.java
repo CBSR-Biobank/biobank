@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.dialogs;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -22,17 +23,20 @@ public class SpecimenOriginSelectDialog extends BgcBaseDialog {
     private SpecimenWrapper specimen;
     private CenterWrapper<?> selectedCenter;
     private List<CenterWrapper<?>> centers;
+    private String description;
 
     public SpecimenOriginSelectDialog(Shell parentShell,
         SpecimenWrapper specimen, List<CenterWrapper<?>> centers) {
         super(parentShell);
         this.specimen = specimen;
         this.centers = centers;
+        description = NLS.bind(Messages.SpecimenOriginSelectDialog_description,
+            specimen.getInventoryId());
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.SpecimenOriginSelectDialog_description;
+        return description;
     }
 
     @Override
