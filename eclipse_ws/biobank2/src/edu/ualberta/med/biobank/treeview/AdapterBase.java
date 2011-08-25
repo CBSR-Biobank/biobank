@@ -88,7 +88,6 @@ public abstract class AdapterBase {
             addListener(parent.deltaListener);
         }
         listeners = new ArrayList<AdapterChangedListener>();
-        Assert.isTrue(checkIntegrity(), "integrity checks failed"); //$NON-NLS-1$
     }
 
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
@@ -116,16 +115,6 @@ public abstract class AdapterBase {
      */
     protected void setModelObject(ModelWrapper<?> modelObject) {
         this.modelObject = modelObject;
-    }
-
-    /**
-     * return true if the integrity of the object is ok
-     */
-    private boolean checkIntegrity() {
-        if (modelObject != null) {
-            return modelObject.checkIntegrity();
-        }
-        return true;
     }
 
     public void setParent(AdapterBase parent) {

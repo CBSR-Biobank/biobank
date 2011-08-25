@@ -63,7 +63,7 @@ public class ProcessingEventHelper extends DbHelper {
                 ProcessingEventWrapper pe = ProcessingEventHelper
                     .addProcessingEvent(center, patient, Utils.getRandomDate());
                 SpecimenHelper.addSpecimen(parentSpc,
-                    DbHelper.chooseRandomlyInList(spcTypes), cevent, pe);
+                    DbHelper.chooseRandomlyInList(spcTypes), pe);
                 pevents.add(pe);
             }
         }

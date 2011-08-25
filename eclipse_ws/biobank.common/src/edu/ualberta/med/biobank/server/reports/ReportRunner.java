@@ -303,18 +303,10 @@ public class ReportRunner {
         String parentProperty = getParentProperty(property);
         while (parentProperty != null) {
             if (!createdProperties.contains(parentProperty)) {
-                int joinType = Criteria.INNER_JOIN;
-
-                // TODO: do not hardcode "specimenPosition.", read a list or
-                // config from somewhere. This is necessary because some
-                // aliquots legitimately do not have a position in a container
-                if (parentProperty.equals("specimenPosition") //$NON-NLS-1$
-                    || parentProperty.startsWith("specimenPosition.")) { //$NON-NLS-1$
-                    joinType = Criteria.LEFT_JOIN;
-                }
-
+                // Always use a left join to support the "is not set" option of
+                // many filters.
                 criteria.createCriteria(parentProperty,
-                    getPropertyAlias(parentProperty), joinType);
+                    getPropertyAlias(parentProperty), Criteria.LEFT_JOIN);
                 createdProperties.add(parentProperty);
             }
             parentProperty = getParentProperty(parentProperty);

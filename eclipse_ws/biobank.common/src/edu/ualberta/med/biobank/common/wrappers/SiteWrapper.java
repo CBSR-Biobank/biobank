@@ -111,17 +111,6 @@ public class SiteWrapper extends SiteBaseWrapper {
         cache.put(TOP_CONTAINER_COLLECTION_CACHE_KEY, null);
     }
 
-    @Override
-    public int compareTo(ModelWrapper<Site> wrapper) {
-        if (wrapper instanceof SiteWrapper) {
-            String name1 = wrappedObject.getName();
-            String name2 = wrapper.wrappedObject.getName();
-            return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
-                : -1));
-        }
-        return 0;
-    }
-
     /**
      * get all site existing
      */
@@ -155,13 +144,8 @@ public class SiteWrapper extends SiteBaseWrapper {
         return wrappers;
     }
 
-    @Override
-    public String toString() {
-        return getName();
-    }
-
     public Set<ClinicWrapper> getWorkingClinicCollection() {
-        List<StudyWrapper> studies = getStudyCollection(false);
+        List<StudyWrapper> studies = getStudyCollection();
         Set<ClinicWrapper> clinics = new HashSet<ClinicWrapper>();
         for (StudyWrapper study : studies) {
             clinics.addAll(study.getClinicCollection());
@@ -246,13 +230,13 @@ public class SiteWrapper extends SiteBaseWrapper {
         + Site.class.getName()
         + " as site join site."
         + SitePeer.SPECIMEN_COLLECTION.getName()
-        + " as specimens where site."
-        + SitePeer.ID.getName()
-        + "=? and "
-        + "specimens."
+        + " as specimens join specimens."
         + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-            CollectionEventPeer.PATIENT, PatientPeer.STUDY, StudyPeer.ID)
-        + "=?";
+            CollectionEventPeer.PATIENT)
+        + " as patient where site."
+        + SitePeer.ID.getName()
+        + "=? and patient."
+        + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID) + "=?";
 
     @Override
     public long getPatientCountForStudy(StudyWrapper study)

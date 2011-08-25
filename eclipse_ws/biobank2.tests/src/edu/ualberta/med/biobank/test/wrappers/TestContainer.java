@@ -334,6 +334,7 @@ public class TestContainer extends TestDatabase {
         Assert.assertEquals("05 ("
             + container2.getContainerType().getNameShort() + ")",
             container2.getFullInfoLabel());
+        Assert.fail("test ctype null or nameshort null");
 
         // test getFullInfoLabel(): short name is null
         ContainerTypeWrapper topType2 = ContainerTypeHelper.addContainerType(
@@ -699,6 +700,8 @@ public class TestContainer extends TestDatabase {
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
+
+        Assert.fail("check with negative values");
     }
 
     @Test
@@ -978,6 +981,8 @@ public class TestContainer extends TestDatabase {
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
+
+        Assert.fail("check also with fast = true");
     }
 
     @Test
@@ -1348,7 +1353,7 @@ public class TestContainer extends TestDatabase {
             site, patient, Utils.getRandomDate());
 
         SpecimenWrapper spc = SpecimenHelper.addSpecimen(parentSpc, spcType,
-            ce, pe, childL4, 3, 3);
+            pe, childL4, 3, 3);
 
         // attempt to delete the containers - should fail
         String[] cnames = new String[] { "ChildL4", "ChildL3", "ChildL2",
@@ -1501,6 +1506,8 @@ public class TestContainer extends TestDatabase {
         top.getChildren(); // need to load into property map
         Assert.assertEquals(2, top.getChildCount(false));
         Assert.assertEquals(2, top.getChildCount(true));
+
+        Assert.fail("test if not cached ?");
     }
 
     @Test
@@ -1715,4 +1722,38 @@ public class TestContainer extends TestDatabase {
         Assert.assertEquals(newLabel, child.getLabel());
     }
 
+    @Test
+    public void testGetSpecificPositionWrapper() {
+        Assert.fail("to be implemented");
+        // internal but see why this is never called
+    }
+
+    @Test
+    public void testCheckHasPosition() {
+        Assert.fail("to be implemented");
+        // see persist checks
+    }
+
+    @Test
+    public void testCheckContainerTypeSameSite() {
+        Assert.fail("to be implemented");
+        // see persist checks
+    }
+
+    @Test
+    public void testGetPositionString() {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testSetTopContainer() {
+        Assert.fail("to be implemented");
+        // 2 methods
+    }
+
+    @Test
+    public void testMisc() {
+        Assert
+            .fail("see tests made after getSpecimens to check if it is null in addSpecimen and getSpecimen");
+    }
 }

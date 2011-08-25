@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
 import edu.ualberta.med.biobank.common.wrappers.actions.IfAction.Is;
 import edu.ualberta.med.biobank.common.wrappers.actions.UpdateChildrensTopSpecimenAction;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.SpecimenPostPersistChecks;
 import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.loggers.SpecimenLogProvider;
 import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
@@ -183,12 +184,10 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         StudyWrapper study = cevent.getPatient().getStudy();
         Collection<AliquotedSpecimenWrapper> aliquotedSpecimenCollection = study
             .getAliquotedSpecimenCollection(false);
-        if (aliquotedSpecimenCollection != null) {
-            for (AliquotedSpecimenWrapper ss : aliquotedSpecimenCollection) {
-                if (getSpecimenType().equals(ss.getSpecimenType())) {
-                    setQuantity(ss.getVolume());
-                    return;
-                }
+        for (AliquotedSpecimenWrapper as : aliquotedSpecimenCollection) {
+            if (getSpecimenType().equals(as.getSpecimenType())) {
+                setQuantity(as.getVolume());
+                return;
             }
         }
     }
@@ -369,6 +368,10 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         boolean checkDatabase) {
         super.setTopSpecimen(specimen);
 
+        if (equals(specimen)) {
+            setOriginalCollectionEvent(getCollectionEvent());
+        }
+
         // this is overly cautious, assuming that whenever the top Specimen is
         // set that it is changed. Could be improved to check if the value has
         // actually changed, but would probably require lazy loading.
@@ -469,6 +472,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         addTasksToPostCheckLegalSampleType(tasks);
 
         addTasksToUpdateChildren(tasks);
+
+        tasks.add(new SpecimenPostPersistChecks(this));
     }
 
     @Override

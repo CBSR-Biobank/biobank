@@ -93,6 +93,8 @@ public class TestContact extends TestDatabase {
         contact1.setName("stuff");
         contact2.setName("stuff1");
         Assert.assertTrue(contact1.compareTo(contact2) < 0);
+        Assert
+            .fail("should compare with something different from a ContactWraper");
     }
 
     @Test(expected = ValueNotSetException.class)
@@ -183,4 +185,15 @@ public class TestContact extends TestDatabase {
         contact.reset();
         Assert.assertEquals(null, contact.getName());
     }
+
+    @Test
+    public void testGetAllContacts() throws Exception {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testToString() throws Exception {
+        Assert.fail("to be implemented");
+    }
+
 }

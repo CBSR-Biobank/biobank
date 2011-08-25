@@ -49,8 +49,7 @@ public class SpecimenHelper extends DbHelper {
 
     public static SpecimenWrapper newSpecimen(SpecimenWrapper parentSpc,
         SpecimenTypeWrapper specimenType, String activityStatus,
-        CollectionEventWrapper cevent, ProcessingEventWrapper pevent)
-        throws Exception {
+        ProcessingEventWrapper pevent) throws Exception {
         SpecimenWrapper specimen = newSpecimen(specimenType, activityStatus,
             Utils.getRandomDate());
         specimen.setProcessingEvent(pevent);
@@ -63,17 +62,16 @@ public class SpecimenHelper extends DbHelper {
         oi.persist();
         specimen.setOriginInfo(oi);
         specimen.setCurrentCenter(center);
-        specimen.setCollectionEvent(cevent);
         return specimen;
     }
 
     public static SpecimenWrapper newSpecimen(SpecimenWrapper parentSpc,
         SpecimenTypeWrapper specimenType, String activityStatus,
-        CollectionEventWrapper cevent, ProcessingEventWrapper pevent,
-        ContainerWrapper container, Integer row, Integer col) throws Exception {
+        ProcessingEventWrapper pevent, ContainerWrapper container, Integer row,
+        Integer col) throws Exception {
 
         SpecimenWrapper specimen = newSpecimen(parentSpc, specimenType,
-            activityStatus, cevent, pevent);
+            activityStatus, pevent);
 
         if (container != null) {
             specimen.setParent(container, new RowColPos(row, col));
@@ -82,29 +80,20 @@ public class SpecimenHelper extends DbHelper {
         return specimen;
     }
 
-    public static SpecimenWrapper addSpecimen(SpecimenTypeWrapper specimenType,
-        String activityStatus, Date createdAt) throws Exception {
-        SpecimenWrapper specimen = newSpecimen(specimenType, activityStatus,
-            createdAt);
-        specimen.persist();
-        return specimen;
-    }
-
     public static SpecimenWrapper addSpecimen(SpecimenWrapper parentSpc,
         SpecimenTypeWrapper specimenType, String activityStatus,
-        CollectionEventWrapper cevent, ProcessingEventWrapper pevent)
-        throws Exception {
+        ProcessingEventWrapper pevent) throws Exception {
         SpecimenWrapper spc = newSpecimen(parentSpc, specimenType,
-            activityStatus, cevent, pevent);
+            activityStatus, pevent);
         spc.persist();
         return spc;
     }
 
     public static SpecimenWrapper addSpecimen(SpecimenWrapper parentSpc,
-        SpecimenTypeWrapper specimenType, CollectionEventWrapper cevent,
-        ProcessingEventWrapper pevent) throws Exception {
+        SpecimenTypeWrapper specimenType, ProcessingEventWrapper pevent)
+        throws Exception {
         SpecimenWrapper spc = newSpecimen(parentSpc, specimenType,
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING, cevent, pevent);
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, pevent);
         spc.persist();
         return spc;
     }
@@ -115,6 +104,7 @@ public class SpecimenHelper extends DbHelper {
         SpecimenWrapper specimen = newSpecimen(specimenType, activityStatus,
             createdAt);
         specimen.setCollectionEvent(cevent);
+        specimen.setOriginalCollectionEvent(cevent);
 
         OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
         originInfo.setCenter(center);
@@ -142,12 +132,11 @@ public class SpecimenHelper extends DbHelper {
      * @throws Exception
      */
     public static SpecimenWrapper addSpecimen(SpecimenWrapper parentSpc,
-        SpecimenTypeWrapper specimenType, CollectionEventWrapper cevent,
-        ProcessingEventWrapper pevent, ContainerWrapper container, Integer row,
-        Integer col) throws Exception {
+        SpecimenTypeWrapper specimenType, ProcessingEventWrapper pevent,
+        ContainerWrapper container, Integer row, Integer col) throws Exception {
         SpecimenWrapper spc = newSpecimen(parentSpc, specimenType,
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING, cevent, pevent,
-            container, row, col);
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, pevent, container, row,
+            col);
         spc.persist();
         return spc;
     }
@@ -181,7 +170,7 @@ public class SpecimenHelper extends DbHelper {
 
         for (int i = 0; i < spcCount; ++i) {
             SpecimenWrapper childSpc = SpecimenHelper.addSpecimen(parentSpc,
-                DbHelper.chooseRandomlyInList(spcTypes), ce, pe);
+                DbHelper.chooseRandomlyInList(spcTypes), pe);
             spcs.add(childSpc);
         }
 
@@ -233,7 +222,7 @@ public class SpecimenHelper extends DbHelper {
 
         for (int i = 0; i < spcCount; ++i, posOffset++) {
             SpecimenWrapper childSpc = SpecimenHelper.addSpecimen(parentSpc,
-                DbHelper.chooseRandomlyInList(spcTypes), ce, pe, container,
+                DbHelper.chooseRandomlyInList(spcTypes), pe, container,
                 posOffset / colCap, posOffset % colCap);
             spcs.add(childSpc);
         }
