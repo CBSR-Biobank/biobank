@@ -1,9 +1,16 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.MembershipRolePeer;
+import edu.ualberta.med.biobank.common.peer.RolePeer;
 import edu.ualberta.med.biobank.common.wrappers.base.RoleBaseWrapper;
+import edu.ualberta.med.biobank.model.MembershipRole;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -60,4 +67,25 @@ public class RoleWrapper extends RoleBaseWrapper {
         return rights;
     }
 
+    @Override
+    protected void deleteChecks() throws BiobankException, ApplicationException {
+        if (isUsedInMembership()) {
+            throw new BiobankDeleteException(
+                "This role is used in at least one membership. Please remove it first.");
+        }
+    }
+
+    private static final String USED_IN_MEMBERSHIP_QRY = "select count(roles) from "
+        + MembershipRole.class.getName()
+        + " as ms where ms."
+        + MembershipRolePeer.ROLE_COLLECTION.getName()
+        + " as roles where roles." + RolePeer.ID + "=?";
+
+    private boolean isUsedInMembership()
+        throws BiobankQueryResultSizeException, ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(USED_IN_MEMBERSHIP_QRY,
+            Arrays.asList(new Object[] {}));
+        Long res = getCountResult(appService, criteria);
+        return res > 0;
+    }
 }
