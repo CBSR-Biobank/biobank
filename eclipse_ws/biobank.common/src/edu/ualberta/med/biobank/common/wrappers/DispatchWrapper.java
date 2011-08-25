@@ -547,7 +547,11 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         }
     }
 
-    public void reloadDispatchSpecimens() {
-        // TODO: re-implement this?
+    public void reloadDispatchSpecimens() throws Exception {
+        for (DispatchSpecimenWrapper ds : getDispatchSpecimenCollection(false)) {
+            ds.reload();
+        }
+        resetMap();
+        dispatchSpecimensToPersist.clear();
     }
 }
