@@ -26,7 +26,7 @@ public class CsvDataExporter extends GuiDataExporter {
 
         try {
             writer = new CsvListWriter(new FileWriter(path),
-                CsvPreference.EXCEL_PREFERENCE);
+                CsvPreference.STANDARD_PREFERENCE);
 
             // can only write column names to a CSV, no comments, title, etc.
             // are allowed b/c cannot have comments in the file, only headers
@@ -38,7 +38,8 @@ public class CsvDataExporter extends GuiDataExporter {
             Object[] labels = new Object[numHeaders];
             for (Object row : data.getRows()) {
                 if (monitor.isCanceled()) {
-                    throw new DataExportException(Messages.CsvDataExporter_cancel_msg);
+                    throw new DataExportException(
+                        Messages.CsvDataExporter_cancel_msg);
                 }
 
                 for (int i = 0; i < numHeaders; i++) {
@@ -51,6 +52,8 @@ public class CsvDataExporter extends GuiDataExporter {
             writer.close();
         } catch (IOException e) {
             throw new DataExportException(e.getMessage());
+        } catch (Exception e) {
+            throw new DataExportException(Messages.CsvDataExporter_0);
         }
     }
 

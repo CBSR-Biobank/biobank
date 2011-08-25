@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -110,16 +109,16 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         + ProcessingEventPeer.CREATED_AT.getName()
         + ">=? and pEvent."
         + ProcessingEventPeer.CREATED_AT.getName()
-        + "<=? and pEvent."
+        + "<? and pEvent."
         + Property.concatNames(ProcessingEventPeer.CENTER, CenterPeer.ID)
         + "= ?";
 
     public static List<ProcessingEventWrapper> getProcessingEventsWithDateForCenter(
         WritableApplicationService appService, Date date,
         CenterWrapper<?> center) throws Exception {
-        HQLCriteria c = new HQLCriteria(
-            PROCESSING_EVENT_BY_DATE_QRY,
-            Arrays.asList(new Object[] { date, endOfDay(date), center.getId() }));
+        HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_BY_DATE_QRY,
+            Arrays.asList(new Object[] { startOfDay(date), endOfDay(date),
+                center.getId() }));
         List<ProcessingEvent> pvs = appService.query(c);
         List<ProcessingEventWrapper> pvws = new ArrayList<ProcessingEventWrapper>();
         for (ProcessingEvent pv : pvs)
@@ -127,14 +126,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         if (pvws.size() == 0)
             return new ArrayList<ProcessingEventWrapper>();
         return pvws;
-    }
-
-    // Date should input with no hour/minute/seconds
-    public static Date endOfDay(Date date) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        c.add(Calendar.DAY_OF_MONTH, 1);
-        return c.getTime();
     }
 
     private static final String PROCESSING_EVENT_BY_WORKSHEET_QRY = "select pEvent from "
@@ -277,5 +268,14 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         List<ProcessingEvent> res = appService.query(c);
         return wrapModelCollection(appService, res,
             ProcessingEventWrapper.class);
+    }
+
+    /**
+     * Should be addToSpecimenCollection most of the time. But can use this
+     * method from tome to tome to reset the collection (used in saving pEvent
+     * when want to try to re-add the specimens)
+     */
+    public void setSpecimenWrapperCollection(List<SpecimenWrapper> specs) {
+        setWrapperCollection(ProcessingEventPeer.SPECIMEN_COLLECTION, specs);
     }
 }
