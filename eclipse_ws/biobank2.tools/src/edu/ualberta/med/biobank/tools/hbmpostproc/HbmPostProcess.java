@@ -206,18 +206,17 @@ public class HbmPostProcess {
         for (ModelClass dmClass : dmClasses.values()) {
             LOGGER.debug("class name: " + dmClass.getName());
 
-            ModelClass dmTable = null;
             ModelClass extendsClass = dmClass.getExtendsClass();
+            ModelClass dmTable = null;
+            ModelClass dmExtendTable = null;
 
-            if (extendsClass == null) {
-                dmTable = dmTables
-                    .get(CamelCase.toTitleCase(dmClass.getName()));
-            } else {
-                dmTable = dmTables.get(CamelCase.toTitleCase(extendsClass
+            dmTable = dmTables.get(CamelCase.toTitleCase(dmClass.getName()));
+            if (extendsClass != null) {
+                dmExtendTable = dmTables.get(CamelCase.toTitleCase(extendsClass
                     .getName()));
             }
 
-            if (dmTable == null) {
+            if (dmTable == null && dmExtendTable == null) {
                 LOGGER.info("Error: data model table not found for class "
                     + dmClass.getName());
                 System.exit(-1);
@@ -225,8 +224,6 @@ public class HbmPostProcess {
 
             Map<String, Attribute> dmClassAttrMap = new HashMap<String, Attribute>(
                 dmClass.getAttrMap());
-            Map<String, Attribute> dmTableAttrMap = dmTable.getAttrMap();
-
             if (extendsClass != null) {
                 // add all attributes from the super class, not already in
                 // derived class
@@ -237,7 +234,11 @@ public class HbmPostProcess {
                     }
                 }
             }
-
+            Map<String, Attribute> dmTableAttrMap = new HashMap<String, Attribute>();
+            if (dmTable != null)
+                dmTableAttrMap.putAll(dmTable.getAttrMap());
+            if (dmExtendTable != null)
+                dmTableAttrMap.putAll(dmExtendTable.getAttrMap());
             for (String attrName : dmClassAttrMap.keySet()) {
                 String tableAttrName = CamelCase.toTitleCase(attrName);
                 String attrType = dmTableAttrMap.get(tableAttrName).getType();
