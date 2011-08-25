@@ -13,6 +13,8 @@ import edu.ualberta.med.biobank.dialogs.startup.LoginDialog;
 
 public class LoginHandler extends AbstractHandler implements IHandler {
 
+    public static final String ID = "edu.ualberta.med.biobank.commands.login"; //$NON-NLS-1$
+
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         LoginDialog loginDialog = new LoginDialog(PlatformUI.getWorkbench()
