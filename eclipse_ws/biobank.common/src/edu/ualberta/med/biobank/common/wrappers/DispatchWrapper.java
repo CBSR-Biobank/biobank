@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
@@ -24,7 +23,6 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
@@ -142,18 +140,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
         // FIXME: temporary fix - this should be converted to a batch update
         for (DispatchSpecimenWrapper rds : toBePersistedDispatchedSpecimens) {
-            SpecimenWrapper spec = rds.getSpecimen();
-            // save things the dispatch could modify:
-            CenterWrapper<?> center = spec.getCurrentCenter();
-            RowColPos pos = spec.getPosition();
-            // reload because spec might have been modified. This should avoid
-            // concurrency problems
-            spec.reload();
-            // set values back:
-            spec.setCurrentCenter(center);
-            if (pos == null)
-                spec.setPosition(null);
-            spec.persist();
+            rds.getSpecimen().persist();
         }
     }
 
@@ -163,20 +150,23 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
         + "=? and "
         + Property.concatNames(DispatchPeer.SHIPMENT_INFO,
+            ShipmentInfoPeer.WAYBILL)
+        + "!= '' and "
+        + Property.concatNames(DispatchPeer.SHIPMENT_INFO,
             ShipmentInfoPeer.WAYBILL) + "=?";
 
     private boolean checkWaybillUniqueForSender() throws ApplicationException,
         BiobankCheckException {
+        if (getShipmentInfo() == null)
+            // no waybill test since there is no shipmentInfo set
+            return true;
         List<Object> params = new ArrayList<Object>();
         CenterWrapper<?> sender = getSenderCenter();
         if (sender == null) {
             throw new BiobankCheckException("sender site cannot be null");
         }
         params.add(sender.getId());
-        if (getShipmentInfo() == null)
-            params.add("");
-        else
-            params.add(getShipmentInfo().getWaybill());
+        params.add(getShipmentInfo().getWaybill());
 
         StringBuilder qry = new StringBuilder(WAYBILL_UNIQUE_FOR_SENDER_QRY);
         if (!isNew()) {
@@ -550,19 +540,11 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         + ShipmentInfoPeer.RECEIVED_AT.getName()
         + " >=? and s."
         + ShipmentInfoPeer.RECEIVED_AT.getName()
-        + " <=? and (d."
+        + " <? and (d."
         + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
         + "= ? or d."
         + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
         + " = ?)";
-
-    // Date should input with no hour/minute/seconds
-    public static Date endOfDay(Date date) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        c.add(Calendar.DAY_OF_MONTH, 1);
-        return c.getTime();
-    }
 
     /**
      * Search for shipments in the site with the given date received. Don't use
@@ -575,8 +557,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         Integer centerId = center.getId();
         HQLCriteria criteria = new HQLCriteria(
             DISPATCHES_BY_DATE_RECEIVED_QRY.toString(),
-            Arrays.asList(new Object[] { dateReceived, endOfDay(dateReceived),
-                centerId, centerId }));
+            Arrays.asList(new Object[] { startOfDay(dateReceived),
+                endOfDay(dateReceived), centerId, centerId }));
 
         List<Dispatch> origins = appService.query(criteria);
         List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(
@@ -590,7 +572,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         + ShipmentInfoPeer.PACKED_AT.getName()
         + " >= ? and s."
         + ShipmentInfoPeer.PACKED_AT.getName()
-        + " <= ? and (d."
+        + " < ? and (d."
         + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
         + "= ? or d."
         + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
@@ -601,8 +583,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         CenterWrapper<?> center) throws ApplicationException {
         Integer centerId = center.getId();
         HQLCriteria criteria = new HQLCriteria(DISPATCHED_BY_DATE_SENT_QRY,
-            Arrays.asList(new Object[] { dateSent, endOfDay(dateSent),
-                centerId, centerId }));
+            Arrays.asList(new Object[] { startOfDay(dateSent),
+                endOfDay(dateSent), centerId, centerId }));
 
         List<Dispatch> origins = appService.query(criteria);
         List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(
@@ -627,5 +609,18 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public boolean hasSpecimenStatesChanged() {
         return hasSpecimenStatesChanged;
+    }
+
+    /**
+     * used when want to retry after a concurrency problem
+     * 
+     * @throws Exception
+     */
+    public void reloadDispatchSpecimens() throws Exception {
+        for (DispatchSpecimenWrapper ds : getDispatchSpecimenCollection(false)) {
+            ds.reload();
+        }
+        resetMap();
+        toBePersistedDispatchedSpecimens.clear();
     }
 }

@@ -732,6 +732,52 @@ public class TestDispatch extends TestDatabase {
             sp.reload();
             Assert.assertNull(sp.getPosition());
         }
+    }
+
+    /**
+     * Related to issue #1438: should insert with no problem the dispatch if no
+     * shipmentinfo is set + can insert more than one dispatch with an empty
+     * waybill, with the same sender.
+     */
+    @Test
+    public void testPersistWaybillEmpty() throws Exception {
+        String name = "testPersistWaybillUnique" + r.nextInt();
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+
+        ShippingMethodWrapper method = ShippingMethodWrapper
+            .getShippingMethods(appService).get(0);
+        DispatchWrapper dispatch1 = DispatchHelper.newDispatch(senderSite,
+            receiverSite, method, "", Utils.getRandomDate());
+        dispatch1.persist();
+        DispatchHelper.createdDispatches.add(dispatch1);
+
+        // Test with no shipment info:
+        DispatchWrapper dispatch2 = DispatchHelper.newDispatch(senderSite,
+            receiverSite, method, "", Utils.getRandomDate());
+        dispatch2.setShipmentInfo(null);
+        try {
+            dispatch2.persist();
+            Assert.assertTrue(true);
+            DispatchHelper.createdDispatches.add(dispatch2);
+        } catch (Exception e) {
+            Assert.fail("Persist should succeed");
+        }
+        Assert.assertNull(dispatch2.getShipmentInfo());
+
+        // Test with another dispatch with waybill empty
+        DispatchWrapper dispatch3 = DispatchHelper.newDispatch(senderSite,
+            receiverSite, method, "", Utils.getRandomDate());
+        try {
+            dispatch3.persist();
+            DispatchHelper.createdDispatches.add(dispatch3);
+            Assert.assertTrue(true);
+        } catch (Exception e) {
+            Assert.fail("Persist should succeed");
+        }
+        Assert.assertEquals("", dispatch3.getShipmentInfo().getWaybill());
+        Assert.assertEquals(dispatch1.getShipmentInfo().getWaybill(), dispatch3
+            .getShipmentInfo().getWaybill());
 
     }
 }
