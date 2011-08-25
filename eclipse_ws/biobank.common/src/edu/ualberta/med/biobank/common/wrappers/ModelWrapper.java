@@ -558,11 +558,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     public boolean canRead(UserWrapper user) {
         try {
-            return user.hasPrivilegeOnObject(
+            return user.hasPrivilegeOnKeyDesc(
                 PrivilegeWrapper.getReadPrivilege(appService),
-                getWrappedClass());
+                getWrappedClass().getName());
         } catch (Exception e) {
-            return false;
+            throw new RuntimeException(e);
         }
     }
 
@@ -571,12 +571,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     public boolean canUpdate(UserWrapper user) {
         try {
-            return user.hasPrivilegeOnObject(
+            return user.hasPrivilegeOnKeyDesc(
                 PrivilegeWrapper.getUpdatePrivilege(appService),
-                getWrappedClass()
-            /* ,getSecuritySpecificCenters() */);
+                getWrappedClass().getName());
         } catch (Exception e) {
-            return false;
+            throw new RuntimeException(e);
         }
     }
 
@@ -585,12 +584,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     public boolean canDelete(UserWrapper user) {
         try {
-            return user.hasPrivilegeOnObject(
+            return user.hasPrivilegeOnKeyDesc(
                 PrivilegeWrapper.getDeletePrivilege(appService),
-                getWrappedClass()
-            /* ,getSecuritySpecificCenters() */);
+                getWrappedClass().getName());
         } catch (Exception e) {
-            return false;
+            throw new RuntimeException(e);
         }
     }
 

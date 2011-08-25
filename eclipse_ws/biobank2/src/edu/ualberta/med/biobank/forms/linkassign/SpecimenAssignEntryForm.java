@@ -39,6 +39,7 @@ import edu.ualberta.med.biobank.common.scanprocess.data.AssignProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -247,7 +248,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         // cabinet from the old database where 4 letters. A 'C' has been added
         // to them to make them different from the freezer specimen with exactly
         // the same inventory id
-        boolean cbsrCenter = SessionManager.getUser().isCBSRCenter();
+        CenterWrapper<?> center = SessionManager.getUser()
+            .getCurrentWorkingCenter();
+        boolean cbsrCenter = center != null
+            && center.getNameShort().equals("CBSR"); //$NON-NLS-1$
         widgetCreator.showWidget(cabinetCheckButtonLabel, cbsrCenter);
         widgetCreator.showWidget(cabinetCheckButton, cbsrCenter);
 
@@ -969,7 +973,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         SpecimenWrapper specimen = cell.getSpecimen();
                         if (specimen != null) {
                             specimen.setPosition(rcp);
-                            specimen.setParentContainer(currentMultipleContainer);
+                            specimen
+                                .setParentContainer(currentMultipleContainer);
                             specimen.persist();
                             String posStr = specimen.getPositionString(true,
                                 false);

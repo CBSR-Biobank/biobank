@@ -1,7 +1,10 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.wrappers.base.MembershipBaseWrapper;
 import edu.ualberta.med.biobank.model.Membership;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class MembershipWrapper<T extends Membership> extends
@@ -37,4 +40,7 @@ public abstract class MembershipWrapper<T extends Membership> extends
     }
 
     public abstract String getMembershipObjectsListString();
+
+    public abstract List<PrivilegeWrapper> getPrivilegesForRight(
+        BbRightWrapper right) throws ApplicationException;
 }

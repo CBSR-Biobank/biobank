@@ -574,7 +574,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     @Override
     public boolean canDelete(UserWrapper user) {
         return super.canDelete(user)
-            && (getPatient() == null || getPatient().getStudy() == null || user
+            && (getPatient() == null || getPatient().getStudy() == null
+                || user.getCurrentWorkingCenter() == null || user
                 .getCurrentWorkingCenter().getStudyCollection()
                 .contains(getPatient().getStudy()));
     }
@@ -585,7 +586,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     @Override
     public boolean canUpdate(UserWrapper user) {
         return super.canUpdate(user)
-            && (getPatient() == null || getPatient().getStudy() == null || user
+            && (getPatient() == null || getPatient().getStudy() == null
+                || user.getCurrentWorkingCenter() == null || user
                 .getCurrentWorkingCenter().getStudyCollection()
                 .contains(getPatient().getStudy()));
     }

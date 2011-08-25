@@ -368,8 +368,9 @@ public class PatientWrapper extends PatientBaseWrapper {
     @Override
     public boolean canDelete(UserWrapper user) {
         return super.canDelete(user)
-            && (getStudy() == null || user.getCurrentWorkingCenter()
-                .getStudyCollection().contains(getStudy()));
+            && (getStudy() == null || user.getCurrentWorkingCenter() == null || user
+                .getCurrentWorkingCenter().getStudyCollection()
+                .contains(getStudy()));
     }
 
     /**
@@ -378,7 +379,8 @@ public class PatientWrapper extends PatientBaseWrapper {
     @Override
     public boolean canUpdate(UserWrapper user) {
         return super.canUpdate(user)
-            && (getStudy() == null || user.getCurrentWorkingCenter()
-                .getStudyCollection().contains(getStudy()));
+            && (getStudy() == null || user.getCurrentWorkingCenter() == null || user
+                .getCurrentWorkingCenter().getStudyCollection()
+                .contains(getStudy()));
     }
 }

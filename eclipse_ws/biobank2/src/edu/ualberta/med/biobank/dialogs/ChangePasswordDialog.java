@@ -135,8 +135,8 @@ public class ChangePasswordDialog extends BgcBaseDialog {
             return;
         }
         try {
-            SessionManager.getAppService().modifyPassword(
-                this.oldPassText.getText(), this.newPass2Text.getText());
+            SessionManager.getUser().modifyPassword(this.oldPassText.getText(),
+                this.newPass2Text.getText());
 
             SessionManager.getInstance().getSession().resetAppService();
             BgcPlugin.openInformation(

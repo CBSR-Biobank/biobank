@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.StringValue
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 import edu.ualberta.med.biobank.test.internal.GroupHelper;
+import edu.ualberta.med.biobank.test.internal.RightHelper;
 import edu.ualberta.med.biobank.test.internal.RoleHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentInfoHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
@@ -72,6 +73,7 @@ public class TestDatabase {
             GroupHelper.deleteCreatedGroups();
             UserHelper.deleteCreatedUsers();
             RoleHelper.deleteCreatedRoles();
+            RightHelper.deleteCreatedRights();
         } catch (Exception e) {
             e.printStackTrace(System.err);
             Assert.fail();

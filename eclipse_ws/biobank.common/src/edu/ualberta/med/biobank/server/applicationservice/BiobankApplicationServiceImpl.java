@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
+import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
@@ -8,14 +9,12 @@ import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.security.Group;
-import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PrintedSsInvItem;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
@@ -26,10 +25,13 @@ import gov.nih.nci.system.dao.Request;
 import gov.nih.nci.system.dao.Response;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
+import gov.nih.nci.system.query.example.UpdateExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 import gov.nih.nci.system.util.ClassCache;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -133,86 +135,27 @@ public class BiobankApplicationServiceImpl extends
             .getResponse();
     }
 
-    @Override
-    public void modifyPassword(String oldPassword, String newPassword)
-        throws ApplicationException {
-        BiobankSecurityUtil.modifyPassword(oldPassword, newPassword);
-    }
+    private static final String GET_USER_QRY = "from " + User.class.getName()
+        + " where " + UserPeer.CSM_USER_ID.getName() + " = ?";
 
-    @Deprecated
     @Override
-    public List<Group> getSecurityGroups(User currentUser,
-        boolean includeSuperAdmin) throws ApplicationException {
-        currentUser.initCurrentWorkingCenter(this);
-        return BiobankSecurityUtil.getSecurityGroups(currentUser,
-            includeSuperAdmin);
-    }
-
-    @Deprecated
-    @Override
-    public List<User> getSecurityUsers(User currentUser)
-        throws ApplicationException {
-        currentUser.initCurrentWorkingCenter(this);
-        return BiobankSecurityUtil.getSecurityUsers(currentUser);
-    }
-
-    @Deprecated
-    @Override
-    public User persistUserOld(User currentUser, User userToPersist)
-        throws ApplicationException {
-        currentUser.initCurrentWorkingCenter(this);
-        return BiobankSecurityUtil.persistUserOld(currentUser, userToPersist);
-    }
-
-    @Deprecated
-    @Override
-    public void deleteUserOld(User currentUser, String loginToDelete)
-        throws ApplicationException {
-        currentUser.initCurrentWorkingCenter(this);
-        BiobankSecurityUtil.deleteUserOld(currentUser, loginToDelete);
-    }
-
-    @Deprecated
-    @Override
-    public User getCurrentUserOld() throws ApplicationException {
-        return BiobankSecurityUtil.getCurrentUserOld();
-    }
-
-    @Deprecated
-    @Override
-    public Group persistGroupOld(User currentUser, Group group)
-        throws ApplicationException {
-        currentUser.initCurrentWorkingCenter(this);
-        return BiobankSecurityUtil.persistGroupOld(currentUser, group);
-    }
-
-    @Deprecated
-    @Override
-    public void deleteGroupOld(User currentUser, Group group)
-        throws ApplicationException {
-        currentUser.initCurrentWorkingCenter(this);
-        BiobankSecurityUtil.deleteGroupOld(currentUser, group);
+    public void executeModifyPassword(Long csmUserId, String oldPassword,
+        String newPassword) throws ApplicationException {
+        BiobankCSMSecurityUtil.modifyPassword(csmUserId, oldPassword,
+            newPassword);
+        List<User> users = query(new HQLCriteria(GET_USER_QRY,
+            Arrays.asList(csmUserId)));
+        if (users.size() != 1) {
+            throw new ApplicationException("Problem with HQL result size");
+        }
+        User user = users.get(0);
+        user.setNeedChangePwd(false);
+        executeQuery(new UpdateExampleQuery(user));
     }
 
     @Override
     public void unlockUser(String userNameToUnlock) throws ApplicationException {
-        BiobankSecurityUtil.unlockUser(userNameToUnlock);
-    }
-
-    @Deprecated
-    @Override
-    public List<ProtectionGroupPrivilege> getSecurityGlobalFeatures(
-        User currentUser) throws ApplicationException {
-        currentUser.initCurrentWorkingCenter(this);
-        return BiobankSecurityUtil.getSecurityGlobalFeatures(currentUser);
-    }
-
-    @Deprecated
-    @Override
-    public List<ProtectionGroupPrivilege> getSecurityCenterFeatures(
-        User currentUser) throws ApplicationException {
-        currentUser.initCurrentWorkingCenter(this);
-        return BiobankSecurityUtil.getSecurityCenterFeatures(currentUser);
+        BiobankCSMSecurityUtil.unlockUser(userNameToUnlock);
     }
 
     @Override
@@ -227,7 +170,8 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
-        ProcessData processData, boolean isRescanMode, User user, Locale locale)
+        ProcessData processData, boolean isRescanMode,
+        edu.ualberta.med.biobank.common.security.User user, Locale locale)
         throws ApplicationException {
         try {
             ServerProcess process = processData.getProcessInstance(this, user,
@@ -242,7 +186,8 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public CellProcessResult processCellStatus(Cell cell,
-        ProcessData processData, User user, Locale locale)
+        ProcessData processData,
+        edu.ualberta.med.biobank.common.security.User user, Locale locale)
         throws ApplicationException {
         try {
             ServerProcess process = processData.getProcessInstance(this, user,
@@ -321,22 +266,22 @@ public class BiobankApplicationServiceImpl extends
     @Override
     public Long persistUser(edu.ualberta.med.biobank.model.User user,
         String password) throws ApplicationException {
-        return BiobankSecurityUtil.persistUser(user, password);
+        return BiobankCSMSecurityUtil.persistUser(user, password);
     }
 
     @Override
     public void deleteUser(edu.ualberta.med.biobank.model.User user)
         throws ApplicationException {
-        BiobankSecurityUtil.deleteUser(user);
+        BiobankCSMSecurityUtil.deleteUser(user);
     }
 
     @Override
     public String getUserPassword(String login) throws ApplicationException {
-        return BiobankSecurityUtil.getUserPassword(login);
+        return BiobankCSMSecurityUtil.getUserPassword(login);
     }
 
     @Override
     public boolean isUserLockedOut(Long csmUserId) throws ApplicationException {
-        return BiobankSecurityUtil.isUserLockedOut(csmUserId);
+        return BiobankCSMSecurityUtil.isUserLockedOut(csmUserId);
     }
 }

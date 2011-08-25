@@ -24,7 +24,6 @@ public class LoginHandler extends AbstractHandler implements IHandler {
                     .getWorkbench().getActiveWorkbenchWindow().getShell(), true);
                 dlg.open();
             }
-
         return null;
     }
 }

@@ -13,7 +13,6 @@ import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -366,8 +365,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return sb.toString();
     }
 
-    public boolean canBeSentBy(UserWrapper user)
-        throws BiobankFailedQueryException, ApplicationException {
+    public boolean canBeSentBy(UserWrapper user) {
         return canUpdate(user)
             && getSenderCenter().equals(user.getCurrentWorkingCenter())
             && isInCreationState() && hasDispatchSpecimens();
@@ -378,8 +376,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             && !getSpecimenCollection(false).isEmpty();
     }
 
-    public boolean canBeReceivedBy(UserWrapper user)
-        throws BiobankFailedQueryException, ApplicationException {
+    public boolean canBeReceivedBy(UserWrapper user) {
         return canUpdate(user)
             && getReceiverCenter().equals(user.getCurrentWorkingCenter())
             && isInTransitState();
@@ -438,8 +435,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return getDispatchSpecimenCollection(false);
     }
 
-    public boolean canBeClosedBy(UserWrapper user)
-        throws BiobankFailedQueryException, ApplicationException {
+    public boolean canBeClosedBy(UserWrapper user) {
         return isInReceivedState() && canUpdate(user);
     }
 

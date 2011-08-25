@@ -1,12 +1,11 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.security.SecurityFeature;
 import edu.ualberta.med.biobank.common.wrappers.base.UserBaseWrapper;
@@ -184,6 +183,22 @@ public class UserWrapper extends UserBaseWrapper {
         return true;
     }
 
+    public boolean hasRightsOn(String... rightsKeyDescs)
+        throws BiobankFailedQueryException, ApplicationException {
+        return hasRightsOn(Arrays.asList(rightsKeyDescs));
+    }
+
+    public boolean hasRightsOn(List<String> rightsKeyDesc)
+        throws BiobankFailedQueryException, ApplicationException {
+        for (String keyDesc : rightsKeyDesc) {
+            boolean ok = hasPrivilegeOnKeyDesc(
+                PrivilegeWrapper.getReadPrivilege(appService), keyDesc);
+            if (ok)
+                return ok;
+        }
+        return false;
+    }
+
     @Deprecated
     public boolean isAdministratorForCurrentCenter() {
         // FIXME this method was used in old User object. What should be done
@@ -191,57 +206,23 @@ public class UserWrapper extends UserBaseWrapper {
         return false;
     }
 
-    @SuppressWarnings("unused")
-    public boolean hasPrivilegeOnObject(PrivilegeWrapper privilege,
-        Class<?> objectClazz) {
-        String type = objectClazz.getName();
-        if (ModelWrapper.class.isAssignableFrom(objectClazz)) {
-            ModelWrapper<?> wrapper = null;
-            try {
-                Constructor<?> constructor = objectClazz
-                    .getConstructor(WritableApplicationService.class);
-                wrapper = (ModelWrapper<?>) constructor
-                    .newInstance((WritableApplicationService) null);
-            } catch (NoSuchMethodException e) {
-                return false;
-            } catch (InvocationTargetException e) {
-                return false;
-            } catch (IllegalAccessException e) {
-                return false;
-            } catch (InstantiationException e) {
-                return false;
-            }
-            type = wrapper.getWrappedClass().getName();
+    // FIXME should check study and/or center ?
+    public boolean hasPrivilegeOnKeyDesc(PrivilegeWrapper privilege,
+        String keyDesc) throws BiobankFailedQueryException,
+        ApplicationException {
+        BbRightWrapper right = BbRightWrapper.getRightWithKeyDesc(appService,
+            keyDesc);
+        List<PrivilegeWrapper> userPrivileges = getPrivilegesForRight(right);
+        return userPrivileges.contains(privilege);
+    }
+
+    private List<PrivilegeWrapper> getPrivilegesForRight(BbRightWrapper right)
+        throws ApplicationException {
+        List<PrivilegeWrapper> privileges = new ArrayList<PrivilegeWrapper>();
+        for (MembershipWrapper<?> ms : getMembershipCollection(false)) {
+            privileges.addAll(ms.getPrivilegesForRight(right));
         }
-        boolean currentCenterRights = true;
-        CenterWrapper<?> currentCenter = getCurrentWorkingCenter();
-        return currentCenterRights && hasPrivilegeOnObject(privilege, type);
-    }
-
-    private boolean hasPrivilegeOnObject(PrivilegeWrapper privilege, String type) {
-        try {
-            // add a class information to the right ?
-            BbRightWrapper right = BbRightWrapper.getRight(appService, type);
-            List<PrivilegeWrapper> userPrivileges = getPrivilegesForRight(right);
-        } catch (Exception e) {
-            return false;
-        }
-        // for (Group group : groups) {
-        // if (group.hasPrivilegeOnObject(privilege, type)) {
-        // return true;
-        // }
-        // }
-        return false;
-    }
-
-    private List<PrivilegeWrapper> getPrivilegesForRight(BbRightWrapper right) {
-        // TODO Auto-generated method stub
-        return new ArrayList<PrivilegeWrapper>();
-    }
-
-    public boolean isCBSRCenter() {
-        CenterWrapper<?> center = getCurrentWorkingCenter();
-        return center != null && center.getNameShort().equals("CBSR"); //$NON-NLS-1$
+        return privileges;
     }
 
     public boolean needChangePassword() {
@@ -303,5 +284,15 @@ public class UserWrapper extends UserBaseWrapper {
         List<User> users = appService.query(criteria);
         return ModelWrapper.wrapModelCollection(appService, users,
             UserWrapper.class);
+    }
+
+    /**
+     * This method should be called by the user itself. If another user is
+     * connected to the server, the method will fail
+     */
+    public void modifyPassword(String oldPassword, String newPassword)
+        throws Exception {
+        ((BiobankApplicationService) appService).executeModifyPassword(
+            getCsmUserId(), oldPassword, newPassword);
     }
 }

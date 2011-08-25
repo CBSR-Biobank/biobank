@@ -6,12 +6,17 @@ import java.util.Map;
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
-import edu.ualberta.med.biobank.common.security.SecurityFeature;
+import edu.ualberta.med.biobank.BbRightHelper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 
 public class SessionState extends AbstractSourceProvider {
+
     public final static String SESSION_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.loginState"; //$NON-NLS-1$
+
+    private static BgcLogger logger = BgcLogger.getLogger(SessionState.class
+        .getName());
 
     public final static String IS_SUPER_ADMIN_MODE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.isSuperAdminMode"; //$NON-NLS-1$
     public final static String HAS_WORKING_CENTER_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter"; //$NON-NLS-1$
@@ -126,18 +131,23 @@ public class SessionState extends AbstractSourceProvider {
     }
 
     public void setUser(UserWrapper user) {
-        setSuperAdminMode(user != null && user.isInSuperAdminMode());
-        setHasWorkingCenter(user != null
-            && user.getCurrentWorkingCenter() != null);
-        setCurrentCenterType((user == null) ? null : user
-            .getCurrentWorkingCenter());
-        setHasClinicShipmentRights(user != null
-            && user.canPerformActions(SecurityFeature.CLINIC_SHIPMENT));
-        setDispatchRights(user != null
-            && user.canPerformActions(SecurityFeature.DISPATCH_REQUEST));
-        setIsCurrentCenterAdmin(user != null
-            && user.isAdministratorForCurrentCenter());
-        setHasPrinterLabelsRights(user != null
-            && user.canPerformActions(SecurityFeature.PRINTER_LABELS));
+        try {
+            setSuperAdminMode(user != null && user.isInSuperAdminMode());
+            setHasWorkingCenter(user != null
+                && user.getCurrentWorkingCenter() != null);
+            setCurrentCenterType((user == null) ? null : user
+                .getCurrentWorkingCenter());
+            setHasClinicShipmentRights(user != null
+                && user.hasRightsOn(BbRightHelper.CLINIC_SHIPMENT_KEY_DESC));
+            setDispatchRights(user != null
+                && user.hasRightsOn(BbRightHelper.DISPATCH_RECEIVE_KEY_DESC,
+                    BbRightHelper.DISPATCH_SEND_KEY_DESC));
+            setIsCurrentCenterAdmin(user != null
+                && user.isAdministratorForCurrentCenter());
+            setHasPrinterLabelsRights(user != null
+                && user.hasRightsOn(BbRightHelper.PRINT_LABEL_KEY_DESC));
+        } catch (Exception e) {
+            logger.error("Error setting session state", e); //$NON-NLS-1$
+        }
     }
 }

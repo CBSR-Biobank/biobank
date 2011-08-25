@@ -75,16 +75,16 @@ public class RoleWrapper extends RoleBaseWrapper {
         }
     }
 
-    private static final String USED_IN_MEMBERSHIP_QRY = "select count(roles) from "
+    private static final String USED_IN_MEMBERSHIP_QRY = "select count(ms) from "
         + MembershipRole.class.getName()
-        + " as ms where ms."
+        + " as ms join ms."
         + MembershipRolePeer.ROLE_COLLECTION.getName()
-        + " as roles where roles." + RolePeer.ID + "=?";
+        + " as roles where roles." + RolePeer.ID.getName() + "=?";
 
     private boolean isUsedInMembership()
         throws BiobankQueryResultSizeException, ApplicationException {
         HQLCriteria criteria = new HQLCriteria(USED_IN_MEMBERSHIP_QRY,
-            Arrays.asList(new Object[] {}));
+            Arrays.asList(new Object[] { getId() }));
         Long res = getCountResult(appService, criteria);
         return res > 0;
     }

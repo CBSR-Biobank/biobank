@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
+import edu.ualberta.med.biobank.common.peer.BbRightPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.BbRightBaseWrapper;
 import edu.ualberta.med.biobank.model.BbRight;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -36,14 +37,14 @@ public class BbRightWrapper extends BbRightBaseWrapper {
     }
 
     private static final String RIGHT_QRY = "from " + BbRight.class.getName()
-        + " where name = ?";
+        + " where " + BbRightPeer.KEY_DESC.getName() + " = ?";
 
-    public static BbRightWrapper getRight(
-        WritableApplicationService appService, String name)
+    public static BbRightWrapper getRightWithKeyDesc(
+        WritableApplicationService appService, String keyDesc)
         throws ApplicationException, BiobankFailedQueryException {
 
         HQLCriteria c = new HQLCriteria(RIGHT_QRY,
-            Arrays.asList(new Object[] { name }));
+            Arrays.asList(new Object[] { keyDesc }));
 
         List<BbRight> result = appService.query(c);
         if (result.size() != 1)
@@ -63,4 +64,21 @@ public class BbRightWrapper extends BbRightBaseWrapper {
         }
         return 0;
     }
+
+    public boolean isForSite() {
+        return getForSite() != null && getForSite();
+    }
+
+    public boolean isForResearchGroup() {
+        return getForResearchGroup() != null && getForResearchGroup();
+    }
+
+    public boolean isForClinic() {
+        return getForClinic() != null && getForClinic();
+    }
+
+    public boolean isForStudy() {
+        return getForStudy() != null && getForStudy();
+    }
+
 }

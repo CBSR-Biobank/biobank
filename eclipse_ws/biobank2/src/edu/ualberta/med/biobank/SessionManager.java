@@ -285,13 +285,14 @@ public class SessionManager {
 
     public static void logLookup(ModelWrapper<?> wrapper) throws Exception {
         if (!wrapper.isNew())
-            wrapper.logLookup(getUser().getCurrentWorkingCenter()
-                .getNameShort());
+            wrapper.logLookup(getUser().getCurrentWorkingCenter() == null ? "" //$NON-NLS-1$
+                : getUser().getCurrentWorkingCenter().getNameShort());
     }
 
     public static void logEdit(ModelWrapper<?> wrapper) throws Exception {
         if (!wrapper.isNew())
-            wrapper.logEdit(getUser().getCurrentWorkingCenter().getNameShort());
+            wrapper.logEdit(getUser().getCurrentWorkingCenter() == null ? "" //$NON-NLS-1$
+                : getUser().getCurrentWorkingCenter().getNameShort());
     }
 
     /**

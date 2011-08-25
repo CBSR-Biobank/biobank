@@ -1,19 +1,26 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
+import edu.ualberta.med.biobank.common.wrappers.MembershipRoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.model.RightPrivilege;
 import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.test.TestDatabase;
+import edu.ualberta.med.biobank.test.internal.MembershipHelper;
 import edu.ualberta.med.biobank.test.internal.RoleHelper;
+import edu.ualberta.med.biobank.test.internal.UserHelper;
 
 public class TestRole extends TestDatabase {
 
@@ -75,5 +82,36 @@ public class TestRole extends TestDatabase {
                 RightPrivilege.class, id);
             Assert.assertNull(dbRp);
         }
+    }
+
+    @Test
+    public void testDeleteIsUsedInMembership() throws Exception {
+        String name = "addMembershipsWithRole" + r.nextInt();
+        UserWrapper user = UserHelper.addUser(name, null, true);
+
+        RoleWrapper role = RoleHelper.addRole(name, false);
+
+        MembershipRoleWrapper mwr = MembershipHelper.newMembershipRole(user,
+            null, null);
+        mwr.addToRoleCollection(Arrays.asList(role));
+        user.persist();
+
+        user.reload();
+        Assert.assertEquals(1, user.getMembershipCollection(false).size());
+
+        role.reload();
+        try {
+            role.delete();
+        } catch (BiobankDeleteException bde) {
+            Assert.assertTrue(
+                "Can't delete because it is still used in memberships", true);
+        } catch (BiobankServerException e) {
+            Assert
+                .fail("If try to delete when used in a membership, the query will fail because of foreign keys problems");
+        }
+
+        user.getMembershipCollection(false).get(0).delete();
+        // should be able to delete it now
+        role.delete();
     }
 }

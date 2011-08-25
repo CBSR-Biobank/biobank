@@ -6,8 +6,6 @@ import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.security.Group;
-import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Log;
@@ -40,35 +38,11 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public void logActivity(Log log) throws Exception;
 
-    public void modifyPassword(String oldPassword, String newPassword)
-        throws ApplicationException;
-
-    @Deprecated
-    public List<Group> getSecurityGroups(User currentUser,
-        boolean includeSuperAdmin) throws ApplicationException;
-
-    @Deprecated
-    public List<User> getSecurityUsers(User currentUser)
-        throws ApplicationException;
-
-    @Deprecated
-    public User persistUserOld(User currentUser, User userToPersist)
-        throws ApplicationException;
-
-    @Deprecated
-    public void deleteUserOld(User currentUser, String loginToDelete)
-        throws ApplicationException;
-
-    @Deprecated
-    public User getCurrentUserOld() throws ApplicationException;
-
-    @Deprecated
-    public Group persistGroupOld(User currentUser, Group group)
-        throws ApplicationException;
-
-    @Deprecated
-    public void deleteGroupOld(User currentUser, Group group)
-        throws ApplicationException;
+    /**
+     * csmUserId will help to check this method is called by the user itself.
+     */
+    public void executeModifyPassword(Long csmUserId, String oldPassword,
+        String newPassword) throws ApplicationException;
 
     public void unlockUser(String userNameToUnlock) throws ApplicationException;
 
@@ -78,14 +52,6 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void checkVersion(String clientVersion) throws ApplicationException;
 
     public String getServerVersion();
-
-    @Deprecated
-    public List<ProtectionGroupPrivilege> getSecurityGlobalFeatures(
-        User currentUser) throws ApplicationException;
-
-    @Deprecated
-    public List<ProtectionGroupPrivilege> getSecurityCenterFeatures(
-        User currentUser) throws ApplicationException;
 
     public QueryHandle createQuery(QueryCommand qc) throws Exception;
 

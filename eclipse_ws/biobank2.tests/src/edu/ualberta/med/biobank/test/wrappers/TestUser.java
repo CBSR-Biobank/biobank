@@ -16,7 +16,8 @@ import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankSecurityUtil;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
 import edu.ualberta.med.biobank.test.AllTests;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.GroupHelper;
@@ -25,6 +26,7 @@ import edu.ualberta.med.biobank.test.internal.RoleHelper;
 import edu.ualberta.med.biobank.test.internal.UserHelper;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestUser extends TestDatabase {
 
@@ -43,7 +45,7 @@ public class TestUser extends TestDatabase {
 
         // check csm user
         UserProvisioningManager upm = SecurityServiceProvider
-            .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
+            .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
 
         gov.nih.nci.security.authorization.domainobjects.User csmUser = upm
             .getUser(name);
@@ -52,15 +54,14 @@ public class TestUser extends TestDatabase {
         Assert.assertFalse(csmUser.getPassword().isEmpty());
 
         // check user can connect
-        AllTests.connect(name, password);
-        // check user can access a biobank object
+        BiobankApplicationService newUserAppService = AllTests.connect(name,
+            password);
+        // check user can access a biobank object using the new appService
         try {
-            appService.search(Site.class, new Site());
+            newUserAppService.search(Site.class, new Site());
         } catch (AccessDeniedException ade) {
             Assert.fail("User should be able to access any object");
         }
-        // reconnect to testuser
-        AllTests.connectTestUser();
     }
 
     @Test
@@ -88,7 +89,7 @@ public class TestUser extends TestDatabase {
             user.getId());
         Assert.assertNotNull(dbUser);
         UserProvisioningManager upm = SecurityServiceProvider
-            .getUserProvisioningManager(BiobankSecurityUtil.APPLICATION_CONTEXT_NAME);
+            .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
         gov.nih.nci.security.authorization.domainobjects.User csmUser = upm
             .getUser(name);
         Assert.assertNotNull(csmUser);
@@ -186,5 +187,33 @@ public class TestUser extends TestDatabase {
         Membership msDB = ModelUtils.getObjectWithId(appService,
             Membership.class, mwrId);
         Assert.assertNull(msDB);
+    }
+
+    @Test
+    public void modifyPassword() throws Exception {
+        String name = "createUser" + r.nextInt();
+        String password = "123";
+        UserWrapper user = UserHelper.addUser(name, password, true);
+
+        // check user can connect
+        BiobankApplicationService newUserAppService = AllTests.connect(name,
+            password);
+        String newPwd = "new123";
+        // search the user again otherwise the appService will still try with
+        // testuser
+        user = UserWrapper.getUser(newUserAppService, name);
+        user.modifyPassword(password, newPwd);
+
+        // check user can't connect with old password
+        try {
+            AllTests.connect(name, password);
+            Assert
+                .fail("Should not be able to connect with the old password anymore");
+        } catch (ApplicationException ae) {
+            Assert.assertTrue("Should failed because of authentication", ae
+                .getMessage().contains("Error authenticating user"));
+        }
+        // check user can't connect with new password
+        AllTests.connect(name, newPwd);
     }
 }
