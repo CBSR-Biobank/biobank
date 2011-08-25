@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -546,5 +545,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             getWrapper().hasSpecimenStatesChanged = false;
             getWrapper().dispatchSpecimensToPersist.clear();
         }
+    }
+
+    public void reloadDispatchSpecimens() {
+        // TODO: re-implement this?
     }
 }
