@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -172,6 +173,24 @@ public class TestDispatch extends TestDatabase {
         } catch (BiobankCheckException e) {
             Assert.assertTrue(true);
         }
+
+        // test duplicate waybill
+
+        String waybill = TestCommon.getNewWaybill(r);
+        DispatchWrapper dispatch2 = DispatchHelper.newDispatch(senderSite,
+            senderSite, method, waybill, Utils.getRandomDate());
+        dispatch2.persist();
+        dispatch = DispatchHelper.newDispatch(senderSite, senderSite, method,
+            waybill, Utils.getRandomDate());
+        try {
+            dispatch.persist();
+            Assert
+                .fail("should not be allowed to persist a dispatch with a used waybill");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+        dispatch2.delete();
+
     }
 
     @Test
@@ -451,26 +470,147 @@ public class TestDispatch extends TestDatabase {
     }
 
     @Test
-    public void testRandomGetters() throws Exception {
-        String name = "testRandomGetters" + r.nextInt();
+    public void testStringOutputs() throws Exception {
+        String name = "testRandomStrings" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
-        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
-
-        DispatchWrapper dispatch = DispatchHelper.addDispatch(senderSite,
+        ClinicWrapper senderClinic = ClinicHelper.addClinic("Fake");
+        DispatchWrapper dispatch = DispatchHelper.addDispatch(senderClinic,
             receiverSite, ShippingMethodWrapper.getShippingMethods(appService)
                 .get(0));
 
-        dispatch.isInClosedState();
-        dispatch.isInCreationState();
-        dispatch.isInLostState();
-        dispatch.isInReceivedState();
-        dispatch.isInTransitState();
-        dispatch.hasSpecimenStatesChanged();
-        dispatch.hasNewSpecimens();
-        dispatch.hasErrors();
-        dispatch.hasBeenReceived();
-        dispatch.hasDispatchSpecimens();
+        Date date = DateFormatter.parseToDate("2011-08-17");
+        ShipmentInfoWrapper info = new ShipmentInfoWrapper(appService);
+        info.setWaybill("testWaybill");
+        info.setShippingMethod(ShippingMethodWrapper.getShippingMethods(
+            appService).get(0));
+        info.setReceivedAt(date);
+        dispatch.setShipmentInfo(info);
+        Assert.assertEquals("2011-08-17 00:00",
+            dispatch.getFormattedReceivedAt());
+        Assert.assertEquals(
+            senderClinic.getNameShort() + "/" + receiverSite.getNameShort()
+                + "/" + dispatch.getFormattedReceivedAt(), dispatch.toString());
+
+    }
+
+    @Test
+    public void testRandomGetters() throws Exception {
+        String name = "testRandomGetters" + r.nextInt();
+        StudyWrapper study = StudyHelper.addStudy(name);
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+
+        ClinicWrapper senderClinic = ClinicHelper.addClinic("Fake");
+
+        SpecimenWrapper spec = SpecimenHelper.addParentSpecimen(senderClinic,
+            study, PatientHelper.addPatient(Utils.getRandomString(10), study));
+        DispatchWrapper dispatch = DispatchHelper.addDispatch(senderClinic,
+            receiverSite, ShippingMethodWrapper.getShippingMethods(appService)
+                .get(0));
+        dispatch.addSpecimens(Arrays.asList(spec), DispatchSpecimenState.NONE);
+        Assert.assertTrue(!dispatch.hasSpecimenStatesChanged());
+        Assert.assertTrue(dispatch.hasNewSpecimens());
+
+        dispatch.setState(DispatchState.CLOSED);
+        Assert.assertTrue(dispatch.isInClosedState());
+        Assert.assertTrue(dispatch.hasBeenReceived());
+
+        dispatch.setState(DispatchState.CREATION);
+        Assert.assertTrue(dispatch.isInCreationState());
+
+        dispatch.setState(DispatchState.LOST);
+        Assert.assertTrue(dispatch.isInLostState());
+
+        dispatch.setState(DispatchState.RECEIVED);
+        Assert.assertTrue(dispatch.isInReceivedState());
+        Assert.assertTrue(dispatch.hasBeenReceived());
+
+        dispatch.setState(DispatchState.IN_TRANSIT);
+        Assert.assertTrue(dispatch.isInTransitState());
+
+        dispatch.getDispatchSpecimenCollection(false).get(0)
+            .setDispatchSpecimenState(DispatchSpecimenState.MISSING);
+        Assert.assertTrue(dispatch.hasErrors());
+        Assert.assertTrue(!dispatch.hasSpecimenStatesChanged());
+
+        Assert.assertTrue(dispatch.hasDispatchSpecimens());
+        dispatch.removeDispatchSpecimens(dispatch
+            .getDispatchSpecimenCollection(false));
+        Assert.assertTrue(!dispatch.hasDispatchSpecimens());
+
+        Assert.assertTrue(!dispatch.canBeSentBy(appService.getCurrentUser()));
+        Assert
+            .assertTrue(!dispatch.canBeReceivedBy(appService.getCurrentUser()));
+        Assert.assertTrue(!dispatch.canBeClosedBy(appService.getCurrentUser()));
+
+    }
+
+    @Test
+    public void testReceiveSpecimens() throws Exception {
+        String name = "testReceiveSpecimens" + r.nextInt();
+        StudyWrapper study = StudyHelper.addStudy(name + "_study");
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_site");
+        ClinicWrapper clinic = ClinicHelper.addClinic(name + "_clinic");
+        SpecimenWrapper spec = SpecimenHelper.addParentSpecimen(clinic, study,
+            PatientHelper.addPatient(Utils.getRandomString(10), study));
+        DispatchWrapper dispatch = DispatchHelper.addDispatch(clinic,
+            receiverSite, ShippingMethodWrapper.getShippingMethods(appService)
+                .get(0));
+        dispatch.addSpecimens(Arrays.asList(spec), DispatchSpecimenState.NONE);
+
+        Assert.assertTrue(dispatch.getNonProcessedDispatchSpecimenCollection()
+            .size() == 1);
+        dispatch.receiveSpecimens(Arrays.asList(spec));
+        Assert.assertTrue(dispatch.getReceivedDispatchSpecimens().get(0)
+            .getSpecimen().equals(spec));
+        Assert.assertTrue(dispatch.getNonProcessedDispatchSpecimenCollection()
+            .size() == 0);
+
+        Assert.assertEquals(0, dispatch.getMissingDispatchSpecimens().size());
+        DispatchSpecimenWrapper dspec = dispatch.getDispatchSpecimen(spec
+            .getInventoryId());
+        dspec.setDispatchSpecimenState(DispatchSpecimenState.MISSING);
+        dspec.persist();
+        dispatch.reload();
+
+        Assert.assertEquals(1, dispatch.getMissingDispatchSpecimens().size());
+
+        Assert.assertEquals(1,
+            dispatch.getMap().get(DispatchSpecimenState.MISSING).size());
+
+        dspec.setDispatchSpecimenState(DispatchSpecimenState.EXTRA);
+        dspec.persist();
+        dispatch.reload();
+
+        Assert.assertEquals(1, dispatch.getExtraDispatchSpecimens().size());
+
+        Assert.assertEquals(1,
+            dispatch.getMap().get(DispatchSpecimenState.EXTRA).size());
+
+    }
+
+    @Test
+    public void testGetDispatchesByWaybill() throws Exception {
+
+        Assert.assertTrue(DispatchWrapper.getDispatchesByWaybill(appService,
+            "testWaybill").size() == 0);
+
+        String name = "testGetDispatchesByWaybill" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name + "_clinic");
+        DispatchWrapper testDispatch = DispatchHelper.addDispatch(site, clinic,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0));
+        ShipmentInfoWrapper info = new ShipmentInfoWrapper(appService);
+        info.setWaybill("testWaybill");
+        info.setShippingMethod(ShippingMethodWrapper.getShippingMethods(
+            appService).get(0));
+        testDispatch.setShipmentInfo(info);
+        testDispatch.persist();
+
+        Assert.assertTrue(DispatchWrapper
+            .getDispatchesByWaybill(appService, "testWaybill").get(0)
+            .equals(testDispatch));
+
     }
 
     @Test
