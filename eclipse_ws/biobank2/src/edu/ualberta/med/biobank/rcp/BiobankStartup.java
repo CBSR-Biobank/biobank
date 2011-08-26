@@ -44,10 +44,6 @@ public class BiobankStartup implements IStartup {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                    // // then launch the login dialog
-                    // LoginDialog dlg = new LoginDialog(window.getShell());
-                    // dlg.open();
-
                 }
             }
         });
