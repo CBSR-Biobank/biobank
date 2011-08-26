@@ -135,7 +135,7 @@ public class TestActivityStatus extends TestDatabase {
 
         // ProcessingEvent
         ProcessingEventWrapper pevent = ProcessingEventHelper
-            .addProcessingEvent(site, patient, Utils.getRandomDate());
+            .addProcessingEvent(site, Utils.getRandomDate());
 
         ModelWrapper<?>[] wrappers = new ModelWrapper<?>[] { originSpecimen,
             studyEventAttr, topContainer, topContainerType, cevent,

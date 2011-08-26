@@ -57,7 +57,7 @@ public class TestSite extends TestDatabase {
             .addCollectionEvent(site, patient, visitNumber, parentSpc);
 
         parentSpc = cevent.getOriginalSpecimenCollection(false).get(0);
-        pevents.addAll(ProcessingEventHelper.addProcessingEvents(site, patient,
+        pevents.addAll(ProcessingEventHelper.addProcessingEvents(site,
             Utils.getRandomDate(), parentSpc, spcTypes, maxProcEvent,
             spcPerProcEvent));
         return pevents;
@@ -526,7 +526,7 @@ public class TestSite extends TestDatabase {
             cevents.add(cevent);
 
             ProcessingEventWrapper pevent = ProcessingEventHelper
-                .addProcessingEvent(site, p, Utils.getRandomDate());
+                .addProcessingEvent(site, Utils.getRandomDate());
             pevent.addToSpecimenCollection(cevent
                 .getOriginalSpecimenCollection(false));
             pevent.persist();

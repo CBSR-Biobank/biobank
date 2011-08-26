@@ -329,8 +329,7 @@ public class TestDispatch extends TestDatabase {
         oi.persist();
 
         ProcessingEventWrapper pevent = ProcessingEventHelper
-            .addProcessingEvent(container.getSite(), parentSpc
-                .getCollectionEvent().getPatient(), Utils.getRandomDate());
+            .addProcessingEvent(container.getSite(), Utils.getRandomDate());
 
         List<SpecimenWrapper> spcs = new ArrayList<SpecimenWrapper>();
         for (int i = 0; i < colCapacity; ++i) {

@@ -69,12 +69,9 @@ public class TestCenter extends TestDatabase {
     @Test
     public void testGetProcessingEvents() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testProcessingEvents");
-        ProcessingEventHelper.addProcessingEvent(site,
-            PatientWrapper.getPatient(appService, "testP"), new Date());
-        ProcessingEventHelper.addProcessingEvent(site,
-            PatientWrapper.getPatient(appService, "testP"), new Date());
-        ProcessingEventHelper.addProcessingEvent(site,
-            PatientWrapper.getPatient(appService, "testP"), new Date());
+        ProcessingEventHelper.addProcessingEvent(site, new Date());
+        ProcessingEventHelper.addProcessingEvent(site, new Date());
+        ProcessingEventHelper.addProcessingEvent(site, new Date());
 
         site.reload();
         Assert.assertEquals(3, site.getProcessingEventCount());
@@ -85,8 +82,7 @@ public class TestCenter extends TestDatabase {
     public void testGetAliquotedSpecimens() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testAliquots" + r.nextInt());
         ProcessingEventWrapper pevent = ProcessingEventHelper
-            .addProcessingEvent(site,
-                PatientWrapper.getPatient(appService, "testP"), new Date());
+            .addProcessingEvent(site, new Date());
         SpecimenTypeWrapper testtype = SpecimenTypeHelper
             .addSpecimenType("testTypeAliquoted");
         SpecimenWrapper parent = SpecimenHelper.newSpecimen(testtype, "Active",

@@ -164,7 +164,7 @@ public class SpecimenHelper extends DbHelper {
         CollectionEventWrapper ce = parentSpc.getCollectionEvent();
 
         ProcessingEventWrapper pe = ProcessingEventHelper.addProcessingEvent(
-            site, ce.getPatient(), Utils.getRandomDate());
+            site, Utils.getRandomDate());
 
         parentSpc.setProcessingEvent(pe);
         parentSpc.persist();
@@ -219,7 +219,7 @@ public class SpecimenHelper extends DbHelper {
         CollectionEventWrapper ce = parentSpc.getCollectionEvent();
 
         ProcessingEventWrapper pe = ProcessingEventHelper.addProcessingEvent(
-            container.getSite(), ce.getPatient(), Utils.getRandomDate());
+            container.getSite(), Utils.getRandomDate());
 
         List<SpecimenWrapper> spcs = new ArrayList<SpecimenWrapper>();
 
