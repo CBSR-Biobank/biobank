@@ -11,96 +11,56 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
+import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.IfAction.Is;
+import edu.ualberta.med.biobank.common.wrappers.actions.UpdateChildrensTopSpecimenAction;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.SpecimenPostPersistChecks;
 import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
-import edu.ualberta.med.biobank.model.Log;
+import edu.ualberta.med.biobank.common.wrappers.loggers.SpecimenLogProvider;
+import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
+import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage;
+import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage.LazyArg;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.SpecimenPosition;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenWrapper extends SpecimenBaseWrapper {
-
+    private static final String BAD_SAMPLE_TYPE_MSG = "Container {0} does not allow inserts of sample type {1}.";
     private static final String DISPATCHS_CACHE_KEY = "dispatchs";
-    private AbstractObjectWithPositionManagement<SpecimenPosition, SpecimenWrapper> objectWithPositionManagement;
+    private static final SpecimenLogProvider LOG_PROVIDER = new SpecimenLogProvider();
+
+    private boolean topSpecimenChanged = false;
 
     public SpecimenWrapper(WritableApplicationService appService,
         Specimen wrappedObject) {
         super(appService, wrappedObject);
-        init();
     }
 
     public SpecimenWrapper(WritableApplicationService appService) {
         super(appService);
-        init();
-    }
-
-    private void init() {
-        if (isNew()) {
-            setTopSpecimenInternal(this);
-        }
-        initManagement();
-    }
-
-    private void initManagement() {
-        objectWithPositionManagement = new AbstractObjectWithPositionManagement<SpecimenPosition, SpecimenWrapper>(
-            this) {
-
-            @Override
-            protected AbstractPositionWrapper<SpecimenPosition> getSpecificPositionWrapper(
-                boolean initIfNoPosition) {
-                if (nullPositionSet)
-                    return null;
-
-                SpecimenPosition pos = wrappedObject.getSpecimenPosition();
-                if (pos != null) {
-                    return new SpecimenPositionWrapper(appService, pos);
-                } else if (initIfNoPosition) {
-                    SpecimenPositionWrapper posWrapper = new SpecimenPositionWrapper(
-                        appService);
-                    posWrapper.setSpecimen(SpecimenWrapper.this);
-                    wrappedObject.setSpecimenPosition(posWrapper
-                        .getWrappedObject());
-                    return posWrapper;
-                }
-                return null;
-            }
-        };
     }
 
     @Override
-    public void persist() throws Exception {
-        // check if position was deleted
-        if (getPosition() == null) {
-            // get original position
-            SpecimenPosition rawPos = wrappedObject.getSpecimenPosition();
-            if (rawPos != null) {
-                AbstractPositionWrapper<SpecimenPosition> pos = new SpecimenPositionWrapper(
-                    appService, rawPos);
-                if (!pos.isNew()) {
-                    pos.delete();
-                }
-            }
-            wrappedObject.setSpecimenPosition(null);
-        }
-        objectWithPositionManagement.persist();
-        super.persist();
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        checkInventoryIdUnique();
-        checkParentAcceptSampleType();
-        objectWithPositionManagement.persistChecks();
+    protected Specimen getNewObject() throws Exception {
+        Specimen newObject = super.getNewObject();
+        // by default, any newly created Specimen will have a null parent, so
+        // its top is itself.
+        newObject.setTopSpecimen(newObject);
+        return newObject;
     }
 
     public void checkInventoryIdUnique() throws BiobankException,
@@ -114,52 +74,47 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     public ContainerWrapper getParentContainer() {
-        return objectWithPositionManagement.getParentContainer();
+        SpecimenPositionWrapper pos = getSpecimenPosition();
+        return pos == null ? null : pos.getParent();
     }
 
-    public void setParentContainer(ContainerWrapper container) {
-        objectWithPositionManagement.setParentContainer(container);
+    public void setParent(ContainerWrapper container, RowColPos position) {
+        if (container == null) {
+            setSpecimenPosition(null);
+        } else {
+            getOrCreatePosition().setParent(container, position);
+        }
+    }
+
+    public ContainerWrapper getTop() {
+        ContainerWrapper top = getParentContainer();
+        if (top != null) {
+            top = top.getTopContainer();
+        }
+
+        return top;
     }
 
     public boolean hasParent() {
-        return objectWithPositionManagement.hasParentContainer();
+        return getParentContainer() != null;
     }
 
     public RowColPos getPosition() {
-        return objectWithPositionManagement.getPosition();
+        SpecimenPositionWrapper pos = getSpecimenPosition();
+        return pos == null ? null : pos.getPosition();
     }
 
-    public void setPosition(RowColPos rcp) {
-        if (rcp == null) {
-            setParentContainer(null);
+    private SpecimenPositionWrapper getOrCreatePosition() {
+        SpecimenPositionWrapper specimenPosition = getSpecimenPosition();
+        if (specimenPosition == null) {
+            specimenPosition = new SpecimenPositionWrapper(appService);
+            setSpecimenPosition(specimenPosition);
         }
-        objectWithPositionManagement.setPosition(rcp);
+        return specimenPosition;
     }
 
     public String getPositionString() {
         return getPositionString(true, true);
-    }
-
-    private void checkParentAcceptSampleType() throws BiobankCheckException {
-        ContainerWrapper parent = getParentContainer();
-        if (parent != null) {
-            ContainerTypeWrapper parentType = getParentContainer()
-                .getContainerType();
-            try {
-                parentType.reload();
-            } catch (Exception e) {
-                throw new BiobankCheckException(e);
-            }
-            List<SpecimenTypeWrapper> types = parentType
-                .getSpecimenTypeCollection(false);
-            if (types == null || !types.contains(getSpecimenType())) {
-                throw new BiobankCheckException("Container "
-                    + getParentContainer().getFullInfoLabel()
-                    + " does not allow inserts of sample type "
-                    + ((getSpecimenType() == null) ? "null" : getSpecimenType()
-                        .getName()) + ".");
-            }
-        }
     }
 
     public String getCenterString() {
@@ -172,52 +127,24 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return "CANNOT DISPLAY INFORMATION";
     }
 
+    @Override
+    public SpecimenLogProvider getLogProvider() {
+        return LOG_PROVIDER;
+    }
+
     /**
      * Set the position in the given container using the positionString
      */
-    public void setSpecimenPositionFromString(String positionString,
+    public void setParentFromPositionString(String positionString,
         ContainerWrapper parentContainer) throws Exception {
         RowColPos rcp = parentContainer.getContainerType()
             .getRowColFromPositionString(
                 positionString.replaceFirst(parentContainer.getLabel(), ""));
-        if ((rcp.row > -1) && (rcp.col > -1)) {
-            setPosition(rcp);
+        if ((rcp.getRow() > -1) && (rcp.getCol() > -1)) {
+            setParent(parentContainer, rcp);
         } else {
             throw new Exception("Position " + positionString + " not valid");
         }
-    }
-
-    private static final String POSITION_FREE_QRY = "from "
-        + Specimen.class.getName()
-        + " where "
-        + Property.concatNames(SpecimenPeer.SPECIMEN_POSITION,
-            SpecimenPositionPeer.ROW)
-        + "=? and "
-        + Property.concatNames(SpecimenPeer.SPECIMEN_POSITION,
-            SpecimenPositionPeer.COL)
-        + "=? and "
-        + Property.concatNames(SpecimenPeer.SPECIMEN_POSITION,
-            SpecimenPositionPeer.CONTAINER) + "=?";
-
-    /**
-     * Method used to check if the current position of this Specimen is
-     * available on the container. Return true if the position is free, false
-     * otherwise
-     */
-    public boolean isPositionFree(ContainerWrapper parentContainer)
-        throws ApplicationException {
-        RowColPos position = getPosition();
-        if (position != null) {
-            HQLCriteria criteria = new HQLCriteria(POSITION_FREE_QRY,
-                Arrays.asList(new Object[] { position.row, position.col,
-                    parentContainer.getWrappedObject() }));
-
-            List<Specimen> samples = appService.query(criteria);
-            if (samples.size() > 0) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public String getPositionString(boolean fullString,
@@ -326,9 +253,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                 assert false;
             }
             if (rcp != null) {
-                if ((rcp.row > -1) && (rcp.col > -1)) {
-                    SpecimenWrapper Specimen = container.getSpecimen(rcp.row,
-                        rcp.col);
+                if ((rcp.getRow() > -1) && (rcp.getCol() > -1)) {
+                    SpecimenWrapper Specimen = container.getSpecimen(
+                        rcp.getRow(), rcp.getCol());
                     if (Specimen != null) {
                         Specimens.add(Specimen);
                     }
@@ -374,33 +301,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return dispatchs;
     }
 
-    @Override
-    protected Log getLogMessage(String action, String center, String details) {
-        Log log = new Log();
-        log.setAction(action);
-        if (center == null) {
-            CenterWrapper<?> c = getCurrentCenter();
-            if (c != null) {
-                center = c.getNameShort();
-            }
-        }
-        log.setCenter(center);
-
-        CollectionEventWrapper cevent = getCollectionEvent();
-        if (cevent != null) {
-            PatientWrapper patient = cevent.getPatient();
-            if (patient != null) {
-                log.setPatientNumber(patient.getPnumber());
-            }
-        }
-
-        log.setInventoryId(getInventoryId());
-        log.setLocationLabel(getPositionString(true, true));
-        log.setDetails(details);
-        log.setType("Specimen");
-        return log;
-    }
-
     public boolean isActive() {
         ActivityStatusWrapper status = getActivityStatus();
         return status != null && status.isActive();
@@ -409,10 +309,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     public boolean isFlagged() {
         ActivityStatusWrapper status = getActivityStatus();
         return status != null && status.isFlagged();
-    }
-
-    public ContainerWrapper getTop() {
-        return objectWithPositionManagement.getTop();
     }
 
     public List<DispatchSpecimenWrapper> getDispatchSpecimenCollection() {
@@ -444,62 +340,170 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     @Override
-    protected void resetInternalFields() {
-        objectWithPositionManagement.resetInternalFields();
-        if (isNew())
-            setTopSpecimenInternal(this);
-    }
-
-    @Override
-    protected void persistDependencies(Specimen originalSpecimen)
-        throws Exception {
-
-        boolean parentChanged = (originalSpecimen != null
-            && originalSpecimen.getParentSpecimen() != null && originalSpecimen
-            .getParentSpecimen().getId().equals(getParentSpecimen().getId()));
-
-        if (isNew() || parentChanged) {
-            updateChildren();
-        }
-    }
-
-    private void updateChildren() throws Exception {
-        for (SpecimenWrapper child : getChildSpecimenCollection(false)) {
-            child.setTopSpecimenInternal(getTopSpecimen());
-
-            // only persist if the child has already been persisted, otherwise
-            // only update the reference.
-            if (child.isNew()) {
-                child.updateChildren();
-            } else {
-                child.persist();
-            }
-        }
-    }
-
-    @Override
-    public void setParentSpecimen(SpecimenWrapper specimen) {
+    public void setParentSpecimen(SpecimenBaseWrapper specimen) {
         super.setParentSpecimen(specimen);
-        // topSpecimen should never be null
-        setTopSpecimenInternal(specimen != null ? specimen.getTopSpecimen()
-            : this);
+
+        // keep the top Specimen up-to-date whenever the parent is set; however,
+        // only update this top Specimen, not the children's top Specimen. This
+        // is so that the children/ descendants will only be updated if the
+        // Specimen whose parent Specimen was changed is persisted.
+        SpecimenWrapper topSpecimen = specimen == null ? this : specimen
+            .getTopSpecimen();
+        setTopSpecimenInternal(topSpecimen, true);
     }
 
     /**
-     * Call <code>setParentSpecimen(SpecimenWrapper)</code> instead of this
-     * method to change the top parent. The 'topSpecimen' will be automatically
-     * updated.
+     * Call {@code setParentSpecimen(SpecimenWrapper parent)} instead of this
+     * method to change the top {@code Specimen}. The top {@code Specimen} will
+     * be automatically updated.
      */
     @Override
     @Deprecated
-    public void setTopSpecimen(SpecimenWrapper specimen) {
-        // this method should never be called outside of the wrapper.
+    public void setTopSpecimen(SpecimenBaseWrapper specimen) {
         throw new UnsupportedOperationException(
-            "this method should never be called");
+            "Not allowed to directly set the top Specimen. Set the parent Specimen instead.");
     }
 
-    protected void setTopSpecimenInternal(SpecimenWrapper specimen) {
+    protected void setTopSpecimenInternal(SpecimenWrapper specimen,
+        boolean checkDatabase) {
         super.setTopSpecimen(specimen);
+
+        if (equals(specimen)) {
+            setOriginalCollectionEvent(getCollectionEvent());
+        }
+
+        // this is overly cautious, assuming that whenever the top Specimen is
+        // set that it is changed. Could be improved to check if the value has
+        // actually changed, but would probably require lazy loading.
+
+        if (!isNew() && checkDatabase) {
+            // TODO: actually check the database. Get the current
+            // topSpecimen through an HQL query and compare it against the
+            // one set.
+            topSpecimenChanged = true;
+            // TODO: may want to set to false if set back to the original?
+        } else {
+            topSpecimenChanged = true;
+        }
+    }
+
+    /**
+     * Return the top {@code Specimen} of the top loaded {@code Specimen}. This
+     * will give the correct "in memory" answer of who the top {@code Specimen}
+     * is (whereas super.getTopSpecimen() will give the value from the
+     * underlying model).
+     */
+    @Override
+    public SpecimenWrapper getTopSpecimen() {
+        // if parent is cached, return their top specimen, otherwise get and
+        // return mine (from super).
+        if (isPropertyCached(SpecimenPeer.PARENT_SPECIMEN)
+            && getParentSpecimen() != null) {
+            return getParentSpecimen().getTopSpecimen();
+        } else {
+            return super.getTopSpecimen();
+        }
+    }
+
+    private void addTasksToPostCheckLegalSampleType(TaskList tasks) {
+        LazyArg containerLabel = LazyMessage.newArg(this,
+            SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.CONTAINER
+                .to(ContainerPeer.LABEL)));
+
+        LazyArg specimenType = LazyMessage.newArg(this,
+            SpecimenPeer.SPECIMEN_TYPE.to(SpecimenTypePeer.NAME_SHORT));
+
+        LazyMessage badSampleTypeMsg = new LazyMessage(BAD_SAMPLE_TYPE_MSG,
+            containerLabel, specimenType);
+
+        Property<Collection<SpecimenType>, Specimen> pathToLegalSpecimenTypeOptions = SpecimenPeer.SPECIMEN_POSITION
+            .to(SpecimenPositionPeer.CONTAINER.to(ContainerPeer.CONTAINER_TYPE
+                .to(ContainerTypePeer.SPECIMEN_TYPE_COLLECTION)));
+
+        BiobankSessionAction checkLegalSampleType = check().legalOption(
+            pathToLegalSpecimenTypeOptions, SpecimenPeer.SPECIMEN_TYPE,
+            badSampleTypeMsg);
+
+        tasks.add(check().ifProperty(
+            SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.ID),
+            Is.NOT_NULL, checkLegalSampleType));
+    }
+
+    private void addTasksToUpdateChildren(TaskList tasks) {
+        if (topSpecimenChanged) {
+            SpecimenWrapper topSpecimen = getTopSpecimen();
+            if (isPropertyCached(SpecimenPeer.CHILD_SPECIMEN_COLLECTION)) {
+                // if the children have already been loaded, then update their
+                // top specimen so that they update their children, etc. so that
+                // the entire subtree is consistent.
+                List<SpecimenWrapper> children = getChildSpecimenCollection(false);
+                for (SpecimenWrapper child : children) {
+                    child.setTopSpecimenInternal(topSpecimen, false);
+
+                    // Save children whether they're are new or not, because the
+                    // children's children could be already persistent and need
+                    // to be updated (but would then need their parent to be
+                    // persisted first).
+                    child.addPersistTasks(tasks);
+                }
+            } else {
+                // Use HQL to update all descendants of this Specimen because
+                // they are not loaded and loading them would be unnecessary.
+                tasks.add(new UpdateChildrensTopSpecimenAction(this));
+            }
+
+            tasks.add(new ResetTopSpecimenChangedQueryTask(this));
+        }
+    }
+
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(check().notNull(SpecimenPeer.SPECIMEN_TYPE));
+        tasks.add(check().notNull(SpecimenPeer.INVENTORY_ID));
+
+        tasks.add(check().unique(SpecimenPeer.INVENTORY_ID));
+
+        tasks.deleteRemovedValue(this, SpecimenPeer.SPECIMEN_POSITION);
+
+        super.addPersistTasks(tasks);
+
+        tasks.persist(this, SpecimenPeer.SPECIMEN_POSITION);
+
+        addTasksToPostCheckLegalSampleType(tasks);
+
+        addTasksToUpdateChildren(tasks);
+
+        tasks.add(new SpecimenPostPersistChecks(this));
+    }
+
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        tasks.add(check().empty(SpecimenPeer.CHILD_SPECIMEN_COLLECTION));
+
+        // Either Hibernate must delete this object (via the defined cascade) or
+        // do it here, but not both. If both are done, then a
+        // StaleStateException is thrown because an attempt is made to delete an
+        // already deleted object.
+        // tasks.delete(this, SpecimenPeer.SPECIMEN_POSITION);
+
+        super.addDeleteTasks(tasks);
+    }
+
+    @Override
+    protected void resetInternalFields() {
+        topSpecimenChanged = false;
+    }
+
+    private static class ResetTopSpecimenChangedQueryTask extends
+        NoActionWrapperQueryTask<SpecimenWrapper> {
+        public ResetTopSpecimenChangedQueryTask(SpecimenWrapper specimen) {
+            super(specimen);
+        }
+
+        @Override
+        public void afterExecute(SDKQueryResult result) {
+            getWrapper().topSpecimenChanged = false;
+        }
     }
 
     /**

@@ -6,12 +6,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ResearchGroupHelper;
@@ -125,7 +125,7 @@ public class TestResearchGroup extends TestDatabase {
             researchGroup.persist();
             Assert
                 .fail("Should not insert the researchGroup : same name already in database for this site");
-        } catch (DuplicateEntryException dee) {
+        } catch (DuplicatePropertySetException e) {
             Assert.assertTrue(true);
         }
         researchGroup.setName(name + "_otherName");

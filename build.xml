@@ -549,8 +549,6 @@
       <include name="**/tools/modelextender/*.java" />
       <include name="**/tools/modelumlparser/*.java" />
       <include name="**/tools/utils/*.java" />
-      <include name="**/common/util/TypeReference.java" />
-      <include name="**/common/wrappers/Property.java" />
       <classpath>
         <pathelement location="${req.jars.dir}/jargs.jar" />
         <pathelement location="${req.jars.dir}/commons-lang-2.4.jar" />

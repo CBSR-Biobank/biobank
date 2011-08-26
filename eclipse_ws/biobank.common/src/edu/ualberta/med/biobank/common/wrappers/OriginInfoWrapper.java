@@ -5,17 +5,13 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
-import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
-import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Log;
+import edu.ualberta.med.biobank.common.wrappers.checks.OriginInfoFromClinicCheck;
+import edu.ualberta.med.biobank.common.wrappers.loggers.OriginInfoLogProvider;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -23,7 +19,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class OriginInfoWrapper extends OriginInfoBaseWrapper {
-
+    private static final OriginInfoLogProvider LOG_PROVIDER = new OriginInfoLogProvider();
     private static final String SHIPMENT_HQL_STRING = "from "
         + OriginInfo.class.getName() + " as o inner join fetch o."
         + OriginInfoPeer.SHIPMENT_INFO.getName() + " as s ";
@@ -56,19 +52,6 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return patients;
     }
 
-    @Override
-    protected void deleteDependencies() throws Exception {
-        // all specimen should be linked to another origin info. This origin
-        // info center will be the specimen current center.
-        for (SpecimenWrapper spc : getSpecimenCollection()) {
-            OriginInfoWrapper oi = new OriginInfoWrapper(appService);
-            oi.setCenter(spc.getCurrentCenter());
-            oi.persist();
-            spc.setOriginInfo(oi);
-            spc.persist();
-        }
-    }
-
     public void checkAtLeastOneSpecimen() {
         // FIXME don't want that when create from collection event
         // List<SpecimenWrapper> spc = getSpecimenCollection(false);
@@ -76,65 +59,6 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         // throw new BiobankCheckException(
         // "At least one specimen should be added to this Collection Event.");
         // }
-    }
-
-    private static final String WAYBILL_UNIQUE_FOR_CLINIC_BASE_QRY = "from "
-        + Clinic.class.getName() + " as clinic join clinic."
-        + ClinicPeer.ORIGIN_INFO_COLLECTION.getName() + " as oi join oi."
-        + OriginInfoPeer.SHIPMENT_INFO.getName() + " as si where clinic."
-        + ClinicPeer.ID.getName() + "=? and si."
-        + ShipmentInfoPeer.WAYBILL.getName() + "=?";
-
-    private boolean checkWaybillUniqueForClinic(ClinicWrapper clinic)
-        throws ApplicationException {
-        List<Object> params = new ArrayList<Object>();
-        params.add(clinic.getId());
-        params.add(getShipmentInfo().getWaybill());
-
-        StringBuilder qry = new StringBuilder(
-            WAYBILL_UNIQUE_FOR_CLINIC_BASE_QRY);
-        if (!isNew()) {
-            qry.append(" and oi.").append(OriginInfoPeer.ID.getName())
-                .append(" <> ?");
-            params.add(getId());
-        }
-        HQLCriteria c = new HQLCriteria(qry.toString(), params);
-
-        List<Object> results = appService.query(c);
-        return results.size() == 0;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        CenterWrapper<?> center = getCenter();
-        if (center == null) {
-            throw new BiobankCheckException("A Center should be set.");
-        }
-        checkAtLeastOneSpecimen();
-
-        if (center instanceof ClinicWrapper && getShipmentInfo() != null) {
-            ClinicWrapper clinic = (ClinicWrapper) center;
-            String waybill = getShipmentInfo().getWaybill();
-
-            if (Boolean.TRUE.equals(clinic.getSendsShipments())) {
-                if (waybill == null || waybill.isEmpty()) {
-                    throw new BiobankCheckException(
-                        "A waybill should be set on this shipment");
-                }
-                if (!checkWaybillUniqueForClinic(clinic)) {
-                    throw new BiobankCheckException("A shipment with waybill "
-                        + waybill + " already exist in clinic "
-                        + clinic.getNameShort());
-                }
-            } else {
-                if (waybill != null) {
-                    throw new BiobankCheckException(
-                        "This clinic doesn't send shipments: waybill should not be set");
-                }
-            }
-        }
-
     }
 
     public static List<OriginInfoWrapper> getTodayShipments(
@@ -238,34 +162,39 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details) {
-        ShipmentInfoWrapper shipInfo = getShipmentInfo();
-        if (shipInfo == null) {
-            // nothing to log since origin info does not yet point to any
-            // shipping information
-            return null;
+    public OriginInfoLogProvider getLogProvider() {
+        return LOG_PROVIDER;
+    }
+
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(check().notNull(OriginInfoPeer.CENTER));
+
+        super.addPersistTasks(tasks);
+
+        tasks.add(new OriginInfoFromClinicCheck(this));
+    }
+
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        // TODO: this SHOULD NOT be done in the wrappers. It should be done in
+        // some other method because this is a highly customized action and is
+        // not always correct. For example, if a shipment is deleted after a
+        // dispatch, then it will appear that the specimen came from the place
+        // it was dispatched to.
+
+        // all specimen should be linked to another origin info. This origin
+        // info center will be the specimen current center.
+        for (SpecimenWrapper spc : getSpecimenCollection()) {
+            OriginInfoWrapper oi = new OriginInfoWrapper(appService);
+            oi.setCenter(spc.getCurrentCenter());
+            spc.setOriginInfo(oi);
+
+            oi.addPersistAndLogTasks(tasks);
+            spc.addPersistAndLogTasks(tasks);
         }
 
-        Log log = new Log();
-        log.setAction(action);
-        if (site == null) {
-            log.setCenter(getCenter().getNameShort());
-        } else {
-            log.setCenter(site);
-        }
-
-        List<String> detailsList = new ArrayList<String>();
-        if (details.length() > 0) {
-            detailsList.add(details);
-        }
-
-        detailsList.add(new StringBuilder("waybill:").append(
-            shipInfo.getWaybill()).toString());
-        detailsList.add(new StringBuilder("specimens:").append(
-            getSpecimenCollection(false).size()).toString());
-        log.setDetails(StringUtils.join(detailsList, ", "));
-        log.setType("Shipment");
-        return log;
+        super.addDeleteTasks(tasks);
     }
 
     /**

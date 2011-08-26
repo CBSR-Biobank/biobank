@@ -34,7 +34,6 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -478,9 +477,8 @@ public class ContainerViewForm extends BiobankViewForm {
                         .setSite((SiteWrapper) containerAdapter
                             .getParentFromClass(SiteAdapter.class)
                             .getModelObject());
-                    containerToOpen.setParent(container);
-                    containerToOpen.setPositionAsRowCol(new RowColPos(cell
-                        .getRow(), cell.getCol()));
+                    RowColPos pos = new RowColPos(cell.getRow(), cell.getCol());
+                    containerToOpen.setParent(container, pos);
                     newAdapter = new ContainerAdapter(containerAdapter,
                         containerToOpen);
                     newAdapter.openEntryForm(true);
@@ -491,8 +489,6 @@ public class ContainerViewForm extends BiobankViewForm {
                 SessionManager.openViewForm(child);
             }
             containerAdapter.performExpand();
-        } catch (BiobankFailedQueryException e) {
-            BgcPlugin.openAsyncError(Messages.ContainerViewForm_error_title, e);
         } catch (BiobankCheckException e) {
             BgcPlugin.openAsyncError(Messages.ContainerViewForm_error_title, e);
         }
@@ -509,11 +505,11 @@ public class ContainerViewForm extends BiobankViewForm {
             .getTemperature());
         if (container.hasParentContainer()) {
             if (rowLabel != null) {
-                setTextValue(rowLabel, container.getPositionAsRowCol().row);
+                setTextValue(rowLabel, container.getPositionAsRowCol().getRow());
             }
 
             if (colLabel != null) {
-                setTextValue(colLabel, container.getPositionAsRowCol().col);
+                setTextValue(colLabel, container.getPositionAsRowCol().getCol());
             }
         }
     }

@@ -52,7 +52,7 @@ public abstract class PlateForm extends BiobankViewForm {
     protected void processScanResult() {
         Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
         for (RowColPos rcp : cells.keySet()) {
-            Integer typesRowsCount = typesRows.get(rcp.row);
+            Integer typesRowsCount = typesRows.get(rcp.getRow());
             if (typesRowsCount == null) {
                 typesRowsCount = 0;
             }
@@ -61,7 +61,7 @@ public abstract class PlateForm extends BiobankViewForm {
             processCellStatus(cell);
             if (PalletCell.hasValue(cell)) {
                 typesRowsCount++;
-                typesRows.put(rcp.row, typesRowsCount);
+                typesRows.put(rcp.getRow(), typesRowsCount);
             }
         }
     }

@@ -50,7 +50,7 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
             int cols = container.getColCapacity();
             try {
                 Map<RowColPos, SpecimenWrapper> aliquots = container
-                    .getSpecimens(true);
+                    .getSpecimens();
 
                 for (int i = 0; i < rows; i++) {
                     for (int j = 0; j < cols; j++) {

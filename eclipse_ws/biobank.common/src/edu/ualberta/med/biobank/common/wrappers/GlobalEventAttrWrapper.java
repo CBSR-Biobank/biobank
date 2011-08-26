@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.GlobalEventAttrBaseWrapper;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -22,12 +22,6 @@ public class GlobalEventAttrWrapper extends GlobalEventAttrBaseWrapper {
         super(appService);
     }
 
-    @Override
-    protected void deleteChecks() throws BiobankDeleteException,
-        ApplicationException {
-        // FIXME if used by any study then it cannot be deleted
-    }
-
     public String getTypeName() {
         return getEventAttrType().getName();
     }
@@ -41,11 +35,6 @@ public class GlobalEventAttrWrapper extends GlobalEventAttrBaseWrapper {
     public String toString() {
         return "" + getId() + ":" + getLabel() + ":"
             + getEventAttrType().getName();
-    }
-
-    @Override
-    public void reload() throws Exception {
-        super.reload();
     }
 
     public static final String ALL_GLOBAL_EVENT_ATTRS_QRY = "from "
@@ -66,4 +55,9 @@ public class GlobalEventAttrWrapper extends GlobalEventAttrBaseWrapper {
         return EventAttrs;
     }
 
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        // FIXME if used by any study then it cannot be deleted
+        super.addDeleteTasks(tasks);
+    }
 }

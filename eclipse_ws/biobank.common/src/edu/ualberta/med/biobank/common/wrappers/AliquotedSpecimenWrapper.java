@@ -33,5 +33,4 @@ public class AliquotedSpecimenWrapper extends AliquotedSpecimenBaseWrapper {
             .append(getQuantity()).append("/").append(getActivityStatus())
             .toString();
     }
-
 }

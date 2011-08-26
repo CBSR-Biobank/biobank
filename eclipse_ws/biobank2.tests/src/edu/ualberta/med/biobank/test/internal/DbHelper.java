@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.Collection;
@@ -68,6 +69,7 @@ public class DbHelper {
         for (DispatchWrapper dispatch : dispaches) {
             dispatch.reload();
             deleteFromList(dispatch.getDispatchSpecimenCollection(false));
+            dispatch.reload();
             dispatch.delete();
         }
     }
@@ -127,6 +129,23 @@ public class DbHelper {
         for (ClinicWrapper clinic : clinics) {
             clinic.reload();
             deleteFromList(clinic.getOriginInfoCollection(false));
+
+            List<StudyWrapper> studies = clinic.getStudyCollection();
+            for (StudyWrapper study : studies) {
+                List<PatientWrapper> patients = study
+                    .getPatientCollection(false);
+                for (PatientWrapper patient : patients) {
+                    List<CollectionEventWrapper> collectionEvents = patient
+                        .getCollectionEventCollection(false);
+                    for (CollectionEventWrapper collectionEvent : collectionEvents) {
+                        deleteFromList(collectionEvent
+                            .getAllSpecimenCollection(false));
+                    }
+                    deleteFromList(collectionEvents);
+                }
+                deleteFromList(patients);
+            }
+            deleteFromList(studies);
             clinic.delete();
         }
     }

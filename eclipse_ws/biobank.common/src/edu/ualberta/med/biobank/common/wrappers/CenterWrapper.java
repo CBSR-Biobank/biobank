@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.CenterBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Center;
@@ -207,19 +208,6 @@ public abstract class CenterWrapper<E extends Center> extends
      */
     public abstract long getPatientCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException;
-
-    @Override
-    protected void persistDependencies(Center origObject) throws Exception {
-        deleteCollectionEvents();
-    }
-
-    private void deleteCollectionEvents() throws Exception {
-        for (CollectionEventWrapper ce : deletedCollectionEvents) {
-            if (!ce.isNew()) {
-                ce.delete();
-            }
-        }
-    }
 
     public static List<CenterWrapper<?>> getCenters(
         WritableApplicationService appService) throws ApplicationException {
@@ -428,6 +416,53 @@ public abstract class CenterWrapper<E extends Center> extends
             return wrapModel(appService, centers.get(0), null);
 
     }
+
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(check().notNull(CenterPeer.NAME));
+        tasks.add(check().notNull(CenterPeer.NAME_SHORT));
+
+        tasks.add(check().unique(CenterPeer.NAME));
+        tasks.add(check().unique(CenterPeer.NAME_SHORT));
+
+        super.addPersistTasks(tasks);
+    }
+
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        super.addDeleteTasks(tasks);
+    }
+
+    // TODO: remove if allowing bi-direcitonal links.
+    // public List<DispatchWrapper> getSrcDispatchCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // DispatchPeer.SENDER_CENTER, Dispatch.class, DispatchWrapper.class,
+    // sort);
+    // }
+    //
+    // public List<DispatchWrapper> getDstDispatchCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // DispatchPeer.RECEIVER_CENTER, Dispatch.class,
+    // DispatchWrapper.class, sort);
+    // }
+    //
+    // public List<SpecimenWrapper> getSpecimenCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // SpecimenPeer.CURRENT_CENTER, Specimen.class, SpecimenWrapper.class,
+    // sort);
+    // }
+    //
+    // public List<OriginInfoWrapper> getOriginInfoCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this, OriginInfoPeer.CENTER,
+    // OriginInfo.class, OriginInfoWrapper.class, sort);
+    // }
+    //
+    // public List<ProcessingEventWrapper> getProcessingEventCollection(
+    // boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // ProcessingEventPeer.CENTER, ProcessingEvent.class,
+    // ProcessingEventWrapper.class, sort);
+    // }
 
     private static final String PENDING_REQUEST_STRING = "select distinct(ra."
         + RequestSpecimenPeer.REQUEST.getName()

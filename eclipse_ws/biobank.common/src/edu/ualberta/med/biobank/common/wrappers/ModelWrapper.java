@@ -1,33 +1,28 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
-import edu.ualberta.med.biobank.common.exception.BiobankRuntimeException;
-import edu.ualberta.med.biobank.common.exception.CheckFieldLimitsException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
-import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
+import edu.ualberta.med.biobank.common.wrappers.loggers.LogAction;
+import edu.ualberta.med.biobank.common.wrappers.loggers.LogGroup;
+import edu.ualberta.med.biobank.common.wrappers.loggers.WrapperLogProvider;
 import edu.ualberta.med.biobank.common.wrappers.util.ModelWrapperHelper;
+import edu.ualberta.med.biobank.common.wrappers.util.ProxyUtil;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.SDKQueryResult;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
-import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
@@ -44,28 +39,33 @@ import java.util.Set;
 
 import net.sf.cglib.proxy.Enhancer;
 
+import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
-
-    private final Map<Property<?, ?>, Object> propertyCache = new HashMap<Property<?, ?>, Object>();
+    final Map<Property<?, ?>, Object> propertyCache = new HashMap<Property<?, ?>, Object>();
 
     protected WritableApplicationService appService;
-
     protected E wrappedObject;
-
     protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
         this);
-
     protected HashMap<String, Object> cache = new HashMap<String, Object>();
 
-    private List<WrapperListener> listeners = new ArrayList<WrapperListener>();
+    private final List<WrapperListener> listeners = new ArrayList<WrapperListener>();
+    private final ElementTracker<E> elementTracker = new ElementTracker<E>(this);
+    private final ElementQueue<E> elementQueue = new ElementQueue<E>(this);
+    private final WrapperCascader<E> cascader = new WrapperCascader<E>(this);
+    private final WrapperChecker<E> preChecker = new WrapperChecker<E>(this);
+
+    private HashMap<Object, ModelWrapper<?>> modelWrapperMap = new HashMap<Object, ModelWrapper<?>>();
 
     public ModelWrapper(WritableApplicationService appService, E wrappedObject) {
         this.appService = appService;
         this.wrappedObject = wrappedObject;
+
+        addSelfToModelWrapperMap();
     }
 
     public ModelWrapper(WritableApplicationService appService) {
@@ -83,18 +83,32 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                     e);
             }
         }
+
+        addSelfToModelWrapperMap();
+    }
+
+    private void addSelfToModelWrapperMap() {
+        if (wrappedObject != null) {
+            // TODO: extract into method that unproxies for us so not repeated
+            // here and in wrap*Smarter()
+            E unproxiedModel = ProxyUtil.convertProxyToObject(wrappedObject);
+
+            modelWrapperMap.put(unproxiedModel, this);
+        }
     }
 
     public E getWrappedObject() {
         return wrappedObject;
     }
 
+    public abstract Property<Integer, ? super E> getIdProperty();
+
     public void setWrappedObject(E newWrappedObject) {
         E oldWrappedObject = wrappedObject;
         wrappedObject = newWrappedObject;
 
-        cache.clear();
-        propertyCache.clear();
+        clear();
+        addSelfToModelWrapperMap();
 
         firePropertyChanges(oldWrappedObject, newWrappedObject);
     }
@@ -107,7 +121,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         for (Property<?, ? super E> property : propertiesList) {
-            if (property.getName().equals(propertyName)) {
+            if (property.getPropertyChangeName().equals(propertyName)) {
                 propertyChangeSupport.addPropertyChangeListener(propertyName,
                     listener);
                 return;
@@ -126,30 +140,27 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public Integer getId() {
-        Class<?> wrappedClass = wrappedObject.getClass();
-        try {
-            Method methodGetId = wrappedClass.getMethod("getId");
-            return (Integer) methodGetId.invoke(wrappedObject);
-        } catch (Exception e) {
-
-        }
-        return null;
+        return getIdProperty().get(wrappedObject);
     }
 
-    private void setId(Integer id) throws Exception {
-        Class<?> wrappedClass = wrappedObject.getClass();
-        Method methodSetId = wrappedClass.getMethod("setId", Integer.class);
-        methodSetId.invoke(wrappedObject, id);
+    protected void setId(Integer id) {
+        getIdProperty().set(wrappedObject, id);
     }
 
     public WritableApplicationService getAppService() {
         return appService;
     }
 
+    public void persist() throws Exception {
+        WrapperTransaction.persist(this, appService);
+    }
+
+    public void delete() throws Exception {
+        WrapperTransaction.delete(this, appService);
+    }
+
     public void reload() throws Exception {
-        cache.clear();
-        propertyCache.clear();
-        resetInternalFields();
+        clear();
 
         E oldWrappedObject = wrappedObject;
 
@@ -160,7 +171,76 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             }
         }
 
+        addSelfToModelWrapperMap();
+
         firePropertyChanges(oldWrappedObject, wrappedObject);
+    }
+
+    /**
+     * Add tasks to the given {@link TaskList} that will persist (i.e. insert or
+     * update) the wrapped model object. The {@link TaskList}-s might also check
+     * certain conditions on the client or server, as well as persist potential
+     * dependent objects.
+     * <p>
+     * This method should be overridden as necessary to add to the
+     * {@link TaskList} so the wrapped model object is properly persisted.
+     * <p>
+     * <strong>IMPORTANT.</strong> Checks can also be added to the
+     * {@link TaskList}. However, in general, checks should be performed using
+     * HQL <em>after</em> the object is persisted (and related objects are
+     * cascaded) so that the database's state can be verified. This is opposed
+     * to checking the in-memory model objects, since it cannot be easily
+     * determined which will or have actually been persisted. Checks can be done
+     * on the in-memory model objects (before persisting) before the database
+     * throws an error, but it is often difficult to know what values to check.
+     * 
+     * @param tasks where to add the tasks
+     */
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(new PersistModelWrapperQueryTask<E>(this));
+        tasks.add(check().stringLengths());
+    }
+
+    /**
+     * Add tasks to the given {@link TaskList} that will delete the wrapped
+     * model object. The {@link TaskList}-s might also check certain conditions
+     * on the client or server, as well as persist potential dependent objects.
+     * <p>
+     * This method should be overridden as necessary to add to the
+     * {@link TaskList} so the wrapped model object is properly deleted.
+     * 
+     * @param tasks where to add the tasks
+     */
+    protected void addDeleteTasks(TaskList tasks) {
+        tasks.add(new DeleteModelWrapperQueryTask<E>(this));
+    }
+
+    /**
+     * Same as addPersistTasks() excepts includes logging.
+     * 
+     * @param tasks
+     */
+    protected final void addPersistAndLogTasks(TaskList tasks) {
+        addPersistTasks(tasks);
+        log(LogAction.Type.PERSIST, tasks);
+    }
+
+    /**
+     * Same as addDeleteTasks() excepts includes logging.
+     * 
+     * @param tasks
+     */
+    protected final void addDeleteAndLogTasks(TaskList tasks) {
+        log(LogAction.Type.DELETE, tasks);
+        addDeleteTasks(tasks);
+    }
+
+    private void log(LogAction.Type type, TaskList tasks) {
+        WrapperLogProvider<E> logProvider = getLogProvider();
+        if (logProvider != null) {
+            LogGroup logGroup = tasks.getLogGroup();
+            tasks.add(new LogAction<E>(type, this, logProvider, logGroup));
+        }
     }
 
     /**
@@ -176,17 +256,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private void firePropertyChanges(E oldWrappedObject, E newWrappedObject) {
         List<Property<?, ? super E>> properties = getProperties();
 
-        if (properties == null) {
-            // TODO: is this necessary? Just early-out if null?
-            throw new RuntimeException("getProperties() cannot return null");
-        }
-
         if (oldWrappedObject == newWrappedObject) {
             return;
         }
 
         for (Property<?, ? super E> property : properties) {
-            String propertyName = property.getName();
+            String propertyName = property.getPropertyChangeName();
             PropertyChangeListener[] listeners = propertyChangeSupport
                 .getPropertyChangeListeners(propertyName);
 
@@ -198,8 +273,22 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 continue;
             }
 
+            // don't fire a property change if the old model's property has not
+            // even been initialized or loaded, as the old value is not
+            // necessarily correct (if we lazily load it now, then it will
+            if (!isInitialized(oldWrappedObject, property)) {
+                continue;
+            }
+
             Object oldValue = property.get(oldWrappedObject);
             Object newValue = property.get(newWrappedObject);
+
+            // if the old and new property value are the same, do not send a
+            // property change event
+            if (oldValue == newValue
+                || (oldValue != null && oldValue.equals(newValue))) {
+                continue;
+            }
 
             propertyChangeSupport.firePropertyChange(propertyName, oldValue,
                 newValue);
@@ -236,147 +325,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     public abstract Class<E> getWrappedClass();
 
-    /**
-     * insert or update the object into the database
-     */
-    @SuppressWarnings("unchecked")
-    public void persist() throws Exception {
-        checkFieldLimits();
-        persistChecks();
-        SDKQuery query;
-        E origObject = null;
-        WrapperEventType eventType;
-        if (isNew()) {
-            query = new InsertExampleQuery(wrappedObject);
-            eventType = WrapperEventType.INSERT;
-        } else {
-            query = new UpdateExampleQuery(wrappedObject);
-            origObject = getObjectFromDatabase();
-            eventType = WrapperEventType.UPDATE;
-        }
-        persistDependencies(origObject);
-        SDKQueryResult result = ((BiobankApplicationService) appService)
-            .executeQuery(query);
-        wrappedObject = ((E) result.getObjectResult());
-        Log logMessage = null;
-        try {
-            logMessage = getLogMessage(eventType.name().toLowerCase(), null, "");
-        } catch (Exception ex) {
-            // Don't want the logs to affect persist
-            // FIXME save somewhere this information
-            ex.printStackTrace();
-        }
-        if (logMessage != null) {
-            ((BiobankApplicationService) appService).logActivity(logMessage);
-        }
-        cache.clear();
-        propertyCache.clear();
-        resetInternalFields();
-        notifyListeners(new WrapperEvent(eventType, this));
-    }
-
-    /**
-     * should redefine this method if others updates (or deletes) need to be
-     * done when this object is update origObject can be null in the case of an
-     * insert
-     */
-    @SuppressWarnings("unused")
-    protected void persistDependencies(E origObject) throws Exception {
-    }
-
-    @SuppressWarnings("unused")
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-
-    }
-
-    protected void checkFieldLimits() throws BiobankCheckException,
-        CheckFieldLimitsException {
-        String fieldValue = "";
-        for (Property<?, ? super E> property : getProperties()) {
-            // TODO: use accessor instead!
-            String field = property.getName();
-
-            Integer maxLen = VarCharLengths
-                .getMaxSize(getWrappedClass(), field);
-            if (maxLen == null)
-                continue;
-
-            Method method;
-            try {
-                method = this.getClass().getMethod(
-                    "get" + Character.toUpperCase(field.charAt(0))
-                        + field.substring(1));
-                if (method.getReturnType().equals(String.class)) {
-                    fieldValue = (String) method.invoke(this);
-                    if ((fieldValue != null) && (fieldValue.length() > maxLen)) {
-                        throw new CheckFieldLimitsException(field, maxLen,
-                            fieldValue);
-                    }
-                }
-            } catch (BiobankRuntimeException e) {
-            } catch (SecurityException e) {
-                throwBiobankException(field, e);
-            } catch (NoSuchMethodException e) {
-                throwBiobankException(field, e);
-            } catch (IllegalArgumentException e) {
-                throwBiobankException(field, e);
-            } catch (IllegalAccessException e) {
-                throwBiobankException(field, e);
-            } catch (InvocationTargetException e) {
-                // do nothing this - this method is meant to not be used by the
-                // user
-            }
-        }
-    }
-
-    private void throwBiobankException(String field, Exception e)
-        throws BiobankCheckException {
-        throw new BiobankCheckException("Cannot get max length for field "
-            + field, e);
-    }
-
-    /**
-     * delete the object into the database
-     * 
-     * @throws ApplicationException
-     */
-    public void delete() throws Exception {
-        if (isNew()) {
-            throw new Exception("Can't delete an object not yet persisted");
-        }
-        reload();
-        deleteChecks();
-        deleteDependencies();
-        Log logMessage = null;
-        try {
-            logMessage = getLogMessage("delete", null, "");
-        } catch (Exception ex) {
-            // Don't want the logs to affect delete
-            // FIXME save somewhere this information
-            ex.printStackTrace();
-        }
-        appService.executeQuery(new DeleteExampleQuery(wrappedObject));
-        if (logMessage != null) {
-            ((BiobankApplicationService) appService).logActivity(logMessage);
-        }
-        notifyListeners(new WrapperEvent(WrapperEventType.DELETE, this));
-    }
-
-    @SuppressWarnings("unused")
-    protected void deleteDependencies() throws Exception {
-
-    }
-
-    @SuppressWarnings("unused")
-    protected void deleteChecks() throws BiobankException, ApplicationException {
-
-    }
-
     public void reset() throws Exception {
-        cache.clear();
-        propertyCache.clear();
-        resetInternalFields();
+        clear();
         if (isNew()) {
             resetToNewObject();
         } else {
@@ -393,27 +343,23 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private void resetToNewObject() throws Exception {
         E oldWrappedObject = wrappedObject;
         wrappedObject = getNewObject();
+
+        addSelfToModelWrapperMap();
+
         firePropertyChanges(oldWrappedObject, wrappedObject);
     }
 
+    /**
+     * Override this method to supply default values.
+     * 
+     * @return
+     * @throws Exception
+     */
     protected E getNewObject() throws Exception {
+        // TODO: could override in base classes with "new WrappedClass();" then
+        // no exception would be thrown.
         Constructor<E> constructor = getWrappedClass().getConstructor();
         return constructor.newInstance();
-    }
-
-    public void loadAttributes() throws Exception {
-        Class<E> classType = getWrappedClass();
-        if (classType == null) {
-            throw new Exception("wrapped class is null");
-        }
-        Method[] methods = classType.getMethods();
-        for (Method method : methods) {
-            if (method.getName().startsWith("get")
-                && !method.getName().equals("getClass")
-                && !Collection.class.isAssignableFrom(method.getReturnType())) {
-                method.invoke(wrappedObject, (Object[]) null);
-            }
-        }
     }
 
     private static final String CHECK_NO_DUPLICATES = "select count(o) from {0} "
@@ -423,15 +369,19 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         String value, String errorName) throws ApplicationException,
         BiobankException {
         HQLCriteria c;
-        List<Object> params = new ArrayList<Object>();
+        final List<Object> params = new ArrayList<Object>();
         params.add(value);
         String equalsTest = "";
         if (!isNew()) {
             equalsTest = " and id <> ?";
             params.add(getId());
         }
-        c = new HQLCriteria(MessageFormat.format(CHECK_NO_DUPLICATES,
-            objectClass.getName(), propertyName, equalsTest), params);
+
+        final String hqlString = MessageFormat.format(CHECK_NO_DUPLICATES,
+            objectClass.getName(), propertyName, equalsTest);
+
+        c = new HQLCriteria(hqlString, params);
+
         if (getCountResult(appService, c) > 0) {
             throw new DuplicateEntryException(errorName + " \"" + value
                 + "\" already exists.");
@@ -498,7 +448,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         Integer id = getId();
         Integer id2 = ((ModelWrapper<?>) object).getId();
         if (id == null && id2 == null) {
-            return toString().equals(object.toString());
+            return wrappedObject == ((ModelWrapper<?>) object).wrappedObject;
         }
         return id != null && id2 != null && id.equals(id2);
     }
@@ -588,7 +538,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         listeners.add(listener);
     }
 
-    private void notifyListeners(WrapperEvent event) {
+    void notifyListeners(WrapperEvent event) {
         // create a new list to avoid concurrent modification
         for (WrapperListener listener : new ArrayList<WrapperListener>(
             listeners)) {
@@ -628,14 +578,72 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     @SuppressWarnings("unused")
-    protected Log getLogMessage(String action, String site, String details)
+    protected final Log getLogMessage(String action, String site, String details)
         throws Exception {
+        Log log = null;
+        WrapperLogProvider<E> logProvider = getLogProvider();
+
+        if (logProvider != null) {
+            log = logProvider.getLog(getWrappedObject());
+
+            log.setAction(action);
+            log.setCenter(site);
+            log.setType(getWrappedClass().getSimpleName());
+
+            if (details != null) {
+                if (log.getDetails() != null) {
+                    details += log.getDetails();
+                }
+                log.setDetails(details);
+            }
+        }
+
+        return log;
+    }
+
+    protected WrapperLogProvider<E> getLogProvider() {
         return null;
     }
 
     @Override
     public int compareTo(ModelWrapper<E> arg0) {
         return this.getId().compareTo(arg0.getId());
+    }
+
+    // TODO: rename this
+    private <W extends ModelWrapper<? extends M>, M> W wrapModelSmarter(
+        M model, Class<W> wrapperKlazz) throws Exception {
+
+        M unproxiedModel = ProxyUtil.convertProxyToObject(model);
+
+        // several proxies exist for the exact same model object? okay...
+        @SuppressWarnings("unchecked")
+        W wrapper = (W) modelWrapperMap.get(unproxiedModel);
+
+        if (wrapper == null) {
+            wrapper = wrapModel(appService, model, wrapperKlazz);
+            wrapper.modelWrapperMap = modelWrapperMap;
+            modelWrapperMap.put(unproxiedModel, wrapper);
+        }
+
+        return wrapper;
+    }
+
+    private <W extends ModelWrapper<? extends R>, R, M> List<W> wrapModelCollectionSmarter(
+        List<? extends R> modelCollection, Class<W> wrapperKlazz) {
+        List<W> wrappers = new ArrayList<W>();
+
+        if (modelCollection != null) {
+            for (R element : modelCollection) {
+                try {
+                    W wrapper = wrapModelSmarter(element, wrapperKlazz);
+                    wrappers.add(wrapper);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return wrappers;
     }
 
     @SuppressWarnings("unchecked")
@@ -731,12 +739,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public static <W extends ModelWrapper<? extends R>, R, M> List<W> wrapModelCollection(
-        WritableApplicationService appService, List<R> modelCollection,
-        Class<W> wrapperKlazz) {
+        WritableApplicationService appService,
+        List<? extends R> modelCollection, Class<W> wrapperKlazz) {
         List<W> wrappers = new ArrayList<W>();
 
         if (modelCollection != null) {
-
             for (R element : modelCollection) {
                 try {
                     W wrapper = ModelWrapper.wrapModel(appService, element,
@@ -748,6 +755,17 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             }
         }
         return wrappers;
+    }
+
+    public static <M> Collection<M> unwrapModelCollection(
+        Collection<ModelWrapper<M>> wrappers) {
+        Collection<M> unwrapped = new ArrayList<M>();
+
+        for (ModelWrapper<M> wrapper : wrappers) {
+            unwrapped.add(wrapper.getWrappedObject());
+        }
+
+        return unwrapped;
     }
 
     protected <W extends ModelWrapper<? extends R>, R> W getWrappedProperty(
@@ -770,8 +788,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
             if (raw != null) {
                 try {
-                    W tmp = ModelWrapper.wrapModel(appService, raw,
-                        wrapperKlazz);
+                    W tmp = wrapModelSmarter(raw, wrapperKlazz);
                     wrapper = tmp;
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -792,37 +809,38 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private <W extends ModelWrapper<? extends R>, R, M> void setWrappedProperty(
         ModelWrapper<M> modelWrapper, Property<R, ? super M> property, W wrapper) {
         R newValue = (wrapper == null ? null : wrapper.getWrappedObject());
+
+        modelWrapper.elementTracker.trackProperty(property);
         setProperty(modelWrapper, property, newValue, wrapper);
-        modelWrapper.cacheProperty(property, wrapper);
     }
 
-    protected <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
-        Property<? extends Collection<R>, ? super E> property,
-        Collection<W> wrappers) {
+    public <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
+        Property<Collection<R>, ? super E> property, Collection<W> wrappers) {
         setWrapperCollection(this, property, wrappers);
     }
 
+    // TODO: make methods static that take a ModelWrapper instance
     private <W extends ModelWrapper<? extends R>, R, M> void setWrapperCollection(
         ModelWrapper<M> modelWrapper,
-        Property<? extends Collection<R>, ? super M> property,
-        Collection<W> wrappers) {
+        Property<Collection<R>, ? super M> property, Collection<W> wrappers) {
         Collection<R> newValues = new HashSet<R>();
         for (W element : wrappers) {
             newValues.add(element.getWrappedObject());
         }
 
+        modelWrapper.elementTracker.trackCollection(property);
         setModelProperty(modelWrapper, property, newValues, wrappers);
     }
 
     protected <W extends ModelWrapper<? extends R>, R> List<W> getWrapperCollection(
-        Property<? extends Collection<R>, ? super E> property,
+        Property<? extends Collection<? extends R>, ? super E> property,
         Class<W> wrapperKlazz, boolean sort) {
         return getWrapperCollection(this, property, wrapperKlazz, sort);
     }
 
     private <W extends ModelWrapper<? extends R>, R, M> List<W> getWrapperCollection(
         ModelWrapper<M> modelWrapper,
-        Property<? extends Collection<R>, ? super M> property,
+        Property<? extends Collection<? extends R>, ? super M> property,
         Class<W> wrapperKlazz, boolean sort) {
         if (modelWrapper == null) {
             return null;
@@ -832,19 +850,21 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         List<W> wrappers = (List<W>) modelWrapper.recallProperty(property);
 
         if (wrappers == null && !modelWrapper.isPropertyCached(property)) {
-            Collection<R> raw = getModelProperty(modelWrapper, property);
+            Collection<? extends R> raw = getModelProperty(modelWrapper,
+                property);
 
-            List<R> list = new ArrayList<R>();
+            List<? extends R> list = new ArrayList<R>();
             if (raw != null) {
                 if (raw instanceof List) {
-                    list = (List<R>) raw;
+                    list = (List<? extends R>) raw;
                 } else {
                     list = new ArrayList<R>(raw);
                 }
             }
 
-            wrappers = wrapModelCollection(appService, list, wrapperKlazz);
+            wrappers = wrapModelCollectionSmarter(list, wrapperKlazz);
             modelWrapper.cacheProperty(property, wrappers);
+            modelWrapper.elementQueue.flush(property);
         }
 
         if (wrappers != null && sort) {
@@ -856,13 +876,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     protected <W extends ModelWrapper<? extends R>, R> void addToWrapperCollection(
-        Property<? extends Collection<R>, ? super E> property,
-        List<W> newWrappers) {
+        Property<Collection<R>, ? super E> property, List<W> newWrappers) {
         if (newWrappers == null || newWrappers.isEmpty()) {
             return;
         }
 
-        Collection<W> allWrappers = new ArrayList<W>();
+        // Use a set so that wrappers of the same object are not double-added.
+        Set<W> allWrappers = new HashSet<W>();
 
         @SuppressWarnings("unchecked")
         Class<W> wrapperKlazz = (Class<W>) newWrappers.get(0).getClass();
@@ -870,18 +890,19 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         List<W> currentWrappers = getWrapperCollection(property, wrapperKlazz,
             false);
 
+        // if the new wrapper is already in the collection, use the new one
+        allWrappers.addAll(newWrappers);
+
         if (currentWrappers != null) {
+            currentWrappers.removeAll(newWrappers);
             allWrappers.addAll(currentWrappers);
         }
 
-        allWrappers.addAll(newWrappers);
-
-        setWrapperCollection(property, allWrappers);
+        setWrapperCollection(property, new ArrayList<W>(allWrappers));
     }
 
     protected <W extends ModelWrapper<? extends R>, R> void removeFromWrapperCollection(
-        Property<? extends Collection<R>, ? super E> property,
-        List<W> wrappersToRemove) {
+        Property<Collection<R>, ? super E> property, List<W> wrappersToRemove) {
         if (wrappersToRemove == null || wrappersToRemove.isEmpty()) {
             return;
         }
@@ -901,8 +922,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public <W extends ModelWrapper<? extends R>, R> void removeFromWrapperCollectionWithCheck(
-        Property<? extends Collection<R>, ? super E> property,
-        List<W> wrappersToRemove) throws BiobankCheckException {
+        Property<Collection<R>, ? super E> property, List<W> wrappersToRemove)
+        throws BiobankCheckException {
         if (wrappersToRemove == null || wrappersToRemove.isEmpty()) {
             return;
         }
@@ -951,76 +972,82 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     private static <T, M> T getModelProperty(ModelWrapper<M> modelWrapper,
         Property<T, ? super M> property) {
-        T value = null;
-
-        try {
-            M model = modelWrapper.getWrappedObject();
-
-            Class<?> modelKlazz = model.getClass();
-            Method getter = modelKlazz.getMethod("get"
-                + capitalizeFirstLetter(property.getName()));
-
-            @SuppressWarnings("unchecked")
-            T tmp = (T) getter.invoke(model);
-            value = tmp;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        M model = modelWrapper.getWrappedObject();
+        T value = property.get(model);
 
         return value;
     }
 
-    private <T, M, R> void setModelProperty(ModelWrapper<M> modelWrapper,
-        Property<? extends T, ? super M> property, T newValue, R valueForCache) {
-        try {
-            M model = modelWrapper.getWrappedObject();
-            Class<?> modelKlazz = model.getClass();
+    /**
+     * Determines whether the given property of the wrapped object has been
+     * initialized.
+     * 
+     * @param property of the wrapped object
+     * @return true if the given {@code Property} has been initialized or if the
+     *         wrapped object is not a proxy (and therefore new), otherwise
+     *         false.
+     */
+    protected boolean isInitialized(Property<?, ? super E> property) {
+        return isNew() || isInitialized(wrappedObject, property);
+    }
 
-            Method getter = modelKlazz.getMethod("get"
-                + capitalizeFirstLetter(property.getName()));
-
-            @SuppressWarnings("unchecked")
-            T oldValue = (T) getter.invoke(model);
-
-            Method setter = modelKlazz.getMethod("set"
-                + capitalizeFirstLetter(property.getName()),
-                getter.getReturnType());
-
-            setter.invoke(model, newValue);
-
-            // need to add into cache before the firePropertyChange is called
-            // because its will call the getters that refers to the cache
-            modelWrapper.cacheProperty(property, valueForCache);
-            propertyChangeSupport.firePropertyChange(property.getName(),
-                oldValue, newValue);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    /**
+     * Determines whether the given property of the given model object has been
+     * initialized (loaded).
+     * 
+     * @param model object with the {@code property}
+     * @param property of the wrapped object
+     * @return true if the given {@code Property} has been initialized or if the
+     *         wrapped object is not a proxy (and therefore new), otherwise
+     *         false.
+     */
+    private static <E> boolean isInitialized(E model,
+        Property<?, ? super E> property) {
+        if (model instanceof Advised) {
+            Advised proxy = (Advised) model;
+            try {
+                @SuppressWarnings("unchecked")
+                E tmp = (E) proxy.getTargetSource().getTarget();
+                model = tmp;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
         }
+
+        return Hibernate.isPropertyInitialized(model, property.getName());
+    }
+
+    private <T, M, R> void setModelProperty(ModelWrapper<M> modelWrapper,
+        Property<T, ? super M> property, T newValue, R valueForCache) {
+        M model = modelWrapper.getWrappedObject();
+
+        // TODO: whenever a property is set, the old value is retrieved from
+        // the database (or memory if already loaded) to send the
+        // information for the change to listeners. This should be changed
+        // to either (1) only get if there are listeners or (2) remember all
+        // old values so they can be removed (see cascade().persistAdded()).
+        T oldValue = property.get(model);
+
+        property.set(model, newValue);
+
+        // need to add into cache before the firePropertyChange is called
+        // because its will call the getters that refers to the cache
+        modelWrapper.cacheProperty(property, valueForCache);
+        propertyChangeSupport.firePropertyChange(property.getName(), oldValue,
+            newValue);
     }
 
     private void cacheProperty(Property<?, ?> property, Object value) {
         propertyCache.put(property, value);
     }
 
-    protected boolean isPropertyCached(Property<?, ?> property) {
+    protected boolean isPropertyCached(Property<?, ? super E> property) {
         return propertyCache.containsKey(property);
     }
 
-    private Object recallProperty(Property<?, ?> property) {
+    protected Object recallProperty(Property<?, ?> property) {
         return propertyCache.get(property);
-    }
-
-    private static String capitalizeFirstLetter(String name) {
-        StringBuilder sb = new StringBuilder();
-
-        if (name.length() > 0) {
-            sb.append(Character.toUpperCase(name.charAt(0)));
-            if (name.length() > 1) {
-                sb.append(name.substring(1));
-            }
-        }
-
-        return sb.toString();
     }
 
     @SuppressWarnings("unchecked")
@@ -1043,13 +1070,39 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return Collections.emptyList();
     }
 
-    public static <T> void persistBatch(Set<? extends ModelWrapper<T>> wrappers)
-        throws Exception {
-        // FIXME once the persist method is using batch queries, we should use
-        // batch queries here
-        for (ModelWrapper<T> wrapper : wrappers) {
-            wrapper.persist();
-        }
+    /**
+     * Clear internal state, cached, and state-tracking objects.
+     */
+    private void clear() {
+        elementQueue.clear();
+        elementTracker.clear();
+        propertyCache.clear();
+        cache.clear();
+
+        // Don't clear the map because it might be shared with other
+        // ModelWrapper-s. Instead, start a new map.
+        // TODO: remove ModelWrapper.this from the propertyCache of all
+        // ModelWrapper-s in the modelWrapperMap? reload() really messes things
+        // up.
+        modelWrapperMap = new HashMap<Object, ModelWrapper<?>>();
+
+        resetInternalFields();
+    }
+
+    public ElementTracker<E> getElementTracker() {
+        return elementTracker;
+    }
+
+    protected ElementQueue<E> getElementQueue() {
+        return elementQueue;
+    }
+
+    protected WrapperCascader<E> cascade() {
+        return cascader;
+    }
+
+    protected WrapperChecker<E> check() {
+        return preChecker;
     }
 
     /**

@@ -131,6 +131,7 @@ public class DebugUtil {
         if (maxSize == null)
             specimens = res;
         else {
+            maxSize = Math.min(maxSize, res.size());
             specimens = new ArrayList<Specimen>();
             int i = 0;
             if (res.size() > 0)
