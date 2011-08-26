@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,17 +50,6 @@ public class ContainerLabelingSchemeWrapper extends
 
     public ContainerLabelingSchemeWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    private static final String HAS_CONTAINER_TYPES_QRY = "from "
-        + ContainerType.class.getName() + " where "
-        + ContainerTypePeer.CHILD_LABELING_SCHEME.getName() + "=?";
-
-    private boolean hasContainerTypes() throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(HAS_CONTAINER_TYPES_QRY,
-            Arrays.asList(new Object[] { wrappedObject }));
-        List<ContainerType> types = appService.query(criteria);
-        return types.size() > 0;
     }
 
     public static synchronized Map<Integer, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(

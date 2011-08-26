@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
@@ -39,8 +37,6 @@ public abstract class CenterWrapper<E extends Center> extends
 
     private static final String ALL_CENTERS_HQL_STRING = "from "
         + Center.class.getName();
-
-    private Set<CollectionEventWrapper> deletedCollectionEvents = new HashSet<CollectionEventWrapper>();
 
     public CenterWrapper(WritableApplicationService appService) {
         super(appService);
