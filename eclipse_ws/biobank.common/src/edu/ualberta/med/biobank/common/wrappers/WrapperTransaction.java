@@ -272,7 +272,7 @@ public class WrapperTransaction {
                 || wrapper.isInitialized(property)) {
                 if (property.isCollection()) {
                     @SuppressWarnings("unchecked")
-                    Property<? extends Collection<P>, ? super M> tmp = (Property<? extends Collection<P>, ? super M>) property;
+                    Property<Collection<P>, ? super M> tmp = (Property<Collection<P>, ? super M>) property;
                     Collection<ModelWrapper<P>> list = wrapper
                         .getWrapperCollection(tmp, null, false);
                     for (ModelWrapper<?> wrappedProperty : list) {
@@ -305,7 +305,7 @@ public class WrapperTransaction {
             Property<P, M> property) {
             if (property.isCollection()) {
                 @SuppressWarnings("unchecked")
-                Property<? extends Collection<P>, ? super M> tmp = (Property<? extends Collection<P>, ? super M>) property;
+                Property<Collection<P>, ? super M> tmp = (Property<Collection<P>, ? super M>) property;
                 Collection<ModelWrapper<P>> list = wrapper
                     .getWrapperCollection(tmp, null, false);
                 for (ModelWrapper<?> wrappedProperty : list) {
@@ -333,7 +333,7 @@ public class WrapperTransaction {
          * @param property to persist the added elements of
          */
         public <M, P> void persistAdded(ModelWrapper<M> wrapper,
-            Property<? extends Collection<P>, M> property) {
+            Property<Collection<P>, M> property) {
             Collection<ModelWrapper<P>> elements = wrapper.getElementTracker()
                 .getAddedElements(property);
             for (ModelWrapper<P> element : elements) {
@@ -349,7 +349,7 @@ public class WrapperTransaction {
          * @param property to persist the removed elements of
          */
         public <M, P> void persistRemoved(ModelWrapper<M> wrapper,
-            Property<? extends Collection<P>, M> property) {
+            Property<Collection<P>, M> property) {
             Collection<ModelWrapper<P>> elements = wrapper.getElementTracker()
                 .getRemovedElements(property);
             for (ModelWrapper<P> element : elements) {
@@ -365,7 +365,7 @@ public class WrapperTransaction {
          * @param property to persist the removed elements of
          */
         public <M, P> void deleteRemoved(ModelWrapper<M> wrapper,
-            Property<? extends Collection<P>, M> property) {
+            Property<Collection<P>, M> property) {
             Collection<ModelWrapper<P>> elements = wrapper.getElementTracker()
                 .getRemovedElements(property);
             for (ModelWrapper<P> element : elements) {

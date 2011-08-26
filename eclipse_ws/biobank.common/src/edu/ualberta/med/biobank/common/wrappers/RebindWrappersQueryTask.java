@@ -83,8 +83,8 @@ public class RebindWrappersQueryTask implements QueryTask {
             // reference to the same AddressWrapper, which was rebound to a new
             // address model object.
 
-            wrapper.getSession().remove(oldModel);
-            wrapper.getSession().add(wrapper);
+            wrapper.session.remove(oldModel);
+            wrapper.session.add(wrapper);
         }
     }
 

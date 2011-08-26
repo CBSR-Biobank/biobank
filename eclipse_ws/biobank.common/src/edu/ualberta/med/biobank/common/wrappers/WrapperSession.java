@@ -21,7 +21,7 @@ public class WrapperSession {
     // database in an object graph made by get-method calls. However, if an
     // object is set from a completely separate graph, this guarantee is no
     // longer made.
-    private HashMap<Object, ModelWrapper<?>> modelToWrapper = new HashMap<Object, ModelWrapper<?>>();
+    private HashMap<Object, ModelWrapper<?>> map = new HashMap<Object, ModelWrapper<?>>();
 
     public WrapperSession(ModelWrapper<?> wrapper) {
         // TODO: if a wrapper already has a WrapperSession, then perhaps it
@@ -33,15 +33,18 @@ public class WrapperSession {
     }
 
     public void add(ModelWrapper<?> wrapper) {
-        modelToWrapper.put(new ModelKey(wrapper.wrappedObject), wrapper);
+        if (wrapper != null) {
+            wrapper.session = this;
+            map.put(new ModelKey(wrapper.wrappedObject), wrapper);
+        }
     }
 
-    public ModelWrapper<?> get(Object model) {
-        return modelToWrapper.get(new ModelKey(model));
+    public Object get(Object model) {
+        return map.get(new ModelKey(model));
     }
 
-    public ModelWrapper<?> remove(Object model) {
-        return modelToWrapper.remove(new ModelKey(model));
+    public Object remove(Object model) {
+        return map.remove(new ModelKey(model));
     }
 
     /**

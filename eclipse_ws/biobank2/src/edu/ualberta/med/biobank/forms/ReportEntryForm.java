@@ -45,6 +45,7 @@ import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.common.util.ReportListProxy;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
+import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.export.CsvDataExporter;
 import edu.ualberta.med.biobank.export.Data;
 import edu.ualberta.med.biobank.export.DataExporter;
@@ -414,8 +415,8 @@ public class ReportEntryForm extends BiobankEntryForm {
                             Integer.class);
                         setIdMethod.invoke(instance, id);
 
-                        ModelWrapper<?> wrapper = ModelWrapper.wrapObject(
-                            appService, instance);
+                        ModelWrapper<?> wrapper = WrapperUtil
+                            .wrapObject(appService, instance);
 
                         SessionManager.openViewForm(wrapper);
                     } catch (Exception e) {

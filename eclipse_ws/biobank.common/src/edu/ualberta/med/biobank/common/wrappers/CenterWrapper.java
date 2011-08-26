@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.CenterBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
+import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Request;
@@ -413,7 +414,7 @@ public abstract class CenterWrapper<E extends Center> extends
         if (centers.size() == 0)
             return null;
         else
-            return wrapModel(appService, centers.get(0), null);
+            return WrapperUtil.wrapModel(appService, centers.get(0), null);
 
     }
 
