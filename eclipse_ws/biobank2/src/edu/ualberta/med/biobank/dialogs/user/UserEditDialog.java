@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
@@ -119,14 +118,14 @@ public class UserEditDialog extends BgcBaseDialog {
         if (!originalUser.equals(SessionManager.getUser()))
             createPasswordWidgets(contents);
 
-        Section rpSection = createSection(contents, "Memberships",
-            "Add new membership", new SelectionAdapter() {
+        createSection(contents, Messages.UserEditDialog_memberships_label,
+            Messages.UserEditDialog_memberships_add_label,
+            new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     addMembership();
                 }
             });
-
         membershipInfoTable = new MembershipInfoTable(contents, originalUser);
         gd = (GridData) membershipInfoTable.getLayoutData();
         gd.horizontalSpan = 2;

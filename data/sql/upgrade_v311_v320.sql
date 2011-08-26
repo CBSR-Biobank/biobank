@@ -224,7 +224,9 @@ INSERT INTO `BB_RIGHT` (ID, VERSION, NAME, FOR_SITE, FOR_CLINIC, FOR_RESEARCH_GR
 ( 19, 0, 'Print labels', 1, 1, 0, 0, 'print-labels'),
 ( 20, 0, 'Specimen Types', 1, 1, 1, 1, 'SpecimenType'),
 ( 21, 0, 'Shipping Methods', 1, 1, 1, 1, 'ShippingMethod'),
-( 22, 0, 'Activity Status', 1, 1,1, 1, 'ActivityStatus');
+( 22, 0, 'Activity Status', 1, 1,1, 1, 'ActivityStatus'),
+( 23, 0, 'Specimen', 1, 1, 1, 1, 'Specimen'),
+( 24, 0, 'Contact', 1, 1, 1, 1, 'Contact');
 UNLOCK TABLES;
 
 

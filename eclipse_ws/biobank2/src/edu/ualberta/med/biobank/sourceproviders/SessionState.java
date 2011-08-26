@@ -6,7 +6,8 @@ import java.util.Map;
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
-import edu.ualberta.med.biobank.BbRightHelper;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.SessionSecurityHelper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -138,14 +139,17 @@ public class SessionState extends AbstractSourceProvider {
             setCurrentCenterType((user == null) ? null : user
                 .getCurrentWorkingCenter());
             setHasClinicShipmentRights(user != null
-                && user.hasRightsOn(BbRightHelper.CLINIC_SHIPMENT_KEY_DESC));
+                && SessionManager
+                    .canAccess(SessionSecurityHelper.CLINIC_SHIPMENT_KEY_DESC));
             setDispatchRights(user != null
-                && user.hasRightsOn(BbRightHelper.DISPATCH_RECEIVE_KEY_DESC,
-                    BbRightHelper.DISPATCH_SEND_KEY_DESC));
+                && SessionManager.canAccess(
+                    SessionSecurityHelper.DISPATCH_RECEIVE_KEY_DESC,
+                    SessionSecurityHelper.DISPATCH_SEND_KEY_DESC));
             setIsCurrentCenterAdmin(user != null
                 && user.isAdministratorForCurrentCenter());
             setHasPrinterLabelsRights(user != null
-                && user.hasRightsOn(BbRightHelper.PRINT_LABEL_KEY_DESC));
+                && SessionManager
+                    .canAccess(SessionSecurityHelper.PRINT_LABEL_KEY_DESC));
         } catch (Exception e) {
             logger.error("Error setting session state", e); //$NON-NLS-1$
         }

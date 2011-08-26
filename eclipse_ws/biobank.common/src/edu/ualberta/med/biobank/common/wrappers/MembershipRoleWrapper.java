@@ -44,13 +44,14 @@ public class MembershipRoleWrapper extends MembershipRoleBaseWrapper {
         + " as rps join rps."
         + RightPrivilegePeer.PRIVILEGE_COLLECTION.getName()
         + " as p where rps."
-        + Property.concatNames(RightPrivilegePeer.RIGHT, BbRightPeer.ID) + "=?";
+        + Property.concatNames(RightPrivilegePeer.RIGHT, BbRightPeer.ID)
+        + "=? and msrs." + MembershipRolePeer.ID.getName() + "=?";
 
     @Override
     public List<PrivilegeWrapper> getPrivilegesForRight(BbRightWrapper right)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(PRIVILEGES_FOR_RIGHT_QRY,
-            Arrays.asList(right.getId()));
+            Arrays.asList(right.getId(), getId()));
         List<Privilege> res = appService.query(criteria);
         return wrapModelCollection(appService, res, PrivilegeWrapper.class);
     }

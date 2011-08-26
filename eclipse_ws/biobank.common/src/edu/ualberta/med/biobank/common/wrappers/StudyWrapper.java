@@ -497,7 +497,7 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     @Override
     public boolean canUpdate(UserWrapper user) {
-        return user.isInSuperAdminMode() && super.canUpdate(user);
+        return user.isInSuperAdminMode();
     }
 
     private static final String ACTIVE_ALIQUOTED_SPECIMENS_TYPE_QRY = "select aspec."

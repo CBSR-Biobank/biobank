@@ -13,8 +13,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 @SuppressWarnings("rawtypes")
 public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper<?>> {
     public static final int ROWS_PER_PAGE = 8;
-    private static final String[] HEADINGS = new String[] { "Center", "Study",
-        "Role or right/privilege" };
+    private static final String[] HEADINGS = new String[] { Messages.MembershipInfoTable_center_label, Messages.MembershipInfoTable_study_label,
+        Messages.MembershipInfoTable_role_right_privilege_label };
 
     protected static class TableRowData {
         MembershipWrapper<?> ms;
@@ -69,7 +69,7 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper<?>> {
         throws Exception {
         TableRowData info = new TableRowData();
         info.center = ms.getCenter() == null ? "" : ms.getCenter().getNameShort(); //$NON-NLS-1$
-        info.study = ms.getStudy() == null ? "" : ms.getStudy().getNameShort();
+        info.study = ms.getStudy() == null ? "" : ms.getStudy().getNameShort(); //$NON-NLS-1$
         info.roleOrRP = ms.getMembershipObjectsListString();
         info.ms = ms;
         return info;
@@ -90,7 +90,7 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper<?>> {
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.MembershipInfoTable_loading;
                     }
                     return ""; //$NON-NLS-1$
                 }

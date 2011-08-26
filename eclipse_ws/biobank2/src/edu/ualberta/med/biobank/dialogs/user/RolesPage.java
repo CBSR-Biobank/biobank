@@ -85,8 +85,8 @@ public abstract class RolesPage extends BgcDialogPage {
         int res = dlg.open();
         if (res == Status.OK) {
             BgcPlugin.openAsyncInformation(
-                "Role added",
-                MessageFormat.format("Successfully added new role {0}",
+                Messages.RolesPage_role_added_title,
+                MessageFormat.format(Messages.RolesPage_role_added_msg,
                     newRole.getName()));
             getCurrentAllRolesList().add(newRole);
             roleInfoTable.reloadCollection(getCurrentAllRolesList(), newRole);

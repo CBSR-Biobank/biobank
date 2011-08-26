@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.text.MessageFormat;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -19,7 +18,6 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.dialogs.user.UserEditDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -160,13 +158,6 @@ public class UserInfoTable extends InfoTableWidget<UserWrapper> {
      * return an integer representing the type of result
      */
     protected int editUser(UserWrapper user) {
-        List<Group> groups = Collections.emptyList(); // getGroups();
-        if (groups == null) {
-            BgcPlugin.openAsyncError(Messages.UserInfoTable_error_title,
-                Messages.UserInfoTable_nogroups_msg);
-            return Dialog.CANCEL;
-        }
-
         UserEditDialog dlg = new UserEditDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), user);
         int res = dlg.open();

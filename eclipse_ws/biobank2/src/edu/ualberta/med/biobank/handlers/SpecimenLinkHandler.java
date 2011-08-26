@@ -4,7 +4,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.SecurityFeature;
+import edu.ualberta.med.biobank.SessionSecurityHelper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.forms.linkassign.SpecimenLinkEntryForm;
 import edu.ualberta.med.biobank.treeview.processing.SpecimenLinkAdapter;
@@ -22,6 +22,11 @@ public class SpecimenLinkHandler extends LinkAssignCommonHandler {
 
     @Override
     protected boolean canUserPerformAction(UserWrapper user) {
-        return user.canPerformActions(SecurityFeature.LINK);
+        try {
+            return SessionManager
+                .canAccess(SessionSecurityHelper.SPECIMEN_LINK_KEY_DESC);
+        } catch (Exception ae) {
+            throw new RuntimeException(ae);
+        }
     }
 }

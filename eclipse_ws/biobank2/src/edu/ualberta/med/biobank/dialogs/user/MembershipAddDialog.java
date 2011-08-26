@@ -50,8 +50,8 @@ public class MembershipAddDialog extends BgcBaseDialog {
         super(parent);
         Assert.isNotNull(principal);
         this.principal = principal;
-        currentTitle = "Add memberships";
-        titleAreaMessage = "Add new memberships";
+        currentTitle = Messages.MembershipAddDialog_title;
+        titleAreaMessage = Messages.MembershipAddDialog_description;
     }
 
     @Override
@@ -82,23 +82,23 @@ public class MembershipAddDialog extends BgcBaseDialog {
         compCenters.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         final Button allCentersRadio = new Button(compCenters, SWT.RADIO);
         allCentersRadio.setSelection(true);
-        allCentersRadio.setText("All centers");
+        allCentersRadio.setText(Messages.MembershipAddDialog_allCenters_label);
         final Button sitesRadio = new Button(compCenters, SWT.RADIO);
-        sitesRadio.setText("Sites only");
+        sitesRadio.setText(Messages.MembershipAddDialog_sitesOnly_label);
         final Button clinicsRadio = new Button(compCenters, SWT.RADIO);
-        clinicsRadio.setText("Clinics only");
+        clinicsRadio.setText(Messages.MembershipAddDialog_clinicsOnly_label);
         final Button rgRadio = new Button(compCenters, SWT.RADIO);
-        rgRadio.setText("Research Groups only");
+        rgRadio.setText(Messages.MembershipAddDialog_rgOnly_label);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         compCenters.setLayoutData(gd);
 
         List centers = new ArrayList();
-        final String noCenterSelection = new String("No specific to any center");
+        final String noCenterSelection = new String(Messages.MembershipAddDialog_nospecific_center_label);
         centers.add(noCenterSelection);
         centers
             .addAll(CenterWrapper.getCenters(SessionManager.getAppService()));
-        centersViewer = createComboViewer(contents, "Center", centers, null,
+        centersViewer = createComboViewer(contents, Messages.MembershipAddDialog_center_label, centers, null,
             null, null, new LabelProvider() {
                 @Override
                 public String getText(Object element) {
@@ -143,11 +143,11 @@ public class MembershipAddDialog extends BgcBaseDialog {
         rgRadio.addSelectionListener(selListener);
 
         List studies = new ArrayList();
-        String noStudySelection = new String("No specific to any study");
+        String noStudySelection = new String(Messages.MembershipAddDialog_nospecific_study_label);
         studies.add(noStudySelection);
         studies.addAll(StudyWrapper.getAllStudies(SessionManager
             .getAppService()));
-        studiesViewer = createComboViewer(contents, "Study", studies, null,
+        studiesViewer = createComboViewer(contents, Messages.MembershipAddDialog_study_label, studies, null,
             null, null, new LabelProvider() {
                 @Override
                 public String getText(Object element) {
@@ -159,7 +159,7 @@ public class MembershipAddDialog extends BgcBaseDialog {
         studiesViewer.setSelection(new StructuredSelection(noStudySelection));
 
         rolesWidget = new MultiSelectWidget<RoleWrapper>(contents, SWT.NONE,
-            "Available roles", "Selected roles", 110) {
+            Messages.MembershipAddDialog_roles_available_label, Messages.MembershipAddDialog_roles_selected_label, 110) {
             @Override
             protected String getTextForObject(RoleWrapper nodeObject) {
                 return nodeObject.getName();

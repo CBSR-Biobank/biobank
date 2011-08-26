@@ -83,7 +83,7 @@ public class DispatchAdapter extends AdapterBase {
             && SessionManager.getUser().getCurrentWorkingCenter() != null)
             return SessionManager.getUser().getCurrentWorkingCenter()
                 .equals(getWrapper().getSenderCenter())
-                && getWrapper().canDelete(SessionManager.getUser())
+                && SessionManager.canDelete(getWrapper())
                 && getWrapper().isInCreationState();
         else
             return false;
@@ -99,7 +99,7 @@ public class DispatchAdapter extends AdapterBase {
                 addDeleteMenu(menu, Messages.DispatchAdapter_dispatch_label);
             }
             if (siteParent.equals(getWrapper().getSenderCenter())
-                && getWrapper().canUpdate(SessionManager.getUser())
+                && SessionManager.canUpdate(getWrapper())
                 && getWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
                 mi.setText(Messages.DispatchAdapter_move_creation_label);
@@ -193,7 +193,8 @@ public class DispatchAdapter extends AdapterBase {
         } catch (final AccessDeniedException ade) {
             BgcPlugin.openAccessDeniedErrorMessage(ade);
         } catch (Exception ex) {
-            BgcPlugin.openAsyncError(Messages.DispatchAdapter_save_error_title, ex);
+            BgcPlugin.openAsyncError(Messages.DispatchAdapter_save_error_title,
+                ex);
         }
         SpecimenTransitView.getCurrent().reload();
     }

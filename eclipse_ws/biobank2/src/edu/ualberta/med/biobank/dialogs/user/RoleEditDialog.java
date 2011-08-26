@@ -67,11 +67,11 @@ public class RoleEditDialog extends BgcBaseDialog {
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             Messages.RoleEditDialog_property_title_name, null, role,
-            RolePeer.NAME.getName(), new NonEmptyStringValidator( //$NON-NLS-1$
+            RolePeer.NAME.getName(), new NonEmptyStringValidator(
                 Messages.RoleEditDialog_msg_name_required));
 
         Section rpSection = createSection(contents,
-            "Right/Privileges associations", "Add new association",
+            Messages.RoleEditDialog_right_privilege_label, Messages.RoleEditDialog_new_assoc_label,
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {

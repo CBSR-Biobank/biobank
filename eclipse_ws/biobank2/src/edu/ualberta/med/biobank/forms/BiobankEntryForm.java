@@ -254,7 +254,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
 
     protected void checkEditAccess() {
         if (adapter != null && adapter.getModelObject() != null
-            && !adapter.getModelObject().canUpdate(SessionManager.getUser())) {
+            && !SessionManager.canUpdate(adapter.getModelObject())) {
             BgcPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 Messages.BiobankEntryForm_access_denied_error_msg);

@@ -307,9 +307,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
      */
     @Override
     public boolean canDelete(UserWrapper user) {
-        return super.canDelete(user)
-            && (getCenter() == null || getCenter().equals(
-                user.getCurrentWorkingCenter()));
+        return getCenter() == null
+            || getCenter().equals(user.getCurrentWorkingCenter());
     }
 
     /**
@@ -317,9 +316,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
      */
     @Override
     public boolean canUpdate(UserWrapper user) {
-        return super.canUpdate(user)
-            && (getCenter() == null || getCenter().equals(
-                user.getCurrentWorkingCenter()));
+        return getCenter() == null
+            || getCenter().equals(user.getCurrentWorkingCenter());
     }
 
     public static String PE_BY_PATIENT_STRING = "select distinct s."

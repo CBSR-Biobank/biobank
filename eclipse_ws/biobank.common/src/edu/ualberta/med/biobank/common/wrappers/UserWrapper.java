@@ -1,8 +1,12 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
@@ -155,10 +159,12 @@ public class UserWrapper extends UserBaseWrapper {
             .get(WORKING_CENTERS_KEY);
         if (workingCenters == null) {
             workingCenters = new ArrayList<CenterWrapper<?>>();
+            Set<CenterWrapper<?>> setOfWorkingCenter = new HashSet<CenterWrapper<?>>();
             for (MembershipWrapper<?> ms : getMembershipCollection(false)) {
                 if (ms.getCenter() != null)
-                    workingCenters.add(ms.getCenter());
+                    setOfWorkingCenter.add(ms.getCenter());
             }
+            workingCenters.addAll(setOfWorkingCenter);
             cache.put(WORKING_CENTERS_KEY, workingCenters);
         }
         return workingCenters;
@@ -183,16 +189,11 @@ public class UserWrapper extends UserBaseWrapper {
         return true;
     }
 
-    public boolean hasRightsOn(String... rightsKeyDescs)
-        throws BiobankFailedQueryException, ApplicationException {
-        return hasRightsOn(Arrays.asList(rightsKeyDescs));
-    }
-
-    public boolean hasRightsOn(List<String> rightsKeyDesc)
-        throws BiobankFailedQueryException, ApplicationException {
-        for (String keyDesc : rightsKeyDesc) {
-            boolean ok = hasPrivilegeOnKeyDesc(
-                PrivilegeWrapper.getReadPrivilege(appService), keyDesc);
+    public boolean hasPrivilegesOnKeyDesc(PrivilegeWrapper privilege,
+        String... rightsKeyDescs) throws BiobankFailedQueryException,
+        ApplicationException {
+        for (String keyDesc : rightsKeyDescs) {
+            boolean ok = hasPrivilegeOnKeyDesc(privilege, keyDesc);
             if (ok)
                 return ok;
         }
@@ -214,6 +215,31 @@ public class UserWrapper extends UserBaseWrapper {
             keyDesc);
         List<PrivilegeWrapper> userPrivileges = getPrivilegesForRight(right);
         return userPrivileges.contains(privilege);
+    }
+
+    public boolean hasPrivilegeOnClassObject(PrivilegeWrapper privilege,
+        Class<?> objectClazz) throws BiobankFailedQueryException,
+        ApplicationException {
+        if (ModelWrapper.class.isAssignableFrom(objectClazz)) {
+            ModelWrapper<?> wrapper = null;
+            try {
+                Constructor<?> constructor = objectClazz
+                    .getConstructor(WritableApplicationService.class);
+                wrapper = (ModelWrapper<?>) constructor
+                    .newInstance((WritableApplicationService) null);
+            } catch (NoSuchMethodException e) {
+                return false;
+            } catch (InvocationTargetException e) {
+                return false;
+            } catch (IllegalAccessException e) {
+                return false;
+            } catch (InstantiationException e) {
+                return false;
+            }
+            String type = wrapper.getWrappedClass().getSimpleName();
+            return hasPrivilegeOnKeyDesc(privilege, type);
+        }
+        return false;
     }
 
     private List<PrivilegeWrapper> getPrivilegesForRight(BbRightWrapper right)
@@ -295,4 +321,5 @@ public class UserWrapper extends UserBaseWrapper {
         ((BiobankApplicationService) appService).executeModifyPassword(
             getCsmUserId(), oldPassword, newPassword);
     }
+
 }

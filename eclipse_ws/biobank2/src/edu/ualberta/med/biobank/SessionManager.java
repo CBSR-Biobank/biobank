@@ -243,34 +243,59 @@ public class SessionManager {
         return getInstance().getSession().getServerName();
     }
 
-    @Deprecated
     public static boolean canCreate(Class<?> clazz) {
-        // return getUser().hasPrivilegeOnObject(Privilege.CREATE, clazz);
-        return true;
+        try {
+            return SessionSecurityHelper.canCreate(getAppService(), getUser(),
+                clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @Deprecated
     public static boolean canDelete(Class<?> clazz) {
-        // return getUser().hasPrivilegeOnObject(Privilege.DELETE, clazz);
-        return true;
+        try {
+            return SessionSecurityHelper.canDelete(getAppService(), getUser(),
+                clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @Deprecated
     public static boolean canDelete(ModelWrapper<?> wrapper) {
-        // return wrapper.canDelete(getUser());
-        return true;
+        return SessionSecurityHelper.canDelete(getAppService(), getUser(),
+            wrapper);
     }
 
-    @Deprecated
     public static boolean canView(Class<?> clazz) {
-        // return getUser().hasPrivilegeOnObject(Privilege.READ, clazz);
-        return true;
+        try {
+            return SessionSecurityHelper.canView(getAppService(), getUser(),
+                clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @Deprecated
+    public static boolean canAccess(String... keyDesc) {
+        try {
+            return SessionSecurityHelper.canAccess(getAppService(), getUser(),
+                keyDesc);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static boolean canUpdate(Class<?> clazz) {
-        // return getUser().hasPrivilegeOnObject(Privilege.UPDATE, clazz);
-        return true;
+        try {
+            return SessionSecurityHelper.canUpdate(getAppService(), getUser(),
+                clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean canUpdate(ModelWrapper<?> wrapper) {
+        return SessionSecurityHelper.canUpdate(getAppService(), getUser(),
+            wrapper);
     }
 
     public boolean isConnected() {

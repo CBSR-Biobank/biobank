@@ -728,12 +728,12 @@ public abstract class AdapterBase {
     protected boolean internalIsDeletable() {
         return editable && modelObject != null
             && SessionManager.getInstance().isConnected()
-            && modelObject.canDelete(SessionManager.getUser());
+            && SessionManager.canDelete(modelObject);
     }
 
     public boolean isEditable() {
         return editable && SessionManager.getInstance().isConnected()
-            && modelObject.canUpdate(SessionManager.getUser());
+            && SessionManager.canUpdate(modelObject);
     }
 
     public void setEditable(boolean editable) {

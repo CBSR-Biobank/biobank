@@ -1,24 +1,18 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.common.peer.BbGroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class GroupEditDialog extends BgcBaseDialog {
@@ -26,11 +20,6 @@ public class GroupEditDialog extends BgcBaseDialog {
     private final String titleAreaMessage;
 
     private BbGroupWrapper originalGroup, modifiedGroup;
-    private MultiSelectWidget workingCentersWidget;
-    private List<CenterWrapper<?>> allCenters;
-    private MultiSelectWidget centerFeaturesWidget;
-    private Text centersFilterText;
-    private LinkedHashMap<Integer, String> allFeaturesMap;
 
     public GroupEditDialog(Shell parent, BbGroupWrapper originalGroup) {
         super(parent);

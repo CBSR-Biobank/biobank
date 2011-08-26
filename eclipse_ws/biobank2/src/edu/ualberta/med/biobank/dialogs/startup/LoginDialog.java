@@ -413,7 +413,7 @@ public class LoginDialog extends TitleAreaDialog {
             if (workingCenters.size() == 0) {
                 if (!sessionHelper.getUser().isSuperAdmin())
                     // cannot access the application.
-                    BgcPlugin.openAsyncError(
+                    BgcPlugin.openError(
                         Messages.LoginDialog_workingCenter_error_title,
                         Messages.LoginDialog_noWorkingCenter_error_msg);
             } else if (workingCenters.size() == 1
@@ -428,7 +428,7 @@ public class LoginDialog extends TitleAreaDialog {
             && !sessionHelper.getUser().isInSuperAdminMode())
             if (sessionHelper.getUser().isSuperAdmin()) {
                 // connect in admin mode
-                BgcPlugin.openAsyncInformation(
+                BgcPlugin.openInformation(
                     Messages.LoginDialog_workingCenter_admin_title,
                     Messages.LoginDialog_noWorkingCenter_admin_msg);
                 // open the administration perspective if another

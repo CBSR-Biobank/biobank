@@ -6,8 +6,8 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.runtime.Assert;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class DeleteSelectionHandler extends AbstractHandler implements IHandler {
@@ -17,7 +17,8 @@ public class DeleteSelectionHandler extends AbstractHandler implements IHandler 
         AdapterBase adapter = SessionManager.getSelectedNode();
         Assert.isNotNull(adapter, "adapter is null"); //$NON-NLS-1$
         if (!adapter.isDeletable()) {
-            BgcPlugin.openError(Messages.DeleteSelectionHandler_delete_error_title,
+            BgcPlugin.openError(
+                Messages.DeleteSelectionHandler_delete_error_title,
                 Messages.DeleteSelectionHandler_delete_error_msg);
             return null;
         }
@@ -29,7 +30,7 @@ public class DeleteSelectionHandler extends AbstractHandler implements IHandler 
     public boolean isEnabled() {
         AdapterBase adapter = SessionManager.getSelectedNode();
         boolean isEnabled = adapter != null && adapter.isDeletable()
-            && adapter.getModelObject().canDelete(SessionManager.getUser());
+            && SessionManager.canDelete(adapter.getModelObject());
         return isEnabled;
     }
 }

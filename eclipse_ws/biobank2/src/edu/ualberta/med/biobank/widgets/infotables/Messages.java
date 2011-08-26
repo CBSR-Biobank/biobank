@@ -287,6 +287,14 @@ public class Messages extends NLS {
 
     public static String LoggingInfoTable_user_label;
 
+    public static String MembershipInfoTable_center_label;
+
+    public static String MembershipInfoTable_loading;
+
+    public static String MembershipInfoTable_role_right_privilege_label;
+
+    public static String MembershipInfoTable_study_label;
+
     public static String PeListInfoTable_aliquoteds_label;
 
     public static String PeListInfoTable_loading;

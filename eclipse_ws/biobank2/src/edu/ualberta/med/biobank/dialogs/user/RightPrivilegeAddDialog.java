@@ -41,8 +41,8 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
         super(parent);
         Assert.isNotNull(role);
         this.role = role;
-        currentTitle = "Add right/privileges associations";
-        titleAreaMessage = "Add new right/privileges associations";
+        currentTitle = Messages.RightPrivilegeAddDialog_title;
+        titleAreaMessage = Messages.RightPrivilegeAddDialog_description;
     }
 
     public int edit(RightPrivilegeWrapper rp) {
@@ -79,19 +79,19 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
                 true));
             final Button allCentersRadio = new Button(compCenters, SWT.RADIO);
             allCentersRadio.setSelection(true);
-            allCentersRadio.setText("All centers");
+            allCentersRadio.setText(Messages.RightPrivilegeAddDialog_allCenters_label);
             final Button sitesRadio = new Button(compCenters, SWT.RADIO);
-            sitesRadio.setText("Sites only");
+            sitesRadio.setText(Messages.RightPrivilegeAddDialog_sitesOnly_label);
             final Button clinicsRadio = new Button(compCenters, SWT.RADIO);
-            clinicsRadio.setText("Clinics only");
+            clinicsRadio.setText(Messages.RightPrivilegeAddDialog_clinicsOnly_label);
             final Button rgRadio = new Button(compCenters, SWT.RADIO);
-            rgRadio.setText("Research Groups only");
+            rgRadio.setText(Messages.RightPrivilegeAddDialog_rgOnly_label);
             GridData gd = new GridData();
             gd.horizontalSpan = 2;
             compCenters.setLayoutData(gd);
 
             rightsWidget = new MultiSelectWidget<BbRightWrapper>(contents,
-                SWT.NONE, "Available rights", "Selected rights", 110) {
+                SWT.NONE, Messages.RightPrivilegeAddDialog_rights_available_label, Messages.RightPrivilegeAddDialog_rights_selected_label, 110) {
                 @Override
                 protected String getTextForObject(BbRightWrapper nodeObject) {
                     return nodeObject.getName();
@@ -132,12 +132,12 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
         } else {
             Label label = new Label(contents, SWT.NONE);
             label.setText(NLS.bind(
-                "Editing privileges associated with right ''{0}'''", editRp
+                Messages.RightPrivilegeAddDialog_edit_privileges_label, editRp
                     .getRight().getName()));
         }
 
         privilegesWidget = new MultiSelectWidget<PrivilegeWrapper>(contents,
-            SWT.NONE, "Available privileges", "Selected privileges", 110) {
+            SWT.NONE, Messages.RightPrivilegeAddDialog_privileges_available_label, Messages.RightPrivilegeAddDialog_privileges_selected_label, 110) {
             @Override
             protected String getTextForObject(PrivilegeWrapper nodeObject) {
                 return nodeObject.getName();

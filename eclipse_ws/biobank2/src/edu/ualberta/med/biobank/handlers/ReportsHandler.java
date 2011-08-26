@@ -8,7 +8,7 @@ import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.SecurityFeature;
+import edu.ualberta.med.biobank.SessionSecurityHelper;
 import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
 
 public class ReportsHandler extends AbstractHandler {
@@ -22,8 +22,7 @@ public class ReportsHandler extends AbstractHandler {
                 workbench.showPerspective(ReportsPerspective.ID,
                     workbench.getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
-            throw new ExecutionException(
-                Messages.ReportsHandler_init_error, e);
+            throw new ExecutionException(Messages.ReportsHandler_init_error, e);
         }
         return null;
 
@@ -31,8 +30,13 @@ public class ReportsHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.getInstance().isConnected()
-            && SessionManager.getUser().canPerformActions(
-                SecurityFeature.REPORTS, SecurityFeature.LOGGING);
+        try {
+            return SessionManager.getInstance().isConnected()
+                && SessionManager.canAccess(
+                    SessionSecurityHelper.REPORTS_KEY_DESC,
+                    SessionSecurityHelper.LOGGING_KEY_DESC);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

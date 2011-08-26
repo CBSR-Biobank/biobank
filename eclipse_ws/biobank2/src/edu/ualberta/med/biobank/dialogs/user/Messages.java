@@ -25,6 +25,52 @@ public class Messages extends NLS {
 
     public static String GroupsPage_page_title;
 
+    public static String MembershipAddDialog_allCenters_label;
+
+    public static String MembershipAddDialog_center_label;
+
+    public static String MembershipAddDialog_clinicsOnly_label;
+
+    public static String MembershipAddDialog_description;
+
+    public static String MembershipAddDialog_nospecific_center_label;
+
+    public static String MembershipAddDialog_nospecific_study_label;
+
+    public static String MembershipAddDialog_rgOnly_label;
+
+    public static String MembershipAddDialog_roles_available_label;
+
+    public static String MembershipAddDialog_roles_selected_label;
+
+    public static String MembershipAddDialog_sitesOnly_label;
+
+    public static String MembershipAddDialog_study_label;
+
+    public static String MembershipAddDialog_title;
+
+    public static String RightPrivilegeAddDialog_allCenters_label;
+
+    public static String RightPrivilegeAddDialog_clinicsOnly_label;
+
+    public static String RightPrivilegeAddDialog_description;
+
+    public static String RightPrivilegeAddDialog_edit_privileges_label;
+
+    public static String RightPrivilegeAddDialog_privileges_available_label;
+
+    public static String RightPrivilegeAddDialog_privileges_selected_label;
+
+    public static String RightPrivilegeAddDialog_rgOnly_label;
+
+    public static String RightPrivilegeAddDialog_rights_available_label;
+
+    public static String RightPrivilegeAddDialog_rights_selected_label;
+
+    public static String RightPrivilegeAddDialog_sitesOnly_label;
+
+    public static String RightPrivilegeAddDialog_title;
+
     public static String RoleEditDialog_msg_error_name_used;
 
     public static String RoleEditDialog_msg_error_retrieve_centers;
@@ -33,7 +79,11 @@ public class Messages extends NLS {
 
     public static String RoleEditDialog_msg_persit_error;
 
+    public static String RoleEditDialog_new_assoc_label;
+
     public static String RoleEditDialog_property_title_name;
+
+    public static String RoleEditDialog_right_privilege_label;
 
     public static String RoleEditDialog_title_add;
 
@@ -42,6 +92,10 @@ public class Messages extends NLS {
     public static String RoleEditDialog_titlearea_add;
 
     public static String RoleEditDialog_titlearea_modify;
+
+    public static String RolesPage_role_added_msg;
+
+    public static String RolesPage_role_added_title;
 
     public static String RolesPage_title;
 
@@ -74,6 +128,10 @@ public class Messages extends NLS {
     public static String UserEditDialog_login_unique_error_msg;
 
     public static String UserEditDialog_loginName_validation_msg;
+
+    public static String UserEditDialog_memberships_add_label;
+
+    public static String UserEditDialog_memberships_label;
 
     public static String UserEditDialog_password_label;
 

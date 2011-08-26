@@ -52,28 +52,4 @@ public class PrivilegeWrapper extends PrivilegeBaseWrapper {
         return new PrivilegeWrapper(appService, result.get(0));
     }
 
-    public static PrivilegeWrapper getReadPrivilege(
-        WritableApplicationService appService)
-        throws BiobankFailedQueryException, ApplicationException {
-        return getPrivilege(appService, "Read");
-    }
-
-    public static PrivilegeWrapper getUpdatePrivilege(
-        WritableApplicationService appService)
-        throws BiobankFailedQueryException, ApplicationException {
-        return getPrivilege(appService, "Update");
-    }
-
-    public static PrivilegeWrapper getDeletePrivilege(
-        WritableApplicationService appService)
-        throws BiobankFailedQueryException, ApplicationException {
-        return getPrivilege(appService, "Delete");
-    }
-
-    public static PrivilegeWrapper getCreatePrivilege(
-        WritableApplicationService appService)
-        throws BiobankFailedQueryException, ApplicationException {
-        return getPrivilege(appService, "Create");
-    }
-
 }
