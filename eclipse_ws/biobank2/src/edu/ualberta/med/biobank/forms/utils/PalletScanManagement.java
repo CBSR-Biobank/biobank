@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PalletScanManagement {
 
@@ -173,8 +172,8 @@ public class PalletScanManagement {
                     String value = scanTubeAloneDialog(rcp);
                     if (value != null && !value.isEmpty()) {
                         if (cell == null) {
-                            cell = new PalletCell(new ScanCell(rcp.row,
-                                rcp.col, value));
+                            cell = new PalletCell(new ScanCell(rcp.getRow(),
+                                rcp.getCol(), value));
                             cells.put(rcp, cell);
                         } else {
                             cell.setValue(value);
@@ -293,18 +292,14 @@ public class PalletScanManagement {
     public void initCellsWithContainer(ContainerWrapper container) {
         if (!useScanner) {
             cells.clear();
-            try {
-                for (Entry<RowColPos, SpecimenWrapper> entry : container
-                    .getSpecimens(true).entrySet()) {
-                    RowColPos rcp = entry.getKey();
-                    PalletCell cell = new PalletCell(new ScanCell(rcp.row,
-                        rcp.col, entry.getValue().getInventoryId()));
-                    cell.setSpecimen(entry.getValue());
-                    cell.setStatus(UICellStatus.FILLED);
-                    cells.put(rcp, cell);
-                }
-            } catch (ApplicationException e) {
-                throw new RuntimeException(e);
+            for (Entry<RowColPos, SpecimenWrapper> entry : container
+                .getSpecimens().entrySet()) {
+                RowColPos rcp = entry.getKey();
+                PalletCell cell = new PalletCell(new ScanCell(rcp.getRow(), rcp.getCol(),
+                    entry.getValue().getInventoryId()));
+                cell.setSpecimen(entry.getValue());
+                cell.setStatus(UICellStatus.FILLED);
+                cells.put(rcp, cell);
             }
         }
     }

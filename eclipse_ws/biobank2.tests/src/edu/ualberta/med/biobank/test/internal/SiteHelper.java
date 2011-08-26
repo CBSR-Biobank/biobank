@@ -6,7 +6,9 @@ import java.util.List;
 import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 
 public class SiteHelper extends CenterHelper {
@@ -74,7 +76,15 @@ public class SiteHelper extends CenterHelper {
         deleteCenterDependencies(site);
 
         site.reload();
-        deleteFromList(site.getProcessingEventCollection(false));
+        List<ProcessingEventWrapper> processingEvents = site
+            .getProcessingEventCollection(false);
+        for (ProcessingEventWrapper processingEvent : processingEvents) {
+            List<SpecimenWrapper> specimens = processingEvent
+                .getSpecimenCollection(false);
+            deleteFromList(specimens);
+        }
+
+        deleteFromList(processingEvents);
 
         site.removeFromStudyCollection(site.getStudyCollection(false));
         site.persist();

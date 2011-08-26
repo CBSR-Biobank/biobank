@@ -125,27 +125,28 @@ public class TestContainerLabelingScheme extends TestDatabase {
     @Test
     public void testTwoCharNumeric() throws Exception {
         int totalRows = 5 + r.nextInt(5);
-        RowColPos pos = new RowColPos();
 
         for (int i = 0; i < totalRows; ++i) {
-            pos.row = i % totalRows;
-            pos.col = i / totalRows;
+            Integer row = i % totalRows;
+            Integer col = i / totalRows;
+            RowColPos pos = new RowColPos(row, col);
             String result = ContainerLabelingSchemeWrapper
                 .rowColToTwoCharNumeric(pos, totalRows);
             Assert.assertEquals(result.length(), 2);
-            Assert.assertEquals(new Integer(pos.row + 1).toString(),
+            Assert.assertEquals(new Integer(pos.getRow() + 1).toString(),
                 result.substring(1, 2));
-            Assert.assertEquals(pos.col.toString(), result.substring(0, 1));
+            Assert
+                .assertEquals(pos.getCol().toString(), result.substring(0, 1));
         }
 
         for (int i = 0; i < totalRows; ++i) {
             Integer row = i % totalRows + 1;
             Integer col = i / totalRows;
             String label = col.toString() + row.toString();
-            pos = ContainerLabelingSchemeWrapper.twoCharNumericToRowCol(
-                appService, label, totalRows);
-            Assert.assertEquals(pos.row, new Integer(row - 1));
-            Assert.assertEquals(pos.col, col);
+            RowColPos pos = ContainerLabelingSchemeWrapper
+                .twoCharNumericToRowCol(appService, label, totalRows);
+            Assert.assertEquals(pos.getRow(), new Integer(row - 1));
+            Assert.assertEquals(pos.getCol(), col);
         }
     }
 
@@ -155,12 +156,10 @@ public class TestContainerLabelingScheme extends TestDatabase {
         int totalCols = 5 + r.nextInt(5);
 
         String cbsrString;
-        RowColPos pos = new RowColPos();
 
         for (int col = 0; col < totalCols; ++col) {
             for (int row = 0; row < totalRows; ++row) {
-                pos.row = row;
-                pos.col = col;
+                RowColPos pos = new RowColPos(row, col);
                 cbsrString = ContainerLabelingSchemeWrapper.rowColToTwoChar(
                     pos, totalRows, totalCols);
                 Assert.assertTrue(cbsrString.length() == 2);
@@ -177,15 +176,15 @@ public class TestContainerLabelingScheme extends TestDatabase {
             for (int row = 0; row < totalRows; ++row) {
                 cbsrString = ALPHA.get((row + col * totalRows) / ALPHA.size())
                     + ALPHA.get((row + col * totalRows) % ALPHA.size());
-                pos = ContainerLabelingSchemeWrapper.twoCharToRowCol(
+                RowColPos pos = ContainerLabelingSchemeWrapper.twoCharToRowCol(
                     appService, cbsrString, totalRows, totalCols, "test");
-                Assert.assertEquals(new Integer(row), pos.row);
-                Assert.assertEquals(new Integer(col), pos.col);
+                Assert.assertEquals(new Integer(row), pos.getRow());
+                Assert.assertEquals(new Integer(col), pos.getCol());
             }
         }
 
         try {
-            pos = ContainerLabelingSchemeWrapper.cbsrTwoCharToRowCol(
+            RowColPos pos = ContainerLabelingSchemeWrapper.cbsrTwoCharToRowCol(
                 appService, "aa", totalRows, totalCols, "test");
             Assert.fail("should not be allowed to use lower case characters");
         } catch (Exception e) {
@@ -199,12 +198,10 @@ public class TestContainerLabelingScheme extends TestDatabase {
         int totalCols = 5 + r.nextInt(5);
 
         String cbsrString;
-        RowColPos pos = new RowColPos();
 
         for (int col = 0; col < totalCols; ++col) {
             for (int row = 0; row < totalRows; ++row) {
-                pos.row = row;
-                pos.col = col;
+                RowColPos pos = new RowColPos(row, col);
                 cbsrString = ContainerLabelingSchemeWrapper
                     .rowColToCbsrTwoChar(pos, totalRows, totalCols);
                 Assert.assertTrue(cbsrString.length() == 2);
@@ -225,15 +222,16 @@ public class TestContainerLabelingScheme extends TestDatabase {
                     / CBSR_ALPHA.size())
                     + CBSR_ALPHA.get((row + col * totalRows)
                         % CBSR_ALPHA.size());
-                pos = ContainerLabelingSchemeWrapper.cbsrTwoCharToRowCol(
-                    appService, cbsrString, totalRows, totalCols, "test");
-                Assert.assertEquals(new Integer(row), pos.row);
-                Assert.assertEquals(new Integer(col), pos.col);
+                RowColPos pos = ContainerLabelingSchemeWrapper
+                    .cbsrTwoCharToRowCol(appService, cbsrString, totalRows,
+                        totalCols, "test");
+                Assert.assertEquals(new Integer(row), pos.getRow());
+                Assert.assertEquals(new Integer(col), pos.getCol());
             }
         }
 
         try {
-            pos = ContainerLabelingSchemeWrapper.cbsrTwoCharToRowCol(
+            RowColPos pos = ContainerLabelingSchemeWrapper.cbsrTwoCharToRowCol(
                 appService, "aa", totalRows, totalCols, "test");
             Assert.fail("should not be allowed to use lower case characters");
         } catch (Exception e) {
@@ -246,7 +244,6 @@ public class TestContainerLabelingScheme extends TestDatabase {
         int totalRows;
         int totalCols;
         String posString;
-        RowColPos pos = new RowColPos();
 
         for (int i = 1; i <= 2; ++i) {
             switch (i) {
@@ -264,8 +261,7 @@ public class TestContainerLabelingScheme extends TestDatabase {
 
             for (int col = 0; col < totalCols; ++col) {
                 for (int row = 0; row < totalRows; ++row) {
-                    pos.row = row;
-                    pos.col = col;
+                    RowColPos pos = new RowColPos(row, col);
                     posString = ContainerLabelingSchemeWrapper.rowColToSbs(pos);
                     if (col >= 9) {
                         Assert.assertTrue(posString.length() == 3);
@@ -281,11 +277,11 @@ public class TestContainerLabelingScheme extends TestDatabase {
 
             for (int col = 0; col < totalCols; ++col) {
                 for (int row = 0; row < totalRows; ++row) {
-                    pos = ContainerLabelingSchemeWrapper.sbsToRowCol(
+                    RowColPos pos = ContainerLabelingSchemeWrapper.sbsToRowCol(
                         appService,
                         String.format("%s%02d", SBS_ALPHA.get(row), col + 1));
-                    Assert.assertEquals(row, pos.row.intValue());
-                    Assert.assertEquals(col, pos.col.intValue());
+                    Assert.assertEquals(row, pos.getRow().intValue());
+                    Assert.assertEquals(col, pos.getCol().intValue());
                 }
             }
         }
@@ -298,12 +294,10 @@ public class TestContainerLabelingScheme extends TestDatabase {
     @Test
     public void testDewar() throws Exception {
         String posString;
-        RowColPos pos = new RowColPos();
 
         for (int row = 0; row < DEWAR_MAX_ROWS; ++row) {
             for (int col = 0; col < DEWAR_MAX_COLS; ++col) {
-                pos.row = row;
-                pos.col = col;
+                RowColPos pos = new RowColPos(row, col);
                 posString = ContainerLabelingSchemeWrapper.rowColToDewar(pos,
                     DEWAR_MAX_COLS);
                 Assert.assertEquals(DEWAR_ALPHA.get(row * DEWAR_MAX_COLS + col)
@@ -317,10 +311,10 @@ public class TestContainerLabelingScheme extends TestDatabase {
             for (int col = 0; col < DEWAR_MAX_COLS; ++col) {
                 String label = DEWAR_ALPHA.get(row * DEWAR_MAX_COLS + col);
                 label += label;
-                pos = ContainerLabelingSchemeWrapper.dewarToRowCol(appService,
-                    label, DEWAR_MAX_COLS);
-                Assert.assertEquals(row, pos.row.intValue());
-                Assert.assertEquals(col, pos.col.intValue());
+                RowColPos pos = ContainerLabelingSchemeWrapper.dewarToRowCol(
+                    appService, label, DEWAR_MAX_COLS);
+                Assert.assertEquals(row, pos.getRow().intValue());
+                Assert.assertEquals(col, pos.getCol().intValue());
             }
         }
 

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
@@ -20,17 +20,24 @@ import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.PatientBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.CollectionIsEmptyCheck;
+import edu.ualberta.med.biobank.common.wrappers.checks.NotUsedCheck;
+import edu.ualberta.med.biobank.common.wrappers.loggers.PatientLogProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientWrapper extends PatientBaseWrapper {
+    private static final PatientLogProvider LOG_PROVIDER = new PatientLogProvider();
+    private static final String HAS_SPECIMENS_MSG = "Unable to delete patient {0} because patient has specimens stored in database.";
+    private static final String HAS_COLLECTION_EVENTS_MSG = "Collection events are still linked to this patient. Delete them before attempting to remove the patient.";
 
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
         super(appService, patient);
@@ -50,13 +57,6 @@ public class PatientWrapper extends PatientBaseWrapper {
 
         newObject.setCreatedAt(createdAt.getTime());
         return newObject;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        checkNoDuplicates(Patient.class, PatientPeer.PNUMBER.getName(),
-            getPnumber(), "A patient with PNumber");
     }
 
     private static final String PATIENT_QRY = "from " + Patient.class.getName()
@@ -103,53 +103,6 @@ public class PatientWrapper extends PatientBaseWrapper {
             }
         }
         return patient;
-    }
-
-    @Override
-    protected void deleteDependencies() throws Exception {
-        List<CollectionEventWrapper> cevents = getCollectionEventCollection(false);
-        for (CollectionEventWrapper cevent : cevents) {
-            cevent.delete();
-        }
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankException, ApplicationException {
-        checkNoMoreCollectionEvents();
-        if (getAllSpecimensCount(false) > 0)
-            throw new BiobankDeleteException("Unable to delete patient "
-                + getPnumber()
-                + " because patient has specimens stored in database.");
-    }
-
-    private void checkNoMoreCollectionEvents() throws BiobankDeleteException {
-        List<CollectionEventWrapper> pvs = getCollectionEventCollection(false);
-        if (pvs != null && !pvs.isEmpty()) {
-            throw new BiobankDeleteException(
-                "Collection events are still linked to this patient."
-                    + " Delete them before attempting to remove the patient.");
-        }
-    }
-
-    private static final String ALL_SPECIMEN_COUNT_QRY = "select count(spcs) from "
-        + CollectionEvent.class.getName()
-        + " as cevent join cevent."
-        + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
-        + " as spcs where cevent."
-        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
-        + "=?";
-
-    public long getAllSpecimensCount(boolean fast) throws ApplicationException,
-        BiobankException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(ALL_SPECIMEN_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        long total = 0;
-        for (CollectionEventWrapper cevent : getCollectionEventCollection(false))
-            total += cevent.getAllSpecimensCount(false);
-        return total;
     }
 
     private static final String SOURCE_SPECIMEN_COUNT_QRY = "select count(spcs) from "
@@ -252,14 +205,8 @@ public class PatientWrapper extends PatientBaseWrapper {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details) {
-        Log log = new Log();
-        log.setAction(action);
-        log.setCenter(site);
-        log.setPatientNumber(getPnumber());
-        log.setDetails(details);
-        log.setType("Patient");
-        return log;
+    public PatientLogProvider getLogProvider() {
+        return LOG_PROVIDER;
     }
 
     /**
@@ -362,6 +309,28 @@ public class PatientWrapper extends PatientBaseWrapper {
             return getCountResult(appService, criteria);
         }
         return (long) getCollectionEventCollection(false).size();
+    }
+
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(check().notNull(PatientPeer.PNUMBER));
+        tasks.add(check().unique(PatientPeer.PNUMBER));
+
+        super.addPersistTasks(tasks);
+    }
+
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        String hasCollectionEventsMsg = HAS_COLLECTION_EVENTS_MSG;
+        tasks.add(new CollectionIsEmptyCheck<Patient>(this,
+            PatientPeer.COLLECTION_EVENT_COLLECTION, hasCollectionEventsMsg));
+
+        String hasSpecimensMsg = MessageFormat.format(HAS_SPECIMENS_MSG,
+            getPnumber());
+        tasks.add(new NotUsedCheck<Patient>(this, SpecimenPeer.COLLECTION_EVENT
+            .to(CollectionEventPeer.PATIENT), Specimen.class, hasSpecimensMsg));
+
+        super.addDeleteTasks(tasks);
     }
 
     /**

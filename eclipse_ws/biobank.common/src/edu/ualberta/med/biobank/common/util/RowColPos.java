@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.common.util;
 
 import java.io.Serializable;
 
+import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
+
 public class RowColPos implements Comparable<RowColPos>, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -10,21 +12,31 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
 
     public static Integer PALLET_96_COL_MAX = 12;
 
-    public Integer row;
-    public Integer col;
-
-    public RowColPos() {
-
-    }
+    private final Integer row;
+    private final Integer col;
 
     public RowColPos(Integer row, Integer col) {
-        super();
-        if (row == null)
-            throw new RuntimeException("row cannot be null");
-        if (col == null)
-            throw new RuntimeException("col cannot be null");
         this.row = row;
         this.col = col;
+
+        if (row == null || col == null) {
+            throw new IllegalArgumentException(
+                "Neither the row nor column of a position can be null");
+        }
+    }
+
+    // TODO: this should be a convenience method outside of this class.
+    // RowColPos shouldn't know about AbstractPositionWrapper -JMF
+    public RowColPos(AbstractPositionWrapper<?> pos) {
+        this(pos.getRow(), pos.getCol());
+    }
+
+    public Integer getRow() {
+        return row;
+    }
+
+    public Integer getCol() {
+        return col;
     }
 
     public boolean equals(Integer row, Integer col) {
@@ -66,5 +78,4 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
         }
         return row - pos.row;
     }
-
 }

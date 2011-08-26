@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,9 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
@@ -21,6 +20,7 @@ import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.util.RequestState;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.SiteBaseWrapper;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -33,6 +33,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SiteWrapper extends SiteBaseWrapper {
     private static final String TOP_CONTAINER_COLLECTION_CACHE_KEY = "topContainerCollection";
+    private static final String EXISTING_CHILDREN_MSG = "Unable to delete site {0}. All defined children (processing events, container types, and containers) must be removed first.";
 
     @SuppressWarnings("unused")
     private Map<RequestState, List<RequestWrapper>> requestCollectionMap = new HashMap<RequestState, List<RequestWrapper>>();
@@ -43,28 +44,6 @@ public class SiteWrapper extends SiteBaseWrapper {
 
     public SiteWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        checkNoDuplicates(Center.class, CenterPeer.NAME.getName(), getName(),
-            "A center with name");
-        checkNoDuplicates(Center.class, CenterPeer.NAME_SHORT.getName(),
-            getNameShort(), "A center with short name");
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankDeleteException,
-        ApplicationException {
-        if (!getContainerCollection(false).isEmpty()
-            || !getContainerTypeCollection().isEmpty()
-            || !getProcessingEventCollection(false).isEmpty()) {
-            throw new BiobankDeleteException(
-                "Unable to delete site "
-                    + getName()
-                    + ". All defined children (processing events, container types, and containers) must be removed first.");
-        }
     }
 
     // due to bug in Hibernate when using elements in query must also use a left
@@ -241,6 +220,7 @@ public class SiteWrapper extends SiteBaseWrapper {
     @Override
     public long getCollectionEventCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException {
+
         HQLCriteria c = new HQLCriteria(COLLECTION_EVENT_COUNT_FOR_STUDY_QRY,
             Arrays.asList(new Object[] { getId(), study.getId() }));
         return getCountResult(appService, c);
@@ -266,4 +246,13 @@ public class SiteWrapper extends SiteBaseWrapper {
         return getCountResult(appService, c);
     }
 
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        String errMsg = MessageFormat.format(EXISTING_CHILDREN_MSG, getName());
+        tasks.add(check().empty(SitePeer.CONTAINER_COLLECTION, errMsg));
+        tasks.add(check().empty(SitePeer.CONTAINER_TYPE_COLLECTION, errMsg));
+        tasks.add(check().empty(SitePeer.PROCESSING_EVENT_COLLECTION, errMsg));
+
+        super.addDeleteTasks(tasks);
+    }
 }

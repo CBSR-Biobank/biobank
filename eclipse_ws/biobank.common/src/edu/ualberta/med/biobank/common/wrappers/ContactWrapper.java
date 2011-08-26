@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
+import edu.ualberta.med.biobank.common.peer.ContactPeer;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ContactBaseWrapper;
 import edu.ualberta.med.biobank.model.Contact;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -15,6 +17,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * contact
  */
 public class ContactWrapper extends ContactBaseWrapper {
+    private static final String HAS_STUDIES_MSG = "Unable to delete contact {0}. No more study reference should exist.";
 
     public ContactWrapper(WritableApplicationService appService,
         Contact wrappedObject) {
@@ -27,15 +30,6 @@ public class ContactWrapper extends ContactBaseWrapper {
 
     public List<StudyWrapper> getStudyCollection() {
         return getStudyCollection(false);
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankDeleteException,
-        ApplicationException {
-        if (!deleteAllowed()) {
-            throw new BiobankDeleteException("Unable to delete contact "
-                + getName() + ". No more study reference should exist.");
-        }
     }
 
     public boolean deleteAllowed() {
@@ -72,5 +66,14 @@ public class ContactWrapper extends ContactBaseWrapper {
             wrappers.add(new ContactWrapper(appService, contact));
         }
         return wrappers;
+    }
+
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        String hasStudiesMsg = MessageFormat.format(HAS_STUDIES_MSG, getName());
+
+        tasks.add(check().empty(ContactPeer.STUDY_COLLECTION, hasStudiesMsg));
+
+        super.addDeleteTasks(tasks);
     }
 }

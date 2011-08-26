@@ -8,7 +8,6 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
@@ -29,6 +28,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
@@ -159,7 +159,7 @@ public class TestDispatch extends TestDatabase {
             dispatch.persist();
             Assert
                 .fail("should not be allowed to persist a dispatch shipment without a sender");
-        } catch (BiobankCheckException e) {
+        } catch (BiobankSessionException e) {
             Assert.assertTrue(true);
         }
 
@@ -170,7 +170,7 @@ public class TestDispatch extends TestDatabase {
             dispatch.persist();
             Assert
                 .fail("should not be allowed to persist a dispatch shipment without a receiver");
-        } catch (BiobankCheckException e) {
+        } catch (BiobankSessionException e) {
             Assert.assertTrue(true);
         }
 
@@ -369,7 +369,7 @@ public class TestDispatch extends TestDatabase {
         topContainerType.persist();
         topContainerType.reload();
         ContainerWrapper topContainer = ContainerHelper.addContainer(
-            String.valueOf(r.nextInt()), name + "top", null, senderSite,
+            String.valueOf(r.nextInt()), name + "top", senderSite,
             topContainerType);
         ContainerWrapper container = ContainerHelper.addContainer(null, name,
             topContainer, senderSite, containerType, 0, 0);
@@ -437,7 +437,7 @@ public class TestDispatch extends TestDatabase {
         topContainerType.persist();
         topContainerType.reload();
         ContainerWrapper topContainer = ContainerHelper.addContainer(
-            String.valueOf(r.nextInt()), name + "top", null, senderSite,
+            String.valueOf(r.nextInt()), name + "top", senderSite,
             topContainerType);
         ContainerWrapper container = ContainerHelper.addContainer(null, name,
             topContainer, senderSite, containerType, 0, 0);
@@ -698,7 +698,7 @@ public class TestDispatch extends TestDatabase {
         topContainerType.persist();
         topContainerType.reload();
         ContainerWrapper topContainer = ContainerHelper.addContainer(
-            String.valueOf(r.nextInt()), name + "top", null, senderSite,
+            String.valueOf(r.nextInt()), name + "top", senderSite,
             topContainerType);
         ContainerWrapper container = ContainerHelper.addContainer(null, name,
             topContainer, senderSite, containerType, 0, 0);

@@ -368,8 +368,8 @@ public final class TestReportsProcedurallyGeneratedData implements
                 for (ContainerTypeWrapper containerType : allContainerTypes) {
                     if (containerType.getTopLevel()) {
                         containers.add(ContainerHelper.addContainer(labelPrefix
-                            + getInstance().getRandString(), null,
-                            parentContainer, site, containerType));
+                            + getInstance().getRandString(), null, site,
+                            containerType));
                     }
                 }
             }

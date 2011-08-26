@@ -251,10 +251,11 @@ public class TestCenter extends TestDatabase {
             site.getId());
         Assert.assertNotNull(siteInDB);
 
+        Integer siteId = site.getId();
+
         site.delete();
 
-        siteInDB = ModelUtils.getObjectWithId(appService, Site.class,
-            site.getId());
+        siteInDB = ModelUtils.getObjectWithId(appService, Site.class, siteId);
         // object is not anymore in database
         Assert.assertNull(siteInDB);
     }

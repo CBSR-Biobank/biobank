@@ -10,7 +10,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -21,6 +20,8 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
@@ -62,7 +63,7 @@ public class TestClinic extends TestDatabase {
 
         List<ContactWrapper> contacts = clinic.getContactCollection(true);
         if (contacts.size() > 1) {
-            for (int i = 0; i < contacts.size() - 1; i++) {
+            for (int i = 0; i < (contacts.size() - 1); i++) {
                 ContactWrapper contact1 = contacts.get(i);
                 ContactWrapper contact2 = contacts.get(i + 1);
                 Assert.assertTrue(contact1.compareTo(contact2) <= 0);
@@ -184,7 +185,7 @@ public class TestClinic extends TestDatabase {
 
         List<StudyWrapper> studies = clinic.getStudyCollection();
         if (studies.size() > 1) {
-            for (int i = 0; i < studies.size() - 1; i++) {
+            for (int i = 0; i < (studies.size() - 1); i++) {
                 StudyWrapper s1 = studies.get(i);
                 StudyWrapper s2 = studies.get(i + 1);
                 Assert.assertTrue(s1.compareTo(s2) <= 0);
@@ -259,7 +260,7 @@ public class TestClinic extends TestDatabase {
             clinic.persist();
             Assert
                 .fail("Should not insert the clinic : same name already in database for this site");
-        } catch (DuplicateEntryException dee) {
+        } catch (DuplicatePropertySetException e) {
             Assert.assertTrue(true);
         }
         clinic.setName(name + "_otherName");
@@ -279,10 +280,12 @@ public class TestClinic extends TestDatabase {
             Clinic.class, clinic.getId());
         Assert.assertNotNull(clinicInDB);
 
+        Integer clinicId = clinic.getId();
+
         clinic.delete();
 
         clinicInDB = ModelUtils.getObjectWithId(appService, Clinic.class,
-            clinic.getId());
+            clinicId);
         // object is not anymore in database
         Assert.assertNull(clinicInDB);
     }
@@ -321,7 +324,7 @@ public class TestClinic extends TestDatabase {
             clinic.delete();
             Assert
                 .fail("Can't remove a clinic if a study linked to one of its contacts still exists");
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankSessionException e) {
             Assert.assertTrue(true);
         }
     }
@@ -345,7 +348,7 @@ public class TestClinic extends TestDatabase {
         try {
             clinic.delete();
             Assert.fail("Can't remove a clinic if shipments linked to it");
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankSessionException e) {
             Assert.assertTrue(true);
         }
     }
@@ -571,7 +574,7 @@ public class TestClinic extends TestDatabase {
 
             PatientWrapper patient = PatientHelper.addPatient(name + "_" + i,
                 study);
-            for (int eventNb = 0; eventNb < r.nextInt(10) + 3; eventNb++) {
+            for (int eventNb = 0; eventNb < (r.nextInt(10) + 3); eventNb++) {
                 SpecimenWrapper originSpecimen = SpecimenHelper
                     .newSpecimen(SpecimenTypeWrapper.getAllSpecimenTypes(
                         appService, false).get(0));

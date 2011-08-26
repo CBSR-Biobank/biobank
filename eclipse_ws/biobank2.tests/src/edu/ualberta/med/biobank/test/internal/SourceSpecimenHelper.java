@@ -43,7 +43,7 @@ public class SourceSpecimenHelper extends DbHelper {
     public static List<SourceSpecimenWrapper> addRandSourceSpecimens(
         StudyWrapper study, String name, boolean needTimeDrawn,
         boolean needOriginalVolume) throws Exception {
-        int nber = r.nextInt(15) + 1;
+        int nber = 2; // r.nextInt(15) + 1;
         List<SourceSpecimenWrapper> sourceSpcs = new ArrayList<SourceSpecimenWrapper>();
         for (int i = 0; i < nber; i++) {
             SpecimenTypeWrapper svType = SpecimenTypeHelper
