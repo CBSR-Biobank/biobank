@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.common.wrappers.loggers.LogAction;
 import edu.ualberta.med.biobank.common.wrappers.loggers.LogGroup;
 import edu.ualberta.med.biobank.common.wrappers.loggers.WrapperLogProvider;
 import edu.ualberta.med.biobank.common.wrappers.util.ModelWrapperHelper;
-import edu.ualberta.med.biobank.common.wrappers.util.ProxyUtil;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -58,14 +57,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private final ElementQueue<E> elementQueue = new ElementQueue<E>(this);
     private final WrapperCascader<E> cascader = new WrapperCascader<E>(this);
     private final WrapperChecker<E> preChecker = new WrapperChecker<E>(this);
-
-    private HashMap<Object, ModelWrapper<?>> modelWrapperMap = new HashMap<Object, ModelWrapper<?>>();
+    private WrapperSession wrapperSession;
 
     public ModelWrapper(WritableApplicationService appService, E wrappedObject) {
         this.appService = appService;
         this.wrappedObject = wrappedObject;
 
-        addSelfToModelWrapperMap();
+        this.wrapperSession = new WrapperSession(this);
     }
 
     public ModelWrapper(WritableApplicationService appService) {
@@ -84,17 +82,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             }
         }
 
-        addSelfToModelWrapperMap();
-    }
-
-    private void addSelfToModelWrapperMap() {
-        if (wrappedObject != null) {
-            // TODO: extract into method that unproxies for us so not repeated
-            // here and in wrap*Smarter()
-            E unproxiedModel = ProxyUtil.convertProxyToObject(wrappedObject);
-
-            modelWrapperMap.put(unproxiedModel, this);
-        }
+        this.wrapperSession = new WrapperSession(this);
     }
 
     public E getWrappedObject() {
@@ -108,7 +96,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         wrappedObject = newWrappedObject;
 
         clear();
-        addSelfToModelWrapperMap();
+        wrapperSession = new WrapperSession(this);
 
         firePropertyChanges(oldWrappedObject, newWrappedObject);
     }
@@ -171,7 +159,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             }
         }
 
-        addSelfToModelWrapperMap();
+        wrapperSession = new WrapperSession(this);
 
         firePropertyChanges(oldWrappedObject, wrappedObject);
     }
@@ -344,7 +332,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         E oldWrappedObject = wrappedObject;
         wrappedObject = getNewObject();
 
-        addSelfToModelWrapperMap();
+        wrapperSession = new WrapperSession(this);
 
         firePropertyChanges(oldWrappedObject, wrappedObject);
     }
@@ -613,17 +601,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     // TODO: rename this
     private <W extends ModelWrapper<? extends M>, M> W wrapModelSmarter(
         M model, Class<W> wrapperKlazz) throws Exception {
-
-        M unproxiedModel = ProxyUtil.convertProxyToObject(model);
-
-        // several proxies exist for the exact same model object? okay...
         @SuppressWarnings("unchecked")
-        W wrapper = (W) modelWrapperMap.get(unproxiedModel);
+        W wrapper = (W) wrapperSession.get(model);
 
         if (wrapper == null) {
             wrapper = wrapModel(appService, model, wrapperKlazz);
-            wrapper.modelWrapperMap = modelWrapperMap;
-            modelWrapperMap.put(unproxiedModel, wrapper);
+            wrapper.wrapperSession = wrapperSession;
+            wrapperSession.add(wrapper);
         }
 
         return wrapper;
@@ -1079,18 +1063,17 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         propertyCache.clear();
         cache.clear();
 
-        // Don't clear the map because it might be shared with other
-        // ModelWrapper-s. Instead, start a new map.
-        // TODO: remove ModelWrapper.this from the propertyCache of all
-        // ModelWrapper-s in the modelWrapperMap? reload() really messes things
-        // up.
-        modelWrapperMap = new HashMap<Object, ModelWrapper<?>>();
+        wrapperSession = new WrapperSession(this);
 
         resetInternalFields();
     }
 
     public ElementTracker<E> getElementTracker() {
         return elementTracker;
+    }
+
+    WrapperSession getSession() {
+        return wrapperSession;
     }
 
     protected ElementQueue<E> getElementQueue() {
