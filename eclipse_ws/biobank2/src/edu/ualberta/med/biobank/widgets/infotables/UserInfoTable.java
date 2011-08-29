@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -21,7 +20,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.dialogs.user.UserEditDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserInfoTable extends InfoTableWidget<UserWrapper> {
@@ -115,8 +114,8 @@ public class UserInfoTable extends InfoTableWidget<UserWrapper> {
     }
 
     @Override
-    protected IBaseLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public Image getColumnImage(Object element, int columnIndex) {
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
@@ -219,4 +218,5 @@ public class UserInfoTable extends InfoTableWidget<UserWrapper> {
             return null;
         return ((TableRowData) o).toString();
     }
+
 }

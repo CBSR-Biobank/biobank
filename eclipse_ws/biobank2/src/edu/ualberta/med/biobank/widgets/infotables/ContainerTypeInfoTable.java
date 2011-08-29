@@ -13,10 +13,10 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ContainerTypeInfoTable extends
     InfoTableWidget<ContainerTypeWrapper> {
@@ -57,8 +57,8 @@ public class ContainerTypeInfoTable extends
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;

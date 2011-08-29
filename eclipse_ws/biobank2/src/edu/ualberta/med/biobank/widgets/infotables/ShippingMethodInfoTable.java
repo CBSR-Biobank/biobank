@@ -6,7 +6,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 public class ShippingMethodInfoTable extends
     InfoTableWidget<ShippingMethodWrapper> {
@@ -20,8 +20,8 @@ public class ShippingMethodInfoTable extends
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 ShippingMethodWrapper item = (ShippingMethodWrapper) ((BiobankCollectionModel) element).o;

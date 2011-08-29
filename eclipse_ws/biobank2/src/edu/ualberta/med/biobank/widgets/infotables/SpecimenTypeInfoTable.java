@@ -5,13 +5,14 @@ import java.util.List;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 10;
 
-    private static final String[] HEADINGS = new String[] { Messages.SpecimenTypeInfoTable_type_label,
+    private static final String[] HEADINGS = new String[] {
+        Messages.SpecimenTypeInfoTable_type_label,
         Messages.SpecimenTypeInfoTable_shortname_label };
 
     public SpecimenTypeInfoTable(Composite parent,
@@ -21,8 +22,8 @@ public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> 
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 SpecimenTypeWrapper item = (SpecimenTypeWrapper) ((BiobankCollectionModel) element).o;

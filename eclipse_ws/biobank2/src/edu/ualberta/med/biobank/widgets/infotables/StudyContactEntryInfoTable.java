@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> {
 
@@ -48,8 +48,8 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;

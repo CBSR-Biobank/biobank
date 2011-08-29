@@ -7,7 +7,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
@@ -25,8 +25,8 @@ public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 DispatchWrapper item = (DispatchWrapper) ((BiobankCollectionModel) element).o;

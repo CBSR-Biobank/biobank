@@ -28,9 +28,9 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
 import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.utils.BiobankClipboard;
 
 public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
 
@@ -173,8 +173,8 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
 
         autoSizeColumns = columnWidths == null ? true : false;
 
-        BiobankClipboard.addClipboardCopySupport(treeViewer, menu,
-            (BiobankLabelProvider) getLabelProvider(), headings.length);
+        BgcClipboard.addClipboardCopySupport(treeViewer, menu,
+            (BgcLabelProvider) getLabelProvider(), headings.length);
 
     }
 

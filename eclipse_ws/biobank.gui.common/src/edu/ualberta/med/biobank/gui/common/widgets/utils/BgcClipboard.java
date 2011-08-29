@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets.utils;
+package edu.ualberta.med.biobank.gui.common.widgets.utils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,15 +18,15 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class BiobankClipboard {
+public class BgcClipboard {
 
     public static void addClipboardCopySupport(final ColumnViewer tv,
-        Menu menu, final BiobankLabelProvider labelProvider, final int numCols) {
+        Menu menu, final BgcLabelProvider labelProvider, final int numCols) {
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.BiobankClipboard_copy_label);
+        item.setText(Messages.BgcClipboard_copy);
         item.addSelectionListener(new SelectionAdapter() {
             @SuppressWarnings("unchecked")
             @Override

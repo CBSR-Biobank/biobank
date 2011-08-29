@@ -187,16 +187,6 @@ public class Messages extends NLS {
 
     public static String StudyInfoTable_visits_label;
 
-    public static String AbstractInfoTableWidget_first_label;
-
-    public static String AbstractInfoTableWidget_last_label;
-
-    public static String AbstractInfoTableWidget_load_error_title;
-
-    public static String AbstractInfoTableWidget_next_label;
-
-    public static String AbstractInfoTableWidget_previous_label;
-
     public static String ActivityStatusInfoTable_loading;
 
     public static String ActivityStatusInfoTable_status_label;

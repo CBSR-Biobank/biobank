@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
 
@@ -26,7 +26,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         ALL(new String[] { Messages.SpecimenInfoTable_inventoryid_label,
             Messages.SpecimenInfoTable_type_label,
             Messages.SpecimenInfoTable_patient_label,
-            Messages.SpecimenInfoTable_visitNber_label, Messages.SpecimenInfoTable_origin_center_label,
+            Messages.SpecimenInfoTable_visitNber_label,
+            Messages.SpecimenInfoTable_origin_center_label,
             Messages.SpecimenInfoTable_current_center_label,
             Messages.SpecimenInfoTable_position_label,
             Messages.SpecimenInfoTable_created_label,
@@ -81,7 +82,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             Messages.SpecimenInfoTable_quantity_label,
             Messages.SpecimenInfoTable_status_label,
             Messages.SpecimenInfoTable_study_label,
-            Messages.SpecimenInfoTable_pnumber_label, Messages.SpecimenInfoTable_origin_center_label,
+            Messages.SpecimenInfoTable_pnumber_label,
+            Messages.SpecimenInfoTable_origin_center_label,
             Messages.SpecimenInfoTable_current_center_label,
             Messages.SpecimenInfoTable_comments_label }) {
             @Override
@@ -128,9 +130,11 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         ALIQUOTS(new String[] { Messages.SpecimenInfoTable_inventoryid_label,
             Messages.SpecimenInfoTable_type_label,
             Messages.SpecimenInfoTable_position_label,
-            Messages.SpecimenInfoTable_created_label, Messages.SpecimenInfoTable_worksheet_label,
+            Messages.SpecimenInfoTable_created_label,
+            Messages.SpecimenInfoTable_worksheet_label,
             Messages.SpecimenInfoTable_quantity_label,
-            Messages.SpecimenInfoTable_status_label, Messages.SpecimenInfoTable_origin_center_label,
+            Messages.SpecimenInfoTable_status_label,
+            Messages.SpecimenInfoTable_origin_center_label,
             Messages.SpecimenInfoTable_current_center_label,
             Messages.SpecimenInfoTable_comments_label }) {
             @Override
@@ -224,8 +228,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public Image getColumnImage(Object element, int columnIndex) {
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
