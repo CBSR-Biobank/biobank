@@ -705,16 +705,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             // in the session. This can be done later since it is probably
             // unlikely. But if not done, will yield incorrect results.
 
-            // TODO: getters should be bidirectional, specifically for
-            // lazily-loaded associations. Otherwise, problems can
-            // occur, as seen in the following example: assume two objects A and
-            // B have a bi-directional link. If A is loaded, then A.getB() is
-            // called, then B.getA() is called, the session cache should have
-            // been used to find and use the correct A object. HOWEVER, if
-            // before B.getA() was called, someone changed B's value of A, then
-            // B.getA() would return a different id object than the database,
-            // and A.getB().getA() would not return the original A.
-
             cacheProperty(property, wrappers);
             elementQueue.flush(property);
         }
@@ -724,7 +714,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             Collections.sort(wrappers);
         }
 
-        return wrappers;
+        // return a copy of the internally stored list so that someone
+        // externally modifying the collection does not modify the internal
+        // collection.
+        return new ArrayList<W>(wrappers);
     }
 
     protected <W extends ModelWrapper<? extends R>, R> void addToWrapperCollection(

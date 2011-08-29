@@ -119,7 +119,7 @@ public class TestStudy extends TestDatabase {
 
         List<ContactWrapper> contacts = study.getContactCollection(true);
         if (contacts.size() > 1) {
-            for (int i = 0; i < contacts.size() - 1; i++) {
+            for (int i = 0; i < (contacts.size() - 1); i++) {
                 ContactWrapper contact1 = contacts.get(i);
                 ContactWrapper contact2 = contacts.get(i + 1);
                 Assert.assertTrue(contact1.compareTo(contact2) <= 0);
@@ -219,7 +219,7 @@ public class TestStudy extends TestDatabase {
         List<AliquotedSpecimenWrapper> storages = study
             .getAliquotedSpecimenCollection(true);
         if (storages.size() > 1) {
-            for (int i = 0; i < storages.size() - 1; i++) {
+            for (int i = 0; i < (storages.size() - 1); i++) {
                 AliquotedSpecimenWrapper storage1 = storages.get(i);
                 AliquotedSpecimenWrapper storage2 = storages.get(i + 1);
                 Assert.assertTrue(storage1.compareTo(storage2) <= 0);
@@ -268,7 +268,7 @@ public class TestStudy extends TestDatabase {
         List<SourceSpecimenWrapper> sources = study
             .getSourceSpecimenCollection(true);
         if (sources.size() > 1) {
-            for (int i = 0; i < sources.size() - 1; i++) {
+            for (int i = 0; i < (sources.size() - 1); i++) {
                 SourceSpecimenWrapper source1 = sources.get(i);
                 SourceSpecimenWrapper source2 = sources.get(i + 1);
                 Assert.assertTrue(source1.compareTo(source2) <= 0);
@@ -576,7 +576,7 @@ public class TestStudy extends TestDatabase {
 
         List<PatientWrapper> patients = study.getPatientCollection(true);
         if (patients.size() > 1) {
-            for (int i = 0; i < patients.size() - 1; i++) {
+            for (int i = 0; i < (patients.size() - 1); i++) {
                 PatientWrapper patient1 = patients.get(i);
                 PatientWrapper patient2 = patients.get(i + 1);
                 Assert.assertTrue(patient1.compareTo(patient2) <= 0);
@@ -841,10 +841,12 @@ public class TestStudy extends TestDatabase {
             study.getId());
         Assert.assertNotNull(studyInDB);
 
+        Integer studyId = study.getId();
+
         study.delete();
 
-        studyInDB = ModelUtils.getObjectWithId(appService, Study.class,
-            study.getId());
+        studyInDB = ModelUtils
+            .getObjectWithId(appService, Study.class, studyId);
         // object is not anymore in database
         Assert.assertNull(studyInDB);
     }

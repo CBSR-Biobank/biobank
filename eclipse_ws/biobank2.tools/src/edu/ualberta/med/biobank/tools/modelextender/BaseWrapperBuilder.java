@@ -355,18 +355,31 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
+        String inverse = createWrappedPropertyGetterInverse(mc, assoc);
+
+        String peerProperty = mc.getName() + "Peer."
+            + CamelCase.toTitleCase(assocName);
+        String notCached = "";
+        if (!inverse.isEmpty()) {
+            notCached = "        boolean notCached = !isPropertyCached("
+                + peerProperty + ");\n";
+        }
+
         String genericString = "";
         if (modelBaseClasses.containsKey(assocClassName)) {
             genericString = "<?>";
             result.append("   ").append(SUPPRESS_WARNING_UNCHECKED)
                 .append("\n");
         }
+
         result.append("    public ").append(assocClassName).append("Wrapper")
             .append(genericString).append(" get")
             .append(CamelCase.toCamelCase(assocName, true)).append("() {\n")
-            .append("        return getWrappedProperty(").append(mc.getName())
-            .append("Peer.").append(CamelCase.toTitleCase(assocName))
-            .append(", ").append(assocClassName).append("Wrapper.class);\n")
+            .append(notCached).append("        ").append(assocClassName)
+            .append("Wrapper ").append(genericString).append(assocName)
+            .append(" = getWrappedProperty(").append(peerProperty).append(", ")
+            .append(assocClassName).append("Wrapper.class);\n").append(inverse)
+            .append("        return ").append(assocName).append(";\n")
             .append("    }\n\n");
         return result.toString();
     }
@@ -462,6 +475,44 @@ public class BaseWrapperBuilder extends BaseBuilder {
         return result;
     }
 
+    private String createWrappedPropertyGetterInverse(ModelClass mc,
+        ClassAssociation assoc) throws Exception {
+        ClassAssociation inverse = assoc.getInverse();
+        if (inverse == null)
+            return "";
+
+        String assocClassName = assoc.getToClass().getName();
+        String assocName = assoc.getAssocName();
+
+        String genericString = "";
+        if (modelBaseClasses.containsKey(assocClassName))
+            genericString = "<?>";
+
+        String paramName = assocName;
+        String paramType = assocClassName + "BaseWrapper" + genericString;
+
+        String method = null;
+        if (inverse.getAssociationType() == ClassAssociationType.ONE_TO_ONE
+            || inverse.getAssociationType() == ClassAssociationType.ZERO_TO_ONE) {
+            method = "set"
+                + CamelCase.toCamelCase(inverse.getAssocName(), true)
+                + "Internal(this)";
+        } else {
+
+            method = "addTo"
+                + CamelCase.toCamelCase(inverse.getAssocName(), true)
+                + "Internal(Arrays.asList(this))";
+            imports.add(Arrays.class.getName());
+        }
+
+        // @formatter:off
+        String castedParamName = "(("+paramType+") "+paramName+")";
+        String result = "        if ("+paramName+" != null && notCached) "+castedParamName+"."+method+";\n"; 
+        // @formatter:on
+
+        return result;
+    }
+
     private static String getPeerProperty(ModelClass mc, ClassAssociation assoc) {
         return mc.getName() + "Peer."
             + CamelCase.toTitleCase(assoc.getAssocName());
@@ -488,21 +539,34 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
+        String inverse = createCollectionGetterInverse(mc, assoc);
+
         // fix warnings
         if (mc.getName().equals("ShippingMethod")) {
             result
                 .append("    @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
         }
 
+        String peerProperty = mc.getName() + "Peer."
+            + CamelCase.toTitleCase(assocName);
+
+        String notCached = "";
+        if (!inverse.isEmpty()) {
+            notCached = "        boolean notCached = !isPropertyCached("
+                + peerProperty + ");\n";
+        }
+
         result.append("    public List<").append(assocClassName)
             .append("Wrapper> get")
             .append(CamelCase.toCamelCase(assocName, true))
-            .append("(boolean sort) {\n")
-            .append("        return getWrapperCollection(")
+            .append("(boolean sort) {\n").append(notCached)
+            .append("        List<").append(assocClassName).append("Wrapper> ")
+            .append(assocName).append(" = getWrapperCollection(")
             .append(mc.getName()).append("Peer.")
             .append(CamelCase.toTitleCase(assocName)).append(", ")
             .append(assocClassName).append("Wrapper.class, sort);\n")
-            .append("    }\n\n");
+            .append(inverse).append("        return ").append(assocName)
+            .append(";\n").append("    }\n\n");
         return result.toString();
     }
 
@@ -695,6 +759,42 @@ public class BaseWrapperBuilder extends BaseBuilder {
         // @formatter:off
         String result = "        for ("+elementBaseType+" e : "+paramName+") {\n" +
                         "            e."+method+";\n" +
+                        "        }\n";
+        // @formatter:on
+
+        return result;
+    }
+
+    private String createCollectionGetterInverse(ModelClass mc,
+        ClassAssociation assoc) throws Exception {
+        ClassAssociation inverse = assoc.getInverse();
+        if (inverse == null)
+            return "";
+
+        String assocClassName = assoc.getToClass().getName();
+        String assocName = assoc.getAssocName();
+
+        String paramName = assocName;
+        String elementBaseType = assocClassName + "BaseWrapper";
+
+        String method = null;
+        if (inverse.getAssociationType() == ClassAssociationType.ONE_TO_ONE
+            || inverse.getAssociationType() == ClassAssociationType.ZERO_TO_ONE) {
+            method = "set"
+                + CamelCase.toCamelCase(inverse.getAssocName(), true)
+                + "Internal(this)";
+        } else {
+            method = "addTo"
+                + CamelCase.toCamelCase(inverse.getAssocName(), true)
+                + "Internal(Arrays.asList(this))";
+            imports.add(Arrays.class.getName());
+        }
+
+        // @formatter:off
+        String result = "        if (notCached) {\n" +
+                        "            for ("+elementBaseType+" e : "+paramName+") {\n" +
+                        "                e."+method+";\n" +
+                        "            }\n" +
                         "        }\n";
         // @formatter:on
 
