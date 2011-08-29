@@ -6,6 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
@@ -22,7 +23,8 @@ public class CollectionEventAddHandler extends AbstractHandler {
             PatientAdapter patientAdapter = CollectionView.getCurrentPatient();
             CollectionEventWrapper ceWrapper = new CollectionEventWrapper(
                 SessionManager.getAppService());
-            ceWrapper.setPatient(patientAdapter.getWrapper());
+            ceWrapper.setPatient((PatientWrapper) patientAdapter
+                .getModelObject());
             CollectionEventAdapter adapter = new CollectionEventAdapter(
                 patientAdapter, ceWrapper);
             adapter.openEntryForm();

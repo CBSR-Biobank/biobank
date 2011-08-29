@@ -1,0 +1,50 @@
+<?xml encoding="UTF-8"?>
+
+<!ELEMENT test_suite (test_section)+>
+<!ATTLIST test_suite
+  xmlns CDATA #FIXED ''
+  xmlns:xsi CDATA #FIXED 'http://www.w3.org/2001/XMLSchema-instance'
+  name CDATA #REQUIRED
+  xsi:noNamespaceSchemaLocation NMTOKEN #REQUIRED>
+
+<!ELEMENT test_section (test_section,test_case)+>
+<!ATTLIST test_section
+  xmlns CDATA #FIXED ''
+  id CDATA #REQUIRED
+  name CDATA #REQUIRED>
+
+<!ELEMENT test_case (description,precondition,expected_result,note,
+                     dependency,steps)>
+<!ATTLIST test_case
+  xmlns CDATA #FIXED ''
+  id CDATA #REQUIRED
+  name CDATA #REQUIRED
+  variety NMTOKEN #REQUIRED>
+
+<!ELEMENT description (#PCDATA)>
+<!ATTLIST description
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT precondition (#PCDATA)>
+<!ATTLIST precondition
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT expected_result (#PCDATA)>
+<!ATTLIST expected_result
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT note (#PCDATA)>
+<!ATTLIST note
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT dependency EMPTY>
+<!ATTLIST dependency
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT steps (step)+>
+<!ATTLIST steps
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT step (#PCDATA)>
+<!ATTLIST step
+  xmlns CDATA #FIXED ''>

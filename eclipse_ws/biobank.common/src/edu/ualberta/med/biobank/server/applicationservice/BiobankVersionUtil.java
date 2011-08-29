@@ -66,15 +66,19 @@ public class BiobankVersionUtil {
                     + " client_version/" + clientVersionStr); //$NON-NLS-1$
 
                 if (clientVersion.getMajor() < serverVersion.getMajor()) {
-                    throw new ServerVersionNewerException();
+                    throw new ServerVersionNewerException(
+                        serverVersion.toString(), clientVersion.toString());
                 } else if (clientVersion.getMajor() > serverVersion.getMajor()) {
-                    throw new ServerVersionOlderException();
+                    throw new ServerVersionOlderException(
+                        serverVersion.toString(), clientVersion.toString());
                 } else {
                     if (clientVersion.getMinor() < serverVersion.getMinor()) {
-                        throw new ServerVersionNewerException();
+                        throw new ServerVersionNewerException(
+                            serverVersion.toString(), clientVersion.toString());
                     } else if (clientVersion.getMinor() > serverVersion
                         .getMinor()) {
-                        throw new ServerVersionOlderException();
+                        throw new ServerVersionOlderException(
+                            serverVersion.toString(), clientVersion.toString());
                     }
                 }
             } catch (VersionFormatInvalidException e) {

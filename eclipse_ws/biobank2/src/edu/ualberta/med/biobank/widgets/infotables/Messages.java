@@ -355,8 +355,6 @@ public class Messages extends NLS {
 
     public static String UserInfoTable_lastname_label;
 
-    public static String UserInfoTable_load_error_msg;
-
     public static String UserInfoTable_loading;
 
     public static String UserInfoTable_login_label;

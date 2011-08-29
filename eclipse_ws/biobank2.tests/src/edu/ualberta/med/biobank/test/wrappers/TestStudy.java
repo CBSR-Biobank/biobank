@@ -10,8 +10,6 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -24,7 +22,9 @@ import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropertyException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -39,7 +39,6 @@ import edu.ualberta.med.biobank.test.internal.SourceSpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestStudy extends TestDatabase {
-
     @Test
     public void testGetSiteCollection() throws Exception {
         String name = "testGetSiteCollection" + r.nextInt();
@@ -61,6 +60,8 @@ public class TestStudy extends TestDatabase {
 
         // delete a site
         sites.remove(site);
+        site.reload(); // because stale from adding study through a different
+                       // wrapper
         site.delete();
         SiteHelper.createdSites.remove(site);
 
@@ -763,7 +764,7 @@ public class TestStudy extends TestDatabase {
             StudyHelper.addStudy(name);
             Assert
                 .fail("Should not insert the study : same name already in database");
-        } catch (DuplicateEntryException e) {
+        } catch (DuplicatePropertySetException e) {
             Assert.assertTrue(true);
         }
     }
@@ -774,9 +775,7 @@ public class TestStudy extends TestDatabase {
         try {
             s1.persist();
             Assert.fail("Should not insert the study : name empty");
-        } catch (ValueNotSetException e) {
-            Assert.assertTrue(true);
-        } catch (ValidationException e) {
+        } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
     }
@@ -789,9 +788,7 @@ public class TestStudy extends TestDatabase {
         try {
             s1.persist();
             Assert.fail("Should not insert the study : name short empty");
-        } catch (ValueNotSetException e) {
-            Assert.assertTrue(true);
-        } catch (ValidationException e) {
+        } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
     }
@@ -810,7 +807,7 @@ public class TestStudy extends TestDatabase {
             s2.persist();
             Assert
                 .fail("Should not insert the study : same short name already in database");
-        } catch (DuplicateEntryException e) {
+        } catch (DuplicatePropertySetException e) {
             Assert.assertTrue(true);
         }
     }
@@ -862,7 +859,7 @@ public class TestStudy extends TestDatabase {
             study.delete();
             Assert
                 .fail("Should not delete : patients need to be removed first");
-        } catch (BiobankCheckException bce) {
+        } catch (CollectionNotEmptyException e) {
             Assert.assertTrue(true);
         }
     }

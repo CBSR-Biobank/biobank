@@ -11,6 +11,7 @@ public class Messages extends NLS {
     public static String DispatchAdapter_move_creation_label;
     public static String DispatchAdapter_receive_label;
     public static String DispatchAdapter_receive_process_label;
+    public static String DispatchAdapter_reload_error;
     public static String DispatchAdapter_save_error_title;
     public static String IncomingNode_incoming_node_label;
     public static String InCreationDispatchGroup_add_label;

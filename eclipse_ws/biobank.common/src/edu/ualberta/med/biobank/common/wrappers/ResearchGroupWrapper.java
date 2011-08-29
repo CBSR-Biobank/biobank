@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ResearchGroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ResearchGroupBaseWrapper;
-import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -64,15 +62,6 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
     }
 
     @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        checkNoDuplicates(Center.class, CenterPeer.NAME.getName(), getName(),
-            "A center with name");
-        checkNoDuplicates(Center.class, CenterPeer.NAME_SHORT.getName(),
-            getNameShort(), "A center with short name");
-    }
-
-    @Override
     public long getCollectionEventCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException {
         // TODO Auto-generated method stub
@@ -88,8 +77,16 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
 
     @Override
     public Long getPatientCount() throws Exception {
-        // TODO Auto-generated method stub
-        return null;
+        return (long) 0;
     }
 
+    @Override
+    public int compareTo(ModelWrapper<ResearchGroup> wrapper) {
+        if (wrapper instanceof ResearchGroupWrapper) {
+            String myName = wrappedObject.getName();
+            String wrapperName = wrapper.wrappedObject.getName();
+            return myName.compareTo(wrapperName);
+        }
+        return 0;
+    }
 }

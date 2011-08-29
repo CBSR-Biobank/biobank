@@ -139,14 +139,11 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                             .getLabelInternal();
                     return ""; //$NON-NLS-1$
                 } else if (element instanceof TreeItemAdapter) {
-                    if (columnIndex < 3)
-                        return ((TreeItemAdapter) element)
-                            .getColumnText(columnIndex);
                     if (columnIndex == 4)
                         return ((DispatchSpecimenWrapper) ((TreeItemAdapter) element)
                             .getSpecimen()).getComment();
-                    else
-                        return ""; //$NON-NLS-1$
+                    return ((TreeItemAdapter) element)
+                        .getColumnText(columnIndex);
                 }
                 return ""; //$NON-NLS-1$
             }

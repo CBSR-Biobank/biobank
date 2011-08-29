@@ -52,13 +52,13 @@ public class SiteViewForm extends AddressViewFormCommon {
     private BgcBaseText commentLabel;
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue((adapter instanceof SiteAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
-        site = siteAdapter.getWrapper();
+        site = (SiteWrapper) getModelObject();
         retrieveSite();
         setPartName(NLS.bind(Messages.SiteViewForm_title, site.getNameShort()));
     }

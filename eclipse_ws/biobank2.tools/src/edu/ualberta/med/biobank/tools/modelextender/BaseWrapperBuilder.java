@@ -4,15 +4,17 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
-import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.tools.modelumlparser.Attribute;
 import edu.ualberta.med.biobank.tools.modelumlparser.ClassAssociation;
 import edu.ualberta.med.biobank.tools.modelumlparser.ClassAssociationType;
@@ -35,6 +37,8 @@ public class BaseWrapperBuilder extends BaseBuilder {
     protected Map<String, ModelClass> modelBaseClasses;
 
     protected Map<String, String> wrapperMap;
+
+    protected Set<String> imports = new TreeSet<String>();
 
     public BaseWrapperBuilder(String outputdir, String packagename,
         String peerpackagename, Map<String, ModelClass> modelClasses) {
@@ -106,7 +110,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
             + "BaseWrapper.java");
         FileOutputStream fos = new FileOutputStream(f);
 
-        StringBuilder contents = new StringBuilder("/*\n")
+        StringBuilder preClassDef = new StringBuilder("/*\n")
             .append(
                 " * This code is automatically generated. Please do not edit.\n")
             .append(" */\n\n")
@@ -118,67 +122,89 @@ public class BaseWrapperBuilder extends BaseBuilder {
             .append(";\n")
             .append(
                 "import gov.nih.nci.system.applicationservice.WritableApplicationService;\n")
-            .append("import ").append(mc.getPkg()).append(".")
-            .append(mc.getName()).append(";\n").append("import ")
-            .append(Property.class.getName()).append(";\n");
+            .append("import ")
+            .append(mc.getPkg())
+            .append(".")
+            .append(mc.getName())
+            .append(";\n")
+            .append(
+                "import edu.ualberta.med.biobank.common.wrappers.Property;\n");
 
         if (mc.getExtendsClass() == null)
-            contents.append("import ").append(wrapperPackageName)
+            preClassDef.append("import ").append(wrapperPackageName)
                 .append(".ModelWrapper;\n");
 
         if (modelBaseClasses.containsKey(mc.getName())
             || mc.getExtendsClass() != null)
             // need this for the getPropertyChangeNames method
-            contents.append("import ").append(ArrayList.class.getName())
+            preClassDef.append("import ").append(ArrayList.class.getName())
                 .append(";\n");
 
         // import the peer class
-        contents.append("import ").append(peerpackagename).append(".")
+        preClassDef.append("import ").append(peerpackagename).append(".")
             .append(mc.getName()).append("Peer;\n");
 
-        contents.append(getWrapperImports(mc));
+        preClassDef.append(getWrapperImports(mc));
+
+        StringBuilder classDef = new StringBuilder();
 
         if (modelBaseClasses.containsKey(mc.getName())) {
-            contents.append("\npublic abstract class ").append(mc.getName())
+            classDef.append("\npublic abstract class ").append(mc.getName())
                 .append("BaseWrapper").append("<E extends ")
                 .append(mc.getName()).append("> extends ModelWrapper<E> ");
         } else if (mc.getExtendsClass() != null) {
-            contents.append("\npublic abstract class ").append(mc.getName())
+            classDef.append("\npublic abstract class ").append(mc.getName())
                 .append("BaseWrapper").append(" extends ")
                 .append(mc.getExtendsClass().getName()).append("Wrapper<")
                 .append(mc.getName()).append("> ");
         } else {
-            contents.append("\npublic class ").append(mc.getName())
+            classDef.append("\npublic class ").append(mc.getName())
                 .append("BaseWrapper").append(" extends ModelWrapper<")
                 .append(mc.getName()).append("> ");
         }
-        contents.append("{\n\n");
-        contents.append(createContructors(mc));
-        contents.append(createRequiredMethods(mc));
+        classDef.append("{\n\n");
+        classDef.append(createContructors(mc));
+        classDef.append(createRequiredMethods(mc));
 
         for (Attribute attr : mc.getAttrMap().values()) {
             if (attr.getName().equals("id"))
                 continue;
-            contents.append(createPropertyGetter(mc, attr));
-            contents.append(createPropertySetter(mc, attr));
+            classDef.append(createPropertyGetter(mc, attr));
+            classDef.append(createPropertySetter(mc, attr));
         }
 
         for (ClassAssociation assoc : mc.getAssocMap().values()) {
             ClassAssociationType assocType = assoc.getAssociationType();
 
-            if ((assocType == ClassAssociationType.ZERO_OR_ONE_TO_ONE)
+            if ((assocType == ClassAssociationType.ZERO_TO_ONE)
                 || (assocType == ClassAssociationType.ONE_TO_ONE)) {
-                contents.append(createWrappedPropertyGetter(mc, assoc));
-                contents.append(createWrappedPropertySetter(mc, assoc));
+                classDef.append(createWrappedPropertyGetter(mc, assoc));
+                classDef.append(createWrappedPropertySetter(mc, assoc, false));
+                classDef.append(createWrappedPropertySetter(mc, assoc, true));
             } else {
-                contents.append(createCollectionGetter(mc, assoc));
-                contents.append(createCollectionAdder(mc, assoc));
-                contents.append(createCollectionRemover(mc, assoc));
-                contents.append(createCollectionRemoverWithCheck(mc, assoc));
+                classDef.append(createCollectionGetter(mc, assoc));
+                classDef.append(createCollectionAdder(mc, assoc, false));
+                classDef.append(createCollectionAdder(mc, assoc, true));
+                classDef.append(createCollectionRemover(mc, assoc, false));
+                classDef.append(createCollectionRemover(mc, assoc, true));
+                classDef.append(createCollectionRemoverWithCheck(mc, assoc,
+                    false));
+                classDef.append(createCollectionRemoverWithCheck(mc, assoc,
+                    true));
             }
         }
 
-        contents.append("}\n");
+        classDef.append("}\n");
+
+        StringBuilder contents = new StringBuilder();
+        contents.append(preClassDef);
+
+        for (String imp : imports) {
+            contents.append("import ").append(imp).append(";\n");
+        }
+        imports.clear();
+
+        contents.append(classDef);
         fos.write(contents.toString().getBytes());
     }
 
@@ -215,7 +241,9 @@ public class BaseWrapperBuilder extends BaseBuilder {
         }
 
         String wrappedObjectType = mc.getName();
+        String idModelClassName = mc.getName();
         if (modelBaseClasses.containsKey(mc.getName())) {
+            idModelClassName = modelBaseClasses.get(mc.getName()).getName();
             wrappedObjectType = "E";
         }
 
@@ -246,7 +274,13 @@ public class BaseWrapperBuilder extends BaseBuilder {
         }
 
         result.append("    @Override\n")
-            .append("   protected List<Property<?, ? super ")
+            .append("    public Property<Integer, ? super ")
+            .append(wrappedObjectType).append("> getIdProperty() {\n")
+            .append("        return ").append(idModelClassName)
+            .append("Peer.ID;\n").append("    }\n\n");
+
+        result.append("    @Override\n")
+            .append("    protected List<Property<?, ? super ")
             .append(wrappedObjectType).append(">> getProperties() {\n");
 
         if (modelBaseClasses.containsKey(mc.getName()))
@@ -275,19 +309,19 @@ public class BaseWrapperBuilder extends BaseBuilder {
     private String createPropertyGetter(ModelClass mc, Attribute member) {
         StringBuilder result = new StringBuilder();
 
-        result.append("   public ").append(member.getType()).append(" get")
+        result.append("    public ").append(member.getType()).append(" get")
             .append(CamelCase.toCamelCase(member.getName(), true))
-            .append("() {\n").append("      return getProperty(")
+            .append("() {\n").append("        return getProperty(")
             .append(mc.getName()).append("Peer.")
             .append(CamelCase.toTitleCase(member.getName())).append(");\n")
-            .append("   }\n\n");
+            .append("    }\n\n");
         return result.toString();
     }
 
     private String createPropertySetter(ModelClass mc, Attribute member) {
         StringBuilder result = new StringBuilder();
 
-        result.append("   public void set")
+        result.append("    public void set")
             .append(CamelCase.toCamelCase(member.getName(), true)).append("(")
             .append(member.getType()).append(" ").append(member.getName())
             .append(") {\n");
@@ -295,14 +329,14 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String value = member.getName();
         if (member.getType().equals("String")) {
             value = "trimmed";
-            result.append("      String ").append(value).append(" = ")
+            result.append("        String ").append(value).append(" = ")
                 .append(member.getName()).append(" == null ? null : ")
                 .append(member.getName()).append(".trim();\n");
         }
 
-        result.append("      setProperty(").append(mc.getName())
+        result.append("        setProperty(").append(mc.getName())
             .append("Peer.").append(CamelCase.toTitleCase(member.getName()))
-            .append(", ").append(value).append(");\n").append("   }\n\n");
+            .append(", ").append(value).append(");\n").append("    }\n\n");
 
         return result.toString();
     }
@@ -311,7 +345,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
         ClassAssociation assoc) throws Exception {
         ClassAssociationType assocType = assoc.getAssociationType();
 
-        if ((assocType != ClassAssociationType.ZERO_OR_ONE_TO_ONE)
+        if ((assocType != ClassAssociationType.ZERO_TO_ONE)
             && (assocType != ClassAssociationType.ONE_TO_ONE)) {
             throw new Exception("class " + mc.getName() + " does not have a "
                 + "zero to one or one to one relationship with class"
@@ -327,21 +361,21 @@ public class BaseWrapperBuilder extends BaseBuilder {
             result.append("   ").append(SUPPRESS_WARNING_UNCHECKED)
                 .append("\n");
         }
-        result.append("   public ").append(assocClassName).append("Wrapper")
+        result.append("    public ").append(assocClassName).append("Wrapper")
             .append(genericString).append(" get")
             .append(CamelCase.toCamelCase(assocName, true)).append("() {\n")
-            .append("      return getWrappedProperty(").append(mc.getName())
+            .append("        return getWrappedProperty(").append(mc.getName())
             .append("Peer.").append(CamelCase.toTitleCase(assocName))
             .append(", ").append(assocClassName).append("Wrapper.class);\n")
-            .append("   }\n\n");
+            .append("    }\n\n");
         return result.toString();
     }
 
     private String createWrappedPropertySetter(ModelClass mc,
-        ClassAssociation assoc) throws Exception {
+        ClassAssociation assoc, boolean isInternal) throws Exception {
         ClassAssociationType assocType = assoc.getAssociationType();
 
-        if ((assocType != ClassAssociationType.ZERO_OR_ONE_TO_ONE)
+        if ((assocType != ClassAssociationType.ZERO_TO_ONE)
             && (assocType != ClassAssociationType.ONE_TO_ONE)) {
             throw new Exception("class " + mc.getName() + " does not have a "
                 + "zero to one or one to one relationship with class"
@@ -350,20 +384,87 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
         String assocClassName = assoc.getToClass().getName();
         String assocName = assoc.getAssocName();
-        StringBuilder result = new StringBuilder();
 
         String genericString = "";
         if (modelBaseClasses.containsKey(assocClassName))
             genericString = "<?>";
 
-        result.append("   public void set")
-            .append(CamelCase.toCamelCase(assocName, true)).append("(")
-            .append(assocClassName).append("Wrapper").append(genericString)
-            .append(" ").append(assocName).append(") {\n")
-            .append("      setWrappedProperty(").append(mc.getName())
-            .append("Peer.").append(CamelCase.toTitleCase(assocName))
-            .append(", ").append(assocName).append(");\n").append("   }\n\n");
-        return result.toString();
+        // @formatter:off
+        String method = "set" + CamelCase.toCamelCase(assocName, true);
+        
+        String visibility = "public ";
+        if (isInternal) {
+            method += "Internal";
+            visibility = "";
+        }
+        
+        String parameterType = assocClassName + "BaseWrapper" + genericString;
+        String parameterName = assocName;
+        String property = getPeerProperty(mc, assoc);
+        String inverse = isInternal ? "" : createWrappedPropertySetterInverse(mc, assoc);
+        
+        String result = "    "+visibility+"void "+method+"("+parameterType+" "+parameterName+") {\n" +
+                        inverse +
+        		        "        setWrappedProperty("+property+", "+parameterName+");\n" +
+        		        "    }\n\n";
+        // @formatter:on
+
+        return result;
+    }
+
+    private String createWrappedPropertySetterInverse(ModelClass mc,
+        ClassAssociation assoc) throws Exception {
+        ClassAssociation inverse = assoc.getInverse();
+        if (inverse == null)
+            return "";
+
+        String assocClassName = assoc.getToClass().getName();
+        String assocName = assoc.getAssocName();
+
+        String genericString = "";
+        if (modelBaseClasses.containsKey(assocClassName))
+            genericString = "<?>";
+
+        String property = getPeerProperty(mc, assoc);
+        String oldVar = "old" + CamelCase.toCamelCase(assocName, true);
+        String paramName = assocName;
+        String paramType = assocClassName + "BaseWrapper" + genericString;
+        String getter = "get" + CamelCase.toCamelCase(assocName, true);
+
+        String oldMethod = null;
+        String method = null;
+        if (inverse.getAssociationType() == ClassAssociationType.ONE_TO_ONE
+            || inverse.getAssociationType() == ClassAssociationType.ZERO_TO_ONE) {
+            oldMethod = "set"
+                + CamelCase.toCamelCase(inverse.getAssocName(), true)
+                + "Internal(null)";
+            method = "set"
+                + CamelCase.toCamelCase(inverse.getAssocName(), true)
+                + "Internal(this)";
+        } else {
+            oldMethod = "removeFrom"
+                + CamelCase.toCamelCase(inverse.getAssocName(), true)
+                + "Internal(Arrays.asList(this))";
+            method = "addTo"
+                + CamelCase.toCamelCase(inverse.getAssocName(), true)
+                + "Internal(Arrays.asList(this))";
+            imports.add(Arrays.class.getName());
+        }
+
+        // @formatter:off
+        String result = "        if (isPropertyCached("+property+")) {\n" +
+                        "            "+paramType+" "+oldVar+" = "+getter+"();\n" +
+                        "            if ("+oldVar+" != null) "+oldVar+"."+oldMethod+";\n" +
+                        "        }\n" +
+                        "        if ("+paramName+" != null) "+paramName+"."+method+";\n"; 
+        // @formatter:on
+
+        return result;
+    }
+
+    private static String getPeerProperty(ModelClass mc, ClassAssociation assoc) {
+        return mc.getName() + "Peer."
+            + CamelCase.toTitleCase(assoc.getAssocName());
     }
 
     private String createCollectionGetter(ModelClass mc, ClassAssociation assoc)
@@ -377,7 +478,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
         ClassAssociationType assocType = assoc.getAssociationType();
 
-        if ((assocType != ClassAssociationType.ZERO_OR_ONE_TO_MANY)
+        if ((assocType != ClassAssociationType.ZERO_TO_MANY)
             && (assocType != ClassAssociationType.ONE_TO_MANY)) {
             throw new Exception("class " + mc.getName() + " does not have a "
                 + "zero to many or one to many relationship with class"
@@ -388,7 +489,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
         StringBuilder result = new StringBuilder();
 
         String genericString = "";
-        if (assoc.getToClass().getIsParentClass()) {
+        if (assoc.getToClass().isParentClass()) {
             // fix warnings for generics
             result.append("   ").append(SUPPRESS_WARNING_UNCHECKED)
                 .append("\n");
@@ -398,15 +499,16 @@ public class BaseWrapperBuilder extends BaseBuilder {
             .append("Wrapper").append(genericString).append("> get")
             .append(CamelCase.toCamelCase(assocName, true))
             .append("(boolean sort) {\n")
-            .append("      return getWrapperCollection(").append(mc.getName())
-            .append("Peer.").append(CamelCase.toTitleCase(assocName))
-            .append(", ").append(assocClassName)
-            .append("Wrapper.class, sort);\n").append("   }\n\n");
+            .append("        return getWrapperCollection(")
+            .append(mc.getName()).append("Peer.")
+            .append(CamelCase.toTitleCase(assocName)).append(", ")
+            .append(assocClassName).append("Wrapper.class, sort);\n")
+            .append("    }\n\n");
         return result.toString();
     }
 
-    private Object createCollectionAdder(ModelClass mc, ClassAssociation assoc)
-        throws Exception {
+    private Object createCollectionAdder(ModelClass mc, ClassAssociation assoc,
+        boolean isInternal) throws Exception {
         String assocClassName = assoc.getToClass().getName();
         String assocWrapperName = new StringBuilder(assocClassName).append(
             "Wrapper").toString();
@@ -416,7 +518,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
         ClassAssociationType assocType = assoc.getAssociationType();
 
-        if ((assocType != ClassAssociationType.ZERO_OR_ONE_TO_MANY)
+        if ((assocType != ClassAssociationType.ZERO_TO_MANY)
             && (assocType != ClassAssociationType.ONE_TO_MANY)) {
             throw new Exception("class " + mc.getName() + " does not have a "
                 + "zero to many or one to many relationship with class"
@@ -426,25 +528,47 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
-        String collectionExtends = "";
+        // fix warnings
+        if (mc.getName().equals("ShippingMethod")) {
+            result
+                .append("    @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
+        }
+
+        String visibility = "public ";
+        String methodName = "addTo" + CamelCase.toCamelCase(assocName, true);
+        String inverse = createCollectionSetterInverse(mc, assoc, true);
+
+        if (isInternal) {
+            inverse = "";
+            visibility = "";
+            methodName += "Internal";
+        }
+
+        // @formatter:off
+        String action = "        addToWrapperCollection(" + mc.getName() + "Peer." + CamelCase.toTitleCase(assocName) + ", " + assocName + ");\n";
+        if (isInternal) {
+            action = "        if (isPropertyCached(" + mc.getName() + "Peer." + CamelCase.toTitleCase(assocName) + ")) {\n" +
+            		"    " + action +
+            		"        } else {\n" +
+            		"            getElementQueue().add(" + mc.getName() + "Peer." + CamelCase.toTitleCase(assocName) + ", " + assocName + ");\n" +
+            		"        }\n";
+        }          
+        // @formatter:on
+
         String genericString = "";
-        if (assoc.getToClass().getIsParentClass()) {
-            collectionExtends = "? extends ";
+        if (assoc.getToClass().isParentClass()) {
             genericString = "<?>";
         }
-        result.append("   public void addTo")
-            .append(CamelCase.toCamelCase(assocName, true)).append("(List<")
-            .append(collectionExtends).append(assocClassName).append("Wrapper")
-            .append(genericString).append("> ").append(assocName)
-            .append(") {\n").append("      addToWrapperCollection(")
-            .append(mc.getName()).append("Peer.")
-            .append(CamelCase.toTitleCase(assocName)).append(", ")
-            .append(assocName).append(");\n").append("   }\n\n");
+        result.append("    ").append(visibility).append("void ")
+            .append(methodName).append("(List<? extends ")
+            .append(assocClassName).append("BaseWrapper").append(genericString)
+            .append("> ").append(assocName).append(") {\n").append(action)
+            .append(inverse).append("    }\n\n");
         return result.toString();
     }
 
-    private Object createCollectionRemover(ModelClass mc, ClassAssociation assoc)
-        throws Exception {
+    private Object createCollectionRemover(ModelClass mc,
+        ClassAssociation assoc, boolean isInternal) throws Exception {
         String assocClassName = assoc.getToClass().getName();
         String assocWrapperName = new StringBuilder(assocClassName).append(
             "Wrapper").toString();
@@ -454,7 +578,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
         ClassAssociationType assocType = assoc.getAssociationType();
 
-        if ((assocType != ClassAssociationType.ZERO_OR_ONE_TO_MANY)
+        if ((assocType != ClassAssociationType.ZERO_TO_MANY)
             && (assocType != ClassAssociationType.ONE_TO_MANY)) {
             throw new Exception("class " + mc.getName() + " does not have a "
                 + "zero to many or one to many relationship with class"
@@ -464,25 +588,43 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
-        String collectionExtends = "";
+        String visibility = "public ";
+        String methodName = "removeFrom"
+            + CamelCase.toCamelCase(assocName, true);
+        String inverse = createCollectionSetterInverse(mc, assoc, false);
+
+        if (isInternal) {
+            inverse = "";
+            visibility = "";
+            methodName += "Internal";
+        }
+
+        // @formatter:off
+        String action = "        removeFromWrapperCollection(" + mc.getName() + "Peer." + CamelCase.toTitleCase(assocName) + ", " + assocName + ");\n";
+        if (isInternal) {
+            action = "        if (isPropertyCached(" + mc.getName() + "Peer." + CamelCase.toTitleCase(assocName) + ")) {\n" +
+                    "    " + action +
+                    "        } else {\n" +
+                    "            getElementQueue().remove(" + mc.getName() + "Peer." + CamelCase.toTitleCase(assocName) + ", " + assocName + ");\n" +
+                    "        }\n";
+        }          
+        // @formatter:on
+
         String genericString = "";
-        if (assoc.getToClass().getIsParentClass()) {
-            collectionExtends = "? extends ";
+        if (assoc.getToClass().isParentClass()) {
             genericString = "<?>";
         }
-        result.append("   public void removeFrom")
-            .append(CamelCase.toCamelCase(assocName, true)).append("(List<")
-            .append(collectionExtends).append(assocClassName).append("Wrapper")
-            .append(genericString).append("> ").append(assocName)
-            .append(") {\n").append("      removeFromWrapperCollection(")
-            .append(mc.getName()).append("Peer.")
-            .append(CamelCase.toTitleCase(assocName)).append(", ")
-            .append(assocName).append(");\n").append("   }\n\n");
+
+        result.append("    ").append(visibility).append("void ")
+            .append(methodName).append("(List<? extends ")
+            .append(assocClassName).append("BaseWrapper").append(genericString)
+            .append("> ").append(assocName).append(") {\n").append(action)
+            .append(inverse).append("    }\n\n");
         return result.toString();
     }
 
     private Object createCollectionRemoverWithCheck(ModelClass mc,
-        ClassAssociation assoc) throws Exception {
+        ClassAssociation assoc, boolean isInternal) throws Exception {
         String assocClassName = assoc.getToClass().getName();
         String assocWrapperName = new StringBuilder(assocClassName).append(
             "Wrapper").toString();
@@ -492,7 +634,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
         ClassAssociationType assocType = assoc.getAssociationType();
 
-        if ((assocType != ClassAssociationType.ZERO_OR_ONE_TO_MANY)
+        if ((assocType != ClassAssociationType.ZERO_TO_MANY)
             && (assocType != ClassAssociationType.ONE_TO_MANY)) {
             throw new Exception("class " + mc.getName() + " does not have a "
                 + "zero to many or one to many relationship with class"
@@ -502,23 +644,87 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
-        String collectionExtends = "";
+        // String collectionExtends = "";
+        // String genericString = "";
+        // if (assoc.getToClass().getIsParentClass()) {
+        // collectionExtends = "? extends ";
+        // genericString = "<?>";
+        // }
+        // result.append("   public void removeFrom")
+        // .append(CamelCase.toCamelCase(assocName, true))
+        // .append("WithCheck(List<").append(collectionExtends)
+        // .append(assocClassName).append("Wrapper").append(genericString)
+        // .append("> ").append(assocName)
+        // fix warnings
+        if (mc.getName().equals("ShippingMethod")) {
+            result
+                .append("    @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
+        }
+
+        String visibility = "public ";
+        String methodName = "removeFrom"
+            + CamelCase.toCamelCase(assocName, true) + "WithCheck";
+        String inverse = createCollectionSetterInverse(mc, assoc, false);
+
+        if (isInternal) {
+            inverse = "";
+            visibility = "";
+            methodName += "Internal";
+        }
+
         String genericString = "";
-        if (assoc.getToClass().getIsParentClass()) {
-            collectionExtends = "? extends ";
+        if (assoc.getToClass().isParentClass()) {
             genericString = "<?>";
         }
-        result.append("   public void removeFrom")
-            .append(CamelCase.toCamelCase(assocName, true))
-            .append("WithCheck(List<").append(collectionExtends)
-            .append(assocClassName).append("Wrapper").append(genericString)
+
+        result.append("    ").append(visibility).append("void ")
+            .append(methodName).append("(List<? extends ")
+            .append(assocClassName).append("BaseWrapper").append(genericString)
             .append("> ").append(assocName)
             .append(") throws BiobankCheckException {\n")
-            .append("      removeFromWrapperCollectionWithCheck(")
+            .append("        removeFromWrapperCollectionWithCheck(")
             .append(mc.getName()).append("Peer.")
             .append(CamelCase.toTitleCase(assocName)).append(", ")
-            .append(assocName).append(");\n").append("   }\n\n");
+            .append(assocName).append(");\n").append(inverse)
+            .append("    }\n\n");
         return result.toString();
+    }
+
+    private String createCollectionSetterInverse(ModelClass mc,
+        ClassAssociation assoc, boolean isAdd) throws Exception {
+        ClassAssociation inverse = assoc.getInverse();
+        if (inverse == null)
+            return "";
+
+        String assocClassName = assoc.getToClass().getName();
+        String assocName = assoc.getAssocName();
+
+        String paramName = assocName;
+        String elementBaseType = assocClassName + "BaseWrapper";
+        if (assoc.getToClass().isParentClass()) {
+            elementBaseType += "<?>";
+        }
+
+        String method = null;
+        if (inverse.getAssociationType() == ClassAssociationType.ONE_TO_ONE
+            || inverse.getAssociationType() == ClassAssociationType.ZERO_TO_ONE) {
+            method = "set"
+                + CamelCase.toCamelCase(inverse.getAssocName(), true)
+                + "Internal" + (isAdd ? "(this)" : "(null)");
+        } else {
+            method = (isAdd ? "addTo" : "removeFrom")
+                + CamelCase.toCamelCase(inverse.getAssocName(), true)
+                + "Internal(Arrays.asList(this))";
+            imports.add(Arrays.class.getName());
+        }
+
+        // @formatter:off
+        String result = "        for ("+elementBaseType+" e : "+paramName+") {\n" +
+                        "            e."+method+";\n" +
+                        "        }\n";
+        // @formatter:on
+
+        return result;
     }
 
     private String getWrapperImports(ModelClass mc) {
@@ -559,7 +765,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
             // check if need to import BioBankCheckException
             ClassAssociationType assocType = assoc.getAssociationType();
-            if (((assocType == ClassAssociationType.ZERO_OR_ONE_TO_MANY) || (assocType == ClassAssociationType.ONE_TO_MANY))
+            if (((assocType == ClassAssociationType.ZERO_TO_MANY) || (assocType == ClassAssociationType.ONE_TO_MANY))
                 && (importCount.get("BioBankCheckException") == null)) {
 
                 String wrapperName = new StringBuilder(toClass.getName())
@@ -578,6 +784,8 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
             StringBuilder wrapperName = new StringBuilder(toClass.getName())
                 .append("Wrapper");
+            StringBuilder baseWrapperName = new StringBuilder(toClass.getName())
+                .append("BaseWrapper");
 
             String packagename = wrapperMap.get(wrapperName.toString());
 
@@ -590,6 +798,9 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
             sb.append("import ").append(packagename).append(".")
                 .append(wrapperName).append(";\n");
+
+            sb.append("import edu.ualberta.med.biobank.common.wrappers.base.")
+                .append(baseWrapperName).append(";\n");
         }
 
         return sb.toString();

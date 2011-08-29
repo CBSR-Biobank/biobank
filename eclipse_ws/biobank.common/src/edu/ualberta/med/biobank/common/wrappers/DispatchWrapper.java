@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
@@ -9,10 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -22,31 +20,43 @@ import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
+import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.IfAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.IfAction.Is;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.DispatchSpecimenBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.NotNullPreCheck;
+import edu.ualberta.med.biobank.common.wrappers.checks.UniqueCheck;
+import edu.ualberta.med.biobank.common.wrappers.loggers.DispatchLogProvider;
+import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
-import edu.ualberta.med.biobank.model.Log;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DispatchWrapper extends DispatchBaseWrapper {
+    private static final DispatchLogProvider LOG_PROVIDER = new DispatchLogProvider();
+    private static final Property<String, Dispatch> WAYBILL_PROPERTY = DispatchPeer.SHIPMENT_INFO
+        .to(ShipmentInfoPeer.WAYBILL);
+    private static final Collection<Property<?, ? super Dispatch>> UNIQUE_WAYBILL_PER_SENDER_PROPERTIES = new ArrayList<Property<?, ? super Dispatch>>();
+
+    static {
+        UNIQUE_WAYBILL_PER_SENDER_PROPERTIES.add(WAYBILL_PROPERTY);
+        UNIQUE_WAYBILL_PER_SENDER_PROPERTIES.add(DispatchPeer.SENDER_CENTER);
+    }
 
     private final Map<DispatchSpecimenState, List<DispatchSpecimenWrapper>> dispatchSpecimenMap = new HashMap<DispatchSpecimenState, List<DispatchSpecimenWrapper>>();
-
-    private List<DispatchSpecimenWrapper> deletedDispatchedSpecimens = new ArrayList<DispatchSpecimenWrapper>();
-
-    /**
-     * Contains specimen that need to be persisted when this dispatch is
-     * persisted
-     */
-    private List<DispatchSpecimenWrapper> toBePersistedDispatchedSpecimens = new ArrayList<DispatchSpecimenWrapper>();
 
     private boolean hasNewSpecimens = false;
 
     private boolean hasSpecimenStatesChanged = false;
 
-    private boolean removeSpecimensPosition = false;
+    // TODO: Not sure if it's a good idea to maintain a list like this
+    // internally. It can result in unwanted changes being persisted.
+    private List<DispatchSpecimenWrapper> dispatchSpecimensToPersist = new ArrayList<DispatchSpecimenWrapper>();
 
     public DispatchWrapper(WritableApplicationService appService) {
         super(appService);
@@ -98,81 +108,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public Map<DispatchSpecimenState, List<DispatchSpecimenWrapper>> getMap() {
         return dispatchSpecimenMap;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        if (getSenderCenter() == null) {
-            throw new BiobankCheckException("Sender should be set");
-        }
-        if (getReceiverCenter() == null) {
-            throw new BiobankCheckException("Receiver should be set");
-        }
-
-        if (!checkWaybillUniqueForSender()) {
-            throw new BiobankCheckException("A dispatch with waybill "
-                + getShipmentInfo().getWaybill()
-                + " already exists for sending site "
-                + getSenderCenter().getNameShort());
-        }
-    }
-
-    @Override
-    protected void persistDependencies(Dispatch origObject) throws Exception {
-        for (DispatchSpecimenWrapper dds : deletedDispatchedSpecimens) {
-            if (!dds.isNew()) {
-                dds.delete();
-            }
-        }
-
-        // set true when state is switch to in_transit. This means we need to
-        // remove the specimens position
-        if (removeSpecimensPosition) {
-            for (DispatchSpecimenWrapper rds : getDispatchSpecimenCollection(false)) {
-                if (rds.getSpecimen().getPosition() != null) {
-                    rds.getSpecimen().setPosition(null);
-                    toBePersistedDispatchedSpecimens.add(rds);
-                }
-            }
-        }
-
-        // FIXME: temporary fix - this should be converted to a batch update
-        for (DispatchSpecimenWrapper rds : toBePersistedDispatchedSpecimens) {
-            rds.getSpecimen().persist();
-        }
-    }
-
-    private static final String WAYBILL_UNIQUE_FOR_SENDER_QRY = "from "
-        + Dispatch.class.getName()
-        + " where "
-        + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
-        + "=? and "
-        + Property.concatNames(DispatchPeer.SHIPMENT_INFO,
-            ShipmentInfoPeer.WAYBILL) + "=?";
-
-    private boolean checkWaybillUniqueForSender() throws ApplicationException,
-        BiobankCheckException {
-        List<Object> params = new ArrayList<Object>();
-        CenterWrapper<?> sender = getSenderCenter();
-        if (sender == null) {
-            throw new BiobankCheckException("sender site cannot be null");
-        }
-        params.add(sender.getId());
-        if (getShipmentInfo() == null)
-            params.add("");
-        else
-            params.add(getShipmentInfo().getWaybill());
-
-        StringBuilder qry = new StringBuilder(WAYBILL_UNIQUE_FOR_SENDER_QRY);
-        if (!isNew()) {
-            qry.append(" and id <> ?");
-            params.add(getId());
-        }
-        HQLCriteria c = new HQLCriteria(qry.toString(), params);
-
-        List<Object> results = appService.query(c);
-        return results.size() == 0;
     }
 
     private List<DispatchSpecimenWrapper> getDispatchSpecimenCollectionWithState(
@@ -246,8 +181,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                         specimen.setCurrentCenter(getReceiverCenter());
                         // remove position in case it has one in the previous
                         // center.
-                        specimen.setPosition(null);
-                        toBePersistedDispatchedSpecimens.add(dsa);
+                        specimen.setParent(null, null);
+                        dispatchSpecimensToPersist.add(dsa);
                     }
                     newDispatchSpecimens.add(dsa);
                     hasNewSpecimens = true;
@@ -258,15 +193,12 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                     + " does not belong to this sender.");
         }
         addToDispatchSpecimenCollection(newDispatchSpecimens);
-        // make sure previously deleted ones, that have been re-added, are
-        // no longer deleted
-        deletedDispatchedSpecimens.removeAll(newDispatchSpecimens);
         resetMap();
     }
 
     @Override
     public void removeFromDispatchSpecimenCollection(
-        List<DispatchSpecimenWrapper> dasToRemove) {
+        List<? extends DispatchSpecimenBaseWrapper> dasToRemove) {
         super.removeFromDispatchSpecimenCollection(dasToRemove);
         resetMap();
     }
@@ -284,7 +216,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         for (DispatchSpecimenWrapper dsa : getDispatchSpecimenCollection(false)) {
             if (spcs.contains(dsa.getSpecimen())) {
                 removeDispatchSpecimens.add(dsa);
-                deletedDispatchedSpecimens.add(dsa);
             }
         }
         removeFromDispatchSpecimenCollection(removeDispatchSpecimens);
@@ -304,12 +235,16 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         for (DispatchSpecimenWrapper dsa : currentDaList) {
             if (dsaList.contains(dsa)) {
                 removeDispatchSpecimens.add(dsa);
-                deletedDispatchedSpecimens.add(dsa);
             }
         }
         removeFromDispatchSpecimenCollection(removeDispatchSpecimens);
     }
 
+    // TODO: IMHO methods like this shouldn't even exist in the wrapper. It
+    // should be a static method in some DispatchUtilFunctions class that keeps
+    // track of what was added, then persists them immediately. Having all this
+    // tracking done in the wrapper just creates potential problems if several
+    // methods that do tracking are called without persisting after - JMF
     public void receiveSpecimens(List<SpecimenWrapper> specimensToReceive) {
         List<DispatchSpecimenWrapper> nonProcessedSpecimens = getDispatchSpecimenCollectionWithState(DispatchSpecimenState.NONE);
         for (DispatchSpecimenWrapper ds : nonProcessedSpecimens) {
@@ -317,7 +252,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 hasSpecimenStatesChanged = true;
                 ds.setDispatchSpecimenState(DispatchSpecimenState.RECEIVED);
                 ds.getSpecimen().setCurrentCenter(getReceiverCenter());
-                toBePersistedDispatchedSpecimens.add(ds);
+                dispatchSpecimensToPersist.add(ds);
             }
         }
         resetMap();
@@ -351,7 +286,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public void setState(DispatchState ds) {
         setState(ds.getId());
-        removeSpecimensPosition = (ds == DispatchState.IN_TRANSIT);
     }
 
     @Override
@@ -442,11 +376,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     @Override
     protected void resetInternalFields() {
         resetMap();
-        deletedDispatchedSpecimens.clear();
-        toBePersistedDispatchedSpecimens.clear();
         hasNewSpecimens = false;
         hasSpecimenStatesChanged = false;
-        removeSpecimensPosition = false;
+        dispatchSpecimensToPersist.clear();
     }
 
     public void resetMap() {
@@ -454,59 +386,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details) {
-        Log log = new Log();
-        log.setAction(action);
-
-        DispatchState state = getDispatchState();
-
-        if (site != null) {
-            log.setCenter(site);
-        } else if (state != null) {
-            if (state.equals(DispatchState.CREATION)
-                || state.equals(DispatchState.IN_TRANSIT)) {
-                log.setCenter(getSenderCenter().getNameShort());
-            } else {
-                log.setCenter(getReceiverCenter().getNameShort());
-            }
-        }
-
-        List<String> detailsList = new ArrayList<String>();
-        if (details.length() > 0) {
-            detailsList.add(details);
-        }
-
-        detailsList.add(new StringBuilder("state: ").append(
-            getStateDescription()).toString());
-
-        if ((state != null)
-            && ((state.equals(DispatchState.CREATION)
-                || state.equals(DispatchState.IN_TRANSIT) || state
-                    .equals(DispatchState.LOST)))) {
-            String packedAt = getFormattedPackedAt();
-            if ((packedAt != null) && (packedAt.length() > 0)) {
-                detailsList.add(new StringBuilder("packed at: ").append(
-                    packedAt).toString());
-            }
-        }
-
-        ShipmentInfoWrapper shipInfo = getShipmentInfo();
-        if (shipInfo != null) {
-            String receivedAt = shipInfo.getFormattedDateReceived();
-            if ((receivedAt != null) && (receivedAt.length() > 0)) {
-                detailsList.add(new StringBuilder("received at: ").append(
-                    receivedAt).toString());
-            }
-
-            String waybill = shipInfo.getWaybill();
-            if (waybill != null) {
-                detailsList.add(new StringBuilder(", waybill: ")
-                    .append(waybill).toString());
-            }
-        }
-        log.setDetails(StringUtils.join(detailsList, ", "));
-        log.setType("Dispatch");
-        return log;
+    public DispatchLogProvider getLogProvider() {
+        return LOG_PROVIDER;
     }
 
     private static final String DISPATCH_HQL_STRING = "from "
@@ -532,9 +413,11 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     private static final String DISPATCHES_BY_DATE_RECEIVED_QRY = DISPATCH_HQL_STRING
-        + " where DATE(s."
+        + " where s."
         + ShipmentInfoPeer.RECEIVED_AT.getName()
-        + ") = DATE(?) and (d."
+        + " >=? and s."
+        + ShipmentInfoPeer.RECEIVED_AT.getName()
+        + " <? and (d."
         + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
         + "= ? or d."
         + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
@@ -551,7 +434,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         Integer centerId = center.getId();
         HQLCriteria criteria = new HQLCriteria(
             DISPATCHES_BY_DATE_RECEIVED_QRY.toString(),
-            Arrays.asList(new Object[] { dateReceived, centerId, centerId }));
+            Arrays.asList(new Object[] { startOfDay(dateReceived),
+                endOfDay(dateReceived), centerId, centerId }));
 
         List<Dispatch> origins = appService.query(criteria);
         List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(
@@ -561,9 +445,11 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     private static final String DISPATCHED_BY_DATE_SENT_QRY = DISPATCH_HQL_STRING
-        + " where DATE(s."
+        + " where s."
         + ShipmentInfoPeer.PACKED_AT.getName()
-        + ") = DATE(?) and (d."
+        + " >= ? and s."
+        + ShipmentInfoPeer.PACKED_AT.getName()
+        + " < ? and (d."
         + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
         + "= ? or d."
         + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
@@ -574,7 +460,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         CenterWrapper<?> center) throws ApplicationException {
         Integer centerId = center.getId();
         HQLCriteria criteria = new HQLCriteria(DISPATCHED_BY_DATE_SENT_QRY,
-            Arrays.asList(new Object[] { dateSent, centerId, centerId }));
+            Arrays.asList(new Object[] { startOfDay(dateSent),
+                endOfDay(dateSent), centerId, centerId }));
 
         List<Dispatch> origins = appService.query(criteria);
         List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(
@@ -597,7 +484,73 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return hasNewSpecimens;
     }
 
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(check().notNull(DispatchPeer.SENDER_CENTER));
+        tasks.add(check().notNull(DispatchPeer.RECEIVER_CENTER));
+
+        tasks.add(new NotNullPreCheck<Dispatch>(this,
+            DispatchPeer.SENDER_CENTER));
+
+        tasks.deleteRemoved(this, DispatchPeer.DISPATCH_SPECIMEN_COLLECTION);
+
+        removeSpecimensFromParents(tasks);
+        persistSpecimens(tasks);
+
+        super.addPersistTasks(tasks);
+
+        tasks.persistAdded(this, DispatchPeer.DISPATCH_SPECIMEN_COLLECTION);
+
+        BiobankSessionAction checkWaybill = new UniqueCheck<Dispatch>(this,
+            UNIQUE_WAYBILL_PER_SENDER_PROPERTIES);
+
+        tasks.add(new IfAction<Dispatch>(this, WAYBILL_PROPERTY, Is.NOT_NULL,
+            checkWaybill));
+
+        tasks.add(new ResetInternalStateQueryTask(this));
+    }
+
+    private void persistSpecimens(TaskList tasks) {
+        for (DispatchSpecimenWrapper dispatchSpecimen : dispatchSpecimensToPersist) {
+            SpecimenWrapper specimen = dispatchSpecimen.getSpecimen();
+            specimen.addPersistTasks(tasks);
+        }
+    }
+
+    private void removeSpecimensFromParents(TaskList tasks) {
+        if (DispatchState.IN_TRANSIT.equals(getDispatchState())) {
+            Collection<DispatchSpecimenWrapper> dispatchSpecimens = getDispatchSpecimenCollection(false);
+            for (DispatchSpecimenWrapper dispatchSpecimen : dispatchSpecimens) {
+                SpecimenWrapper specimen = dispatchSpecimen.getSpecimen();
+                specimen.setParent(null, null);
+                specimen.addPersistTasks(tasks);
+            }
+        }
+    }
+
     public boolean hasSpecimenStatesChanged() {
         return hasSpecimenStatesChanged;
+    }
+
+    private static class ResetInternalStateQueryTask extends
+        NoActionWrapperQueryTask<DispatchWrapper> {
+        public ResetInternalStateQueryTask(DispatchWrapper dispatch) {
+            super(dispatch);
+        }
+
+        @Override
+        public void afterExecute(SDKQueryResult result) {
+            getWrapper().hasNewSpecimens = false;
+            getWrapper().hasSpecimenStatesChanged = false;
+            getWrapper().dispatchSpecimensToPersist.clear();
+        }
+    }
+
+    public void reloadDispatchSpecimens() throws Exception {
+        for (DispatchSpecimenWrapper ds : getDispatchSpecimenCollection(false)) {
+            ds.reload();
+        }
+        resetMap();
+        dispatchSpecimensToPersist.clear();
     }
 }

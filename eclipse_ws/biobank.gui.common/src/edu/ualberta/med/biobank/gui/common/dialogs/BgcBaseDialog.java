@@ -35,7 +35,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
@@ -125,9 +124,6 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
             BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (final AccessDeniedException ade) {
             BgcPlugin.openAccessDeniedErrorMessage(ade);
-        } catch (BiobankCheckException bce) {
-            BgcPlugin.openAsyncError(Messages.BgcBaseDialog_save_error_title,
-                bce);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

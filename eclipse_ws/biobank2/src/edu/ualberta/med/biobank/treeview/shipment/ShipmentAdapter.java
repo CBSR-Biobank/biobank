@@ -29,13 +29,9 @@ public class ShipmentAdapter extends AdapterBase {
         setHasChildren(false);
     }
 
-    public OriginInfoWrapper getWrapper() {
-        return (OriginInfoWrapper) modelObject;
-    }
-
     @Override
     protected String getLabelInternal() {
-        OriginInfoWrapper originInfo = getWrapper();
+        OriginInfoWrapper originInfo = (OriginInfoWrapper) getModelObject();
         ShipmentInfoWrapper shipmentInfo = originInfo.getShipmentInfo();
 
         String label = ""; //$NON-NLS-1$
@@ -50,7 +46,7 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        OriginInfoWrapper originInfo = getWrapper();
+        OriginInfoWrapper originInfo = (OriginInfoWrapper) getModelObject();
         if (originInfo != null) {
             CenterWrapper<?> center = originInfo.getCenter();
             if (center != null)

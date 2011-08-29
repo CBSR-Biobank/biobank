@@ -69,7 +69,7 @@ public class ModelClass {
         this.isParentClass = isParentClass;
     }
 
-    public boolean getIsParentClass() {
+    public boolean isParentClass() {
         return isParentClass;
     }
 

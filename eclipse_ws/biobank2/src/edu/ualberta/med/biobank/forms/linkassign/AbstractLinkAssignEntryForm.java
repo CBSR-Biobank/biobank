@@ -27,6 +27,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -93,10 +94,11 @@ public abstract class AbstractLinkAssignEntryForm extends
     protected void init() throws Exception {
         super.init();
         singleSpecimen = new SpecimenWrapper(appService);
-        canSaveSingleBinding = widgetCreator.addBooleanBinding(
-            new WritableValue(Boolean.FALSE, Boolean.class),
-            canSaveSingleSpecimen,
-            Messages.AbstractLinkAssignEntryForm_fill_fields_or_previous_errors);
+        canSaveSingleBinding = widgetCreator
+            .addBooleanBinding(
+                new WritableValue(Boolean.FALSE, Boolean.class),
+                canSaveSingleSpecimen,
+                Messages.AbstractLinkAssignEntryForm_fill_fields_or_previous_errors);
     }
 
     protected abstract String getFormTitle();
@@ -694,14 +696,19 @@ public abstract class AbstractLinkAssignEntryForm extends
                         displaySinglePositions(false);
                         return;
                     }
+
+                    ContainerWrapper container = parentContainers.get(0);
+
                     appendLog(NLS
                         .bind(
                             Messages.AbstractLinkAssignEntryForm_single_activitylog_checkingPosition,
                             positionString));
-                    singleSpecimen.setSpecimenPositionFromString(
-                        positionString, parentContainers.get(0));
-                    if (singleSpecimen.isPositionFree(parentContainers.get(0))) {
-                        singleSpecimen.setParentContainer(parentContainers.get(0));
+
+                    RowColPos position = container.getContainerType()
+                        .getRowColFromPositionString(positionString);
+
+                    if (container.isPositionFree(position)) {
+                        singleSpecimen.setParent(container, position);
                         displaySinglePositions(true);
                         canSaveSingleSpecimen.setValue(true);
                         cancelConfirmWidget.setFocus();

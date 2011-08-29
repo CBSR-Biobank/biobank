@@ -146,10 +146,12 @@ public class TestAliquotedSpecimen extends TestDatabase {
             AliquotedSpecimen.class, aliquotedSpec.getId());
         Assert.assertNotNull(ssInDB);
 
+        Integer aliquotedSpecId = aliquotedSpec.getId();
+
         aliquotedSpec.delete();
 
         ssInDB = ModelUtils.getObjectWithId(appService,
-            AliquotedSpecimen.class, aliquotedSpec.getId());
+            AliquotedSpecimen.class, aliquotedSpecId);
         // object is not anymore in database
         Assert.assertNull(ssInDB);
     }

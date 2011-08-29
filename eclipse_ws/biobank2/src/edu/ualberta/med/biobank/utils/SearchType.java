@@ -73,7 +73,7 @@ public enum SearchType {
                     .getActivePage()
                     .openEditor(input, SpecimenListViewForm.ID, false);
             } catch (PartInitException e) {
-                logger.error(NLS.bind(Messages.SearchType_form_open_error_msg,
+                logger.error(NLS.bind(CAN_T_OPEN_FORM_WITH_ID_MSG,
                     SpecimenListViewForm.ID), e);
             }
         }
@@ -136,12 +136,14 @@ public enum SearchType {
                     .getActivePage()
                     .openEditor(input, PeListViewForm.ID, false);
             } catch (PartInitException e) {
-                logger.error(
-                    NLS.bind(Messages.SearchType_form_open_error_msg, PeListViewForm.ID),
-                    e);
+                logger
+                    .error(NLS.bind(CAN_T_OPEN_FORM_WITH_ID_MSG,
+                        PeListViewForm.ID), e);
             }
         }
     };
+
+    private static final String CAN_T_OPEN_FORM_WITH_ID_MSG = "Can''t open form with id {0}"; //$NON-NLS-1$
 
     private static BgcLogger logger = BgcLogger.getLogger(SearchType.class
         .getName());
@@ -166,12 +168,10 @@ public enum SearchType {
         if (size == 1) {
             openResult(res.get(0));
         } else {
-            boolean open = MessageDialog
-                .openQuestion(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(),
-                    Messages.SearchType_question_title, NLS.bind(
-                        Messages.SearchType_question_msg,
-                        size));
+            boolean open = MessageDialog.openQuestion(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(),
+                Messages.SearchType_question_title,
+                NLS.bind(Messages.SearchType_question_msg, size));
             if (open) {
                 for (ModelWrapper<?> wrapper : res) {
                     openResult(wrapper);

@@ -11,6 +11,7 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.UserBaseWrapper;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -36,23 +37,25 @@ public class UserWrapper extends UserBaseWrapper {
         super(appService);
     }
 
-    @Override
-    protected void persistDependencies(User origObject) throws Exception {
-        Long csmId = ((BiobankApplicationService) appService).persistUser(
-            getWrappedObject(), password);
-        if (isNew())
-            setCsmUserId(csmId);
-        super.persistDependencies(origObject);
-    }
-
-    @Override
-    public void delete() throws Exception {
-        User userMiniCopy = new User();
-        userMiniCopy.setCsmUserId(getCsmUserId());
-        super.delete();
-        // should delete in csm only if the wrapper delete succeedes
-        ((BiobankApplicationService) appService).deleteUser(userMiniCopy);
-    }
+    // FIXME need new way of doing this with new wrappers
+    // @Override
+    // protected void persistDependencies(User origObject) throws Exception {
+    // Long csmId = ((BiobankApplicationService) appService).persistUser(
+    // getWrappedObject(), password);
+    // if (isNew())
+    // setCsmUserId(csmId);
+    // super.persistDependencies(origObject);
+    // }
+    //
+    // @Override
+    // // FIXME see addDeleteTasks ?
+    // public void delete() throws Exception {
+    // User userMiniCopy = new User();
+    // userMiniCopy.setCsmUserId(getCsmUserId());
+    // super.delete();
+    // // should delete in csm only if the wrapper delete succeedes
+    // ((BiobankApplicationService) appService).deleteUser(userMiniCopy);
+    // }
 
     public void setPassword(String password) {
         String old = this.password;
@@ -79,37 +82,18 @@ public class UserWrapper extends UserBaseWrapper {
         lockedOut = null;
     }
 
-    /**
-     * Should use group.addToUserCollection
-     */
     @Override
-    @Deprecated
-    public void addToGroupCollection(List<BbGroupWrapper> groupCollection) {
+    protected void addDeleteTasks(TaskList tasks) {
+        removeThisuserFromGroups(tasks);
+
+        super.addDeleteTasks(tasks);
     }
 
-    /**
-     * Should use group.removeFromUserCollection
-     */
-    @Override
-    @Deprecated
-    public void removeFromGroupCollection(List<BbGroupWrapper> groupCollection) {
-    }
-
-    /**
-     * Should use group.removeFromUserCollectionWithCheck
-     */
-    @Override
-    @Deprecated
-    public void removeFromGroupCollectionWithCheck(
-        List<BbGroupWrapper> groupCollection) throws BiobankCheckException {
-    }
-
-    @Override
-    public void deleteDependencies() throws Exception {
+    public void removeThisuserFromGroups(TaskList tasks) {
         // should remove this user from its groups
         for (BbGroupWrapper group : getGroupCollection(false)) {
             group.removeFromUserCollection(Arrays.asList(this));
-            group.persist();
+            group.addPersistTasks(tasks);
         }
     }
 

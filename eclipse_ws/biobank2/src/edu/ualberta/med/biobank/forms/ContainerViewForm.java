@@ -34,10 +34,10 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -108,7 +108,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         containerAdapter = (ContainerAdapter) adapter;
-        container = containerAdapter.getContainer();
+        container = (ContainerWrapper) getModelObject();
         container.reload();
         setPartName(NLS.bind(Messages.ContainerViewForm_title,
             container.getLabel(), container.getContainerType().getNameShort()));
@@ -473,11 +473,12 @@ public class ContainerViewForm extends BiobankViewForm {
                     if (containerToOpen == null) {
                         containerToOpen = new ContainerWrapper(appService);
                     }
-                    containerToOpen.setSite(containerAdapter
-                        .getParentFromClass(SiteAdapter.class).getWrapper());
-                    containerToOpen.setParent(container);
-                    containerToOpen.setPositionAsRowCol(new RowColPos(cell
-                        .getRow(), cell.getCol()));
+                    containerToOpen
+                        .setSite((SiteWrapper) containerAdapter
+                            .getParentFromClass(SiteAdapter.class)
+                            .getModelObject());
+                    RowColPos pos = new RowColPos(cell.getRow(), cell.getCol());
+                    containerToOpen.setParent(container, pos);
                     newAdapter = new ContainerAdapter(containerAdapter,
                         containerToOpen);
                     newAdapter.openEntryForm(true);
@@ -488,8 +489,6 @@ public class ContainerViewForm extends BiobankViewForm {
                 SessionManager.openViewForm(child);
             }
             containerAdapter.performExpand();
-        } catch (BiobankFailedQueryException e) {
-            BgcPlugin.openAsyncError(Messages.ContainerViewForm_error_title, e);
         } catch (BiobankCheckException e) {
             BgcPlugin.openAsyncError(Messages.ContainerViewForm_error_title, e);
         }
@@ -506,11 +505,11 @@ public class ContainerViewForm extends BiobankViewForm {
             .getTemperature());
         if (container.hasParentContainer()) {
             if (rowLabel != null) {
-                setTextValue(rowLabel, container.getPositionAsRowCol().row);
+                setTextValue(rowLabel, container.getPositionAsRowCol().getRow());
             }
 
             if (colLabel != null) {
-                setTextValue(colLabel, container.getPositionAsRowCol().col);
+                setTextValue(colLabel, container.getPositionAsRowCol().getCol());
             }
         }
     }

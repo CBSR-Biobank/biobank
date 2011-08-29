@@ -89,19 +89,19 @@ public class SessionHelper implements Runnable {
             } else if (exp instanceof ServerVersionNewerException) {
                 if (BgcPlugin.openConfirm(
                     Messages.SessionHelper_server_version_error_title,
-                    Messages.SessionHelper_server_oldversion_error_msg)) {
+                    exp.getMessage()
+                        + Messages.SessionHelper_server_oldversion_error_msg)) {
                     try {
                         Desktop.getDesktop().browse(new URI(DOWNLOAD_URL));
                     } catch (Exception e1) {
                         // ignore
                     }
-                    logger.error(
-                        Messages.SessionHelper_server_oldversion_log_msg, exp);
+                    logger.error(exp.getMessage(), exp);
                 }
             } else if (exp instanceof ServerVersionOlderException) {
                 BgcPlugin.openError(
                     Messages.SessionHelper_server_version_error_title,
-                    Messages.SessionHelper_server_newversion_error_msg, exp);
+                    exp.getMessage(), exp);
             } else if (exp instanceof ClientVersionInvalidException) {
                 BgcPlugin.openError(Messages.SessionHelper_client_error_title,
                     Messages.SessionHelper_client_invalid_error_msg, exp);

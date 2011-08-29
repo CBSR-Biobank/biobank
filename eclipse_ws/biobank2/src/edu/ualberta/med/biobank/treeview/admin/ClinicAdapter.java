@@ -20,13 +20,9 @@ public class ClinicAdapter extends AdapterBase {
         setEditable(parent instanceof ClinicMasterGroup || parent == null);
     }
 
-    public ClinicWrapper getWrapper() {
-        return (ClinicWrapper) modelObject;
-    }
-
     @Override
     protected String getLabelInternal() {
-        ClinicWrapper wrapper = getWrapper();
+        ClinicWrapper wrapper = (ClinicWrapper) getModelObject();
         Assert.isNotNull(wrapper, "client is null"); //$NON-NLS-1$
         return wrapper.getNameShort();
     }

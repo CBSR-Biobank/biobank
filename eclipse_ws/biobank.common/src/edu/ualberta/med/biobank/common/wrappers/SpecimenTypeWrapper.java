@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,11 +8,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
+import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
@@ -22,6 +25,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
+    private static final String HAS_SPECIMENS_MSG = "Unable to delete specimen type {0}. Specimens of this type exists in storage. Remove all instances before deleting this type.";
+    private static final String HAS_SOURCE_SPECIMENS_MSG = "Unable to delete specimen type {0}. Source specimens of this type exists in storage. Remove all instances before deleting this type.";
+    private static final String HAS_ALIQUOTED_SPECIMENS_MSG = "Unable to delete specimen type {0}. Aliquoted specimens of this type exists in storage. Remove all instances before deleting this type.";
 
     private static final String UNKNOWN_IMPORT_NAME = "Unknown / import";
 
@@ -67,31 +73,6 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return new ArrayList<SpecimenTypeWrapper>(SpecimenTypes);
     }
 
-    @Override
-    public boolean checkIntegrity() {
-        return true;
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankException, ApplicationException {
-        if (isUsed()) {
-            throw new BiobankDeleteException(
-                "Unable to delete specimen type "
-                    + getName()
-                    + ". Specimens of this type exists in storage, or studies are using it in their definition."
-                    + " Remove all references to this type before deleting it.");
-        }
-    }
-
-    @Override
-    public void deleteDependencies() throws Exception {
-        // should remove this type from its parents
-        for (SpecimenTypeWrapper parent : getParentSpecimenTypeCollection(false)) {
-            parent.removeFromChildSpecimenTypeCollection(Arrays.asList(this));
-            parent.persist();
-        }
-    }
-
     public static final String ALL_SAMPLE_TYPES_QRY = "from "
         + SpecimenType.class.getName();
 
@@ -131,31 +112,6 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     }
 
     @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        checkNameAndShortNameUnique();
-    }
-
-    /**
-     * This method should only be called to save the new sample type list.
-     */
-    public static void persistSpecimenTypes(
-        List<SpecimenTypeWrapper> addedOrModifiedTypes,
-        List<SpecimenTypeWrapper> typesToDelete) throws BiobankCheckException,
-        Exception {
-        if (addedOrModifiedTypes != null) {
-            for (SpecimenTypeWrapper ss : addedOrModifiedTypes) {
-                ss.persist();
-            }
-        }
-        if (typesToDelete != null) {
-            for (SpecimenTypeWrapper ss : typesToDelete) {
-                ss.delete();
-            }
-        }
-    }
-
-    @Override
     public int compareTo(ModelWrapper<SpecimenType> wrapper) {
         if (wrapper instanceof SpecimenTypeWrapper) {
             String name1 = wrappedObject.getName();
@@ -192,8 +148,45 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     }
 
     @Override
-    public void reload() throws Exception {
-        super.reload();
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(check().notNull(SpecimenTypePeer.NAME));
+        tasks.add(check().notNull(SpecimenTypePeer.NAME_SHORT));
+
+        tasks.add(check().unique(SpecimenTypePeer.NAME));
+        tasks.add(check().unique(SpecimenTypePeer.NAME_SHORT));
+
+        super.addPersistTasks(tasks);
+    }
+
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        String isUsedBySpecimensMsg = MessageFormat.format(HAS_SPECIMENS_MSG,
+            getName());
+        tasks.add(check().notUsedBy(Specimen.class, SpecimenPeer.SPECIMEN_TYPE,
+            isUsedBySpecimensMsg));
+
+        String isUsedBySourceSpecimensMsg = MessageFormat.format(
+            HAS_SOURCE_SPECIMENS_MSG, getName());
+        tasks.add(check().notUsedBy(SourceSpecimen.class,
+            SourceSpecimenPeer.SPECIMEN_TYPE, isUsedBySourceSpecimensMsg));
+
+        String isUsedByAliquotedSpecimensMsg = MessageFormat.format(
+            HAS_ALIQUOTED_SPECIMENS_MSG, getName());
+        tasks
+            .add(check().notUsedBy(AliquotedSpecimen.class,
+                AliquotedSpecimenPeer.SPECIMEN_TYPE,
+                isUsedByAliquotedSpecimensMsg));
+
+        removeThisTypeFromParents(tasks);
+
+        super.addDeleteTasks(tasks);
+    }
+
+    public void removeThisTypeFromParents(TaskList tasks) {
+        for (SpecimenTypeWrapper parent : getParentSpecimenTypeCollection(false)) {
+            parent.removeFromChildSpecimenTypeCollection(Arrays.asList(this));
+            parent.addPersistTasks(tasks);
+        }
     }
 
     public void checkNameAndShortNameUnique() throws ApplicationException,
@@ -208,48 +201,4 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     public boolean isUnknownImport() {
         return getName() != null && UNKNOWN_IMPORT_NAME.equals(getName());
     }
-
-    /**
-     * @deprecated instead of
-     *             child.addToParentSpecimenTypeCollection(Arrays.asList
-     *             (parent)), do
-     *             parent.addToChildSpecimenTypeCollection(Arrays.asList(child))
-     *             (this hibernate mapping with correlation table works only in
-     *             one way)
-     */
-    @Override
-    @Deprecated
-    public void addToParentSpecimenTypeCollection(
-        List<SpecimenTypeWrapper> parentSpecimenTypeCollection) {
-    }
-
-    /**
-     * @deprecated instead of
-     *             child.removeFromParentSpecimenTypeCollection(Arrays
-     *             .asList(parent)), do
-     *             parent.removeFromChildSpecimenTypeCollection
-     *             (Arrays.asList(child)) (this hibernate mapping with
-     *             correlation table works only in one way)
-     */
-    @Override
-    @Deprecated
-    public void removeFromParentSpecimenTypeCollection(
-        List<SpecimenTypeWrapper> parentSpecimenTypeCollection) {
-    }
-
-    /**
-     * @deprecated instead of
-     *             child.removeFromParentSpecimenTypeCollectionWithCheck
-     *             (Arrays.asList (parent)), do
-     *             parent.removeFromChildSpecimenTypeCollectionWithCheck(Arrays
-     *             .asList(child)) (this hibernate mapping with correlation
-     *             table works only in one way)
-     */
-    @Override
-    @Deprecated
-    public void removeFromParentSpecimenTypeCollectionWithCheck(
-        List<SpecimenTypeWrapper> parentSpecimenTypeCollection)
-        throws BiobankCheckException {
-    }
-
 }

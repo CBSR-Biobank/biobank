@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PrintedSsInvItem;
 import edu.ualberta.med.biobank.model.Report;
@@ -61,6 +62,19 @@ public class BiobankApplicationServiceImpl extends
     public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
         String targetClassName) throws ApplicationException {
         return privateQuery(sqlCriteria, targetClassName);
+    }
+
+    @Override
+    protected Request prepareRequest(SDKQuery query, String classname) {
+        Request request = super.prepareRequest(query, classname);
+
+        // super.prepareRequest replaces the request of SearchHQLQuery, switch
+        // it back to the query if it's a BiobankSessionAction
+        if (query instanceof BiobankSessionAction) {
+            request.setRequest(query);
+        }
+
+        return request;
     }
 
     @Override

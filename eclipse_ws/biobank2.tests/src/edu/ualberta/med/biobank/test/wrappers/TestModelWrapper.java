@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -39,12 +40,20 @@ public class TestModelWrapper extends TestDatabase {
             return 0;
         }
 
+        @Override
+        public Property<Integer, ? super Object> getIdProperty() {
+            return null;
+        }
     }
 
     class TestSiteWrapper extends ModelWrapper<Site> {
 
         public TestSiteWrapper(WritableApplicationService appService) {
             super(appService);
+        }
+
+        public TestSiteWrapper(WritableApplicationService appService, Site site) {
+            super(appService, site);
         }
 
         @Override
@@ -62,6 +71,10 @@ public class TestModelWrapper extends TestDatabase {
             return 0;
         }
 
+        @Override
+        public Property<Integer, ? super Site> getIdProperty() {
+            return SitePeer.ID;
+        }
     }
 
     @Test
@@ -122,13 +135,6 @@ public class TestModelWrapper extends TestDatabase {
     }
 
     @Test
-    public void testLoadAttributes() throws Exception {
-        String name = "testLoadAttributes";
-        SiteWrapper wrapper = SiteHelper.addSite(name);
-        wrapper.loadAttributes();
-    }
-
-    @Test
     public void testEquals() throws Exception {
         TestSiteWrapper wrapper = new TestSiteWrapper(appService);
         SiteWrapper site = SiteHelper.addSite("testEquals");
@@ -140,7 +146,11 @@ public class TestModelWrapper extends TestDatabase {
 
         // call to equals should handle null IDs
         TestSiteWrapper wrapper2 = new TestSiteWrapper(appService);
-        Assert.assertTrue(wrapper.equals(wrapper2));
+        Assert.assertFalse(wrapper.equals(wrapper2));
+
+        TestSiteWrapper wrapper3 = new TestSiteWrapper(appService,
+            wrapper.getWrappedObject());
+        Assert.assertTrue(wrapper.equals(wrapper3));
     }
 
     @Test

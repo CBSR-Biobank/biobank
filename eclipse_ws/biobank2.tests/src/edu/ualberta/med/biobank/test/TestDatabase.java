@@ -21,6 +21,8 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.StringValue
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 import edu.ualberta.med.biobank.test.internal.GroupHelper;
+import edu.ualberta.med.biobank.test.internal.RequestHelper;
+import edu.ualberta.med.biobank.test.internal.ResearchGroupHelper;
 import edu.ualberta.med.biobank.test.internal.RightHelper;
 import edu.ualberta.med.biobank.test.internal.RoleHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentInfoHelper;
@@ -64,7 +66,10 @@ public class TestDatabase {
         Assert.assertNotNull("appService is null", appService);
         try {
             DispatchHelper.deleteCreatedDispatches();
+            RequestHelper.deleteCreatedRequests();
+            StudyHelper.deleteStudyDependencies();
             SiteHelper.deleteCreatedSites();
+            ResearchGroupHelper.deleteCreatedResearchGroups();
             StudyHelper.deleteCreatedStudies();
             ShipmentInfoHelper.deleteCreatedShipInfos();
             ClinicHelper.deleteCreatedClinics();

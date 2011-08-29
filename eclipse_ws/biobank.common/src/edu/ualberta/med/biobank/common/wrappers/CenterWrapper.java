@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
@@ -16,6 +14,7 @@ import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.CenterBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Center;
@@ -38,14 +37,28 @@ public abstract class CenterWrapper<E extends Center> extends
     private static final String ALL_CENTERS_HQL_STRING = "from "
         + Center.class.getName();
 
-    private Set<CollectionEventWrapper> deletedCollectionEvents = new HashSet<CollectionEventWrapper>();
-
     public CenterWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
     public CenterWrapper(WritableApplicationService appService, E c) {
         super(appService, c);
+    }
+
+    @Override
+    public int compareTo(ModelWrapper<E> wrapper) {
+        if (wrapper instanceof CenterWrapper) {
+            String name1 = wrappedObject.getName();
+            String name2 = wrapper.wrappedObject.getName();
+            return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
+                : -1));
+        }
+        return 0;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 
     @Override
@@ -190,19 +203,6 @@ public abstract class CenterWrapper<E extends Center> extends
      */
     public abstract long getPatientCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException;
-
-    @Override
-    protected void persistDependencies(Center origObject) throws Exception {
-        deleteCollectionEvents();
-    }
-
-    private void deleteCollectionEvents() throws Exception {
-        for (CollectionEventWrapper ce : deletedCollectionEvents) {
-            if (!ce.isNew()) {
-                ce.delete();
-            }
-        }
-    }
 
     public static List<CenterWrapper<?>> getCenters(
         WritableApplicationService appService) throws ApplicationException {
@@ -412,6 +412,53 @@ public abstract class CenterWrapper<E extends Center> extends
 
     }
 
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(check().notNull(CenterPeer.NAME));
+        tasks.add(check().notNull(CenterPeer.NAME_SHORT));
+
+        tasks.add(check().unique(CenterPeer.NAME));
+        tasks.add(check().unique(CenterPeer.NAME_SHORT));
+
+        super.addPersistTasks(tasks);
+    }
+
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        super.addDeleteTasks(tasks);
+    }
+
+    // TODO: remove if allowing bi-direcitonal links.
+    // public List<DispatchWrapper> getSrcDispatchCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // DispatchPeer.SENDER_CENTER, Dispatch.class, DispatchWrapper.class,
+    // sort);
+    // }
+    //
+    // public List<DispatchWrapper> getDstDispatchCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // DispatchPeer.RECEIVER_CENTER, Dispatch.class,
+    // DispatchWrapper.class, sort);
+    // }
+    //
+    // public List<SpecimenWrapper> getSpecimenCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // SpecimenPeer.CURRENT_CENTER, Specimen.class, SpecimenWrapper.class,
+    // sort);
+    // }
+    //
+    // public List<OriginInfoWrapper> getOriginInfoCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this, OriginInfoPeer.CENTER,
+    // OriginInfo.class, OriginInfoWrapper.class, sort);
+    // }
+    //
+    // public List<ProcessingEventWrapper> getProcessingEventCollection(
+    // boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // ProcessingEventPeer.CENTER, ProcessingEvent.class,
+    // ProcessingEventWrapper.class, sort);
+    // }
+
     private static final String PENDING_REQUEST_STRING = "select distinct(ra."
         + RequestSpecimenPeer.REQUEST.getName()
         + ") from "
@@ -429,7 +476,7 @@ public abstract class CenterWrapper<E extends Center> extends
             Arrays.asList(new Object[] { center.getWrappedObject() }));
         List<Request> requests = appService.query(criteria);
         if (requests.size() == 0)
-            return null;
+            return new ArrayList<RequestWrapper>();
         else
             return wrapModelCollection(appService, requests,
                 RequestWrapper.class);

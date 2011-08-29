@@ -5,6 +5,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.forms.messages"; //$NON-NLS-1$
 
+    public static String LoggingForm_date_label;
+
     public static String AbstractDispatchEntryForm_add_spec_label;
 
     public static String AbstractDispatchEntryForm_scanDialog_label;
@@ -31,8 +33,6 @@ public class Messages extends NLS {
 
     public static String AddressEntryFormCommon_postalCode_label;
 
-    public static String AddressEntryFormCommon_postalCode_validation_msg;
-
     public static String AddressEntryFormCommon_province_label;
 
     public static String AddressEntryFormCommon_street1_label;
@@ -43,7 +43,7 @@ public class Messages extends NLS {
 
     public static String BiobankEntryForm_access_denied_error_msg;
 
-    public static String BiobankEntryForm_save_error_title;
+    public static String BiobankFormBase_save_error_title;
 
     public static String BiobankEntryForm_saving;
 
@@ -314,6 +314,8 @@ public class Messages extends NLS {
     public static String ProcessingEventEntryForm_title_new;
     public static String ProcessingEventEntryForm_center_spec_error_msg;
 
+    public static String ProcessingEventEntryForm_concurrency_error_msg;
+
     public static String ProcessingEventEntryForm_confirm_remove_title;
 
     public static String ProcessingEventEntryForm_confirm_remove_msg;
@@ -322,6 +324,12 @@ public class Messages extends NLS {
     public static String ProcessingEventEntryForm_edition_msg;
     public static String ProcessingEventEntryForm_title_edit_worksheet;
     public static String ProcessingEventEntryForm_title_edit_noworksheet;
+
+    public static String ProcessingEventEntryForm_try_again_adding_error_label;
+
+    public static String ProcessingEventEntryForm_try_again_error_msg;
+
+    public static String ProcessingEventEntryForm_try_again_removing_error_label;
     public static String ProcessingEventEntryForm_main_title;
     public static String ProcessingEvent_field_center_label;
     public static String ProcessingEvent_field_date_label;
@@ -333,6 +341,8 @@ public class Messages extends NLS {
     public static String ProcessingEventEntryForm_notfound_spec_error_msg;
 
     public static String ProcessingEventEntryForm_other_pEvent_error_msg;
+
+    public static String ProcessingEventEntryForm_save_error_title;
 
     public static String ProcessingEventEntryForm_spec_active_only_error_msg;
 
@@ -385,6 +395,8 @@ public class Messages extends NLS {
     public static String DispatchReceivingEntryForm_notFound_errror_msg;
 
     public static String DispatchReceivingEntryForm_ok_msg;
+
+    public static String DispatchReceivingEntryForm_problem_spec_error;
 
     public static String DispatchReceivingEntryForm_receive_error_title;
 
@@ -490,6 +502,10 @@ public class Messages extends NLS {
 
     public static String DispatchViewForm_waybill_label;
 
+    public static String LoggingForm_0;
+
+    public static String LoggingForm_1;
+
     public static String LoggingForm_action_label;
 
     public static String LoggingForm_center_label;
@@ -579,11 +595,17 @@ public class Messages extends NLS {
 
     public static String ScanPlateForm_scanplate_button;
 
+    public static String ShipmentEntryForm_adding_label;
+
     public static String ShipmentEntryForm_boxNber_label;
 
     public static String ShipmentEntryForm_center_select_msg;
 
     public static String ShipmentEntryForm_comments_label;
+
+    public static String ShipmentEntryForm_concurrency_msg;
+
+    public static String ShipmentEntryForm_concurrency_title;
 
     public static String ShipmentEntryForm_dispatched_specimen_error_msg;
 
@@ -611,6 +633,8 @@ public class Messages extends NLS {
 
     public static String ShipmentEntryForm_receiver_validation_msg;
 
+    public static String ShipmentEntryForm_removing_label;
+
     public static String ShipmentEntryForm_sender_label;
 
     public static String ShipmentEntryForm_sender_validation_msg;
@@ -626,6 +650,8 @@ public class Messages extends NLS {
     public static String ShipmentEntryForm_title_edit;
 
     public static String ShipmentEntryForm_title_new;
+
+    public static String ShipmentEntryForm_tryAgain_error_msg;
 
     public static String ShipmentEntryForm_waybill_label;
 
@@ -814,15 +840,15 @@ public class Messages extends NLS {
     public static String ResearchGroupViewForm_csv_file_label;
 
     public static String ResearchGroupViewForm_csvFile_label;
+    public static String ResearchGroupViewForm_0;
+
+    public static String ResearchGroupViewForm_1;
 
     public static String ResearchGroupViewForm_error_title;
 
     public static String ResearchGroupViewForm_title;
-    public static String ResearchGroupViewForm_field_label_totalPatients;
-    public static String ResearchGroupViewForm_field_label_totalCollectionEvents;
 
     public static String ResearchGroupViewForm_parse_error_msg;
-    public static String ResearchGroupViewForm_request_description;
 
     public static String ResearchGroupViewForm_request_upload_title;
 
@@ -844,7 +870,6 @@ public class Messages extends NLS {
     public static String ResearchGroupEntryForm_main_title;
     public static String ResearchGroupEntryForm_main_description;
     public static String ResearchGroupEntryForm_activity_validator_msg;
-    public static String ResearchGroupEntryForm_contact_button_add;
     public static String ResearchGroupEntryForm_study_label;
 
     public static String ResearchGroupEntryForm_study_validator_msg;

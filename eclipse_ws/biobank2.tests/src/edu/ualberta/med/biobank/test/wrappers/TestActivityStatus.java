@@ -12,7 +12,6 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
-import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.ClassUtils;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
@@ -31,6 +30,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotedSpecimenHelper;
@@ -135,14 +135,19 @@ public class TestActivityStatus extends TestDatabase {
 
         // ProcessingEvent
         ProcessingEventWrapper pevent = ProcessingEventHelper
-            .addProcessingEvent(site, patient, Utils.getRandomDate());
+            .addProcessingEvent(site, Utils.getRandomDate());
 
         ModelWrapper<?>[] wrappers = new ModelWrapper<?>[] { originSpecimen,
             studyEventAttr, topContainer, topContainerType, cevent,
             aliquotedSpecimenType, pevent, study, site };
         for (ModelWrapper<?> wrapper : wrappers) {
-            testDeleteFail(wrapper,
-                name + ClassUtils.getClassName(wrapper.getClass()));
+            try {
+                testDeleteFail(wrapper,
+                    name + ClassUtils.getClassName(wrapper.getClass()));
+            } catch (Exception e) {
+                throw e;
+            }
+
         }
     }
 
@@ -154,9 +159,13 @@ public class TestActivityStatus extends TestDatabase {
         as.persist();
         as.reload();
 
-        Method setActivityMethod = wrapper.getClass().getMethod(
-            "setActivityStatus", ActivityStatusWrapper.class);
-        setActivityMethod.invoke(wrapper, as);
+        try {
+            Method setActivityMethod = wrapper.getClass().getMethod(
+                "setActivityStatus", ActivityStatusWrapper.class);
+            setActivityMethod.invoke(wrapper, as);
+        } catch (NoSuchMethodException e) {
+            return;
+        }
         wrapper.persist();
         wrapper.reload();
 
@@ -168,7 +177,7 @@ public class TestActivityStatus extends TestDatabase {
         }
 
         if (wrapper instanceof StudyWrapper)
-            StudyHelper.deleteStudyAndDependencies((StudyWrapper) wrapper);
+            StudyHelper.deleteStudyDependencies();
         else if (wrapper instanceof SiteWrapper) {
             SiteHelper.deleteSiteAndDependencies(((SiteWrapper) wrapper));
         } else {
@@ -239,7 +248,7 @@ public class TestActivityStatus extends TestDatabase {
 
         statuses = ActivityStatusWrapper.getAllActivityStatuses(appService);
         after = statuses.size();
-        Assert.assertEquals(before - 5 + 3, after);
+        Assert.assertEquals((before - 5) + 3, after);
         Assert.assertTrue(statuses.containsAll(toAdd));
 
         addedstatus.addAll(toAdd);
@@ -264,7 +273,7 @@ public class TestActivityStatus extends TestDatabase {
             newAs.persist();
             Assert.fail("Cannot have 2 statuses with same name");
             addedstatus.add(newAs);
-        } catch (DuplicateEntryException dee) {
+        } catch (DuplicatePropertySetException e) {
             Assert.assertTrue(true);
         }
     }

@@ -92,7 +92,7 @@ public class Drawer36Display extends AbstractContainerDisplay {
                 .getColor());
             gc.fillRectangle(rectangle);
             if (displayWidget.getSelection() != null
-                && (displayWidget.getSelection().row + 1) == boxIndex) {
+                && (displayWidget.getSelection().getRow() + 1) == boxIndex) {
                 gc.setBackground(e.display.getSystemColor(SWT.COLOR_YELLOW));
                 gc.fillRectangle(rectangle);
             }

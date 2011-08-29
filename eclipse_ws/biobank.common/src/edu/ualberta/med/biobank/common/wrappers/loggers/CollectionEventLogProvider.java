@@ -1,0 +1,38 @@
+package edu.ualberta.med.biobank.common.wrappers.loggers;
+
+import java.util.Collection;
+
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Log;
+import edu.ualberta.med.biobank.model.Specimen;
+
+public class CollectionEventLogProvider implements
+    WrapperLogProvider<CollectionEvent> {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Log getLog(CollectionEvent collectionEvent) {
+        Log log = new Log();
+
+        log.setPatientNumber(collectionEvent.getPatient().getPnumber());
+
+        String details = "visit: " + collectionEvent.getVisitNumber()
+            + ", specimens: " + getOriginalSpecimensCount(collectionEvent);
+        log.setDetails(details);
+
+        return log;
+    }
+
+    private int getOriginalSpecimensCount(CollectionEvent collectionEvent) {
+        int count = 0;
+
+        // TODO: could be switched to HQL count query to be way faster
+        Collection<Specimen> originals = collectionEvent
+            .getOriginalSpecimenCollection();
+        if (originals != null) {
+            count = originals.size();
+        }
+
+        return count;
+    }
+}

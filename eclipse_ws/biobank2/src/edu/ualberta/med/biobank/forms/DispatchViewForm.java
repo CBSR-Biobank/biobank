@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
 
-import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
@@ -21,8 +20,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.springframework.remoting.RemoteAccessException;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.DispatchState;
@@ -80,7 +77,7 @@ public class DispatchViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         dispatchAdapter = (DispatchAdapter) adapter;
-        dispatch = (DispatchWrapper) adapter.getModelObject();
+        dispatch = (DispatchWrapper) getModelObject();
         SessionManager.logLookup(dispatch);
         retrieveDispatch();
         setPartName(Messages.DispatchViewForm_title);
@@ -265,24 +262,15 @@ public class DispatchViewForm extends BiobankViewForm {
                                 monitor.beginTask(
                                     Messages.DispatchViewForm_saving_text,
                                     IProgressMonitor.UNKNOWN);
-                                dispatch.setState(DispatchState.IN_TRANSIT);
                                 try {
+                                    ShipmentInfoWrapper si = dispatch
+                                        .getShipmentInfo();
+                                    dispatch.reload();
+                                    dispatch.setShipmentInfo(si);
+                                    dispatch.setState(DispatchState.IN_TRANSIT);
                                     dispatch.persist();
-                                } catch (final RemoteConnectFailureException exp) {
-                                    BgcPlugin
-                                        .openRemoteConnectErrorMessage(exp);
-                                    return;
-                                } catch (final RemoteAccessException exp) {
-                                    BgcPlugin.openRemoteAccessErrorMessage(exp);
-                                    return;
-                                } catch (final AccessDeniedException ade) {
-                                    BgcPlugin.openAccessDeniedErrorMessage(ade);
-                                    return;
                                 } catch (Exception ex) {
-                                    BgcPlugin
-                                        .openAsyncError(
-                                            Messages.DispatchViewForm_save_error_title,
-                                            ex);
+                                    saveErrorCatch(ex, monitor, false);
                                     return;
                                 }
                                 monitor.done();

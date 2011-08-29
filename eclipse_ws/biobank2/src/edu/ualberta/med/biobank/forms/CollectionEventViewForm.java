@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
@@ -24,11 +23,6 @@ import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShow
 public class CollectionEventViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventViewForm"; //$NON-NLS-1$
-
-    private static BgcLogger logger = BgcLogger
-        .getLogger(CollectionEventViewForm.class.getName());
-
-    private CollectionEventAdapter ceventAdapter;
 
     private CollectionEventWrapper cevent;
 
@@ -58,9 +52,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        ceventAdapter = (CollectionEventAdapter) adapter;
-        cevent = ceventAdapter.getWrapper();
-        retrievePatientVisit();
+        cevent = (CollectionEventWrapper) getModelObject();
         SessionManager.logLookup(cevent);
 
         setPartName(NLS.bind(Messages.CollectionEventViewForm_title,
@@ -170,8 +162,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void reload() {
-        retrievePatientVisit();
+    public void reload() throws Exception {
+        cevent.reload();
         setPartName(NLS.bind(Messages.CollectionEventViewForm_title,
             cevent.getVisitNumber()));
         form.setText(NLS.bind(Messages.CollectionEventViewForm_main_title,
@@ -181,16 +173,6 @@ public class CollectionEventViewForm extends BiobankViewForm {
             .getOriginalSpecimenCollection(true));
         aliquotedSpecimenTable.setCollection(cevent
             .getAliquotedSpecimenCollection(true));
-    }
-
-    private void retrievePatientVisit() {
-        try {
-            cevent.reload();
-        } catch (Exception ex) {
-            logger.error("Error while retrieving patient visit " //$NON-NLS-1$
-                + cevent.getVisitNumber() + "(patient " //$NON-NLS-1$
-                + cevent.getPatient() + ")", ex); //$NON-NLS-1$
-        }
     }
 
 }

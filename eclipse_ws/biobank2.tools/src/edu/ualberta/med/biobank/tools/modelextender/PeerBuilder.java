@@ -13,8 +13,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import edu.ualberta.med.biobank.common.util.TypeReference;
-import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.tools.modelumlparser.Attribute;
 import edu.ualberta.med.biobank.tools.modelumlparser.ClassAssociation;
 import edu.ualberta.med.biobank.tools.modelumlparser.ClassAssociationType;
@@ -38,13 +36,17 @@ public class PeerBuilder extends BaseBuilder {
         FileOutputStream fos = new FileOutputStream(f);
 
         StringBuilder result = new StringBuilder("package ")
-            .append(packagename).append(";\n").append("\nimport ")
-            .append(TypeReference.class.getName()).append(";\n")
-            .append("import ").append(Collections.class.getName())
-            .append(";\n").append("import ").append(Property.class.getName())
-            .append(";\n").append("import ").append(List.class.getName())
-            .append(";\n").append("import ").append(ArrayList.class.getName())
-            .append(";\n");
+            .append(packagename)
+            .append(";\n")
+            .append(
+                "\nimport edu.ualberta.med.biobank.common.util.TypeReference;\n")
+            .append("import ")
+            .append(Collections.class.getName())
+            .append(";\n")
+            .append(
+                "import edu.ualberta.med.biobank.common.wrappers.Property;\n")
+            .append("import ").append(List.class.getName()).append(";\n")
+            .append("import ").append(ArrayList.class.getName()).append(";\n");
 
         // add imports for required classes
         result.append(getImports(mc));
@@ -77,7 +79,7 @@ public class PeerBuilder extends BaseBuilder {
             String modelClass = mc.getName();
             String propertyName = assocName;
 
-            if ((assoc.getAssociationType() == ClassAssociationType.ZERO_OR_ONE_TO_MANY)
+            if ((assoc.getAssociationType() == ClassAssociationType.ZERO_TO_MANY)
                 || (assoc.getAssociationType() == ClassAssociationType.ONE_TO_MANY)) {
                 propertyClass = "Collection<" + propertyClass + ">";
             }
@@ -146,7 +148,7 @@ public class PeerBuilder extends BaseBuilder {
         for (ClassAssociation assoc : assocMap.values()) {
             ModelClass toClass = assoc.getToClass();
 
-            if ((assoc.getAssociationType() == ClassAssociationType.ZERO_OR_ONE_TO_MANY)
+            if ((assoc.getAssociationType() == ClassAssociationType.ZERO_TO_MANY)
                 || (assoc.getAssociationType() == ClassAssociationType.ONE_TO_MANY)) {
                 hasCollections = true;
             }

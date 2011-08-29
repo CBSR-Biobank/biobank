@@ -37,10 +37,10 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.CEventComboCallback;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.PatientTextCallback;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
@@ -235,7 +235,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                                     .getCells();
                                 if (cells != null) {
                                     for (RowColPos rcp : cells.keySet()) {
-                                        if (rcp.row == indexRow) {
+                                        if (rcp.getRow() == indexRow) {
                                             PalletCell cell = cells.get(rcp);
                                             if (PalletCell.hasValue(cell)) {
                                                 setHierarchyToCell(cell,
@@ -534,7 +534,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             }
         }
         // persist of parent will automatically persist children
-        ModelWrapper.persistBatch(modifiedSources);
+
+        WrapperTransaction tx = new WrapperTransaction(appService);
+        tx.persist(modifiedSources);
+        tx.commit();
+
         // display logs only if persist succeeds.
         appendLog(sb.toString());
 
@@ -698,10 +702,10 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      */
     @Override
     protected void processCellResult(final RowColPos rcp, PalletCell cell) {
-        Integer typesRowsCount = typesRows.get(rcp.row);
+        Integer typesRowsCount = typesRows.get(rcp.getRow());
         if (typesRowsCount == null) {
             typesRowsCount = 0;
-            specimenTypesWidgets.get(rcp.row).resetValues(!isRescanMode(),
+            specimenTypesWidgets.get(rcp.getRow()).resetValues(!isRescanMode(),
                 true, true);
         }
         SpecimenHierarchy selection = preSelections.get(cell.getRow());
@@ -709,7 +713,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             setHierarchyToCell(cell, selection);
         if (PalletCell.hasValue(cell)) {
             typesRowsCount++;
-            typesRows.put(rcp.row, typesRowsCount);
+            typesRows.put(rcp.getRow(), typesRowsCount);
         }
     }
 

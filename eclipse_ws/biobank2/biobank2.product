@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="BioBank" uid="biobank.product" id="biobank.product" application="biobank.biobank" version="3.1.1.rc1" useFeatures="true" includeLaunchers="false">
+<product name="BioBank" uid="biobank.product" id="biobank.product" application="biobank.biobank" version="3.2.0.rc1" useFeatures="true" includeLaunchers="false">
 
 
    <aboutInfo>

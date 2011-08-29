@@ -22,6 +22,8 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -59,7 +61,7 @@ public class TestSite extends TestDatabase {
             .addCollectionEvent(site, patient, visitNumber, parentSpc);
 
         parentSpc = cevent.getOriginalSpecimenCollection(false).get(0);
-        pevents.addAll(ProcessingEventHelper.addProcessingEvents(site, patient,
+        pevents.addAll(ProcessingEventHelper.addProcessingEvents(site,
             Utils.getRandomDate(), parentSpc, spcTypes, maxProcEvent,
             spcPerProcEvent));
         return pevents;
@@ -288,7 +290,7 @@ public class TestSite extends TestDatabase {
         List<ContainerTypeWrapper> types = site
             .getContainerTypeCollection(true);
         if (types.size() > 1) {
-            for (int i = 0; i < types.size() - 1; i++) {
+            for (int i = 0; i < (types.size() - 1); i++) {
                 ContainerTypeWrapper type1 = types.get(i);
                 ContainerTypeWrapper type2 = types.get(i + 1);
                 Assert.assertTrue(type1.compareTo(type2) <= 0);
@@ -324,7 +326,7 @@ public class TestSite extends TestDatabase {
         int totalContainers = ContainerHelper.addTopContainersWithChildren(
             site, name, 1);
 
-        List<ContainerWrapper> containers = site.getContainerCollection(false);
+        List<ContainerWrapper> containers = site.getContainerCollection();
         int sizeFound = containers.size();
 
         Assert.assertEquals(totalContainers, sizeFound);
@@ -340,8 +342,7 @@ public class TestSite extends TestDatabase {
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
             site, name);
         ContainerWrapper container = ContainerHelper.newContainer(
-            String.valueOf(r.nextInt()), name + "newContainer", null, site,
-            type);
+            String.valueOf(r.nextInt()), name + "newContainer", site, type);
         site.addToContainerCollection(Arrays.asList(container));
         site.persist();
 
@@ -360,30 +361,6 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testPersistFailNoAddress() throws Exception {
-        int oldTotal = SiteWrapper.getSites(appService).size();
-        String name = "testPersistFailNoAddress" + r.nextInt();
-        SiteWrapper site = new SiteWrapper(appService);
-        site.setName(name);
-        site.setNameShort(name);
-        site.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
-
-        try {
-            site.persist();
-            Assert.fail("Should not insert the site : no address");
-        } catch (ValueNotSetException e) {
-            Assert.assertTrue(true);
-        }
-
-        site.setCity("Vesoul");
-        SiteHelper.createdSites.add(site);
-        site.persist();
-        int newTotal = SiteWrapper.getSites(appService).size();
-        Assert.assertEquals(oldTotal + 1, newTotal);
-    }
-
-    @Test
     public void testPersistFailNameUnique() throws Exception {
         int oldTotal = SiteWrapper.getSites(appService).size();
         String name = "testPersistFailNameUnique" + r.nextInt();
@@ -396,7 +373,7 @@ public class TestSite extends TestDatabase {
             site2.persist();
             Assert
                 .fail("Should not insert the site : same name already in database");
-        } catch (DuplicateEntryException e) {
+        } catch (DuplicatePropertySetException e) {
             Assert.assertTrue(true);
         }
 
@@ -440,10 +417,11 @@ public class TestSite extends TestDatabase {
             site.getId());
         Assert.assertNotNull(siteInDB);
 
+        Integer id = site.getId();
+
         site.delete();
 
-        siteInDB = ModelUtils.getObjectWithId(appService, Site.class,
-            site.getId());
+        siteInDB = ModelUtils.getObjectWithId(appService, Site.class, id);
         // object is not anymore in database
         Assert.assertNull(siteInDB);
     }
@@ -462,7 +440,7 @@ public class TestSite extends TestDatabase {
             site.delete();
             Assert
                 .fail("Should not delete the site : a container type is still there");
-        } catch (BiobankCheckException bce) {
+        } catch (CollectionNotEmptyException bce) {
             Assert.assertEquals(oldTotal + 1, SiteWrapper.getSites(appService)
                 .size());
         }
@@ -486,7 +464,7 @@ public class TestSite extends TestDatabase {
             site.delete();
             Assert
                 .fail("Should not delete the site : a container and a container type is still there");
-        } catch (BiobankCheckException bce) {
+        } catch (CollectionNotEmptyException bce) {
             Assert.assertEquals(oldTotal + 1, SiteWrapper.getSites(appService)
                 .size());
         }
@@ -499,33 +477,13 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testResetAlreadyInDatabase() throws Exception {
-        SiteWrapper site = SiteHelper.addSite("testResetAlreadyInDatabase"
-            + r.nextInt());
-        site.reload();
-        String oldName = site.getName();
-        site.setName("toto");
-        site.reset();
-        Assert.assertEquals(oldName, site.getName());
-    }
-
-    @Test
-    public void testResetNew() throws Exception {
-        SiteWrapper newSite = new SiteWrapper(appService);
-        newSite.setName("titi");
-        newSite.reset();
-        Assert.assertEquals(null, newSite.getName());
-    }
-
-    @Test
     public void testGetTopContainerCollection() throws Exception {
         String name = "testGetTopContainerCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int topNber = r.nextInt(8) + 1;
         ContainerHelper.addTopContainersWithChildren(site, name, topNber);
 
-        List<ContainerWrapper> containers = site
-            .getTopContainerCollection(false);
+        List<ContainerWrapper> containers = site.getTopContainerCollection();
         Assert.assertEquals(topNber, containers.size());
 
         // clear the top containers and get again
@@ -544,7 +502,7 @@ public class TestSite extends TestDatabase {
         List<ContainerWrapper> containers = site
             .getTopContainerCollection(true);
         if (containers.size() > 1) {
-            for (int i = 0; i < containers.size() - 1; i++) {
+            for (int i = 0; i < (containers.size() - 1); i++) {
                 ContainerWrapper container1 = containers.get(i);
                 ContainerWrapper containter2 = containers.get(i + 1);
                 Assert.assertTrue(container1.compareTo(containter2) <= 0);
@@ -573,17 +531,6 @@ public class TestSite extends TestDatabase {
         List<Integer> max = appService.query(criteria);
         siteWrappers = SiteWrapper.getSites(appService, max.get(0) + 1000);
         Assert.assertEquals(0, siteWrappers.size());
-    }
-
-    @Test
-    public void testCompareTo() throws Exception {
-        String name = "testCompareTo" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite("QWERTY" + name);
-        SiteWrapper site2 = SiteHelper.addSite("ASDFG" + name);
-
-        Assert.assertTrue(site.compareTo(site2) > 0);
-        Assert.assertTrue(site2.compareTo(site) < 0);
-        Assert.assertTrue(site.compareTo(site) == 0);
     }
 
     @Test
@@ -625,12 +572,15 @@ public class TestSite extends TestDatabase {
             cevents.add(cevent);
 
             ProcessingEventWrapper pevent = ProcessingEventHelper
-                .addProcessingEvent(site, p, Utils.getRandomDate());
+                .addProcessingEvent(site, Utils.getRandomDate());
             pevent.addToSpecimenCollection(cevent
                 .getOriginalSpecimenCollection(false));
             pevent.persist();
             pevents.add(pevent);
         }
+
+        Assert.assertEquals(2, site.getCollectionEventCountForStudy(study1));
+        Assert.assertEquals(1, site.getCollectionEventCountForStudy(study2));
 
         site.reload();
         Assert.assertEquals(3, site.getPatientCount().longValue());
@@ -648,6 +598,10 @@ public class TestSite extends TestDatabase {
 
         site.reload();
         Assert.assertEquals(2, site.getPatientCount().longValue());
+        Assert.assertEquals(
+            site.getPatientCountForStudy(study1)
+                + site.getPatientCountForStudy(study2), site.getPatientCount()
+                .longValue());
     }
 
     @Test
@@ -702,6 +656,20 @@ public class TestSite extends TestDatabase {
         DbHelper.deleteProcessingEvents(pevents2);
         site.reload();
         Assert.assertEquals(0, site.getProcessingEventCount());
+    }
+
+    @Test
+    public void testGetWorkingClinicCollection() throws Exception {
+        SiteWrapper site = SiteHelper.addSite("testGetWorkingClinics");
+        Assert.assertTrue(site.getWorkingClinicCollectionSize() == 0);
+        StudyWrapper study = StudyHelper.addStudy("testStudy");
+        ClinicWrapper clinic = ClinicHelper.addClinic("testClinic");
+        ContactWrapper contact = ContactHelper
+            .addContact(clinic, "testContact");
+        clinic.reload();
+        study.addToContactCollection(clinic.getContactCollection(false));
+        site.addToStudyCollection(Arrays.asList(study));
+        Assert.assertEquals(1, site.getWorkingClinicCollection().size());
     }
 
     @Test

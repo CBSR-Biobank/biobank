@@ -76,7 +76,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
             if (container.hasParentContainer()) {
                 // need to set the label at least for display. But will be set
                 // during persit dependencies of the container
-                container.setLabelUsingPositionAndParent();
+                // TODO: don't think this is necessary anymore, but CHECK!
+                // container.setLabelUsingPositionAndParent();
             }
         } else {
             tabName = NLS.bind(Messages.ContainerEntryForm_edit_title,

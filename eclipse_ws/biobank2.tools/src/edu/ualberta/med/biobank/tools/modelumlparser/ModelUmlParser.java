@@ -109,7 +109,7 @@ public class ModelUmlParser {
                 ClassAssociation assoc = modelClass.getAssocMap()
                     .get(assocName);
 
-                if ((assoc.getAssociationType() == ClassAssociationType.ZERO_OR_ONE_TO_MANY)
+                if ((assoc.getAssociationType() == ClassAssociationType.ZERO_TO_MANY)
                     || (assoc.getAssociationType() == ClassAssociationType.ONE_TO_MANY)) {
                     LOGGER
                         .debug("   Collection<" + assoc.getToClass().getName()
@@ -396,9 +396,11 @@ public class ModelUmlParser {
                 throw new Exception("association with more than 2 classes");
             }
 
+            ClassAssociation ca1 = null, ca2 = null;
+
             if ((classAssocs.get(0).getAssocName() != null)
                 && (classAssocs.get(0).getAssocName().length() > 0)) {
-                addClassAssoc(classAssocs.get(1).getToClass().getName(),
+                ca1 = addClassAssoc(classAssocs.get(1).getToClass().getName(),
                     classAssocs.get(0).getAssocName(), classAssocs.get(0)
                         .getToClass().getName(), classAssocs.get(0)
                         .getAssociationType());
@@ -406,10 +408,15 @@ public class ModelUmlParser {
 
             if ((classAssocs.get(1).getAssocName() != null)
                 && (classAssocs.get(1).getAssocName().length() > 0)) {
-                addClassAssoc(classAssocs.get(0).getToClass().getName(),
+                ca2 = addClassAssoc(classAssocs.get(0).getToClass().getName(),
                     classAssocs.get(1).getAssocName(), classAssocs.get(1)
                         .getToClass().getName(), classAssocs.get(1)
                         .getAssociationType());
+            }
+
+            if (ca1 != null && ca2 != null) {
+                ca1.setInverse(ca2);
+                ca2.setInverse(ca1);
             }
         }
     }
@@ -439,11 +446,11 @@ public class ModelUmlParser {
         if (lowerMult.equals("1") && upperMult.equals("1")) {
             assocType = ClassAssociationType.ONE_TO_ONE;
         } else if (lowerMult.equals("0") && upperMult.equals("1")) {
-            assocType = ClassAssociationType.ZERO_OR_ONE_TO_ONE;
+            assocType = ClassAssociationType.ZERO_TO_ONE;
         } else if (lowerMult.equals("1") && upperMult.equals("-1")) {
             assocType = ClassAssociationType.ONE_TO_MANY;
         } else if (lowerMult.equals("0") && upperMult.equals("-1")) {
-            assocType = ClassAssociationType.ZERO_OR_ONE_TO_MANY;
+            assocType = ClassAssociationType.ZERO_TO_MANY;
         }
         if (assocType == null) {
             throw new Exception("Could not determine muliplicity");
@@ -451,8 +458,9 @@ public class ModelUmlParser {
         return assocType;
     }
 
-    private void addClassAssoc(String fromClassName, String assocName,
-        String toClassName, ClassAssociationType assocType) throws Exception {
+    private ClassAssociation addClassAssoc(String fromClassName,
+        String assocName, String toClassName, ClassAssociationType assocType)
+        throws Exception {
         ModelClass fromModelClass = logicalModelClassMap.get(fromClassName);
         ModelClass toModelClass = logicalModelClassMap.get(toClassName);
 
@@ -464,11 +472,15 @@ public class ModelUmlParser {
             throw new Exception("class not found: " + toClassName);
         }
 
-        fromModelClass.addAssoc(assocName, new ClassAssociation(toModelClass,
-            assocName, assocType));
+        ClassAssociation result = new ClassAssociation(toModelClass, assocName,
+            assocType);
+
+        fromModelClass.addAssoc(assocName, result);
 
         LOGGER.debug("LM assoc: " + fromClassName + "." + assocName + " -> "
             + toClassName);
+
+        return result;
     }
 
     public Map<String, ModelClass> geDataModel(String modelFileName)

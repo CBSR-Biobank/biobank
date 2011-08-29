@@ -23,8 +23,7 @@ public class SpecimenRequestImpl extends AbstractReport {
         + ("    inner join fetch s.topSpecimen ts") //$NON-NLS-1$
         + ("    inner join fetch s.specimenType st") //$NON-NLS-1$
         + ("    inner join fetch s.activityStatus a") //$NON-NLS-1$
-        + " WHERE s.parentSpecimen is not null" // "aliquots" only //$NON-NLS-1$
-        + ("    and s.specimenPosition.container.label not like '" //$NON-NLS-1$
+        + ("    WHERE s.specimenPosition.container.label not like '" //$NON-NLS-1$
             + SENT_SAMPLES_FREEZER_NAME + "'") //$NON-NLS-1$
         + "     and s.collectionEvent.patient.pnumber = ?" //$NON-NLS-1$
         + "     and datediff(s.topSpecimen.createdAt, ?) = 0" //$NON-NLS-1$

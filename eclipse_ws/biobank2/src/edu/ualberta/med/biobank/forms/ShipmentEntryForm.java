@@ -3,8 +3,11 @@ package edu.ualberta.med.biobank.forms;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
@@ -20,6 +23,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -29,12 +33,14 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.SpecimenOriginSelectDialog;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModificationConcurrencyException;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
@@ -84,7 +90,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private BgcBaseText waybillWidget;
 
-    private Set<SpecimenWrapper> specimensToPersist = new HashSet<SpecimenWrapper>();
+    private Set<SpecimenWrapper> removedSpecimensToPersist = new HashSet<SpecimenWrapper>();
 
     private BgcBaseText boxNumberWidget;
 
@@ -92,6 +98,10 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     @SuppressWarnings("unused")
     private NonEmptyStringValidator boxValidator;
+
+    private boolean isTryingAgain;
+
+    protected boolean tryAgain;
 
     @Override
     protected void init() throws Exception {
@@ -247,6 +257,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             widgetCreator.addBinding(BOX_NUMBER_BINDING);
         } else {
             widgetCreator.removeBinding(BOX_NUMBER_BINDING);
+            boxNumberWidget.setText(""); //$NON-NLS-1$
         }
         form.layout(true, true);
     }
@@ -333,7 +344,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                                 form.getShell(), specimen, centers);
 
                             if (dlg.open() == Window.OK) {
-                                specimensToPersist.add(specimen);
+                                removedSpecimensToPersist.add(specimen);
                             } else {
                                 throw new VetoException(
                                     Messages.ShipmentEntryForm_center_select_msg);
@@ -378,25 +389,113 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             && originInfo.getShipmentInfo().getWaybill().isEmpty()) {
             originInfo.getShipmentInfo().setWaybill(null);
         }
+        try {
+            originInfo.persist();
+        } catch (ModificationConcurrencyException mc) {
+            if (isTryingAgain) {
+                // already tried once
+                throw mc;
+            }
 
-        originInfo.persist();
-
-        for (SpecimenWrapper s : specimensToPersist) {
-            OriginInfoWrapper origin = s.getOriginInfo();
-            origin.persist();
-
-            s.setOriginInfo(origin);
-            s.persist();
+            Display.getDefault().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    tryAgain = BgcPlugin.openConfirm(
+                        Messages.ShipmentEntryForm_concurrency_title,
+                        Messages.ShipmentEntryForm_concurrency_msg);
+                    setDirty(true);
+                    try {
+                        doTrySettingAgain();
+                        tryAgain = true;
+                    } catch (Exception e) {
+                        saveErrorCatch(e, null, true);
+                    }
+                }
+            });
         }
 
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                SpecimenTransitView.reloadCurrent();
-                if (!originInfo.getShipmentInfo().isReceivedToday())
-                    SpecimenTransitView.showShipment(originInfo);
+        if (!tryAgain)
+            // persist those specimens only once we are sure the shipment
+            // persist has succeeded.
+            for (SpecimenWrapper s : removedSpecimensToPersist) {
+                // when remove a specimen, ask for the origin center. Then
+                // create a new origin info with this center and the deleted
+                // specimen:
+                OriginInfoWrapper origin = s.getOriginInfo();
+                origin.persist();
+                // then we set back the originfo to the specimen to be sure it
+                // has the right modelObject:
+                s.setOriginInfo(origin);
+                // then we save the specimen
+                s.persist();
             }
-        });
+    }
+
+    protected void doTrySettingAgain() throws Exception {
+        // remove added specimens and add removed specimens and try to
+        // add/remove them again (after reloading them) through the
+        // SpecimenEntryWidget to check again if can perform the action
+
+        List<SpecimenWrapper> addedSpecimens = specimenEntryWidget
+            .getAddedSpecimens();
+
+        List<SpecimenWrapper> removedSpecimens = specimenEntryWidget
+            .getRemovedSpecimens();
+        List<SpecimenWrapper> pEventSpecs = originInfo
+            .getSpecimenCollection(false);
+        pEventSpecs.removeAll(addedSpecimens);
+        pEventSpecs.addAll(removedSpecimens);
+        for (SpecimenWrapper sp : pEventSpecs) {
+            sp.reload();
+        }
+        originInfo.setSpecimenWrapperCollection(pEventSpecs);
+        specimenEntryWidget.setSpecimens(pEventSpecs);
+
+        Map<String, String> problems = new HashMap<String, String>();
+        for (SpecimenWrapper spec : addedSpecimens) {
+            String inventoryId = spec.getInventoryId();
+            try {
+                spec.reload();
+                specimenEntryWidget.addSpecimen(spec);
+            } catch (Exception ex) {
+                problems.put(Messages.ShipmentEntryForm_adding_label
+                    + " " + inventoryId, ex.getMessage()); //$NON-NLS-1$
+            }
+        }
+        for (SpecimenWrapper spec : removedSpecimens) {
+            String inventoryId = spec.getInventoryId();
+            try {
+                spec.reload();
+                specimenEntryWidget.removeSpecimen(spec);
+            } catch (Exception ex) {
+                problems.put(Messages.ShipmentEntryForm_removing_label
+                    + " " + inventoryId, ex.getMessage()); //$NON-NLS-1$
+            }
+        }
+        if (problems.size() != 0) {
+            StringBuffer msg = new StringBuffer();
+            for (Entry<String, String> entry : problems.entrySet()) {
+                if (msg.length() > 0)
+                    msg.append("\n"); //$NON-NLS-1$
+                msg.append(entry.getKey()).append(": ") //$NON-NLS-1$
+                    .append(entry.getValue());
+            }
+            throw new BiobankException(
+                Messages.ShipmentEntryForm_tryAgain_error_msg + msg.toString());
+        }
+    }
+
+    @Override
+    protected void doAfterSave() throws Exception {
+        if (tryAgain) {
+            isTryingAgain = true;
+            tryAgain = false;
+            confirm();
+        } else {
+            SpecimenTransitView.reloadCurrent();
+            if (!originInfo.getShipmentInfo().isReceivedToday())
+                SpecimenTransitView.showShipment(originInfo);
+        }
     }
 
     @Override
@@ -404,7 +503,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         originInfo.reset();
 
         // do not change origin if form reset
-        specimensToPersist.clear();
+        removedSpecimensToPersist.clear();
 
         shipmentInfo.reset();
         originInfo.setShipmentInfo(shipmentInfo);
