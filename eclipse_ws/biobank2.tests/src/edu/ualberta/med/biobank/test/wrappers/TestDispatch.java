@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.DispatchSpecimenPeer;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -18,15 +19,18 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -41,6 +45,7 @@ import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class TestDispatch extends TestDatabase {
 
@@ -591,6 +596,66 @@ public class TestDispatch extends TestDatabase {
         for (SpecimenWrapper sp : spcSet1) {
             sp.reload();
             Assert.assertNull(sp.getPosition());
+        }
+    }
+
+    @Test
+    public void testDispatchSpecimenCompareTo() {
+        SpecimenWrapper s1 = new SpecimenWrapper(appService);
+        s1.setInventoryId("a");
+
+        SpecimenWrapper s2 = new SpecimenWrapper(appService);
+        s2.setInventoryId("b");
+
+        DispatchSpecimenWrapper ds1 = new DispatchSpecimenWrapper(appService);
+        ds1.setSpecimen(s1);
+
+        DispatchSpecimenWrapper ds2 = new DispatchSpecimenWrapper(appService);
+        ds2.setSpecimen(s1);
+
+        Assert.assertTrue(ds1.compareTo(ds2) == 0);
+
+        ds2.setSpecimen(s2);
+        Assert.assertTrue(ds1.compareTo(ds2) < 0);
+
+        DispatchSpecimenWrapper2 ds3 = new DispatchSpecimenWrapper2(appService);
+
+        Assert.assertTrue(ds1.compareTo(ds3) == 0);
+    }
+
+    private static final class DispatchSpecimenWrapper2 extends
+        ModelWrapper<DispatchSpecimen> {
+
+        public DispatchSpecimenWrapper2(WritableApplicationService appService) {
+            super(appService);
+        }
+
+        @Override
+        public Property<Integer, ? super DispatchSpecimen> getIdProperty() {
+            return DispatchSpecimenPeer.ID;
+        }
+
+        @Override
+        protected List<Property<?, ? super DispatchSpecimen>> getProperties() {
+            return new ArrayList<Property<?, ? super DispatchSpecimen>>();
+        }
+
+        @Override
+        public Class<DispatchSpecimen> getWrappedClass() {
+            return DispatchSpecimen.class;
+        }
+    }
+
+    @Test
+    public void testDispatchSpecimenState() throws Exception {
+        DispatchSpecimenWrapper ds = new DispatchSpecimenWrapper(appService);
+
+        DispatchSpecimenState[] states = DispatchSpecimenState.values();
+        for (DispatchSpecimenState state : states) {
+            ds.setState(state.getId());
+            Assert
+                .assertTrue(ds.getStateDescription().equals(state.getLabel()));
+            Assert.assertTrue(ds.getSpecimenState().equals(state));
         }
     }
 

@@ -558,8 +558,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     @Override
-    public int compareTo(ModelWrapper<E> arg0) {
-        return this.getId().compareTo(arg0.getId());
+    public int compareTo(ModelWrapper<E> other) {
+        return nullSafeComparator(getId(), other.getId());
     }
 
     /**
