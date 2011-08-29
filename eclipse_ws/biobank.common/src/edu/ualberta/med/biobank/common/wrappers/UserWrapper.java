@@ -11,7 +11,6 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
-import edu.ualberta.med.biobank.common.security.SecurityFeature;
 import edu.ualberta.med.biobank.common.wrappers.base.UserBaseWrapper;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -176,19 +175,6 @@ public class UserWrapper extends UserBaseWrapper {
         return getIsSuperAdmin();
     }
 
-    @Deprecated
-    public boolean canPerformActions(SecurityFeature... features) {
-        return canPerformActions(Arrays.asList(features));
-    }
-
-    @SuppressWarnings("unused")
-    @Deprecated
-    public boolean canPerformActions(List<SecurityFeature> value) {
-        // FIXME this method was used in old User object. What should be done
-        // now ?
-        return true;
-    }
-
     public boolean hasPrivilegesOnKeyDesc(PrivilegeWrapper privilege,
         String... rightsKeyDescs) throws BiobankFailedQueryException,
         ApplicationException {
@@ -197,13 +183,6 @@ public class UserWrapper extends UserBaseWrapper {
             if (ok)
                 return ok;
         }
-        return false;
-    }
-
-    @Deprecated
-    public boolean isAdministratorForCurrentCenter() {
-        // FIXME this method was used in old User object. What should be done
-        // now ?
         return false;
     }
 

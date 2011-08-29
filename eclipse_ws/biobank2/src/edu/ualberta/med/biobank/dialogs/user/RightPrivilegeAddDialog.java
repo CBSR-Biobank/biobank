@@ -79,11 +79,14 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
                 true));
             final Button allCentersRadio = new Button(compCenters, SWT.RADIO);
             allCentersRadio.setSelection(true);
-            allCentersRadio.setText(Messages.RightPrivilegeAddDialog_allCenters_label);
+            allCentersRadio
+                .setText(Messages.RightPrivilegeAddDialog_allCenters_label);
             final Button sitesRadio = new Button(compCenters, SWT.RADIO);
-            sitesRadio.setText(Messages.RightPrivilegeAddDialog_sitesOnly_label);
+            sitesRadio
+                .setText(Messages.RightPrivilegeAddDialog_sitesOnly_label);
             final Button clinicsRadio = new Button(compCenters, SWT.RADIO);
-            clinicsRadio.setText(Messages.RightPrivilegeAddDialog_clinicsOnly_label);
+            clinicsRadio
+                .setText(Messages.RightPrivilegeAddDialog_clinicsOnly_label);
             final Button rgRadio = new Button(compCenters, SWT.RADIO);
             rgRadio.setText(Messages.RightPrivilegeAddDialog_rgOnly_label);
             GridData gd = new GridData();
@@ -91,7 +94,9 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
             compCenters.setLayoutData(gd);
 
             rightsWidget = new MultiSelectWidget<BbRightWrapper>(contents,
-                SWT.NONE, Messages.RightPrivilegeAddDialog_rights_available_label, Messages.RightPrivilegeAddDialog_rights_selected_label, 110) {
+                SWT.NONE,
+                Messages.RightPrivilegeAddDialog_rights_available_label,
+                Messages.RightPrivilegeAddDialog_rights_selected_label, 110) {
                 @Override
                 protected String getTextForObject(BbRightWrapper nodeObject) {
                     return nodeObject.getName();
@@ -137,7 +142,9 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
         }
 
         privilegesWidget = new MultiSelectWidget<PrivilegeWrapper>(contents,
-            SWT.NONE, Messages.RightPrivilegeAddDialog_privileges_available_label, Messages.RightPrivilegeAddDialog_privileges_selected_label, 110) {
+            SWT.NONE,
+            Messages.RightPrivilegeAddDialog_privileges_available_label,
+            Messages.RightPrivilegeAddDialog_privileges_selected_label, 110) {
             @Override
             protected String getTextForObject(PrivilegeWrapper nodeObject) {
                 return nodeObject.getName();

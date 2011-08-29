@@ -6,7 +6,6 @@ import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
@@ -60,11 +59,12 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void stopQuery(QueryHandle qh) throws Exception;
 
     public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
-        ProcessData processData, boolean rescanMode, User user, Locale locale)
+        ProcessData processData, boolean rescanMode,
+        Integer currentWorkingCenterId, Locale locale)
         throws ApplicationException;
 
     public CellProcessResult processCellStatus(Cell cell,
-        ProcessData processData, User user, Locale locale)
+        ProcessData processData, Integer currentWorkingCenterId, Locale locale)
         throws ApplicationException;
 
     public List<String> executeGetSourceSpecimenUniqueInventoryIds(int numIds)

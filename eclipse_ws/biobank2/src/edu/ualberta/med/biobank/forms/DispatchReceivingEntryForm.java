@@ -99,10 +99,10 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     @Override
     protected void doSpecimenTextAction(String inventoryId) {
         try {
-            CellProcessResult res = appService
-                .processCellStatus(new Cell(-1, -1, inventoryId, null),
-                    new ShipmentProcessData(null, dispatch, false, false),
-                    SessionManager.getUserOld(), Locale.getDefault());
+            CellProcessResult res = appService.processCellStatus(new Cell(-1,
+                -1, inventoryId, null), new ShipmentProcessData(null, dispatch,
+                false, false), SessionManager.getUser()
+                .getCurrentWorkingCenter().getId(), Locale.getDefault());
             SpecimenWrapper specimen = null;
             if (res.getCell().getSpecimenId() != null) {
                 specimen = new SpecimenWrapper(appService);

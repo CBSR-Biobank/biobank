@@ -5,7 +5,6 @@ import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.scanprocess.data.AssignProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -20,8 +19,8 @@ import java.util.Map;
 public class AssignProcess extends ServerProcess {
 
     public AssignProcess(WritableApplicationService appService,
-        AssignProcessData data, User user, Locale locale) {
-        super(appService, data, user, locale);
+        AssignProcessData data, Integer currentWorkingCenterId, Locale locale) {
+        super(appService, data, currentWorkingCenterId, locale);
     }
 
     @Override
@@ -105,8 +104,8 @@ public class AssignProcess extends ServerProcess {
                 appService, value);
             if (foundSpecimen == null) {
                 updateCellAsNotFound(positionString, scanCell);
-            } else if (!foundSpecimen.getCurrentCenter().equals(
-                user.getCurrentWorkingCenter())) {
+            } else if (!foundSpecimen.getCurrentCenter().getId()
+                .equals(currentWorkingCenterId)) {
                 updateCellAsInOtherSite(positionString, scanCell, foundSpecimen);
             } else if (expectedSpecimen != null
                 && !foundSpecimen.equals(expectedSpecimen)) {

@@ -573,11 +573,11 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
      */
     @Override
     public boolean canDelete(UserWrapper user) {
-        return getPatient() == null
-            || getPatient().getStudy() == null
-            || user.getCurrentWorkingCenter() == null
-            || user.getCurrentWorkingCenter().getStudyCollection()
-                .contains(getPatient().getStudy());
+        return super.canDelete(user)
+            && (getPatient() == null || getPatient().getStudy() == null
+                || user.getCurrentWorkingCenter() == null || user
+                .getCurrentWorkingCenter().getStudyCollection()
+                .contains(getPatient().getStudy()));
     }
 
     /**
@@ -585,11 +585,11 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
      */
     @Override
     public boolean canUpdate(UserWrapper user) {
-        return getPatient() == null
-            || getPatient().getStudy() == null
-            || user.getCurrentWorkingCenter() == null
-            || user.getCurrentWorkingCenter().getStudyCollection()
-                .contains(getPatient().getStudy());
+        return super.canUpdate(user)
+            && (getPatient() == null || getPatient().getStudy() == null
+                || user.getCurrentWorkingCenter() == null || user
+                .getCurrentWorkingCenter().getStudyCollection()
+                .contains(getPatient().getStudy()));
     }
 
     public Date getMinSourceSpecimenDate() {

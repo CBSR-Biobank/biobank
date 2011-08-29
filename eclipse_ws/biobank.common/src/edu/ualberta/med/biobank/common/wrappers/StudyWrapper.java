@@ -496,8 +496,9 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     @Override
+    // FIXME need to call super method ?
     public boolean canUpdate(UserWrapper user) {
-        return user.isInSuperAdminMode();
+        return super.canUpdate(user) && user.isInSuperAdminMode();
     }
 
     private static final String ACTIVE_ALIQUOTED_SPECIMENS_TYPE_QRY = "select aspec."

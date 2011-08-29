@@ -554,17 +554,42 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
-     * default return true
+     * return true if the user can view this object
      */
-    public boolean canDelete(@SuppressWarnings("unused") UserWrapper user) {
-        return true;
+    public boolean canRead(UserWrapper user) {
+        try {
+            return user.hasPrivilegeOnKeyDesc(
+                PrivilegeWrapper.getReadPrivilege(appService),
+                getWrappedClass().getName());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
-     * default return true;
+     * return true if the user can edit this object
      */
-    public boolean canUpdate(@SuppressWarnings("unused") UserWrapper user) {
-        return true;
+    public boolean canUpdate(UserWrapper user) {
+        try {
+            return user.hasPrivilegeOnKeyDesc(
+                PrivilegeWrapper.getUpdatePrivilege(appService),
+                getWrappedClass().getName());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * return true if the user can delete this object
+     */
+    public boolean canDelete(UserWrapper user) {
+        try {
+            return user.hasPrivilegeOnKeyDesc(
+                PrivilegeWrapper.getDeletePrivilege(appService),
+                getWrappedClass().getName());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void addWrapperListener(WrapperListener listener) {

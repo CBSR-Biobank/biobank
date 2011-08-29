@@ -171,11 +171,11 @@ public class BiobankApplicationServiceImpl extends
     @Override
     public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
         ProcessData processData, boolean isRescanMode,
-        edu.ualberta.med.biobank.common.security.User user, Locale locale)
+        Integer currentWorkingCenterId, Locale locale)
         throws ApplicationException {
         try {
-            ServerProcess process = processData.getProcessInstance(this, user,
-                locale);
+            ServerProcess process = processData.getProcessInstance(this,
+                currentWorkingCenterId, locale);
             return process.processScanResult(cells, isRescanMode);
         } catch (ApplicationException ae) {
             throw ae;
@@ -186,12 +186,11 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public CellProcessResult processCellStatus(Cell cell,
-        ProcessData processData,
-        edu.ualberta.med.biobank.common.security.User user, Locale locale)
+        ProcessData processData, Integer currentWorkingCenterId, Locale locale)
         throws ApplicationException {
         try {
-            ServerProcess process = processData.getProcessInstance(this, user,
-                locale);
+            ServerProcess process = processData.getProcessInstance(this,
+                currentWorkingCenterId, locale);
             return process.processCellStatus(cell);
         } catch (ApplicationException ae) {
             throw ae;

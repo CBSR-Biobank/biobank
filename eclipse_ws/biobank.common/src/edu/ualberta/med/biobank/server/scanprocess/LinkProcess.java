@@ -5,7 +5,6 @@ import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.scanprocess.data.LinkProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -20,8 +19,8 @@ import java.util.Map.Entry;
 public class LinkProcess extends ServerProcess {
 
     public LinkProcess(WritableApplicationService appService,
-        LinkProcessData data, User user, Locale locale) {
-        super(appService, data, user, locale);
+        LinkProcessData data, Integer currentWorkingCenterId, Locale locale) {
+        super(appService, data, currentWorkingCenterId, locale);
     }
 
     @Override

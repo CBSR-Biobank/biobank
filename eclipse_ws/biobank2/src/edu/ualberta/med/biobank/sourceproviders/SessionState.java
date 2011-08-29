@@ -31,7 +31,6 @@ public class SessionState extends AbstractSourceProvider {
     private boolean hasWorkingCenter;
     private boolean hasClinicShipmentRights;
     private boolean hasDispatchRights;
-    private boolean isCurrentCenterAdmin;
     private boolean hasPrinterLabelsRights;
     private String currentCenterType = ""; //$NON-NLS-1$
 
@@ -55,8 +54,6 @@ public class SessionState extends AbstractSourceProvider {
             Boolean.toString(hasClinicShipmentRights));
         currentStateMap.put(HAS_DISPATCH_RIGHTS,
             Boolean.toString(hasDispatchRights));
-        currentStateMap.put(IS_CURRENT_CENTER_ADMIN_SOURCE_NAME,
-            Boolean.toString(isCurrentCenterAdmin));
         currentStateMap.put(HAS_PRINTER_LABELS_RIGHTS,
             Boolean.toString(hasPrinterLabelsRights));
         currentStateMap.put(CURRENT_CENTER_TYPE, currentCenterType);
@@ -85,14 +82,6 @@ public class SessionState extends AbstractSourceProvider {
         this.hasWorkingCenter = hasWorkingCenter;
         fireSourceChanged(ISources.WORKBENCH, HAS_WORKING_CENTER_SOURCE_NAME,
             hasWorkingCenter);
-    }
-
-    private void setIsCurrentCenterAdmin(boolean isCurrentCenterAdmin) {
-        if (this.isCurrentCenterAdmin == isCurrentCenterAdmin)
-            return; // no change
-        this.isCurrentCenterAdmin = isCurrentCenterAdmin;
-        fireSourceChanged(ISources.WORKBENCH,
-            IS_CURRENT_CENTER_ADMIN_SOURCE_NAME, isCurrentCenterAdmin);
     }
 
     private void setHasClinicShipmentRights(boolean hasClinicShipmentRights) {
@@ -145,8 +134,6 @@ public class SessionState extends AbstractSourceProvider {
                 && SessionManager.canAccess(
                     SessionSecurityHelper.DISPATCH_RECEIVE_KEY_DESC,
                     SessionSecurityHelper.DISPATCH_SEND_KEY_DESC));
-            setIsCurrentCenterAdmin(user != null
-                && user.isAdministratorForCurrentCenter());
             setHasPrinterLabelsRights(user != null
                 && SessionManager
                     .canAccess(SessionSecurityHelper.PRINT_LABEL_KEY_DESC));

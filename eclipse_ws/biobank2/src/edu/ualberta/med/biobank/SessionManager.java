@@ -16,7 +16,6 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -235,10 +234,6 @@ public class SessionManager {
         return getInstance().getSession().getUser();
     }
 
-    public static User getUserOld() {
-        return null;
-    }
-
     public static String getServer() {
         return getInstance().getSession().getServerName();
     }
@@ -262,8 +257,7 @@ public class SessionManager {
     }
 
     public static boolean canDelete(ModelWrapper<?> wrapper) {
-        return SessionSecurityHelper.canDelete(getAppService(), getUser(),
-            wrapper);
+        return wrapper.canDelete(getUser());
     }
 
     public static boolean canView(Class<?> clazz) {
@@ -294,8 +288,7 @@ public class SessionManager {
     }
 
     public static boolean canUpdate(ModelWrapper<?> wrapper) {
-        return SessionSecurityHelper.canUpdate(getAppService(), getUser(),
-            wrapper);
+        return wrapper.canUpdate(getUser());
     }
 
     public boolean isConnected() {

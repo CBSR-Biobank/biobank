@@ -520,8 +520,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
      */
     @Override
     public boolean canUpdate(UserWrapper user) {
-        return user.getCurrentWorkingCenter() == null
-            || user.getCurrentWorkingCenter().getStudyCollection()
-                .contains(getCollectionEvent().getPatient().getStudy());
+        return super.canUpdate(user)
+            && (user.getCurrentWorkingCenter() == null || user
+                .getCurrentWorkingCenter().getStudyCollection()
+                .contains(getCollectionEvent().getPatient().getStudy()));
     }
 }

@@ -439,10 +439,4 @@ public abstract class CenterWrapper<E extends Center> extends
         return Collections.emptyList();
     }
 
-    @Deprecated
-    @Override
-    public boolean canUpdate(UserWrapper user) {
-        return user.isInSuperAdminMode()
-            || user.isAdministratorForCurrentCenter();
-    }
 }

@@ -1,13 +1,9 @@
 package edu.ualberta.med.biobank;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SessionSecurityHelper {
 
@@ -22,45 +18,11 @@ public class SessionSecurityHelper {
     public static final String REQUEST_ASK_KEY_DESC = "ask-request"; //$NON-NLS-1$
     public static final String REQUEST_RECEIVE_DESC = "receive-request"; //$NON-NLS-1$
 
-    public static Map<String, PrivilegeWrapper> privileges;
-
-    private static Map<String, PrivilegeWrapper> getPrivileges(
-        BiobankApplicationService appService) throws ApplicationException {
-        if (privileges == null) {
-            privileges = new HashMap<String, PrivilegeWrapper>();
-            for (PrivilegeWrapper p : PrivilegeWrapper
-                .getAllPrivileges(appService)) {
-                privileges.put(p.getName(), p);
-            }
-        }
-        return privileges;
-    }
-
-    public static PrivilegeWrapper getReadPrivilege(
-        BiobankApplicationService appService) throws ApplicationException {
-        return getPrivileges(appService).get("Read"); //$NON-NLS-1$
-    }
-
-    public static PrivilegeWrapper getUpdatePrivilege(
-        BiobankApplicationService appService) throws ApplicationException {
-        return getPrivileges(appService).get("Update"); //$NON-NLS-1$
-    }
-
-    public static PrivilegeWrapper getDeletePrivilege(
-        BiobankApplicationService appService) throws ApplicationException {
-        return getPrivileges(appService).get("Delete"); //$NON-NLS-1$
-    }
-
-    public static PrivilegeWrapper getCreatePrivilege(
-        BiobankApplicationService appService) throws ApplicationException {
-        return getPrivileges(appService).get("Create"); //$NON-NLS-1$
-    }
-
     public static boolean canCreate(BiobankApplicationService appService,
         UserWrapper user, Class<?> clazz) {
         try {
             return user.hasPrivilegeOnClassObject(
-                getCreatePrivilege(appService), clazz);
+                PrivilegeWrapper.getCreatePrivilege(appService), clazz);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -70,27 +32,21 @@ public class SessionSecurityHelper {
         UserWrapper user, Class<?> clazz) {
         try {
             return user.hasPrivilegeOnClassObject(
-                getDeletePrivilege(appService), clazz);
+                PrivilegeWrapper.getDeletePrivilege(appService), clazz);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static boolean canDelete(BiobankApplicationService appService,
-        UserWrapper user, ModelWrapper<?> wrapper) {
-        try {
-            return user.hasPrivilegeOnKeyDesc(getDeletePrivilege(appService),
-                wrapper.getWrappedClass().getSimpleName());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public static boolean canDelete(UserWrapper user, ModelWrapper<?> wrapper) {
+        return wrapper.canDelete(user);
     }
 
     public static boolean canView(BiobankApplicationService appService,
         UserWrapper user, Class<?> clazz) {
         try {
-            return user.hasPrivilegeOnClassObject(getReadPrivilege(appService),
-                clazz);
+            return user.hasPrivilegeOnClassObject(
+                PrivilegeWrapper.getReadPrivilege(appService), clazz);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -99,8 +55,8 @@ public class SessionSecurityHelper {
     public static boolean canAccess(BiobankApplicationService appService,
         UserWrapper user, String... keyDesc) {
         try {
-            return user.hasPrivilegesOnKeyDesc(getReadPrivilege(appService),
-                keyDesc);
+            return user.hasPrivilegesOnKeyDesc(
+                PrivilegeWrapper.getReadPrivilege(appService), keyDesc);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -110,19 +66,13 @@ public class SessionSecurityHelper {
         UserWrapper user, Class<?> clazz) {
         try {
             return user.hasPrivilegeOnClassObject(
-                getUpdatePrivilege(appService), clazz);
+                PrivilegeWrapper.getUpdatePrivilege(appService), clazz);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static boolean canUpdate(BiobankApplicationService appService,
-        UserWrapper user, ModelWrapper<?> wrapper) {
-        try {
-            return user.hasPrivilegeOnKeyDesc(getUpdatePrivilege(appService),
-                wrapper.getWrappedClass().getSimpleName());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public static boolean canUpdate(UserWrapper user, ModelWrapper<?> wrapper) {
+        return wrapper.canUpdate(user);
     }
 }

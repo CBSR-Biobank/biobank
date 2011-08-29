@@ -737,25 +737,15 @@
                <reference
                      definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
-               <or>
                   <reference
                         definitionId="biobank.isSuperAdminMode">
                   </reference>
-                  <reference
-                        definitionId="biobank.isCurrentCenterAdmin">
-                  </reference>
-               </or>
             </and>
          </activeWhen>
          <enabledWhen>
-            <or>
                <reference
                      definitionId="biobank.isSuperAdminMode">
                </reference>
-               <reference
-                     definitionId="biobank.isCurrentCenterAdmin">
-               </reference>
-            </or>
          </enabledWhen>
       </handler>
       <handler
@@ -1010,14 +1000,9 @@
                       style="push">
                    <visibleWhen
                          checkEnabled="false">
-                      <or>
                          <reference
                                definitionId="biobank.isSuperAdminMode">
                          </reference>
-                         <reference
-                               definitionId="biobank.isCurrentCenterAdmin">
-                         </reference>
-                      </or>
                    </visibleWhen>
                 </command>
                 <command
@@ -2462,15 +2447,6 @@
                      property="biobank.canUpdate">
                </test>
             </iterate>
-         </with>
-      </definition>
-      <definition
-            id="biobank.isCurrentCenterAdmin">
-         <with
-               variable="edu.ualberta.med.biobank.sourceprovider.isCurrentCenterAdmin">
-            <equals
-                  value="true">
-            </equals>
          </with>
       </definition>
       <definition
