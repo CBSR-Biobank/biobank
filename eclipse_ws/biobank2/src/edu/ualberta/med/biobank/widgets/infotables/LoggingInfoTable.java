@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
 
@@ -50,8 +50,8 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    public BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData item = getCollectionModelObject((LogWrapper) element);

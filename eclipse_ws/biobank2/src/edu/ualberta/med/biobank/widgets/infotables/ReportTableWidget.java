@@ -16,7 +16,8 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
 
@@ -51,12 +52,12 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    public BgcLabelProvider getLabelProvider() {
         return getLabelProvider(true);
     }
 
-    public BiobankLabelProvider getLabelProvider(final boolean formatNumbers) {
-        return new BiobankLabelProvider() {
+    public BgcLabelProvider getLabelProvider(final boolean formatNumbers) {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 if (element instanceof Object[]) {

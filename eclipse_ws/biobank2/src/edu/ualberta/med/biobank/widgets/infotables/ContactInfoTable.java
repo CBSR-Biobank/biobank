@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
@@ -33,16 +33,23 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         }
     }
 
-    private static final String[] HEADINGS = new String[] { Messages.ContactInfoTable_name_label,
-        Messages.ContactInfoTable_title_label, Messages.ContactInfoTable_studies_label, Messages.ContactInfoTable_email_label, Messages.ContactInfoTable_mobile_label, Messages.ContactInfoTable_pager_label, Messages.ContactInfoTable_office_label, Messages.ContactInfoTable_fax_label };
+    private static final String[] HEADINGS = new String[] {
+        Messages.ContactInfoTable_name_label,
+        Messages.ContactInfoTable_title_label,
+        Messages.ContactInfoTable_studies_label,
+        Messages.ContactInfoTable_email_label,
+        Messages.ContactInfoTable_mobile_label,
+        Messages.ContactInfoTable_pager_label,
+        Messages.ContactInfoTable_office_label,
+        Messages.ContactInfoTable_fax_label };
 
     public ContactInfoTable(Composite parent, List<ContactWrapper> contacts) {
         super(parent, contacts, HEADINGS, PAGE_SIZE_ROWS, ContactWrapper.class);
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;

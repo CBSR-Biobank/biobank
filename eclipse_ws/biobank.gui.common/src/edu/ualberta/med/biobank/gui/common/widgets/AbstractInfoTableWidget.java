@@ -1,9 +1,8 @@
-package edu.ualberta.med.biobank.widgets.infotables;
+package edu.ualberta.med.biobank.gui.common.widgets;
 
 import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -26,16 +25,14 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.utils.BiobankClipboard;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
 
 public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
 
-    class PageInformation {
-        int page;
-        int rowsPerPage;
-        int pageTotal;
+    public class PageInformation {
+        public int page;
+        public int rowsPerPage;
+        public int pageTotal;
     }
 
     protected TableViewer tableViewer;
@@ -119,8 +116,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
             autoSizeColumns();
         }
 
-        BiobankClipboard.addClipboardCopySupport(tableViewer, menu,
-            (BiobankLabelProvider) getLabelProvider(), headings.length);
+        BgcClipboard.addClipboardCopySupport(tableViewer, menu,
+            getLabelProvider(), headings.length);
 
     }
 
@@ -135,7 +132,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
                 final TableViewerColumn col = new TableViewerColumn(
                     tableViewer, SWT.NONE);
                 col.getColumn().setText(name);
-                if (columnWidths == null || columnWidths[index] == -1) {
+                if ((columnWidths == null) || (columnWidths[index] == -1)) {
                     col.getColumn().pack();
                 } else {
                     col.getColumn().setWidth(columnWidths[index]);
@@ -156,7 +153,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
 
     protected abstract boolean isEditMode();
 
-    protected abstract IBaseLabelProvider getLabelProvider();
+    protected abstract BgcLabelProvider getLabelProvider();
 
     public List<T> getCollection() {
         return collection;
@@ -200,8 +197,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
             if ((collection == null)
                 || ((backgroundThread != null) && backgroundThread.isAlive())) {
                 return;
-            } else if (this.collection != collection
-                || size != collection.size()) {
+            } else if ((this.collection != collection)
+                || (size != collection.size())) {
                 this.collection = collection;
                 init(collection);
                 setPaginationParams(collection);
@@ -290,9 +287,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         int totalWidths = 0;
         table.setVisible(false);
         for (int i = 0; i < table.getColumnCount(); i++) {
-            int width = (int) ((double) maxCellContentsWidths[i]
-                / sumOfMaxTextWidths * tableWidth);
-            if (i == table.getColumnCount() - 1)
+            int width = (int) (((double) maxCellContentsWidths[i] / sumOfMaxTextWidths) * tableWidth);
+            if (i == (table.getColumnCount() - 1))
                 table.getColumn(i).setWidth(tableWidth - totalWidths - 5);
             else
                 table.getColumn(i).setWidth(width);
@@ -308,7 +304,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         Table table = getTableViewer().getTable();
         GridData gd = (GridData) table.getLayoutData();
         int rows = Math.max(pageInfo.rowsPerPage, 5);
-        gd.heightHint = (rows - 1) * table.getItemHeight()
+        gd.heightHint = ((rows - 1) * table.getItemHeight())
             + table.getHeaderHeight() + table.getBorderWidth();
     }
 
