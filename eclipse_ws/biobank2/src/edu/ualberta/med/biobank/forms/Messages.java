@@ -222,10 +222,6 @@ public class Messages extends NLS {
     public static String ContainerTypeEntryForm_contents_specimen_available;
     public static String ContainerTypeEntryForm_contents_subcontainer_selected;
     public static String ContainerTypeEntryForm_contents_subcontainer_available;
-    public static String ContainerTypeEntryForm_save_error_msg_specimen_added;
-    public static String ContainerTypeEntryForm_save_error_msg_specimen_removed;
-    public static String ContainerTypeEntryForm_save_error_msg_subcontainer_added;
-    public static String ContainerTypeEntryForm_save_error_msg_subcontainer_removed;
 
     public static String PatientViewForm_title;
     public static String patient_field_label_study;
@@ -835,14 +831,7 @@ public class Messages extends NLS {
 
     public static String RequestEntryForm_title;
 
-    public static String ResearchGroup_field_label_sendsShipments;
-    public static String ResearchGroup_contact_title;
     public static String ResearchGroupViewForm_csv_file_label;
-
-    public static String ResearchGroupViewForm_csvFile_label;
-    public static String ResearchGroupViewForm_0;
-
-    public static String ResearchGroupViewForm_1;
 
     public static String ResearchGroupViewForm_error_title;
 
@@ -852,7 +841,6 @@ public class Messages extends NLS {
 
     public static String ResearchGroupViewForm_request_upload_title;
 
-    public static String ResearchGroupViewForm_studies_title;
     public static String ResearchGroupViewForm_submit_request_rg_label;
 
     public static String ResearchGroupViewForm_success_msg;

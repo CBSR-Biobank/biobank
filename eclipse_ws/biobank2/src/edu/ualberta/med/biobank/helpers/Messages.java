@@ -10,10 +10,8 @@ public class Messages extends NLS {
     public static String SessionHelper_login_error_msg;
     public static String SessionHelper_login_error_title;
     public static String SessionHelper_login_server_error_msg;
-    public static String SessionHelper_server_newversion_error_msg;
     public static String SessionHelper_server_noversion_error_msg;
     public static String SessionHelper_server_oldversion_error_msg;
-    public static String SessionHelper_server_oldversion_log_msg;
     public static String SessionHelper_server_version_error_title;
     static {
         // initialize resource bundle

@@ -321,12 +321,6 @@ public class Messages extends NLS {
 
     public static String RequestDispatchInfoTable_total_specs_label;
 
-    public static String RightPrivilegeInfoTable_confirm_delete_msg;
-
-    public static String RightPrivilegeInfoTable_confirm_delete_title;
-
-    public static String RightPrivilegeInfoTable_delete_error;
-
     public static String RightPrivilegeInfoTable_privileges_label;
 
     public static String RightPrivilegeInfoTable_right_label;
@@ -349,8 +343,6 @@ public class Messages extends NLS {
 
     public static String UserInfoTable_email_label;
 
-    public static String UserInfoTable_error_title;
-
     public static String UserInfoTable_firstname_label;
 
     public static String UserInfoTable_lastname_label;
@@ -358,8 +350,6 @@ public class Messages extends NLS {
     public static String UserInfoTable_loading;
 
     public static String UserInfoTable_login_label;
-
-    public static String UserInfoTable_nogroups_msg;
 
     public static String UserInfoTable_superadmin_label;
 

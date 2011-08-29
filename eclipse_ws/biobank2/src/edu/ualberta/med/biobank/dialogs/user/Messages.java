@@ -6,21 +6,13 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.dialogs.user.messages"; //$NON-NLS-1$
 
     public static String GroupEditDialog_msg_error_name_used;
-    public static String GroupEditDialog_msg_error_retrieve_centers;
     public static String GroupEditDialog_msg_name_required;
     public static String GroupEditDialog_msg_persit_error;
     public static String GroupEditDialog_property_title_name;
-    public static String GroupEditDialog_center_administrator_title;
-    public static String GroupEditDialog_center_list_available;
-    public static String GroupEditDialog_center_list_working;
     public static String GroupEditDialog_title_add;
     public static String GroupEditDialog_title_edit;
     public static String GroupEditDialog_titlearea_add;
     public static String GroupEditDialog_titlearea_modify;
-    public static String GroupEditDialog_feature_center_list_available;
-    public static String GroupEditDialog_feature_center_list_selected;
-
-    public static String GroupEditDialog_filter_centers;
 
     public static String GroupsPage_page_title;
 
@@ -72,8 +64,6 @@ public class Messages extends NLS {
 
     public static String RoleEditDialog_msg_error_name_used;
 
-    public static String RoleEditDialog_msg_error_retrieve_centers;
-
     public static String RoleEditDialog_msg_name_required;
 
     public static String RoleEditDialog_msg_persit_error;
@@ -98,13 +88,7 @@ public class Messages extends NLS {
 
     public static String RolesPage_title;
 
-    public static String TemplatesPage_page_title;
-
     public static String UserEditDialog_bulkemail_label;
-
-    public static String UserEditDialog_deleteRight_confirm_msg;
-
-    public static String UserEditDialog_deleteRight_confirm_title;
 
     public static String UserEditDialog_description_add;
 
@@ -112,13 +96,7 @@ public class Messages extends NLS {
 
     public static String UserEditDialog_Email_label;
 
-    public static String UserEditDialog_filterText_label;
-
     public static String UserEditDialog_firstName_label;
-
-    public static String UserEditDialog_groups_assigned_label;
-
-    public static String UserEditDialog_groups_available_label;
 
     public static String UserEditDialog_lastname_label;
 
@@ -158,15 +136,11 @@ public class Messages extends NLS {
 
     public static String UserManagementDialog_description;
 
-    public static String UserManagementDialog_get_users_groups_error_title;
-
     public static String UserManagementDialog_group_added_msg;
 
     public static String UserManagementDialog_group_added_title;
 
     public static String UserManagementDialog_groups_load_error_title;
-
-    public static String UserManagementDialog_loading;
 
     public static String UserManagementDialog_title;
 
