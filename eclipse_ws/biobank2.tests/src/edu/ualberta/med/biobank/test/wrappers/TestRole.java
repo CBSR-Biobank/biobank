@@ -7,7 +7,6 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipRoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
@@ -16,7 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.model.RightPrivilege;
 import edu.ualberta.med.biobank.model.Role;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.MembershipHelper;
 import edu.ualberta.med.biobank.test.internal.RoleHelper;
@@ -102,10 +101,10 @@ public class TestRole extends TestDatabase {
         role.reload();
         try {
             role.delete();
-        } catch (BiobankDeleteException bde) {
+        } catch (BiobankSessionException bse) {
             Assert.assertTrue(
                 "Can't delete because it is still used in memberships", true);
-        } catch (BiobankServerException e) {
+        } catch (Exception e) {
             Assert
                 .fail("If try to delete when used in a membership, the query will fail because of foreign keys problems");
         }

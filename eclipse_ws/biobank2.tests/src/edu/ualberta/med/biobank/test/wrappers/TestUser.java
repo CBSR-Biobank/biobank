@@ -94,9 +94,10 @@ public class TestUser extends TestDatabase {
             .getUser(name);
         Assert.assertNotNull(csmUser);
 
+        Integer idUser = user.getId();
         user.delete();
         Assert.assertNull(ModelUtils.getObjectWithId(appService, User.class,
-            user.getId()));
+            idUser));
         csmUser = upm.getUser(name);
         Assert.assertNull(csmUser);
     }

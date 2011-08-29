@@ -1,7 +1,10 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.peer.PrincipalPeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
+import edu.ualberta.med.biobank.common.wrappers.base.MembershipBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.PrincipalBaseWrapper;
 import edu.ualberta.med.biobank.model.Principal;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -20,8 +23,17 @@ public abstract class PrincipalWrapper<T extends Principal> extends
 
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.persistRemoved(this, PrincipalPeer.MEMBERSHIP_COLLECTION);
+        tasks.deleteRemoved(this, PrincipalPeer.MEMBERSHIP_COLLECTION);
         super.addPersistTasks(tasks);
     }
 
+    @Override
+    public void removeFromMembershipCollection(
+        List<? extends MembershipBaseWrapper<?>> membershipCollection) {
+        removeFromWrapperCollection(PrincipalPeer.MEMBERSHIP_COLLECTION,
+            membershipCollection);
+        // for (MembershipBaseWrapper<?> e : membershipCollection) {
+        // e.setPrincipalInternal(null);
+        // }
+    }
 }

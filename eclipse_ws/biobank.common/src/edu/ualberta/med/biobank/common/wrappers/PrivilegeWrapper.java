@@ -87,6 +87,7 @@ public class PrivilegeWrapper extends PrivilegeBaseWrapper {
 
     public static List<PrivilegeWrapper> getAllPrivileges(
         WritableApplicationService appService) throws ApplicationException {
-        return (List<PrivilegeWrapper>) getPrivileges(appService).values();
+        return new ArrayList<PrivilegeWrapper>(getPrivileges(appService)
+            .values());
     }
 }

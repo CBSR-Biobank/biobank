@@ -38,17 +38,13 @@ public class UserWrapper extends UserBaseWrapper {
     }
 
     @Override
-    // FIXME can do something better. Or event can remove CSM ?
-    public void persist() throws Exception {
-        Long csmId = ((BiobankApplicationService) appService).persistUser(
-            getWrappedObject(), password);
-        if (isNew())
-            setCsmUserId(csmId);
-        super.persist();
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(new CSMUserIdPreQueryTask(this));
+        super.addPersistTasks(tasks);
     }
 
     @Override
-    // FIXME can do something better. Or event can remove CSM ?
+    // FIXME can do something better. Or can even remove CSM ?
     public void delete() throws Exception {
         User userMiniCopy = new User();
         userMiniCopy.setCsmUserId(getCsmUserId());

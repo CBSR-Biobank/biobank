@@ -79,4 +79,5 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public String getUserPassword(String login) throws ApplicationException;
 
     public boolean isUserLockedOut(Long csmUserId) throws ApplicationException;
+
 }

@@ -9,6 +9,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -201,6 +203,13 @@ public class UserEditDialog extends BgcBaseDialog {
             (originalUser.isNew() ? Messages.UserEditDialog_password_new_label
                 : Messages.UserEditDialog_password_label), new String[0],
             originalUser, "password", passwordValidator); //$NON-NLS-1$
+
+        password.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                originalUser.setNeedChangePwd(true);
+            }
+        });
 
         BgcBaseText passwordRetyped = (BgcBaseText) createBoundWidgetWithLabel(
             parent,
