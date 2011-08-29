@@ -37,25 +37,25 @@ public class UserWrapper extends UserBaseWrapper {
         super(appService);
     }
 
-    // FIXME need new way of doing this with new wrappers
-    // @Override
-    // protected void persistDependencies(User origObject) throws Exception {
-    // Long csmId = ((BiobankApplicationService) appService).persistUser(
-    // getWrappedObject(), password);
-    // if (isNew())
-    // setCsmUserId(csmId);
-    // super.persistDependencies(origObject);
-    // }
-    //
-    // @Override
-    // // FIXME see addDeleteTasks ?
-    // public void delete() throws Exception {
-    // User userMiniCopy = new User();
-    // userMiniCopy.setCsmUserId(getCsmUserId());
-    // super.delete();
-    // // should delete in csm only if the wrapper delete succeedes
-    // ((BiobankApplicationService) appService).deleteUser(userMiniCopy);
-    // }
+    @Override
+    // FIXME can do something better. Or event can remove CSM ?
+    public void persist() throws Exception {
+        Long csmId = ((BiobankApplicationService) appService).persistUser(
+            getWrappedObject(), password);
+        if (isNew())
+            setCsmUserId(csmId);
+        super.persist();
+    }
+
+    @Override
+    // FIXME can do something better. Or event can remove CSM ?
+    public void delete() throws Exception {
+        User userMiniCopy = new User();
+        userMiniCopy.setCsmUserId(getCsmUserId());
+        super.delete();
+        // should delete in csm only if the wrapper delete succeedes
+        ((BiobankApplicationService) appService).deleteUser(userMiniCopy);
+    }
 
     public void setPassword(String password) {
         String old = this.password;
@@ -89,7 +89,7 @@ public class UserWrapper extends UserBaseWrapper {
         super.addDeleteTasks(tasks);
     }
 
-    public void removeThisuserFromGroups(TaskList tasks) {
+    private void removeThisuserFromGroups(TaskList tasks) {
         // should remove this user from its groups
         for (BbGroupWrapper group : getGroupCollection(false)) {
             group.removeFromUserCollection(Arrays.asList(this));
