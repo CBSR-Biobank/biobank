@@ -16,10 +16,9 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
+public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
 
     private static BgcLogger logger = BgcLogger
         .getLogger(ReportTableWidget.class.getName());

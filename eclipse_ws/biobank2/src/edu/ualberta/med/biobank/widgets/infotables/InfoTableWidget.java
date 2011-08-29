@@ -27,13 +27,12 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
 /**
- * Used to display tabular information for an object in the object model or
- * combined information from several objects in the object model.
+ * Used to display tabular information for a class in the object model or
+ * combined information from several classes in the object model.
  * <p>
  * The information in the table is loaded in a background thread. By loading
  * object model data in a background thread, the main UI thread is not blocked
@@ -66,7 +65,7 @@ import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
  * @param <T> The model object wrapper the table is based on.
  * 
  */
-public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
+public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
 
     /*
      * see http://lekkimworld.com/2008/03/27/setting_table_row_height_in_swt

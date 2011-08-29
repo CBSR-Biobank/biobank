@@ -15,18 +15,37 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
 
+/**
+ * This abstract class is used to create most the tables used in the client. The
+ * template parameter is the collection that contains the information to be
+ * displayed in the table.
+ * <p>
+ * Derived classes must provide the following (through the use of abstract
+ * methods):
+ * <ul>
+ * <li>label provider</li>
+ * <li>table sorter</li>
+ * </ul>
+ * 
+ * This class contains the following features:
+ * <ul>
+ * <li>column sorting</li>
+ * <li>copy row to clipboard</li>
+ * <li>pagination widget</li>
+ * </ul>
+ * 
+ * @param <T> The information to be displayed in the table.
+ */
 public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
 
     public class PageInformation {
@@ -57,17 +76,17 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
 
     protected Label pageLabel;
 
-    private List<T> collection;
-
     protected int start;
 
     protected int end;
 
     protected boolean reloadData = false;
 
-    private int size;
+    protected boolean autoSizeColumns;
 
-    private boolean autoSizeColumns;
+    private BgcTableSorter tableSorter;
+
+    private BgcLabelProvider labelProvider;
 
     public AbstractInfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths, int rowsPerPage) {
@@ -87,6 +106,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
             style = style | SWT.MULTI;
 
         tableViewer = new TableViewer(this, style);
+        tableSorter = getTableSorter();
+        labelProvider = getLabelProvider();
 
         Table table = tableViewer.getTable();
         table.setLayout(new TableLayout());
@@ -95,19 +116,19 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         GridData gd = new GridData(SWT.FILL, SWT.NONE, true, true);
         table.setLayoutData(gd);
 
+        tableViewer.setSorter(tableSorter);
+
         setHeadings(headings, columnWidths);
         tableViewer.setUseHashlookup(true);
-        tableViewer.setLabelProvider(getLabelProvider());
+        tableViewer.setLabelProvider(labelProvider);
         tableViewer.setContentProvider(new ArrayContentProvider());
 
         addPaginationWidget();
 
-        autoSizeColumns = columnWidths == null ? true : false;
+        autoSizeColumns = (columnWidths == null) ? true : false;
 
         menu = new Menu(parent);
         tableViewer.getTable().setMenu(menu);
-
-        setCollection(collection);
 
         // need to autosize at creation to be sure the size is well initialized
         // the first time. (if don't do that, display problems in UserManagement
@@ -116,9 +137,11 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
             autoSizeColumns();
         }
 
-        BgcClipboard.addClipboardCopySupport(tableViewer, menu,
-            getLabelProvider(), headings.length);
+        BgcClipboard.addClipboardCopySupport(tableViewer, menu, labelProvider,
+            headings.length);
 
+        // load the data
+        setCollection(collection);
     }
 
     public void setHeadings(String[] headings) {
@@ -129,20 +152,35 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         int index = 0;
         if (headings != null) {
             for (String name : headings) {
-                final TableViewerColumn col = new TableViewerColumn(
+                final TableViewerColumn viewerCol = new TableViewerColumn(
                     tableViewer, SWT.NONE);
-                col.getColumn().setText(name);
+                final TableColumn col = viewerCol.getColumn();
+                final int fIndex = index;
+                col.setText(name);
                 if ((columnWidths == null) || (columnWidths[index] == -1)) {
-                    col.getColumn().pack();
+                    col.pack();
                 } else {
-                    col.getColumn().setWidth(columnWidths[index]);
+                    col.setWidth(columnWidths[index]);
                 }
-                col.getColumn().setResizable(true);
-                col.getColumn().setMoveable(true);
-                col.getColumn().addListener(SWT.SELECTED, new Listener() {
+                col.setResizable(true);
+                col.setMoveable(true);
+                col.addSelectionListener(new SelectionAdapter() {
                     @Override
-                    public void handleEvent(Event event) {
-                        col.getColumn().pack();
+                    public void widgetSelected(SelectionEvent e) {
+                        col.pack();
+
+                        if (tableSorter != null) {
+                            tableSorter.setColumn(fIndex);
+                            int dir = tableViewer.getTable().getSortDirection();
+                            if (tableViewer.getTable().getSortColumn() == col) {
+                                dir = (dir == SWT.UP ? SWT.DOWN : SWT.UP);
+                            } else {
+                                dir = SWT.DOWN;
+                            }
+                            tableViewer.getTable().setSortDirection(dir);
+                            tableViewer.getTable().setSortColumn(col);
+                            tableViewer.refresh();
+                        }
                     }
                 });
                 index++;
@@ -155,8 +193,10 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
 
     protected abstract BgcLabelProvider getLabelProvider();
 
-    public List<T> getCollection() {
-        return collection;
+    // TODO: convert to abstract method
+    // protected abstract BgcTableSorter getTableSorter();
+    protected BgcTableSorter getTableSorter() {
+        return null;
     }
 
     @Override
@@ -173,67 +213,9 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         return tableViewer;
     }
 
-    /**
-     * This method is used to load object model data in the background thread.
-     * 
-     * @param item the model object representing the base object to get
-     *            information from.
-     * @return an non-object model object with the table data.
-     * 
-     * @throws Exception
-     */
-    protected abstract void tableLoader(final List<T> collection,
-        final T Selection);
+    public abstract void setCollection(final List<T> collection);
 
-    public void setCollection(final List<T> collection) {
-        setCollection(collection, null);
-        if (collection != null) {
-            size = collection.size();
-        }
-    }
-
-    public void setCollection(final List<T> collection, final T selection) {
-        try {
-            if ((collection == null)
-                || ((backgroundThread != null) && backgroundThread.isAlive())) {
-                return;
-            } else if ((this.collection != collection)
-                || (size != collection.size())) {
-                this.collection = collection;
-                init(collection);
-                setPaginationParams(collection);
-            }
-            if (paginationRequired) {
-                showPaginationWidget();
-                setPageLabelText();
-                enablePaginationWidget(false);
-            } else if (paginationWidget != null)
-                paginationWidget.setVisible(false);
-            final Display display = getTableViewer().getTable().getDisplay();
-
-            resizeTable();
-            backgroundThread = new Thread() {
-                @Override
-                public void run() {
-                    tableLoader(collection, selection);
-                    if (autoSizeColumns) {
-                        display.syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                autoSizeColumns();
-                            }
-                        });
-                    }
-                }
-            };
-            backgroundThread.start();
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError(
-                Messages.AbstractInfoTableWidget_load_error_title, e);
-        }
-    }
-
-    private void autoSizeColumns() {
+    protected void autoSizeColumns() {
         // TODO: auto-size table initially based on headers? Sort of already
         // done with .pack().
         Table table = tableViewer.getTable();
@@ -300,7 +282,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
 
     protected abstract void init(List<T> collection);
 
-    private void resizeTable() {
+    protected void resizeTable() {
         Table table = getTableViewer().getTable();
         GridData gd = (GridData) table.getLayoutData();
         int rows = Math.max(pageInfo.rowsPerPage, 5);
@@ -388,7 +370,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
 
     protected abstract void setDefaultWidgetsEnabled();
 
-    private void showPaginationWidget() {
+    protected void showPaginationWidget() {
         paginationWidget.setVisible(true);
     }
 
@@ -419,8 +401,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget {
         newPage();
     }
 
-    private void newPage() {
-        setCollection(collection);
+    protected void newPage() {
         setPageLabelText();
     }
 

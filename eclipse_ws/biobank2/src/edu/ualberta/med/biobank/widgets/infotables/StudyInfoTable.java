@@ -4,13 +4,16 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 
-public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
+public class StudyInfoTable extends AbstractInfoTableWidget<StudyWrapper> {
 
     protected static class TableRowData {
         StudyWrapper study;
@@ -36,7 +39,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         Messages.StudyInfoTable_visits_label };
 
     public StudyInfoTable(Composite parent, List<StudyWrapper> collection) {
-        super(parent, collection, HEADINGS, 10, StudyWrapper.class);
+        super(parent, collection, HEADINGS, new int[] {}, 10);
     }
 
     @Override
@@ -66,6 +69,30 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
                     return ""; //$NON-NLS-1$
                 }
             }
+        };
+    }
+
+    @Override
+    protected BgcTableSorter getTableSorter() {
+        return new BgcTableSorter() {
+
+            @Override
+            public int compare(Viewer viewer, Object e1, Object e2) {
+                TableRowData row1 = (TableRowData) e1;
+                TableRowData row2 = (TableRowData) e2;
+                int rc = 0;
+
+                switch (propertyIndex) {
+                case 0:
+                    rc = row1.name.compareTo(row2.name);
+                    break;
+                case 1:
+                    rc = row1.nameShort.compareTo(row2.nameShort);
+                    break;
+                }
+                return rc;
+            }
+
         };
     }
 
