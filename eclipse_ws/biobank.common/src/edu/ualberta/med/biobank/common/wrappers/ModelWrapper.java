@@ -589,27 +589,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         if (modelCollection != null) {
             for (R element : modelCollection) {
-                try {
-                    W wrapper = WrapperUtil.wrapModel(appService, element,
-                        wrapperKlazz);
-                    wrappers.add(wrapper);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                W wrapper = WrapperUtil.wrapModel(appService, element,
+                    wrapperKlazz);
+                wrappers.add(wrapper);
             }
         }
         return wrappers;
-    }
-
-    public static <M> Collection<M> unwrapModelCollection(
-        Collection<ModelWrapper<M>> wrappers) {
-        Collection<M> unwrapped = new ArrayList<M>();
-
-        for (ModelWrapper<M> wrapper : wrappers) {
-            unwrapped.add(wrapper.getWrappedObject());
-        }
-
-        return unwrapped;
     }
 
     protected <W extends ModelWrapper<? extends M>, M> W getWrappedProperty(
@@ -651,7 +636,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         setProperty(this, property, newValue, wrapper);
     }
 
-    public <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
+    protected <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
         Property<Collection<R>, ? super E> property, Collection<W> wrappers) {
         Collection<R> newValues = new HashSet<R>();
         for (W element : wrappers) {
@@ -662,7 +647,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         setModelProperty(this, property, newValues, wrappers);
     }
 
-    protected <W extends ModelWrapper<? extends M>, M> List<W> wrapCollectionProperty(
+    private <W extends ModelWrapper<? extends M>, M> List<W> wrapCollectionProperty(
         Property<Collection<M>, ? super E> property, Class<W> klazz) {
         List<W> wrappers = new ArrayList<W>();
 
