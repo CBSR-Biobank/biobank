@@ -27,8 +27,10 @@ public class UserHelper extends PrincipalHelper {
     }
 
     public static void deleteCreatedUsers() throws Exception {
-        for (UserWrapper user : createdUsers)
+        for (UserWrapper user : createdUsers) {
+            user.reload();
             user.delete();
+        }
         createdUsers.clear();
     }
 

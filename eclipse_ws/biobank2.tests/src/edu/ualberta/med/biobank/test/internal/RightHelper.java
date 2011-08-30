@@ -25,8 +25,10 @@ public class RightHelper extends DbHelper {
     }
 
     public static void deleteCreatedRights() throws Exception {
-        for (BbRightWrapper right : createdRights)
+        for (BbRightWrapper right : createdRights) {
+            right.reload();
             right.delete();
+        }
         createdRights.clear();
     }
 }

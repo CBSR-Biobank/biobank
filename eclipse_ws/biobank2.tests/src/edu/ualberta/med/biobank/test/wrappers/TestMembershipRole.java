@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
+import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.MembershipHelper;
 import edu.ualberta.med.biobank.test.internal.RightHelper;
@@ -24,7 +25,6 @@ public class TestMembershipRole extends TestDatabase {
     @Test
     public void testGetPrivilegesForRight() throws Exception {
         String name = "testGetPrivilegesForRight" + r.nextInt();
-        UserWrapper user = UserHelper.addUser(name, null, true);
 
         PrivilegeWrapper read = PrivilegeWrapper.getReadPrivilege(appService);
         PrivilegeWrapper update = PrivilegeWrapper
@@ -54,19 +54,20 @@ public class TestMembershipRole extends TestDatabase {
         role2.persist();
         RoleHelper.createdRoles.add(role2);
 
+        UserWrapper user = UserHelper.addUser(name, null, true);
+
         MembershipRoleWrapper mwr = MembershipHelper.newMembershipRole(user,
             null, null);
         mwr.addToRoleCollection(Arrays.asList(role1));
+        mwr.persist();
 
         // another membership for the second role
         MembershipRoleWrapper mwr2 = MembershipHelper.newMembershipRole(user,
             null, null);
         mwr2.addToRoleCollection(Arrays.asList(role2));
+        mwr2.persist();
 
-        user.persist();
-
-        user.reload();
-        mwr.persist();
+        mwr.reload();
         List<PrivilegeWrapper> privilegesForRight = mwr
             .getPrivilegesForRight(right);
         // make sure retrieve privileges for this Membership only
@@ -75,5 +76,41 @@ public class TestMembershipRole extends TestDatabase {
         Assert.assertTrue(privilegesForRight.contains(update));
         Assert.assertFalse(privilegesForRight.contains(delete));
         Assert.assertFalse(privilegesForRight.contains(create));
+    }
+
+    @Test
+    public void testCanDeleteMembershipRoleUsingARole() throws Exception {
+        String name = "testCanDeleteMembershipRoleUsingARole" + r.nextInt();
+        UserWrapper user = UserHelper.addUser(name, null, true);
+
+        BbRightWrapper right = RightHelper.addRight(name, name, true);
+
+        RoleWrapper role1 = RoleHelper.newRole(name + "_1");
+        RightPrivilegeWrapper rp = new RightPrivilegeWrapper(appService);
+        rp.setRight(right);
+        rp.addToPrivilegeCollection(Arrays.asList(PrivilegeWrapper
+            .getReadPrivilege(appService)));
+        rp.setRole(role1);
+        role1.addToRightPrivilegeCollection(Arrays.asList(rp));
+        role1.persist();
+        RoleHelper.createdRoles.add(role1);
+
+        MembershipRoleWrapper mwr = MembershipHelper.newMembershipRole(user,
+            null, null);
+        mwr.addToRoleCollection(Arrays.asList(role1));
+        mwr.persist();
+
+        mwr.reload();
+        Integer idRole = role1.getId();
+        Assert.assertEquals(1, mwr.getRoleCollection(false).size());
+        try {
+            mwr.delete();
+            Assert
+                .assertTrue("Can delete a membership role using a role", true);
+        } catch (Exception ex) {
+            Assert.fail("Should be able to delete the membership role");
+        }
+        Assert.assertNotNull(ModelUtils.getObjectWithId(appService, Role.class,
+            idRole));
     }
 }

@@ -25,8 +25,10 @@ public class RoleHelper extends DbHelper {
     }
 
     public static void deleteCreatedRoles() throws Exception {
-        for (RoleWrapper role : createdRoles)
+        for (RoleWrapper role : createdRoles) {
+            role.reload();
             role.delete();
+        }
         createdRoles.clear();
     }
 }
