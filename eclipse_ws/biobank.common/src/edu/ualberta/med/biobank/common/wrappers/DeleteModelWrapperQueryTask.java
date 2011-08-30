@@ -83,6 +83,7 @@ public class DeleteModelWrapperQueryTask<E> implements
             try {
                 Serializable id = getIdProperty().get(model);
                 session.delete(session.load(getModelClass(), id));
+                // TODO: version check and throw a StaleStateException?
             } catch (PropertyValueException e) {
                 // TODO: determine why the HQL delete is still necessary, test
                 // fail if this is removed. Is there a better option?
