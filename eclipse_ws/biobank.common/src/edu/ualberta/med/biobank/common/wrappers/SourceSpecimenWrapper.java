@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.common.wrappers.base.SourceSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SourceSpecimenWrapper extends SourceSpecimenBaseWrapper {
@@ -15,10 +16,11 @@ public class SourceSpecimenWrapper extends SourceSpecimenBaseWrapper {
     }
 
     @Override
-    public int compareTo(ModelWrapper<SourceSpecimen> o) {
-        if (o instanceof SourceSpecimenWrapper) {
-            return getSpecimenType().compareTo(
-                ((SourceSpecimenWrapper) o).getSpecimenType());
+    public int compareTo(ModelWrapper<SourceSpecimen> other) {
+        if (other instanceof SourceSpecimenWrapper) {
+            ModelWrapper<SpecimenType> otherSpecimenType = ((SourceSpecimenWrapper) other)
+                .getSpecimenType();
+            return nullSafeComparator(getSpecimenType(), otherSpecimenType);
         }
         return 0;
     }
