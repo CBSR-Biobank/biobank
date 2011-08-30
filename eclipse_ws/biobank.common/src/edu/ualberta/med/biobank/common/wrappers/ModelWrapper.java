@@ -508,10 +508,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if the user can edit this object
      */
-    public boolean canUpdate(UserWrapper user) {
+    public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
         try {
             return user.hasPrivilegeOnKeyDesc(
-                PrivilegeWrapper.getUpdatePrivilege(appService),
+                PrivilegeWrapper.getUpdatePrivilege(appService), center, study,
                 getWrappedClass().getSimpleName());
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -521,10 +522,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if the user can delete this object
      */
-    public boolean canDelete(UserWrapper user) {
+    public boolean canDelete(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
         try {
             return user.hasPrivilegeOnKeyDesc(
-                PrivilegeWrapper.getDeletePrivilege(appService),
+                PrivilegeWrapper.getDeletePrivilege(appService), center, study,
                 getWrappedClass().getSimpleName());
         } catch (Exception e) {
             throw new RuntimeException(e);

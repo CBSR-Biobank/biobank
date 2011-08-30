@@ -300,7 +300,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     public boolean canBeSentBy(UserWrapper user) {
-        return canUpdate(user)
+        return canUpdate(user, user.getCurrentWorkingCenter(), null)
             && getSenderCenter().equals(user.getCurrentWorkingCenter())
             && isInCreationState() && hasDispatchSpecimens();
     }
@@ -311,7 +311,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     public boolean canBeReceivedBy(UserWrapper user) {
-        return canUpdate(user)
+        return canUpdate(user, user.getCurrentWorkingCenter(), null)
             && getReceiverCenter().equals(user.getCurrentWorkingCenter())
             && isInTransitState();
     }
@@ -370,7 +370,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     public boolean canBeClosedBy(UserWrapper user) {
-        return isInReceivedState() && canUpdate(user);
+        return isInReceivedState()
+            && canUpdate(user, user.getCurrentWorkingCenter(), null);
     }
 
     @Override

@@ -555,10 +555,10 @@ public class TestPatient extends TestDatabase {
     public void testCanDo() throws Exception {
         PatientWrapper p = PatientHelper.addPatient("testp",
             StudyHelper.addStudy("testst"));
-        Assert.assertEquals(false,
-            p.canDelete(UserWrapper.getUser(appService, "testuser")));
-        Assert.assertEquals(false,
-            p.canUpdate(UserWrapper.getUser(appService, "testuser")));
+        Assert.assertEquals(false, p.canDelete(
+            UserWrapper.getUser(appService, "testuser"), null, null));
+        Assert.assertEquals(false, p.canUpdate(
+            UserWrapper.getUser(appService, "testuser"), null, null));
     }
 
 }

@@ -34,7 +34,8 @@ public class MembershipRoleWrapper extends MembershipRoleBaseWrapper {
      * to call getter, they will be loaded once and the kept in memory
      */
     @Override
-    public List<PrivilegeWrapper> getPrivilegesForRight(BbRightWrapper right)
+    protected List<PrivilegeWrapper> getPrivilegesForRightInternal(
+        BbRightWrapper right, CenterWrapper<?> center, StudyWrapper study)
         throws ApplicationException {
         List<PrivilegeWrapper> privileges = new ArrayList<PrivilegeWrapper>();
         for (RoleWrapper r : getRoleCollection(false)) {

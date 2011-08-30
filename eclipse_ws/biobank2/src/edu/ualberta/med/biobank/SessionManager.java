@@ -239,25 +239,17 @@ public class SessionManager {
     }
 
     public static boolean canCreate(Class<?> clazz) {
-        try {
-            return SessionSecurityHelper.canCreate(getAppService(), getUser(),
-                clazz);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return SessionSecurityHelper.canCreate(getAppService(), getUser(),
+            clazz);
     }
 
     public static boolean canDelete(Class<?> clazz) {
-        try {
-            return SessionSecurityHelper.canDelete(getAppService(), getUser(),
-                clazz);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return SessionSecurityHelper.canDelete(getAppService(), getUser(),
+            clazz);
     }
 
     public static boolean canDelete(ModelWrapper<?> wrapper) {
-        return wrapper.canDelete(getUser());
+        return SessionSecurityHelper.canDelete(getUser(), wrapper);
     }
 
     public static boolean canView(Class<?> clazz) {
@@ -269,6 +261,7 @@ public class SessionManager {
         }
     }
 
+    // FIXME is using current working center and no study
     public static boolean canAccess(String... keyDesc) {
         try {
             return SessionSecurityHelper.canAccess(getAppService(), getUser(),
@@ -288,7 +281,7 @@ public class SessionManager {
     }
 
     public static boolean canUpdate(ModelWrapper<?> wrapper) {
-        return wrapper.canUpdate(getUser());
+        return SessionSecurityHelper.canUpdate(getUser(), wrapper);
     }
 
     public boolean isConnected() {

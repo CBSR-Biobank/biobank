@@ -335,8 +335,9 @@ public class PatientWrapper extends PatientBaseWrapper {
      * return true if the user can delete this object
      */
     @Override
-    public boolean canDelete(UserWrapper user) {
-        return super.canDelete(user)
+    public boolean canDelete(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canDelete(user, center, study)
             && (getStudy() == null || user.getCurrentWorkingCenter() == null || user
                 .getCurrentWorkingCenter().getStudyCollection()
                 .contains(getStudy()));
@@ -346,8 +347,9 @@ public class PatientWrapper extends PatientBaseWrapper {
      * return true if the user can edit this object
      */
     @Override
-    public boolean canUpdate(UserWrapper user) {
-        return super.canUpdate(user)
+    public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canUpdate(user, center, study)
             && (getStudy() == null || user.getCurrentWorkingCenter() == null || user
                 .getCurrentWorkingCenter().getStudyCollection()
                 .contains(getStudy()));

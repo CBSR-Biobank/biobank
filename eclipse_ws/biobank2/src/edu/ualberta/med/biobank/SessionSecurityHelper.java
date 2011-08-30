@@ -6,6 +6,11 @@ import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
+/**
+ * for now, test only by using the current center. No study is used yet.
+ * 
+ * @author delphine
+ */
 public class SessionSecurityHelper {
 
     public static final String PRINT_LABEL_KEY_DESC = "print-labels"; //$NON-NLS-1$
@@ -23,7 +28,8 @@ public class SessionSecurityHelper {
         UserWrapper user, Class<?> clazz) {
         try {
             return user.hasPrivilegeOnClassObject(
-                PrivilegeWrapper.getCreatePrivilege(appService), clazz);
+                PrivilegeWrapper.getCreatePrivilege(appService),
+                user.getCurrentWorkingCenter(), null, clazz);
         } catch (NoRightForKeyDescException nre) {
             // If there is no right corresponding to this class, then can create
             return true;
@@ -36,7 +42,8 @@ public class SessionSecurityHelper {
         UserWrapper user, Class<?> clazz) {
         try {
             return user.hasPrivilegeOnClassObject(
-                PrivilegeWrapper.getDeletePrivilege(appService), clazz);
+                PrivilegeWrapper.getDeletePrivilege(appService),
+                user.getCurrentWorkingCenter(), null, clazz);
         } catch (NoRightForKeyDescException nre) {
             // If there is no right corresponding to this class, then can delete
             return true;
@@ -46,14 +53,15 @@ public class SessionSecurityHelper {
     }
 
     public static boolean canDelete(UserWrapper user, ModelWrapper<?> wrapper) {
-        return wrapper.canDelete(user);
+        return wrapper.canDelete(user, user.getCurrentWorkingCenter(), null);
     }
 
     public static boolean canView(BiobankApplicationService appService,
         UserWrapper user, Class<?> clazz) {
         try {
             return user.hasPrivilegeOnClassObject(
-                PrivilegeWrapper.getReadPrivilege(appService), clazz);
+                PrivilegeWrapper.getReadPrivilege(appService),
+                user.getCurrentWorkingCenter(), null, clazz);
         } catch (NoRightForKeyDescException nre) {
             // If there is no right corresponding to this class, then can view
             return true;
@@ -66,7 +74,8 @@ public class SessionSecurityHelper {
         UserWrapper user, String... keyDesc) {
         try {
             return user.hasPrivilegesOnKeyDesc(
-                PrivilegeWrapper.getReadPrivilege(appService), keyDesc);
+                PrivilegeWrapper.getReadPrivilege(appService),
+                user.getCurrentWorkingCenter(), null, keyDesc);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -76,7 +85,8 @@ public class SessionSecurityHelper {
         UserWrapper user, Class<?> clazz) {
         try {
             return user.hasPrivilegeOnClassObject(
-                PrivilegeWrapper.getUpdatePrivilege(appService), clazz);
+                PrivilegeWrapper.getUpdatePrivilege(appService),
+                user.getCurrentWorkingCenter(), null, clazz);
         } catch (NoRightForKeyDescException nre) {
             // If there is no right corresponding to this class, then can update
             return true;
@@ -86,6 +96,6 @@ public class SessionSecurityHelper {
     }
 
     public static boolean canUpdate(UserWrapper user, ModelWrapper<?> wrapper) {
-        return wrapper.canUpdate(user);
+        return wrapper.canUpdate(user, user.getCurrentWorkingCenter(), null);
     }
 }

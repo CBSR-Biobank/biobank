@@ -523,8 +523,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
      * return true if the user can edit this object
      */
     @Override
-    public boolean canUpdate(UserWrapper user) {
-        return super.canUpdate(user)
+    public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canUpdate(user, center, study)
             && (user.getCurrentWorkingCenter() == null || user
                 .getCurrentWorkingCenter().getStudyCollection()
                 .contains(getCollectionEvent().getPatient().getStudy()));

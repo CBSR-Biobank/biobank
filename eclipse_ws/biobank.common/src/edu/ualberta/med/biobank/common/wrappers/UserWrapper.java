@@ -156,30 +156,32 @@ public class UserWrapper extends UserBaseWrapper {
     }
 
     public boolean hasPrivilegesOnKeyDesc(PrivilegeWrapper privilege,
-        String... rightsKeyDescs) throws NoRightForKeyDescException,
-        ApplicationException {
+        CenterWrapper<?> center, StudyWrapper study, String... rightsKeyDescs)
+        throws NoRightForKeyDescException, ApplicationException {
         for (String keyDesc : rightsKeyDescs) {
-            boolean ok = hasPrivilegeOnKeyDesc(privilege, keyDesc);
+            boolean ok = hasPrivilegeOnKeyDesc(privilege, center, study,
+                keyDesc);
             if (ok)
                 return ok;
         }
         return false;
     }
 
-    // FIXME should check study and/or center ?
     public boolean hasPrivilegeOnKeyDesc(PrivilegeWrapper privilege,
-        String keyDesc) throws ApplicationException, NoRightForKeyDescException {
+        CenterWrapper<?> center, StudyWrapper study, String keyDesc)
+        throws ApplicationException, NoRightForKeyDescException {
         BbRightWrapper right = BbRightWrapper.getRightWithKeyDesc(appService,
             keyDesc);
         if (right == null)
             throw new NoRightForKeyDescException(keyDesc);
-        List<PrivilegeWrapper> userPrivileges = getPrivilegesForRight(right);
+        List<PrivilegeWrapper> userPrivileges = getPrivilegesForRight(right,
+            center, study);
         return userPrivileges.contains(privilege);
     }
 
     public boolean hasPrivilegeOnClassObject(PrivilegeWrapper privilege,
-        Class<?> objectClazz) throws NoRightForKeyDescException,
-        ApplicationException {
+        CenterWrapper<?> center, StudyWrapper study, Class<?> objectClazz)
+        throws NoRightForKeyDescException, ApplicationException {
         if (ModelWrapper.class.isAssignableFrom(objectClazz)) {
             ModelWrapper<?> wrapper = null;
             try {
@@ -197,16 +199,17 @@ public class UserWrapper extends UserBaseWrapper {
                 return false;
             }
             String type = wrapper.getWrappedClass().getSimpleName();
-            return hasPrivilegeOnKeyDesc(privilege, type);
+            return hasPrivilegeOnKeyDesc(privilege, center, study, type);
         }
         return false;
     }
 
-    private List<PrivilegeWrapper> getPrivilegesForRight(BbRightWrapper right)
+    private List<PrivilegeWrapper> getPrivilegesForRight(BbRightWrapper right,
+        CenterWrapper<?> center, StudyWrapper study)
         throws ApplicationException {
         List<PrivilegeWrapper> privileges = new ArrayList<PrivilegeWrapper>();
         for (MembershipWrapper<?> ms : getMembershipCollection(false)) {
-            privileges.addAll(ms.getPrivilegesForRight(right));
+            privileges.addAll(ms.getPrivilegesForRight(right, center, study));
         }
         return privileges;
     }

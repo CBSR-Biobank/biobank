@@ -7,9 +7,9 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.WorkbenchException;
 
-import edu.ualberta.med.biobank.SessionSecurityHelper;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.SessionSecurityHelper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
@@ -40,7 +40,8 @@ public class ProcessingAdministrationHandler extends AbstractHandler implements
             // FIXME do we want this test on research groups or do we just test
             // the privileges ?
             && !(SessionManager.getUser().getCurrentWorkingCenter() instanceof ResearchGroupWrapper)
-            && SessionManager.canAccess(SessionSecurityHelper.SPECIMEN_ASSIGN_KEY_DESC,
+            && SessionManager.canAccess(
+                SessionSecurityHelper.SPECIMEN_ASSIGN_KEY_DESC,
                 SessionSecurityHelper.CLINIC_SHIPMENT_KEY_DESC,
                 SessionSecurityHelper.DISPATCH_RECEIVE_KEY_DESC,
                 SessionSecurityHelper.DISPATCH_SEND_KEY_DESC,

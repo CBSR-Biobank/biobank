@@ -232,8 +232,9 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
      * return true if the user can delete this object
      */
     @Override
-    public boolean canDelete(UserWrapper user) {
-        return super.canDelete(user)
+    public boolean canDelete(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canDelete(user, center, study)
             && (getCenter() == null || getCenter().equals(
                 user.getCurrentWorkingCenter()));
     }
@@ -242,8 +243,9 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
      * return true if the user can edit this object
      */
     @Override
-    public boolean canUpdate(UserWrapper user) {
-        return super.canUpdate(user)
+    public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canUpdate(user, center, study)
             && (getCenter() == null || getCenter().equals(
                 user.getCurrentWorkingCenter()));
     }

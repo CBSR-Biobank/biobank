@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.base.MembershipBaseWrapper;
@@ -41,6 +42,21 @@ public abstract class MembershipWrapper<T extends Membership> extends
 
     public abstract String getMembershipObjectsListString();
 
-    public abstract List<PrivilegeWrapper> getPrivilegesForRight(
-        BbRightWrapper right) throws ApplicationException;
+    public List<PrivilegeWrapper> getPrivilegesForRight(BbRightWrapper right,
+        CenterWrapper<?> center, StudyWrapper study)
+        throws ApplicationException {
+        // if this membership center is null, then can apply to all centers.
+        // Otherwise it should be the same center.
+        // if this membership study is null, then can apply to all studies.
+        // Otherwise it should be the same study
+        if ((getCenter() == null || getCenter().equals(center))
+            && (getStudy() == null || getStudy().equals(study))) {
+            return getPrivilegesForRightInternal(right, center, study);
+        }
+        return new ArrayList<PrivilegeWrapper>();
+    }
+
+    protected abstract List<PrivilegeWrapper> getPrivilegesForRightInternal(
+        BbRightWrapper right, CenterWrapper<?> center, StudyWrapper study)
+        throws ApplicationException;
 }
