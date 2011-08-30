@@ -124,6 +124,7 @@ public class InfoTablePaginationWidget extends Composite {
         pageInfo = new PageInformation();
         pageInfo.rowsPerPage = rowsPerPage;
         pageInfo.page = 0;
+        pageInfo.pageTotal = TOTAL_PAGES_UNKNOWN;
 
         setPageLabelText();
     }
