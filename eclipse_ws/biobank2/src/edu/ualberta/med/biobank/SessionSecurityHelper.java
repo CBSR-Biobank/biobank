@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank;
 
+import edu.ualberta.med.biobank.common.exception.NoRightForKeyDescException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
@@ -23,6 +24,9 @@ public class SessionSecurityHelper {
         try {
             return user.hasPrivilegeOnClassObject(
                 PrivilegeWrapper.getCreatePrivilege(appService), clazz);
+        } catch (NoRightForKeyDescException nre) {
+            // If there is no right corresponding to this class, then can create
+            return true;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -33,6 +37,9 @@ public class SessionSecurityHelper {
         try {
             return user.hasPrivilegeOnClassObject(
                 PrivilegeWrapper.getDeletePrivilege(appService), clazz);
+        } catch (NoRightForKeyDescException nre) {
+            // If there is no right corresponding to this class, then can delete
+            return true;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -47,6 +54,9 @@ public class SessionSecurityHelper {
         try {
             return user.hasPrivilegeOnClassObject(
                 PrivilegeWrapper.getReadPrivilege(appService), clazz);
+        } catch (NoRightForKeyDescException nre) {
+            // If there is no right corresponding to this class, then can view
+            return true;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -67,6 +77,9 @@ public class SessionSecurityHelper {
         try {
             return user.hasPrivilegeOnClassObject(
                 PrivilegeWrapper.getUpdatePrivilege(appService), clazz);
+        } catch (NoRightForKeyDescException nre) {
+            // If there is no right corresponding to this class, then can update
+            return true;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -506,26 +506,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
-     * return true if the user can view this object
-     */
-    public boolean canRead(UserWrapper user) {
-        try {
-            return user.hasPrivilegeOnKeyDesc(
-                PrivilegeWrapper.getReadPrivilege(appService),
-                getWrappedClass().getName());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
      * return true if the user can edit this object
      */
     public boolean canUpdate(UserWrapper user) {
         try {
             return user.hasPrivilegeOnKeyDesc(
                 PrivilegeWrapper.getUpdatePrivilege(appService),
-                getWrappedClass().getName());
+                getWrappedClass().getSimpleName());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -538,7 +525,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         try {
             return user.hasPrivilegeOnKeyDesc(
                 PrivilegeWrapper.getDeletePrivilege(appService),
-                getWrappedClass().getName());
+                getWrappedClass().getSimpleName());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

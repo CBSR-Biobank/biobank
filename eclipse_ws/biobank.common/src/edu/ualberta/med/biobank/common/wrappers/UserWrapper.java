@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
+import edu.ualberta.med.biobank.common.exception.NoRightForKeyDescException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.UserBaseWrapper;
@@ -156,7 +156,7 @@ public class UserWrapper extends UserBaseWrapper {
     }
 
     public boolean hasPrivilegesOnKeyDesc(PrivilegeWrapper privilege,
-        String... rightsKeyDescs) throws BiobankFailedQueryException,
+        String... rightsKeyDescs) throws NoRightForKeyDescException,
         ApplicationException {
         for (String keyDesc : rightsKeyDescs) {
             boolean ok = hasPrivilegeOnKeyDesc(privilege, keyDesc);
@@ -168,16 +168,17 @@ public class UserWrapper extends UserBaseWrapper {
 
     // FIXME should check study and/or center ?
     public boolean hasPrivilegeOnKeyDesc(PrivilegeWrapper privilege,
-        String keyDesc) throws BiobankFailedQueryException,
-        ApplicationException {
+        String keyDesc) throws ApplicationException, NoRightForKeyDescException {
         BbRightWrapper right = BbRightWrapper.getRightWithKeyDesc(appService,
             keyDesc);
+        if (right == null)
+            throw new NoRightForKeyDescException(keyDesc);
         List<PrivilegeWrapper> userPrivileges = getPrivilegesForRight(right);
         return userPrivileges.contains(privilege);
     }
 
     public boolean hasPrivilegeOnClassObject(PrivilegeWrapper privilege,
-        Class<?> objectClazz) throws BiobankFailedQueryException,
+        Class<?> objectClazz) throws NoRightForKeyDescException,
         ApplicationException {
         if (ModelWrapper.class.isAssignableFrom(objectClazz)) {
             ModelWrapper<?> wrapper = null;

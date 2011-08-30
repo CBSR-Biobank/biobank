@@ -1,12 +1,10 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.wrappers.base.PrivilegeBaseWrapper;
 import edu.ualberta.med.biobank.model.Privilege;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -28,23 +26,6 @@ public class PrivilegeWrapper extends PrivilegeBaseWrapper {
     public PrivilegeWrapper(WritableApplicationService appService,
         Privilege wrappedObject) {
         super(appService, wrappedObject);
-    }
-
-    private static final String PRIVILEGE_QRY = "from "
-        + Privilege.class.getName() + " where name = ?";
-
-    public static PrivilegeWrapper getPrivilege(
-        WritableApplicationService appService, String name)
-        throws ApplicationException, BiobankFailedQueryException {
-
-        HQLCriteria c = new HQLCriteria(PRIVILEGE_QRY,
-            Arrays.asList(new Object[] { name }));
-
-        List<Privilege> result = appService.query(c);
-        if (result.size() != 1)
-            throw new BiobankFailedQueryException(
-                "unexpected results from query");
-        return new PrivilegeWrapper(appService, result.get(0));
     }
 
     private static final String ALL_PRIVILEGES_QRY = "from "
