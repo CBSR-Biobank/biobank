@@ -56,8 +56,6 @@ or protection_element_name = 'edu.ualberta.med.biobank.model.Role';
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `bb_group` (
   `PRINCIPAL_ID` int(11) NOT NULL,
   `NAME` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
@@ -65,19 +63,26 @@ CREATE TABLE `bb_group` (
   KEY `FK119439A0FF154DAF` (`PRINCIPAL_ID`),
   CONSTRAINT `FK119439A0FF154DAF` FOREIGN KEY (`PRINCIPAL_ID`) REFERENCES `principal` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `bb_right` (
+  `ID` int(11) NOT NULL,
+  `VERSION` int(11) NOT NULL,
+  `NAME` varchar(255) COLLATE latin1_general_cs NOT NULL,
+  `FOR_SITE` bit(1) DEFAULT NULL,
+  `FOR_CLINIC` bit(1) DEFAULT NULL,
+  `FOR_RESEARCH_GROUP` bit(1) DEFAULT NULL,
+  `FOR_STUDY` bit(1) DEFAULT NULL,
+  `KEY_DESC` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `NAME` (`NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+
 CREATE TABLE `principal` (
   `ID` int(11) NOT NULL,
   `VERSION` int(11) NOT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user` (
   `PRINCIPAL_ID` int(11) NOT NULL,
   `LOGIN` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
@@ -92,10 +97,7 @@ CREATE TABLE `user` (
   KEY `FK27E3CBFF154DAF` (`PRINCIPAL_ID`),
   CONSTRAINT `FK27E3CBFF154DAF` FOREIGN KEY (`PRINCIPAL_ID`) REFERENCES `principal` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `group_user` (
   `USER_ID` int(11) NOT NULL,
   `GROUP_ID` int(11) NOT NULL,
@@ -105,48 +107,23 @@ CREATE TABLE `group_user` (
   CONSTRAINT `FK6B1EC1AB691634EF` FOREIGN KEY (`GROUP_ID`) REFERENCES `bb_group` (`PRINCIPAL_ID`),
   CONSTRAINT `FK6B1EC1ABB9634A05` FOREIGN KEY (`USER_ID`) REFERENCES `user` (`PRINCIPAL_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `membership` (
   `ID` int(11) NOT NULL,
+  `DISCRIMINATOR` varchar(255) COLLATE latin1_general_cs NOT NULL,
   `VERSION` int(11) NOT NULL,
-  `PRINCIPAL_ID` int(11) NOT NULL,
-  `CENTER_ID` int(11) DEFAULT NULL,
   `STUDY_ID` int(11) DEFAULT NULL,
+  `CENTER_ID` int(11) DEFAULT NULL,
+  `PRINCIPAL_ID` int(11) NOT NULL,
   PRIMARY KEY (`ID`),
-  KEY `FKCD0773D6F2A2464F` (`STUDY_ID`),
   KEY `FKCD0773D6FF154DAF` (`PRINCIPAL_ID`),
+  KEY `FKCD0773D6F2A2464F` (`STUDY_ID`),
   KEY `FKCD0773D692FAA705` (`CENTER_ID`),
   CONSTRAINT `FKCD0773D692FAA705` FOREIGN KEY (`CENTER_ID`) REFERENCES `center` (`ID`),
   CONSTRAINT `FKCD0773D6F2A2464F` FOREIGN KEY (`STUDY_ID`) REFERENCES `study` (`ID`),
   CONSTRAINT `FKCD0773D6FF154DAF` FOREIGN KEY (`PRINCIPAL_ID`) REFERENCES `principal` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `membership_role` (
-  `MEMBERSHIP_ID` int(11) NOT NULL,
-  PRIMARY KEY (`MEMBERSHIP_ID`),
-  KEY `FKEF36B33FD26ABDE5` (`MEMBERSHIP_ID`),
-  CONSTRAINT `FKEF36B33FD26ABDE5` FOREIGN KEY (`MEMBERSHIP_ID`) REFERENCES `membership` (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `membership_right` (
-  `MEMBERSHIP_ID` int(11) NOT NULL,
-  PRIMARY KEY (`MEMBERSHIP_ID`),
-  KEY `FKF79CE853D26ABDE5` (`MEMBERSHIP_ID`),
-  CONSTRAINT `FKF79CE853D26ABDE5` FOREIGN KEY (`MEMBERSHIP_ID`) REFERENCES `membership` (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `membership_role_role` (
   `MEMBERSHIP_ROLE_ID` int(11) NOT NULL,
   `ROLE_ID` int(11) NOT NULL,
@@ -154,12 +131,9 @@ CREATE TABLE `membership_role_role` (
   KEY `FK6E3AD76D6BCA5F2` (`MEMBERSHIP_ROLE_ID`),
   KEY `FK6E3AD7614388625` (`ROLE_ID`),
   CONSTRAINT `FK6E3AD7614388625` FOREIGN KEY (`ROLE_ID`) REFERENCES `role` (`ID`),
-  CONSTRAINT `FK6E3AD76D6BCA5F2` FOREIGN KEY (`MEMBERSHIP_ROLE_ID`) REFERENCES `membership_role` (`MEMBERSHIP_ID`)
+  CONSTRAINT `FK6E3AD76D6BCA5F2` FOREIGN KEY (`MEMBERSHIP_ROLE_ID`) REFERENCES `membership` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `role` (
   `ID` int(11) NOT NULL,
   `VERSION` int(11) NOT NULL,
@@ -167,28 +141,22 @@ CREATE TABLE `role` (
   PRIMARY KEY (`ID`),
   UNIQUE KEY `NAME` (`NAME`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `right_privilege` (
   `ID` int(11) NOT NULL,
   `VERSION` int(11) NOT NULL,
+  `ROLE_ID` int(11) DEFAULT NULL,
   `MEMBERSHIP_RIGHT_ID` int(11) DEFAULT NULL,
   `RIGHT_ID` int(11) NOT NULL,
-  `ROLE_ID` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `FK4B32800E14388625` (`ROLE_ID`),
   KEY `FK4B32800EF5E5B3CF` (`RIGHT_ID`),
   KEY `FK4B32800EBB1B5B42` (`MEMBERSHIP_RIGHT_ID`),
-  CONSTRAINT `FK4B32800EBB1B5B42` FOREIGN KEY (`MEMBERSHIP_RIGHT_ID`) REFERENCES `membership_right` (`MEMBERSHIP_ID`),
+  CONSTRAINT `FK4B32800EBB1B5B42` FOREIGN KEY (`MEMBERSHIP_RIGHT_ID`) REFERENCES `membership` (`ID`),
   CONSTRAINT `FK4B32800E14388625` FOREIGN KEY (`ROLE_ID`) REFERENCES `role` (`ID`),
   CONSTRAINT `FK4B32800EF5E5B3CF` FOREIGN KEY (`RIGHT_ID`) REFERENCES `bb_right` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `right_privilege_privilege` (
   `RIGHT_PRIVILEGE_ID` int(11) NOT NULL,
   `PRIVILEGE_ID` int(11) NOT NULL,
@@ -198,24 +166,24 @@ CREATE TABLE `right_privilege_privilege` (
   CONSTRAINT `FKE1E847A03267910C` FOREIGN KEY (`RIGHT_PRIVILEGE_ID`) REFERENCES `right_privilege` (`ID`),
   CONSTRAINT `FKE1E847A0AABB1ACF` FOREIGN KEY (`PRIVILEGE_ID`) REFERENCES `privilege` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `bb_right` (
+CREATE TABLE `privilege` (
   `ID` int(11) NOT NULL,
   `VERSION` int(11) NOT NULL,
   `NAME` varchar(255) COLLATE latin1_general_cs NOT NULL,
-  `FOR_SITE` bit(1) DEFAULT NULL,
-  `FOR_CLINIC` bit(1) DEFAULT NULL,
-  `FOR_RESEARCH_GROUP` bit(1) DEFAULT NULL,
-  `FOR_STUDY` bit(1) DEFAULT NULL,
-  `KEY_DESC` varchar(255) COLLATE latin1_general_cs NOT NULL,
   PRIMARY KEY (`ID`),
-  UNIQUE KEY `NAME` (`NAME`),
-  UNIQUE KEY `KEY_DESC` (`KEY_DESC`)
+  UNIQUE KEY `NAME` (`NAME`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- add data in security tables:
 
 LOCK TABLES `BB_RIGHT` WRITE;
 INSERT INTO `BB_RIGHT` (ID, VERSION, NAME, FOR_SITE, FOR_CLINIC, FOR_RESEARCH_GROUP, FOR_STUDY, KEY_DESC) VALUES
@@ -246,19 +214,6 @@ INSERT INTO `BB_RIGHT` (ID, VERSION, NAME, FOR_SITE, FOR_CLINIC, FOR_RESEARCH_GR
 ( 24, 0, 'Contact', 1, 1, 1, 1, 'Contact');
 UNLOCK TABLES;
 
-
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `privilege` (
-  `ID` int(11) NOT NULL,
-  `VERSION` int(11) NOT NULL,
-  `NAME` varchar(255) COLLATE latin1_general_cs NOT NULL,
-  PRIMARY KEY (`ID`),
-  UNIQUE KEY `NAME` (`NAME`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
 LOCK TABLES `PRIVILEGE` WRITE;
 INSERT INTO `PRIVILEGE` (ID, VERSION, NAME) VALUES
 ( 1, 0, 'Read'),
@@ -266,14 +221,6 @@ INSERT INTO `PRIVILEGE` (ID, VERSION, NAME) VALUES
 ( 3, 0, 'Delete'),
 ( 4, 0, 'Create');
 UNLOCK TABLES;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- convert users from csm to users from biobank:
 insert into principal (id, version)  
