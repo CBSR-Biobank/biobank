@@ -3,17 +3,18 @@ package edu.ualberta.med.biobank.widgets.infotables;
 import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 @SuppressWarnings("rawtypes")
 public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper<?>> {
     public static final int ROWS_PER_PAGE = 8;
-    private static final String[] HEADINGS = new String[] { Messages.MembershipInfoTable_center_label, Messages.MembershipInfoTable_study_label,
+    private static final String[] HEADINGS = new String[] {
+        Messages.MembershipInfoTable_center_label,
+        Messages.MembershipInfoTable_study_label,
         Messages.MembershipInfoTable_role_right_privilege_label };
 
     protected static class TableRowData {
@@ -83,8 +84,8 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper<?>> {
     }
 
     @Override
-    protected IBaseLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
