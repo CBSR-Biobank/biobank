@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
@@ -34,15 +33,11 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
     }
 
     @Override
-    protected void setDefaultWidgetsEnabled() {
-        lastButton.setEnabled(false);
-    }
-
-    @Override
     protected void setPaginationParams(List<T> collection) {
+        int rowsPerPage = paginationWidget.getRowsPerPage();
         if (collection != null
-            && (collection.size() == -1 || collection.size() > pageInfo.rowsPerPage)) {
-            if (collection.get(pageInfo.rowsPerPage) != null) {
+            && (collection.size() == -1 || collection.size() > rowsPerPage)) {
+            if (collection.get(rowsPerPage) != null) {
                 paginationRequired = true;
                 init(collection);
             }
@@ -85,12 +80,13 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
         final Table table = viewer.getTable();
         Display display = viewer.getTable().getDisplay();
 
+        int rowsPerPage = paginationWidget.getRowsPerPage();
         if (paginationRequired) {
-            start = pageInfo.page * pageInfo.rowsPerPage;
-            end = start + pageInfo.rowsPerPage;
+            start = paginationWidget.getCurrentPage() * rowsPerPage;
+            end = start + rowsPerPage;
         } else {
             start = 0;
-            end = pageInfo.rowsPerPage;
+            end = rowsPerPage;
         }
         final Collection<T> collSubList;
 
@@ -109,7 +105,7 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
             public void run() {
                 if (!table.isDisposed()) {
                     if (paginationRequired) {
-                        setPageLabelText();
+                        paginationWidget.setPageLabelText();
                         ReportTableWidget.this.getShell().layout(true, true);
                     }
                     tableViewer.setInput(collSubList);
@@ -165,80 +161,45 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
     }
 
     @Override
-    protected void enableWidgets(boolean enable) {
-        if (enable && (pageInfo.page > 0)) {
-            firstButton.setEnabled(true);
-            prevButton.setEnabled(true);
-        } else {
-            firstButton.setEnabled(false);
-            prevButton.setEnabled(false);
-        }
-
-        if (!enable) {
-            nextButton.setEnabled(false);
-            lastButton.setEnabled(false);
-        } else {
-            if (pageInfo.pageTotal == 0) {
-                nextButton.setEnabled(true);
-            } else if (pageInfo.page < pageInfo.pageTotal - 1) {
-                lastButton.setEnabled(true);
-                nextButton.setEnabled(true);
-            }
-        }
-
-    }
-
-    @Override
-    protected void firstPage() {
-        pageInfo.page = 0;
-    }
-
-    @Override
-    protected void prevPage() {
-        if (pageInfo.page == 0)
-            return;
-        pageInfo.page--;
-    }
-
-    @Override
-    protected void nextPage() {
-        pageInfo.page++;
-    }
-
-    @Override
-    protected void lastPage() {
-        pageInfo.page = pageInfo.pageTotal - 1;
-    }
-
-    @Override
-    protected void setPageLabelText() {
-        String total;
-        if (pageInfo.pageTotal > 0)
-            total = String.valueOf(pageInfo.pageTotal);
-        else
-            total = "?"; //$NON-NLS-1$
-        pageLabel.setText(NLS.bind(Messages.ReportTableWidget_pages_label,
-            (pageInfo.page + 1), total));
-    }
-
-    @Override
     protected void init(List<T> collection) {
-        if (pageInfo.pageTotal == 0) {
+        if (paginationWidget.getTotalPages() == 0) {
             if (collection instanceof AbstractBiobankListProxy) {
                 int realSize = ((AbstractBiobankListProxy<?>) collection)
                     .getRealSize();
                 if (realSize != -1)
-                    pageInfo.pageTotal = (realSize - 1) / pageInfo.rowsPerPage
-                        + 1;
+                    paginationWidget.setTableMaxRows(realSize);
             } else
-                pageInfo.pageTotal = (collection.size() - 1)
-                    / pageInfo.rowsPerPage + 1;
+                paginationWidget.setTableMaxRows(collection.size());
         }
     }
 
     @Override
     protected boolean isEditMode() {
         return false;
+    }
+
+    @Override
+    public void firstPage() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void prevPage() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void nextPage() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void lastPage() {
+        // TODO Auto-generated method stub
+
     }
 
 }

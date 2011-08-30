@@ -202,7 +202,6 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             public List<DispatchSpecimenWrapper> getInternalDispatchSpecimens() {
                 return dispatch.getNonProcessedDispatchSpecimenCollection();
             }
-
         };
         specimensNonProcessedTable.adaptToToolkit(toolkit, true);
         specimensNonProcessedTable.addClickListener(new IDoubleClickListener() {

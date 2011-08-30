@@ -12,7 +12,6 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -139,18 +138,11 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
 
     @Override
     protected void setPaginationParams(List<T> collection) {
-        if (pageInfo.rowsPerPage != 0
-            && (collection.size() > pageInfo.rowsPerPage)) {
-            Double size = new Double(collection.size());
-            Double pageSize = new Double(pageInfo.rowsPerPage);
-            pageInfo.pageTotal = Double.valueOf(Math.ceil(size / pageSize))
-                .intValue();
-            paginationRequired = true;
-            if (pageInfo.page == pageInfo.pageTotal)
-                pageInfo.page--;
+        paginationRequired = paginationWidget
+            .setTableMaxRows(collection.size());
+        if (paginationRequired) {
             getTableViewer().refresh();
-        } else
-            paginationRequired = false;
+        }
     }
 
     /**
@@ -223,8 +215,9 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
         initModel(collection);
 
         if (paginationRequired) {
-            start = pageInfo.page * pageInfo.rowsPerPage;
-            end = Math.min(start + pageInfo.rowsPerPage, model.size());
+            int rowsPerPage = paginationWidget.getRowsPerPage();
+            start = paginationWidget.getCurrentPage() * rowsPerPage;
+            end = Math.min(start + rowsPerPage, model.size());
         } else {
             start = 0;
             end = model.size();
@@ -429,82 +422,19 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
     }
 
     @Override
-    protected void enableWidgets(boolean enable) {
-        if (enable && (pageInfo.page > 0)) {
-            firstButton.setEnabled(true);
-            prevButton.setEnabled(true);
-        } else {
-            firstButton.setEnabled(false);
-            prevButton.setEnabled(false);
-        }
-
-        if (enable && (pageInfo.page < pageInfo.pageTotal - 1)) {
-            lastButton.setEnabled(true);
-            nextButton.setEnabled(true);
-        } else {
-            lastButton.setEnabled(false);
-            nextButton.setEnabled(false);
-        }
+    public void firstPage() {
     }
 
     @Override
-    protected void setDefaultWidgetsEnabled() {
-        firstButton.setEnabled(false);
-        prevButton.setEnabled(false);
+    public void lastPage() {
     }
 
     @Override
-    protected void firstPage() {
-        pageInfo.page = 0;
-        firstButton.setEnabled(false);
-        prevButton.setEnabled(false);
-        lastButton.setEnabled(true);
-        nextButton.setEnabled(true);
+    public void prevPage() {
     }
 
     @Override
-    protected void lastPage() {
-        pageInfo.page = pageInfo.pageTotal - 1;
-        firstButton.setEnabled(true);
-        prevButton.setEnabled(true);
-        lastButton.setEnabled(false);
-        nextButton.setEnabled(false);
-    }
-
-    @Override
-    protected void prevPage() {
-        if (pageInfo.page == 0)
-            return;
-        pageInfo.page--;
-        if (pageInfo.page == 0) {
-            firstButton.setEnabled(false);
-            prevButton.setEnabled(false);
-        }
-        if (pageInfo.page == pageInfo.pageTotal - 2) {
-            lastButton.setEnabled(true);
-            nextButton.setEnabled(true);
-        }
-    }
-
-    @Override
-    protected void nextPage() {
-        if (pageInfo.page >= pageInfo.pageTotal)
-            return;
-        pageInfo.page++;
-        if (pageInfo.page == 1) {
-            firstButton.setEnabled(true);
-            prevButton.setEnabled(true);
-        }
-        if (pageInfo.page == pageInfo.pageTotal - 1) {
-            lastButton.setEnabled(false);
-            nextButton.setEnabled(false);
-        }
-    }
-
-    @Override
-    protected void setPageLabelText() {
-        pageLabel.setText(NLS.bind(Messages.InfoTableWidget_pages_label,
-            (pageInfo.page + 1), +pageInfo.pageTotal));
+    public void nextPage() {
     }
 
 }

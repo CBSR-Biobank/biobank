@@ -53,7 +53,7 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
             }
             if (paginationRequired) {
                 showPaginationWidget();
-                setPageLabelText();
+                paginationWidget.setPageLabelText();
                 enablePaginationWidget(false);
             } else if (paginationWidget != null)
                 paginationWidget.setVisible(false);
@@ -83,12 +83,6 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
 
     public List<T> getCollection() {
         return collection;
-    }
-
-    @Override
-    protected void newPage() {
-        setCollection(collection);
-        super.newPage();
     }
 
 }
