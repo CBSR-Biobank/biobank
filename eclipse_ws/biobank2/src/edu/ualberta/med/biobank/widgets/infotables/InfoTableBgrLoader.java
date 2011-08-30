@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 import edu.ualberta.med.biobank.gui.common.widgets.Messages;
 
 public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
@@ -83,6 +84,13 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
 
     public List<T> getCollection() {
         return collection;
+    }
+
+    @Override
+    protected BgcTableSorter getTableSorter() {
+        // sorting not supported on background loading tables because
+        // not all rows have been populated on the client side
+        return null;
     }
 
     @Override

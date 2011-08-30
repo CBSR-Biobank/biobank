@@ -172,11 +172,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
     protected abstract BgcLabelProvider getLabelProvider();
 
-    // TODO: convert to abstract method
-    // protected abstract BgcTableSorter getTableSorter();
-    protected BgcTableSorter getTableSorter() {
-        return null;
-    }
+    protected abstract BgcTableSorter getTableSorter();
 
     @Override
     public boolean setFocus() {
@@ -283,6 +279,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
     protected void showPaginationWidget() {
         paginationWidget.setVisible(true);
+        paginationWidget.enableWidgets(true);
     }
 
     protected void enablePaginationWidget(boolean enable) {
