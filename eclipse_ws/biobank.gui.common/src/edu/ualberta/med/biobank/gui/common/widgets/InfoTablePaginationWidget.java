@@ -118,7 +118,6 @@ public class InfoTablePaginationWidget extends Composite {
         GridData gd = new GridData(SWT.END, SWT.TOP, true, false);
         gd.exclude = false;
         setLayoutData(gd);
-        layout(true, true);
 
         pageInfo = new PageInformation();
         pageInfo.rowsPerPage = rowsPerPage;

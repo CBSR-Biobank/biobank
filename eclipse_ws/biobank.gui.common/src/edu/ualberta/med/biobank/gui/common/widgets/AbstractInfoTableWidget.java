@@ -100,8 +100,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         tableViewer.setLabelProvider(labelProvider);
         tableViewer.setContentProvider(new ArrayContentProvider());
 
-        paginationWidget = new InfoTablePaginationWidget(parent, SWT.NONE,
-            this, InfoTablePaginationWidget.NEXT_PAGE_BUTTON
+        paginationWidget = new InfoTablePaginationWidget(this, SWT.NONE, this,
+            InfoTablePaginationWidget.NEXT_PAGE_BUTTON
                 | InfoTablePaginationWidget.LAST_PAGE_BUTTON, rowsPerPage);
 
         autoSizeColumns = (columnWidths == null) ? true : false;
@@ -279,7 +279,6 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
     protected void showPaginationWidget() {
         paginationWidget.setVisible(true);
-        paginationWidget.enableWidgets(true);
     }
 
     protected void enablePaginationWidget(boolean enable) {
