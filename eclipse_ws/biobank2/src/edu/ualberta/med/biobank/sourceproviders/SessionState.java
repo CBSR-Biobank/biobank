@@ -23,8 +23,8 @@ public class SessionState extends AbstractSourceProvider {
     public final static String HAS_WORKING_CENTER_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter"; //$NON-NLS-1$
     public final static String HAS_CLINIC_SHIPMENT_RIGHTS = "edu.ualberta.med.biobank.sourceprovider.clinicShipmentRights"; //$NON-NLS-1$
     public final static String HAS_DISPATCH_RIGHTS = "edu.ualberta.med.biobank.sourceprovider.dispatchRights"; //$NON-NLS-1$
-    public final static String IS_CURRENT_CENTER_ADMIN_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.isCurrentCenterAdmin"; //$NON-NLS-1$
     public final static String HAS_PRINTER_LABELS_RIGHTS = "edu.ualberta.med.biobank.sourceprovider.hasPrinterLabelsRights"; //$NON-NLS-1$
+    public final static String HAS_USER_MANAGEMENT_RIGHTS = "edu.ualberta.med.biobank.sourceprovider.hasUserManagementRights"; //$NON-NLS-1$
     public final static String CURRENT_CENTER_TYPE = "edu.ualberta.med.biobank.sourceprovider.currentCenterType"; //$NON-NLS-1$
 
     private boolean isSuperAdminMode;
@@ -32,6 +32,7 @@ public class SessionState extends AbstractSourceProvider {
     private boolean hasClinicShipmentRights;
     private boolean hasDispatchRights;
     private boolean hasPrinterLabelsRights;
+    private boolean hasUserManagementRights;
     private String currentCenterType = ""; //$NON-NLS-1$
 
     @Override
@@ -39,8 +40,7 @@ public class SessionState extends AbstractSourceProvider {
         return new String[] { SESSION_STATE_SOURCE_NAME,
             IS_SUPER_ADMIN_MODE_SOURCE_NAME, HAS_WORKING_CENTER_SOURCE_NAME,
             HAS_CLINIC_SHIPMENT_RIGHTS, HAS_DISPATCH_RIGHTS,
-            IS_CURRENT_CENTER_ADMIN_SOURCE_NAME, HAS_PRINTER_LABELS_RIGHTS,
-            CURRENT_CENTER_TYPE };
+            HAS_PRINTER_LABELS_RIGHTS, CURRENT_CENTER_TYPE };
     }
 
     @Override
@@ -108,6 +108,14 @@ public class SessionState extends AbstractSourceProvider {
             hasPrinterLabelsRights);
     }
 
+    private void setHasUserManagementRights(boolean hasUserManagementRights) {
+        if (this.hasUserManagementRights == hasUserManagementRights)
+            return; // no change
+        this.hasUserManagementRights = hasUserManagementRights;
+        fireSourceChanged(ISources.WORKBENCH, HAS_USER_MANAGEMENT_RIGHTS,
+            hasUserManagementRights);
+    }
+
     private void setCurrentCenterType(CenterWrapper<?> currentCenter) {
         String type = ""; //$NON-NLS-1$
         if (currentCenter != null) {
@@ -137,6 +145,9 @@ public class SessionState extends AbstractSourceProvider {
             setHasPrinterLabelsRights(user != null
                 && SessionManager
                     .canAccess(SessionSecurityHelper.PRINT_LABEL_KEY_DESC));
+            setHasUserManagementRights(user != null
+                && SessionManager
+                    .canAccess(SessionSecurityHelper.USER_MANAGEMENT_DESC));
         } catch (Exception e) {
             logger.error("Error setting session state", e); //$NON-NLS-1$
         }

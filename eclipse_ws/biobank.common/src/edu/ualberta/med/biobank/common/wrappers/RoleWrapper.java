@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.peer.RolePeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.RoleBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.RolePreDeleteChecks;
@@ -67,6 +68,13 @@ public class RoleWrapper extends RoleBaseWrapper {
         tasks.add(new RolePreDeleteChecks(this));
 
         super.addDeleteTasks(tasks);
+    }
+
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        // if a rightprivilege is removed, it should be deleted.
+        tasks.deleteRemoved(this, RolePeer.RIGHT_PRIVILEGE_COLLECTION);
+        super.addPersistTasks(tasks);
     }
 
 }

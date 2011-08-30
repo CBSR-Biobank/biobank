@@ -23,6 +23,7 @@ public class SessionSecurityHelper {
     public static final String REPORTS_KEY_DESC = "reports"; //$NON-NLS-1$
     public static final String REQUEST_ASK_KEY_DESC = "ask-request"; //$NON-NLS-1$
     public static final String REQUEST_RECEIVE_DESC = "receive-request"; //$NON-NLS-1$
+    public static final String USER_MANAGEMENT_DESC = "user-mgt"; //$NON-NLS-1$
 
     public static boolean canCreate(BiobankApplicationService appService,
         UserWrapper user, Class<?> clazz) {

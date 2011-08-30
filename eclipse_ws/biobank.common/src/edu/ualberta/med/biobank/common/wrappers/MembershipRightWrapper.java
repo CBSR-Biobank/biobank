@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.peer.MembershipRightPeer;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.MembershipRightBaseWrapper;
 import edu.ualberta.med.biobank.model.MembershipRight;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -39,5 +41,13 @@ public class MembershipRightWrapper extends MembershipRightBaseWrapper {
                 privileges.addAll(rp.getPrivilegeCollection(false));
         }
         return privileges;
+    }
+
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        // if a rightprivilege is removed, it should be deleted.
+        tasks.deleteRemoved(this,
+            MembershipRightPeer.RIGHT_PRIVILEGE_COLLECTION);
+        super.addPersistTasks(tasks);
     }
 }

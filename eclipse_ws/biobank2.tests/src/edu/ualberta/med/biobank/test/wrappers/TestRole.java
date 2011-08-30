@@ -113,4 +113,27 @@ public class TestRole extends TestDatabase {
         // should be able to delete it now
         role.delete();
     }
+
+    @Test
+    public void testRemoveFromRightPrivilegeCollection() throws Exception {
+        String name = "testRemoveFromRightPrivilegeCollection" + r.nextInt();
+        RoleWrapper role = new RoleWrapper(appService);
+        role.setName(name);
+
+        RightPrivilegeWrapper rp = new RightPrivilegeWrapper(appService);
+        rp.setRight(BbRightWrapper.getAllRights(appService).get(0));
+        rp.addToPrivilegeCollection(Arrays.asList(PrivilegeWrapper
+            .getReadPrivilege(appService)));
+        rp.setRole(role);
+        role.addToRightPrivilegeCollection(Arrays.asList(rp));
+        role.persist();
+
+        role.reload();
+        Integer idRp = rp.getId();
+        role.removeFromRightPrivilegeCollection(Arrays.asList(rp));
+        role.persist();
+
+        Assert.assertNull(ModelUtils.getObjectWithId(appService,
+            RightPrivilege.class, idRp));
+    }
 }

@@ -737,15 +737,25 @@
                <reference
                      definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
+               <or>
                   <reference
                         definitionId="biobank.isSuperAdminMode">
                   </reference>
+                   <reference
+                        definitionId="biobank.hasUserManagementRights">
+                  </reference>
+               </or>
             </and>
          </activeWhen>
          <enabledWhen>
+         <or>
                <reference
                      definitionId="biobank.isSuperAdminMode">
                </reference>
+                <reference
+                        definitionId="biobank.hasUserManagementRights">
+                  </reference>
+               </or>
          </enabledWhen>
       </handler>
       <handler
@@ -1000,9 +1010,14 @@
                       style="push">
                    <visibleWhen
                          checkEnabled="false">
+                         <or>
                          <reference
                                definitionId="biobank.isSuperAdminMode">
                          </reference>
+                           <reference
+                        definitionId="biobank.hasUserManagementRights">
+                  </reference>
+               </or>
                    </visibleWhen>
                 </command>
                 <command
@@ -2482,6 +2497,15 @@
                variable="edu.ualberta.med.biobank.sourceprovider.currentCenterType">
             <equals
                   value="ResearchGroup">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank.hasUserManagementRights">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.hasUserManagementRights">
+            <equals
+                  value="true">
             </equals>
          </with>
       </definition>       
