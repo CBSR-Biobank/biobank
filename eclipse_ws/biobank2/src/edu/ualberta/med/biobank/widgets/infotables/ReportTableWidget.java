@@ -166,8 +166,7 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
             if (collection instanceof AbstractBiobankListProxy) {
                 int realSize = ((AbstractBiobankListProxy<?>) collection)
                     .getRealSize();
-                if (realSize != -1)
-                    paginationWidget.setTableMaxRows(realSize);
+                paginationWidget.setTableMaxRows(realSize);
             } else
                 paginationWidget.setTableMaxRows(collection.size());
         }
@@ -176,30 +175,6 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
     @Override
     protected boolean isEditMode() {
         return false;
-    }
-
-    @Override
-    public void firstPage() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void prevPage() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void nextPage() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void lastPage() {
-        // TODO Auto-generated method stub
-
     }
 
 }

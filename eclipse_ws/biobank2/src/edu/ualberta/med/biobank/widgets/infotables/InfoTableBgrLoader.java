@@ -56,8 +56,9 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
                 showPaginationWidget();
                 paginationWidget.setPageLabelText();
                 enablePaginationWidget(false);
-            } else if (paginationWidget != null)
+            } else if (paginationWidget != null) {
                 paginationWidget.setVisible(false);
+            }
             final Display display = getTableViewer().getTable().getDisplay();
 
             resizeTable();

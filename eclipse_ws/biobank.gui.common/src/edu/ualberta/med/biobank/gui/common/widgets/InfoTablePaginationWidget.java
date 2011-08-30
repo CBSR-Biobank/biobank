@@ -28,6 +28,8 @@ public class InfoTablePaginationWidget extends Composite {
 
     public static final int LAST_PAGE_BUTTON = 8;
 
+    public static final int TOTAL_PAGES_UNKNOWN = -1;
+
     private IInfoTalePagination paginator;
 
     private Button firstButton;
@@ -135,12 +137,18 @@ public class InfoTablePaginationWidget extends Composite {
             prevButton.setEnabled(false);
         }
 
-        if (enable && (pageInfo.page < (pageInfo.pageTotal - 1))) {
-            lastButton.setEnabled(true);
+        if (enable
+            && ((pageInfo.pageTotal == TOTAL_PAGES_UNKNOWN) || (pageInfo.page < (pageInfo.pageTotal - 1)))) {
             nextButton.setEnabled(true);
         } else {
-            lastButton.setEnabled(false);
             nextButton.setEnabled(false);
+        }
+
+        if (enable && (pageInfo.pageTotal != TOTAL_PAGES_UNKNOWN)
+            && (pageInfo.page < (pageInfo.pageTotal - 1))) {
+            lastButton.setEnabled(true);
+        } else {
+            lastButton.setEnabled(false);
         }
     }
 
@@ -155,8 +163,10 @@ public class InfoTablePaginationWidget extends Composite {
     }
 
     private void prevPageInternal() {
-        if (pageInfo.page == 0)
+        if (pageInfo.page == 0) {
             return;
+        }
+
         pageInfo.page--;
         if (pageInfo.page == 0) {
             firstButton.setEnabled(false);
@@ -171,8 +181,9 @@ public class InfoTablePaginationWidget extends Composite {
     }
 
     private void nextPageInternal() {
-        if (pageInfo.page >= pageInfo.pageTotal)
+        if ((pageInfo.pageTotal >= 0) && (pageInfo.page >= pageInfo.pageTotal))
             return;
+
         pageInfo.page++;
         if (pageInfo.page == 1) {
             firstButton.setEnabled(true);
@@ -201,11 +212,11 @@ public class InfoTablePaginationWidget extends Composite {
     }
 
     public void setPageLabelText() {
-        if (pageInfo.pageTotal > 0) {
+        if (pageInfo.pageTotal == TOTAL_PAGES_UNKNOWN) {
+            pageLabel.setText(NLS.bind("Page: {0} of ?", pageInfo.page + 1));
+        } else {
             pageLabel.setText(NLS.bind("Page: {0} of {1}", pageInfo.page + 1,
                 +pageInfo.pageTotal));
-        } else {
-            pageLabel.setText(NLS.bind("Page: {0} of ?", pageInfo.page + 1));
         }
     }
 
@@ -224,7 +235,9 @@ public class InfoTablePaginationWidget extends Composite {
     public boolean setTableMaxRows(int tableMaxRows) {
         boolean result = false;
 
-        if ((pageInfo.rowsPerPage != 0)
+        if (tableMaxRows < 0) {
+            pageInfo.pageTotal = TOTAL_PAGES_UNKNOWN;
+        } else if ((pageInfo.rowsPerPage != 0)
             && (tableMaxRows > pageInfo.rowsPerPage)) {
             Double size = new Double(tableMaxRows);
             Double pageSize = new Double(pageInfo.rowsPerPage);
