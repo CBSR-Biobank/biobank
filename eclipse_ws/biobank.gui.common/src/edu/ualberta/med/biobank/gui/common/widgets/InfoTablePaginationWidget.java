@@ -113,8 +113,6 @@ public class InfoTablePaginationWidget extends Composite {
             lastButton.setEnabled(false);
         }
 
-        setPageLabelText();
-
         // do not display it yet, wait till collection is added
         setVisible(false);
         GridData gd = new GridData(SWT.END, SWT.TOP, true, false);
@@ -126,6 +124,7 @@ public class InfoTablePaginationWidget extends Composite {
         pageInfo.rowsPerPage = rowsPerPage;
         pageInfo.page = 0;
 
+        setPageLabelText();
     }
 
     protected void enableWidgets(boolean enable) {

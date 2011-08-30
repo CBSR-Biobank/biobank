@@ -85,4 +85,24 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
         return collection;
     }
 
+    @Override
+    public void firstPage() {
+        setCollection(collection);
+    }
+
+    @Override
+    public void lastPage() {
+        setCollection(collection);
+    }
+
+    @Override
+    public void prevPage() {
+        setCollection(collection);
+    }
+
+    @Override
+    public void nextPage() {
+        setCollection(collection);
+    }
+
 }

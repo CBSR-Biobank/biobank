@@ -421,20 +421,4 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
         }
     }
 
-    @Override
-    public void firstPage() {
-    }
-
-    @Override
-    public void lastPage() {
-    }
-
-    @Override
-    public void prevPage() {
-    }
-
-    @Override
-    public void nextPage() {
-    }
-
 }
