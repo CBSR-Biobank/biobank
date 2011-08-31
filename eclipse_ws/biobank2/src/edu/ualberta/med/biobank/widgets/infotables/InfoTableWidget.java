@@ -61,8 +61,7 @@ import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
  * @param <T> The model object wrapper the table is based on.
  * 
  */
-public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T>
-    implements IInfoTableEditItemListener {
+public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
 
     /*
      * see http://lekkimworld.com/2008/03/27/setting_table_row_height_in_swt
@@ -97,8 +96,23 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T>
     public void createDefaultEditItem() {
         if (SessionManager.canUpdate(wrapperClass)) {
             useDefaultEditItem = true;
-            addEditItemListener(this);
+            // IMPORTANT! call our super classes addEditItemListener() here
+            //
+            // if not, then the default edit item behaviour will not work
+            super.addEditItemListener(new IInfoTableEditItemListener() {
+                @Override
+                public void editItem(InfoTableEvent event) {
+                    // do nothing
+                }
+            });
         }
+    }
+
+    @Override
+    public void addEditItemListener(IInfoTableEditItemListener listener) {
+        // turn off the default edit item behaviour
+        useDefaultEditItem = false;
+        super.addEditItemListener(listener);
     }
 
     @Override
@@ -330,12 +344,6 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T>
                 }
             });
         }
-    }
-
-    @Override
-    public void editItem(InfoTableEvent event) {
-        throw new RuntimeException(
-            "derived classes should override this method");
     }
 
     @Override
