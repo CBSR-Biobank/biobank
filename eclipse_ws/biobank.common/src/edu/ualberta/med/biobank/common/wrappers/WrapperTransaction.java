@@ -59,19 +59,19 @@ public class WrapperTransaction {
     public void persist(Collection<? extends ModelWrapper<?>> wrappers) {
         // TODO: check that wrapper not already added?
         for (ModelWrapper<?> wrapper : wrappers) {
-            actions.add(new Action(Action.Type.PERSIST, wrapper));
+            persist(wrapper);
         }
     }
 
-    public void delete(ModelWrapper<?> Wrapper) {
+    public void delete(ModelWrapper<?> wrapper) {
         // TODO: check that wrapper not already added?
-        actions.add(new Action(Action.Type.DELETE, Wrapper));
+        actions.add(new Action(Action.Type.DELETE, wrapper));
     }
 
     public void delete(Collection<? extends ModelWrapper<?>> wrappers) {
         // TODO: check that wrapper not already added?
         for (ModelWrapper<?> wrapper : wrappers) {
-            actions.add(new Action(Action.Type.DELETE, wrapper));
+            delete(wrapper);
         }
     }
 
@@ -220,17 +220,6 @@ public class WrapperTransaction {
          */
         public void add(PreQueryTask task) {
             preQueryTasks.add(task);
-        }
-
-        /**
-         * Adds all of the given {@link TaskList}'s internal lists into this
-         * {@link TaskList}.
-         * 
-         * @param list
-         */
-        public void add(TaskList list) {
-            queryTasks.addAll(list.queryTasks);
-            preQueryTasks.addAll(list.preQueryTasks);
         }
 
         /**
