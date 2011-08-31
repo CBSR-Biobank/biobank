@@ -5,6 +5,10 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.dialogs.user.messages"; //$NON-NLS-1$
 
+    public static String GroupEditDialog_membership_add_label;
+
+    public static String GroupEditDialog_membership_section_label;
+
     public static String GroupEditDialog_msg_error_name_used;
     public static String GroupEditDialog_msg_name_required;
     public static String GroupEditDialog_msg_persit_error;
@@ -30,9 +34,21 @@ public class Messages extends NLS {
 
     public static String MembershipAddDialog_rgOnly_label;
 
+    public static String MembershipAddDialog_rights_error_msg;
+
+    public static String MembershipAddDialog_rights_selection_label;
+
+    public static String MembershipAddDialog_role_error_msg;
+
     public static String MembershipAddDialog_roles_available_label;
 
     public static String MembershipAddDialog_roles_selected_label;
+
+    public static String MembershipAddDialog_roles_selection_label;
+
+    public static String MembershipAddDialog_rp_assoc_add_label;
+
+    public static String MembershipAddDialog_rp_assoc_section;
 
     public static String MembershipAddDialog_sitesOnly_label;
 

@@ -403,7 +403,10 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String property = getPeerProperty(mc, assoc);
         String inverse = isInternal ? "" : createWrappedPropertySetterInverse(mc, assoc);
         
-        String result = "    "+visibility+"void "+method+"("+parameterType+" "+parameterName+") {\n" +
+        String preString = "";
+        if (inverse.contains("Arrays.asList(this)") && assoc.getInverse().getToClass().isParentClass())
+            preString = "    " + SUPPRESS_WARNING_UNCHECKED + "\n";
+        String result = preString+ "    "+visibility+"void "+method+"("+parameterType+" "+parameterName+") {\n" +
                         inverse +
         		        "        setWrappedProperty("+property+", "+parameterName+");\n" +
         		        "    }\n\n";

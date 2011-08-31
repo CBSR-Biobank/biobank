@@ -69,7 +69,9 @@ public class GroupEditDialog extends BgcBaseDialog {
             BbGroupPeer.NAME.getName(), new NonEmptyStringValidator(
                 Messages.GroupEditDialog_msg_name_required));
 
-        createSection(contents, "Memberships", "Add a new membership",
+        createSection(contents,
+            Messages.GroupEditDialog_membership_section_label,
+            Messages.GroupEditDialog_membership_add_label,
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {

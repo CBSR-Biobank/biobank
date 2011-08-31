@@ -118,9 +118,9 @@ public class MembershipAddDialog extends BgcBaseDialog {
             true));
         final Button rolesRadio = new Button(compRoleOrRight, SWT.RADIO);
         rolesRadio.setSelection(true);
-        rolesRadio.setText("Roles selection");
+        rolesRadio.setText(Messages.MembershipAddDialog_roles_selection_label);
         final Button rightsRadio = new Button(compRoleOrRight, SWT.RADIO);
-        rightsRadio.setText("Rights selection");
+        rightsRadio.setText(Messages.MembershipAddDialog_rights_selection_label);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         compRoleOrRight.setLayoutData(gd);
@@ -243,7 +243,7 @@ public class MembershipAddDialog extends BgcBaseDialog {
                 @Override
                 public void selectionChanged(MultiSelectEvent event) {
                     if (rolesWidget.getSelected().isEmpty())
-                        setErrorMessage("Should selected at least one role");
+                        setErrorMessage(Messages.MembershipAddDialog_role_error_msg);
                     else
                         setErrorMessage(null);
                 }
@@ -252,8 +252,8 @@ public class MembershipAddDialog extends BgcBaseDialog {
     }
 
     private void createRightsWidgets(Composite contents) {
-        rpSection = createSection(contents, "Right/Privilege association",
-            "Add a new association", new SelectionAdapter() {
+        rpSection = createSection(contents, Messages.MembershipAddDialog_rp_assoc_section,
+            Messages.MembershipAddDialog_rp_assoc_add_label, new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     addRightPrivilege();
@@ -285,7 +285,7 @@ public class MembershipAddDialog extends BgcBaseDialog {
                 @Override
                 public void selectionChanged(MultiSelectEvent event) {
                     if (rightPrivilegeInfoTable.getCollection().isEmpty())
-                        setErrorMessage("Should selected at least one right/privilege association");
+                        setErrorMessage(Messages.MembershipAddDialog_rights_error_msg);
                     else
                         setErrorMessage(null);
                 }

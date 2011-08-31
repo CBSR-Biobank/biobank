@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -9,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.NoRightForKeyDescException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.UserBaseWrapper;
@@ -155,65 +152,6 @@ public class UserWrapper extends UserBaseWrapper {
         return getIsSuperAdmin();
     }
 
-    public boolean hasPrivilegesOnKeyDesc(PrivilegeWrapper privilege,
-        CenterWrapper<?> center, StudyWrapper study, String... rightsKeyDescs)
-        throws NoRightForKeyDescException, ApplicationException {
-        for (String keyDesc : rightsKeyDescs) {
-            boolean ok = hasPrivilegeOnKeyDesc(privilege, center, study,
-                keyDesc);
-            if (ok)
-                return ok;
-        }
-        return false;
-    }
-
-    public boolean hasPrivilegeOnKeyDesc(PrivilegeWrapper privilege,
-        CenterWrapper<?> center, StudyWrapper study, String keyDesc)
-        throws ApplicationException, NoRightForKeyDescException {
-        BbRightWrapper right = BbRightWrapper.getRightWithKeyDesc(appService,
-            keyDesc);
-        if (right == null)
-            throw new NoRightForKeyDescException(keyDesc);
-        List<PrivilegeWrapper> userPrivileges = getPrivilegesForRight(right,
-            center, study);
-        return userPrivileges.contains(privilege);
-    }
-
-    public boolean hasPrivilegeOnClassObject(PrivilegeWrapper privilege,
-        CenterWrapper<?> center, StudyWrapper study, Class<?> objectClazz)
-        throws NoRightForKeyDescException, ApplicationException {
-        if (ModelWrapper.class.isAssignableFrom(objectClazz)) {
-            ModelWrapper<?> wrapper = null;
-            try {
-                Constructor<?> constructor = objectClazz
-                    .getConstructor(WritableApplicationService.class);
-                wrapper = (ModelWrapper<?>) constructor
-                    .newInstance((WritableApplicationService) null);
-            } catch (NoSuchMethodException e) {
-                return false;
-            } catch (InvocationTargetException e) {
-                return false;
-            } catch (IllegalAccessException e) {
-                return false;
-            } catch (InstantiationException e) {
-                return false;
-            }
-            String type = wrapper.getWrappedClass().getSimpleName();
-            return hasPrivilegeOnKeyDesc(privilege, center, study, type);
-        }
-        return false;
-    }
-
-    private List<PrivilegeWrapper> getPrivilegesForRight(BbRightWrapper right,
-        CenterWrapper<?> center, StudyWrapper study)
-        throws ApplicationException {
-        List<PrivilegeWrapper> privileges = new ArrayList<PrivilegeWrapper>();
-        for (MembershipWrapper<?> ms : getMembershipCollection(false)) {
-            privileges.addAll(ms.getPrivilegesForRight(right, center, study));
-        }
-        return privileges;
-    }
-
     public boolean needChangePassword() {
         if (getNeedChangePwd() == null)
             return false;
@@ -301,5 +239,20 @@ public class UserWrapper extends UserBaseWrapper {
     @Override
     public UserWrapper duplicate() {
         return (UserWrapper) super.duplicate();
+    }
+
+    /**
+     * User needs to go through its groups as well.
+     */
+    @Override
+    protected List<PrivilegeWrapper> getPrivilegesForRight(
+        BbRightWrapper right, CenterWrapper<?> center, StudyWrapper study)
+        throws ApplicationException {
+        List<PrivilegeWrapper> privileges = super.getPrivilegesForRight(right,
+            center, study);
+        for (BbGroupWrapper g : getGroupCollection(false)) {
+            privileges.addAll(g.getPrivilegesForRight(right, center, study));
+        }
+        return privileges;
     }
 }
