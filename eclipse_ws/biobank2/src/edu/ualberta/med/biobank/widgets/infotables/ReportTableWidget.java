@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
@@ -180,6 +181,11 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
     @Override
     protected boolean isEditMode() {
         return false;
+    }
+
+    @Override
+    public void doubleClick(DoubleClickEvent event) {
+        // not used
     }
 
 }

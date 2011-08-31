@@ -5,27 +5,24 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
@@ -64,7 +61,8 @@ import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
  * @param <T> The model object wrapper the table is based on.
  * 
  */
-public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
+public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T>
+    implements IInfoTableEditItemListener {
 
     /*
      * see http://lekkimworld.com/2008/03/27/setting_table_row_height_in_swt
@@ -76,56 +74,33 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
 
     protected List<BiobankCollectionModel> model;
 
-    protected ListenerList addItemListeners = new ListenerList();
-
-    protected ListenerList editItemListeners = new ListenerList();
-
-    protected ListenerList deleteItemListeners = new ListenerList();
-
-    protected ListenerList doubleClickListeners = new ListenerList();
-
-    private MenuItem editItem;
-
-    private final Class<T> wrapperClass;
+    protected boolean useDefaultEditItem;
 
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings, Class<T> wrapperClass) {
         super(parent, collection, headings, null, 5);
-        this.wrapperClass = wrapperClass;
         addTableClickListener();
+        useDefaultEditItem = false;
+
+        if (SessionManager.canUpdate(wrapperClass)) {
+            createDefaultEditItem();
+        }
     }
 
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int rowsPerPage, Class<T> wrapperClass) {
         super(parent, collection, headings, null, rowsPerPage);
-        this.wrapperClass = wrapperClass;
         addTableClickListener();
+        useDefaultEditItem = false;
+
+        if (SessionManager.canUpdate(wrapperClass)) {
+            createDefaultEditItem();
+        }
     }
 
-    private void addTableClickListener() {
-        tableViewer.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-            public void doubleClick(DoubleClickEvent event) {
-                if (doubleClickListeners.size() > 0) {
-                    InfoTableWidget.this.doubleClick();
-                }
-            }
-        });
-        menu.addMenuListener(new MenuAdapter() {
-
-            @Override
-            public void menuShown(MenuEvent e) {
-                if (editItem == null)
-                    return;
-
-                if (getSelection() instanceof ModelWrapper<?>
-                    && !(getSelection() instanceof DispatchSpecimenWrapper))
-                    editItem.setEnabled(((ModelWrapper<?>) getSelection())
-                        .canUpdate(SessionManager.getUser()));
-                else
-                    editItem.setEnabled(false);
-            }
-        });
+    protected void createDefaultEditItem() {
+        useDefaultEditItem = true;
+        addEditItemListener(this);
     }
 
     @Override
@@ -296,27 +271,8 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
         return object;
     }
 
-    public void addClickListener(IDoubleClickListener listener) {
-        doubleClickListeners.add(listener);
-        if (SessionManager.canUpdate(wrapperClass)) {
-            editItem = new MenuItem(getMenu(), SWT.PUSH);
-            editItem.setText(Messages.InfoTableWidget_edit_label);
-            editItem.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    ModelWrapper<?> selection = (ModelWrapper<?>) InfoTableWidget.this
-                        .getSelection();
-                    if (selection != null) {
-                        AdapterBase adapter = AdapterFactory
-                            .getAdapter(selection);
-                        adapter.openEntryForm();
-                    }
-                }
-            });
-        }
-    }
-
-    public void doubleClick() {
+    @Override
+    public void doubleClick(DoubleClickEvent dcevent) {
         // get selection as derived class object
         Object selection = getSelection();
 
@@ -334,48 +290,7 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
         }
     }
 
-    public void addAddItemListener(IInfoTableAddItemListener listener) {
-        addItemListeners.add(listener);
-
-        Assert.isNotNull(menu);
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.InfoTableWidget_add_label);
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                addItem();
-            }
-        });
-    }
-
-    public void addEditItemListener(IInfoTableEditItemListener listener) {
-        editItemListeners.add(listener);
-
-        Assert.isNotNull(menu);
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.InfoTableWidget_edit_label);
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                editItem();
-            }
-        });
-    }
-
-    public void addDeleteItemListener(IInfoTableDeleteItemListener listener) {
-        deleteItemListeners.add(listener);
-
-        Assert.isNotNull(menu);
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.InfoTableWidget_delete_label);
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                deleteItem();
-            }
-        });
-    }
-
+    @Override
     protected void addItem() {
         InfoTableSelection selection = new InfoTableSelection(getSelection());
         final InfoTableEvent event = new InfoTableEvent(this, selection);
@@ -391,7 +306,20 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
         }
     }
 
-    protected void editItem() {
+    @Override
+    public void editItem() {
+        if (useDefaultEditItem) {
+            // default edit item which opens the entry form for the selected
+            // model object
+            ModelWrapper<?> selection = (ModelWrapper<?>) InfoTableWidget.this
+                .getSelection();
+            if (selection != null) {
+                AdapterBase adapter = AdapterFactory.getAdapter(selection);
+                adapter.openEntryForm();
+            }
+            return;
+        }
+
         InfoTableSelection selection = new InfoTableSelection(getSelection());
         final InfoTableEvent event = new InfoTableEvent(this, selection);
         Object[] listeners = editItemListeners.getListeners();
@@ -406,6 +334,13 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
         }
     }
 
+    @Override
+    public void editItem(InfoTableEvent event) {
+        throw new RuntimeException(
+            "derived classes should override this method");
+    }
+
+    @Override
     protected void deleteItem() {
         InfoTableSelection selection = new InfoTableSelection(getSelection());
         final InfoTableEvent event = new InfoTableEvent(this, selection);

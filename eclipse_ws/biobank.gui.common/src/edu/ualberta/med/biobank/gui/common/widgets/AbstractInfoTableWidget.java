@@ -2,7 +2,10 @@ package edu.ualberta.med.biobank.gui.common.widgets;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -15,6 +18,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -44,7 +48,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
  * @param <T> The information to be displayed in the table.
  */
 public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
-    implements IInfoTalePagination {
+    implements IInfoTalePagination, IDoubleClickListener {
 
     protected TableViewer tableViewer;
 
@@ -67,6 +71,14 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     private BgcLabelProvider labelProvider;
 
     protected InfoTablePaginationWidget paginationWidget;
+
+    protected ListenerList addItemListeners = new ListenerList();
+
+    protected ListenerList editItemListeners = new ListenerList();
+
+    protected ListenerList deleteItemListeners = new ListenerList();
+
+    protected ListenerList doubleClickListeners = new ListenerList();
 
     public AbstractInfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths, int rowsPerPage) {
@@ -284,6 +296,68 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     protected void enablePaginationWidget(boolean enable) {
         paginationWidget.setEnabled(enable);
         paginationWidget.enableWidgets(enable);
+    }
+
+    protected void addTableClickListener() {
+        tableViewer.addDoubleClickListener(this);
+    }
+
+    public void addClickListener(IDoubleClickListener listener) {
+        doubleClickListeners.add(listener);
+    }
+
+    public void addAddItemListener(IInfoTableAddItemListener listener) {
+        addItemListeners.add(listener);
+
+        Assert.isNotNull(menu);
+        MenuItem item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Add");
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                addItem();
+            }
+        });
+    }
+
+    public void addEditItemListener(IInfoTableEditItemListener listener) {
+        editItemListeners.add(listener);
+
+        Assert.isNotNull(menu);
+        MenuItem item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Edit");
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                editItem();
+            }
+        });
+    }
+
+    public void addDeleteItemListener(IInfoTableDeleteItemListener listener) {
+        deleteItemListeners.add(listener);
+
+        Assert.isNotNull(menu);
+        MenuItem item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Delete");
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                deleteItem();
+            }
+        });
+    }
+
+    protected void addItem() {
+        // derived classes should override this method
+    }
+
+    protected void editItem() {
+        // derived classes should override this method
+    }
+
+    protected void deleteItem() {
+        // derived classes should override this method
     }
 
 }
