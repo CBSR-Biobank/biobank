@@ -296,19 +296,9 @@ public class PatientWrapper extends PatientBaseWrapper {
         }
     }
 
-    private static final String CEVENT_COUNT_QRY = "select count(cevent) from "
-        + CollectionEvent.class.getName() + " as cevent where cevent."
-        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
-        + "=?";
-
     public Long getCollectionEventCount(boolean fast)
         throws BiobankQueryResultSizeException, ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(CEVENT_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        return (long) getCollectionEventCollection(false).size();
+        return getPropertyCount(PatientPeer.COLLECTION_EVENT_COLLECTION, fast);
     }
 
     @Override

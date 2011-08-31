@@ -25,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -330,6 +331,30 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         session = new WrapperSession(this);
 
         firePropertyChanges(oldWrappedObject, wrappedObject);
+    }
+
+    private static final String PROPERTY_COUNT_HQL = "SELECT COUNT(DISTINCT m.{0}) FROM {1} m WHERE m.id = ?";
+
+    protected final <T> Long getPropertyCount(
+        Property<Collection<T>, ? super E> property, boolean fast)
+        throws BiobankQueryResultSizeException, ApplicationException {
+        long count = 0;
+
+        if (fast && !isInitialized(property)) {
+            String prop = property.getName();
+            String klazz = getWrappedClass().getName();
+            String hql = MessageFormat.format(PROPERTY_COUNT_HQL, prop, klazz);
+
+            List<Object> params = Arrays.asList(new Object[] { getId() });
+            HQLCriteria criteria = new HQLCriteria(hql, params);
+
+            count = getCountResult(appService, criteria);
+        } else {
+            Collection<T> collection = property.get(wrappedObject);
+            count = collection != null ? collection.size() : 0;
+        }
+
+        return count;
     }
 
     /**

@@ -11,7 +11,6 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
-import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.User;
@@ -22,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.base.CenterBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -167,33 +165,14 @@ public abstract class CenterWrapper<E extends Center> extends
         initAddress().setProperty(AddressPeer.COUNTRY, country);
     }
 
-    public static final String PROCESSING_EVENT_COUNT_QRY = "select count(proc) from "
-        + ProcessingEvent.class.getName()
-        + " as proc where "
-        + Property.concatNames(ProcessingEventPeer.CENTER, CenterPeer.ID)
-        + " = ?";
-
     public long getProcessingEventCount() throws ApplicationException,
         BiobankException {
         return getProcessingEventCount(false);
     }
 
-    /**
-     * fast = true will execute a hql query. fast = false will call the
-     * getCollectionEventCollection().size method
-     */
     public long getProcessingEventCount(boolean fast)
         throws ApplicationException, BiobankException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(PROCESSING_EVENT_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        List<ProcessingEventWrapper> list = getProcessingEventCollection(false);
-        if (list == null) {
-            return 0;
-        }
-        return list.size();
+        return getPropertyCount(CenterPeer.PROCESSING_EVENT_COLLECTION, fast);
     }
 
     /**

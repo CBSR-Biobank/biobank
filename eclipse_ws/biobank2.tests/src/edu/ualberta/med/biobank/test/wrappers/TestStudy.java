@@ -684,40 +684,35 @@ public class TestStudy extends TestDatabase {
         List<CollectionEventWrapper> set1_1 = CollectionEventHelper
             .addCollectionEvents(clinic1, study1, study1.getName() + "_set1");
         study1.reload();
-        Assert
-            .assertEquals(set1_1.size(), study1.getCollectionEventCount(true));
+        Assert.assertEquals(set1_1.size(), study1.getCollectionEventCount());
 
         List<CollectionEventWrapper> set1_2 = CollectionEventHelper
             .addCollectionEvents(clinic1, study1, study1.getName() + "_set2");
         study1.reload();
         Assert.assertEquals(set1_1.size() + set1_2.size(),
-            study1.getCollectionEventCount(true));
+            study1.getCollectionEventCount());
 
         List<CollectionEventWrapper> set2_1 = CollectionEventHelper
             .addCollectionEvents(clinic2, study2, study2.getName() + "_set1");
         study2.reload();
-        Assert
-            .assertEquals(set2_1.size(), study2.getCollectionEventCount(true));
+        Assert.assertEquals(set2_1.size(), study2.getCollectionEventCount());
         // ensure count for study1 does not change
         Assert.assertEquals(set1_1.size() + set1_2.size(),
-            study1.getCollectionEventCount(true));
+            study1.getCollectionEventCount());
 
         DbHelper.deleteCollectionEvents(set1_1);
         study1.reload();
-        Assert
-            .assertEquals(set1_2.size(), study1.getCollectionEventCount(true));
+        Assert.assertEquals(set1_2.size(), study1.getCollectionEventCount());
 
         // ensure count does not change for study2
-        Assert
-            .assertEquals(set2_1.size(), study2.getCollectionEventCount(true));
+        Assert.assertEquals(set2_1.size(), study2.getCollectionEventCount());
 
         DbHelper.deleteCollectionEvents(set1_2);
         study1.reload();
-        Assert.assertEquals(0, study1.getCollectionEventCount(true));
+        Assert.assertEquals(0, study1.getCollectionEventCount());
 
         // ensure count does not change for study2
-        Assert
-            .assertEquals(set2_1.size(), study2.getCollectionEventCount(true));
+        Assert.assertEquals(set2_1.size(), study2.getCollectionEventCount());
     }
 
     @Test

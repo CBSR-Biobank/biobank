@@ -133,7 +133,7 @@ public class StudyViewForm extends BiobankViewForm {
         setTextValue(activityStatusLabel, study.getActivityStatus());
         setTextValue(commentLabel, study.getComment());
         setTextValue(patientTotal, study.getPatientCount(true));
-        setTextValue(visitTotal, study.getCollectionEventCount(true));
+        setTextValue(visitTotal, study.getCollectionEventCount());
     }
 
     private void createAliquotedSpecimenSection() {
