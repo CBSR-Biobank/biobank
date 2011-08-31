@@ -10,7 +10,7 @@ INSERT INTO `BB_RIGHT` (ID, VERSION, NAME, FOR_SITE, FOR_CLINIC, FOR_RESEARCH_GR
 ( 7, 0, 'Reports', 1, 1, 1, 1, 'reports'),
 ( 8, 0, 'Container', 1, 0, 0, 0, 'Container'),
 ( 9, 0, 'Container Type', 1, 0, 0, 0, 'ContainerType'),
-( 10 0, 'Patient', 1, 1, 1, 1, 'Patient'),
+( 10, 0, 'Patient', 1, 1, 1, 1, 'Patient'),
 ( 11, 0, 'Collection Event', 1, 1, 0, 0, 'CollectionEvent'),
 ( 12, 0, 'Processing Event', 1, 1, 0, 0, 'ProcessingEvent'),
 ( 13, 0, 'Send Dispatch', 1, 1, 0, 0, 'send-Dispatch'),

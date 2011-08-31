@@ -197,7 +197,7 @@ INSERT INTO `BB_RIGHT` (ID, VERSION, NAME, FOR_SITE, FOR_CLINIC, FOR_RESEARCH_GR
 ( 7, 0, 'Reports', 1, 1, 1, 1, 'reports'),
 ( 8, 0, 'Container', 1, 0, 0, 0, 'Container'),
 ( 9, 0, 'Container Type', 1, 0, 0, 0, 'ContainerType'),
-( 10 0, 'Patient', 1, 1, 1, 1, 'Patient'),
+( 10, 0, 'Patient', 1, 1, 1, 1, 'Patient'),
 ( 11, 0, 'Collection Event', 1, 1, 0, 0, 'CollectionEvent'),
 ( 12, 0, 'Processing Event', 1, 1, 0, 0, 'ProcessingEvent'),
 ( 13, 0, 'Send Dispatch', 1, 1, 0, 0, 'send-Dispatch'),
@@ -226,7 +226,7 @@ insert into principal (id, version)
 select user_id, 0 from csm_user;
 
 insert into user (principal_id, login, csm_user_id, bulk_emails, first_name, last_name, email, need_change_pwd, is_super_admin) 
-select user_id, login_name, user_id, 1, first_name, last_name, email_id, 0, 0 from csm_user;
+select user_id, login_name, user_id, 1, first_name, last_name, email_id, 0, 0 from csm_user where login_name != 'administrator' and login_name != 'bbadmin';
 -- group_id = 5 is 'Super Admin Group'
 update user as u, csm_user_group as ug
 set u.is_super_admin = 1
