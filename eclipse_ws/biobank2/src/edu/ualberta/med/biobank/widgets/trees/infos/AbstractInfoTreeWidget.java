@@ -173,7 +173,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         autoSizeColumns = columnWidths == null ? true : false;
 
         BgcClipboard.addClipboardCopySupport(treeViewer, menu,
-            (BgcLabelProvider) getLabelProvider(), headings.length);
+            getLabelProvider(), headings.length);
 
     }
 

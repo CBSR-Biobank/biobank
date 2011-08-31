@@ -1068,7 +1068,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     /**
      * @return a list of center security should check for modifications
+     * 
+     *         is not used anymore for now. But we will need something like that
+     *         so I keep it until I reuse what subclasses are doing with it.
      */
+    @Deprecated
     public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
         return Collections.emptyList();
     }

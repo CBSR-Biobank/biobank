@@ -50,4 +50,18 @@ public class MembershipRightWrapper extends MembershipRightBaseWrapper {
             MembershipRightPeer.RIGHT_PRIVILEGE_COLLECTION);
         super.addPersistTasks(tasks);
     }
+
+    @Override
+    protected MembershipRightWrapper createDuplicate() {
+        MembershipRightWrapper newMs = new MembershipRightWrapper(appService);
+        List<RightPrivilegeWrapper> newRpList = new ArrayList<RightPrivilegeWrapper>();
+        for (RightPrivilegeWrapper rp : getRightPrivilegeCollection(false)) {
+            RightPrivilegeWrapper newRp = new RightPrivilegeWrapper(appService);
+            newRp.setRight(rp.getRight());
+            newRp.addToPrivilegeCollection(rp.getPrivilegeCollection(false));
+            newRpList.add(newRp);
+        }
+        newMs.addToRightPrivilegeCollection(newRpList);
+        return newMs;
+    }
 }

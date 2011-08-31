@@ -59,4 +59,18 @@ public abstract class MembershipWrapper<T extends Membership> extends
     protected abstract List<PrivilegeWrapper> getPrivilegesForRightInternal(
         BbRightWrapper right, CenterWrapper<?> center, StudyWrapper study)
         throws ApplicationException;
+
+    /**
+     * Duplicate a membership: create a new one that will have the exact same
+     * relations, center, study. This duplicated membership is not yet saved
+     * into the DB. Principal is not copied because a new one will be set
+     */
+    public MembershipWrapper<T> duplicate() {
+        MembershipWrapper<T> newMs = createDuplicate();
+        newMs.setCenter(getCenter());
+        newMs.setStudy(getStudy());
+        return newMs;
+    }
+
+    protected abstract MembershipWrapper<T> createDuplicate();
 }

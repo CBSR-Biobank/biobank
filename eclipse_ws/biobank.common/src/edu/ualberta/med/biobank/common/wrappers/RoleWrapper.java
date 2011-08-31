@@ -48,10 +48,20 @@ public class RoleWrapper extends RoleBaseWrapper {
             RoleWrapper.class);
     }
 
+    /**
+     * Duplicate this role. The resulting role is not saved yet in the database
+     */
     public RoleWrapper duplicate() {
         RoleWrapper newRole = new RoleWrapper(appService);
         newRole.setName(getName());
-        // FIXME also copy relations
+        List<RightPrivilegeWrapper> newRpList = new ArrayList<RightPrivilegeWrapper>();
+        for (RightPrivilegeWrapper rp : getRightPrivilegeCollection(false)) {
+            RightPrivilegeWrapper newRp = new RightPrivilegeWrapper(appService);
+            newRp.setRight(rp.getRight());
+            newRp.addToPrivilegeCollection(rp.getPrivilegeCollection(false));
+            newRpList.add(newRp);
+        }
+        newRole.addToRightPrivilegeCollection(newRpList);
         return newRole;
     }
 

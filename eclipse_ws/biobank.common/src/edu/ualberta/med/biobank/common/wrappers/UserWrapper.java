@@ -285,4 +285,21 @@ public class UserWrapper extends UserBaseWrapper {
             getCsmUserId(), oldPassword, newPassword);
     }
 
+    /**
+     * Duplicate a user: create a new one that will have the exact same
+     * relations. This duplicated user is not yet saved into the DB. Login,
+     * email and csmUserId, user specific info are not copied
+     */
+    @Override
+    public UserWrapper createDuplicate() {
+        UserWrapper newUser = new UserWrapper(appService);
+        newUser.setBulkEmails(getBulkEmails());
+        newUser.setIsSuperAdmin(getIsSuperAdmin());
+        return newUser;
+    }
+
+    @Override
+    public UserWrapper duplicate() {
+        return (UserWrapper) super.duplicate();
+    }
 }

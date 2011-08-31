@@ -47,4 +47,11 @@ public class MembershipRoleWrapper extends MembershipRoleBaseWrapper {
         }
         return privileges;
     }
+
+    @Override
+    protected MembershipRoleWrapper createDuplicate() {
+        MembershipRoleWrapper newMs = new MembershipRoleWrapper(appService);
+        newMs.addToRoleCollection(getRoleCollection(false));
+        return newMs;
+    }
 }

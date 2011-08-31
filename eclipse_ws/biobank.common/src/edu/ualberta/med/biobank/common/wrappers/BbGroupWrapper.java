@@ -46,14 +46,19 @@ public class BbGroupWrapper extends BbGroupBaseWrapper {
         return 0;
     }
 
+    @Override
+    public BbGroupWrapper duplicate() {
+        return (BbGroupWrapper) super.duplicate();
+    }
+
     /**
      * Duplicate a group: create a new one that will have the exact same
      * relations. This duplicated group is not yet saved into the DB.
      */
-    public BbGroupWrapper duplicate() {
+    @Override
+    public BbGroupWrapper createDuplicate() {
         BbGroupWrapper newGroup = new BbGroupWrapper(appService);
         newGroup.setName(getName());
-        // FIXME also copy relations
         return newGroup;
     }
 
