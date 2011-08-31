@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
@@ -348,16 +350,92 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         });
     }
 
-    protected void addItem() {
-        // derived classes should override this method
+    /**
+     * Derived classes should override this method
+     * 
+     * @return
+     */
+    public Object getSelection() {
+        return null;
     }
 
-    protected void editItem() {
-        // derived classes should override this method
+    @Override
+    public void doubleClick(DoubleClickEvent dcevent) {
+        // get selection as derived class object
+        Object selection = getSelection();
+
+        final DoubleClickEvent event = new DoubleClickEvent(tableViewer,
+            new InfoTableSelection(selection));
+        Object[] listeners = doubleClickListeners.getListeners();
+        for (int i = 0; i < listeners.length; ++i) {
+            final IDoubleClickListener l = (IDoubleClickListener) listeners[i];
+            SafeRunnable.run(new SafeRunnable() {
+                @Override
+                public void run() {
+                    l.doubleClick(event);
+                }
+            });
+        }
+    }
+
+    protected void addItem() {
+        Object objSelected = getSelection();
+
+        if (objSelected == null)
+            return;
+
+        InfoTableSelection selection = new InfoTableSelection(objSelected);
+        final InfoTableEvent event = new InfoTableEvent(this, selection);
+        Object[] listeners = addItemListeners.getListeners();
+        for (int i = 0; i < listeners.length; ++i) {
+            final IInfoTableAddItemListener l = (IInfoTableAddItemListener) listeners[i];
+            SafeRunnable.run(new SafeRunnable() {
+                @Override
+                public void run() {
+                    l.addItem(event);
+                }
+            });
+        }
+    }
+
+    public void editItem() {
+        Object objSelected = getSelection();
+
+        if (objSelected == null)
+            return;
+
+        InfoTableSelection selection = new InfoTableSelection(objSelected);
+        final InfoTableEvent event = new InfoTableEvent(this, selection);
+        Object[] listeners = editItemListeners.getListeners();
+        for (int i = 0; i < listeners.length; ++i) {
+            final IInfoTableEditItemListener l = (IInfoTableEditItemListener) listeners[i];
+            SafeRunnable.run(new SafeRunnable() {
+                @Override
+                public void run() {
+                    l.editItem(event);
+                }
+            });
+        }
     }
 
     protected void deleteItem() {
-        // derived classes should override this method
+        Object objSelected = getSelection();
+
+        if (objSelected == null)
+            return;
+
+        InfoTableSelection selection = new InfoTableSelection(objSelected);
+        final InfoTableEvent event = new InfoTableEvent(this, selection);
+        Object[] listeners = deleteItemListeners.getListeners();
+        for (int i = 0; i < listeners.length; ++i) {
+            final IInfoTableDeleteItemListener l = (IInfoTableDeleteItemListener) listeners[i];
+            SafeRunnable.run(new SafeRunnable() {
+                @Override
+                public void run() {
+                    l.deleteItem(event);
+                }
+            });
+        }
     }
 
 }

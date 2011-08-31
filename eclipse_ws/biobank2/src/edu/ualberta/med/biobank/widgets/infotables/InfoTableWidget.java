@@ -5,9 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -18,11 +15,8 @@ import org.eclipse.swt.widgets.Table;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
-import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
-import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
@@ -78,19 +72,16 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
     private Class<T> wrapperClass;
 
     public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, Class<T> wrapperClass) {
-        super(parent, collection, headings, null, 5);
+        String[] headings, int rowsPerPage, Class<T> wrapperClass) {
+        super(parent, collection, headings, null, rowsPerPage);
         this.wrapperClass = wrapperClass;
         addTableClickListener();
         useDefaultEditItem = false;
     }
 
     public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int rowsPerPage, Class<T> wrapperClass) {
-        super(parent, collection, headings, null, rowsPerPage);
-        this.wrapperClass = wrapperClass;
-        addTableClickListener();
-        useDefaultEditItem = false;
+        String[] headings, Class<T> wrapperClass) {
+        this(parent, collection, headings, 5, wrapperClass);
     }
 
     public void createDefaultEditItem() {
@@ -189,8 +180,7 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
     }
 
     public void reloadCollection(final List<T> collection) {
-        reloadData = true;
-        setCollection(collection, null);
+        reloadCollection(collection, null);
     }
 
     @Override
@@ -274,6 +264,7 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
         return item;
     }
 
+    @Override
     public Object getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
@@ -281,41 +272,6 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
         Object object = item.o;
         Assert.isNotNull(object);
         return object;
-    }
-
-    @Override
-    public void doubleClick(DoubleClickEvent dcevent) {
-        // get selection as derived class object
-        Object selection = getSelection();
-
-        final DoubleClickEvent event = new DoubleClickEvent(tableViewer,
-            new InfoTableSelection(selection));
-        Object[] listeners = doubleClickListeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-            final IDoubleClickListener l = (IDoubleClickListener) listeners[i];
-            SafeRunnable.run(new SafeRunnable() {
-                @Override
-                public void run() {
-                    l.doubleClick(event);
-                }
-            });
-        }
-    }
-
-    @Override
-    protected void addItem() {
-        InfoTableSelection selection = new InfoTableSelection(getSelection());
-        final InfoTableEvent event = new InfoTableEvent(this, selection);
-        Object[] listeners = addItemListeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTableAddItemListener l = (IInfoTableAddItemListener) listeners[i];
-            SafeRunnable.run(new SafeRunnable() {
-                @Override
-                public void run() {
-                    l.addItem(event);
-                }
-            });
-        }
     }
 
     @Override
@@ -332,34 +288,7 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
             return;
         }
 
-        InfoTableSelection selection = new InfoTableSelection(getSelection());
-        final InfoTableEvent event = new InfoTableEvent(this, selection);
-        Object[] listeners = editItemListeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTableEditItemListener l = (IInfoTableEditItemListener) listeners[i];
-            SafeRunnable.run(new SafeRunnable() {
-                @Override
-                public void run() {
-                    l.editItem(event);
-                }
-            });
-        }
-    }
-
-    @Override
-    protected void deleteItem() {
-        InfoTableSelection selection = new InfoTableSelection(getSelection());
-        final InfoTableEvent event = new InfoTableEvent(this, selection);
-        Object[] listeners = deleteItemListeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTableDeleteItemListener l = (IInfoTableDeleteItemListener) listeners[i];
-            SafeRunnable.run(new SafeRunnable() {
-                @Override
-                public void run() {
-                    l.deleteItem(event);
-                }
-            });
-        }
+        super.editItem();
     }
 
 }
