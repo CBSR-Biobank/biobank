@@ -126,6 +126,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         studiesTable = new StudyInfoTable(section, site.getStudyCollection());
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addClickListener(collectionDoubleClickListener);
+        studiesTable.createDefaultEditItem();
         section.setClient(studiesTable);
     }
 

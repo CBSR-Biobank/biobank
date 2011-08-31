@@ -194,6 +194,7 @@ public class DispatchViewForm extends BiobankViewForm {
                         specimensNonProcessedTable.reloadCollection();
                     }
                 });
+            specimensNonProcessedTable.createDefaultEditItem();
         } else {
             specimensTree = new DispatchSpecimensTreeTable(page, dispatch,
                 false, false);

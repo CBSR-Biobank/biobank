@@ -39,6 +39,7 @@ public class PeListViewForm extends BiobankViewForm {
         processingEvents = new PeListInfoTable(page, pes);
         processingEvents.adaptToToolkit(toolkit, true);
         processingEvents.addClickListener(collectionDoubleClickListener);
+        processingEvents.createDefaultEditItem();
     }
 
     @Override

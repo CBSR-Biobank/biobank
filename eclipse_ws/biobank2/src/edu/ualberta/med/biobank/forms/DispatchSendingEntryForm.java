@@ -218,6 +218,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 }
             }
         });
+        specimensNonProcessedTable.createDefaultEditItem();
         specimensNonProcessedTable.addSelectionChangedListener(biobankListener);
     }
 

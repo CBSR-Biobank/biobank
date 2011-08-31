@@ -90,6 +90,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
             10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
         sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
+        sourceSpecimenTable.createDefaultEditItem();
     }
 
     @Override

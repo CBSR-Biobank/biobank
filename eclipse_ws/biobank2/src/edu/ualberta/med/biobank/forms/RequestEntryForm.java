@@ -169,6 +169,7 @@ public class RequestEntryForm extends BiobankViewForm {
         dispatchTable = new RequestDispatchInfoTable(dispatchCreation,
             request.getDispatchCollection(false));
         dispatchTable.addClickListener(collectionDoubleClickListener);
+        dispatchTable.createDefaultEditItem();
         dispatchTable.addSelectionListener(new SelectionListener() {
 
             @Override

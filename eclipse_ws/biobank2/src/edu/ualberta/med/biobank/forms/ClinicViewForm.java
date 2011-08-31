@@ -112,6 +112,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(studiesTable);
 
         studiesTable.addClickListener(collectionDoubleClickListener);
+        studiesTable.createDefaultEditItem();
     }
 
     @Override

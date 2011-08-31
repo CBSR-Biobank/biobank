@@ -76,31 +76,29 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T>
 
     protected boolean useDefaultEditItem;
 
+    private Class<T> wrapperClass;
+
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings, Class<T> wrapperClass) {
         super(parent, collection, headings, null, 5);
+        this.wrapperClass = wrapperClass;
         addTableClickListener();
         useDefaultEditItem = false;
-
-        if (SessionManager.canUpdate(wrapperClass)) {
-            createDefaultEditItem();
-        }
     }
 
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int rowsPerPage, Class<T> wrapperClass) {
         super(parent, collection, headings, null, rowsPerPage);
+        this.wrapperClass = wrapperClass;
         addTableClickListener();
         useDefaultEditItem = false;
-
-        if (SessionManager.canUpdate(wrapperClass)) {
-            createDefaultEditItem();
-        }
     }
 
-    protected void createDefaultEditItem() {
-        useDefaultEditItem = true;
-        addEditItemListener(this);
+    public void createDefaultEditItem() {
+        if (SessionManager.canUpdate(wrapperClass)) {
+            useDefaultEditItem = true;
+            addEditItemListener(this);
+        }
     }
 
     @Override
