@@ -9,13 +9,13 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.dialogs.user.RightPrivilegeAddDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class RightPrivilegeInfoTable extends
+public abstract class RightPrivilegeInfoTable extends
     InfoTableWidget<RightPrivilegeWrapper> {
     public static final int ROWS_PER_PAGE = 8;
     private static final String[] HEADINGS = new String[] {
@@ -33,9 +33,10 @@ public class RightPrivilegeInfoTable extends
         }
     }
 
-    public RightPrivilegeInfoTable(Composite parent, final RoleWrapper role) {
-        super(parent, role.getRightPrivilegeCollection(true), HEADINGS,
-            ROWS_PER_PAGE, RightPrivilegeWrapper.class);
+    public RightPrivilegeInfoTable(Composite parent,
+        List<RightPrivilegeWrapper> rpCollection) {
+        super(parent, rpCollection, HEADINGS, ROWS_PER_PAGE,
+            RightPrivilegeWrapper.class);
 
         addEditItemListener(new IInfoTableEditItemListener() {
             @Override
@@ -43,7 +44,7 @@ public class RightPrivilegeInfoTable extends
                 RightPrivilegeWrapper rp = ((TableRowData) getSelection()).rp;
                 RightPrivilegeAddDialog dlg = new RightPrivilegeAddDialog(
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell(), role);
+                        .getShell(), getAlreadyUsedRights());
                 int res = dlg.edit(rp);
                 if (res == Dialog.OK) {
                     reloadCollection(getCollection(), rp);
@@ -56,12 +57,17 @@ public class RightPrivilegeInfoTable extends
             @Override
             public void deleteItem(InfoTableEvent event) {
                 RightPrivilegeWrapper rp = ((TableRowData) getSelection()).rp;
-                role.removeFromRightPrivilegeCollection(Arrays.asList(rp));
+                removeFromRightPrivilegeCollection(Arrays.asList(rp));
                 getCollection().remove(rp);
                 reloadCollection(getCollection());
             }
         });
     }
+
+    protected abstract List<BbRightWrapper> getAlreadyUsedRights();
+
+    protected abstract void removeFromRightPrivilegeCollection(
+        List<RightPrivilegeWrapper> rpList);
 
     @SuppressWarnings("serial")
     @Override

@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.SWT;
@@ -15,6 +17,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.common.peer.RolePeer;
+import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
@@ -71,15 +75,27 @@ public class RoleEditDialog extends BgcBaseDialog {
                 Messages.RoleEditDialog_msg_name_required));
 
         Section rpSection = createSection(contents,
-            Messages.RoleEditDialog_right_privilege_label, Messages.RoleEditDialog_new_assoc_label,
-            new SelectionAdapter() {
+            Messages.RoleEditDialog_right_privilege_label,
+            Messages.RoleEditDialog_new_assoc_label, new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     addRightPrivilege();
                 }
             });
 
-        rightPrivilegeInfoTable = new RightPrivilegeInfoTable(rpSection, role);
+        rightPrivilegeInfoTable = new RightPrivilegeInfoTable(rpSection,
+            role.getRightPrivilegeCollection(true)) {
+            @Override
+            protected List<BbRightWrapper> getAlreadyUsedRights() {
+                return role.getRightsInUse();
+            }
+
+            @Override
+            protected void removeFromRightPrivilegeCollection(
+                List<RightPrivilegeWrapper> rpList) {
+                role.removeFromRightPrivilegeCollection(rpList);
+            }
+        };
         rpSection.setClient(rightPrivilegeInfoTable);
     }
 
@@ -89,11 +105,11 @@ public class RoleEditDialog extends BgcBaseDialog {
             public void run() {
                 RightPrivilegeAddDialog dlg = new RightPrivilegeAddDialog(
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell(), role);
+                        .getShell(), role.getRightsInUse());
                 int res = dlg.open();
                 if (res == Status.OK) {
                     rightPrivilegeInfoTable.getCollection().addAll(
-                        dlg.getRightPrivilegeList());
+                        dlg.getNewRightPrivilegeList());
                     rightPrivilegeInfoTable.reloadCollection(
                         role.getRightPrivilegeCollection(true), null);
                 }

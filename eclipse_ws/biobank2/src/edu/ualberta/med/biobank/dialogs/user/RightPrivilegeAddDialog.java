@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.dialogs.user;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
@@ -22,7 +21,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNode;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
@@ -31,16 +29,16 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class RightPrivilegeAddDialog extends BgcBaseDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
-    private RoleWrapper role;
+    private List<BbRightWrapper> alreadyUsedRights;
     private MultiSelectWidget<PrivilegeWrapper> privilegesWidget;
     private MultiSelectWidget<BbRightWrapper> rightsWidget;
-    List<RightPrivilegeWrapper> rpList = new ArrayList<RightPrivilegeWrapper>();
+    private List<RightPrivilegeWrapper> newRpList = new ArrayList<RightPrivilegeWrapper>();
     private RightPrivilegeWrapper editRp;
 
-    public RightPrivilegeAddDialog(Shell parent, RoleWrapper role) {
+    public RightPrivilegeAddDialog(Shell parent,
+        List<BbRightWrapper> alreadyUsedRights) {
         super(parent);
-        Assert.isNotNull(role);
-        this.role = role;
+        this.alreadyUsedRights = alreadyUsedRights;
         currentTitle = Messages.RightPrivilegeAddDialog_title;
         titleAreaMessage = Messages.RightPrivilegeAddDialog_description;
     }
@@ -104,7 +102,7 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
             };
             List<BbRightWrapper> allRights = BbRightWrapper
                 .getAllRights(SessionManager.getAppService());
-            allRights.removeAll(role.getRightsinUse());
+            allRights.removeAll(alreadyUsedRights);
             rightsWidget.setSelections(allRights,
                 new ArrayList<BbRightWrapper>());
             rightsWidget.setFilter(new ViewerFilter() {
@@ -167,9 +165,8 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
                 rp.setRight(right);
                 rp.addToPrivilegeCollection(privilegesWidget
                     .getAddedToSelection());
-                rpList.add(rp);
+                newRpList.add(rp);
             }
-            role.addToRightPrivilegeCollection(rpList);
         } else {
             editRp.addToPrivilegeCollection(privilegesWidget
                 .getAddedToSelection());
@@ -179,8 +176,8 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
         super.okPressed();
     }
 
-    public List<RightPrivilegeWrapper> getRightPrivilegeList() {
-        return rpList;
+    public List<RightPrivilegeWrapper> getNewRightPrivilegeList() {
+        return newRpList;
     }
 
 }

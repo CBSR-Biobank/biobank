@@ -22,9 +22,14 @@ public class MembershipRoleWrapper extends MembershipRoleBaseWrapper {
     @Override
     public String getMembershipObjectsListString() {
         StringBuffer sb = new StringBuffer();
+        boolean first = true;
         for (RoleWrapper r : getRoleCollection(true)) {
+            if (first)
+                first = false;
+            else
+                sb.append("\n");
             sb.append(r.getName());
-            sb.append("\n");
+
         }
         return sb.toString();
     }

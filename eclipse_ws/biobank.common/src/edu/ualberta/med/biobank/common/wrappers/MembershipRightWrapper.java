@@ -23,8 +23,25 @@ public class MembershipRightWrapper extends MembershipRightBaseWrapper {
 
     @Override
     public String getMembershipObjectsListString() {
-        // TODO Auto-generated method stub
-        return "";
+        StringBuffer sb = new StringBuffer();
+        boolean first = true;
+        for (RightPrivilegeWrapper rp : getRightPrivilegeCollection(true)) {
+            if (first)
+                first = false;
+            else
+                sb.append("\n");
+            sb.append(rp.getRight().getName());
+            sb.append("/");
+            boolean firstP = true;
+            for (PrivilegeWrapper p : rp.getPrivilegeCollection(true)) {
+                if (firstP)
+                    firstP = false;
+                else
+                    sb.append(",");
+                sb.append(p.getName());
+            }
+        }
+        return sb.toString();
     }
 
     /**
