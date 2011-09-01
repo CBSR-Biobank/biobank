@@ -313,7 +313,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Add");
+        item.setText(Messages.AbstractInfoTableWidget_add);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -327,7 +327,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Edit");
+        item.setText(Messages.AbstractInfoTableWidget_edit);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -341,7 +341,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Delete");
+        item.setText(Messages.AbstractInfoTableWidget_delete);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {

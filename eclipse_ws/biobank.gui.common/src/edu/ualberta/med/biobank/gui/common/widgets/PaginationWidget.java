@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class PaginationWidget extends Composite {
 
-    public class PageInformation {
+    class PageInformation {
         public int page;
         public int rowsPerPage;
         public int pageTotal;
@@ -214,10 +214,12 @@ public class PaginationWidget extends Composite {
 
     public void setPageLabelText() {
         if (pageInfo.pageTotal == TOTAL_PAGES_UNKNOWN) {
-            pageLabel.setText(NLS.bind("Page: {0} of ?", pageInfo.page + 1));
+            pageLabel.setText(NLS.bind(
+                Messages.PaginationWidget_page_counter_unknown_total,
+                pageInfo.page + 1));
         } else {
-            pageLabel.setText(NLS.bind("Page: {0} of {1}", pageInfo.page + 1,
-                +pageInfo.pageTotal));
+            pageLabel.setText(NLS.bind(Messages.PaginationWidget_page_counter,
+                pageInfo.page + 1, +pageInfo.pageTotal));
         }
     }
 
