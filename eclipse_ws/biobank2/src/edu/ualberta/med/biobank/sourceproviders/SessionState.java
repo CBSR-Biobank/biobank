@@ -145,6 +145,9 @@ public class SessionState extends AbstractSourceProvider {
             setHasPrinterLabelsRights(user != null
                 && SessionManager
                     .canAccess(SessionSecurityHelper.PRINT_LABEL_KEY_DESC));
+            // FIXME for user management, should be able to access even if user
+            // is not connected to the right center? Right now can access only
+            // if connected to same center on which has user mgt access
             setHasUserManagementRights(user != null
                 && SessionManager
                     .canAccess(SessionSecurityHelper.USER_MANAGEMENT_DESC));

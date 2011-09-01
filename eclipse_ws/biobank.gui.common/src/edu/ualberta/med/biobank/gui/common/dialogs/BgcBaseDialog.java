@@ -274,11 +274,13 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
             section.setTextClient(tbar);
         }
 
-        ToolItem titem = new ToolItem(tbar, SWT.NULL);
-        titem.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_ADD));
-        titem.setToolTipText(addTooltip);
-        titem.addSelectionListener(addListener);
+        if (addListener != null) {
+            ToolItem titem = new ToolItem(tbar, SWT.NULL);
+            titem.setImage(BgcPlugin.getDefault().getImageRegistry()
+                .get(BgcPlugin.IMG_ADD));
+            titem.setToolTipText(addTooltip);
+            titem.addSelectionListener(addListener);
+        }
         return section;
     }
 

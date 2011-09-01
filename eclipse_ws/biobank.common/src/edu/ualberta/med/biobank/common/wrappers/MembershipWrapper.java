@@ -73,4 +73,6 @@ public abstract class MembershipWrapper<T extends Membership> extends
     }
 
     protected abstract MembershipWrapper<T> createDuplicate();
+
+    public abstract boolean isUsingRight(BbRightWrapper right);
 }

@@ -3,7 +3,10 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.NoRightForKeyDescException;
 import edu.ualberta.med.biobank.common.peer.PrincipalPeer;
@@ -15,6 +18,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class PrincipalWrapper<T extends Principal> extends
     PrincipalBaseWrapper<T> {
+    
+    private static final String WORKING_CENTERS_KEY = "workingCenters";
 
     public PrincipalWrapper(WritableApplicationService appService,
         T wrappedObject) {
@@ -106,4 +111,55 @@ public abstract class PrincipalWrapper<T extends Principal> extends
         return privileges;
     }
 
+    public List<UserWrapper> getUsersVisible() throws ApplicationException {
+        List<UserWrapper> users = new ArrayList<UserWrapper>();
+        List<CenterWrapper<?>> centers = getAllCentersForRight("user-mgt");
+        for (UserWrapper u : UserWrapper.getAllUsers(appService)) {
+            if (!Collections.disjoint(centers, u.getAllCentersInvolved()))
+                users.add(u);
+        }
+        return users;
+    }
+
+    protected List<CenterWrapper<?>> getAllCentersInvolved() {
+        List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>();
+        for (MembershipWrapper<?> ms : getMembershipCollection(false)) {
+            centers.add(ms.getCenter());
+        }
+        return centers;
+    }
+
+    protected List<CenterWrapper<?>> getAllCentersForRight(String keyDesc)
+        throws ApplicationException {
+        BbRightWrapper right = BbRightWrapper.getRightWithKeyDesc(appService,
+            keyDesc);
+        List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>();
+        for (MembershipWrapper<?> ms : getMembershipCollection(false)) {
+            if (ms.isUsingRight(right))
+                centers.add(ms.getCenter());
+        }
+        return centers;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<CenterWrapper<?>> getWorkingCenters() {
+        List<CenterWrapper<?>> workingCenters = (List<CenterWrapper<?>>) cache
+            .get(WORKING_CENTERS_KEY);
+        if (workingCenters == null) {
+            workingCenters = new ArrayList<CenterWrapper<?>>();
+            Set<CenterWrapper<?>> setOfWorkingCenter = getWorkingCentersInternal();
+            workingCenters.addAll(setOfWorkingCenter);
+            cache.put(WORKING_CENTERS_KEY, workingCenters);
+        }
+        return workingCenters;
+    }
+
+    protected Set<CenterWrapper<?>> getWorkingCentersInternal() {
+        Set<CenterWrapper<?>> setOfWorkingCenter = new HashSet<CenterWrapper<?>>();
+        for (MembershipWrapper<?> ms : getMembershipCollection(false)) {
+            if (ms.getCenter() != null)
+                setOfWorkingCenter.add(ms.getCenter());
+        }
+        return setOfWorkingCenter;
+    }
 }

@@ -87,4 +87,12 @@ public class RoleWrapper extends RoleBaseWrapper {
         super.addPersistTasks(tasks);
     }
 
+    public boolean isUsingRight(BbRightWrapper right) {
+        if (right != null)
+            for (RightPrivilegeWrapper rp : getRightPrivilegeCollection(false)) {
+                if (rp.getRight().equals(right))
+                    return true;
+            }
+        return false;
+    }
 }

@@ -81,7 +81,7 @@ public class BiobankCSMSecurityUtil {
                     serverUser = new User();
                 } else
                     throw new ApplicationException(MessageFormat.format(
-                        "Login {0} alreday exists.", user.getLogin()));
+                        "Login {0} already exists.", user.getLogin()));
             } else {
                 if (user.getCsmUserId() == null)
                     throw new ApplicationException(

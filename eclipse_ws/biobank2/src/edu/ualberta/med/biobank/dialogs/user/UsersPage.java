@@ -57,7 +57,7 @@ public abstract class UsersPage extends BgcDialogPage {
             }
         };
 
-        userInfoTable = new UserInfoTable(content, null) {
+        userInfoTable = new UserInfoTable(content, getCurrentAllUsersList()) {
             @Override
             protected int editUser(UserWrapper user) {
                 int res = super.editUser(user);
@@ -76,7 +76,6 @@ public abstract class UsersPage extends BgcDialogPage {
                 return deleted;
             }
         };
-        userInfoTable.setCollection(getCurrentAllUsersList());
         setControl(content);
     }
 

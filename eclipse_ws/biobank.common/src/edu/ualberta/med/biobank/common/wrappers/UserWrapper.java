@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,8 +16,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class UserWrapper extends UserBaseWrapper {
-
-    private static final String WORKING_CENTERS_KEY = "workingCenters";
 
     private String password;
 
@@ -36,6 +33,7 @@ public class UserWrapper extends UserBaseWrapper {
 
     @Override
     protected void addPersistTasks(TaskList tasks) {
+        // FIXME problem= if persist fail, then the csm user is created anyway
         tasks.add(new CSMUserIdPreQueryTask(this));
         super.addPersistTasks(tasks);
     }
@@ -127,23 +125,6 @@ public class UserWrapper extends UserBaseWrapper {
 
     public void setCurrentWorkingCenter(CenterWrapper<?> currentWorkingCenter) {
         this.currentWorkingCenter = currentWorkingCenter;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<CenterWrapper<?>> getWorkingCenters() {
-        List<CenterWrapper<?>> workingCenters = (List<CenterWrapper<?>>) cache
-            .get(WORKING_CENTERS_KEY);
-        if (workingCenters == null) {
-            workingCenters = new ArrayList<CenterWrapper<?>>();
-            Set<CenterWrapper<?>> setOfWorkingCenter = new HashSet<CenterWrapper<?>>();
-            for (MembershipWrapper<?> ms : getMembershipCollection(false)) {
-                if (ms.getCenter() != null)
-                    setOfWorkingCenter.add(ms.getCenter());
-            }
-            workingCenters.addAll(setOfWorkingCenter);
-            cache.put(WORKING_CENTERS_KEY, workingCenters);
-        }
-        return workingCenters;
     }
 
     public boolean isSuperAdmin() {
@@ -254,5 +235,22 @@ public class UserWrapper extends UserBaseWrapper {
             privileges.addAll(g.getPrivilegesForRight(right, center, study));
         }
         return privileges;
+    }
+
+    @Override
+    public List<UserWrapper> getUsersVisible() throws ApplicationException {
+        if (isSuperAdmin())
+            return UserWrapper.getAllUsers(appService);
+        return super.getUsersVisible();
+    }
+
+    @Override
+    protected Set<CenterWrapper<?>> getWorkingCentersInternal() {
+        Set<CenterWrapper<?>> setOfWorkingCenter = super
+            .getWorkingCentersInternal();
+        for (BbGroupWrapper g : getGroupCollection(false)) {
+            setOfWorkingCenter.addAll(g.getWorkingCentersInternal());
+        }
+        return setOfWorkingCenter;
     }
 }

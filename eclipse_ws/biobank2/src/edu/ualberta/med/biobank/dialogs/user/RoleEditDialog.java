@@ -108,6 +108,8 @@ public class RoleEditDialog extends BgcBaseDialog {
                         .getShell(), role.getRightsInUse());
                 int res = dlg.open();
                 if (res == Status.OK) {
+                    role.addToRightPrivilegeCollection(dlg
+                        .getNewRightPrivilegeList());
                     rightPrivilegeInfoTable.getCollection().addAll(
                         dlg.getNewRightPrivilegeList());
                     rightPrivilegeInfoTable.reloadCollection(

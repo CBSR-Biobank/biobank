@@ -58,6 +58,7 @@ public class MembershipAddDialog extends BgcBaseDialog {
     private Section rpSection;
     private MembershipWrapper<?> ms;
     private Composite contents;
+    private List<RightPrivilegeWrapper> addedRights = new ArrayList<RightPrivilegeWrapper>();
 
     public MembershipAddDialog(Shell parent, PrincipalWrapper<?> principal) {
         super(parent);
@@ -120,7 +121,8 @@ public class MembershipAddDialog extends BgcBaseDialog {
         rolesRadio.setSelection(true);
         rolesRadio.setText(Messages.MembershipAddDialog_roles_selection_label);
         final Button rightsRadio = new Button(compRoleOrRight, SWT.RADIO);
-        rightsRadio.setText(Messages.MembershipAddDialog_rights_selection_label);
+        rightsRadio
+            .setText(Messages.MembershipAddDialog_rights_selection_label);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         compRoleOrRight.setLayoutData(gd);
@@ -252,8 +254,10 @@ public class MembershipAddDialog extends BgcBaseDialog {
     }
 
     private void createRightsWidgets(Composite contents) {
-        rpSection = createSection(contents, Messages.MembershipAddDialog_rp_assoc_section,
-            Messages.MembershipAddDialog_rp_assoc_add_label, new SelectionAdapter() {
+        rpSection = createSection(contents,
+            Messages.MembershipAddDialog_rp_assoc_section,
+            Messages.MembershipAddDialog_rp_assoc_add_label,
+            new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     addRightPrivilege();
@@ -302,6 +306,7 @@ public class MembershipAddDialog extends BgcBaseDialog {
                         .getShell(), new ArrayList<BbRightWrapper>());
                 int res = dlg.open();
                 if (res == Status.OK) {
+                    addedRights.addAll(dlg.getNewRightPrivilegeList());
                     rightPrivilegeInfoTable.getCollection().addAll(
                         dlg.getNewRightPrivilegeList());
                     rightPrivilegeInfoTable.reloadCollection(
@@ -330,9 +335,7 @@ public class MembershipAddDialog extends BgcBaseDialog {
             }
             MembershipRightWrapper msRight = new MembershipRightWrapper(
                 SessionManager.getAppService());
-            // FIXME need only new msr
-            msRight.addToRightPrivilegeCollection(rightPrivilegeInfoTable
-                .getCollection());
+            msRight.addToRightPrivilegeCollection(addedRights);
             ms = msRight;
         }
         ms.setCenter(getCenterSelection());

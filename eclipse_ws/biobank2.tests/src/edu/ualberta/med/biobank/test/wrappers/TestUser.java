@@ -217,4 +217,5 @@ public class TestUser extends TestDatabase {
         // check user can't connect with new password
         AllTests.connect(name, newPwd);
     }
+
 }

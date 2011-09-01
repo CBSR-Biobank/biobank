@@ -24,7 +24,9 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
+import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
@@ -36,6 +38,8 @@ import edu.ualberta.med.biobank.validators.MatchingTextValidator;
 import edu.ualberta.med.biobank.validators.OrValidator;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.infotables.MembershipInfoTable;
+import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserEditDialog extends BgcBaseDialog {
     public static final int CLOSE_PARENT_RETURN_CODE = 3;
@@ -46,6 +50,7 @@ public class UserEditDialog extends BgcBaseDialog {
 
     private UserWrapper originalUser = new UserWrapper(null);
     private MembershipInfoTable membershipInfoTable;
+    private MultiSelectWidget<BbGroupWrapper> groupsWidget;
 
     public UserEditDialog(Shell parent, UserWrapper originalUser) {
         super(parent);
@@ -83,11 +88,20 @@ public class UserEditDialog extends BgcBaseDialog {
     }
 
     @Override
-    protected void createDialogAreaInternal(Composite parent) {
+    protected void createDialogAreaInternal(Composite parent)
+        throws ApplicationException {
         Composite contents = new Composite(parent, SWT.NONE);
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+        createUserFields(contents);
+
+        createMembershipsSection(contents);
+
+        createGroupsSection(contents);
+    }
+
+    private void createUserFields(Composite contents) {
         Control c = createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER, Messages.UserEditDialog_login_label, null,
             originalUser, UserPeer.LOGIN.getName(),
@@ -119,7 +133,9 @@ public class UserEditDialog extends BgcBaseDialog {
 
         if (!originalUser.equals(SessionManager.getUser()))
             createPasswordWidgets(contents);
+    }
 
+    private void createMembershipsSection(Composite contents) {
         createSection(contents, Messages.UserEditDialog_memberships_label,
             Messages.UserEditDialog_memberships_add_label,
             new SelectionAdapter() {
@@ -129,8 +145,27 @@ public class UserEditDialog extends BgcBaseDialog {
                 }
             });
         membershipInfoTable = new MembershipInfoTable(contents, originalUser);
-        gd = (GridData) membershipInfoTable.getLayoutData();
+        GridData gd = (GridData) membershipInfoTable.getLayoutData();
         gd.horizontalSpan = 2;
+    }
+
+    private void createGroupsSection(Composite contents)
+        throws ApplicationException {
+        createSection(contents, "Groups", null, null);
+
+        groupsWidget = new MultiSelectWidget<BbGroupWrapper>(contents,
+            SWT.NONE, "Available groups", "Selected Groups", 75) {
+            @Override
+            protected String getTextForObject(BbGroupWrapper nodeObject) {
+                return nodeObject.getName();
+            }
+        };
+        GridData gd = (GridData) groupsWidget.getLayoutData();
+        gd.horizontalSpan = 2;
+
+        groupsWidget.setSelections(
+            BbGroupWrapper.getAllGroups(SessionManager.getAppService()),
+            originalUser.getGroupCollection(false));
     }
 
     protected void addMembership() {
@@ -156,7 +191,21 @@ public class UserEditDialog extends BgcBaseDialog {
         // try saving or updating the user inside this dialog so that if there
         // is an error the entered information is not lost
         try {
-            originalUser.persist();
+            // FIXME tried to add
+            // "tasks.persistAdded(this, UserPeer.GROUP_COLLECTION);" in
+            // "addPersistTasks" method of userwrapper but didn't work.
+            // The following is working fine, but do we want to generalize it?
+            WrapperTransaction tx = new WrapperTransaction(
+                SessionManager.getAppService());
+            tx.persist(originalUser);
+            // add into group after persisting because user needs to be created
+            // first
+            for (BbGroupWrapper g : groupsWidget.getAddedToSelection()) {
+                g.addToUserCollection(Arrays.asList(originalUser));
+                tx.persist(g);
+            }
+            tx.commit();
+
             if (SessionManager.getUser().equals(originalUser)) {
                 // if the User is making changes to himself, logout
                 BgcPlugin.openInformation(

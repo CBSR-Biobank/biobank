@@ -59,4 +59,14 @@ public class MembershipRoleWrapper extends MembershipRoleBaseWrapper {
         newMs.addToRoleCollection(getRoleCollection(false));
         return newMs;
     }
+
+    @Override
+    public boolean isUsingRight(BbRightWrapper right) {
+        if (right != null)
+            for (RoleWrapper r : getRoleCollection(false)) {
+                if (r.isUsingRight(right))
+                    return true;
+            }
+        return false;
+    }
 }

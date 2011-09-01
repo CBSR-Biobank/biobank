@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 @SuppressWarnings("rawtypes")
 public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper<?>> {
-    public static final int ROWS_PER_PAGE = 8;
+    public static final int ROWS_PER_PAGE = 7;
     private static final String[] HEADINGS = new String[] {
         Messages.MembershipInfoTable_center_label,
         Messages.MembershipInfoTable_study_label,
