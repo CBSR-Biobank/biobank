@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
-public class InfoTablePaginationWidget extends Composite {
+public class PaginationWidget extends Composite {
 
     public class PageInformation {
         public int page;
@@ -44,7 +44,7 @@ public class InfoTablePaginationWidget extends Composite {
 
     protected PageInformation pageInfo;
 
-    public InfoTablePaginationWidget(Composite parent, int style,
+    public PaginationWidget(Composite parent, int style,
         IInfoTalePagination paginator, int buttonsEnabledOnInit, int rowsPerPage) {
         super(parent, style);
         this.paginator = paginator;

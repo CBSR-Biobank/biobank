@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
-import edu.ualberta.med.biobank.gui.common.widgets.InfoTablePaginationWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.PaginationWidget;
 
 public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
 
@@ -164,7 +164,7 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
 
     @Override
     protected void init(List<T> collection) {
-        if (paginationWidget.getTotalPages() == InfoTablePaginationWidget.TOTAL_PAGES_UNKNOWN) {
+        if (paginationWidget.getTotalPages() == PaginationWidget.TOTAL_PAGES_UNKNOWN) {
             int size;
             if (collection instanceof AbstractBiobankListProxy) {
                 size = ((AbstractBiobankListProxy<?>) collection).getRealSize();

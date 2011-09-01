@@ -72,7 +72,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
     private BgcLabelProvider labelProvider;
 
-    protected InfoTablePaginationWidget paginationWidget;
+    protected PaginationWidget paginationWidget;
 
     protected ListenerList addItemListeners = new ListenerList();
 
@@ -114,9 +114,9 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         tableViewer.setLabelProvider(labelProvider);
         tableViewer.setContentProvider(new ArrayContentProvider());
 
-        paginationWidget = new InfoTablePaginationWidget(this, SWT.NONE, this,
-            InfoTablePaginationWidget.NEXT_PAGE_BUTTON
-                | InfoTablePaginationWidget.LAST_PAGE_BUTTON, rowsPerPage);
+        paginationWidget = new PaginationWidget(this, SWT.NONE, this,
+            PaginationWidget.NEXT_PAGE_BUTTON
+                | PaginationWidget.LAST_PAGE_BUTTON, rowsPerPage);
 
         autoSizeColumns = (columnWidths == null) ? true : false;
 
