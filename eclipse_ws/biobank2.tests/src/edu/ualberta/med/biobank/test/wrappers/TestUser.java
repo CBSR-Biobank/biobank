@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
 import edu.ualberta.med.biobank.test.AllTests;
 import edu.ualberta.med.biobank.test.TestDatabase;
+import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.GroupHelper;
 import edu.ualberta.med.biobank.test.internal.MembershipHelper;
 import edu.ualberta.med.biobank.test.internal.RoleHelper;
@@ -218,4 +219,45 @@ public class TestUser extends TestDatabase {
         AllTests.connect(name, newPwd);
     }
 
+    @Test
+    public void testAddUserFailAndCsmUser() throws Exception {
+        UserWrapper user = new UserWrapper(appService);
+        String login = Utils.getRandomString(300, 400);
+        user.setLogin(login);
+        try {
+            user.persist();
+            Assert.fail();
+        } catch (Exception ex) {
+            Assert.assertTrue("should fail because login is too long", true);
+        }
+        // check csm user
+        UserProvisioningManager upm = SecurityServiceProvider
+            .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
+
+        gov.nih.nci.security.authorization.domainobjects.User csmUser = upm
+            .getUser(login);
+        Assert.assertNull(csmUser);
+    }
+
+    @Test
+    public void addGroups() throws Exception {
+        String name = "addGroups" + r.nextInt();
+
+        UserWrapper user = UserHelper.addUser(name, null, true);
+
+        Assert.assertEquals(0, user.getGroupCollection(false).size());
+
+        BbGroupWrapper group1 = GroupHelper.addGroup(name + "_1", true);
+        BbGroupWrapper group2 = GroupHelper.addGroup(name + "_2", true);
+
+        user.addToGroupCollection(Arrays.asList(group1, group2));
+        user.persist();
+
+        user.reload();
+        group1.reload();
+        group2.reload();
+        Assert.assertEquals(2, user.getGroupCollection(false).size());
+        Assert.assertEquals(1, group1.getUserCollection(false).size());
+        Assert.assertEquals(1, group2.getUserCollection(false).size());
+    }
 }

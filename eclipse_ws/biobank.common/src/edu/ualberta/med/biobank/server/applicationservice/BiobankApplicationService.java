@@ -70,12 +70,6 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public List<String> executeGetSourceSpecimenUniqueInventoryIds(int numIds)
         throws ApplicationException;
 
-    public Long persistUser(edu.ualberta.med.biobank.model.User user,
-        String password) throws ApplicationException;
-
-    public void deleteUser(edu.ualberta.med.biobank.model.User user)
-        throws ApplicationException;
-
     public String getUserPassword(String login) throws ApplicationException;
 
     public boolean isUserLockedOut(Long csmUserId) throws ApplicationException;

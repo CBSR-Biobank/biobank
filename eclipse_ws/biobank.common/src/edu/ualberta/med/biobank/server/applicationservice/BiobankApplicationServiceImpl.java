@@ -277,18 +277,6 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public Long persistUser(edu.ualberta.med.biobank.model.User user,
-        String password) throws ApplicationException {
-        return BiobankCSMSecurityUtil.persistUser(user, password);
-    }
-
-    @Override
-    public void deleteUser(edu.ualberta.med.biobank.model.User user)
-        throws ApplicationException {
-        BiobankCSMSecurityUtil.deleteUser(user);
-    }
-
-    @Override
     public String getUserPassword(String login) throws ApplicationException {
         return BiobankCSMSecurityUtil.getUserPassword(login);
     }

@@ -94,6 +94,14 @@ public class UserEditDialog extends BgcBaseDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+        // TabFolder tb = new TabFolder(contents, SWT.TOP);
+        // TabItem ti1 = new TabItem(tb, SWT.NONE);
+        // ti1.setText("riri");
+        // TabItem ti2 = new TabItem(tb, SWT.NONE);
+        // ti2.setText("fifi");
+        // TabItem ti3 = new TabItem(tb, SWT.NONE);
+        // ti3.setText("loulou");
+
         createUserFields(contents);
 
         createMembershipsSection(contents);
@@ -198,12 +206,13 @@ public class UserEditDialog extends BgcBaseDialog {
             WrapperTransaction tx = new WrapperTransaction(
                 SessionManager.getAppService());
             tx.persist(originalUser);
-            // add into group after persisting because user needs to be created
-            // first
             for (BbGroupWrapper g : groupsWidget.getAddedToSelection()) {
                 g.addToUserCollection(Arrays.asList(originalUser));
                 tx.persist(g);
             }
+            // add into group after persisting because user needs to be created
+            // first
+
             tx.commit();
 
             if (SessionManager.getUser().equals(originalUser)) {

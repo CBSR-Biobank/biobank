@@ -8,11 +8,16 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
+import edu.ualberta.med.biobank.common.wrappers.actions.DeleteCsmUserAction;
+import edu.ualberta.med.biobank.common.wrappers.actions.PersistCsmUserAction;
 import edu.ualberta.med.biobank.common.wrappers.base.UserBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.tasks.QueryTask;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class UserWrapper extends UserBaseWrapper {
@@ -34,18 +39,41 @@ public class UserWrapper extends UserBaseWrapper {
     @Override
     protected void addPersistTasks(TaskList tasks) {
         // FIXME problem= if persist fail, then the csm user is created anyway
-        tasks.add(new CSMUserIdPreQueryTask(this));
+        tasks.add(new QueryTask() {
+            @Override
+            public SDKQuery getSDKQuery() {
+                return new PersistCsmUserAction(UserWrapper.this,
+                    UserWrapper.this.getPassword());
+            }
+
+            @Override
+            public void afterExecute(SDKQueryResult result) {
+                // TODO Auto-generated method stub
+            }
+        });
         super.addPersistTasks(tasks);
+        tasks.persistAdded(this, UserPeer.GROUP_COLLECTION);
     }
 
     @Override
-    // FIXME can do something better. Or can even remove CSM ?
-    public void delete() throws Exception {
-        User userMiniCopy = new User();
-        userMiniCopy.setCsmUserId(getCsmUserId());
-        super.delete();
-        // should delete in csm only if the wrapper delete succeedes
-        ((BiobankApplicationService) appService).deleteUser(userMiniCopy);
+    protected void addDeleteTasks(TaskList tasks) {
+        // should remove this user from its groups
+        for (BbGroupWrapper group : getGroupCollection(false)) {
+            group.removeFromUserCollection(Arrays.asList(this));
+            group.addPersistTasks(tasks);
+        }
+        super.addDeleteTasks(tasks);
+        tasks.add(new QueryTask() {
+            @Override
+            public SDKQuery getSDKQuery() {
+                return new DeleteCsmUserAction(UserWrapper.this);
+            }
+
+            @Override
+            public void afterExecute(SDKQueryResult result) {
+                // TODO Auto-generated method stub
+            }
+        });
     }
 
     public void setPassword(String password) {
@@ -71,21 +99,6 @@ public class UserWrapper extends UserBaseWrapper {
         super.resetInternalFields();
         password = null;
         lockedOut = null;
-    }
-
-    @Override
-    protected void addDeleteTasks(TaskList tasks) {
-        removeThisuserFromGroups(tasks);
-
-        super.addDeleteTasks(tasks);
-    }
-
-    private void removeThisuserFromGroups(TaskList tasks) {
-        // should remove this user from its groups
-        for (BbGroupWrapper group : getGroupCollection(false)) {
-            group.removeFromUserCollection(Arrays.asList(this));
-            group.addPersistTasks(tasks);
-        }
     }
 
     private static final String GET_USER_QRY = "from " + User.class.getName()
