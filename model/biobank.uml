@@ -193,7 +193,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Fri Sep 02 12:56:52 MDT 2011'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Fri Sep 02 15:10:21 MDT 2011'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.26.2(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -14454,7 +14454,7 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-125e27c7:1322ad44f51:-8000:0000000000001F58'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.BbRight.privilegeCollection</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.BbRight.availablePrivilegeCollection</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:112105617ae:-8000:000000000000315F'/>
                           </UML:TaggedValue.type>
@@ -14478,7 +14478,7 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-125e27c7:1322ad44f51:-8000:0000000000001F57'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.BbRight.privilegeCollection</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.BbRight.availablePrivilegeCollection</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
                           </UML:TaggedValue.type>
@@ -21557,7 +21557,7 @@
                                           </UML:AssociationEnd.participant>
                                         </UML:AssociationEnd>
                                         <UML:AssociationEnd xmi.id = '127-0-1-1--6b7bfb20:1322ae0e943:-8000:0000000000001F6E'
-                                          name = 'privilegeCollection' visibility = 'public' isSpecification = 'false'
+                                          name = 'availablePrivilegeCollection' visibility = 'public' isSpecification = 'false'
                                           isNavigable = 'true' ordering = 'unordered' aggregation = 'none' targetScope = 'instance'
                                           changeability = 'changeable'>
                                           <UML:AssociationEnd.multiplicity>

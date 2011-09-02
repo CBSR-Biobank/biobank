@@ -6,6 +6,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.peer.MembershipPeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.MembershipBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.MembershipUniquePreCheck;
 import edu.ualberta.med.biobank.model.Membership;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -133,6 +134,7 @@ public class MembershipWrapper extends MembershipBaseWrapper {
 
     @Override
     protected void addPersistTasks(TaskList tasks) {
+        tasks.add(new MembershipUniquePreCheck(this));
         // if a permission is removed, it should be deleted.
         tasks.deleteRemoved(this, MembershipPeer.PERMISSION_COLLECTION);
         super.addPersistTasks(tasks);
