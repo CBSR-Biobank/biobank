@@ -18,7 +18,8 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
 
     public InfoTableBgrLoader(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths, int rowsPerPage) {
-        super(parent, collection, headings, columnWidths, rowsPerPage);
+        super(parent, headings, columnWidths, rowsPerPage);
+        setCollection(collection);
     }
 
     /**

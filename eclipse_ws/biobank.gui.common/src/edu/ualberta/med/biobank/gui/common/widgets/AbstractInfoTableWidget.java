@@ -82,8 +82,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
     protected ListenerList doubleClickListeners = new ListenerList();
 
-    public AbstractInfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int[] columnWidths, int rowsPerPage) {
+    public AbstractInfoTableWidget(Composite parent, String[] headings,
+        int[] columnWidths, int rowsPerPage) {
         super(parent, SWT.NONE);
 
         GridLayout gl = new GridLayout(1, false);
@@ -132,9 +132,6 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
         BgcClipboard.addClipboardCopySupport(tableViewer, menu, labelProvider,
             headings.length);
-
-        // load the data
-        setCollection(collection);
     }
 
     public void setHeadings(String[] headings) {

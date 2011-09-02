@@ -138,7 +138,9 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         studiesTable = new StudyAddInfoTable(section, site, superAdmin);
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addClickListener(collectionDoubleClickListener);
-        studiesTable.createDefaultEditItem();
+        // TODO: the new style info table needs to support editing of items
+        // via the context menu
+        // studiesTable.createDefaultEditItem();
         studiesTable.addSelectionChangedListener(listener);
         section.setClient(studiesTable);
     }

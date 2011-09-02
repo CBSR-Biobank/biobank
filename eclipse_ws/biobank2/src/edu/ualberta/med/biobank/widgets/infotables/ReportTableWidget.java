@@ -36,15 +36,17 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
 
     @Override
     protected void setPaginationParams(List<T> collection) {
-        int rowsPerPage = paginationWidget.getRowsPerPage();
-        if (collection != null
-            && (collection.size() == -1 || collection.size() > rowsPerPage)) {
-            if (collection.get(rowsPerPage) != null) {
+        if (collection != null) {
+            int rowsPerPage = paginationWidget.getRowsPerPage();
+            int size = collection.size();
+            if (((size == -1) || (size > rowsPerPage))
+                && (collection.get(rowsPerPage) != null)) {
                 paginationRequired = true;
                 init(collection);
             }
-        } else
+        } else {
             paginationRequired = false;
+        }
     }
 
     @Override
