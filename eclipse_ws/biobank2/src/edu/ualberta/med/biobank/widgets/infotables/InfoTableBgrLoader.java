@@ -34,7 +34,6 @@ public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
     protected abstract void tableLoader(final List<?> collection,
         final Object Selection);
 
-    @Override
     public void setCollection(List<?> collection) {
         setCollection(collection, null);
         if (collection != null) {
@@ -84,6 +83,10 @@ public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
         }
     }
 
+    protected abstract void init(List<?> collection);
+
+    protected abstract void setPaginationParams(List<?> collection);
+
     public List<?> getCollection() {
         return collection;
     }
@@ -112,6 +115,11 @@ public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
 
     @Override
     public void nextPage() {
+        setCollection(collection);
+    }
+
+    @Override
+    public void reload() {
         setCollection(collection);
     }
 

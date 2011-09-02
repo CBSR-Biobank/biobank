@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.gui.common.widgets;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.SafeRunnable;
@@ -49,6 +47,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
  */
 public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
     IInfoTalePagination, IDoubleClickListener {
+
+    public static class RowItem {
+        int itemNumber;
+    }
 
     protected TableViewer tableViewer;
 
@@ -183,6 +185,8 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
 
     protected abstract BgcTableSorter getTableSorter();
 
+    public abstract void reload();
+
     @Override
     public boolean setFocus() {
         tableViewer.getControl().setFocus();
@@ -196,8 +200,6 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
     protected TableViewer getTableViewer() {
         return tableViewer;
     }
-
-    public abstract void setCollection(List<?> collection);
 
     protected void autoSizeColumns() {
         // TODO: auto-size table initially based on headers? Sort of already
@@ -264,8 +266,6 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
         table.setVisible(true);
     }
 
-    protected abstract void init(List<?> collection);
-
     protected void resizeTable() {
         Table table = getTableViewer().getTable();
         GridData gd = (GridData) table.getLayoutData();
@@ -273,8 +273,6 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
         gd.heightHint = ((rows - 1) * table.getItemHeight())
             + table.getHeaderHeight() + table.getBorderWidth();
     }
-
-    protected abstract void setPaginationParams(List<?> collection);
 
     @Override
     public void setEnabled(boolean enabled) {

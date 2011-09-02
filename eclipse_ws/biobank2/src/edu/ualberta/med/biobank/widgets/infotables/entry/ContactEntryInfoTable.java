@@ -136,6 +136,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         return deletedContacts;
     }
 
+    @Override
     public void reload() {
         selectedContacts = clinic.getContactCollection(false);
         if (selectedContacts == null) {

@@ -177,7 +177,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         form.setText(NLS.bind(Messages.SiteViewForm_title, site.getName()));
         setSiteSectionValues();
         setAddressValues(site);
-        studiesTable.setCollection(site.getStudyCollection());
+        studiesTable.reload();
         containerTypesTable
             .setCollection(site.getContainerTypeCollection(true));
         topContainersTable.setCollection(site.getTopContainerCollection());

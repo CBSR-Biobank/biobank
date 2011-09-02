@@ -172,6 +172,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
         return deletedAliquotedSpecimen;
     }
 
+    @Override
     public void reload() {
         selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection(true);
         if (selectedAliquotedSpecimen == null) {

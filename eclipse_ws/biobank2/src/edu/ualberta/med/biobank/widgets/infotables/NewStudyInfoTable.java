@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
@@ -15,7 +13,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 
 public class NewStudyInfoTable extends AbstractInfoTableWidget {
 
-    protected static class TableRowData {
+    protected static class RowData extends RowItem {
         StudyWrapper study;
         String name;
         String nameShort;
@@ -38,8 +36,11 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
         Messages.StudyInfoTable_patients_label,
         Messages.StudyInfoTable_visits_label };
 
+    private SiteWrapper site;
+
     public NewStudyInfoTable(Composite parent, SiteWrapper site) {
-        super(parent, HEADINGS, new int[] {}, 10);
+        super(parent, HEADINGS, new int[] { 100, 100, 100, 100, 100 }, 10);
+        this.site = site;
     }
 
     @Override
@@ -47,7 +48,7 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                RowData info = (RowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
                         return Messages.StudyInfoTable_loading;
@@ -78,8 +79,8 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
 
             @Override
             public int compare(Viewer viewer, Object e1, Object e2) {
-                TableRowData row1 = (TableRowData) e1;
-                TableRowData row2 = (TableRowData) e2;
+                RowData row1 = (RowData) e1;
+                RowData row2 = (RowData) e2;
                 int rc = 0;
 
                 switch (propertyIndex) {
@@ -122,24 +123,11 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
 
     @Override
     protected boolean isEditMode() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public void setCollection(List<?> collection) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void init(List<?> collection) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void setPaginationParams(List<?> collection) {
+    public void reload() {
         // TODO Auto-generated method stub
 
     }

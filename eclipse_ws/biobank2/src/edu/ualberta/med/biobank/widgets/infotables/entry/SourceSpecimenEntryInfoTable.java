@@ -183,6 +183,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         }
     }
 
+    @Override
     public void reload() {
         selectedSourceSpecimen = study.getSourceSpecimenCollection(true);
         if (selectedSourceSpecimen == null) {

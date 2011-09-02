@@ -75,10 +75,10 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
                 ContactWrapper contact = getSelection();
                 if (contact != null) {
                     if (!BgcPlugin.openConfirm(
-                        Messages.ClinicAddInfoTable_delete_confirm_title,
-                        NLS.bind(
-                            Messages.ClinicAddInfoTable_delete_confirm_msg,
-                            contact.getName()))) {
+                        Messages.ClinicAddInfoTable_delete_confirm_title, NLS
+                            .bind(
+                                Messages.ClinicAddInfoTable_delete_confirm_msg,
+                                contact.getName()))) {
                         return;
                     }
 
@@ -94,6 +94,7 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
         setCollection(contacts);
     }
 
+    @Override
     public void reload() {
         setCollection(study.getContactCollection(true));
     }
