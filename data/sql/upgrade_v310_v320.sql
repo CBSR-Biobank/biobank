@@ -202,16 +202,18 @@ INSERT INTO `BB_RIGHT` (ID, VERSION, NAME, FOR_SITE, FOR_CLINIC, FOR_RESEARCH_GR
 ( 12, 0, 'Processing Event', 1, 1, 0, 0, 'ProcessingEvent'),
 ( 13, 0, 'Send Dispatch', 1, 1, 0, 0, 'send-Dispatch'),
 ( 14, 0, 'Receive Dispatch', 1, 1, 1, 0, 'receive-Dispatch'),
-( 15, 0, 'Ask Request', 0, 0, 1, 1, 'ask-request'),
-( 16, 0, 'Receive Request', 1, 0, 0, 0, 'receive-request'),
+( 15, 0, 'Create Specimen Request', 0, 0, 1, 1, 'create-spec-request'),
+( 16, 0, 'Receive Specimen Request', 1, 0, 0, 0, 'receive-spec-request'),
 ( 17, 0, 'Clinic Shipment (CBSR special)', 1, 0, 0, 0, 'cs-OriginInfo'),
 ( 18, 0, 'Print labels', 1, 1, 0, 0, 'print-labels'),
 ( 19, 0, 'Specimen Types', 1, 1, 1, 1, 'SpecimenType'),
 ( 20, 0, 'Shipping Methods', 1, 1, 1, 1, 'ShippingMethod'),
 ( 21, 0, 'Activity Status', 1, 1,1, 1, 'ActivityStatus'),
 ( 22, 0, 'Specimen', 1, 1, 1, 1, 'Specimen'),
-( 23, 0, 'User Management', 1, 1, 1, 1, 'user-mgt');
+( 23, 0, 'User Management', 1, 1, 1, 1, 'user-mgt'),
+( 24, 0, 'Administrator', 1, 1, 1, 1, 'admin');
 UNLOCK TABLES;
+
 
 LOCK TABLES `PRIVILEGE` WRITE;
 INSERT INTO `PRIVILEGE` (ID, VERSION, NAME) VALUES
@@ -219,7 +221,9 @@ INSERT INTO `PRIVILEGE` (ID, VERSION, NAME) VALUES
 ( 2, 0, 'Update'),
 ( 3, 0, 'Delete'),
 ( 4, 0, 'Create');
+( 5, 0, 'Allowed');
 UNLOCK TABLES;
+
 
 -- convert users from csm to users from biobank:
 insert into principal (id, version)  

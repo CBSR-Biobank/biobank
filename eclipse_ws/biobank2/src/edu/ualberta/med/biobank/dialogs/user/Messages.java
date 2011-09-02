@@ -20,7 +20,9 @@ public class Messages extends NLS {
 
     public static String GroupsPage_page_title;
 
-    public static String MembershipAddDialog_allCenters_label;
+    public static String MembershipAddDialog_all_centers_label;
+
+    public static String MembershipAddDialog_all_studies_label;
 
     public static String MembershipAddDialog_center_label;
 
@@ -28,9 +30,7 @@ public class Messages extends NLS {
 
     public static String MembershipAddDialog_description;
 
-    public static String MembershipAddDialog_nospecific_center_label;
-
-    public static String MembershipAddDialog_nospecific_study_label;
+    public static String MembershipAddDialog_none_label;
 
     public static String MembershipAddDialog_rgOnly_label;
 

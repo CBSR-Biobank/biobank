@@ -95,7 +95,7 @@ public class MembershipAddDialog extends BgcBaseDialog {
 
         List studies = new ArrayList();
         String noStudySelection = new String(
-            Messages.MembershipAddDialog_nospecific_study_label);
+            Messages.MembershipAddDialog_all_studies_label);
         studies.add(noStudySelection);
         studies.addAll(StudyWrapper.getAllStudies(SessionManager
             .getAppService()));
@@ -156,31 +156,42 @@ public class MembershipAddDialog extends BgcBaseDialog {
 
     private void createCentersCombo(Composite contents)
         throws ApplicationException {
+        Label label = widgetCreator.createLabel(contents,
+            Messages.MembershipAddDialog_center_label);
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+
         Composite compCenters = new Composite(contents, SWT.NONE);
-        compCenters.setLayout(new GridLayout(4, false));
+        compCenters.setLayout(new GridLayout(5, false));
         compCenters.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        gd = new GridData();
+        gd.horizontalSpan = 2;
+        compCenters.setLayoutData(gd);
+
+        Label filterlabel = widgetCreator.createLabel(compCenters,
+            "Filter list by");
+        gd = new GridData();
+        gd.verticalSpan = 2;
+        gd.verticalAlignment = SWT.TOP;
+        filterlabel.setLayoutData(gd);
         final Button allCentersRadio = new Button(compCenters, SWT.RADIO);
         allCentersRadio.setSelection(true);
-        allCentersRadio.setText(Messages.MembershipAddDialog_allCenters_label);
+        allCentersRadio.setText(Messages.MembershipAddDialog_none_label);
         final Button sitesRadio = new Button(compCenters, SWT.RADIO);
         sitesRadio.setText(Messages.MembershipAddDialog_sitesOnly_label);
         final Button clinicsRadio = new Button(compCenters, SWT.RADIO);
         clinicsRadio.setText(Messages.MembershipAddDialog_clinicsOnly_label);
         final Button rgRadio = new Button(compCenters, SWT.RADIO);
         rgRadio.setText(Messages.MembershipAddDialog_rgOnly_label);
-        GridData gd = new GridData();
-        gd.horizontalSpan = 2;
-        compCenters.setLayoutData(gd);
 
         List<Object> centers = new ArrayList<Object>();
         final String noCenterSelection = new String(
-            Messages.MembershipAddDialog_nospecific_center_label);
+            Messages.MembershipAddDialog_all_centers_label);
         centers.add(noCenterSelection);
         centers
             .addAll(CenterWrapper.getCenters(SessionManager.getAppService()));
-        centersViewer = createComboViewer(contents,
-            Messages.MembershipAddDialog_center_label, centers, null, null,
-            null, new LabelProvider() {
+        centersViewer = widgetCreator.createComboViewer(compCenters, label,
+            centers, null, null, true, null, null, new LabelProvider() {
                 @Override
                 public String getText(Object element) {
                     if (element instanceof String)
@@ -188,6 +199,9 @@ public class MembershipAddDialog extends BgcBaseDialog {
                     return ((CenterWrapper<?>) element).getNameShort();
                 }
             });
+        gd = (GridData) centersViewer.getControl().getLayoutData();
+        gd.horizontalSpan = 4;
+        centersViewer.getControl().setLayoutData(gd);
         centersViewer.setSelection(new StructuredSelection(noCenterSelection));
         centersViewer.addFilter(new ViewerFilter() {
             @Override

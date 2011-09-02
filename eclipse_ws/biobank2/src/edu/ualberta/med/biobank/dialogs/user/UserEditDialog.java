@@ -17,9 +17,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -91,33 +92,34 @@ public class UserEditDialog extends BgcBaseDialog {
     protected void createDialogAreaInternal(Composite parent)
         throws ApplicationException {
         Composite contents = new Composite(parent, SWT.NONE);
-        contents.setLayout(new GridLayout(2, false));
+        contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        // TabFolder tb = new TabFolder(contents, SWT.TOP);
-        // TabItem ti1 = new TabItem(tb, SWT.NONE);
-        // ti1.setText("riri");
-        // TabItem ti2 = new TabItem(tb, SWT.NONE);
-        // ti2.setText("fifi");
-        // TabItem ti3 = new TabItem(tb, SWT.NONE);
-        // ti3.setText("loulou");
+        TabFolder tb = new TabFolder(contents, SWT.TOP);
+        tb.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createUserFields(contents);
+        createUserFields(createTabItem(tb, "General", 2));
 
-        createMembershipsSection(contents);
+        createMembershipsSection(createTabItem(tb, "Roles and Permissions", 1));
 
-        createGroupsSection(contents);
+        createGroupsSection(createTabItem(tb, "Groups", 1));
+    }
+
+    private Composite createTabItem(TabFolder tb, String title, int columns) {
+        TabItem item = new TabItem(tb, SWT.NONE);
+        item.setText(title);
+        Composite contents = new Composite(tb, SWT.NONE);
+        contents.setLayout(new GridLayout(columns, false));
+        // contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        item.setControl(contents);
+        return contents;
     }
 
     private void createUserFields(Composite contents) {
-        Control c = createBoundWidgetWithLabel(contents, BgcBaseText.class,
-            SWT.BORDER, Messages.UserEditDialog_login_label, null,
-            originalUser, UserPeer.LOGIN.getName(),
-            new NonEmptyStringValidator(
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
+            Messages.UserEditDialog_login_label, null, originalUser,
+            UserPeer.LOGIN.getName(), new NonEmptyStringValidator(
                 Messages.UserEditDialog_loginName_validation_msg));
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        gd.widthHint = 250;
-        c.setLayoutData(gd);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             Messages.UserEditDialog_firstName_label, null, originalUser,
@@ -144,23 +146,24 @@ public class UserEditDialog extends BgcBaseDialog {
     }
 
     private void createMembershipsSection(Composite contents) {
-        createSection(contents, Messages.UserEditDialog_memberships_label,
-            Messages.UserEditDialog_memberships_add_label,
-            new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    addMembership();
-                }
-            });
+        Button addButton = new Button(contents, SWT.PUSH);
+        addButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                addMembership();
+            }
+        });
+        addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ADD));
+        GridData gd = new GridData();
+        gd.horizontalAlignment = SWT.RIGHT;
+        addButton.setLayoutData(gd);
+
         membershipInfoTable = new MembershipInfoTable(contents, originalUser);
-        GridData gd = (GridData) membershipInfoTable.getLayoutData();
-        gd.horizontalSpan = 2;
     }
 
     private void createGroupsSection(Composite contents)
         throws ApplicationException {
-        createSection(contents, "Groups", null, null);
-
         groupsWidget = new MultiSelectWidget<BbGroupWrapper>(contents,
             SWT.NONE, "Available groups", "Selected Groups", 75) {
             @Override
@@ -168,8 +171,6 @@ public class UserEditDialog extends BgcBaseDialog {
                 return nodeObject.getName();
             }
         };
-        GridData gd = (GridData) groupsWidget.getLayoutData();
-        gd.horizontalSpan = 2;
 
         groupsWidget.setSelections(
             BbGroupWrapper.getAllGroups(SessionManager.getAppService()),
