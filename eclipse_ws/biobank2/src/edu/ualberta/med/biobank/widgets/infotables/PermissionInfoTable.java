@@ -10,20 +10,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
-import edu.ualberta.med.biobank.dialogs.user.RightPrivilegeAddDialog;
+import edu.ualberta.med.biobank.dialogs.user.PermissionAddDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public abstract class RightPrivilegeInfoTable extends
-    InfoTableWidget<RightPrivilegeWrapper> {
+public abstract class PermissionInfoTable extends
+    InfoTableWidget<PermissionWrapper> {
     public static final int ROWS_PER_PAGE = 8;
     private static final String[] HEADINGS = new String[] {
-        Messages.RightPrivilegeInfoTable_right_label,
-        Messages.RightPrivilegeInfoTable_privileges_label };
+        Messages.PermissionInfoTable_right_label,
+        Messages.PermissionInfoTable_privileges_label };
 
     protected static class TableRowData {
-        RightPrivilegeWrapper rp;
+        PermissionWrapper rp;
         String right;
         String privileges;
 
@@ -33,16 +33,16 @@ public abstract class RightPrivilegeInfoTable extends
         }
     }
 
-    public RightPrivilegeInfoTable(Composite parent,
-        List<RightPrivilegeWrapper> rpCollection) {
+    public PermissionInfoTable(Composite parent,
+        List<PermissionWrapper> rpCollection) {
         super(parent, rpCollection, HEADINGS, ROWS_PER_PAGE,
-            RightPrivilegeWrapper.class);
+            PermissionWrapper.class);
 
         addEditItemListener(new IInfoTableEditItemListener() {
             @Override
             public void editItem(InfoTableEvent event) {
-                RightPrivilegeWrapper rp = ((TableRowData) getSelection()).rp;
-                RightPrivilegeAddDialog dlg = new RightPrivilegeAddDialog(
+                PermissionWrapper rp = ((TableRowData) getSelection()).rp;
+                PermissionAddDialog dlg = new PermissionAddDialog(
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                         .getShell(), getAlreadyUsedRights());
                 int res = dlg.edit(rp);
@@ -56,8 +56,8 @@ public abstract class RightPrivilegeInfoTable extends
         addDeleteItemListener(new IInfoTableDeleteItemListener() {
             @Override
             public void deleteItem(InfoTableEvent event) {
-                RightPrivilegeWrapper rp = ((TableRowData) getSelection()).rp;
-                removeFromRightPrivilegeCollection(Arrays.asList(rp));
+                PermissionWrapper rp = ((TableRowData) getSelection()).rp;
+                removeFromPermissionCollection(Arrays.asList(rp));
                 getCollection().remove(rp);
                 reloadCollection(getCollection());
             }
@@ -66,8 +66,8 @@ public abstract class RightPrivilegeInfoTable extends
 
     protected abstract List<BbRightWrapper> getAlreadyUsedRights();
 
-    protected abstract void removeFromRightPrivilegeCollection(
-        List<RightPrivilegeWrapper> rpList);
+    protected abstract void removeFromPermissionCollection(
+        List<PermissionWrapper> rpList);
 
     @SuppressWarnings("serial")
     @Override
@@ -75,10 +75,10 @@ public abstract class RightPrivilegeInfoTable extends
         return new BiobankTableSorter() {
             @Override
             public int compare(Object o1, Object o2) {
-                if (o1 instanceof RightPrivilegeWrapper
-                    && o2 instanceof RightPrivilegeWrapper) {
-                    RightPrivilegeWrapper rp1 = (RightPrivilegeWrapper) o1;
-                    RightPrivilegeWrapper rp2 = (RightPrivilegeWrapper) o2;
+                if (o1 instanceof PermissionWrapper
+                    && o2 instanceof PermissionWrapper) {
+                    PermissionWrapper rp1 = (PermissionWrapper) o1;
+                    PermissionWrapper rp2 = (PermissionWrapper) o2;
                     return rp1.compareTo(rp2);
                 }
                 return 0;
@@ -87,7 +87,7 @@ public abstract class RightPrivilegeInfoTable extends
     }
 
     @Override
-    public Object getCollectionModelObject(RightPrivilegeWrapper rp)
+    public Object getCollectionModelObject(PermissionWrapper rp)
         throws Exception {
         TableRowData info = new TableRowData();
         info.right = rp.getRight() == null ? "" : rp.getRight().getName(); //$NON-NLS-1$
@@ -115,7 +115,7 @@ public abstract class RightPrivilegeInfoTable extends
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.UserInfoTable_loading;
+                        return Messages.PermissionInfoTable_loading;
                     }
                     return ""; //$NON-NLS-1$
                 }

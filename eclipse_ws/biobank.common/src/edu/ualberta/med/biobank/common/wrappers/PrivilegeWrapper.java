@@ -66,6 +66,11 @@ public class PrivilegeWrapper extends PrivilegeBaseWrapper {
         return getPrivileges(appService).get("Create"); //$NON-NLS-1$
     }
 
+    public static PrivilegeWrapper getAllowedPrivilege(
+        WritableApplicationService appService) throws ApplicationException {
+        return getPrivileges(appService).get("Allowed"); //$NON-NLS-1$
+    }
+
     public static List<PrivilegeWrapper> getAllPrivileges(
         WritableApplicationService appService) throws ApplicationException {
         return new ArrayList<PrivilegeWrapper>(getPrivileges(appService)

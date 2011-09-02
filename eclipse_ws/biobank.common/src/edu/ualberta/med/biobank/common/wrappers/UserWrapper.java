@@ -122,8 +122,7 @@ public class UserWrapper extends UserBaseWrapper {
     }
 
     public void setInSuperAdminMode(boolean inSuperAdminMode) {
-        this.inSuperAdminMode = inSuperAdminMode && (getIsSuperAdmin() != null)
-            && getIsSuperAdmin();
+        this.inSuperAdminMode = inSuperAdminMode && isSuperAdmin();
     }
 
     public SiteWrapper getCurrentWorkingSite() {
@@ -141,9 +140,13 @@ public class UserWrapper extends UserBaseWrapper {
     }
 
     public boolean isSuperAdmin() {
-        if (getIsSuperAdmin() == null)
-            return false;
-        return getIsSuperAdmin();
+        try {
+            return hasPrivilegeOnKeyDesc(
+                PrivilegeWrapper.getAllowedPrivilege(appService), null, null,
+                "admin");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean needChangePassword() {
@@ -226,7 +229,6 @@ public class UserWrapper extends UserBaseWrapper {
     public UserWrapper createDuplicate() {
         UserWrapper newUser = new UserWrapper(appService);
         newUser.setBulkEmails(getBulkEmails());
-        newUser.setIsSuperAdmin(getIsSuperAdmin());
         return newUser;
     }
 

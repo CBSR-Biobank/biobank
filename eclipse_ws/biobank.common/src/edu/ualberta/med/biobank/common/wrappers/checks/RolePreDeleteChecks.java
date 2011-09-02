@@ -5,11 +5,11 @@ import java.text.MessageFormat;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import edu.ualberta.med.biobank.common.peer.MembershipRolePeer;
+import edu.ualberta.med.biobank.common.peer.MembershipPeer;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.actions.UncachedAction;
-import edu.ualberta.med.biobank.model.MembershipRole;
+import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 
@@ -20,9 +20,9 @@ public class RolePreDeleteChecks extends UncachedAction<Role> {
 
     // @formatter:off
     private static final String USED_IN_MEMBERSHIP_QRY = "select count(ms) from "
-        + MembershipRole.class.getName()
+        + Membership.class.getName()
         + " as ms join ms."
-        + MembershipRolePeer.ROLE_COLLECTION.getName()
+        + MembershipPeer.ROLE_COLLECTION.getName()
         + " as roles where roles=?";
     // @formatter:on
 

@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
-import edu.ualberta.med.biobank.common.wrappers.MembershipRoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
@@ -138,7 +137,7 @@ public class TestUser extends TestDatabase {
         String name = "addMembershipsWithNoObject" + r.nextInt();
         UserWrapper user = UserHelper.addUser(name, null, true);
 
-        UserHelper.addMembershipRole(user, null, null);
+        UserHelper.addMembership(user, null, null);
 
         user.reload();
         Assert.assertEquals(1, user.getMembershipCollection(false).size());
@@ -151,17 +150,14 @@ public class TestUser extends TestDatabase {
 
         RoleWrapper role = RoleHelper.addRole(name, true);
 
-        MembershipRoleWrapper mwr = MembershipHelper.newMembershipRole(user,
-            null, null);
-        mwr.addToRoleCollection(Arrays.asList(role));
+        MembershipWrapper ms = MembershipHelper.newMembership(user, null, null);
+        ms.addToRoleCollection(Arrays.asList(role));
         user.persist();
 
         user.reload();
         Assert.assertEquals(1, user.getMembershipCollection(false).size());
-        MembershipWrapper<?> mw = user.getMembershipCollection(false).get(0);
-        Assert.assertTrue(mw instanceof MembershipRoleWrapper);
-        Assert.assertEquals(1,
-            ((MembershipRoleWrapper) mw).getRoleCollection(false).size());
+        ms = user.getMembershipCollection(false).get(0);
+        Assert.assertEquals(1, ms.getRoleCollection(false).size());
     }
 
     @Test
@@ -170,16 +166,15 @@ public class TestUser extends TestDatabase {
         UserWrapper user = UserHelper.addUser(name, null, true);
 
         RoleWrapper role = RoleHelper.addRole(name, true);
-        MembershipRoleWrapper mwr = MembershipHelper.newMembershipRole(user,
-            null, null);
+        MembershipWrapper mwr = MembershipHelper
+            .newMembership(user, null, null);
         mwr.addToRoleCollection(Arrays.asList(role));
         user.persist();
 
         user.reload();
         Assert.assertEquals(1, user.getMembershipCollection(false).size());
 
-        mwr = (MembershipRoleWrapper) user.getMembershipCollection(false)
-            .get(0);
+        mwr = user.getMembershipCollection(false).get(0);
         Integer mwrId = mwr.getId();
         user.removeFromMembershipCollection(Arrays.asList(mwr));
         user.persist();

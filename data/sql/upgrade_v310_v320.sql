@@ -21,9 +21,7 @@ insert into csm_protection_element (protection_element_name, object_id, applicat
 ('edu.ualberta.med.biobank.model.BbGroup','edu.ualberta.med.biobank.model.BbGroup',2,sysdate()),
 ('edu.ualberta.med.biobank.model.Principal','edu.ualberta.med.biobank.model.Principal',2,sysdate()),
 ('edu.ualberta.med.biobank.model.Membership','edu.ualberta.med.biobank.model.Membership',2,sysdate()),
-('edu.ualberta.med.biobank.model.MembershipRole','edu.ualberta.med.biobank.model.MembershipRole',2,sysdate()),
-('edu.ualberta.med.biobank.model.MembershipRight','edu.ualberta.med.biobank.model.MembershipRight',2,sysdate()),
-('edu.ualberta.med.biobank.model.RightPrivilege','edu.ualberta.med.biobank.model.RightPrivilege',2,sysdate()),
+('edu.ualberta.med.biobank.model.Permission','edu.ualberta.med.biobank.model.Permission',2,sysdate()),
 ('edu.ualberta.med.biobank.model.BbRight','edu.ualberta.med.biobank.model.BbRight',2,sysdate()),
 ('edu.ualberta.med.biobank.model.Privilege','edu.ualberta.med.biobank.model.Privilege',2,sysdate()),
 ('edu.ualberta.med.biobank.model.Role','edu.ualberta.med.biobank.model.Role',2,sysdate());
@@ -35,9 +33,7 @@ where protection_element_name = 'edu.ualberta.med.biobank.model.User'
 or protection_element_name = 'edu.ualberta.med.biobank.model.BbGroup'
 or protection_element_name = 'edu.ualberta.med.biobank.model.Principal'
 or protection_element_name = 'edu.ualberta.med.biobank.model.Membership'
-or protection_element_name = 'edu.ualberta.med.biobank.model.MembershipRole'
-or protection_element_name = 'edu.ualberta.med.biobank.model.MembershipRight'
-or protection_element_name = 'edu.ualberta.med.biobank.model.RightPrivilege'
+or protection_element_name = 'edu.ualberta.med.biobank.model.Permission'
 or protection_element_name = 'edu.ualberta.med.biobank.model.BbRight'
 or protection_element_name = 'edu.ualberta.med.biobank.model.Privilege'
 or protection_element_name = 'edu.ualberta.med.biobank.model.Role';
@@ -87,10 +83,8 @@ CREATE TABLE `user` (
   `PRINCIPAL_ID` int(11) NOT NULL,
   `LOGIN` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
   `CSM_USER_ID` bigint(20) DEFAULT NULL,
-  `IS_SUPER_ADMIN` bit(1) DEFAULT NULL,
   `BULK_EMAILS` bit(1) DEFAULT NULL,
-  `FIRST_NAME` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  `LAST_NAME` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  `FULL_NAME` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
   `EMAIL` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
   `NEED_CHANGE_PWD` bit(1) DEFAULT NULL,
   PRIMARY KEY (`PRINCIPAL_ID`),
@@ -110,28 +104,28 @@ CREATE TABLE `group_user` (
 
 CREATE TABLE `membership` (
   `ID` int(11) NOT NULL,
-  `DISCRIMINATOR` varchar(255) COLLATE latin1_general_cs NOT NULL,
   `VERSION` int(11) NOT NULL,
-  `STUDY_ID` int(11) DEFAULT NULL,
   `CENTER_ID` int(11) DEFAULT NULL,
   `PRINCIPAL_ID` int(11) NOT NULL,
+  `STUDY_ID` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`),
-  KEY `FKCD0773D6FF154DAF` (`PRINCIPAL_ID`),
+  UNIQUE KEY `uc_membership` (`PRINCIPAL_ID`,`CENTER_ID`,`STUDY_ID`),
   KEY `FKCD0773D6F2A2464F` (`STUDY_ID`),
+  KEY `FKCD0773D6FF154DAF` (`PRINCIPAL_ID`),
   KEY `FKCD0773D692FAA705` (`CENTER_ID`),
   CONSTRAINT `FKCD0773D692FAA705` FOREIGN KEY (`CENTER_ID`) REFERENCES `center` (`ID`),
   CONSTRAINT `FKCD0773D6F2A2464F` FOREIGN KEY (`STUDY_ID`) REFERENCES `study` (`ID`),
   CONSTRAINT `FKCD0773D6FF154DAF` FOREIGN KEY (`PRINCIPAL_ID`) REFERENCES `principal` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
-CREATE TABLE `membership_role_role` (
-  `MEMBERSHIP_ROLE_ID` int(11) NOT NULL,
+CREATE TABLE `membership_role` (
+  `MEMBERSHIP_ID` int(11) NOT NULL,
   `ROLE_ID` int(11) NOT NULL,
-  PRIMARY KEY (`MEMBERSHIP_ROLE_ID`,`ROLE_ID`),
-  KEY `FK6E3AD76D6BCA5F2` (`MEMBERSHIP_ROLE_ID`),
-  KEY `FK6E3AD7614388625` (`ROLE_ID`),
-  CONSTRAINT `FK6E3AD7614388625` FOREIGN KEY (`ROLE_ID`) REFERENCES `role` (`ID`),
-  CONSTRAINT `FK6E3AD76D6BCA5F2` FOREIGN KEY (`MEMBERSHIP_ROLE_ID`) REFERENCES `membership` (`ID`)
+  PRIMARY KEY (`MEMBERSHIP_ID`,`ROLE_ID`),
+  KEY `FKEF36B33F14388625` (`ROLE_ID`),
+  KEY `FKEF36B33FD26ABDE5` (`MEMBERSHIP_ID`),
+  CONSTRAINT `FKEF36B33FD26ABDE5` FOREIGN KEY (`MEMBERSHIP_ID`) REFERENCES `membership` (`ID`),
+  CONSTRAINT `FKEF36B33F14388625` FOREIGN KEY (`ROLE_ID`) REFERENCES `role` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 CREATE TABLE `role` (
@@ -142,29 +136,29 @@ CREATE TABLE `role` (
   UNIQUE KEY `NAME` (`NAME`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
-CREATE TABLE `right_privilege` (
+CREATE TABLE `permission` (
   `ID` int(11) NOT NULL,
   `VERSION` int(11) NOT NULL,
-  `ROLE_ID` int(11) DEFAULT NULL,
-  `MEMBERSHIP_RIGHT_ID` int(11) DEFAULT NULL,
   `RIGHT_ID` int(11) NOT NULL,
+  `MEMBERSHIP_ID` int(11) DEFAULT NULL,
+  `ROLE_ID` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`),
-  KEY `FK4B32800E14388625` (`ROLE_ID`),
-  KEY `FK4B32800EF5E5B3CF` (`RIGHT_ID`),
-  KEY `FK4B32800EBB1B5B42` (`MEMBERSHIP_RIGHT_ID`),
-  CONSTRAINT `FK4B32800EBB1B5B42` FOREIGN KEY (`MEMBERSHIP_RIGHT_ID`) REFERENCES `membership` (`ID`),
-  CONSTRAINT `FK4B32800E14388625` FOREIGN KEY (`ROLE_ID`) REFERENCES `role` (`ID`),
-  CONSTRAINT `FK4B32800EF5E5B3CF` FOREIGN KEY (`RIGHT_ID`) REFERENCES `bb_right` (`ID`)
+  KEY `FKFE0FB1CF14388625` (`ROLE_ID`),
+  KEY `FKFE0FB1CFD26ABDE5` (`MEMBERSHIP_ID`),
+  KEY `FKFE0FB1CFF5E5B3CF` (`RIGHT_ID`),
+  CONSTRAINT `FKFE0FB1CFF5E5B3CF` FOREIGN KEY (`RIGHT_ID`) REFERENCES `bb_right` (`ID`),
+  CONSTRAINT `FKFE0FB1CF14388625` FOREIGN KEY (`ROLE_ID`) REFERENCES `role` (`ID`),
+  CONSTRAINT `FKFE0FB1CFD26ABDE5` FOREIGN KEY (`MEMBERSHIP_ID`) REFERENCES `membership` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
-CREATE TABLE `right_privilege_privilege` (
-  `RIGHT_PRIVILEGE_ID` int(11) NOT NULL,
+CREATE TABLE `permission_privilege` (
+  `PERMISSION_ID` int(11) NOT NULL,
   `PRIVILEGE_ID` int(11) NOT NULL,
-  PRIMARY KEY (`RIGHT_PRIVILEGE_ID`,`PRIVILEGE_ID`),
-  KEY `FKE1E847A0AABB1ACF` (`PRIVILEGE_ID`),
-  KEY `FKE1E847A03267910C` (`RIGHT_PRIVILEGE_ID`),
-  CONSTRAINT `FKE1E847A03267910C` FOREIGN KEY (`RIGHT_PRIVILEGE_ID`) REFERENCES `right_privilege` (`ID`),
-  CONSTRAINT `FKE1E847A0AABB1ACF` FOREIGN KEY (`PRIVILEGE_ID`) REFERENCES `privilege` (`ID`)
+  PRIMARY KEY (`PERMISSION_ID`,`PRIVILEGE_ID`),
+  KEY `FK6B26FC21AABB1ACF` (`PRIVILEGE_ID`),
+  KEY `FK6B26FC21F196CF45` (`PERMISSION_ID`),
+  CONSTRAINT `FK6B26FC21F196CF45` FOREIGN KEY (`PERMISSION_ID`) REFERENCES `permission` (`ID`),
+  CONSTRAINT `FK6B26FC21AABB1ACF` FOREIGN KEY (`PRIVILEGE_ID`) REFERENCES `privilege` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 CREATE TABLE `privilege` (
@@ -173,6 +167,16 @@ CREATE TABLE `privilege` (
   `NAME` varchar(255) COLLATE latin1_general_cs NOT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `NAME` (`NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+
+CREATE TABLE `right_privilege` (
+  `RIGHT_ID` int(11) NOT NULL,
+  `PRIVILEGE_ID` int(11) NOT NULL,
+  PRIMARY KEY (`RIGHT_ID`,`PRIVILEGE_ID`),
+  KEY `FK4B32800EAABB1ACF` (`PRIVILEGE_ID`),
+  KEY `FK4B32800EF5E5B3CF` (`RIGHT_ID`),
+  CONSTRAINT `FK4B32800EF5E5B3CF` FOREIGN KEY (`RIGHT_ID`) REFERENCES `bb_right` (`ID`),
+  CONSTRAINT `FK4B32800EAABB1ACF` FOREIGN KEY (`PRIVILEGE_ID`) REFERENCES `privilege` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -220,8 +224,104 @@ INSERT INTO `PRIVILEGE` (ID, VERSION, NAME) VALUES
 ( 1, 0, 'Read'),
 ( 2, 0, 'Update'),
 ( 3, 0, 'Delete'),
-( 4, 0, 'Create');
+( 4, 0, 'Create'),
 ( 5, 0, 'Allowed');
+UNLOCK TABLES;
+
+LOCK TABLES `right_privilege` WRITE;
+INSERT INTO `right_privilege` (right_id, privilege_id) VALUES
+-- specimen link
+( 0, 5),
+-- specimen assign
+( 1, 5),
+-- study
+( 2, 1),
+( 2, 2),
+( 2, 3),
+( 2, 4),
+-- clinic
+( 3, 1),
+( 3, 2),
+( 3, 3),
+( 3, 4),
+-- Site
+( 4, 1),
+( 4, 2),
+( 4, 3),
+( 4, 4),
+-- Research Group
+( 5, 1),
+( 5, 2),
+( 5, 3),
+( 5, 4),
+-- Logging
+( 6, 5),
+-- reports
+( 7, 5),
+-- Container
+( 8, 1),
+( 8, 2),
+( 8, 3),
+( 8, 4),
+-- Container Type
+( 9, 1),
+( 9, 2),
+( 9, 3),
+( 9, 4),
+-- Patient
+( 10, 1),
+( 10, 2),
+( 10, 3),
+( 10, 4),
+-- Collection Event
+( 11, 1),
+( 11, 2),
+( 11, 3),
+( 11, 4),
+-- Processing Event
+( 12, 1),
+( 12, 2),
+( 12, 3),
+( 12, 4),
+-- Send Dispatch
+( 13, 5),
+-- Receive Dispatch
+( 14, 5),
+-- Create specimen request
+( 15, 5),
+-- Receive specimen request
+( 16, 5),
+-- Clinic shipment
+( 17, 1),
+( 17, 2),
+( 17, 3),
+( 17, 4),
+-- Print labels
+( 18, 5),
+-- Specimen types
+( 19, 1),
+( 19, 2),
+( 19, 3),
+( 19, 4),
+-- Shipping methods
+( 20, 1),
+( 20, 2),
+( 20, 3),
+( 20, 4),
+-- Activity status
+( 21, 1),
+( 21, 2),
+( 21, 3),
+( 21, 4),
+-- Specimen
+( 22, 1),
+( 22, 2),
+( 22, 3),
+( 22, 4),
+-- User management
+( 23, 5),
+-- Administrator
+( 24, 5);
 UNLOCK TABLES;
 
 
@@ -229,14 +329,35 @@ UNLOCK TABLES;
 insert into principal (id, version)  
 select user_id, 0 from csm_user;
 
-insert into user (principal_id, login, csm_user_id, bulk_emails, first_name, last_name, email, need_change_pwd, is_super_admin) 
-select user_id, login_name, user_id, 1, first_name, last_name, email_id, 0, 0 from csm_user where login_name != 'administrator' and login_name != 'bbadmin';
--- group_id = 5 is 'Super Admin Group'
-update user as u, csm_user_group as ug
-set u.is_super_admin = 1
-where ug.group_id = 5 and ug.user_id = u.csm_user_id;
+insert into user (principal_id, login, csm_user_id, bulk_emails, full_name, email, need_change_pwd) 
+select user_id, login_name, user_id, 1, first_name + ' ' + last_name, email_id, 0 from csm_user where login_name != 'administrator' and login_name != 'bbadmin';
 
--- give access to all object to all users:
+-- Add a default super admin group. 
+insert into principal (id, version) 
+select coalesce(MAX(id), 0)+1, 0 from principal;
+
+insert into bb_group (principal_id, name)
+select max(id), 'Super Administrators' from principal;
+
+-- add a membership to this super admin role
+insert into membership(id, version, principal_id)
+select 1, 0, max(id) from principal;
+
+-- add a permission to this membership that contains right 'administrator' (id=24)
+insert into permission(id, version, right_id, membership_id) values
+(1, 0, 24, 1);
+
+-- add privilege 'allowed' (id = 5) to this permission
+insert into permission_privilege(permission_id, privilege_id) values
+(1, 5);
+
+-- Old super admin group_id was 5 in csm database. Add previous super admin users in this new super admin group:
+insert into group_user(user_id, group_id) 
+select u.principal_id, g.principal_id from user u, bb_group g, csm_user_group ug
+where ug.group_id = 5 and ug.user_id = u.csm_user_id and g.name='Super Administrators';
+
+
+-- give access to all object to all users (in csm):
 insert into csm_user_group_role_pg (user_id, role_id, protection_group_id, update_date)
 select user_id, 8, 1, sysdate() from csm_user;
 

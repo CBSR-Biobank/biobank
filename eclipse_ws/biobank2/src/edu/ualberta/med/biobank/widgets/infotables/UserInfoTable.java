@@ -39,17 +39,13 @@ public class UserInfoTable extends InfoTableWidget<UserWrapper> {
         UserWrapper user;
         String login;
         String email;
-        String firstName;
-        String lastName;
-        boolean isSuperAdmin;
+        String fullName;
         boolean lockedOut;
 
         @Override
         public String toString() {
-            return StringUtils.join(
-                new String[] { login, email, firstName, lastName,
-                    String.valueOf(isSuperAdmin), String.valueOf(lockedOut) },
-                "\t"); //$NON-NLS-1$
+            return StringUtils.join(new String[] { login, email, fullName,
+                String.valueOf(lockedOut) }, "\t"); //$NON-NLS-1$
         }
     }
 
@@ -139,13 +135,9 @@ public class UserInfoTable extends InfoTableWidget<UserWrapper> {
                 case 0:
                     return info.login;
                 case 1:
-                    return info.firstName;
+                    return info.fullName;
                 case 2:
-                    return info.lastName;
-                case 3:
                     return info.email;
-                case 4:
-                    return String.valueOf(info.isSuperAdmin);
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -202,9 +194,7 @@ public class UserInfoTable extends InfoTableWidget<UserWrapper> {
     public Object getCollectionModelObject(UserWrapper user) throws Exception {
         TableRowData info = new TableRowData();
         info.email = user.getEmail();
-        info.firstName = user.getFirstName();
-        info.lastName = user.getLastName();
-        info.isSuperAdmin = user.isSuperAdmin();
+        info.fullName = user.getFullName();
         info.login = user.getLogin();
         info.lockedOut = user.isLockedOut();
         info.user = user;

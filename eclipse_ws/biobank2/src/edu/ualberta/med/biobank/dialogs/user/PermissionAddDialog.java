@@ -19,31 +19,31 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNode;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class RightPrivilegeAddDialog extends BgcBaseDialog {
+public class PermissionAddDialog extends BgcBaseDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
     private List<BbRightWrapper> alreadyUsedRights;
     private MultiSelectWidget<PrivilegeWrapper> privilegesWidget;
     private MultiSelectWidget<BbRightWrapper> rightsWidget;
-    private List<RightPrivilegeWrapper> newRpList = new ArrayList<RightPrivilegeWrapper>();
-    private RightPrivilegeWrapper editRp;
+    private List<PermissionWrapper> newRpList = new ArrayList<PermissionWrapper>();
+    private PermissionWrapper editRp;
 
-    public RightPrivilegeAddDialog(Shell parent,
+    public PermissionAddDialog(Shell parent,
         List<BbRightWrapper> alreadyUsedRights) {
         super(parent);
         this.alreadyUsedRights = alreadyUsedRights;
-        currentTitle = Messages.RightPrivilegeAddDialog_title;
-        titleAreaMessage = Messages.RightPrivilegeAddDialog_description;
+        currentTitle = Messages.PermissionAddDialog_title;
+        titleAreaMessage = Messages.PermissionAddDialog_description;
     }
 
-    public int edit(RightPrivilegeWrapper rp) {
+    public int edit(PermissionWrapper rp) {
         this.editRp = rp;
         return open();
     }
@@ -78,23 +78,23 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
             final Button allCentersRadio = new Button(compCenters, SWT.RADIO);
             allCentersRadio.setSelection(true);
             allCentersRadio
-                .setText(Messages.RightPrivilegeAddDialog_allCenters_label);
+                .setText(Messages.PermissionAddDialog_allCenters_label);
             final Button sitesRadio = new Button(compCenters, SWT.RADIO);
             sitesRadio
-                .setText(Messages.RightPrivilegeAddDialog_sitesOnly_label);
+                .setText(Messages.PermissionAddDialog_sitesOnly_label);
             final Button clinicsRadio = new Button(compCenters, SWT.RADIO);
             clinicsRadio
-                .setText(Messages.RightPrivilegeAddDialog_clinicsOnly_label);
+                .setText(Messages.PermissionAddDialog_clinicsOnly_label);
             final Button rgRadio = new Button(compCenters, SWT.RADIO);
-            rgRadio.setText(Messages.RightPrivilegeAddDialog_rgOnly_label);
+            rgRadio.setText(Messages.PermissionAddDialog_rgOnly_label);
             GridData gd = new GridData();
             gd.horizontalSpan = 2;
             compCenters.setLayoutData(gd);
 
             rightsWidget = new MultiSelectWidget<BbRightWrapper>(contents,
                 SWT.NONE,
-                Messages.RightPrivilegeAddDialog_rights_available_label,
-                Messages.RightPrivilegeAddDialog_rights_selected_label, 110) {
+                Messages.PermissionAddDialog_rights_available_label,
+                Messages.PermissionAddDialog_rights_selected_label, 110) {
                 @Override
                 protected String getTextForObject(BbRightWrapper nodeObject) {
                     return nodeObject.getName();
@@ -135,14 +135,14 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
         } else {
             Label label = new Label(contents, SWT.NONE);
             label.setText(NLS.bind(
-                Messages.RightPrivilegeAddDialog_edit_privileges_label, editRp
+                Messages.PermissionAddDialog_edit_privileges_label, editRp
                     .getRight().getName()));
         }
 
         privilegesWidget = new MultiSelectWidget<PrivilegeWrapper>(contents,
             SWT.NONE,
-            Messages.RightPrivilegeAddDialog_privileges_available_label,
-            Messages.RightPrivilegeAddDialog_privileges_selected_label, 110) {
+            Messages.PermissionAddDialog_privileges_available_label,
+            Messages.PermissionAddDialog_privileges_selected_label, 110) {
             @Override
             protected String getTextForObject(PrivilegeWrapper nodeObject) {
                 return nodeObject.getName();
@@ -160,7 +160,7 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
     protected void okPressed() {
         if (editRp == null) {
             for (BbRightWrapper right : rightsWidget.getAddedToSelection()) {
-                RightPrivilegeWrapper rp = new RightPrivilegeWrapper(
+                PermissionWrapper rp = new PermissionWrapper(
                     SessionManager.getAppService());
                 rp.setRight(right);
                 rp.addToPrivilegeCollection(privilegesWidget
@@ -176,7 +176,7 @@ public class RightPrivilegeAddDialog extends BgcBaseDialog {
         super.okPressed();
     }
 
-    public List<RightPrivilegeWrapper> getNewRightPrivilegeList() {
+    public List<PermissionWrapper> getNewPermissionList() {
         return newRpList;
     }
 

@@ -295,6 +295,12 @@ public class Messages extends NLS {
 
     public static String PeListInfoTable_study_label;
 
+    public static String PermissionInfoTable_privileges_label;
+
+    public static String PermissionInfoTable_right_label;
+
+    public static String PermissionInfoTable_loading;
+
     public static String ReportTableWidget_pages_label;
 
     public static String RequestDispatchInfoTable_loading;
@@ -310,10 +316,6 @@ public class Messages extends NLS {
     public static String RequestDispatchInfoTable_state_label;
 
     public static String RequestDispatchInfoTable_total_specs_label;
-
-    public static String RightPrivilegeInfoTable_privileges_label;
-
-    public static String RightPrivilegeInfoTable_right_label;
 
     public static String RoleInfoTable_name_label;
 

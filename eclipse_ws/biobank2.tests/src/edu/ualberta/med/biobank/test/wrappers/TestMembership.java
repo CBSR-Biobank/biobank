@@ -8,15 +8,17 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
-import edu.ualberta.med.biobank.common.wrappers.MembershipRoleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.test.TestDatabase;
+import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.MembershipHelper;
 import edu.ualberta.med.biobank.test.internal.RightHelper;
 import edu.ualberta.med.biobank.test.internal.RoleHelper;
@@ -24,7 +26,7 @@ import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import edu.ualberta.med.biobank.test.internal.UserHelper;
 
-public class TestMembershipRole extends TestDatabase {
+public class TestMembership extends TestDatabase {
 
     @Test
     public void testGetPrivilegesForRight() throws Exception {
@@ -41,33 +43,33 @@ public class TestMembershipRole extends TestDatabase {
         BbRightWrapper right = RightHelper.addRight(name, name, true);
 
         RoleWrapper role1 = RoleHelper.newRole(name + "_1");
-        RightPrivilegeWrapper rp = new RightPrivilegeWrapper(appService);
+        PermissionWrapper rp = new PermissionWrapper(appService);
         rp.setRight(right);
         rp.addToPrivilegeCollection(Arrays.asList(read, update));
         rp.setRole(role1);
-        role1.addToRightPrivilegeCollection(Arrays.asList(rp));
+        role1.addToPermissionCollection(Arrays.asList(rp));
         role1.persist();
         RoleHelper.createdRoles.add(role1);
 
         RoleWrapper role2 = RoleHelper.newRole(name + "_2");
-        rp = new RightPrivilegeWrapper(appService);
+        rp = new PermissionWrapper(appService);
         rp.setRight(right);
         rp.addToPrivilegeCollection(Arrays.asList(delete, create));
         rp.setRole(role2);
-        role2.addToRightPrivilegeCollection(Arrays.asList(rp));
+        role2.addToPermissionCollection(Arrays.asList(rp));
         role2.persist();
         RoleHelper.createdRoles.add(role2);
 
         UserWrapper user = UserHelper.addUser(name, null, true);
 
-        MembershipRoleWrapper mwr = MembershipHelper.newMembershipRole(user,
-            null, null);
+        MembershipWrapper mwr = MembershipHelper
+            .newMembership(user, null, null);
         mwr.addToRoleCollection(Arrays.asList(role1));
         mwr.persist();
 
         // another membership for the second role
-        MembershipRoleWrapper mwr2 = MembershipHelper.newMembershipRole(user,
-            null, null);
+        MembershipWrapper mwr2 = MembershipHelper.newMembership(user, null,
+            null);
         mwr2.addToRoleCollection(Arrays.asList(role2));
         mwr2.persist();
 
@@ -97,20 +99,20 @@ public class TestMembershipRole extends TestDatabase {
         BbRightWrapper right = RightHelper.addRight(name, name, true);
 
         RoleWrapper role1 = RoleHelper.newRole(name + "_1");
-        RightPrivilegeWrapper rp = new RightPrivilegeWrapper(appService);
+        PermissionWrapper rp = new PermissionWrapper(appService);
         rp.setRight(right);
         rp.addToPrivilegeCollection(Arrays.asList(read, update));
         rp.setRole(role1);
-        role1.addToRightPrivilegeCollection(Arrays.asList(rp));
+        role1.addToPermissionCollection(Arrays.asList(rp));
         role1.persist();
         RoleHelper.createdRoles.add(role1);
 
         RoleWrapper role2 = RoleHelper.newRole(name + "_2");
-        rp = new RightPrivilegeWrapper(appService);
+        rp = new PermissionWrapper(appService);
         rp.setRight(right);
         rp.addToPrivilegeCollection(Arrays.asList(delete, create));
         rp.setRole(role2);
-        role2.addToRightPrivilegeCollection(Arrays.asList(rp));
+        role2.addToPermissionCollection(Arrays.asList(rp));
         role2.persist();
         RoleHelper.createdRoles.add(role2);
 
@@ -120,8 +122,8 @@ public class TestMembershipRole extends TestDatabase {
         SiteWrapper site2 = SiteHelper.addSite(name + "_2");
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        MembershipRoleWrapper mwr = MembershipHelper.newMembershipRole(user,
-            site, null);
+        MembershipWrapper mwr = MembershipHelper
+            .newMembership(user, site, null);
         mwr.addToRoleCollection(Arrays.asList(role1));
         mwr.persist();
 
@@ -151,17 +153,17 @@ public class TestMembershipRole extends TestDatabase {
         BbRightWrapper right = RightHelper.addRight(name, name, true);
 
         RoleWrapper role1 = RoleHelper.newRole(name + "_1");
-        RightPrivilegeWrapper rp = new RightPrivilegeWrapper(appService);
+        PermissionWrapper rp = new PermissionWrapper(appService);
         rp.setRight(right);
         rp.addToPrivilegeCollection(Arrays.asList(PrivilegeWrapper
             .getReadPrivilege(appService)));
         rp.setRole(role1);
-        role1.addToRightPrivilegeCollection(Arrays.asList(rp));
+        role1.addToPermissionCollection(Arrays.asList(rp));
         role1.persist();
         RoleHelper.createdRoles.add(role1);
 
-        MembershipRoleWrapper mwr = MembershipHelper.newMembershipRole(user,
-            null, null);
+        MembershipWrapper mwr = MembershipHelper
+            .newMembership(user, null, null);
         mwr.addToRoleCollection(Arrays.asList(role1));
         mwr.persist();
 
@@ -177,5 +179,21 @@ public class TestMembershipRole extends TestDatabase {
         }
         Assert.assertNotNull(ModelUtils.getObjectWithId(appService, Role.class,
             idRole));
+    }
+
+    /**
+     * Test unique constraint on principal/study/center
+     */
+    @Test
+    public void testUniqueConstraint() throws Exception {
+        String name = "testUniqueConstraint" + r.nextInt();
+
+        StudyWrapper s = StudyHelper.addStudy(name);
+        ClinicWrapper c = ClinicHelper.addClinic(name);
+        UserWrapper u = UserHelper.addUser(name, null, true);
+
+        MembershipHelper.addMembership(u, c, s);
+
+        MembershipHelper.addMembership(u, c, s);
     }
 }

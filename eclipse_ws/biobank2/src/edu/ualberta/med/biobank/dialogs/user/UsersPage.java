@@ -42,8 +42,7 @@ public abstract class UsersPage extends BgcDialogPage {
             protected boolean accept(UserWrapper user, String text) {
                 return contains(user.getLogin(), text)
                     || contains(user.getEmail(), text)
-                    || contains(user.getFirstName(), text)
-                    || contains(user.getLastName(), text);
+                    || contains(user.getFullName(), text);
             }
 
             @Override

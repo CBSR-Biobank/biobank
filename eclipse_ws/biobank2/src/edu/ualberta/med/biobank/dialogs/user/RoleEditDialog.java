@@ -18,13 +18,13 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.common.peer.RolePeer;
 import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.widgets.infotables.RightPrivilegeInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.PermissionInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class RoleEditDialog extends BgcBaseDialog {
@@ -32,7 +32,7 @@ public class RoleEditDialog extends BgcBaseDialog {
     private final String titleAreaMessage;
 
     private RoleWrapper role;
-    private RightPrivilegeInfoTable rightPrivilegeInfoTable;
+    private PermissionInfoTable permissionsInfoTable;
 
     public RoleEditDialog(Shell parent, RoleWrapper role) {
         super(parent);
@@ -79,41 +79,41 @@ public class RoleEditDialog extends BgcBaseDialog {
             Messages.RoleEditDialog_new_assoc_label, new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    addRightPrivilege();
+                    addPermission();
                 }
             });
 
-        rightPrivilegeInfoTable = new RightPrivilegeInfoTable(rpSection,
-            role.getRightPrivilegeCollection(true)) {
+        permissionsInfoTable = new PermissionInfoTable(rpSection,
+            role.getPermissionCollection(true)) {
             @Override
             protected List<BbRightWrapper> getAlreadyUsedRights() {
                 return role.getRightsInUse();
             }
 
             @Override
-            protected void removeFromRightPrivilegeCollection(
-                List<RightPrivilegeWrapper> rpList) {
-                role.removeFromRightPrivilegeCollection(rpList);
+            protected void removeFromPermissionCollection(
+                List<PermissionWrapper> rpList) {
+                role.removeFromPermissionCollection(rpList);
             }
         };
-        rpSection.setClient(rightPrivilegeInfoTable);
+        rpSection.setClient(permissionsInfoTable);
     }
 
-    protected void addRightPrivilege() {
+    protected void addPermission() {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
-                RightPrivilegeAddDialog dlg = new RightPrivilegeAddDialog(
+                PermissionAddDialog dlg = new PermissionAddDialog(
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                         .getShell(), role.getRightsInUse());
                 int res = dlg.open();
                 if (res == Status.OK) {
-                    role.addToRightPrivilegeCollection(dlg
-                        .getNewRightPrivilegeList());
-                    rightPrivilegeInfoTable.getCollection().addAll(
-                        dlg.getNewRightPrivilegeList());
-                    rightPrivilegeInfoTable.reloadCollection(
-                        role.getRightPrivilegeCollection(true), null);
+                    role.addToPermissionCollection(dlg
+                        .getNewPermissionList());
+                    permissionsInfoTable.getCollection().addAll(
+                        dlg.getNewPermissionList());
+                    permissionsInfoTable.reloadCollection(
+                        role.getPermissionCollection(true), null);
                 }
             }
         });

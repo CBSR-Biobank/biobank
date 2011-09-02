@@ -9,8 +9,7 @@ import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-@SuppressWarnings("rawtypes")
-public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper<?>> {
+public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
     public static final int ROWS_PER_PAGE = 7;
     private static final String[] HEADINGS = new String[] {
         Messages.MembershipInfoTable_center_label,
@@ -18,7 +17,7 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper<?>> {
         Messages.MembershipInfoTable_role_right_privilege_label };
 
     protected static class TableRowData {
-        MembershipWrapper<?> ms;
+        MembershipWrapper ms;
         String center;
         String study;
         String roleOrRP;
@@ -36,10 +35,9 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper<?>> {
             ROWS_PER_PAGE, MembershipWrapper.class);
 
         addDeleteItemListener(new IInfoTableDeleteItemListener() {
-            @SuppressWarnings("unchecked")
             @Override
             public void deleteItem(InfoTableEvent event) {
-                MembershipWrapper<?> ms = ((TableRowData) getSelection()).ms;
+                MembershipWrapper ms = ((TableRowData) getSelection()).ms;
                 principal.removeFromMembershipCollection(Arrays.asList(ms));
                 getCollection().remove(ms);
                 reloadCollection(principal.getMembershipCollection(true));
@@ -51,11 +49,10 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper<?>> {
     @Override
     protected BiobankTableSorter getComparator() {
         return new BiobankTableSorter() {
-            @SuppressWarnings("unchecked")
             @Override
             public int compare(Object o1, Object o2) {
-                if (o1 instanceof MembershipWrapper<?>
-                    && o2 instanceof MembershipWrapper<?>) {
+                if (o1 instanceof MembershipWrapper
+                    && o2 instanceof MembershipWrapper) {
                     MembershipWrapper rp1 = (MembershipWrapper) o1;
                     MembershipWrapper rp2 = (MembershipWrapper) o2;
                     return rp1.compareTo(rp2);
@@ -66,11 +63,13 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper<?>> {
     }
 
     @Override
-    public Object getCollectionModelObject(MembershipWrapper<?> ms)
+    public Object getCollectionModelObject(MembershipWrapper ms)
         throws Exception {
         TableRowData info = new TableRowData();
-        info.center = ms.getCenter() == null ? "" : ms.getCenter().getNameShort(); //$NON-NLS-1$
-        info.study = ms.getStudy() == null ? "" : ms.getStudy().getNameShort(); //$NON-NLS-1$
+        info.center = ms.getCenter() == null ? "All" : ms.getCenter()
+            .getNameShort();
+        info.study = ms.getStudy() == null ? "All" : ms.getStudy()
+            .getNameShort();
         info.roleOrRP = ms.getMembershipObjectsListString();
         info.ms = ms;
         return info;

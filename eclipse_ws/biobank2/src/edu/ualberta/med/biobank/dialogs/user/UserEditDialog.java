@@ -98,11 +98,14 @@ public class UserEditDialog extends BgcBaseDialog {
         TabFolder tb = new TabFolder(contents, SWT.TOP);
         tb.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createUserFields(createTabItem(tb, "General", 2));
+        createUserFields(createTabItem(tb,
+            Messages.UserEditDialog_general_title, 2));
 
-        createMembershipsSection(createTabItem(tb, "Roles and Permissions", 1));
+        createMembershipsSection(createTabItem(tb,
+            Messages.UserEditDialog_roles_permissions_title, 1));
 
-        createGroupsSection(createTabItem(tb, "Groups", 1));
+        createGroupsSection(createTabItem(tb,
+            Messages.UserEditDialog_group_title, 1));
     }
 
     private Composite createTabItem(TabFolder tb, String title, int columns) {
@@ -123,19 +126,11 @@ public class UserEditDialog extends BgcBaseDialog {
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             Messages.UserEditDialog_firstName_label, null, originalUser,
-            UserPeer.FIRST_NAME.getName(), null);
-
-        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Messages.UserEditDialog_lastname_label, null, originalUser,
-            UserPeer.LAST_NAME.getName(), null);
+            UserPeer.FULL_NAME.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             Messages.UserEditDialog_Email_label, null, originalUser,
             UserPeer.EMAIL.getName(), null);
-
-        createBoundWidgetWithLabel(contents, Button.class, SWT.CHECK,
-            Messages.UserEditDialog_superAdmin_label, null, originalUser,
-            UserPeer.IS_SUPER_ADMIN.getName(), null);
 
         createBoundWidgetWithLabel(contents, Button.class, SWT.CHECK,
             Messages.UserEditDialog_bulkemail_label, null, originalUser,
@@ -165,7 +160,8 @@ public class UserEditDialog extends BgcBaseDialog {
     private void createGroupsSection(Composite contents)
         throws ApplicationException {
         groupsWidget = new MultiSelectWidget<BbGroupWrapper>(contents,
-            SWT.NONE, "Available groups", "Selected Groups", 75) {
+            SWT.NONE, Messages.UserEditDialog_groups_available,
+            Messages.UserEditDialog_groups_selected, 75) {
             @Override
             protected String getTextForObject(BbGroupWrapper nodeObject) {
                 return nodeObject.getName();

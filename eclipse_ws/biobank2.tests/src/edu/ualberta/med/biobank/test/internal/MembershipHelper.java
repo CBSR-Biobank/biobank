@@ -3,17 +3,16 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.Arrays;
 
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.common.wrappers.MembershipRightWrapper;
-import edu.ualberta.med.biobank.common.wrappers.MembershipRoleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class MembershipHelper extends DbHelper {
 
-    public static MembershipRoleWrapper newMembershipRole(
+    public static MembershipWrapper newMembership(
         PrincipalWrapper<?> principal, CenterWrapper<?> center,
         StudyWrapper study) throws Exception {
-        MembershipRoleWrapper mw = new MembershipRoleWrapper(appService);
+        MembershipWrapper mw = new MembershipWrapper(appService);
         mw.setPrincipal(principal);
         principal.addToMembershipCollection(Arrays.asList(mw));
         mw.setCenter(center);
@@ -21,14 +20,12 @@ public class MembershipHelper extends DbHelper {
         return mw;
     }
 
-    public static MembershipRightWrapper newMembershipRight(
+    public static MembershipWrapper addMembership(
         PrincipalWrapper<?> principal, CenterWrapper<?> center,
         StudyWrapper study) throws Exception {
-        MembershipRightWrapper mw = new MembershipRightWrapper(appService);
-        mw.setPrincipal(principal);
-        principal.addToMembershipCollection(Arrays.asList(mw));
-        mw.setCenter(center);
-        mw.setStudy(study);
-        return mw;
+        MembershipWrapper ms = newMembership(principal, center, study);
+        ms.persist();
+        return ms;
     }
+
 }

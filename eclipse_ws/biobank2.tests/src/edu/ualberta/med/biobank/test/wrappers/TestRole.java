@@ -8,12 +8,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
-import edu.ualberta.med.biobank.common.wrappers.MembershipRoleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
-import edu.ualberta.med.biobank.model.RightPrivilege;
+import edu.ualberta.med.biobank.model.Permission;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -31,8 +31,8 @@ public class TestRole extends TestDatabase {
     }
 
     @Test
-    public void testCascadeWithRightPrivilege() throws Exception {
-        String name = "testCascadeWithRightPrivilege" + r.nextInt();
+    public void testCascadeWithPermission() throws Exception {
+        String name = "testCascadeWithPermission" + r.nextInt();
         RoleWrapper role = new RoleWrapper(appService);
         role.setName(name);
 
@@ -40,27 +40,27 @@ public class TestRole extends TestDatabase {
             .getAllPrivileges(appService);
         List<BbRightWrapper> rights = BbRightWrapper.getAllRights(appService);
 
-        List<RightPrivilegeWrapper> rpList = new ArrayList<RightPrivilegeWrapper>();
+        List<PermissionWrapper> rpList = new ArrayList<PermissionWrapper>();
         for (BbRightWrapper right : rights) {
             // for each right, give all privileges
-            RightPrivilegeWrapper rp = new RightPrivilegeWrapper(appService);
+            PermissionWrapper rp = new PermissionWrapper(appService);
             rp.setRight(right);
             rp.addToPrivilegeCollection(privileges);
             rp.setRole(role);
             rpList.add(rp);
         }
-        role.addToRightPrivilegeCollection(rpList);
+        role.addToPermissionCollection(rpList);
         role.persist();
 
         // checking cascade worked well:
 
         // supposed to have same number of rigthPrivilege than number of rights
-        Assert.assertEquals(rights.size(),
-            role.getRightPrivilegeCollection(false).size());
+        Assert.assertEquals(rights.size(), role.getPermissionCollection(false)
+            .size());
         List<Integer> rpIdList = new ArrayList<Integer>();
         int nberPriviliges = privileges.size();
-        for (RightPrivilegeWrapper rp : role.getRightPrivilegeCollection(false)) {
-            // each rightprivilege is supposed to have save number of privileges
+        for (PermissionWrapper rp : role.getPermissionCollection(false)) {
+            // each permission is supposed to have same number of privileges
             // than the total number of privileges
             Assert.assertEquals(nberPriviliges, rp
                 .getPrivilegeCollection(false).size());
@@ -77,8 +77,8 @@ public class TestRole extends TestDatabase {
         Assert.assertNull(dbRole);
         // check right privileges also deleted:
         for (Integer id : rpIdList) {
-            RightPrivilege dbRp = ModelUtils.getObjectWithId(appService,
-                RightPrivilege.class, id);
+            Permission dbRp = ModelUtils.getObjectWithId(appService,
+                Permission.class, id);
             Assert.assertNull(dbRp);
         }
     }
@@ -90,8 +90,8 @@ public class TestRole extends TestDatabase {
 
         RoleWrapper role = RoleHelper.addRole(name, false);
 
-        MembershipRoleWrapper mwr = MembershipHelper.newMembershipRole(user,
-            null, null);
+        MembershipWrapper mwr = MembershipHelper
+            .newMembership(user, null, null);
         mwr.addToRoleCollection(Arrays.asList(role));
         user.persist();
 
@@ -115,25 +115,25 @@ public class TestRole extends TestDatabase {
     }
 
     @Test
-    public void testRemoveFromRightPrivilegeCollection() throws Exception {
-        String name = "testRemoveFromRightPrivilegeCollection" + r.nextInt();
+    public void testRemoveFromPermissionCollection() throws Exception {
+        String name = "testRemoveFromPermissionCollection" + r.nextInt();
         RoleWrapper role = new RoleWrapper(appService);
         role.setName(name);
 
-        RightPrivilegeWrapper rp = new RightPrivilegeWrapper(appService);
+        PermissionWrapper rp = new PermissionWrapper(appService);
         rp.setRight(BbRightWrapper.getAllRights(appService).get(0));
         rp.addToPrivilegeCollection(Arrays.asList(PrivilegeWrapper
             .getReadPrivilege(appService)));
         rp.setRole(role);
-        role.addToRightPrivilegeCollection(Arrays.asList(rp));
+        role.addToPermissionCollection(Arrays.asList(rp));
         role.persist();
 
         role.reload();
         Integer idRp = rp.getId();
-        role.removeFromRightPrivilegeCollection(Arrays.asList(rp));
+        role.removeFromPermissionCollection(Arrays.asList(rp));
         role.persist();
 
         Assert.assertNull(ModelUtils.getObjectWithId(appService,
-            RightPrivilege.class, idRp));
+            Permission.class, idRp));
     }
 }

@@ -18,7 +18,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class PrincipalWrapper<T extends Principal> extends
     PrincipalBaseWrapper<T> {
-    
+
     private static final String WORKING_CENTERS_KEY = "workingCenters";
 
     public PrincipalWrapper(WritableApplicationService appService,
@@ -42,8 +42,8 @@ public abstract class PrincipalWrapper<T extends Principal> extends
      */
     public PrincipalWrapper<T> duplicate() {
         PrincipalWrapper<T> newPrincipal = createDuplicate();
-        List<MembershipWrapper<?>> msList = new ArrayList<MembershipWrapper<?>>();
-        for (MembershipWrapper<?> ms : getMembershipCollection(false)) {
+        List<MembershipWrapper> msList = new ArrayList<MembershipWrapper>();
+        for (MembershipWrapper ms : getMembershipCollection(false)) {
             msList.add(ms.duplicate());
         }
         newPrincipal.addToMembershipCollection(msList);
@@ -105,7 +105,7 @@ public abstract class PrincipalWrapper<T extends Principal> extends
         BbRightWrapper right, CenterWrapper<?> center, StudyWrapper study)
         throws ApplicationException {
         List<PrivilegeWrapper> privileges = new ArrayList<PrivilegeWrapper>();
-        for (MembershipWrapper<?> ms : getMembershipCollection(false)) {
+        for (MembershipWrapper ms : getMembershipCollection(false)) {
             privileges.addAll(ms.getPrivilegesForRight(right, center, study));
         }
         return privileges;
@@ -123,7 +123,7 @@ public abstract class PrincipalWrapper<T extends Principal> extends
 
     protected List<CenterWrapper<?>> getAllCentersInvolved() {
         List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>();
-        for (MembershipWrapper<?> ms : getMembershipCollection(false)) {
+        for (MembershipWrapper ms : getMembershipCollection(false)) {
             centers.add(ms.getCenter());
         }
         return centers;
@@ -134,13 +134,13 @@ public abstract class PrincipalWrapper<T extends Principal> extends
         BbRightWrapper right = BbRightWrapper.getRightWithKeyDesc(appService,
             keyDesc);
         List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>();
-        for (MembershipWrapper<?> ms : getMembershipCollection(false)) {
+        for (MembershipWrapper ms : getMembershipCollection(false)) {
             if (ms.isUsingRight(right))
                 centers.add(ms.getCenter());
         }
         return centers;
     }
-    
+
     @SuppressWarnings("unchecked")
     public List<CenterWrapper<?>> getWorkingCenters() {
         List<CenterWrapper<?>> workingCenters = (List<CenterWrapper<?>>) cache
@@ -156,7 +156,7 @@ public abstract class PrincipalWrapper<T extends Principal> extends
 
     protected Set<CenterWrapper<?>> getWorkingCentersInternal() {
         Set<CenterWrapper<?>> setOfWorkingCenter = new HashSet<CenterWrapper<?>>();
-        for (MembershipWrapper<?> ms : getMembershipCollection(false)) {
+        for (MembershipWrapper ms : getMembershipCollection(false)) {
             if (ms.getCenter() != null)
                 setOfWorkingCenter.add(ms.getCenter());
         }

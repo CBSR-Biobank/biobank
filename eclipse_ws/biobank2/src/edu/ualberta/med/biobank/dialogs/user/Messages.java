@@ -56,27 +56,27 @@ public class Messages extends NLS {
 
     public static String MembershipAddDialog_title;
 
-    public static String RightPrivilegeAddDialog_allCenters_label;
+    public static String PermissionAddDialog_allCenters_label;
 
-    public static String RightPrivilegeAddDialog_clinicsOnly_label;
+    public static String PermissionAddDialog_clinicsOnly_label;
 
-    public static String RightPrivilegeAddDialog_description;
+    public static String PermissionAddDialog_description;
 
-    public static String RightPrivilegeAddDialog_edit_privileges_label;
+    public static String PermissionAddDialog_edit_privileges_label;
 
-    public static String RightPrivilegeAddDialog_privileges_available_label;
+    public static String PermissionAddDialog_privileges_available_label;
 
-    public static String RightPrivilegeAddDialog_privileges_selected_label;
+    public static String PermissionAddDialog_privileges_selected_label;
 
-    public static String RightPrivilegeAddDialog_rgOnly_label;
+    public static String PermissionAddDialog_rgOnly_label;
 
-    public static String RightPrivilegeAddDialog_rights_available_label;
+    public static String PermissionAddDialog_rights_available_label;
 
-    public static String RightPrivilegeAddDialog_rights_selected_label;
+    public static String PermissionAddDialog_rights_selected_label;
 
-    public static String RightPrivilegeAddDialog_sitesOnly_label;
+    public static String PermissionAddDialog_sitesOnly_label;
 
-    public static String RightPrivilegeAddDialog_title;
+    public static String PermissionAddDialog_title;
 
     public static String RoleEditDialog_msg_error_name_used;
 
@@ -114,6 +114,14 @@ public class Messages extends NLS {
 
     public static String UserEditDialog_firstName_label;
 
+    public static String UserEditDialog_general_title;
+
+    public static String UserEditDialog_group_title;
+
+    public static String UserEditDialog_groups_available;
+
+    public static String UserEditDialog_groups_selected;
+
     public static String UserEditDialog_lastname_label;
 
     public static String UserEditDialog_login_label;
@@ -137,6 +145,8 @@ public class Messages extends NLS {
     public static String UserEditDialog_passwords_length_msg;
 
     public static String UserEditDialog_passwords_match_error_msg;
+
+    public static String UserEditDialog_roles_permissions_title;
 
     public static String UserEditDialog_save_error_title;
 

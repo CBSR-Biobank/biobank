@@ -31,19 +31,15 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.MembershipRightWrapper;
-import edu.ualberta.med.biobank.common.wrappers.MembershipRoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RightPrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
-import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
-import edu.ualberta.med.biobank.widgets.infotables.RightPrivilegeInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.PermissionInfoTable;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -54,11 +50,11 @@ public class MembershipAddDialog extends BgcBaseDialog {
     private ComboViewer centersViewer;
     private ComboViewer studiesViewer;
     private MultiSelectWidget<RoleWrapper> rolesWidget;
-    private RightPrivilegeInfoTable rightPrivilegeInfoTable;
+    private PermissionInfoTable permissionsInfoTable;
     private Section rpSection;
-    private MembershipWrapper<?> ms;
+    private MembershipWrapper ms;
     private Composite contents;
-    private List<RightPrivilegeWrapper> addedRights = new ArrayList<RightPrivilegeWrapper>();
+    private List<PermissionWrapper> addedPermissions = new ArrayList<PermissionWrapper>();
 
     public MembershipAddDialog(Shell parent, PrincipalWrapper<?> principal) {
         super(parent);
@@ -66,6 +62,7 @@ public class MembershipAddDialog extends BgcBaseDialog {
         this.principal = principal;
         currentTitle = Messages.MembershipAddDialog_title;
         titleAreaMessage = Messages.MembershipAddDialog_description;
+        ms = new MembershipWrapper(SessionManager.getAppService());
     }
 
     @Override
@@ -113,45 +110,9 @@ public class MembershipAddDialog extends BgcBaseDialog {
 
         new Label(contents, SWT.NONE);
 
-        Composite compRoleOrRight = new Composite(contents, SWT.NONE);
-        compRoleOrRight.setLayout(new GridLayout(2, false));
-        compRoleOrRight.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-            true));
-        final Button rolesRadio = new Button(compRoleOrRight, SWT.RADIO);
-        rolesRadio.setSelection(true);
-        rolesRadio.setText(Messages.MembershipAddDialog_roles_selection_label);
-        final Button rightsRadio = new Button(compRoleOrRight, SWT.RADIO);
-        rightsRadio
-            .setText(Messages.MembershipAddDialog_rights_selection_label);
-        GridData gd = new GridData();
-        gd.horizontalSpan = 2;
-        compRoleOrRight.setLayoutData(gd);
-
         createRolesWidget(contents);
 
         createRightsWidgets(contents);
-
-        rolesRadio.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                showRolesWidget(rolesRadio.getSelection());
-            }
-        });
-    }
-
-    private void showRolesWidget(boolean show) {
-        widgetCreator.showWidget(rolesWidget, show);
-        widgetCreator.showWidget(rpSection, !show);
-        setErrorMessage(null);
-        contents.layout(true, true);
-        int rolesHeight = rolesWidget.getSize().y;
-        int rpHeight = rpSection.getSize().y;
-        int shellHeight = getShell().getSize().y;
-        if (show) {
-            shellHeight = shellHeight - rpHeight + rolesHeight;
-        } else
-            shellHeight = shellHeight - rolesHeight + rpHeight;
-        getShell().setSize(getShell().getSize().x, shellHeight);
     }
 
     private void createCentersCombo(Composite contents)
@@ -254,17 +215,16 @@ public class MembershipAddDialog extends BgcBaseDialog {
             new ArrayList<RoleWrapper>());
         gd = (GridData) rolesWidget.getLayoutData();
         gd.horizontalSpan = 2;
-        rolesWidget
-            .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
-                @Override
-                public void selectionChanged(MultiSelectEvent event) {
-                    if (rolesWidget.getSelected().isEmpty())
-                        setErrorMessage(Messages.MembershipAddDialog_role_error_msg);
-                    else
-                        setErrorMessage(null);
-                }
-            });
-
+        // rolesWidget
+        // .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
+        // @Override
+        // public void selectionChanged(MultiSelectEvent event) {
+        // if (rolesWidget.getSelected().isEmpty())
+        // setErrorMessage(Messages.MembershipAddDialog_role_error_msg);
+        // else
+        // setErrorMessage(null);
+        // }
+        // });
     }
 
     private void createRightsWidgets(Composite contents) {
@@ -274,18 +234,18 @@ public class MembershipAddDialog extends BgcBaseDialog {
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    addRightPrivilege();
+                    addPermission();
                 }
             });
 
         // FIXME if add only, empty list is ok. If edit, need to get the
         // current membership
-        rightPrivilegeInfoTable = new RightPrivilegeInfoTable(rpSection,
-            new ArrayList<RightPrivilegeWrapper>()) {
+        permissionsInfoTable = new PermissionInfoTable(rpSection,
+            new ArrayList<PermissionWrapper>()) {
             @Override
             protected List<BbRightWrapper> getAlreadyUsedRights() {
                 List<BbRightWrapper> rights = new ArrayList<BbRightWrapper>();
-                for (RightPrivilegeWrapper rp : rightPrivilegeInfoTable
+                for (PermissionWrapper rp : permissionsInfoTable
                     .getCollection()) {
                     rights.add(rp.getRight());
                 }
@@ -293,38 +253,37 @@ public class MembershipAddDialog extends BgcBaseDialog {
             }
 
             @Override
-            protected void removeFromRightPrivilegeCollection(
-                List<RightPrivilegeWrapper> rpList) {
+            protected void removeFromPermissionCollection(
+                List<PermissionWrapper> rpList) {
             }
         };
-        rpSection.setClient(rightPrivilegeInfoTable);
-        rightPrivilegeInfoTable
-            .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
-                @Override
-                public void selectionChanged(MultiSelectEvent event) {
-                    if (rightPrivilegeInfoTable.getCollection().isEmpty())
-                        setErrorMessage(Messages.MembershipAddDialog_rights_error_msg);
-                    else
-                        setErrorMessage(null);
-                }
-            });
-        widgetCreator.hideWidget(rpSection);
+        rpSection.setClient(permissionsInfoTable);
+        // permissionsInfoTable
+        // .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
+        // @Override
+        // public void selectionChanged(MultiSelectEvent event) {
+        // if (permissionsInfoTable.getCollection().isEmpty())
+        // setErrorMessage(Messages.MembershipAddDialog_rights_error_msg);
+        // else
+        // setErrorMessage(null);
+        // }
+        // });
     }
 
-    protected void addRightPrivilege() {
+    protected void addPermission() {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
-                RightPrivilegeAddDialog dlg = new RightPrivilegeAddDialog(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell(), new ArrayList<BbRightWrapper>());
+                PermissionAddDialog dlg = new PermissionAddDialog(PlatformUI
+                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    new ArrayList<BbRightWrapper>());
                 int res = dlg.open();
                 if (res == Status.OK) {
-                    addedRights.addAll(dlg.getNewRightPrivilegeList());
-                    rightPrivilegeInfoTable.getCollection().addAll(
-                        dlg.getNewRightPrivilegeList());
-                    rightPrivilegeInfoTable.reloadCollection(
-                        rightPrivilegeInfoTable.getCollection(), null);
+                    addedPermissions.addAll(dlg.getNewPermissionList());
+                    permissionsInfoTable.getCollection().addAll(
+                        dlg.getNewPermissionList());
+                    permissionsInfoTable.reloadCollection(
+                        permissionsInfoTable.getCollection(), null);
                 }
             }
         });
@@ -332,26 +291,19 @@ public class MembershipAddDialog extends BgcBaseDialog {
 
     @Override
     protected void okPressed() {
-        if (rolesWidget.isVisible()) {
-            if (rolesWidget.getSelected().isEmpty()) {
-                rolesWidget.notifyListeners(new MultiSelectEvent(rolesWidget));
-                return;
-            }
-            MembershipRoleWrapper msRole = new MembershipRoleWrapper(
-                SessionManager.getAppService());
-            msRole.addToRoleCollection(rolesWidget.getAddedToSelection());
-            ms = msRole;
-        } else {
-            if (rightPrivilegeInfoTable.getCollection().isEmpty()) {
-                rightPrivilegeInfoTable.notifyListeners(new MultiSelectEvent(
-                    rightPrivilegeInfoTable));
-                return;
-            }
-            MembershipRightWrapper msRight = new MembershipRightWrapper(
-                SessionManager.getAppService());
-            msRight.addToRightPrivilegeCollection(addedRights);
-            ms = msRight;
-        }
+        // FIXME test at least one role or one permission added
+        // if (rolesWidget.getSelected().isEmpty()) {
+        // rolesWidget.notifyListeners(new MultiSelectEvent(rolesWidget));
+        // return;
+        // }
+        // if (rightPrivilegeInfoTable.getCollection().isEmpty()) {
+        // rightPrivilegeInfoTable.notifyListeners(new MultiSelectEvent(
+        // rightPrivilegeInfoTable));
+        // return;
+        // }
+
+        ms.addToRoleCollection(rolesWidget.getAddedToSelection());
+        ms.addToPermissionCollection(addedPermissions);
         ms.setCenter(getCenterSelection());
         ms.setStudy(getStudySelection());
         ms.setPrincipal(principal);
@@ -387,7 +339,7 @@ public class MembershipAddDialog extends BgcBaseDialog {
         return null;
     }
 
-    public MembershipWrapper<?> getMembership() {
+    public MembershipWrapper getMembership() {
         return ms;
     }
 
