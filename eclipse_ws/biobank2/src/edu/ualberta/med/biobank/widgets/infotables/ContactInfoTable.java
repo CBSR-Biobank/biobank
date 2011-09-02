@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
+public class ContactInfoTable extends InfoTableWidget {
 
     private static final int PAGE_SIZE_ROWS = 5;
 
@@ -84,15 +84,14 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
     }
 
     @Override
-    public TableRowData getCollectionModelObject(ContactWrapper contact)
-        throws Exception {
-        if (contact == null)
+    public TableRowData getCollectionModelObject(Object o) throws Exception {
+        if (o == null)
             return null;
         TableRowData info = new TableRowData();
-        info.contact = contact;
-        info.name = contact.getName();
-        info.title = contact.getTitle();
-        List<StudyWrapper> studies = contact.getStudyCollection(true);
+        info.contact = (ContactWrapper) o;
+        info.name = info.contact.getName();
+        info.title = info.contact.getTitle();
+        List<StudyWrapper> studies = info.contact.getStudyCollection(true);
         if (studies != null) {
             StringBuilder sb = new StringBuilder();
             int count = 0;
@@ -105,11 +104,11 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
             }
             info.studies = sb.toString();
         }
-        info.emailAddress = contact.getEmailAddress();
-        info.mobileNumber = contact.getMobileNumber();
-        info.pagerNumber = contact.getPagerNumber();
-        info.officeNumber = contact.getOfficeNumber();
-        info.faxNumber = contact.getFaxNumber();
+        info.emailAddress = info.contact.getEmailAddress();
+        info.mobileNumber = info.contact.getMobileNumber();
+        info.pagerNumber = info.contact.getPagerNumber();
+        info.officeNumber = info.contact.getOfficeNumber();
+        info.faxNumber = info.contact.getFaxNumber();
         return info;
     }
 

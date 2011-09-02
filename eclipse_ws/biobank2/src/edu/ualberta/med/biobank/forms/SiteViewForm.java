@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.NewStudyInfoTable;
 
 public class SiteViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteViewForm"; //$NON-NLS-1$
@@ -27,7 +27,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private SiteWrapper site;
 
-    private StudyInfoTable studiesTable;
+    private NewStudyInfoTable studiesTable;
     private ContainerTypeInfoTable containerTypesTable;
     private ContainerInfoTable topContainersTable;
 
@@ -123,10 +123,13 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private void createStudySection() {
         Section section = createSection(Messages.SiteViewForm_studies_title);
-        studiesTable = new StudyInfoTable(section, site.getStudyCollection());
+        studiesTable = new NewStudyInfoTable(section, site);
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addClickListener(collectionDoubleClickListener);
-        studiesTable.createDefaultEditItem();
+
+        // TODO: provide way to edit study with this table
+        // studiesTable.createDefaultEditItem();
+
         section.setClient(studiesTable);
     }
 

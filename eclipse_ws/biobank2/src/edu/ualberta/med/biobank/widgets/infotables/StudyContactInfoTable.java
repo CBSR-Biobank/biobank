@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
  * Used to display clinic and contact information. Meant to be used by
  * StudyViewForm only.
  */
-public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
+public class StudyContactInfoTable extends InfoTableWidget {
 
     protected static class TableRowData {
         ContactWrapper contact;
@@ -90,18 +90,17 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
     }
 
     @Override
-    public TableRowData getCollectionModelObject(ContactWrapper contact)
-        throws Exception {
+    public TableRowData getCollectionModelObject(Object o) throws Exception {
         TableRowData info = new TableRowData();
-        info.contact = contact;
-        ClinicWrapper clinic = contact.getClinic();
+        info.contact = (ContactWrapper) o;
+        ClinicWrapper clinic = info.contact.getClinic();
         if (clinic != null) {
             info.clinicNameShort = clinic.getNameShort();
             info.patientCount = clinic.getPatientCountForStudy(study);
             info.ceventCount = clinic.getCollectionEventCountForStudy(study);
         }
-        info.contactName = contact.getName();
-        info.contactTitle = contact.getTitle();
+        info.contactName = info.contact.getName();
+        info.contactTitle = info.contact.getTitle();
         return info;
     }
 

@@ -10,13 +10,13 @@ import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 import edu.ualberta.med.biobank.gui.common.widgets.Messages;
 
-public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
+public abstract class InfoTableBgrLoader extends AbstractInfoTableWidget {
 
     private int size;
 
-    private List<T> collection;
+    private List<?> collection;
 
-    public InfoTableBgrLoader(Composite parent, List<T> collection,
+    public InfoTableBgrLoader(Composite parent, List<?> collection,
         String[] headings, int[] columnWidths, int rowsPerPage) {
         super(parent, headings, columnWidths, rowsPerPage);
         setCollection(collection);
@@ -31,18 +31,18 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
      * 
      * @throws Exception
      */
-    protected abstract void tableLoader(final List<T> collection,
-        final T Selection);
+    protected abstract void tableLoader(final List<?> collection,
+        final Object Selection);
 
     @Override
-    public void setCollection(final List<T> collection) {
+    public void setCollection(List<?> collection) {
         setCollection(collection, null);
         if (collection != null) {
             size = collection.size();
         }
     }
 
-    public void setCollection(final List<T> collection, final T selection) {
+    public void setCollection(final List<?> collection, final Object selection) {
         try {
             if ((collection == null)
                 || ((backgroundThread != null) && backgroundThread.isAlive())) {
@@ -84,7 +84,7 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
         }
     }
 
-    public List<T> getCollection() {
+    public List<?> getCollection() {
         return collection;
     }
 

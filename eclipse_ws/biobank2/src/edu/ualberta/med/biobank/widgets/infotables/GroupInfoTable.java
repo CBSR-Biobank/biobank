@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public abstract class GroupInfoTable extends InfoTableWidget<Group> {
+public abstract class GroupInfoTable extends InfoTableWidget {
     public static final int ROWS_PER_PAGE = 12;
     private static final String[] HEADINGS = new String[] { Messages.GroupInfoTable_name_label };
 

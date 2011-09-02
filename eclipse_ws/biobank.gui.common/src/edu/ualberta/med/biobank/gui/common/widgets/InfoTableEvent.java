@@ -14,8 +14,7 @@ public class InfoTableEvent extends EventObject {
 
     protected transient ISelection selection;
 
-    public InfoTableEvent(AbstractInfoTableWidget<?> source,
-        ISelection selection) {
+    public InfoTableEvent(AbstractInfoTableWidget source, ISelection selection) {
         super(source);
         Assert.isNotNull(selection);
         this.selection = selection;
@@ -35,8 +34,8 @@ public class InfoTableEvent extends EventObject {
      * 
      * @return the originating viewer
      */
-    public AbstractInfoTableWidget<?> getInfoTable() {
-        return (AbstractInfoTableWidget<?>) getSource();
+    public AbstractInfoTableWidget getInfoTable() {
+        return (AbstractInfoTableWidget) getSource();
     }
 
 }

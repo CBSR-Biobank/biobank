@@ -190,8 +190,8 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
             @Override
             public int compare(Object e1, Object e2) {
                 try {
-                    TableRowData i1 = getCollectionModelObject((AliquotedSpecimenWrapper) e1);
-                    TableRowData i2 = getCollectionModelObject((AliquotedSpecimenWrapper) e2);
+                    TableRowData i1 = getCollectionModelObject(e1);
+                    TableRowData i2 = getCollectionModelObject(e2);
                     return super.compare(i1.typeName, i2.typeName);
                 } catch (Exception e) {
                     return 0;

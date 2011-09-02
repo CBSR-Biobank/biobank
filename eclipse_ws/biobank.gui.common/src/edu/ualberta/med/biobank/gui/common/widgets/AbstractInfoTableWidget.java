@@ -46,11 +46,9 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
  * <li>copy row to clipboard</li>
  * <li>pagination widget</li>
  * </ul>
- * 
- * @param <T> The information to be displayed in the table.
  */
-public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
-    implements IInfoTalePagination, IDoubleClickListener {
+public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
+    IInfoTalePagination, IDoubleClickListener {
 
     protected TableViewer tableViewer;
 
@@ -199,7 +197,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         return tableViewer;
     }
 
-    public abstract void setCollection(final List<T> collection);
+    public abstract void setCollection(List<?> collection);
 
     protected void autoSizeColumns() {
         // TODO: auto-size table initially based on headers? Sort of already
@@ -266,7 +264,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         table.setVisible(true);
     }
 
-    protected abstract void init(List<T> collection);
+    protected abstract void init(List<?> collection);
 
     protected void resizeTable() {
         Table table = getTableViewer().getTable();
@@ -276,7 +274,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
             + table.getHeaderHeight() + table.getBorderWidth();
     }
 
-    protected abstract void setPaginationParams(List<T> collection);
+    protected abstract void setPaginationParams(List<?> collection);
 
     @Override
     public void setEnabled(boolean enabled) {

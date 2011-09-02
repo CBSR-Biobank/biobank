@@ -28,7 +28,8 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public abstract class UserInfoTable extends InfoTableWidget<User> {
+public abstract class UserInfoTable extends InfoTableWidget {
+
     public static final int ROWS_PER_PAGE = 12;
     private static final String[] HEADINGS = new String[] {
         Messages.UserInfoTable_login_label, Messages.UserInfoTable_email_label,

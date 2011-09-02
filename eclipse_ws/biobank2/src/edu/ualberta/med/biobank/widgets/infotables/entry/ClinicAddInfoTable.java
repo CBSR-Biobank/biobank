@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
-import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
 
 /**
  * Allows the user to select a clinic and a contact from a clinic. Note that

@@ -12,8 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class AliquotedSpecimenInfoTable extends
-    InfoTableWidget<AliquotedSpecimenWrapper> {
+public class AliquotedSpecimenInfoTable extends InfoTableWidget {
 
     private static final int PAGE_SIZE_ROWS = 5;
 
@@ -45,16 +44,16 @@ public class AliquotedSpecimenInfoTable extends
     }
 
     @Override
-    public TableRowData getCollectionModelObject(
-        AliquotedSpecimenWrapper sampleStorage) throws Exception {
+    public TableRowData getCollectionModelObject(Object obj)
+        throws Exception {
         TableRowData info = new TableRowData();
-        info.sampleStorage = sampleStorage;
-        SpecimenTypeWrapper type = sampleStorage.getSpecimenType();
+        info.sampleStorage = (AliquotedSpecimenWrapper) obj;
+        SpecimenTypeWrapper type = info.sampleStorage.getSpecimenType();
         Assert.isNotNull(type, "sample storage - sample type is null"); //$NON-NLS-1$
         info.typeName = type.getName();
-        info.volume = sampleStorage.getVolume();
-        info.quantity = sampleStorage.getQuantity();
-        ActivityStatusWrapper status = sampleStorage.getActivityStatus();
+        info.volume = info.sampleStorage.getVolume();
+        info.quantity = info.sampleStorage.getQuantity();
+        ActivityStatusWrapper status = info.sampleStorage.getActivityStatus();
         Assert.isNotNull(status, "sample storage - activity status is null"); //$NON-NLS-1$
         info.status = status.getName();
         return info;

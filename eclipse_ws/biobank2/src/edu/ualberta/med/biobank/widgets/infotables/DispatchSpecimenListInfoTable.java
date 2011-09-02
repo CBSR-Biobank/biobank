@@ -19,8 +19,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 
-public abstract class DispatchSpecimenListInfoTable extends
-    InfoTableWidget<DispatchSpecimenWrapper> {
+public abstract class DispatchSpecimenListInfoTable extends InfoTableWidget {
 
     protected static class TableRowData {
         DispatchSpecimenWrapper dsa;
@@ -130,18 +129,17 @@ public abstract class DispatchSpecimenListInfoTable extends
     }
 
     @Override
-    public TableRowData getCollectionModelObject(DispatchSpecimenWrapper dsa)
-        throws Exception {
+    public TableRowData getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
-        info.dsa = dsa;
-        info.inventoryId = dsa.getSpecimen().getInventoryId();
-        info.pnumber = dsa.getSpecimen().getCollectionEvent().getPatient()
+        info.dsa = (DispatchSpecimenWrapper) obj;
+        info.inventoryId = info.dsa.getSpecimen().getInventoryId();
+        info.pnumber = info.dsa.getSpecimen().getCollectionEvent().getPatient()
             .getPnumber();
-        SpecimenTypeWrapper type = dsa.getSpecimen().getSpecimenType();
+        SpecimenTypeWrapper type = info.dsa.getSpecimen().getSpecimenType();
         Assert.isNotNull(type, Messages.DispatchSpecimenListInfoTable_16);
         info.type = type.getName();
-        info.status = dsa.getSpecimen().getActivityStatus().toString();
-        info.comment = dsa.getComment();
+        info.status = info.dsa.getSpecimen().getActivityStatus().toString();
+        info.comment = info.dsa.getComment();
         return info;
     }
 

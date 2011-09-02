@@ -3,14 +3,17 @@ package edu.ualberta.med.biobank.widgets.infotables;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 
-public class StudyInfoTable extends InfoTableWidget {
+public class NewStudyInfoTable extends AbstractInfoTableWidget {
 
     protected static class TableRowData {
         StudyWrapper study;
@@ -35,8 +38,8 @@ public class StudyInfoTable extends InfoTableWidget {
         Messages.StudyInfoTable_patients_label,
         Messages.StudyInfoTable_visits_label };
 
-    public StudyInfoTable(Composite parent, List<StudyWrapper> collection) {
-        super(parent, collection, HEADINGS, 10, StudyWrapper.class);
+    public NewStudyInfoTable(Composite parent, SiteWrapper site) {
+        super(parent, HEADINGS, new int[] {}, 10);
     }
 
     @Override
@@ -69,66 +72,76 @@ public class StudyInfoTable extends InfoTableWidget {
         };
     }
 
-    // @Override
-    // protected BgcTableSorter getTableSorter() {
-    // return new BgcTableSorter() {
-    //
-    // @Override
-    // public int compare(Viewer viewer, Object e1, Object e2) {
-    // TableRowData row1 = (TableRowData) e1;
-    // TableRowData row2 = (TableRowData) e2;
-    // int rc = 0;
-    //
-    // switch (propertyIndex) {
-    // case 0:
-    // rc = row1.name.compareTo(row2.name);
-    // break;
-    // case 1:
-    // rc = row1.nameShort.compareTo(row2.nameShort);
-    // break;
-    // }
-    // return rc;
-    // }
-    //
-    // };
-    // }
-
     @Override
-    public Object getCollectionModelObject(Object study) throws Exception {
-        TableRowData info = new TableRowData();
-        info.study = (StudyWrapper) study;
-        info.name = info.study.getName();
-        info.nameShort = info.study.getNameShort();
-        info.status = info.study.getActivityStatus().getName();
-        if (info.status == null) {
-            info.status = ""; //$NON-NLS-1$
-        }
-        info.patientCount = info.study.getPatientCount(true);
-        info.visitCount = info.study.getCollectionEventCount(true);
-        info.study.reload();
-        return info;
+    protected BgcTableSorter getTableSorter() {
+        return new BgcTableSorter() {
+
+            @Override
+            public int compare(Viewer viewer, Object e1, Object e2) {
+                TableRowData row1 = (TableRowData) e1;
+                TableRowData row2 = (TableRowData) e2;
+                int rc = 0;
+
+                switch (propertyIndex) {
+                case 0:
+                    rc = row1.name.compareTo(row2.name);
+                    break;
+                case 1:
+                    rc = row1.nameShort.compareTo(row2.nameShort);
+                    break;
+                }
+                return rc;
+            }
+
+        };
     }
 
     @Override
-    protected String getCollectionModelObjectToString(Object o) {
-        if (o == null)
-            return null;
-        return ((TableRowData) o).toString();
+    public void firstPage() {
+        // TODO Auto-generated method stub
+
     }
 
     @Override
-    public StudyWrapper getSelection() {
-        BiobankCollectionModel item = getSelectionInternal();
-        if (item == null)
-            return null;
-        TableRowData row = (TableRowData) item.o;
-        Assert.isNotNull(row);
-        return row.study;
+    public void prevPage() {
+        // TODO Auto-generated method stub
+
     }
 
     @Override
-    protected BiobankTableSorter getComparator() {
-        return null;
+    public void nextPage() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void lastPage() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected boolean isEditMode() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void setCollection(List<?> collection) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void init(List<?> collection) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void setPaginationParams(List<?> collection) {
+        // TODO Auto-generated method stub
+
     }
 
 }

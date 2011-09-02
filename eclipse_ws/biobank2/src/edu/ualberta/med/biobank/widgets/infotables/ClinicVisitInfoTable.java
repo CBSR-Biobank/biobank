@@ -9,10 +9,10 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class ClinicVisitInfoTable extends
-    InfoTableWidget<CollectionEventWrapper> {
+public class ClinicVisitInfoTable extends InfoTableWidget {
 
     private static class TableRowData {
+        public CollectionEventWrapper cevent;
         public Integer visit;
         public Long numSource;
         public Long numSpecimens;
@@ -61,12 +61,12 @@ public class ClinicVisitInfoTable extends
     }
 
     @Override
-    public Object getCollectionModelObject(CollectionEventWrapper p)
-        throws Exception {
+    public Object getCollectionModelObject(Object o) throws Exception {
         TableRowData info = new TableRowData();
-        info.visit = p.getVisitNumber();
-        info.numSource = p.getSourceSpecimensCount(true);
-        info.numSpecimens = p.getAliquotedSpecimensCount(true);
+        info.cevent = (CollectionEventWrapper) o;
+        info.visit = info.cevent.getVisitNumber();
+        info.numSource = info.cevent.getSourceSpecimensCount(true);
+        info.numSpecimens = info.cevent.getAliquotedSpecimensCount(true);
         return info;
     }
 

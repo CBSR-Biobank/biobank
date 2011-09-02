@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> {
+public class SpecimenTypeInfoTable extends InfoTableWidget {
 
     private static final int PAGE_SIZE_ROWS = 10;
 
