@@ -465,7 +465,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
         }
 
         // @formatter:off
-        String result = "        if (isPropertyCached("+property+")) {\n" +
+        String result = "        if (isInitialized("+property+")) {\n" +
                         "            "+paramType+" "+oldVar+" = "+getter+"();\n" +
                         "            if ("+oldVar+" != null) "+oldVar+"."+oldMethod+";\n" +
                         "        }\n" +
@@ -610,7 +610,21 @@ public class BaseWrapperBuilder extends BaseBuilder {
         // @formatter:off
         String action = "        addToWrapperCollection(" + mc.getName() + "Peer." + CamelCase.toTitleCase(assocName) + ", " + assocName + ");\n";
         if (isInternal) {
-            action = "        if (isPropertyCached(" + mc.getName() + "Peer." + CamelCase.toTitleCase(assocName) + ")) {\n" +
+            // use isInitialized instead of isPropertyCached
+            // For example, if a new ProcessingEvent is created and a new Specimen
+            // as well, then the Specimen.setProcessingEvent() is called with the
+            // new ProcessingEvent, then the ProcessingEvent's specimenCollection
+            // will be null because it is new. If it's null then it is initialized,
+            // so we should be able to immediately add the Specimen to it (because
+            // it is new). If we used isPropertyCached, then the
+            // ProcessingEventWrapper's specimenCollection property would not be
+            // cached and we would not immediately add to it. This is a particular
+            // problem when accessing the model underneath directly. For example, if
+            // isPropertyCached() returns false, but the model's property is
+            // accessed (via property.get()) then a null value can be returned
+            // instead of accessing the database.
+            
+            action = "        if (isInitialized(" + mc.getName() + "Peer." + CamelCase.toTitleCase(assocName) + ")) {\n" +
             		"    " + action +
             		"        } else {\n" +
             		"            getElementQueue().add(" + mc.getName() + "Peer." + CamelCase.toTitleCase(assocName) + ", " + assocName + ");\n" +
