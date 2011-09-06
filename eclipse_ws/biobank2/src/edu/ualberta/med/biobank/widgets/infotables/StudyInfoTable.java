@@ -69,30 +69,6 @@ public class StudyInfoTable extends InfoTableWidget {
         };
     }
 
-    // @Override
-    // protected BgcTableSorter getTableSorter() {
-    // return new BgcTableSorter() {
-    //
-    // @Override
-    // public int compare(Viewer viewer, Object e1, Object e2) {
-    // TableRowData row1 = (TableRowData) e1;
-    // TableRowData row2 = (TableRowData) e2;
-    // int rc = 0;
-    //
-    // switch (propertyIndex) {
-    // case 0:
-    // rc = row1.name.compareTo(row2.name);
-    // break;
-    // case 1:
-    // rc = row1.nameShort.compareTo(row2.nameShort);
-    // break;
-    // }
-    // return rc;
-    // }
-    //
-    // };
-    // }
-
     @Override
     public Object getCollectionModelObject(Object study) throws Exception {
         TableRowData info = new TableRowData();

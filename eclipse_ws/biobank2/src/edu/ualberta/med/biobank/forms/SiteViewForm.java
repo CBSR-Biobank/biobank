@@ -13,12 +13,14 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewStudyInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteViewForm"; //$NON-NLS-1$
@@ -114,14 +116,14 @@ public class SiteViewForm extends AddressViewFormCommon {
             .size());
         setTextValue(topContainerCountLabel, site.getTopContainerCollection()
             .size());
-        setTextValue(patientCountLabel, site.getPatientCount());
+        setTextValue(patientCountLabel, SiteQuery.getPatientCount(site));
         setTextValue(patientVisitCountLabel, site.getCollectionEventCount());
         setTextValue(specimenCountLabel, site.getAliquotedSpecimenCount());
         setTextValue(activityStatusLabel, site.getActivityStatus().getName());
         setTextValue(commentLabel, site.getComment());
     }
 
-    private void createStudySection() {
+    private void createStudySection() throws ApplicationException {
         Section section = createSection(Messages.SiteViewForm_studies_title);
         studiesTable = new NewStudyInfoTable(section, site);
         studiesTable.adaptToToolkit(toolkit, true);

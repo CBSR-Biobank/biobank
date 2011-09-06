@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -185,7 +186,7 @@ public class TestCenter extends TestDatabase {
 
     @Test
     public void testPersistFailNoAcivityStatus() throws Exception {
-        int oldTotal = SiteWrapper.getSites(appService).size();
+        int oldTotal = SiteQuery.getSites(appService).size();
         String name = "testPersistFailNoAddress" + r.nextInt();
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
@@ -203,7 +204,7 @@ public class TestCenter extends TestDatabase {
             .getActiveActivityStatus(appService));
         SiteHelper.createdSites.add(site);
         site.persist();
-        int newTotal = SiteWrapper.getSites(appService).size();
+        int newTotal = SiteQuery.getSites(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
     }
 
@@ -258,7 +259,7 @@ public class TestCenter extends TestDatabase {
 
     @Test
     public void testPersistFailNoAddress() throws Exception {
-        int oldTotal = SiteWrapper.getSites(appService).size();
+        int oldTotal = SiteQuery.getSites(appService).size();
         String name = "testPersistFailNoAddress" + r.nextInt();
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
@@ -276,7 +277,7 @@ public class TestCenter extends TestDatabase {
         site.setCity("Vesoul");
         SiteHelper.createdSites.add(site);
         site.persist();
-        int newTotal = SiteWrapper.getSites(appService).size();
+        int newTotal = SiteQuery.getSites(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
     }
 

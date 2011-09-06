@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * This abstract class is used to create most the tables used in the client. The
@@ -158,17 +159,18 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
                     @Override
                     public void widgetSelected(SelectionEvent e) {
                         col.pack();
+                        Table table = tableViewer.getTable();
 
                         if (tableSorter != null) {
                             tableSorter.setColumn(fIndex);
-                            int dir = tableViewer.getTable().getSortDirection();
+                            int dir = table.getSortDirection();
                             if (tableViewer.getTable().getSortColumn() == col) {
-                                dir = (dir == SWT.UP ? SWT.DOWN : SWT.UP);
+                                dir = (dir == SWT.UP) ? SWT.DOWN : SWT.UP;
                             } else {
                                 dir = SWT.DOWN;
                             }
-                            tableViewer.getTable().setSortDirection(dir);
-                            tableViewer.getTable().setSortColumn(col);
+                            table.setSortDirection(dir);
+                            table.setSortColumn(col);
                             tableViewer.refresh();
                         }
                     }
@@ -185,7 +187,7 @@ public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
 
     protected abstract BgcTableSorter getTableSorter();
 
-    public abstract void reload();
+    public abstract void reload() throws ApplicationException;
 
     @Override
     public boolean setFocus() {
