@@ -8,18 +8,24 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.BbGroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.widgets.infotables.MembershipInfoTable;
+import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class GroupEditDialog extends BgcBaseDialog {
@@ -28,6 +34,7 @@ public class GroupEditDialog extends BgcBaseDialog {
 
     private BbGroupWrapper originalGroup;
     private MembershipInfoTable membershipInfoTable;
+    private MultiSelectWidget<UserWrapper> usersWidget;
 
     public GroupEditDialog(Shell parent, BbGroupWrapper originalGroup) {
         super(parent);
@@ -61,26 +68,70 @@ public class GroupEditDialog extends BgcBaseDialog {
     protected void createDialogAreaInternal(Composite parent)
         throws ApplicationException {
         Composite contents = new Composite(parent, SWT.NONE);
-        contents.setLayout(new GridLayout(2, false));
+        contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Messages.GroupEditDialog_property_title_name, null, originalGroup,
-            BbGroupPeer.NAME.getName(), new NonEmptyStringValidator(
-                Messages.GroupEditDialog_msg_name_required));
+        TabFolder tb = new TabFolder(contents, SWT.TOP);
+        tb.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createSection(contents,
-            Messages.GroupEditDialog_membership_section_label,
-            Messages.GroupEditDialog_membership_add_label,
-            new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    addMembership();
-                }
-            });
+        createGeneralFields(createTabItem(tb, "General", 2));
+
+        createMembershipsSection(createTabItem(tb,
+            Messages.UserEditDialog_roles_permissions_title, 1));
+
+        createUsersSection(createTabItem(tb, "Users", 1));
+
+    }
+
+    private void createGeneralFields(Composite createTabItem) {
+        createBoundWidgetWithLabel(createTabItem, BgcBaseText.class,
+            SWT.BORDER, Messages.GroupEditDialog_property_title_name, null,
+            originalGroup, BbGroupPeer.NAME.getName(),
+            new NonEmptyStringValidator(
+                Messages.GroupEditDialog_msg_name_required));
+    }
+
+    private void createMembershipsSection(Composite contents) {
+        Button addButton = new Button(contents, SWT.PUSH);
+        addButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                addMembership();
+            }
+        });
+        addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ADD));
+        GridData gd = new GridData();
+        gd.horizontalAlignment = SWT.RIGHT;
+        addButton.setLayoutData(gd);
+
         membershipInfoTable = new MembershipInfoTable(contents, originalGroup);
-        GridData gd = (GridData) membershipInfoTable.getLayoutData();
-        gd.horizontalSpan = 2;
+    }
+
+    private void createUsersSection(Composite contents)
+        throws ApplicationException {
+        // FIXME something else than a double list selection might be better
+        usersWidget = new MultiSelectWidget<UserWrapper>(contents, SWT.NONE,
+            "Available users", "Selected users", 200) {
+            @Override
+            protected String getTextForObject(UserWrapper nodeObject) {
+                return nodeObject.getFullName() + " (" + nodeObject.getLogin() //$NON-NLS-1$
+                    + ")"; //$NON-NLS-1$
+            }
+        };
+
+        usersWidget.setSelections(
+            UserWrapper.getAllUsers(SessionManager.getAppService()),
+            originalGroup.getUserCollection(false));
+    }
+
+    private Composite createTabItem(TabFolder tb, String title, int columns) {
+        TabItem item = new TabItem(tb, SWT.NONE);
+        item.setText(title);
+        Composite contents = new Composite(tb, SWT.NONE);
+        contents.setLayout(new GridLayout(columns, false));
+        item.setControl(contents);
+        return contents;
     }
 
     protected void addMembership() {

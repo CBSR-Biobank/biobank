@@ -52,7 +52,7 @@ public class UserWrapper extends UserBaseWrapper {
             }
         });
         super.addPersistTasks(tasks);
-        tasks.persistAdded(this, UserPeer.GROUP_COLLECTION);
+        // tasks.persistAdded(this, UserPeer.GROUP_COLLECTION);
     }
 
     @Override

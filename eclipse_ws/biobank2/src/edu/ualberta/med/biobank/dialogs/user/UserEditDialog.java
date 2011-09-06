@@ -113,7 +113,6 @@ public class UserEditDialog extends BgcBaseDialog {
         item.setText(title);
         Composite contents = new Composite(tb, SWT.NONE);
         contents.setLayout(new GridLayout(columns, false));
-        // contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         item.setControl(contents);
         return contents;
     }
@@ -161,7 +160,7 @@ public class UserEditDialog extends BgcBaseDialog {
         throws ApplicationException {
         groupsWidget = new MultiSelectWidget<BbGroupWrapper>(contents,
             SWT.NONE, Messages.UserEditDialog_groups_available,
-            Messages.UserEditDialog_groups_selected, 75) {
+            Messages.UserEditDialog_groups_selected, 200) {
             @Override
             protected String getTextForObject(BbGroupWrapper nodeObject) {
                 return nodeObject.getName();
@@ -200,6 +199,7 @@ public class UserEditDialog extends BgcBaseDialog {
             // "tasks.persistAdded(this, UserPeer.GROUP_COLLECTION);" in
             // "addPersistTasks" method of userwrapper but didn't work.
             // The following is working fine, but do we want to generalize it?
+
             WrapperTransaction tx = new WrapperTransaction(
                 SessionManager.getAppService());
             tx.persist(originalUser);

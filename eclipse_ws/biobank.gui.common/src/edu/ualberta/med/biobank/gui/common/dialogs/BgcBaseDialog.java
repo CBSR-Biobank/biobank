@@ -49,6 +49,8 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
 
     protected boolean setupFinished = false;
 
+    private boolean closed;
+
     public BgcBaseDialog(Shell parentShell) {
         super(parentShell);
         widgetCreator = new BgcWidgetCreator(null);
@@ -186,6 +188,20 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
             }
             setOkButtonEnabled(false);
         }
+    }
+
+    @Override
+    public boolean close() {
+        this.closed = true;
+        return super.close();
+    }
+
+    @Override
+    public void setErrorMessage(String newErrorMessage) {
+        if (!closed)
+            // test that dialog is not closed to avoid sometimes
+            // NullPointerException or disposed problems.
+            super.setErrorMessage(newErrorMessage);
     }
 
     protected void setOkButtonEnabled(boolean enabled) {
