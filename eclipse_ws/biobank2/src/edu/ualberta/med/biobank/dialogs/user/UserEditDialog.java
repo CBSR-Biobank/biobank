@@ -31,6 +31,7 @@ import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
+import edu.ualberta.med.biobank.gui.common.validators.EmailValidator;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.handlers.LogoutHandler;
@@ -125,11 +126,13 @@ public class UserEditDialog extends BgcBaseDialog {
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             Messages.UserEditDialog_firstName_label, null, originalUser,
-            UserPeer.FULL_NAME.getName(), null);
+            UserPeer.FULL_NAME.getName(), new NonEmptyStringValidator(
+                "Full name of this user is required"));
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             Messages.UserEditDialog_Email_label, null, originalUser,
-            UserPeer.EMAIL.getName(), null);
+            UserPeer.EMAIL.getName(), new EmailValidator(
+                "A valid email is required"));
 
         createBoundWidgetWithLabel(contents, Button.class, SWT.CHECK,
             Messages.UserEditDialog_bulkemail_label, null, originalUser,
