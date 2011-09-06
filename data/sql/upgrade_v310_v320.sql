@@ -330,7 +330,7 @@ insert into principal (id, version)
 select user_id, 0 from csm_user;
 
 insert into user (principal_id, login, csm_user_id, bulk_emails, full_name, email, need_change_pwd) 
-select user_id, login_name, user_id, 1, first_name + ' ' + last_name, email_id, 0 from csm_user where login_name != 'administrator' and login_name != 'bbadmin';
+select user_id, login_name, user_id, 1, concat(first_name, ' ', last_name), email_id, 0 from csm_user where login_name != 'administrator' and login_name != 'bbadmin';
 
 -- Add a default super admin group. 
 insert into principal (id, version) 
