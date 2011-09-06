@@ -343,6 +343,7 @@
       <fileset file="${cacore.sdk.dir}/system/dist/sdk-core.jar" />
       <fileset file="${cacore.sdk.dir}/system/lib/csmapi-4.1.jar" />
       <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-core.jar" />
+      <fileset file="${cacore.sdk.dir}/system/lib/jta.jar" />
     </copy>
     <copy todir="${eclipse.proj.dir.common}/conf" overwrite="true">
       <filelist dir="${cacore.sdk.dir}/output/biobank/package/remote-client/conf"
@@ -364,6 +365,9 @@
       <filelist dir="${cacore.sdk.dir}/output/biobank/package/ws-client/lib"
                 files="biobank-beans.jar" />
     </copy-->
+    <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
+      <fileset file="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
+    </copy>
     <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
       <fileset file="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
     </copy>
