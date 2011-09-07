@@ -25,6 +25,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
@@ -64,7 +65,7 @@ public class TopContainerListWidget {
         });
         siteCombo.setContentProvider(new ArrayContentProvider());
         try {
-            sites = SiteWrapper.getSites(appService);
+            sites = SiteQuery.getSites(appService);
             SiteWrapper allsites = new SiteWrapper(appService);
             allsites.setNameShort(Messages.TopContainerListWidget_all_label);
             sites.add(allsites);
@@ -85,7 +86,7 @@ public class TopContainerListWidget {
                         if (s != null) {
                             if (s.getNameShort().equals(
                                 Messages.TopContainerListWidget_all_label)) {
-                                List<SiteWrapper> sites = SiteWrapper
+                                List<SiteWrapper> sites = SiteQuery
                                     .getSites(appService);
                                 for (SiteWrapper site : sites) {
                                     containers.addAll(site

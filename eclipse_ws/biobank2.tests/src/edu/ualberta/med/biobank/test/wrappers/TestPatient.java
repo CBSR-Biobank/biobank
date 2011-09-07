@@ -423,10 +423,10 @@ public class TestPatient extends TestDatabase {
             Assert.assertEquals(1, patient.getSourceSpecimenCount(false));
         }
 
-        Assert.assertEquals(3, patient1.getAllSpecimensCount(true));
-        Assert.assertEquals(3, patient2.getAllSpecimensCount(true));
-        Assert.assertEquals(3, patient1.getAllSpecimensCount(false));
-        Assert.assertEquals(3, patient2.getAllSpecimensCount(false));
+        Assert.assertEquals(3, patient1.getSourceSpecimenCount(true));
+        Assert.assertEquals(3, patient2.getSourceSpecimenCount(true));
+        Assert.assertEquals(3, patient1.getSourceSpecimenCount(false));
+        Assert.assertEquals(3, patient2.getSourceSpecimenCount(false));
 
     }
 

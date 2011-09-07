@@ -191,20 +191,6 @@ public abstract class CenterWrapper<E extends Center> extends
         return list.size();
     }
 
-    /**
-     * Collection event count for this center. This count is different for each
-     * center: the method should be defined in each center type
-     */
-    public abstract long getCollectionEventCountForStudy(StudyWrapper study)
-        throws ApplicationException, BiobankException;
-
-    /**
-     * Collection event count for this center. This count is different for each
-     * center: the method should be defined in each center type
-     */
-    public abstract long getPatientCountForStudy(StudyWrapper study)
-        throws ApplicationException, BiobankException;
-
     public static List<CenterWrapper<?>> getCenters(
         WritableApplicationService appService) throws ApplicationException {
         StringBuilder qry = new StringBuilder(ALL_CENTERS_HQL_STRING);
@@ -369,8 +355,6 @@ public abstract class CenterWrapper<E extends Center> extends
             Arrays.asList(new Object[] { getId() }));
         return getCountResult(appService, criteria);
     }
-
-    public abstract Long getPatientCount() throws Exception;
 
     public static final String COLLECTION_EVENT_COUNT_QRY = "select count(distinct cevent) from "
         + Center.class.getName()

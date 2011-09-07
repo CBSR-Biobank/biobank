@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
@@ -79,7 +80,7 @@ public class SiteGroup extends AdapterBase {
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         if (SessionManager.isSuperAdminMode()) {
-            return SiteWrapper.getSites(SessionManager.getAppService());
+            return SiteQuery.getSites(SessionManager.getAppService());
         }
         return Collections.emptyList();
     }

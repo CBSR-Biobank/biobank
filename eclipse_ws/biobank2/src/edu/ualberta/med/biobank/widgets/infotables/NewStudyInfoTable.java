@@ -6,26 +6,34 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class NewStudyInfoTable extends AbstractInfoTableWidget {
 
     protected static class RowData extends RowItem {
-        StudyWrapper study;
         String name;
         String nameShort;
         String status;
         Long patientCount;
-        Long visitCount;
+        Long ceventCount;
+
+        public RowData(Object[] props) {
+            name = (String) props[0];
+            nameShort = (String) props[1];
+            status = (String) props[2];
+            patientCount = (Long) props[3];
+            ceventCount = (Long) props[4];
+        }
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { name, nameShort, status,
                 (patientCount != null) ? patientCount.toString() : "", //$NON-NLS-1$
-                (visitCount != null) ? visitCount.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+                (ceventCount != null) ? ceventCount.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
@@ -38,9 +46,11 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
 
     private SiteWrapper site;
 
-    public NewStudyInfoTable(Composite parent, SiteWrapper site) {
+    public NewStudyInfoTable(Composite parent, SiteWrapper site)
+        throws ApplicationException {
         super(parent, HEADINGS, new int[] { 100, 100, 100, 100, 100 }, 10);
         this.site = site;
+        getTableViewer().setInput(SiteQuery.getSiteStudyQuickInfo(site));
     }
 
     @Override
@@ -48,13 +58,7 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                RowData info = (RowData) ((BiobankCollectionModel) element).o;
-                if (info == null) {
-                    if (columnIndex == 0) {
-                        return Messages.StudyInfoTable_loading;
-                    }
-                    return ""; //$NON-NLS-1$
-                }
+                RowData info = new RowData((Object[]) element);
                 switch (columnIndex) {
                 case 0:
                     return info.name;
@@ -65,7 +69,7 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
                 case 3:
                     return NumberFormatter.format(info.patientCount);
                 case 4:
-                    return NumberFormatter.format(info.visitCount);
+                    return NumberFormatter.format(info.ceventCount);
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -79,9 +83,9 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
 
             @Override
             public int compare(Viewer viewer, Object e1, Object e2) {
-                RowData row1 = (RowData) e1;
-                RowData row2 = (RowData) e2;
                 int rc = 0;
+                RowData row1 = new RowData((Object[]) e1);
+                RowData row2 = new RowData((Object[]) e2);
 
                 switch (propertyIndex) {
                 case 0:
@@ -90,6 +94,19 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
                 case 1:
                     rc = row1.nameShort.compareTo(row2.nameShort);
                     break;
+                case 2:
+                    rc = row1.status.compareTo(row2.status);
+                    break;
+                case 3:
+                    rc = row1.patientCount.compareTo(row2.patientCount);
+                    break;
+                case 4:
+                    rc = row1.ceventCount.compareTo(row2.ceventCount);
+                    break;
+                }
+                // If descending order, flip the direction
+                if (direction == DESCENDING) {
+                    rc = -rc;
                 }
                 return rc;
             }
@@ -99,26 +116,22 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
 
     @Override
     public void firstPage() {
-        // TODO Auto-generated method stub
-
+        // all data on one page, do nothing
     }
 
     @Override
     public void prevPage() {
-        // TODO Auto-generated method stub
-
+        // all data on one page, do nothing
     }
 
     @Override
     public void nextPage() {
-        // TODO Auto-generated method stub
-
+        // all data on one page, do nothing
     }
 
     @Override
     public void lastPage() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -127,9 +140,8 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
     }
 
     @Override
-    public void reload() {
-        // TODO Auto-generated method stub
-
+    public void reload() throws ApplicationException {
+        getTableViewer().setInput(SiteQuery.getSiteStudyQuickInfo(site));
     }
 
 }
