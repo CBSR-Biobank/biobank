@@ -1,30 +1,26 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.RolePeer;
 import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.widgets.infotables.PermissionInfoTable;
+import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTree;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class RoleEditDialog extends BgcBaseDialog {
@@ -74,42 +70,48 @@ public class RoleEditDialog extends BgcBaseDialog {
             RolePeer.NAME.getName(), new NonEmptyStringValidator(
                 Messages.RoleEditDialog_msg_name_required));
 
-        Section rpSection = createSection(contents,
-            Messages.RoleEditDialog_right_privilege_label,
-            Messages.RoleEditDialog_new_assoc_label, new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    addPermission();
-                }
-            });
+        // Section rpSection = createSection(contents,
+        // Messages.RoleEditDialog_right_privilege_label,
+        // Messages.RoleEditDialog_new_assoc_label, new SelectionAdapter() {
+        // @Override
+        // public void widgetSelected(SelectionEvent e) {
+        // addPermission();
+        // }
+        // });
 
-        permissionsInfoTable = new PermissionInfoTable(rpSection,
-            role.getPermissionCollection(true)) {
-            @Override
-            protected List<BbRightWrapper> getAlreadyUsedRights() {
-                return role.getRightsInUse();
-            }
+        // permissionsInfoTable = new PermissionInfoTable(rpSection,
+        // role.getPermissionCollection(true)) {
+        // @Override
+        // protected List<BbRightWrapper> getAlreadyUsedRights() {
+        // return role.getRightsInUse();
+        // }
+        //
+        // @Override
+        // protected void removeFromPermissionCollection(
+        // List<PermissionWrapper> rpList) {
+        // role.removeFromPermissionCollection(rpList);
+        // }
+        // };
+        // rpSection.setClient(permissionsInfoTable);
 
-            @Override
-            protected void removeFromPermissionCollection(
-                List<PermissionWrapper> rpList) {
-                role.removeFromPermissionCollection(rpList);
-            }
-        };
-        rpSection.setClient(permissionsInfoTable);
+        PermissionCheckTree tree = new PermissionCheckTree(contents,
+            BbRightWrapper.getAllRights(SessionManager.getAppService()));
+
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        gd.horizontalSpan = 2;
+        tree.setLayoutData(gd);
     }
 
     protected void addPermission() {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
-                PermissionAddDialog dlg = new PermissionAddDialog(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell(), role.getRightsInUse());
+                PermissionAddDialog dlg = new PermissionAddDialog(PlatformUI
+                    .getWorkbench().getActiveWorkbenchWindow().getShell(), role
+                    .getRightsInUse());
                 int res = dlg.open();
                 if (res == Status.OK) {
-                    role.addToPermissionCollection(dlg
-                        .getNewPermissionList());
+                    role.addToPermissionCollection(dlg.getNewPermissionList());
                     permissionsInfoTable.getCollection().addAll(
                         dlg.getNewPermissionList());
                     permissionsInfoTable.reloadCollection(

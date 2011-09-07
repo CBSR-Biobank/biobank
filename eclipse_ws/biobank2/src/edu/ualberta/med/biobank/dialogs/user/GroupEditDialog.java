@@ -157,6 +157,8 @@ public class GroupEditDialog extends BgcBaseDialog {
         // try saving or updating the group inside this dialog so that if there
         // is an error the entered information is not lost
         try {
+            originalGroup
+                .addToUserCollection(usersWidget.getAddedToSelection());
             originalGroup.persist();
             close();
         } catch (Exception e) {

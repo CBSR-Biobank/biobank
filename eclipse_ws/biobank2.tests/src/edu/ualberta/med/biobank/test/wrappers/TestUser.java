@@ -219,6 +219,10 @@ public class TestUser extends TestDatabase {
         UserWrapper user = new UserWrapper(appService);
         String login = Utils.getRandomString(300, 400);
         user.setLogin(login);
+        // FIXME should use another test because I should set login length to be
+        // the same between csm_user and our user table. Maybe in using a
+        // WrapperTransation with something sending an error to make the commit
+        // fail
         try {
             user.persist();
             Assert.fail();
