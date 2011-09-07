@@ -66,9 +66,9 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
     public Object getCollectionModelObject(MembershipWrapper ms)
         throws Exception {
         TableRowData info = new TableRowData();
-        info.center = ms.getCenter() == null ? "All" : ms.getCenter()
+        info.center = ms.getCenter() == null ? Messages.MembershipInfoTable_all_label : ms.getCenter()
             .getNameShort();
-        info.study = ms.getStudy() == null ? "All" : ms.getStudy()
+        info.study = ms.getStudy() == null ? Messages.MembershipInfoTable_all_label : ms.getStudy()
             .getNameShort();
         info.roleOrRP = ms.getMembershipObjectsListString();
         info.ms = ms;

@@ -1,12 +1,13 @@
 package edu.ualberta.med.biobank.widgets.trees.permission;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface PermissionNode {
 
     public PermissionNode getParent();
 
-    public List<PermissionNode> getChildren();
+    public Collection<? extends PermissionNode> getChildren();
 
     public String getText();
+
 }

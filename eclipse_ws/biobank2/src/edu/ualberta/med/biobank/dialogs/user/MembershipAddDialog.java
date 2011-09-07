@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -13,7 +14,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -21,26 +21,27 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
-import edu.ualberta.med.biobank.widgets.infotables.PermissionInfoTable;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
+import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTree;
+import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTree.PermissionTreeRes;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class MembershipAddDialog extends BgcBaseDialog {
@@ -50,11 +51,8 @@ public class MembershipAddDialog extends BgcBaseDialog {
     private ComboViewer centersViewer;
     private ComboViewer studiesViewer;
     private MultiSelectWidget<RoleWrapper> rolesWidget;
-    private PermissionInfoTable permissionsInfoTable;
-    private Section rpSection;
     private MembershipWrapper ms;
-    private Composite contents;
-    private List<PermissionWrapper> addedPermissions = new ArrayList<PermissionWrapper>();
+    private PermissionCheckTree permissionsTree;
 
     public MembershipAddDialog(Shell parent, PrincipalWrapper<?> principal) {
         super(parent);
@@ -80,15 +78,36 @@ public class MembershipAddDialog extends BgcBaseDialog {
         return currentTitle;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     protected void createDialogAreaInternal(Composite parent)
         throws ApplicationException {
-        contents = new Composite(parent, SWT.NONE);
-        contents.setLayout(new GridLayout(2, false));
+        Composite contents = new Composite(parent, SWT.NONE);
+        contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createCentersCombo(contents);
+        TabFolder tb = new TabFolder(contents, SWT.TOP);
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        tb.setLayoutData(gd);
+
+        Composite centerStudyComp = createTabItem(tb,
+            Messages.MembershipAddDialog_centerStudy_tab_title, 1);
+        createCentersCombo(centerStudyComp);
+        createStudysCombo(centerStudyComp);
+
+        createRolesWidget(createTabItem(tb,
+            Messages.MembershipAddDialog_roles_tab_title, 1));
+
+        createPermissionWidgets(createTabItem(tb,
+            Messages.MembershipAddDialog_permissions_tab_title, 1));
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    protected void createStudysCombo(Composite parent)
+        throws ApplicationException {
+        Group groupComp = new Group(parent, SWT.SHADOW_IN);
+        groupComp.setText(Messages.MembershipAddDialog_study_label);
+        groupComp.setLayout(new GridLayout(2, false));
+        groupComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         List studies = new ArrayList();
         String noStudySelection = new String(
@@ -96,9 +115,9 @@ public class MembershipAddDialog extends BgcBaseDialog {
         studies.add(noStudySelection);
         studies.addAll(StudyWrapper.getAllStudies(SessionManager
             .getAppService()));
-        studiesViewer = createComboViewer(contents,
-            Messages.MembershipAddDialog_study_label, studies, null, null,
-            null, new LabelProvider() {
+        studiesViewer = createComboViewer(groupComp,
+            Messages.MembershipAddDialog_selected_study_label, studies, null,
+            null, null, new LabelProvider() {
                 @Override
                 public String getText(Object element) {
                     if (element instanceof String)
@@ -107,42 +126,25 @@ public class MembershipAddDialog extends BgcBaseDialog {
                 }
             });
         studiesViewer.setSelection(new StructuredSelection(noStudySelection));
-
-        new Label(contents, SWT.NONE);
-
-        createRolesWidget(contents);
-
-        createRightsWidgets(contents);
     }
 
     private void createCentersCombo(Composite contents)
         throws ApplicationException {
-        Label label = widgetCreator.createLabel(contents,
-            Messages.MembershipAddDialog_center_label);
-        GridData gd = new GridData();
-        gd.horizontalSpan = 2;
+        Group groupComp = new Group(contents, SWT.SHADOW_IN);
+        groupComp.setText(Messages.MembershipAddDialog_center_label);
+        groupComp.setLayout(new GridLayout(5, false));
+        groupComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        Composite compCenters = new Composite(contents, SWT.NONE);
-        compCenters.setLayout(new GridLayout(5, false));
-        compCenters.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        gd = new GridData();
-        gd.horizontalSpan = 2;
-        compCenters.setLayoutData(gd);
-
-        Label filterlabel = widgetCreator.createLabel(compCenters,
-            "Filter list by");
-        gd = new GridData();
-        gd.verticalSpan = 2;
-        gd.verticalAlignment = SWT.TOP;
-        filterlabel.setLayoutData(gd);
-        final Button allCentersRadio = new Button(compCenters, SWT.RADIO);
+        widgetCreator.createLabel(groupComp,
+            Messages.MembershipAddDialog_filter_center_label);
+        final Button allCentersRadio = new Button(groupComp, SWT.RADIO);
         allCentersRadio.setSelection(true);
         allCentersRadio.setText(Messages.MembershipAddDialog_none_label);
-        final Button sitesRadio = new Button(compCenters, SWT.RADIO);
+        final Button sitesRadio = new Button(groupComp, SWT.RADIO);
         sitesRadio.setText(Messages.MembershipAddDialog_sitesOnly_label);
-        final Button clinicsRadio = new Button(compCenters, SWT.RADIO);
+        final Button clinicsRadio = new Button(groupComp, SWT.RADIO);
         clinicsRadio.setText(Messages.MembershipAddDialog_clinicsOnly_label);
-        final Button rgRadio = new Button(compCenters, SWT.RADIO);
+        final Button rgRadio = new Button(groupComp, SWT.RADIO);
         rgRadio.setText(Messages.MembershipAddDialog_rgOnly_label);
 
         List<Object> centers = new ArrayList<Object>();
@@ -151,8 +153,9 @@ public class MembershipAddDialog extends BgcBaseDialog {
         centers.add(noCenterSelection);
         centers
             .addAll(CenterWrapper.getCenters(SessionManager.getAppService()));
-        centersViewer = widgetCreator.createComboViewer(compCenters, label,
-            centers, null, null, true, null, null, new LabelProvider() {
+        centersViewer = createComboViewer(groupComp,
+            Messages.MembershipAddDialog_selected_center_label, centers, null,
+            null, null, new LabelProvider() {
                 @Override
                 public String getText(Object element) {
                     if (element instanceof String)
@@ -160,9 +163,9 @@ public class MembershipAddDialog extends BgcBaseDialog {
                     return ((CenterWrapper<?>) element).getNameShort();
                 }
             });
-        gd = (GridData) centersViewer.getControl().getLayoutData();
+        GridData gd = (GridData) centersViewer.getControl().getLayoutData();
         gd.horizontalSpan = 4;
-        centersViewer.getControl().setLayoutData(gd);
+
         centersViewer.setSelection(new StructuredSelection(noCenterSelection));
         centersViewer.addFilter(new ViewerFilter() {
             @Override
@@ -199,12 +202,21 @@ public class MembershipAddDialog extends BgcBaseDialog {
         rgRadio.addSelectionListener(selListener);
     }
 
+    private Composite createTabItem(TabFolder tb, String title, int columns) {
+        TabItem item = new TabItem(tb, SWT.NONE);
+        item.setText(title);
+        Composite contents = new Composite(tb, SWT.NONE);
+        contents.setLayout(new GridLayout(columns, false));
+        item.setControl(contents);
+        return contents;
+    }
+
     private void createRolesWidget(Composite contents)
         throws ApplicationException {
         GridData gd;
         rolesWidget = new MultiSelectWidget<RoleWrapper>(contents, SWT.NONE,
             Messages.MembershipAddDialog_roles_available_label,
-            Messages.MembershipAddDialog_roles_selected_label, 110) {
+            Messages.MembershipAddDialog_roles_selected_label, 300) {
             @Override
             protected String getTextForObject(RoleWrapper nodeObject) {
                 return nodeObject.getName();
@@ -215,75 +227,38 @@ public class MembershipAddDialog extends BgcBaseDialog {
             new ArrayList<RoleWrapper>());
         gd = (GridData) rolesWidget.getLayoutData();
         gd.horizontalSpan = 2;
-        // rolesWidget
-        // .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
-        // @Override
-        // public void selectionChanged(MultiSelectEvent event) {
-        // if (rolesWidget.getSelected().isEmpty())
-        // setErrorMessage(Messages.MembershipAddDialog_role_error_msg);
-        // else
-        // setErrorMessage(null);
-        // }
-        // });
-    }
-
-    private void createRightsWidgets(Composite contents) {
-        rpSection = createSection(contents,
-            Messages.MembershipAddDialog_rp_assoc_section,
-            Messages.MembershipAddDialog_rp_assoc_add_label,
-            new SelectionAdapter() {
+        rolesWidget
+            .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
                 @Override
-                public void widgetSelected(SelectionEvent e) {
-                    addPermission();
+                public void selectionChanged(MultiSelectEvent event) {
+                    checkedRolesOrPermissionsSelected();
                 }
             });
-
-        // FIXME if add only, empty list is ok. If edit, need to get the
-        // current membership
-        permissionsInfoTable = new PermissionInfoTable(rpSection,
-            new ArrayList<PermissionWrapper>()) {
-            @Override
-            protected List<BbRightWrapper> getAlreadyUsedRights() {
-                List<BbRightWrapper> rights = new ArrayList<BbRightWrapper>();
-                for (PermissionWrapper rp : permissionsInfoTable
-                    .getCollection()) {
-                    rights.add(rp.getRight());
-                }
-                return rights;
-            }
-
-            @Override
-            protected void removeFromPermissionCollection(
-                List<PermissionWrapper> rpList) {
-            }
-        };
-        rpSection.setClient(permissionsInfoTable);
-        // permissionsInfoTable
-        // .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
-        // @Override
-        // public void selectionChanged(MultiSelectEvent event) {
-        // if (permissionsInfoTable.getCollection().isEmpty())
-        // setErrorMessage(Messages.MembershipAddDialog_rights_error_msg);
-        // else
-        // setErrorMessage(null);
-        // }
-        // });
     }
 
-    protected void addPermission() {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+    protected void checkedRolesOrPermissionsSelected() {
+        if (rolesWidget.getSelected().isEmpty()
+            && !permissionsTree.hasCheckedItems())
+            setErrorMessage(Messages.MembershipAddDialog_role_error_msg);
+        else
+            setErrorMessage(null);
+    }
+
+    private void createPermissionWidgets(Composite contents)
+        throws ApplicationException {
+        permissionsTree = new PermissionCheckTree(contents, false,
+            BbRightWrapper.getAllRights(SessionManager.getAppService()));
+        permissionsTree.setSelections(ms.getPermissionCollection(false));
+
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        gd.horizontalSpan = 2;
+        permissionsTree.setLayoutData(gd);
+
+        permissionsTree.addCheckedListener(new ICheckStateListener() {
             @Override
-            public void run() {
-                PermissionAddDialog dlg = new PermissionAddDialog(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    new ArrayList<BbRightWrapper>());
-                int res = dlg.open();
-                if (res == Status.OK) {
-                    addedPermissions.addAll(dlg.getNewPermissionList());
-                    permissionsInfoTable.getCollection().addAll(
-                        dlg.getNewPermissionList());
-                    permissionsInfoTable.reloadCollection(
-                        permissionsInfoTable.getCollection(), null);
+            public void checkStateChanged(CheckStateChangedEvent event) {
+                if (!event.getChecked()) {
+                    checkedRolesOrPermissionsSelected();
                 }
             }
         });
@@ -291,19 +266,15 @@ public class MembershipAddDialog extends BgcBaseDialog {
 
     @Override
     protected void okPressed() {
-        // FIXME test at least one role or one permission added
-        // if (rolesWidget.getSelected().isEmpty()) {
-        // rolesWidget.notifyListeners(new MultiSelectEvent(rolesWidget));
-        // return;
-        // }
-        // if (rightPrivilegeInfoTable.getCollection().isEmpty()) {
-        // rightPrivilegeInfoTable.notifyListeners(new MultiSelectEvent(
-        // rightPrivilegeInfoTable));
-        // return;
-        // }
-
+        if (rolesWidget.getSelected().isEmpty()
+            && !permissionsTree.hasCheckedItems()) {
+            checkedRolesOrPermissionsSelected();
+            return;
+        }
         ms.addToRoleCollection(rolesWidget.getAddedToSelection());
-        ms.addToPermissionCollection(addedPermissions);
+        PermissionTreeRes res = permissionsTree.getAddedAndRemovedNodes();
+        ms.addToPermissionCollection(res.addedPermissions);
+        ms.removeFromPermissionCollection(res.deletedPermissions);
         ms.setCenter(getCenterSelection());
         ms.setStudy(getStudySelection());
         ms.setPrincipal(principal);

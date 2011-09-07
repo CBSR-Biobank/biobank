@@ -74,12 +74,12 @@ public class GroupEditDialog extends BgcBaseDialog {
         TabFolder tb = new TabFolder(contents, SWT.TOP);
         tb.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createGeneralFields(createTabItem(tb, "General", 2));
+        createGeneralFields(createTabItem(tb, Messages.GroupEditDialog_general_tab_title, 2));
 
         createMembershipsSection(createTabItem(tb,
             Messages.UserEditDialog_roles_permissions_title, 1));
 
-        createUsersSection(createTabItem(tb, "Users", 1));
+        createUsersSection(createTabItem(tb, Messages.GroupEditDialog_users_tab_title, 1));
 
     }
 
@@ -112,7 +112,7 @@ public class GroupEditDialog extends BgcBaseDialog {
         throws ApplicationException {
         // FIXME something else than a double list selection might be better
         usersWidget = new MultiSelectWidget<UserWrapper>(contents, SWT.NONE,
-            "Available users", "Selected users", 200) {
+            Messages.GroupEditDialog_available_users_label, Messages.GroupEditDialog_selected_users_label, 200) {
             @Override
             protected String getTextForObject(UserWrapper nodeObject) {
                 return nodeObject.getFullName() + " (" + nodeObject.getLogin() //$NON-NLS-1$

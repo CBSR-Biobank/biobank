@@ -277,6 +277,8 @@ public class Messages extends NLS {
 
     public static String LoggingInfoTable_user_label;
 
+    public static String MembershipInfoTable_all_label;
+
     public static String MembershipInfoTable_center_label;
 
     public static String MembershipInfoTable_loading;

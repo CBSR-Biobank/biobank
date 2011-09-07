@@ -5,6 +5,10 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.dialogs.user.messages"; //$NON-NLS-1$
 
+    public static String GroupEditDialog_available_users_label;
+
+    public static String GroupEditDialog_general_tab_title;
+
     public static String GroupEditDialog_membership_add_label;
 
     public static String GroupEditDialog_membership_section_label;
@@ -13,10 +17,14 @@ public class Messages extends NLS {
     public static String GroupEditDialog_msg_name_required;
     public static String GroupEditDialog_msg_persit_error;
     public static String GroupEditDialog_property_title_name;
+
+    public static String GroupEditDialog_selected_users_label;
     public static String GroupEditDialog_title_add;
     public static String GroupEditDialog_title_edit;
     public static String GroupEditDialog_titlearea_add;
     public static String GroupEditDialog_titlearea_modify;
+
+    public static String GroupEditDialog_users_tab_title;
 
     public static String GroupsPage_page_title;
 
@@ -26,11 +34,17 @@ public class Messages extends NLS {
 
     public static String MembershipAddDialog_center_label;
 
+    public static String MembershipAddDialog_centerStudy_tab_title;
+
     public static String MembershipAddDialog_clinicsOnly_label;
 
     public static String MembershipAddDialog_description;
 
+    public static String MembershipAddDialog_filter_center_label;
+
     public static String MembershipAddDialog_none_label;
+
+    public static String MembershipAddDialog_permissions_tab_title;
 
     public static String MembershipAddDialog_rgOnly_label;
 
@@ -46,9 +60,15 @@ public class Messages extends NLS {
 
     public static String MembershipAddDialog_roles_selection_label;
 
+    public static String MembershipAddDialog_roles_tab_title;
+
     public static String MembershipAddDialog_rp_assoc_add_label;
 
     public static String MembershipAddDialog_rp_assoc_section;
+
+    public static String MembershipAddDialog_selected_center_label;
+
+    public static String MembershipAddDialog_selected_study_label;
 
     public static String MembershipAddDialog_sitesOnly_label;
 
@@ -112,7 +132,11 @@ public class Messages extends NLS {
 
     public static String UserEditDialog_Email_label;
 
+    public static String UserEditDialog_email_validator_msg;
+
     public static String UserEditDialog_firstName_label;
+
+    public static String UserEditDialog_fullName_validator_msg;
 
     public static String UserEditDialog_general_title;
 

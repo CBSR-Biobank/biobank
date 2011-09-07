@@ -1,27 +1,27 @@
 package edu.ualberta.med.biobank.widgets.trees.permission;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
 
 public class PrivilegeNode implements PermissionNode {
 
-    private PermissionNode parent;
+    private RightNode parent;
     private PrivilegeWrapper privilege;
 
-    public PrivilegeNode(PermissionNode parent, PrivilegeWrapper privilege) {
+    public PrivilegeNode(RightNode parent, PrivilegeWrapper privilege) {
         this.parent = parent;
         this.privilege = privilege;
     }
 
     @Override
-    public PermissionNode getParent() {
+    public RightNode getParent() {
         return parent;
     }
 
     @Override
-    public List<PermissionNode> getChildren() {
+    public Collection<PermissionNode> getChildren() {
         return new ArrayList<PermissionNode>();
     }
 
@@ -33,4 +33,10 @@ public class PrivilegeNode implements PermissionNode {
     public String getText() {
         return privilege.getName();
     }
+
+    @Override
+    public String toString() {
+        return "Privilege=" + privilege.toString(); //$NON-NLS-1$
+    }
+
 }

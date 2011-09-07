@@ -127,12 +127,12 @@ public class UserEditDialog extends BgcBaseDialog {
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             Messages.UserEditDialog_firstName_label, null, originalUser,
             UserPeer.FULL_NAME.getName(), new NonEmptyStringValidator(
-                "Full name of this user is required"));
+                Messages.UserEditDialog_fullName_validator_msg));
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
             Messages.UserEditDialog_Email_label, null, originalUser,
             UserPeer.EMAIL.getName(), new EmailValidator(
-                "A valid email is required"));
+                Messages.UserEditDialog_email_validator_msg));
 
         createBoundWidgetWithLabel(contents, Button.class, SWT.CHECK,
             Messages.UserEditDialog_bulkemail_label, null, originalUser,
