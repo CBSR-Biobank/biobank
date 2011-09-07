@@ -44,8 +44,8 @@ import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.forms.BgcEntryFormActions;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 
 public abstract class ReportsEditor extends BiobankEntryForm {
@@ -345,8 +345,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
             bw.write("," + columnInfo.get(j)); //$NON-NLS-1$
         }
         bw.println();
-        BiobankLabelProvider stringConverter = reportTable
-            .getLabelProvider(false);
+        BgcLabelProvider stringConverter = reportTable.getLabelProvider(false);
         for (Object row : reportData) {
             Object[] castOb = (Object[]) row;
             bw.write("\"" + stringConverter.getColumnText(castOb, 0) + "\""); //$NON-NLS-1$ //$NON-NLS-2$

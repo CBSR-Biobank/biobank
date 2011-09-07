@@ -32,11 +32,11 @@ import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
 public class DispatchViewForm extends BiobankViewForm {
@@ -194,6 +194,7 @@ public class DispatchViewForm extends BiobankViewForm {
                         specimensNonProcessedTable.reloadCollection();
                     }
                 });
+            specimensNonProcessedTable.createDefaultEditItem();
         } else {
             specimensTree = new DispatchSpecimensTreeTable(page, dispatch,
                 false, false);

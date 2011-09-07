@@ -8,9 +8,9 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
+public class StudyInfoTable extends InfoTableWidget {
 
     protected static class TableRowData {
         StudyWrapper study;
@@ -40,8 +40,8 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
@@ -70,18 +70,18 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
     }
 
     @Override
-    public Object getCollectionModelObject(StudyWrapper study) throws Exception {
+    public Object getCollectionModelObject(Object study) throws Exception {
         TableRowData info = new TableRowData();
-        info.study = study;
-        info.name = study.getName();
-        info.nameShort = study.getNameShort();
-        info.status = study.getActivityStatus().getName();
+        info.study = (StudyWrapper) study;
+        info.name = info.study.getName();
+        info.nameShort = info.study.getNameShort();
+        info.status = info.study.getActivityStatus().getName();
         if (info.status == null) {
             info.status = ""; //$NON-NLS-1$
         }
-        info.patientCount = study.getPatientCount(true);
-        info.visitCount = study.getCollectionEventCount(true);
-        study.reload();
+        info.patientCount = info.study.getPatientCount(true);
+        info.visitCount = info.study.getCollectionEventCount(true);
+        info.study.reload();
         return info;
     }
 

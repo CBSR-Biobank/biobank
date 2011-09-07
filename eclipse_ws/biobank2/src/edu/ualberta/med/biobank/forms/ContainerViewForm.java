@@ -522,6 +522,7 @@ public class ContainerViewForm extends BiobankViewForm {
             ColumnsShown.ALL, 20);
         specimensWidget.adaptToToolkit(toolkit, true);
         specimensWidget.addClickListener(collectionDoubleClickListener);
+        specimensWidget.createDefaultEditItem();
     }
 
     @Override

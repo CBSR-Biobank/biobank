@@ -8,7 +8,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -21,6 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
@@ -198,7 +198,8 @@ public class TestSite extends TestDatabase {
         site.addToStudyCollection(studySet1);
         site.persist();
         site.reload();
-        List<StudyWrapper> siteNonAssocStudies = site.getStudiesNotAssoc();
+        List<StudyWrapper> siteNonAssocStudies = SiteQuery
+            .getStudiesNotAssoc(site);
 
         Assert.assertEquals(studySet2.size(), siteNonAssocStudies.size());
 
@@ -207,7 +208,7 @@ public class TestSite extends TestDatabase {
         site.addToStudyCollection(studySet2);
         site.persist();
         site.reload();
-        siteNonAssocStudies = site.getStudiesNotAssoc();
+        siteNonAssocStudies = SiteQuery.getStudiesNotAssoc(site);
 
         Assert.assertEquals(studySet1.size(), siteNonAssocStudies.size());
 
@@ -215,7 +216,7 @@ public class TestSite extends TestDatabase {
         site.addToStudyCollection(studySet1);
         site.persist();
         site.reload();
-        siteNonAssocStudies = site.getStudiesNotAssoc();
+        siteNonAssocStudies = SiteQuery.getStudiesNotAssoc(site);
 
         Assert.assertEquals(0, siteNonAssocStudies.size());
     }
@@ -354,15 +355,15 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testPersist() throws Exception {
-        int oldTotal = SiteWrapper.getSites(appService).size();
+        int oldTotal = SiteQuery.getSites(appService).size();
         SiteHelper.addSite("testPersist" + r.nextInt());
-        int newTotal = SiteWrapper.getSites(appService).size();
+        int newTotal = SiteQuery.getSites(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
     }
 
     @Test
     public void testPersistFailNameUnique() throws Exception {
-        int oldTotal = SiteWrapper.getSites(appService).size();
+        int oldTotal = SiteQuery.getSites(appService).size();
         String name = "testPersistFailNameUnique" + r.nextInt();
         SiteWrapper site = SiteHelper.newSite(name);
         site = SiteHelper.addSite(name);
@@ -379,13 +380,13 @@ public class TestSite extends TestDatabase {
 
         site.setName("Other Name" + r.nextInt());
         site.persist();
-        int newTotal = SiteWrapper.getSites(appService).size();
+        int newTotal = SiteQuery.getSites(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
     }
 
     @Test
     public void testPersistFailNoAcivityStatus() throws Exception {
-        int oldTotal = SiteWrapper.getSites(appService).size();
+        int oldTotal = SiteQuery.getSites(appService).size();
         String name = "testPersistFailNoAddress" + r.nextInt();
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
@@ -403,7 +404,7 @@ public class TestSite extends TestDatabase {
             .getActiveActivityStatus(appService));
         SiteHelper.createdSites.add(site);
         site.persist();
-        int newTotal = SiteWrapper.getSites(appService).size();
+        int newTotal = SiteQuery.getSites(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
     }
 
@@ -428,7 +429,7 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testDeleteFailNoMoreContainerType() throws Exception {
-        int oldTotal = SiteWrapper.getSites(appService).size();
+        int oldTotal = SiteQuery.getSites(appService).size();
         String name = "testDeleteFailNoMoreContainerType" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name, false);
 
@@ -441,18 +442,18 @@ public class TestSite extends TestDatabase {
             Assert
                 .fail("Should not delete the site : a container type is still there");
         } catch (CollectionNotEmptyException bce) {
-            Assert.assertEquals(oldTotal + 1, SiteWrapper.getSites(appService)
+            Assert.assertEquals(oldTotal + 1, SiteQuery.getSites(appService)
                 .size());
         }
         type.delete();
         site.reload();
         site.delete();
-        Assert.assertEquals(oldTotal, SiteWrapper.getSites(appService).size());
+        Assert.assertEquals(oldTotal, SiteQuery.getSites(appService).size());
     }
 
     @Test
     public void testDeleteFailNoMoreContainer() throws Exception {
-        int oldTotal = SiteWrapper.getSites(appService).size();
+        int oldTotal = SiteQuery.getSites(appService).size();
         String name = "testDeleteFailNoMoreContainer" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name, false);
 
@@ -465,7 +466,7 @@ public class TestSite extends TestDatabase {
             Assert
                 .fail("Should not delete the site : a container and a container type is still there");
         } catch (CollectionNotEmptyException bce) {
-            Assert.assertEquals(oldTotal + 1, SiteWrapper.getSites(appService)
+            Assert.assertEquals(oldTotal + 1, SiteQuery.getSites(appService)
                 .size());
         }
         ContainerTypeWrapper type = container.getContainerType();
@@ -473,7 +474,7 @@ public class TestSite extends TestDatabase {
         type.delete();
         site.reload();
         site.delete();
-        Assert.assertEquals(oldTotal, SiteWrapper.getSites(appService).size());
+        Assert.assertEquals(oldTotal, SiteQuery.getSites(appService).size());
     }
 
     @Test
@@ -516,20 +517,20 @@ public class TestSite extends TestDatabase {
         int nberSite = r.nextInt(15) + 1;
         SiteHelper.addSites("testGetSites" + r.nextInt(), nberSite);
 
-        List<SiteWrapper> siteWrappers = SiteWrapper.getSites(appService);
+        List<SiteWrapper> siteWrappers = SiteQuery.getSites(appService);
         List<Site> sitesDB = appService.search(Site.class, new Site());
         int nberAddedInDB = sitesDB.size() - sitesDBBefore.size();
         Assert.assertEquals(nberSite, nberAddedInDB);
         Assert.assertEquals(siteWrappers.size(), siteWrappers.size());
 
         Site site = DbHelper.chooseRandomlyInList(sitesDB);
-        siteWrappers = SiteWrapper.getSites(appService, site.getId());
+        siteWrappers = SiteQuery.getSites(appService, site.getId());
         Assert.assertEquals(1, siteWrappers.size());
 
         HQLCriteria criteria = new HQLCriteria("select max(id) from "
             + Site.class.getName());
         List<Integer> max = appService.query(criteria);
-        siteWrappers = SiteWrapper.getSites(appService, max.get(0) + 1000);
+        siteWrappers = SiteQuery.getSites(appService, max.get(0) + 1000);
         Assert.assertEquals(0, siteWrappers.size());
     }
 
@@ -579,11 +580,8 @@ public class TestSite extends TestDatabase {
             pevents.add(pevent);
         }
 
-        Assert.assertEquals(2, site.getCollectionEventCountForStudy(study1));
-        Assert.assertEquals(1, site.getCollectionEventCountForStudy(study2));
-
         site.reload();
-        Assert.assertEquals(3, site.getPatientCount().longValue());
+        Assert.assertEquals(3, SiteQuery.getPatientCount(site).longValue());
 
         // delete patient 1
         patient1.reload();
@@ -597,11 +595,10 @@ public class TestSite extends TestDatabase {
         patient1.delete();
 
         site.reload();
-        Assert.assertEquals(2, site.getPatientCount().longValue());
-        Assert.assertEquals(
-            site.getPatientCountForStudy(study1)
-                + site.getPatientCountForStudy(study2), site.getPatientCount()
-                .longValue());
+        Assert.assertEquals(2, SiteQuery.getPatientCount(site).longValue());
+        Assert.assertEquals(SiteQuery.getPatientCountForStudy(site, study1)
+            + SiteQuery.getPatientCountForStudy(site, study2), SiteQuery
+            .getPatientCount(site).longValue());
     }
 
     @Test
@@ -661,7 +658,7 @@ public class TestSite extends TestDatabase {
     @Test
     public void testGetWorkingClinicCollection() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testGetWorkingClinics");
-        Assert.assertTrue(site.getWorkingClinicCollectionSize() == 0);
+        Assert.assertTrue(SiteQuery.getWorkingClinicCollectionSize(site) == 0);
         StudyWrapper study = StudyHelper.addStudy("testStudy");
         ClinicWrapper clinic = ClinicHelper.addClinic("testClinic");
         ContactWrapper contact = ContactHelper

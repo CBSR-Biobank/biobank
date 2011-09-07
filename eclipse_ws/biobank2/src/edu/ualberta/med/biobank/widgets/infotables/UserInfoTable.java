@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -23,10 +22,14 @@ import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.dialogs.user.UserEditDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public abstract class UserInfoTable extends InfoTableWidget<User> {
+public abstract class UserInfoTable extends InfoTableWidget {
+
     public static final int ROWS_PER_PAGE = 12;
     private static final String[] HEADINGS = new String[] {
         Messages.UserInfoTable_login_label, Messages.UserInfoTable_email_label,
@@ -118,8 +121,8 @@ public abstract class UserInfoTable extends InfoTableWidget<User> {
     }
 
     @Override
-    protected IBaseLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public Image getColumnImage(Object element, int columnIndex) {
                 User user = (User) ((BiobankCollectionModel) element).o;

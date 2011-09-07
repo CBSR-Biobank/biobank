@@ -80,7 +80,7 @@ public abstract class AbstractContainerDisplay {
         @SuppressWarnings("unused") Map<RowColPos, ? extends AbstractUICell> cells,
         int indexRow, int indexCol) {
         RowColPos rowcol = new RowColPos(indexRow, indexCol);
-        String parentLabel = "";
+        String parentLabel = ""; //$NON-NLS-1$
         if (displayFullInfoString && container != null) {
             parentLabel = container.getLabel();
         }

@@ -9,9 +9,9 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
+public class ClinicInfoTable extends InfoTableWidget {
 
     private static class TableRowData {
         public ClinicWrapper clinic;
@@ -44,8 +44,8 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
@@ -76,21 +76,20 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     }
 
     @Override
-    public Object getCollectionModelObject(ClinicWrapper clinic)
-        throws Exception {
+    public Object getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
-        info.clinic = clinic;
-        info.clinicName = clinic.getName();
-        info.clinicNameShort = clinic.getNameShort();
-        List<StudyWrapper> studies = clinic.getStudyCollection();
+        info.clinic = (ClinicWrapper) obj;
+        info.clinicName = info.clinic.getName();
+        info.clinicNameShort = info.clinic.getNameShort();
+        List<StudyWrapper> studies = info.clinic.getStudyCollection();
         if (studies == null) {
             info.studyCount = 0;
         } else {
             info.studyCount = studies.size();
         }
-        info.status = clinic.getActivityStatus().getName();
-        info.patientCount = clinic.getPatientCount();
-        info.visitCount = clinic.getCollectionEventCount();
+        info.status = info.clinic.getActivityStatus().getName();
+        info.patientCount = info.clinic.getPatientCount();
+        info.visitCount = info.clinic.getCollectionEventCount();
         return info;
     }
 

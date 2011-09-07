@@ -8,10 +8,9 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class CollectionEventInfoTable extends
-    InfoTableWidget<CollectionEventWrapper> {
+public class CollectionEventInfoTable extends InfoTableWidget {
 
     private static class TableRowData {
         CollectionEventWrapper collectionEvent;
@@ -41,8 +40,8 @@ public class CollectionEventInfoTable extends
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
@@ -56,11 +55,9 @@ public class CollectionEventInfoTable extends
                 case 0:
                     return info.visitNumber.toString();
                 case 1:
-                    return NumberFormatter
-                        .format(info.sourceSpecimenCount);
+                    return NumberFormatter.format(info.sourceSpecimenCount);
                 case 2:
-                    return NumberFormatter
-                        .format(info.aliquotedSpecimenCount);
+                    return NumberFormatter.format(info.aliquotedSpecimenCount);
                 case 3:
                     return info.comment;
 
@@ -72,16 +69,15 @@ public class CollectionEventInfoTable extends
     }
 
     @Override
-    public Object getCollectionModelObject(
-        CollectionEventWrapper collectionEvent) throws Exception {
+    public Object getCollectionModelObject(Object o) throws Exception {
         TableRowData info = new TableRowData();
-        info.collectionEvent = collectionEvent;
-        info.visitNumber = collectionEvent.getVisitNumber();
-        info.sourceSpecimenCount = collectionEvent
+        info.collectionEvent = (CollectionEventWrapper) o;
+        info.visitNumber = info.collectionEvent.getVisitNumber();
+        info.sourceSpecimenCount = info.collectionEvent
             .getSourceSpecimensCount(true);
-        info.aliquotedSpecimenCount = collectionEvent
+        info.aliquotedSpecimenCount = info.collectionEvent
             .getAliquotedSpecimensCount(true);
-        info.comment = collectionEvent.getComment();
+        info.comment = info.collectionEvent.getComment();
         return info;
     }
 

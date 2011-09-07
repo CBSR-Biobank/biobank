@@ -40,6 +40,7 @@ public class SpecimenListViewForm extends BiobankViewForm {
             SpecimenInfoTable.ColumnsShown.ALL, 20);
         specimensWidget.adaptToToolkit(toolkit, true);
         specimensWidget.addClickListener(collectionDoubleClickListener);
+        specimensWidget.createDefaultEditItem();
     }
 
     @Override

@@ -13,6 +13,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -33,13 +34,13 @@ import edu.ualberta.med.biobank.dialogs.dispatch.ModifyStateDispatchDialog;
 import edu.ualberta.med.biobank.forms.utils.DispatchTableGroup;
 import edu.ualberta.med.biobank.forms.utils.TableGroup;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.utils.BiobankClipboard;
 
 public class DispatchSpecimensTreeTable extends BgcBaseWidget {
 
@@ -126,7 +127,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         };
         tv.setContentProvider(contentProvider);
 
-        final BiobankLabelProvider labelProvider = new BiobankLabelProvider() {
+        final BgcLabelProvider labelProvider = new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 if (element instanceof TableGroup) {
@@ -147,6 +148,11 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                 }
                 return ""; //$NON-NLS-1$
             }
+
+            @Override
+            public Image getColumnImage(Object element, int columnIndex) {
+                return null;
+            }
         };
         tv.setLabelProvider(labelProvider);
         tv.setInput("root"); //$NON-NLS-1$
@@ -157,8 +163,8 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                     if (!menuItem.equals(editItem))
                         menuItem.dispose();
                 }
-                BiobankClipboard.addClipboardCopySupport(tv, menu,
-                    labelProvider, 5);
+                BgcClipboard
+                    .addClipboardCopySupport(tv, menu, labelProvider, 5);
                 if (editSpecimensState || editSpecimensComment) {
                     DispatchSpecimenWrapper dsa = getSelectedSpecimen();
                     if (dsa != null) {

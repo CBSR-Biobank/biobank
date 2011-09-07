@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Patient;
@@ -36,7 +37,7 @@ public class CachedReportDataSource implements ReportDataSource {
 
     public List<SiteWrapper> getSites() throws Exception {
         if (sites == null) {
-            sites = SiteWrapper.getSites(appService);
+            sites = SiteQuery.getSites(appService);
         }
         return sites;
     }

@@ -6,10 +6,9 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class ActivityStatusInfoTable extends
-    InfoTableWidget<ActivityStatusWrapper> {
+public class ActivityStatusInfoTable extends InfoTableWidget {
 
     private static final String[] HEADINGS = new String[] { Messages.ActivityStatusInfoTable_status_label };
 
@@ -20,8 +19,8 @@ public class ActivityStatusInfoTable extends
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 ActivityStatusWrapper item = (ActivityStatusWrapper) ((BiobankCollectionModel) element).o;

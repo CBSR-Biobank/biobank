@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
@@ -47,7 +48,7 @@ public class TestStudy extends TestDatabase {
         SiteHelper.addSites(name, sitesNber);
 
         SiteWrapper site = SiteHelper.addSite(name, false);
-        List<SiteWrapper> sites = SiteWrapper.getSites(appService);
+        List<SiteWrapper> sites = SiteQuery.getSites(appService);
         for (SiteWrapper s : sites) {
             s.addToStudyCollection(Arrays.asList(study));
             s.persist();
@@ -76,7 +77,7 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         SiteHelper.addSites(name, r.nextInt(15) + 5);
 
-        List<SiteWrapper> sites = SiteWrapper.getSites(appService);
+        List<SiteWrapper> sites = SiteQuery.getSites(appService);
         for (SiteWrapper s : sites) {
             s.addToStudyCollection(Arrays.asList(study));
             s.persist();
@@ -119,7 +120,7 @@ public class TestStudy extends TestDatabase {
 
         List<ContactWrapper> contacts = study.getContactCollection(true);
         if (contacts.size() > 1) {
-            for (int i = 0; i < contacts.size() - 1; i++) {
+            for (int i = 0; i < (contacts.size() - 1); i++) {
                 ContactWrapper contact1 = contacts.get(i);
                 ContactWrapper contact2 = contacts.get(i + 1);
                 Assert.assertTrue(contact1.compareTo(contact2) <= 0);
@@ -219,7 +220,7 @@ public class TestStudy extends TestDatabase {
         List<AliquotedSpecimenWrapper> storages = study
             .getAliquotedSpecimenCollection(true);
         if (storages.size() > 1) {
-            for (int i = 0; i < storages.size() - 1; i++) {
+            for (int i = 0; i < (storages.size() - 1); i++) {
                 AliquotedSpecimenWrapper storage1 = storages.get(i);
                 AliquotedSpecimenWrapper storage2 = storages.get(i + 1);
                 Assert.assertTrue(storage1.compareTo(storage2) <= 0);
@@ -268,7 +269,7 @@ public class TestStudy extends TestDatabase {
         List<SourceSpecimenWrapper> sources = study
             .getSourceSpecimenCollection(true);
         if (sources.size() > 1) {
-            for (int i = 0; i < sources.size() - 1; i++) {
+            for (int i = 0; i < (sources.size() - 1); i++) {
                 SourceSpecimenWrapper source1 = sources.get(i);
                 SourceSpecimenWrapper source2 = sources.get(i + 1);
                 Assert.assertTrue(source1.compareTo(source2) <= 0);
@@ -576,7 +577,7 @@ public class TestStudy extends TestDatabase {
 
         List<PatientWrapper> patients = study.getPatientCollection(true);
         if (patients.size() > 1) {
-            for (int i = 0; i < patients.size() - 1; i++) {
+            for (int i = 0; i < (patients.size() - 1); i++) {
                 PatientWrapper patient1 = patients.get(i);
                 PatientWrapper patient2 = patients.get(i + 1);
                 Assert.assertTrue(patient1.compareTo(patient2) <= 0);

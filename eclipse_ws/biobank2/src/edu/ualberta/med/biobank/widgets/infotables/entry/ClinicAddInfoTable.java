@@ -14,10 +14,9 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectClinicContactDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
-import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 
 /**
  * Allows the user to select a clinic and a contact from a clinic. Note that
@@ -76,10 +75,10 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
                 ContactWrapper contact = getSelection();
                 if (contact != null) {
                     if (!BgcPlugin.openConfirm(
-                        Messages.ClinicAddInfoTable_delete_confirm_title,
-                        NLS.bind(
-                            Messages.ClinicAddInfoTable_delete_confirm_msg,
-                            contact.getName()))) {
+                        Messages.ClinicAddInfoTable_delete_confirm_title, NLS
+                            .bind(
+                                Messages.ClinicAddInfoTable_delete_confirm_msg,
+                                contact.getName()))) {
                         return;
                     }
 
@@ -95,6 +94,7 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
         setCollection(contacts);
     }
 
+    @Override
     public void reload() {
         setCollection(study.getContactCollection(true));
     }

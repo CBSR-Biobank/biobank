@@ -13,13 +13,12 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class ContainerTypeInfoTable extends
-    InfoTableWidget<ContainerTypeWrapper> {
+public class ContainerTypeInfoTable extends InfoTableWidget {
 
     private static class TableRowData {
         ContainerTypeWrapper containerType;
@@ -57,8 +56,8 @@ public class ContainerTypeInfoTable extends
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
@@ -89,21 +88,20 @@ public class ContainerTypeInfoTable extends
     }
 
     @Override
-    public Object getCollectionModelObject(ContainerTypeWrapper type)
-        throws Exception {
+    public Object getCollectionModelObject(Object type) throws Exception {
         TableRowData info = new TableRowData();
-        Integer rowCapacity = type.getRowCapacity();
-        Integer colCapacity = type.getColCapacity();
+        info.containerType = (ContainerTypeWrapper) type;
+        Integer rowCapacity = info.containerType.getRowCapacity();
+        Integer colCapacity = info.containerType.getColCapacity();
 
-        info.containerType = type;
-        info.name = type.getName();
-        info.nameShort = type.getNameShort();
-        info.status = type.getActivityStatus().getName();
+        info.name = info.containerType.getName();
+        info.nameShort = info.containerType.getNameShort();
+        info.status = info.containerType.getActivityStatus().getName();
         if ((rowCapacity != null) && (colCapacity != null)) {
             info.capacity = rowCapacity * colCapacity;
         }
-        info.inUseCount = type.getContainersCount();
-        info.temperature = type.getDefaultTemperature();
+        info.inUseCount = info.containerType.getContainersCount();
+        info.temperature = info.containerType.getDefaultTemperature();
         return info;
     }
 

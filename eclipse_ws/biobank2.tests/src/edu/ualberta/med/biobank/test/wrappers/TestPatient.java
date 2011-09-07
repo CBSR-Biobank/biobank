@@ -422,7 +422,6 @@ public class TestPatient extends TestDatabase {
             Assert.assertEquals(1, patient.getSourceSpecimenCount(true));
             Assert.assertEquals(1, patient.getSourceSpecimenCount(false));
         }
-
     }
 
     @Test

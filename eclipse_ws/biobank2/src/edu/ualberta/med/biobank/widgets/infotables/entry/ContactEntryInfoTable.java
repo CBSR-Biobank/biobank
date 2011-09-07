@@ -13,12 +13,12 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.select.ContactAddDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 
 public class ContactEntryInfoTable extends ContactInfoTable {
 
@@ -136,6 +136,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         return deletedContacts;
     }
 
+    @Override
     public void reload() {
         selectedContacts = clinic.getContactCollection(false);
         if (selectedContacts == null) {
@@ -153,8 +154,8 @@ public class ContactEntryInfoTable extends ContactInfoTable {
             @Override
             public int compare(Object e1, Object e2) {
                 try {
-                    TableRowData i1 = getCollectionModelObject((ContactWrapper) e1);
-                    TableRowData i2 = getCollectionModelObject((ContactWrapper) e2);
+                    TableRowData i1 = getCollectionModelObject(e1);
+                    TableRowData i2 = getCollectionModelObject(e2);
                     return super.compare(i1.name, i2.name);
                 } catch (Exception e) {
                     return 0;
