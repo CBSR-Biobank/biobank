@@ -42,27 +42,6 @@ public class MembershipWrapper extends MembershipBaseWrapper {
         return 0;
     }
 
-    public String getRolesAndPermissionsString() {
-        StringBuffer sb = new StringBuffer();
-        boolean first = true;
-        for (PermissionWrapper rp : getPermissionCollection(true)) {
-            if (first)
-                first = false;
-            else
-                sb.append(";");
-            sb.append(rp.getRight().getName());
-        }
-        for (RoleWrapper r : getRoleCollection(true)) {
-            if (first)
-                first = false;
-            else
-                sb.append(";");
-            sb.append(r.getName());
-
-        }
-        return sb.toString();
-    }
-
     public List<PrivilegeWrapper> getPrivilegesForRight(BbRightWrapper right,
         CenterWrapper<?> center, StudyWrapper study)
         throws ApplicationException {

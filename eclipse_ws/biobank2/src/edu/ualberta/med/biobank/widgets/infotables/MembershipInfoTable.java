@@ -8,7 +8,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.dialogs.user.MembershipEditDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
@@ -17,18 +19,20 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
     private static final String[] HEADINGS = new String[] {
         Messages.MembershipInfoTable_center_label,
         Messages.MembershipInfoTable_study_label,
-        Messages.MembershipInfoTable_role_right_privilege_label };
+        Messages.MembershipInfoTable_role_label,
+        Messages.MembershipInfoTable_permissions_label };
 
     protected static class TableRowData {
         MembershipWrapper ms;
         String center;
         String study;
-        String roleOrRP;
+        String roles;
+        String permissions;
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { center, study, roleOrRP },
-                "\t"); //$NON-NLS-1$
+            return StringUtils.join(new String[] { center, study, roles,
+                permissions }, "\t"); //$NON-NLS-1$
         }
     }
 
@@ -91,12 +95,47 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
             : ms.getCenter().getNameShort();
         info.study = ms.getStudy() == null ? Messages.MembershipInfoTable_all_label
             : ms.getStudy().getNameShort();
-        info.roleOrRP = ms.getRolesAndPermissionsString();
-        if (info.roleOrRP.length() > 50) {
-            info.roleOrRP = info.roleOrRP.substring(0, 50) + "..."; //$NON-NLS-1$
-        }
+        info.roles = getRolesString(ms);
+        info.permissions = getPermissionsString(ms);
         info.ms = ms;
         return info;
+    }
+
+    public String getRolesString(MembershipWrapper ms) {
+        StringBuffer sb = new StringBuffer();
+        boolean first = true;
+        for (RoleWrapper r : ms.getRoleCollection(true)) {
+            if (sb.length() > 25) {
+                sb.setLength(25);
+                sb.append("..."); //$NON-NLS-1$
+                break;
+            }
+            if (first)
+                first = false;
+            else
+                sb.append(";"); //$NON-NLS-1$
+            sb.append(r.getName());
+
+        }
+        return sb.toString();
+    }
+
+    public String getPermissionsString(MembershipWrapper ms) {
+        StringBuffer sb = new StringBuffer();
+        boolean first = true;
+        for (PermissionWrapper rp : ms.getPermissionCollection(true)) {
+            if (sb.length() > 25) {
+                sb.setLength(25);
+                sb.append("..."); //$NON-NLS-1$
+                break;
+            }
+            if (first)
+                first = false;
+            else
+                sb.append(";"); //$NON-NLS-1$
+            sb.append(rp.getRight().getName());
+        }
+        return sb.toString();
     }
 
     @Override
@@ -124,7 +163,9 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
                 case 1:
                     return info.study;
                 case 2:
-                    return info.roleOrRP;
+                    return info.roles;
+                case 3:
+                    return info.permissions;
                 default:
                     return ""; //$NON-NLS-1$
                 }

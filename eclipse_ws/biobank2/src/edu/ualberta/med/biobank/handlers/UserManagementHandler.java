@@ -17,8 +17,4 @@ public class UserManagementHandler extends AbstractHandler implements IHandler {
         return null;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

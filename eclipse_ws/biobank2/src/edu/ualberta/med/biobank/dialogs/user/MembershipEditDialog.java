@@ -332,4 +332,11 @@ public class MembershipEditDialog extends BgcBaseDialog {
         return ms;
     }
 
+    @Override
+    protected void cancelPressed() {
+        if (ms.isNew())
+            ms.setPrincipal(null);
+        super.cancelPressed();
+    }
+
 }
