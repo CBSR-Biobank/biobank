@@ -24,7 +24,7 @@ public class SpecimenLinkHandler extends LinkAssignCommonHandler {
     protected boolean canUserPerformAction(UserWrapper user) {
         try {
             return SessionManager
-                .canAccess(SessionSecurityHelper.SPECIMEN_LINK_KEY_DESC);
+                .isAllowed(SessionSecurityHelper.SPECIMEN_LINK_KEY_DESC);
         } catch (Exception ae) {
             throw new RuntimeException(ae);
         }

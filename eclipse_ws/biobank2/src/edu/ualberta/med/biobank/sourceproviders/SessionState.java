@@ -137,20 +137,20 @@ public class SessionState extends AbstractSourceProvider {
                 .getCurrentWorkingCenter());
             setHasClinicShipmentRights(user != null
                 && SessionManager
-                    .canAccess(SessionSecurityHelper.CLINIC_SHIPMENT_KEY_DESC));
+                    .isAllowed(SessionSecurityHelper.CLINIC_SHIPMENT_KEY_DESC));
             setDispatchRights(user != null
-                && SessionManager.canAccess(
+                && SessionManager.isAllowed(
                     SessionSecurityHelper.DISPATCH_RECEIVE_KEY_DESC,
                     SessionSecurityHelper.DISPATCH_SEND_KEY_DESC));
             setHasPrinterLabelsRights(user != null
                 && SessionManager
-                    .canAccess(SessionSecurityHelper.PRINT_LABEL_KEY_DESC));
+                    .isAllowed(SessionSecurityHelper.PRINT_LABEL_KEY_DESC));
             // FIXME for user management, should be able to access even if user
             // is not connected to the right center? Right now can access only
             // if connected to same center on which has user mgt access
             setHasUserManagementRights(user != null
                 && SessionManager
-                    .canAccess(SessionSecurityHelper.USER_MANAGEMENT_DESC));
+                    .isAllowed(SessionSecurityHelper.USER_MANAGEMENT_DESC));
         } catch (Exception e) {
             logger.error("Error setting session state", e); //$NON-NLS-1$
         }

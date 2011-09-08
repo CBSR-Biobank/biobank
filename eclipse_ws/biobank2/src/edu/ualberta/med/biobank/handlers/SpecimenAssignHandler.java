@@ -26,7 +26,7 @@ public class SpecimenAssignHandler extends LinkAssignCommonHandler {
         try {
             return user.getCurrentWorkingSite() != null
                 && SessionManager
-                    .canAccess(SessionSecurityHelper.SPECIMEN_ASSIGN_KEY_DESC);
+                    .isAllowed(SessionSecurityHelper.SPECIMEN_ASSIGN_KEY_DESC);
         } catch (Exception ae) {
             throw new RuntimeException(ae);
         }

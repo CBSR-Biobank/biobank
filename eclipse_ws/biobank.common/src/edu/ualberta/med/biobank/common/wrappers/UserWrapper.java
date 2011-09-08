@@ -253,13 +253,6 @@ public class UserWrapper extends UserBaseWrapper {
     }
 
     @Override
-    public List<UserWrapper> getUsersVisible() throws ApplicationException {
-        if (isSuperAdmin())
-            return UserWrapper.getAllUsers(appService);
-        return super.getUsersVisible();
-    }
-
-    @Override
     protected Set<CenterWrapper<?>> getWorkingCentersInternal() {
         Set<CenterWrapper<?>> setOfWorkingCenter = super
             .getWorkingCentersInternal();

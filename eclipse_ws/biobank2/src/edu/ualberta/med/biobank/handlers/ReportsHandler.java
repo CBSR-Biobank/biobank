@@ -32,7 +32,7 @@ public class ReportsHandler extends AbstractHandler {
     public boolean isEnabled() {
         try {
             return SessionManager.getInstance().isConnected()
-                && SessionManager.canAccess(
+                && SessionManager.isAllowed(
                     SessionSecurityHelper.REPORTS_KEY_DESC,
                     SessionSecurityHelper.LOGGING_KEY_DESC);
         } catch (Exception e) {

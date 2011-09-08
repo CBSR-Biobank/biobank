@@ -262,9 +262,9 @@ public class SessionManager {
     }
 
     // FIXME is using current working center and no study
-    public static boolean canAccess(String... keyDesc) {
+    public static boolean isAllowed(String... keyDesc) {
         try {
-            return SessionSecurityHelper.canAccess(getAppService(), getUser(),
+            return SessionSecurityHelper.isAllowed(getAppService(), getUser(),
                 keyDesc);
         } catch (Exception e) {
             throw new RuntimeException(e);

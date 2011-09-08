@@ -71,11 +71,11 @@ public class SessionSecurityHelper {
         }
     }
 
-    public static boolean canAccess(BiobankApplicationService appService,
+    public static boolean isAllowed(BiobankApplicationService appService,
         UserWrapper user, String... keyDesc) {
         try {
             return user.hasPrivilegesOnKeyDesc(
-                PrivilegeWrapper.getReadPrivilege(appService),
+                PrivilegeWrapper.getAllowedPrivilege(appService),
                 user.getCurrentWorkingCenter(), null, keyDesc);
         } catch (Exception e) {
             throw new RuntimeException(e);
