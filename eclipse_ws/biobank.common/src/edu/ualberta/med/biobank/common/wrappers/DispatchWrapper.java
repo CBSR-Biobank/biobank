@@ -296,7 +296,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             .getNameShort() + "/");
         sb.append(getReceiverCenter() == null ? "" : getReceiverCenter()
             .getNameShort() + "/");
-        sb.append(getShipmentInfo().getFormattedDateReceived());
+        sb.append(getShipmentInfo() == null ? "" : getShipmentInfo()
+            .getFormattedDateReceived());
         return sb.toString();
     }
 
