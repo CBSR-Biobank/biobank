@@ -242,7 +242,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
         };
         rolesWidget.setSelections(
             RoleWrapper.getAllRoles(SessionManager.getAppService()),
-            new ArrayList<RoleWrapper>());
+            ms.getRoleCollection(false));
         gd = (GridData) rolesWidget.getLayoutData();
         gd.horizontalSpan = 2;
         rolesWidget

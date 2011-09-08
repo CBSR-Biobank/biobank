@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.widgets.trees.permission;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
@@ -79,6 +80,39 @@ public class RightNode implements PermissionNode {
 
     public PrivilegeNode getNode(PrivilegeWrapper p) {
         return children.get(p);
+    }
+
+    @Override
+    public void setChecked(boolean checked) {
+        setChecked(checked, null);
+    }
+
+    @Override
+    public void setChecked(boolean checked,
+        List<PrivilegeWrapper> defaultPrivilegeSelection) {
+        for (PrivilegeNode child : getChildren())
+            child.setChecked(checked, defaultPrivilegeSelection);
+    }
+
+    @Override
+    public boolean isChecked() {
+        int count = countCheckedChildren();
+        return count == getChildren().size();
+    }
+
+    @Override
+    public boolean isGrayed() {
+        int count = countCheckedChildren();
+        return count > 0 && count < getChildren().size();
+    }
+
+    protected int countCheckedChildren() {
+        int count = 0;
+        for (PrivilegeNode child : getChildren()) {
+            if (child.isChecked())
+                count++;
+        }
+        return count;
     }
 
 }

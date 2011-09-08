@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.widgets.trees.permission;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,22 +9,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
 import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
@@ -33,13 +26,11 @@ import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
 
 public class PermissionCheckTreeWidget extends Composite {
 
-    private ContainerCheckedTreeViewer treeviewer;
+    private PermissionCheckTreeViewer treeviewer;
 
     private PermissionRootNode rootNode;
 
-    private Set<PrivilegeWrapper> allPossiblePrivileges;
-
-    private List<PrivilegeWrapper> currentDefaultPrivilegeSelection;
+    private List<PrivilegeWrapper> allPossiblePrivileges;
 
     public PermissionCheckTreeWidget(Composite parent, boolean title,
         List<BbRightWrapper> allRights) {
@@ -95,12 +86,14 @@ public class PermissionCheckTreeWidget extends Composite {
         // @SuppressWarnings("unchecked")
         // @Override
         // public void selectionChanged(SelectionChangedEvent event) {
-        // currentDefaultPrivilegeSelection = ((IStructuredSelection)
-        // privilegeViewer
-        // .getSelection()).toList();
-        // treeviewer.refresh();
+        // treeviewer
+        // .setDefaultPrivilegeSelection(((IStructuredSelection) privilegeViewer
+        // .getSelection()).toList());
         // }
         // });
+        // privilegeViewer.setComparator(new ViewerComparator());
+        // privilegeFilterLabel.setVisible(false);
+        // privilegeViewer.getList().setVisible(false);
 
         treeviewer = new PermissionCheckTreeViewer(this);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -108,15 +101,11 @@ public class PermissionCheckTreeWidget extends Composite {
         gd.horizontalSpan = 2;
         treeviewer.getTree().setLayoutData(gd);
 
-        treeviewer.setLabelProvider(new PermissionLabelProvider());
-        treeviewer.setContentProvider(new PermissionContentProvider());
-        treeviewer.setComparator(new ViewerComparator());
-
         treeviewer.setInput(buildContent(allRights));
+        treeviewer.expandToLevel(2);
         // privilegeViewer.setInput(allPossiblePrivileges);
         // privilegeViewer.setSelection(new StructuredSelection(
         // allPossiblePrivileges));
-        treeviewer.expandToLevel(2);
 
         treeviewer.addFilter(new ViewerFilter() {
 
@@ -125,11 +114,6 @@ public class PermissionCheckTreeWidget extends Composite {
                 Object element) {
                 if (element instanceof RightNode) {
                     RightNode node = (RightNode) element;
-                    // if
-                    // (Collections.disjoint(currentDefaultPrivilegeSelection,
-                    // node.getRight().getAvailablePrivilegeCollection(false)))
-                    // return false;
-                    // else
                     switch (comboShowRights.getSelectionIndex()) {
                     case 1:
                         // all
@@ -146,11 +130,6 @@ public class PermissionCheckTreeWidget extends Composite {
                     }
                     return true;
                 }
-                // if (element instanceof PrivilegeNode) {
-                // PrivilegeNode node = (PrivilegeNode) element;
-                // return currentDefaultPrivilegeSelection.contains(node
-                // .getPrivilege());
-                // }
                 return true;
             }
         });
@@ -158,93 +137,19 @@ public class PermissionCheckTreeWidget extends Composite {
 
     private List<PermissionRootNode> buildContent(List<BbRightWrapper> allRights) {
         rootNode = new PermissionRootNode();
-        allPossiblePrivileges = new HashSet<PrivilegeWrapper>();
+        Set<PrivilegeWrapper> allPossiblePrivilegesSet = new HashSet<PrivilegeWrapper>();
         final Map<BbRightWrapper, RightNode> nodes = new HashMap<BbRightWrapper, RightNode>();
         for (BbRightWrapper r : allRights) {
             RightNode node = new RightNode(rootNode, r);
             nodes.put(r, node);
             for (PrivilegeNode pNode : node.getChildren()) {
-                allPossiblePrivileges.add(pNode.getPrivilege());
+                allPossiblePrivilegesSet.add(pNode.getPrivilege());
             }
         }
+        this.allPossiblePrivileges = new ArrayList<PrivilegeWrapper>(
+            allPossiblePrivilegesSet);
         rootNode.setChildren(nodes);
         return Arrays.asList(rootNode);
-    }
-
-    public class PermissionLabelProvider implements ILabelProvider {
-
-        @Override
-        public void addListener(ILabelProviderListener listener) {
-        }
-
-        @Override
-        public void dispose() {
-        }
-
-        @Override
-        public boolean isLabelProperty(Object element, String property) {
-            return false;
-        }
-
-        @Override
-        public void removeListener(ILabelProviderListener listener) {
-        }
-
-        @Override
-        public Image getImage(Object element) {
-            return null;
-        }
-
-        @Override
-        public String getText(Object element) {
-            if (element instanceof PermissionNode)
-                return ((PermissionNode) element).getText();
-            return "Problem with display"; //$NON-NLS-1$
-        }
-    }
-
-    public class PermissionContentProvider implements ITreeContentProvider {
-
-        @Override
-        public void dispose() {
-        }
-
-        @Override
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        }
-
-        @SuppressWarnings("rawtypes")
-        @Override
-        public Object[] getElements(Object inputElement) {
-            if (inputElement instanceof Object[]) {
-                return (Object[]) inputElement;
-            }
-            if (inputElement instanceof Collection) {
-                return ((Collection) inputElement).toArray();
-            }
-            return new Object[0];
-        }
-
-        @Override
-        public Object[] getChildren(Object parentElement) {
-            if (parentElement instanceof PermissionNode)
-                return ((PermissionNode) parentElement).getChildren().toArray();
-            return new Object[0];
-        }
-
-        @Override
-        public Object getParent(Object element) {
-            if (element instanceof PermissionNode)
-                return ((PermissionNode) element).getParent();
-            return null;
-        }
-
-        @Override
-        public boolean hasChildren(Object element) {
-            if (element instanceof PermissionNode)
-                return getChildren(element).length > 0;
-            return false;
-        }
     }
 
     public void setSelections(List<PermissionWrapper> permissions) {
@@ -255,8 +160,8 @@ public class PermissionCheckTreeWidget extends Composite {
             for (PrivilegeWrapper privilege : permission
                 .getPrivilegeCollection(false)) {
                 PrivilegeNode pNode = rNode.getNode(privilege);
-                if (pNode == null) {
-                    // probably means this privilege can't be set to this
+                if (pNode != null) {
+                    pNode.setChecked(true);
                 }
                 checkedNodes.add(pNode);
             }
@@ -275,28 +180,25 @@ public class PermissionCheckTreeWidget extends Composite {
         public List<PermissionWrapper> deletedPermissions = new ArrayList<PermissionWrapper>();
 
         public void buildRes() {
-            for (Object o : rootNode.getChildren()) {
-                if (o instanceof RightNode) {
-                    RightNode r = (RightNode) o;
-                    if (treeviewer.getChecked(r)) {
-                        List<PrivilegeWrapper> addedPrivilege = new ArrayList<PrivilegeWrapper>();
-                        List<PrivilegeWrapper> removedPrivilege = new ArrayList<PrivilegeWrapper>();
-                        for (PrivilegeNode p : r.getChildren()) {
-                            if (treeviewer.getChecked(p))
-                                addedPrivilege.add(p.getPrivilege());
-                            else
-                                removedPrivilege.add(p.getPrivilege());
-                        }
-                        r.getPermission().addToPrivilegeCollection(
-                            addedPrivilege);
-                        r.getPermission().removeFromPrivilegeCollection(
-                            removedPrivilege);
-                        if (r.getPermission().isNew())
-                            addedPermissions.add(r.getPermission());
-                    } else {
-                        if (!r.getPermission().isNew())
-                            deletedPermissions.add(r.getPermission());
+            for (RightNode rightNode : rootNode.getChildren()) {
+                if (rightNode.isChecked() || rightNode.isGrayed()) {
+                    List<PrivilegeWrapper> addedPrivilege = new ArrayList<PrivilegeWrapper>();
+                    List<PrivilegeWrapper> removedPrivilege = new ArrayList<PrivilegeWrapper>();
+                    for (PrivilegeNode p : rightNode.getChildren()) {
+                        if (p.isChecked())
+                            addedPrivilege.add(p.getPrivilege());
+                        else
+                            removedPrivilege.add(p.getPrivilege());
                     }
+                    rightNode.getPermission().addToPrivilegeCollection(
+                        addedPrivilege);
+                    rightNode.getPermission().removeFromPrivilegeCollection(
+                        removedPrivilege);
+                    if (rightNode.getPermission().isNew())
+                        addedPermissions.add(rightNode.getPermission());
+                } else {
+                    if (!rightNode.getPermission().isNew())
+                        deletedPermissions.add(rightNode.getPermission());
                 }
             }
         }
