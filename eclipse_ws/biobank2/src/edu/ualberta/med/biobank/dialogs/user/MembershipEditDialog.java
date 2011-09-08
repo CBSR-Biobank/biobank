@@ -8,8 +8,10 @@ import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -31,7 +33,6 @@ import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -40,27 +41,25 @@ import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
-import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTree;
-import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTree.PermissionTreeRes;
+import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget;
+import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget.PermissionTreeRes;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class MembershipAddDialog extends BgcBaseDialog {
+public class MembershipEditDialog extends BgcBaseDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
-    private PrincipalWrapper<?> principal;
     private ComboViewer centersViewer;
     private ComboViewer studiesViewer;
     private MultiSelectWidget<RoleWrapper> rolesWidget;
     private MembershipWrapper ms;
-    private PermissionCheckTree permissionsTree;
+    private PermissionCheckTreeWidget permissionsTree;
 
-    public MembershipAddDialog(Shell parent, PrincipalWrapper<?> principal) {
+    public MembershipEditDialog(Shell parent, MembershipWrapper ms) {
         super(parent);
-        Assert.isNotNull(principal);
-        this.principal = principal;
+        Assert.isNotNull(ms);
+        this.ms = ms;
         currentTitle = Messages.MembershipAddDialog_title;
         titleAreaMessage = Messages.MembershipAddDialog_description;
-        ms = new MembershipWrapper(SessionManager.getAppService());
     }
 
     @Override
@@ -116,8 +115,9 @@ public class MembershipAddDialog extends BgcBaseDialog {
         studies.addAll(StudyWrapper.getAllStudies(SessionManager
             .getAppService()));
         studiesViewer = createComboViewer(groupComp,
-            Messages.MembershipAddDialog_selected_study_label, studies, null,
-            null, null, new LabelProvider() {
+            Messages.MembershipAddDialog_selected_study_label, studies,
+            ms.getStudy() == null ? noStudySelection : ms.getStudy(), null,
+            null, new LabelProvider() {
                 @Override
                 public String getText(Object element) {
                     if (element instanceof String)
@@ -125,7 +125,17 @@ public class MembershipAddDialog extends BgcBaseDialog {
                     return ((StudyWrapper) element).getNameShort();
                 }
             });
-        studiesViewer.setSelection(new StructuredSelection(noStudySelection));
+        studiesViewer.addFilter(new ViewerFilter() {
+            @Override
+            public boolean select(Viewer viewer, Object parentElement,
+                Object element) {
+                StudyWrapper study = null;
+                if (element instanceof StudyWrapper)
+                    study = (StudyWrapper) element;
+                return !ms
+                    .isCenterStudyAlreadyUsed(getCenterSelection(), study);
+            }
+        });
     }
 
     private void createCentersCombo(Composite contents)
@@ -154,8 +164,9 @@ public class MembershipAddDialog extends BgcBaseDialog {
         centers
             .addAll(CenterWrapper.getCenters(SessionManager.getAppService()));
         centersViewer = createComboViewer(groupComp,
-            Messages.MembershipAddDialog_selected_center_label, centers, null,
-            null, null, new LabelProvider() {
+            Messages.MembershipAddDialog_selected_center_label, centers,
+            ms.getCenter() == null ? noCenterSelection : ms.getCenter(), null,
+            null, new LabelProvider() {
                 @Override
                 public String getText(Object element) {
                     if (element instanceof String)
@@ -163,10 +174,17 @@ public class MembershipAddDialog extends BgcBaseDialog {
                     return ((CenterWrapper<?>) element).getNameShort();
                 }
             });
+
+        centersViewer
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    studiesViewer.refresh();
+                }
+            });
         GridData gd = (GridData) centersViewer.getControl().getLayoutData();
         gd.horizontalSpan = 4;
 
-        centersViewer.setSelection(new StructuredSelection(noCenterSelection));
         centersViewer.addFilter(new ViewerFilter() {
             @Override
             public boolean select(Viewer viewer, Object parentElement,
@@ -246,7 +264,7 @@ public class MembershipAddDialog extends BgcBaseDialog {
 
     private void createPermissionWidgets(Composite contents)
         throws ApplicationException {
-        permissionsTree = new PermissionCheckTree(contents, false,
+        permissionsTree = new PermissionCheckTreeWidget(contents, false,
             BbRightWrapper.getAllRights(SessionManager.getAppService()));
         permissionsTree.setSelections(ms.getPermissionCollection(false));
 
@@ -272,12 +290,12 @@ public class MembershipAddDialog extends BgcBaseDialog {
             return;
         }
         ms.addToRoleCollection(rolesWidget.getAddedToSelection());
+        ms.removeFromRoleCollection(rolesWidget.getRemovedFromSelection());
         PermissionTreeRes res = permissionsTree.getAddedAndRemovedNodes();
         ms.addToPermissionCollection(res.addedPermissions);
         ms.removeFromPermissionCollection(res.deletedPermissions);
         ms.setCenter(getCenterSelection());
         ms.setStudy(getStudySelection());
-        ms.setPrincipal(principal);
         super.okPressed();
     }
 

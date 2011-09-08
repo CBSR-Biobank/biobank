@@ -42,7 +42,7 @@ public class MembershipWrapper extends MembershipBaseWrapper {
         return 0;
     }
 
-    public String getMembershipObjectsListString() {
+    public String getRolesAndPermissionsString() {
         StringBuffer sb = new StringBuffer();
         boolean first = true;
         for (PermissionWrapper rp : getPermissionCollection(true)) {
@@ -140,4 +140,17 @@ public class MembershipWrapper extends MembershipBaseWrapper {
         super.addPersistTasks(tasks);
     }
 
+    public boolean isCenterStudyAlreadyUsed(CenterWrapper<?> center,
+        StudyWrapper study) {
+        for (MembershipWrapper ms : getPrincipal().getMembershipCollection(
+            false)) {
+            if (!this.equals(ms)
+                && ((ms.getCenter() == null && center == null) || (ms
+                    .getCenter() != null && ms.getCenter().equals(center)))
+                && ((ms.getStudy() == null && study == null) || (ms.getStudy() != null && ms
+                    .getStudy().equals(study))))
+                return true;
+        }
+        return false;
+    }
 }

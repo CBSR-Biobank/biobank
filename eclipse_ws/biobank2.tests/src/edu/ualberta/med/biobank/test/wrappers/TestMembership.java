@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.MembershipHelper;
@@ -197,19 +198,19 @@ public class TestMembership extends TestDatabase {
         try {
             MembershipHelper.addMembership(u, c, s);
             Assert.fail("Should not be able to insert");
-        } catch (Exception ex) {
+        } catch (DuplicatePropertySetException ex) {
             Assert.assertTrue("Should not be able to insert", true);
         }
         try {
             MembershipHelper.addMembership(u, c, null);
             Assert.assertTrue("Should be able to insert", true);
-        } catch (Exception ex) {
+        } catch (DuplicatePropertySetException ex) {
             Assert.fail("Should be able to insert");
         }
         try {
             MembershipHelper.addMembership(u, c, null);
             Assert.fail("Should not be able to insert");
-        } catch (Exception ex) {
+        } catch (DuplicatePropertySetException ex) {
             Assert.assertTrue("Should not be able to insert", true);
         }
 
@@ -217,7 +218,7 @@ public class TestMembership extends TestDatabase {
         try {
             MembershipHelper.addMembership(u, null, null);
             Assert.fail("Should not be able to insert");
-        } catch (Exception ex) {
+        } catch (DuplicatePropertySetException ex) {
             Assert.assertTrue("Should not be able to insert", true);
         }
     }

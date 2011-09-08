@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers.checks;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.hibernate.Query;
@@ -57,9 +58,12 @@ public class MembershipUniquePreCheck extends UncachedAction<Membership> {
 
     private void throwException() throws DuplicatePropertySetException {
         String modelClass = Format.modelClass(getModelClass());
-        String values = "todo"; // Format.propertyValues(getModel(),
-                                // properties);
-        String names = "todo"; // Format.propertyNames(properties);
+        Collection<Property<?, ? super Membership>> properties = new ArrayList<Property<?, ? super Membership>>();
+        properties.add(MembershipPeer.PRINCIPAL);
+        properties.add(MembershipPeer.CENTER);
+        properties.add(MembershipPeer.STUDY);
+        String values = Format.propertyValues(getModel(), properties);
+        String names = Format.propertyNames(properties);
 
         String msg = MessageFormat.format(EXCEPTION_STRING, modelClass, values,
             names);

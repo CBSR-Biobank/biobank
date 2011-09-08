@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -13,10 +15,14 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
@@ -25,31 +31,81 @@ import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
 
-public class PermissionCheckTree extends Composite {
+public class PermissionCheckTreeWidget extends Composite {
 
     private ContainerCheckedTreeViewer treeviewer;
 
     private PermissionRootNode rootNode;
 
-    public PermissionCheckTree(Composite parent, boolean title,
+    private Set<PrivilegeWrapper> allPossiblePrivileges;
+
+    private List<PrivilegeWrapper> currentDefaultPrivilegeSelection;
+
+    public PermissionCheckTreeWidget(Composite parent, boolean title,
         List<BbRightWrapper> allRights) {
         super(parent, SWT.NONE);
-        GridLayout gl = new GridLayout(1, false);
+        GridLayout gl = new GridLayout(2, false);
         gl.marginWidth = 0;
         gl.marginHeight = 0;
         gl.marginTop = 10;
-        gl.horizontalSpacing = 0;
+        gl.horizontalSpacing = 5;
         gl.verticalSpacing = 5;
         this.setLayout(gl);
 
         if (title) {
             Label label = new Label(this, SWT.NONE);
             label.setText(Messages.PermissionCheckTree_title);
+            GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
+            gd.horizontalSpan = 2;
+            label.setLayoutData(gd);
         }
 
-        treeviewer = new ContainerCheckedTreeViewer(this);
+        Label filterLabel = new Label(this, SWT.NONE);
+        filterLabel.setText("Show rights for:");
+        final Combo comboShowRights = new Combo(this, SWT.READ_ONLY);
+        comboShowRights.add("All centers");
+        comboShowRights.add("Sites only");
+        comboShowRights.add("Clinics only");
+        comboShowRights.add("Research Groups only");
+        comboShowRights.select(0);
+        comboShowRights.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true,
+            false));
+        comboShowRights.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                treeviewer.refresh();
+            }
+        });
+
+        // Label privilegeFilterLabel = new Label(this, SWT.NONE);
+        // privilegeFilterLabel.setText("Privilege default selection:");
+        // final ListViewer privilegeViewer = new ListViewer(this, SWT.READ_ONLY
+        // | SWT.MULTI);
+        // privilegeViewer.getList().setLayoutData(
+        // new GridData(SWT.FILL, SWT.NONE, true, false));
+        // privilegeViewer.setContentProvider(new ArrayContentProvider());
+        // privilegeViewer.setLabelProvider(new LabelProvider() {
+        // @Override
+        // public String getText(Object element) {
+        // return ((PrivilegeWrapper) element).getName();
+        // }
+        // });
+        // privilegeViewer
+        // .addSelectionChangedListener(new ISelectionChangedListener() {
+        // @SuppressWarnings("unchecked")
+        // @Override
+        // public void selectionChanged(SelectionChangedEvent event) {
+        // currentDefaultPrivilegeSelection = ((IStructuredSelection)
+        // privilegeViewer
+        // .getSelection()).toList();
+        // treeviewer.refresh();
+        // }
+        // });
+
+        treeviewer = new PermissionCheckTreeViewer(this);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.heightHint = 300;
+        gd.horizontalSpan = 2;
         treeviewer.getTree().setLayoutData(gd);
 
         treeviewer.setLabelProvider(new PermissionLabelProvider());
@@ -57,15 +113,59 @@ public class PermissionCheckTree extends Composite {
         treeviewer.setComparator(new ViewerComparator());
 
         treeviewer.setInput(buildContent(allRights));
+        // privilegeViewer.setInput(allPossiblePrivileges);
+        // privilegeViewer.setSelection(new StructuredSelection(
+        // allPossiblePrivileges));
         treeviewer.expandToLevel(2);
 
+        treeviewer.addFilter(new ViewerFilter() {
+
+            @Override
+            public boolean select(Viewer viewer, Object parentElement,
+                Object element) {
+                if (element instanceof RightNode) {
+                    RightNode node = (RightNode) element;
+                    // if
+                    // (Collections.disjoint(currentDefaultPrivilegeSelection,
+                    // node.getRight().getAvailablePrivilegeCollection(false)))
+                    // return false;
+                    // else
+                    switch (comboShowRights.getSelectionIndex()) {
+                    case 1:
+                        // all
+                        return true;
+                    case 2:
+                        // sites
+                        return node.getRight().isForSite();
+                    case 3:
+                        // clinics
+                        return node.getRight().isForClinic();
+                    case 4:
+                        // research groups
+                        return node.getRight().isForResearchGroup();
+                    }
+                    return true;
+                }
+                // if (element instanceof PrivilegeNode) {
+                // PrivilegeNode node = (PrivilegeNode) element;
+                // return currentDefaultPrivilegeSelection.contains(node
+                // .getPrivilege());
+                // }
+                return true;
+            }
+        });
     }
 
     private List<PermissionRootNode> buildContent(List<BbRightWrapper> allRights) {
         rootNode = new PermissionRootNode();
+        allPossiblePrivileges = new HashSet<PrivilegeWrapper>();
         final Map<BbRightWrapper, RightNode> nodes = new HashMap<BbRightWrapper, RightNode>();
         for (BbRightWrapper r : allRights) {
-            nodes.put(r, new RightNode(rootNode, r));
+            RightNode node = new RightNode(rootNode, r);
+            nodes.put(r, node);
+            for (PrivilegeNode pNode : node.getChildren()) {
+                allPossiblePrivileges.add(pNode.getPrivilege());
+            }
         }
         rootNode.setChildren(nodes);
         return Arrays.asList(rootNode);

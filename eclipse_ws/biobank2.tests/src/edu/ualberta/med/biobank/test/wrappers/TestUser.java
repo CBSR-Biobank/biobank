@@ -31,7 +31,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class TestUser extends TestDatabase {
 
     @Test
-    public void createUser() throws BiobankCheckException, Exception {
+    public void testCreateUser() throws BiobankCheckException, Exception {
         String name = "createUser" + r.nextInt();
         String password = "123";
         UserWrapper user = UserHelper.addUser(name, password, true);
@@ -65,7 +65,7 @@ public class TestUser extends TestDatabase {
     }
 
     @Test
-    public void updateUser() throws BiobankCheckException, Exception {
+    public void testUpdateUser() throws BiobankCheckException, Exception {
         String name = "updateUser" + r.nextInt();
         String password = "123";
         UserWrapper user = UserHelper.addUser(name, password, true);
@@ -81,7 +81,7 @@ public class TestUser extends TestDatabase {
     }
 
     @Test
-    public void deleteUser() throws BiobankCheckException, Exception {
+    public void testDeleteUser() throws BiobankCheckException, Exception {
         String name = "deleteUser" + r.nextInt();
         UserWrapper user = UserHelper.addUser(name, null, false);
 
@@ -111,7 +111,7 @@ public class TestUser extends TestDatabase {
     }
 
     @Test
-    public void deleteWhenHasGroupRelation() throws Exception {
+    public void testDeleteWhenHasGroupRelation() throws Exception {
         String name = "deleteWhenHasGroupRelation" + r.nextInt();
         UserWrapper user1 = UserHelper.addUser(name + "_1", null, false);
         UserWrapper user2 = UserHelper.addUser(name + "_2", null, true);
@@ -133,7 +133,7 @@ public class TestUser extends TestDatabase {
     }
 
     @Test
-    public void addMembershipsWithNoObject() throws Exception {
+    public void testAddMembershipsWithNoObject() throws Exception {
         String name = "addMembershipsWithNoObject" + r.nextInt();
         UserWrapper user = UserHelper.addUser(name, null, true);
 
@@ -144,7 +144,7 @@ public class TestUser extends TestDatabase {
     }
 
     @Test
-    public void addMembershipsWithRole() throws Exception {
+    public void testAddMembershipsWithRole() throws Exception {
         String name = "addMembershipsWithRole" + r.nextInt();
         UserWrapper user = UserHelper.addUser(name, null, true);
 
@@ -161,7 +161,7 @@ public class TestUser extends TestDatabase {
     }
 
     @Test
-    public void removeMembershipWithRole() throws Exception {
+    public void testRemoveMembershipWithRole() throws Exception {
         String name = "removeMembershipWithRole" + r.nextInt();
         UserWrapper user = UserHelper.addUser(name, null, true);
 
@@ -187,7 +187,7 @@ public class TestUser extends TestDatabase {
     }
 
     @Test
-    public void modifyPassword() throws Exception {
+    public void testModifyPassword() throws Exception {
         String name = "createUser" + r.nextInt();
         String password = "123";
         UserWrapper user = UserHelper.addUser(name, password, true);
@@ -239,7 +239,7 @@ public class TestUser extends TestDatabase {
     }
 
     @Test
-    public void addGroups() throws Exception {
+    public void testAddGroups() throws Exception {
         String name = "addGroups" + r.nextInt();
 
         UserWrapper user = UserHelper.addUser(name, null, true);

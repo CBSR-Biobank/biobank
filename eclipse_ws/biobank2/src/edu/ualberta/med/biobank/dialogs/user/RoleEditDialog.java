@@ -15,8 +15,8 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTree;
-import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTree.PermissionTreeRes;
+import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget;
+import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget.PermissionTreeRes;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class RoleEditDialog extends BgcBaseDialog {
@@ -24,7 +24,7 @@ public class RoleEditDialog extends BgcBaseDialog {
     private final String titleAreaMessage;
 
     private RoleWrapper role;
-    private PermissionCheckTree tree;
+    private PermissionCheckTreeWidget tree;
 
     public RoleEditDialog(Shell parent, RoleWrapper role) {
         super(parent);
@@ -66,7 +66,7 @@ public class RoleEditDialog extends BgcBaseDialog {
             RolePeer.NAME.getName(), new NonEmptyStringValidator(
                 Messages.RoleEditDialog_msg_name_required));
 
-        tree = new PermissionCheckTree(contents, true,
+        tree = new PermissionCheckTreeWidget(contents, true,
             BbRightWrapper.getAllRights(SessionManager.getAppService()));
         tree.setSelections(role.getPermissionCollection(false));
 

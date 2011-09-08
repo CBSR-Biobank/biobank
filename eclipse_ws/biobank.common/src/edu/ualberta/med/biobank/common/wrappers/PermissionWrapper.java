@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.PermissionBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.checks.PermissionPostCheck;
 import edu.ualberta.med.biobank.model.Permission;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -25,6 +27,12 @@ public class PermissionWrapper extends PermissionBaseWrapper {
             return right1.compareTo(right2);
         }
         return 0;
+    }
+
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        super.addPersistTasks(tasks);
+        tasks.add(new PermissionPostCheck(this));
     }
 
 }

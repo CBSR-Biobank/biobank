@@ -3,10 +3,13 @@ package edu.ualberta.med.biobank.widgets.infotables;
 import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
+import edu.ualberta.med.biobank.dialogs.user.MembershipEditDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
@@ -34,6 +37,14 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
         super(parent, principal.getMembershipCollection(true), HEADINGS,
             ROWS_PER_PAGE, MembershipWrapper.class);
 
+        addEditItemListener(new IInfoTableEditItemListener() {
+            @Override
+            public void editItem(InfoTableEvent event) {
+                MembershipWrapper user = ((TableRowData) getSelection()).ms;
+                editMembership(user);
+            }
+        });
+
         addDeleteItemListener(new IInfoTableDeleteItemListener() {
             @Override
             public void deleteItem(InfoTableEvent event) {
@@ -43,6 +54,16 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
                 reloadCollection(principal.getMembershipCollection(true));
             }
         });
+    }
+
+    protected void editMembership(MembershipWrapper ms) {
+        MembershipEditDialog dlg = new MembershipEditDialog(PlatformUI
+            .getWorkbench().getActiveWorkbenchWindow().getShell(), ms);
+        int res = dlg.open();
+        if (res == Dialog.OK) {
+            reloadCollection(getCollection(), ms);
+            notifyListeners();
+        }
     }
 
     @SuppressWarnings("serial")
@@ -66,11 +87,14 @@ public class MembershipInfoTable extends InfoTableWidget<MembershipWrapper> {
     public Object getCollectionModelObject(MembershipWrapper ms)
         throws Exception {
         TableRowData info = new TableRowData();
-        info.center = ms.getCenter() == null ? Messages.MembershipInfoTable_all_label : ms.getCenter()
-            .getNameShort();
-        info.study = ms.getStudy() == null ? Messages.MembershipInfoTable_all_label : ms.getStudy()
-            .getNameShort();
-        info.roleOrRP = ms.getMembershipObjectsListString();
+        info.center = ms.getCenter() == null ? Messages.MembershipInfoTable_all_label
+            : ms.getCenter().getNameShort();
+        info.study = ms.getStudy() == null ? Messages.MembershipInfoTable_all_label
+            : ms.getStudy().getNameShort();
+        info.roleOrRP = ms.getRolesAndPermissionsString();
+        if (info.roleOrRP.length() > 50) {
+            info.roleOrRP = info.roleOrRP.substring(0, 50) + "..."; //$NON-NLS-1$
+        }
         info.ms = ms;
         return info;
     }

@@ -268,4 +268,9 @@ public class UserWrapper extends UserBaseWrapper {
         }
         return setOfWorkingCenter;
     }
+
+    @Override
+    public String toString() {
+        return getLogin();
+    }
 }

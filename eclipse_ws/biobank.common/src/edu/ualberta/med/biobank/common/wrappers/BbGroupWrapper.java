@@ -62,4 +62,9 @@ public class BbGroupWrapper extends BbGroupBaseWrapper {
         return newGroup;
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
+
 }

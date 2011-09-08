@@ -19,6 +19,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.BbGroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
@@ -74,12 +75,14 @@ public class GroupEditDialog extends BgcBaseDialog {
         TabFolder tb = new TabFolder(contents, SWT.TOP);
         tb.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createGeneralFields(createTabItem(tb, Messages.GroupEditDialog_general_tab_title, 2));
+        createGeneralFields(createTabItem(tb,
+            Messages.GroupEditDialog_general_tab_title, 2));
 
         createMembershipsSection(createTabItem(tb,
             Messages.UserEditDialog_roles_permissions_title, 1));
 
-        createUsersSection(createTabItem(tb, Messages.GroupEditDialog_users_tab_title, 1));
+        createUsersSection(createTabItem(tb,
+            Messages.GroupEditDialog_users_tab_title, 1));
 
     }
 
@@ -112,7 +115,8 @@ public class GroupEditDialog extends BgcBaseDialog {
         throws ApplicationException {
         // FIXME something else than a double list selection might be better
         usersWidget = new MultiSelectWidget<UserWrapper>(contents, SWT.NONE,
-            Messages.GroupEditDialog_available_users_label, Messages.GroupEditDialog_selected_users_label, 200) {
+            Messages.GroupEditDialog_available_users_label,
+            Messages.GroupEditDialog_selected_users_label, 200) {
             @Override
             protected String getTextForObject(UserWrapper nodeObject) {
                 return nodeObject.getFullName() + " (" + nodeObject.getLogin() //$NON-NLS-1$
@@ -138,9 +142,12 @@ public class GroupEditDialog extends BgcBaseDialog {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
-                MembershipAddDialog dlg = new MembershipAddDialog(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    originalGroup);
+                MembershipWrapper ms = new MembershipWrapper(SessionManager
+                    .getAppService());
+                ms.setPrincipal(originalGroup);
+
+                MembershipEditDialog dlg = new MembershipEditDialog(PlatformUI
+                    .getWorkbench().getActiveWorkbenchWindow().getShell(), ms);
                 int res = dlg.open();
                 if (res == Status.OK) {
                     membershipInfoTable.getCollection()

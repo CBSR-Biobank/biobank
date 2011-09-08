@@ -33,7 +33,7 @@ public class TestGroup extends TestDatabase {
     }
 
     @Test
-    public void addUsers() throws Exception {
+    public void testAddUsers() throws Exception {
         String name = "addUsers" + r.nextInt();
         BbGroupWrapper group = GroupHelper.addGroup(name, true);
 
