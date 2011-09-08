@@ -220,7 +220,7 @@ public class PatientWrapper extends PatientBaseWrapper {
                 .getCollectionEventCollection(false);
 
             if (!cevents.isEmpty()) {
-                patient2.removeFromCollectionEventCollection(cevents);
+
                 Set<CollectionEventWrapper> toAdd = new HashSet<CollectionEventWrapper>();
                 boolean merged = false;
                 for (CollectionEventWrapper p2event : cevents) {
