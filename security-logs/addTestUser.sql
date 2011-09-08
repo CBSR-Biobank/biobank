@@ -1,5 +1,5 @@
-INSERT INTO csm_user (LOGIN_NAME, MIGRATED_FLAG, FIRST_NAME, LAST_NAME, PASSWORD, UPDATE_DATE)
-VALUES ('testuser',0,'testuser','testuser','orDBlaojDQE=',sysdate());
+INSERT INTO csm_user (USER_ID, LOGIN_NAME, MIGRATED_FLAG, FIRST_NAME, LAST_NAME, PASSWORD, UPDATE_DATE)
+select coalesce(MAX(id), 0)+1, 'testuser', 0 , 'testuser', 'testuser', 'orDBlaojDQE=', sysdate() from principal;
 
 insert into principal (id, version)  
 select user_id, 0 from csm_user where login_name = 'testuser';

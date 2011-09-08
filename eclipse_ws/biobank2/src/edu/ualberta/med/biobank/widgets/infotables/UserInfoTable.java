@@ -29,8 +29,7 @@ public class UserInfoTable extends InfoTableWidget<UserWrapper> {
     private static final String[] HEADINGS = new String[] {
         Messages.UserInfoTable_login_label,
         Messages.UserInfoTable_fullname_label,
-        Messages.UserInfoTable_email_label,
-        Messages.UserInfoTable_superadmin_label };
+        Messages.UserInfoTable_email_label };
 
     private MenuItem unlockMenuItem;
 
