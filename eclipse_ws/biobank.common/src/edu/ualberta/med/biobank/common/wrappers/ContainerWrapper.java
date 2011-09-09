@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
@@ -830,9 +829,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @throws BiobankException
      */
     public static List<ContainerWrapper> getPossibleContainersFromPosition(
-        BiobankApplicationService appService, User user, String positionText,
-        boolean isContainerPosition, ContainerTypeWrapper contType)
-        throws ApplicationException, BiobankException {
+        BiobankApplicationService appService, UserWrapper user,
+        String positionText, boolean isContainerPosition,
+        ContainerTypeWrapper contType) throws ApplicationException,
+        BiobankException {
         List<ContainerWrapper> foundContainers;
         List<ContainerWrapper> possibles = getPossibleParents(appService,
             positionText, user.getCurrentWorkingSite(), contType);

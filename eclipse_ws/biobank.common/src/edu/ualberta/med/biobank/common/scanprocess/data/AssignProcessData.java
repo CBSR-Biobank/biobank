@@ -5,7 +5,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -94,8 +93,10 @@ public class AssignProcessData extends ProcessWithPallet {
 
     @Override
     public ServerProcess getProcessInstance(
-        WritableApplicationService appService, User user, Locale locale) {
-        return new AssignProcess(appService, this, user, locale);
+        WritableApplicationService appService, Integer currentWorkingCenterId,
+        Locale locale) {
+        return new AssignProcess(appService, this, currentWorkingCenterId,
+            locale);
     }
 
 }

@@ -27,6 +27,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -531,10 +532,11 @@ public class TestDispatch extends TestDatabase {
             .getDispatchSpecimenCollection(false));
         Assert.assertTrue(!dispatch.hasDispatchSpecimens());
 
-        Assert.assertTrue(!dispatch.canBeSentBy(appService.getCurrentUser()));
-        Assert
-            .assertTrue(!dispatch.canBeReceivedBy(appService.getCurrentUser()));
-        Assert.assertTrue(!dispatch.canBeClosedBy(appService.getCurrentUser()));
+        UserWrapper currentUser = UserWrapper.getUser(appService, "testuser");
+
+        Assert.assertTrue(!dispatch.canBeSentBy(currentUser));
+        Assert.assertTrue(!dispatch.canBeReceivedBy(currentUser));
+        Assert.assertTrue(!dispatch.canBeClosedBy(currentUser));
 
     }
 

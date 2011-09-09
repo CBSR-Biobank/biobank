@@ -125,7 +125,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private void createStudySection() {
         Section section = createSection(Messages.SiteEntryForm_studies_title);
-        boolean superAdmin = SessionManager.getUser().isSuperAdministrator();
+        boolean superAdmin = SessionManager.getUser().isSuperAdmin();
         if (superAdmin) {
             addSectionToolbar(section, Messages.SiteEntryForm_studies_add,
                 new SelectionAdapter() {

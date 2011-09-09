@@ -20,8 +20,6 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
-import edu.ualberta.med.biobank.common.security.Privilege;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
@@ -388,10 +386,11 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     @Override
-    public boolean canUpdate(User user) {
-        return user.isInSuperAdminMode()
-            && user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass(),
-                getSecuritySpecificCenters());
+    // FIXME need to call super method ?
+    public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canUpdate(user, center, study)
+            && user.isInSuperAdminMode();
     }
 
     @Override

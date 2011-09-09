@@ -26,7 +26,8 @@ eclipse_ws/biobank2.tools/output
 eclipse_ws/biobank2.tests/bin
 eclipse_ws/biobank2.tests/build
 eclipse_ws/biobank2.tests/conf
-eclipse_ws/biobank2.tests/lib/*
+eclipse_ws/biobank2.tests/lib/*.jar
+eclipse_ws/biobank2.tests/src/biobank.csm.new.hibernate.cfg.xml
 eclipse_ws/biobank2/*.bmp
 eclipse_ws/biobank2/bin
 eclipse_ws/biobank2/conf

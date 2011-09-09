@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.ItemState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -58,10 +57,13 @@ public class ShipmentProcessData extends ProcessWithPallet {
 
     @Override
     public ServerProcess getProcessInstance(
-        WritableApplicationService appService, User user, Locale locale) {
+        WritableApplicationService appService, Integer currentWorkingCenterId,
+        Locale locale) {
         if (isCreation())
-            return new DispatchCreateProcess(appService, this, user, locale);
-        return new ShipmentReceiveProcess(appService, this, user, locale);
+            return new DispatchCreateProcess(appService, this,
+                currentWorkingCenterId, locale);
+        return new ShipmentReceiveProcess(appService, this,
+            currentWorkingCenterId, locale);
     }
 
     public Map<Integer, ItemState> getCurrentDispatchSpecimenIds() {

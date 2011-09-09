@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.CollectionEventBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
@@ -512,9 +511,11 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
      * return true if the user can delete this object
      */
     @Override
-    public boolean canDelete(User user) {
-        return super.canDelete(user)
-            && (getPatient() == null || getPatient().getStudy() == null || user
+    public boolean canDelete(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canDelete(user, center, study)
+            && (getPatient() == null || getPatient().getStudy() == null
+                || user.getCurrentWorkingCenter() == null || user
                 .getCurrentWorkingCenter().getStudyCollection()
                 .contains(getPatient().getStudy()));
     }
@@ -523,9 +524,11 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
      * return true if the user can edit this object
      */
     @Override
-    public boolean canUpdate(User user) {
-        return super.canUpdate(user)
-            && (getPatient() == null || getPatient().getStudy() == null || user
+    public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canUpdate(user, center, study)
+            && (getPatient() == null || getPatient().getStudy() == null
+                || user.getCurrentWorkingCenter() == null || user
                 .getCurrentWorkingCenter().getStudyCollection()
                 .contains(getPatient().getStudy()));
     }

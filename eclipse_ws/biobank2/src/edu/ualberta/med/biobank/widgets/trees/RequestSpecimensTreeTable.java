@@ -209,7 +209,7 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
     protected void claim(List<RequestSpecimenWrapper> specs) {
         try {
             for (RequestSpecimenWrapper spec : specs) {
-                spec.setClaimedBy(SessionManager.getUser().getFirstName());
+                spec.setClaimedBy(SessionManager.getUser().getLogin());
                 spec.persist();
             }
         } catch (Exception e) {

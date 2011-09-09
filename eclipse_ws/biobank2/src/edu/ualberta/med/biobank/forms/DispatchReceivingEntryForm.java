@@ -121,7 +121,8 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         try {
             CellProcessResult res = appService.processCellStatus(new Cell(-1,
                 -1, inventoryId, null), new ShipmentProcessData(null, dispatch,
-                false, false), SessionManager.getUser(), Locale.getDefault());
+                false, false), SessionManager.getUser()
+                .getCurrentWorkingCenter().getId(), Locale.getDefault());
             SpecimenWrapper specimen = null;
             if (res.getCell().getSpecimenId() != null) {
                 specimen = new SpecimenWrapper(appService);

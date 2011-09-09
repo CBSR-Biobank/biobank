@@ -332,7 +332,7 @@ public abstract class BgcDialogWithPages extends BgcBaseDialog {
         currentPage = newPage;
         // Ensure that the page control has been created
         // (this allows lazy page control creation)
-        if (currentPage.getControl() == null) {
+        if ((currentPage != null) && (currentPage.getControl() == null)) {
             final boolean[] failed = { false };
             SafeRunnable.run(new ISafeRunnable() {
                 @Override

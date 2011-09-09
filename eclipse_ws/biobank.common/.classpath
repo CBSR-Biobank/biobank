@@ -19,7 +19,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-lang-2.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-logging-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-validator.jar" sourcepath="/home/delphine/projects/sources/hibernate/hibernate-validator-3.0.0.GA/src"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/hibernate3.jar" sourcepath="/home/jferland/proj/sources/hibernate-3.2"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/hibernate3.jar" sourcepath="/home/delphine/projects/sources/hibernate/hibernate-3.2"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/jaxrpc.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/log4j-1.2.14.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/sdk-client-framework.jar"/>
@@ -30,7 +30,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/xercesImpl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/xpp3-1.1.3.4.C.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/xstream-1.3.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/server/csmapi-4.1.jar" sourcepath="/home/delphine/projects/sources/CaCore/CSM/CSM_API_4_1_Source/src"/>
+	<classpathentry exported="true" kind="lib" path="lib/server/csmapi-4.1.jar" sourcepath="/home/delphine/projects/sources/CaCore/CSM/CSM_API_4_1_Source"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-writable-core.jar"/>
 	<classpathentry kind="lib" path="lib/client/mysql-connector-java-5.1.15-bin.jar"/>

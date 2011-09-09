@@ -404,23 +404,16 @@ public class LoginDialog extends TitleAreaDialog {
     private void selectWorkingCenter(SessionHelper sessionHelper) {
         List<CenterWrapper<?>> workingCenters = null;
         try {
-            // if (sessionHelper.getUser().isInSuperAdminMode()) {
-            // // in super admin mode, can use all centers
-            // workingCenters = CenterWrapper.getCenters(sessionHelper
-            // .getAppService());
-            // } else {
-            workingCenters = sessionHelper.getUser().getWorkingCenters(
-                sessionHelper.getAppService());
-            // }
+            workingCenters = sessionHelper.getUser().getWorkingCenters();
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
                 Messages.LoginDialog_workingCenter_error_title, e);
         }
         if (workingCenters != null) {
             if (workingCenters.size() == 0) {
-                if (!sessionHelper.getUser().isSuperAdministrator())
+                if (!sessionHelper.getUser().isSuperAdmin())
                     // cannot access the application.
-                    BgcPlugin.openAsyncError(
+                    BgcPlugin.openError(
                         Messages.LoginDialog_workingCenter_error_title,
                         Messages.LoginDialog_noWorkingCenter_error_msg);
             } else if (workingCenters.size() == 1
@@ -433,9 +426,9 @@ public class LoginDialog extends TitleAreaDialog {
         }
         if (sessionHelper.getUser().getCurrentWorkingCenter() == null
             && !sessionHelper.getUser().isInSuperAdminMode())
-            if (sessionHelper.getUser().isSuperAdministrator()) {
+            if (sessionHelper.getUser().isSuperAdmin()) {
                 // connect in admin mode
-                BgcPlugin.openAsyncInformation(
+                BgcPlugin.openInformation(
                     Messages.LoginDialog_workingCenter_admin_title,
                     Messages.LoginDialog_noWorkingCenter_admin_msg);
                 // open the administration perspective if another
