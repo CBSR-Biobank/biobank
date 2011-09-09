@@ -50,8 +50,9 @@ public class PerspectiveSecurity {
                 for (Entry<String, List<String>> entry : map.entrySet()) {
                     boolean show;
                     try {
-                        show = SessionManager.isAllowed(entry.getValue()
-                            .toArray(new String[entry.getValue().size()]));
+                        String[] keyDescs = entry.getValue().toArray(
+                            new String[entry.getValue().size()]);
+                        show = SessionManager.isAllowedorCanRead(keyDescs);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }

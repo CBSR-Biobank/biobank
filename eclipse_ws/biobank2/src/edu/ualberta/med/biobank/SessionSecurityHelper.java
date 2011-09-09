@@ -82,6 +82,21 @@ public class SessionSecurityHelper {
         }
     }
 
+    public static boolean isAllowedorCanRead(
+        BiobankApplicationService appService, UserWrapper user,
+        String... keyDesc) {
+        try {
+            return user.hasPrivilegesOnKeyDesc(
+                PrivilegeWrapper.getAllowedPrivilege(appService),
+                user.getCurrentWorkingCenter(), null, keyDesc)
+                || user.hasPrivilegesOnKeyDesc(
+                    PrivilegeWrapper.getReadPrivilege(appService),
+                    user.getCurrentWorkingCenter(), null, keyDesc);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static boolean canUpdate(BiobankApplicationService appService,
         UserWrapper user, Class<?> clazz) {
         try {

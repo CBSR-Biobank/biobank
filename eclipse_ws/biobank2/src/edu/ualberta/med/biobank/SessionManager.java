@@ -271,6 +271,15 @@ public class SessionManager {
         }
     }
 
+    public static boolean isAllowedorCanRead(String... keyDesc) {
+        try {
+            return SessionSecurityHelper.isAllowedorCanRead(getAppService(),
+                getUser(), keyDesc);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static boolean canUpdate(Class<?> clazz) {
         try {
             return SessionSecurityHelper.canUpdate(getAppService(), getUser(),
