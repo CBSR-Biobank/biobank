@@ -80,8 +80,8 @@ public class UserManagementDialog extends BgcDialogWithPages {
     protected List<UserWrapper> getUsers() {
         if (currentAllUsersList == null) {
             try {
-                currentAllUsersList = SessionManager.getUser()
-                    .getUsersVisible();
+                currentAllUsersList = UserWrapper.getAllUsers(SessionManager
+                    .getAppService());
             } catch (ApplicationException e) {
                 BgcPlugin.openAsyncError(
                     Messages.UserManagementDialog_users_load_error_title, e);

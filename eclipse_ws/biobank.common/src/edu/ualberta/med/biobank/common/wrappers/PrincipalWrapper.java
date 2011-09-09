@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -109,16 +108,6 @@ public abstract class PrincipalWrapper<T extends Principal> extends
             privileges.addAll(ms.getPrivilegesForRight(right, center, study));
         }
         return privileges;
-    }
-
-    public List<UserWrapper> getUsersVisible() throws ApplicationException {
-        List<UserWrapper> users = new ArrayList<UserWrapper>();
-        List<CenterWrapper<?>> centers = getAllCentersForRight("user-mgt");
-        for (UserWrapper u : UserWrapper.getAllUsers(appService)) {
-            if (!Collections.disjoint(centers, u.getAllCentersInvolved()))
-                users.add(u);
-        }
-        return users;
     }
 
     protected List<CenterWrapper<?>> getAllCentersInvolved() {
