@@ -59,19 +59,19 @@ public class WrapperTransaction {
     public void persist(Collection<? extends ModelWrapper<?>> wrappers) {
         // TODO: check that wrapper not already added?
         for (ModelWrapper<?> wrapper : wrappers) {
-            actions.add(new Action(Action.Type.PERSIST, wrapper));
+            persist(wrapper);
         }
     }
 
-    public void delete(ModelWrapper<?> Wrapper) {
+    public void delete(ModelWrapper<?> wrapper) {
         // TODO: check that wrapper not already added?
-        actions.add(new Action(Action.Type.DELETE, Wrapper));
+        actions.add(new Action(Action.Type.DELETE, wrapper));
     }
 
     public void delete(Collection<? extends ModelWrapper<?>> wrappers) {
         // TODO: check that wrapper not already added?
         for (ModelWrapper<?> wrapper : wrappers) {
-            actions.add(new Action(Action.Type.DELETE, wrapper));
+            delete(wrapper);
         }
     }
 
@@ -223,17 +223,6 @@ public class WrapperTransaction {
         }
 
         /**
-         * Adds all of the given {@link TaskList}'s internal lists into this
-         * {@link TaskList}.
-         * 
-         * @param list
-         */
-        public void add(TaskList list) {
-            queryTasks.addAll(list.queryTasks);
-            preQueryTasks.addAll(list.preQueryTasks);
-        }
-
-        /**
          * Get the {@link LogGroup} that is associated with this transaction.
          * 
          * @return
@@ -272,7 +261,7 @@ public class WrapperTransaction {
                 || wrapper.isInitialized(property)) {
                 if (property.isCollection()) {
                     @SuppressWarnings("unchecked")
-                    Property<? extends Collection<P>, ? super M> tmp = (Property<? extends Collection<P>, ? super M>) property;
+                    Property<Collection<P>, ? super M> tmp = (Property<Collection<P>, ? super M>) property;
                     Collection<ModelWrapper<P>> list = wrapper
                         .getWrapperCollection(tmp, null, false);
                     for (ModelWrapper<?> wrappedProperty : list) {
@@ -305,7 +294,7 @@ public class WrapperTransaction {
             Property<P, M> property) {
             if (property.isCollection()) {
                 @SuppressWarnings("unchecked")
-                Property<? extends Collection<P>, ? super M> tmp = (Property<? extends Collection<P>, ? super M>) property;
+                Property<Collection<P>, ? super M> tmp = (Property<Collection<P>, ? super M>) property;
                 Collection<ModelWrapper<P>> list = wrapper
                     .getWrapperCollection(tmp, null, false);
                 for (ModelWrapper<?> wrappedProperty : list) {
@@ -333,7 +322,7 @@ public class WrapperTransaction {
          * @param property to persist the added elements of
          */
         public <M, P> void persistAdded(ModelWrapper<M> wrapper,
-            Property<? extends Collection<P>, M> property) {
+            Property<Collection<P>, M> property) {
             Collection<ModelWrapper<P>> elements = wrapper.getElementTracker()
                 .getAddedElements(property);
             for (ModelWrapper<P> element : elements) {
@@ -349,7 +338,7 @@ public class WrapperTransaction {
          * @param property to persist the removed elements of
          */
         public <M, P> void persistRemoved(ModelWrapper<M> wrapper,
-            Property<? extends Collection<P>, M> property) {
+            Property<Collection<P>, M> property) {
             Collection<ModelWrapper<P>> elements = wrapper.getElementTracker()
                 .getRemovedElements(property);
             for (ModelWrapper<P> element : elements) {
@@ -365,7 +354,7 @@ public class WrapperTransaction {
          * @param property to persist the removed elements of
          */
         public <M, P> void deleteRemoved(ModelWrapper<M> wrapper,
-            Property<? extends Collection<P>, M> property) {
+            Property<Collection<P>, M> property) {
             Collection<ModelWrapper<P>> elements = wrapper.getElementTracker()
                 .getRemovedElements(property);
             for (ModelWrapper<P> element : elements) {

@@ -44,20 +44,9 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         super(appService);
     }
 
-    private static final String SPECIMEN_COUNT_QRY = "select count(specimen) from "
-        + Specimen.class.getName()
-        + " as specimen where specimen."
-        + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
-            ProcessingEventPeer.ID) + "=?";
-
     public long getSpecimenCount(boolean fast) throws BiobankException,
         ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(SPECIMEN_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        return getSpecimenCollection(false).size();
+        return getPropertyCount(ProcessingEventPeer.SPECIMEN_COLLECTION, fast);
     }
 
     public List<SpecimenWrapper> getDerivedSpecimenCollection(boolean sort) {

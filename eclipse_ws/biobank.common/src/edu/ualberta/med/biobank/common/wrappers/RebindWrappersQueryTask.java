@@ -16,9 +16,6 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 
-// TODO: should share the map/ list for ALL wrappers?
-// TODO: should rebuild the modelWrapperMap since the model objects sent to
-// the server that came back are now invalid?
 public class RebindWrappersQueryTask implements QueryTask {
     private final ModelWrapper<?> wrapper;
     private final List<ModelWrapper<?>> wrappersToRebind = new ArrayList<ModelWrapper<?>>();
@@ -37,38 +34,57 @@ public class RebindWrappersQueryTask implements QueryTask {
 
     @Override
     public void afterExecute(SDKQueryResult result) {
-        // TODO: If we reattach here, no need to do so in Delete or
-        // Persist!! :-)
         @SuppressWarnings("unchecked")
         List<Object> newModels = (List<Object>) result.getObjectResult();
 
         updateWrappedObjects(newModels);
-        updateWrapperMap(newModels);
+        updateSession();
     }
 
     private void updateWrappedObjects(List<Object> newModels) {
         for (int i = 0, n = wrappersToRebind.size(); i < n; i++) {
-            setWrappedObject(wrappersToRebind.get(i), newModels.get(i));
+            ModelWrapper<?> wrapper = wrappersToRebind.get(i);
+
+            setWrappedObject(wrapper, newModels.get(i));
             // TODO: only thing that may have changed is the id, notify
             // listeners?
             // TODO: direct properties may have changed, but not
             // associations (e.g. label if container rename) so should do
             // some sort of notification.
+
+            // clear old values since they are no longer valid after an insert,
+            // update, or delete
+            wrapper.getElementTracker().clear();
         }
     }
 
-    private void updateWrapperMap(List<Object> newModels) {
-        // TODO:
-        // TODO: NEED NEED NEED to clean up the ModelWrapper.wrappersMap
-        // because it will contain model objects (as keys) that no longer
-        // exist.
-        // TODO:
-        // TODO: this is unnecessarily slow, mostly because almost all of
-        // the given wrappers will share the same wrapeprsMap. Could be
-        // optimized.
-        for (ModelWrapper<?> wrapper : wrappersToRebind) {
-            for (int i = 0, n = oldModels.size(); i < n; i++) {
-            }
+    /**
+     * Need to clean up the model wrapper map because after coming back from the
+     * server, it will contain model objects that are no longer referenced by
+     * the wrappers. Remove all old model object keys and replace with the new
+     * model objects.
+     * 
+     * @param newModels
+     */
+    private void updateSession() {
+        for (int i = 0, n = wrappersToRebind.size(); i < n; i++) {
+            ModelWrapper<?> wrapper = wrappersToRebind.get(i);
+            Object oldModel = oldModels.get(i);
+
+            // TODO: note that uni-directional references INTO these model
+            // objects will not be updated, they will still reference a now
+            // detached model object graph. The wrappers could inform an object
+            // when it calls set on it, then it could notify the object that has
+            // a reference to it when it is updated, then a rebind could be
+            // done? For example, if persist was called on an AddressWrapper
+            // object (but not the CenterWrapper object that has it) then the
+            // old center model object would contain a reference to the old
+            // address model object, but the CenterWrapper would contain a
+            // reference to the same AddressWrapper, which was rebound to a new
+            // address model object.
+
+            wrapper.session.remove(oldModel);
+            wrapper.session.add(wrapper);
         }
     }
 

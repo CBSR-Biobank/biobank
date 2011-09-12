@@ -15,6 +15,7 @@ public class SpecimenPostPersistChecks extends LoadModelAction<Specimen> {
 
     private static final String WRONG_COLLECTION_EVENT = "Specimen {0} has a Collection Event which differs from it's parent or top Specimen.";
     private static final String TOP_SPECIMEN_COLLECTION_EVENT_UNSET = "Specimen {0} is a top Specimen, but not part of its Collection Event's original specimen collection.";
+    private static final String CHILDREN_WITHOUT_PROCESSING_EVENT = "Specimen {0} has children but does not have a Processing Event. A Specimen must be part of a Processing Event to have children.";
 
     public SpecimenPostPersistChecks(ModelWrapper<Specimen> wrapper) {
         super(wrapper);
@@ -25,6 +26,8 @@ public class SpecimenPostPersistChecks extends LoadModelAction<Specimen> {
         throws BiobankSessionException {
         checkSameCollectionEvent(specimen);
         checkOriginalCollectionEvent(specimen);
+        // TODO: should check this but it will break a ton of the wrapper tests
+        // checkHasProcessingEventIfHasChildren(specimen);
     }
 
     private static void checkSameCollectionEvent(Specimen specimen)
@@ -47,6 +50,16 @@ public class SpecimenPostPersistChecks extends LoadModelAction<Specimen> {
             && specimen.getOriginalCollectionEvent() == null) {
             String msg = MessageFormat.format(
                 TOP_SPECIMEN_COLLECTION_EVENT_UNSET, specimen.getInventoryId());
+            throw new BiobankSessionException(msg);
+        }
+    }
+
+    private static void checkHasProcessingEventIfHasChildren(Specimen specimen)
+        throws BiobankSessionException {
+        if (!specimen.getChildSpecimenCollection().isEmpty()
+            && specimen.getProcessingEvent() == null) {
+            String msg = MessageFormat.format(
+                CHILDREN_WITHOUT_PROCESSING_EVENT, specimen.getInventoryId());
             throw new BiobankSessionException(msg);
         }
     }

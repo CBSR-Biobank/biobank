@@ -152,10 +152,6 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     public void setChildLabelingSchemeById(Integer id) throws Exception {
         ContainerLabelingSchemeWrapper scheme = ContainerLabelingSchemeWrapper
             .getLabelingSchemeById(appService, id);
-        if (scheme == null) {
-            throw new Exception("labeling scheme with id \"" + id
-                + "\" does not exist");
-        }
         setChildLabelingScheme(scheme);
     }
 

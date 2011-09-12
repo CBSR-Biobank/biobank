@@ -9,6 +9,7 @@ import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 
 import org.hibernate.PropertyValueException;
@@ -74,10 +75,18 @@ public class DeleteModelWrapperQueryTask<E> implements
 
             // Calling session.delete() does not sometimes work because it
             // null-checks values, and can fail. For example, trying to delete a
-            // contact whose clinic value is null will not work.
+            // contact whose clinic value is null will not work. The values were
+            // nulled by a bi-directional setter/ getter. Further, deleting with
+            // HQL does not consider cascades, so, reload the object before
+            // deleting it (see
+            // https://forum.hibernate.org/viewtopic.php?f=1&t=944722)
             try {
-                session.delete(model);
+                Serializable id = getIdProperty().get(model);
+                session.delete(session.load(getModelClass(), id));
+                // TODO: version check and throw a StaleStateException?
             } catch (PropertyValueException e) {
+                // TODO: determine why the HQL delete is still necessary, test
+                // fail if this is removed. Is there a better option?
                 doHqlDelete(session);
             }
 

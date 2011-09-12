@@ -80,7 +80,7 @@ public class StudyInfoTable extends InfoTableWidget {
             info.status = ""; //$NON-NLS-1$
         }
         info.patientCount = info.study.getPatientCount(true);
-        info.visitCount = info.study.getCollectionEventCount(true);
+        info.visitCount = info.study.getCollectionEventCount();
         info.study.reload();
         return info;
     }

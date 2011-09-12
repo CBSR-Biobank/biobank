@@ -586,6 +586,6 @@ public class ContainerLabelingSchemeWrapper extends
         tasks.add(check().notUsedBy(ContainerType.class,
             ContainerTypePeer.CHILD_LABELING_SCHEME));
 
-        super.addPersistTasks(tasks);
+        super.addDeleteTasks(tasks);
     }
 }

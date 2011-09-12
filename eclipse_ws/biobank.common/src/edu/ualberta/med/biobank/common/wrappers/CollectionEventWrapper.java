@@ -154,44 +154,16 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             CollectionEventWrapper.class);
     }
 
-    private static final String SOURCE_SPECIMEN_COUNT_QRY = "select count(specimens) from "
-        + CollectionEvent.class.getName()
-        + " as cEvent join cEvent."
-        + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName()
-        + " as specimens where cEvent."
-        + CollectionEventPeer.ID.getName()
-        + "=?";
-
     public long getSourceSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(SOURCE_SPECIMEN_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        List<SpecimenWrapper> list = getOriginalSpecimenCollection(false);
-        if (list == null)
-            return 0;
-        return list.size();
+        return getPropertyCount(
+            CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION, fast);
     }
-
-    private static final String ALL_SPECIMEN_COUNT_QRY = "select count(spc) from "
-        + Specimen.class.getName()
-        + " as spc where spc."
-        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-            CollectionEventPeer.ID) + "=?";
 
     public long getAllSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(ALL_SPECIMEN_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        List<SpecimenWrapper> list = getOriginalSpecimenCollection(false);
-        if (list == null)
-            return 0;
-        return list.size();
+        return getPropertyCount(CollectionEventPeer.ALL_SPECIMEN_COLLECTION,
+            fast);
     }
 
     private static final String ALIQUOTED_SPECIMEN_COUNT_QRY = "select count(spc) from "
@@ -204,16 +176,20 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     public long getAliquotedSpecimensCount(boolean fast)
         throws BiobankException, ApplicationException {
-        if (fast) {
+        long count = 0;
+
+        if (fast
+            && !isInitialized(CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION)
+            && !isInitialized(CollectionEventPeer.ALL_SPECIMEN_COLLECTION)) {
             HQLCriteria criteria = new HQLCriteria(
                 ALIQUOTED_SPECIMEN_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
+            count = getCountResult(appService, criteria);
+        } else {
+            count = getAllSpecimensCount(fast) - getSourceSpecimensCount(fast);
         }
-        List<SpecimenWrapper> aliquotedSpecimens = getAliquotedSpecimenCollection(false);
-        if (aliquotedSpecimens == null)
-            return 0;
-        return aliquotedSpecimens.size();
+
+        return count;
     }
 
     public List<SpecimenWrapper> getAliquotedSpecimenCollection(boolean sort) {
