@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestContainerLabelingScheme extends TestDatabase {
 
@@ -180,16 +181,31 @@ public class TestContainerLabelingScheme extends TestDatabase {
             }
         }
 
-        for (int col = 0; col < totalCols; ++col) {
-            for (int row = 0; row < totalRows; ++row) {
+        for (int col = 0; col < (totalCols); ++col) {
+            for (int row = 0; row < (totalRows); ++row) {
                 cbsrString = ALPHA
                     .get((row + (col * totalRows)) / ALPHA.size())
                     + ALPHA.get((row + (col * totalRows)) % ALPHA.size());
+
                 RowColPos pos = ContainerLabelingSchemeWrapper.twoCharToRowCol(
                     appService, cbsrString, totalRows, totalCols, "test");
                 Assert.assertEquals(new Integer(row), pos.getRow());
                 Assert.assertEquals(new Integer(col), pos.getCol());
             }
+        }
+
+        try {
+            cbsrString = ALPHA.get(((totalRows - 1)
+                + ((totalCols - 1) * totalRows) + 15)
+                / ALPHA.size())
+                + ALPHA
+                    .get(((totalRows - 1) + ((totalCols - 1) * totalRows) + 15)
+                        % ALPHA.size());
+            ContainerLabelingSchemeWrapper.twoCharToRowCol(appService,
+                cbsrString, totalRows, totalCols, "test");
+            Assert.fail("Should not be allowed to go out of bounds.");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
         }
 
         try {
@@ -383,13 +399,58 @@ public class TestContainerLabelingScheme extends TestDatabase {
     @Test
     public void testGetPosition() throws Exception {
         String output = ContainerLabelingSchemeWrapper.getPositionString(
-            new RowColPos(1, 1),
-            ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA, 2, 2);
-        Assert.assertEquals("AD", output);
+            new RowColPos(8, 0),
+            ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA, 9, 9);
+        Assert.assertEquals("AI", output);
 
-        Assert.assertEquals(new RowColPos(1, 1), ContainerLabelingSchemeWrapper
-            .getRowColFromPositionString(appService, "AD",
-                ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA, 2, 2));
+        Assert.assertEquals(new RowColPos(8, 0), ContainerLabelingSchemeWrapper
+            .getRowColFromPositionString(appService, "AI",
+                ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA, 9, 9));
+
+        output = ContainerLabelingSchemeWrapper.getPositionString(
+            new RowColPos(8, 0),
+            ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_NUMERIC, 9, 9);
+        Assert.assertEquals("09", output);
+
+        Assert.assertEquals(new RowColPos(8, 0), ContainerLabelingSchemeWrapper
+            .getRowColFromPositionString(appService, "09",
+                ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_NUMERIC, 9, 9));
+
+        output = ContainerLabelingSchemeWrapper.getPositionString(
+            new RowColPos(8, 0),
+            ContainerLabelingSchemeWrapper.SCHEME_CBSR_2_CHAR_ALPHA, 9, 9);
+        Assert.assertEquals("AJ", output);
+
+        Assert.assertEquals(new RowColPos(8, 0), ContainerLabelingSchemeWrapper
+            .getRowColFromPositionString(appService, "AJ",
+                ContainerLabelingSchemeWrapper.SCHEME_CBSR_2_CHAR_ALPHA, 9, 9));
+
+        output = ContainerLabelingSchemeWrapper.getPositionString(
+            new RowColPos(8, 0), ContainerLabelingSchemeWrapper.SCHEME_DEWAR,
+            9, 1);
+        Assert.assertEquals("II", output);
+
+        Assert.assertEquals(new RowColPos(8, 0), ContainerLabelingSchemeWrapper
+            .getRowColFromPositionString(appService, "II",
+                ContainerLabelingSchemeWrapper.SCHEME_DEWAR, 9, 1));
+
+        output = ContainerLabelingSchemeWrapper.getPositionString(
+            new RowColPos(8, 0), ContainerLabelingSchemeWrapper.SCHEME_SBS, 9,
+            9);
+        Assert.assertEquals("I1", output);
+
+        Assert.assertEquals(new RowColPos(8, 0), ContainerLabelingSchemeWrapper
+            .getRowColFromPositionString(appService, "I1",
+                ContainerLabelingSchemeWrapper.SCHEME_SBS, 9, 9));
+
+        output = ContainerLabelingSchemeWrapper.getPositionString(
+            new RowColPos(8, 0),
+            ContainerLabelingSchemeWrapper.SCHEME_CBSR_SBS, 9, 9);
+        Assert.assertEquals("J1", output);
+
+        Assert.assertEquals(new RowColPos(8, 0), ContainerLabelingSchemeWrapper
+            .getRowColFromPositionString(appService, "J1",
+                ContainerLabelingSchemeWrapper.SCHEME_CBSR_SBS, 9, 9));
     }
 
     @Test
@@ -405,5 +466,46 @@ public class TestContainerLabelingScheme extends TestDatabase {
         RowColPos pos = new RowColPos(0, 8);
         Assert.assertEquals(pos,
             ContainerLabelingSchemeWrapper.cbsrSbsToRowCol(appService, "A9"));
+    }
+
+    @Test
+    public void testCompareTo() throws Exception {
+        // fake test... this wrapper always returns 0
+        ContainerLabelingSchemeWrapper.getLabelingSchemeById(appService,
+            ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA).compareTo(
+            ContainerLabelingSchemeWrapper.getLabelingSchemeById(appService,
+                ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA));
+    }
+
+    @Test
+    public void testErrors() throws Exception {
+        try {
+            ContainerLabelingSchemeWrapper.getLabelingSchemeById(appService,
+                13123);
+            Assert.fail("Should have received an exception.");
+        } catch (ApplicationException e) {
+            Assert.assertTrue(true);
+        }
+
+        String original;
+        ContainerLabelingSchemeWrapper scheme;
+        for (int i = 1; i < 7; i++) {
+            Map<Integer, ContainerLabelingSchemeWrapper> map = ContainerLabelingSchemeWrapper
+                .getAllLabelingSchemesMap(appService);
+            scheme = map.get(i);
+            original = scheme.getName();
+            try {
+                scheme.setName("asds");
+                scheme.persist();
+                ContainerLabelingSchemeWrapper
+                    .getAllLabelingSchemesMap(appService);
+                Assert.fail("Should have thrown an exception");
+            } catch (Exception e) {
+                Assert.assertTrue(true);
+            } finally {
+                scheme.setName(original);
+                scheme.persist();
+            }
+        }
     }
 }

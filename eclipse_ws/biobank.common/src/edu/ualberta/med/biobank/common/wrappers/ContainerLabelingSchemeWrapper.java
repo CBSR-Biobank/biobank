@@ -327,7 +327,8 @@ public class ContainerLabelingSchemeWrapper extends
             String maxValue = ContainerLabelingSchemeWrapper
                 .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
                     rowCap, colCap);
-            throw new Exception("Address  " + label + " does not exist"
+            throw new BiobankCheckException("Address  " + label
+                + " does not exist"
                 + (containerTypeName == null ? "" : " in " + containerTypeName)
                 + ". Max value is " + maxValue + ". (Max row: " + rowCap
                 + ". Max col: " + colCap + ".)");
@@ -369,7 +370,8 @@ public class ContainerLabelingSchemeWrapper extends
             String maxValue = ContainerLabelingSchemeWrapper
                 .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
                     rowCap, colCap);
-            throw new Exception("Address  " + label + " does not exist"
+            throw new BiobankCheckException("Address  " + label
+                + " does not exist"
                 + (containerTypeName == null ? "" : " in " + containerTypeName)
                 + ". Max value is " + maxValue + ". (Max row: " + rowCap
                 + ". Max col: " + colCap + ".)");
@@ -482,8 +484,7 @@ public class ContainerLabelingSchemeWrapper extends
      */
     public static String rowColToDewar(RowColPos rcp, Integer colCapacity) {
         int pos = rcp.getCol() + (colCapacity * rcp.getRow());
-        String letter = String.valueOf(CBSR_2_CHAR_LABELLING_PATTERN
-            .charAt(pos));
+        String letter = String.valueOf(SBS_ROW_LABELLING_PATTERN.charAt(pos));
         return letter + letter;
     }
 
