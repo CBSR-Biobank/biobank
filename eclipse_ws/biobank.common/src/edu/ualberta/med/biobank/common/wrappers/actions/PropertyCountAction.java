@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers.actions;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -26,7 +28,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
 public class PropertyCountAction<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String PROPERTIES_EMPTY_ERRMSG = "No properties were given to count. At least one property is required.";
-    private static final String HQL = "SELECT COUNT(*) FROM {0} o WHERE ({1}) = (SELECT {1} FROM {0} o2 WHERE o2 = ?)";
+    private static final String HQL = "SELECT COUNT(*) FROM {0} o WHERE ({1}) = (SELECT {2} FROM {0} o2 WHERE o2 = ?)";
 
     private final Collection<Property<?, ? super E>> properties;
 
@@ -49,12 +51,36 @@ public class PropertyCountAction<E> extends WrapperAction<E> {
     @Override
     public Long doAction(Session session) throws BiobankSessionException {
         String modelClassName = getModelClass().getName();
-        String hqlProperties = StringUtil.join(properties, ", ");
-        String hql = MessageFormat.format(HQL, modelClassName, hqlProperties);
+
+        List<String> propertyNames = getPropertyNames(properties);
+        String hqlProperties = StringUtil.join(propertyNames, ", ");
+
+        List<String> subPropertyNames = getPropertyNames("o2.", properties);
+        String subHqlProperties = StringUtil.join(subPropertyNames, ", ");
+
+        String hql = MessageFormat.format(HQL, modelClassName, hqlProperties,
+            subHqlProperties);
 
         Query query = session.createQuery(hql);
+        query.setParameter(0, getModel());
         Long count = HibernateUtil.getCountFromQuery(query);
 
         return count;
+    }
+
+    private List<String> getPropertyNames(
+        Collection<Property<?, ? super E>> properties) {
+        return getPropertyNames("", properties);
+    }
+
+    private List<String> getPropertyNames(String prefix,
+        Collection<Property<?, ? super E>> properties) {
+        List<String> names = new ArrayList<String>();
+
+        for (Property<?, ?> property : properties) {
+            names.add(prefix + property.getName());
+        }
+
+        return names;
     }
 }
