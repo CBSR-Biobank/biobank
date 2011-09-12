@@ -354,7 +354,7 @@ public class WrapperTransaction {
          * @param property to persist the removed elements of
          */
         public <M, P> void deleteRemoved(ModelWrapper<M> wrapper,
-            Property<Collection<P>, M> property) {
+            Property<Collection<P>, ? super M> property) {
             Collection<ModelWrapper<P>> elements = wrapper.getElementTracker()
                 .getRemovedElements(property);
             for (ModelWrapper<P> element : elements) {

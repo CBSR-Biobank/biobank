@@ -4,10 +4,11 @@ import org.eclipse.ui.IStartup;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.IHandlerService;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.dialogs.startup.ActivityLogLocationDialog;
-import edu.ualberta.med.biobank.dialogs.startup.LoginDialog;
+import edu.ualberta.med.biobank.handlers.LoginHandler;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 
 public class BiobankStartup implements IStartup {
@@ -36,9 +37,13 @@ public class BiobankStartup implements IStartup {
                             window.getShell());
                         dlg2.open();
                     }
-                    // then launch the login dialog
-                    LoginDialog dlg = new LoginDialog(window.getShell());
-                    dlg.open();
+                    IHandlerService handlerService = (IHandlerService) window
+                        .getService(IHandlerService.class);
+                    try {
+                        handlerService.executeCommand(LoginHandler.ID, null);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         });

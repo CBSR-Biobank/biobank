@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -379,10 +378,11 @@ public class TestProcessingEvent extends TestDatabase {
             pevents.add(pevent);
 
             // create children
-            for (int j = 0; j < NUM_CHILDREN; j++) {
-                SpecimenHelper.addSpecimen(parentSpc,
-                    allSpcTypes.get(j % allSpcTypes.size()), pevent);
-            }
+            Assert.fail("Commented out because broke with a merge, FIXME!");
+            // for (int j = 0; j < NUM_CHILDREN; j++) {
+            // SpecimenHelper.addSpecimen(parentSpc,
+            // allSpcTypes.get(j % allSpcTypes.size()), pevent);
+            // }
         }
 
         for (ProcessingEventWrapper pevent : pevents) {

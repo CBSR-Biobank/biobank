@@ -4,8 +4,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
-import edu.ualberta.med.biobank.common.security.Privilege;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
@@ -485,26 +483,31 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
-     * return true if the user can view this object
-     */
-    public boolean canRead(User user) {
-        return user.hasPrivilegeOnObject(Privilege.READ, getWrappedClass());
-    }
-
-    /**
      * return true if the user can edit this object
      */
-    public boolean canUpdate(User user) {
-        return user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass(),
-            getSecuritySpecificCenters());
+    public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        try {
+            return user.hasPrivilegeOnKeyDesc(
+                PrivilegeWrapper.getUpdatePrivilege(appService), center, study,
+                getWrappedClass().getSimpleName());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
      * return true if the user can delete this object
      */
-    public boolean canDelete(User user) {
-        return user.hasPrivilegeOnObject(Privilege.DELETE, getWrappedClass(),
-            getSecuritySpecificCenters());
+    public boolean canDelete(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        try {
+            return user.hasPrivilegeOnKeyDesc(
+                PrivilegeWrapper.getDeletePrivilege(appService), center, study,
+                getWrappedClass().getSimpleName());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void addWrapperListener(WrapperListener listener) {
@@ -912,7 +915,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     /**
      * @return a list of center security should check for modifications
+     * 
+     *         is not used anymore for now. But we will need something like that
+     *         so I keep it until I reuse what subclasses are doing with it.
      */
+    @Deprecated
     public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
         return Collections.emptyList();
     }

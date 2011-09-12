@@ -125,8 +125,8 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
 
                 if (getSelection() instanceof ModelWrapper<?>
                     && !(getSelection() instanceof DispatchSpecimenWrapper))
-                    editItem.setEnabled(((ModelWrapper<?>) getSelection())
-                        .canUpdate(SessionManager.getUser()));
+                    editItem.setEnabled(SessionManager
+                        .canUpdate((ModelWrapper<?>) getSelection()));
                 else
                     editItem.setEnabled(false);
             }

@@ -9,9 +9,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankSecurityUtil;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 // TODO: this class is some totally broken example code. It's just an example for now. Fix up later.
 public class ExamplePersistCsmUserAction extends WrapperAction<User> {
@@ -36,13 +34,13 @@ public class ExamplePersistCsmUserAction extends WrapperAction<User> {
     }
 
     private void persistCsmUser() throws BiobankSessionException {
-        try {
-            // TODO: why does this take a current user argument and not just get
-            // the current user? Shouldn't it just get this from the UPM?
-            BiobankSecurityUtil.persistUser(csmUser, null);
-        } catch (ApplicationException e) {
-            throw new BiobankSessionException(e.getMessage(), e);
-        }
+        // try {
+        // // TODO: why does this take a current user argument and not just get
+        // // the current user? Shouldn't it just get this from the UPM?
+        // // BiobankSecurityUtil.persistUser(csmUser, null);
+        // } catch (ApplicationException e) {
+        // throw new BiobankSessionException(e.getMessage(), e);
+        // }
     }
 
     /**

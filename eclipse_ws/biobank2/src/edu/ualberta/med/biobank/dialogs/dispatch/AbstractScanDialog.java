@@ -175,7 +175,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             // server side call
             ScanProcessResult res = SessionManager.getAppService()
                 .processScanResult(serverCells, getProcessData(),
-                    isRescanMode(), SessionManager.getUser(),
+                    isRescanMode(),
+                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
                     Locale.getDefault());
 
             if (cells != null) {
@@ -461,10 +462,11 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     }
 
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-        CellProcessResult res = SessionManager
-            .getAppService()
+        CellProcessResult res = SessionManager.getAppService()
             .processCellStatus(cell.transformIntoServerCell(),
-                getProcessData(), SessionManager.getUser(), Locale.getDefault());
+                getProcessData(),
+                SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                Locale.getDefault());
         cell.merge(SessionManager.getAppService(), res.getCell());
         if (res.getProcessStatus() == CellStatus.ERROR) {
             Button okButton = getButton(IDialogConstants.PROCEED_ID);

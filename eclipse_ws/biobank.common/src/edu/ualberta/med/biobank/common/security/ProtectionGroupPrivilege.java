@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
 /**
  * represent a protection group and its privileges
  */
+@Deprecated
 public class ProtectionGroupPrivilege implements Serializable, NotAProxy {
 
     private static final long serialVersionUID = 1L;

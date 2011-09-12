@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.widgets.trees.infos;
 import java.util.List;
 
 import org.eclipse.jface.viewers.EditingSupport;
-import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
@@ -174,7 +173,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         autoSizeColumns = columnWidths == null ? true : false;
 
         BgcClipboard.addClipboardCopySupport(treeViewer, menu,
-            (BgcLabelProvider) getLabelProvider(), headings.length);
+            getLabelProvider(), headings.length);
 
     }
 
@@ -220,7 +219,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
 
     protected abstract boolean isEditMode();
 
-    protected abstract IBaseLabelProvider getLabelProvider();
+    protected abstract BgcLabelProvider getLabelProvider();
 
     public List<T> getCollection() {
         return collection;

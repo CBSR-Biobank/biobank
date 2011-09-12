@@ -74,6 +74,7 @@ public abstract class InfoTableWidget extends InfoTableBgrLoader {
     public InfoTableWidget(Composite parent, List<?> collection,
         String[] headings, int rowsPerPage, Class<?> wrapperClass) {
         super(parent, collection, headings, null, rowsPerPage);
+
         this.wrapperClass = wrapperClass;
         addTableClickListener();
         useDefaultEditItem = false;

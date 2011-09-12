@@ -416,7 +416,10 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String property = getPeerProperty(mc, assoc);
         String inverse = isInternal ? "" : createWrappedPropertySetterInverse(mc, assoc);
         
-        String result = "    "+visibility+"void "+method+"("+parameterType+" "+parameterName+") {\n" +
+        String preString = "";
+        if (inverse.contains("Arrays.asList(this)") && assoc.getInverse().getToClass().isParentClass())
+            preString = "    " + SUPPRESS_WARNING_UNCHECKED + "\n";
+        String result = preString+ "    "+visibility+"void "+method+"("+parameterType+" "+parameterName+") {\n" +
                         inverse +
         		        "        setWrappedProperty("+property+", "+parameterName+");\n" +
         		        "    }\n\n";
@@ -541,10 +544,12 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
         String inverse = createCollectionGetterInverse(mc, assoc);
 
-        // fix warnings
-        if (mc.getName().equals("ShippingMethod")) {
-            result
-                .append("    @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
+        String genericString = "";
+        if (assoc.getToClass().isParentClass()) {
+            // fix warnings for generics
+            result.append("   ").append(SUPPRESS_WARNING_UNCHECKED)
+                .append("\n");
+            genericString = "<?>";
         }
 
         String peerProperty = mc.getName() + "Peer."
@@ -557,7 +562,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
         }
 
         result.append("    public List<").append(assocClassName)
-            .append("Wrapper> get")
+            .append("Wrapper").append(genericString).append("> get")
             .append(CamelCase.toCamelCase(assocName, true))
             .append("(boolean sort) {\n").append(notCached)
             .append("        List<").append(assocClassName).append("Wrapper> ")
@@ -632,10 +637,15 @@ public class BaseWrapperBuilder extends BaseBuilder {
         }          
         // @formatter:on
 
+        String genericString = "";
+        if (assoc.getToClass().isParentClass()) {
+            genericString = "<?>";
+        }
         result.append("    ").append(visibility).append("void ")
             .append(methodName).append("(List<? extends ")
-            .append(assocClassName).append("BaseWrapper> ").append(assocName)
-            .append(") {\n").append(action).append(inverse).append("    }\n\n");
+            .append(assocClassName).append("BaseWrapper").append(genericString)
+            .append("> ").append(assocName).append(") {\n").append(action)
+            .append(inverse).append("    }\n\n");
         return result.toString();
     }
 
@@ -660,12 +670,6 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
-        // fix warnings
-        if (mc.getName().equals("ShippingMethod")) {
-            result
-                .append("   @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
-        }
-
         String visibility = "public ";
         String methodName = "removeFrom"
             + CamelCase.toCamelCase(assocName, true);
@@ -688,10 +692,16 @@ public class BaseWrapperBuilder extends BaseBuilder {
         }          
         // @formatter:on
 
+        String genericString = "";
+        if (assoc.getToClass().isParentClass()) {
+            genericString = "<?>";
+        }
+
         result.append("    ").append(visibility).append("void ")
             .append(methodName).append("(List<? extends ")
-            .append(assocClassName).append("BaseWrapper> ").append(assocName)
-            .append(") {\n").append(action).append(inverse).append("    }\n\n");
+            .append(assocClassName).append("BaseWrapper").append(genericString)
+            .append("> ").append(assocName).append(") {\n").append(action)
+            .append(inverse).append("    }\n\n");
         return result.toString();
     }
 
@@ -716,6 +726,17 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
+        // String collectionExtends = "";
+        // String genericString = "";
+        // if (assoc.getToClass().getIsParentClass()) {
+        // collectionExtends = "? extends ";
+        // genericString = "<?>";
+        // }
+        // result.append("   public void removeFrom")
+        // .append(CamelCase.toCamelCase(assocName, true))
+        // .append("WithCheck(List<").append(collectionExtends)
+        // .append(assocClassName).append("Wrapper").append(genericString)
+        // .append("> ").append(assocName)
         // fix warnings
         if (mc.getName().equals("ShippingMethod")) {
             result
@@ -733,9 +754,15 @@ public class BaseWrapperBuilder extends BaseBuilder {
             methodName += "Internal";
         }
 
+        String genericString = "";
+        if (assoc.getToClass().isParentClass()) {
+            genericString = "<?>";
+        }
+
         result.append("    ").append(visibility).append("void ")
             .append(methodName).append("(List<? extends ")
-            .append(assocClassName).append("BaseWrapper> ").append(assocName)
+            .append(assocClassName).append("BaseWrapper").append(genericString)
+            .append("> ").append(assocName)
             .append(") throws BiobankCheckException {\n")
             .append("        removeFromWrapperCollectionWithCheck(")
             .append(mc.getName()).append("Peer.")
@@ -756,6 +783,9 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
         String paramName = assocName;
         String elementBaseType = assocClassName + "BaseWrapper";
+        if (assoc.getToClass().isParentClass()) {
+            elementBaseType += "<?>";
+        }
 
         String method = null;
         if (inverse.getAssociationType() == ClassAssociationType.ONE_TO_ONE

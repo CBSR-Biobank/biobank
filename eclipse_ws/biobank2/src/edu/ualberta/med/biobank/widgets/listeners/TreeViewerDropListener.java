@@ -7,39 +7,39 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNode;
-import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNodeTransfer;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
 /**
  * Drop support for moving items between TreeViewers in this widget.
  * 
  */
-public class TreeViewerDropListener extends ViewerDropAdapter {
+public class TreeViewerDropListener<T> extends ViewerDropAdapter {
 
-    private MultiSelectWidget multiSelect;
+    private MultiSelectWidget<T> multiSelect;
 
     public TreeViewerDropListener(TreeViewer viewer,
-        MultiSelectWidget multiSelect) {
+        MultiSelectWidget<T> multiSelect) {
         super(viewer);
         this.multiSelect = multiSelect;
 
         viewer.addDropSupport(DND.DROP_MOVE | DND.DROP_COPY,
-            new Transfer[] { MultiSelectNodeTransfer.getInstance() }, this);
+            new Transfer[] { multiSelect.getDndTransfer() }, this);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean performDrop(Object data) {
         TreeViewer viewer = (TreeViewer) getViewer();
-        MultiSelectNode target = (MultiSelectNode) getCurrentTarget();
-        MultiSelectNode targetParent;
+        MultiSelectNode<T> target = (MultiSelectNode<T>) getCurrentTarget();
+        MultiSelectNode<T> targetParent;
 
         if (target != null) {
             targetParent = target.getParent();
         } else {
-            targetParent = (MultiSelectNode) getViewer().getInput();
+            targetParent = (MultiSelectNode<T>) getViewer().getInput();
         }
 
-        for (MultiSelectNode node : (MultiSelectNode[]) data) {
+        for (MultiSelectNode<T> node : (MultiSelectNode<T>[]) data) {
             targetParent.addChild(node);
             viewer.reveal(node);
         }
@@ -53,7 +53,6 @@ public class TreeViewerDropListener extends ViewerDropAdapter {
         if (target != null && target == this.getSelectedObject())
             return false;
         else
-            return MultiSelectNodeTransfer.getInstance().isSupportedType(
-                transferType);
+            return multiSelect.getDndTransfer().isSupportedType(transferType);
     }
 }

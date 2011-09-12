@@ -76,4 +76,23 @@ public class ContactWrapper extends ContactBaseWrapper {
 
         super.addDeleteTasks(tasks);
     }
+
+    // /**
+    // * contact is part of a clinic. Can update the contact if can read the
+    // * clinic
+    // */
+    // @Override
+    // public boolean canUpdate(UserWrapper user) {
+    // return getClinic() == null || getClinic().canUpdate(user);
+    // }
+    //
+    // /**
+    // * contact is part of a clinic. Can delete the contact if can update the
+    // * clinic
+    // */
+    // @Override
+    // public boolean canDelete(UserWrapper user) {
+    // return getClinic() == null || getClinic().canUpdate(user);
+    // }
+
 }

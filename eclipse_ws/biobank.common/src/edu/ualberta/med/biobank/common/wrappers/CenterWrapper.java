@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
@@ -451,9 +450,4 @@ public abstract class CenterWrapper<E extends Center> extends
         return Collections.emptyList();
     }
 
-    @Override
-    public boolean canUpdate(User user) {
-        return user.isInSuperAdminMode()
-            || user.isAdministratorForCurrentCenter();
-    }
 }
