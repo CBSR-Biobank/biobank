@@ -257,8 +257,8 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     /**
-     * Get the rowColPos corresponding to the given CBSR SBS 2 or 3 char string
-     * position. Could be A2 or F12. (CBSR SBS skip I and O)
+     * Get the rowColPos corresponding to the given CBSR SBS 2 char string
+     * position. Could be A2 or F9. (CBSR SBS skip I and O)
      */
     public static RowColPos cbsrSbsToRowCol(
         WritableApplicationService appService, String pos) throws Exception {
@@ -572,6 +572,10 @@ public class ContainerLabelingSchemeWrapper extends
         case 5:
             // Box81
             return cbsrSbsToRowCol(appService, position);
+        case 6:
+            // 2 char alphabetic
+            return twoCharToRowCol(appService, position, rowCapacity,
+                colCapacity, "wtf");
         }
         return null;
     }
