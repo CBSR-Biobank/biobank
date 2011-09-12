@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
  * represent a protection element
  * 
  */
+@Deprecated
 public class ProtectionElement implements Serializable, NotAProxy {
 
     private static final long serialVersionUID = 1L;

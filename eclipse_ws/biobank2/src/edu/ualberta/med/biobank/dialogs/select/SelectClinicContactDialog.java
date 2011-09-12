@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
-import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.StudyContactEntryInfoTable;
 
 public class SelectClinicContactDialog extends BgcBaseDialog {
 

@@ -187,16 +187,6 @@ public class Messages extends NLS {
 
     public static String StudyInfoTable_visits_label;
 
-    public static String AbstractInfoTableWidget_first_label;
-
-    public static String AbstractInfoTableWidget_last_label;
-
-    public static String AbstractInfoTableWidget_load_error_title;
-
-    public static String AbstractInfoTableWidget_next_label;
-
-    public static String AbstractInfoTableWidget_previous_label;
-
     public static String ActivityStatusInfoTable_loading;
 
     public static String ActivityStatusInfoTable_status_label;
@@ -287,6 +277,18 @@ public class Messages extends NLS {
 
     public static String LoggingInfoTable_user_label;
 
+    public static String MembershipInfoTable_all_label;
+
+    public static String MembershipInfoTable_center_label;
+
+    public static String MembershipInfoTable_loading;
+
+    public static String MembershipInfoTable_permissions_label;
+
+    public static String MembershipInfoTable_role_label;
+
+    public static String MembershipInfoTable_study_label;
+
     public static String PeListInfoTable_aliquoteds_label;
 
     public static String PeListInfoTable_loading;
@@ -296,6 +298,12 @@ public class Messages extends NLS {
     public static String PeListInfoTable_start_label;
 
     public static String PeListInfoTable_study_label;
+
+    public static String PermissionInfoTable_privileges_label;
+
+    public static String PermissionInfoTable_right_label;
+
+    public static String PermissionInfoTable_loading;
 
     public static String ReportTableWidget_pages_label;
 
@@ -313,6 +321,14 @@ public class Messages extends NLS {
 
     public static String RequestDispatchInfoTable_total_specs_label;
 
+    public static String RoleInfoTable_name_label;
+
+    public static String RoleInfoTable_delete_confirm_msg;
+    public static String RoleInfoTable_delete_confirm_title;
+    public static String RoleInfoTable_delete_error_msg;
+
+    public static String RoleInfoTable_duplicate_label;
+
     public static String UserInfoTable_confirm_delete_msg;
 
     public static String UserInfoTable_confirm_delete_suicide_msg;
@@ -323,9 +339,7 @@ public class Messages extends NLS {
 
     public static String UserInfoTable_email_label;
 
-    public static String UserInfoTable_error_title;
-
-    public static String UserInfoTable_firstname_label;
+    public static String UserInfoTable_fullname_label;
 
     public static String UserInfoTable_lastname_label;
 
@@ -333,7 +347,7 @@ public class Messages extends NLS {
 
     public static String UserInfoTable_login_label;
 
-    public static String UserInfoTable_nogroups_msg;
+    public static String UserInfoTable_superadmin_label;
 
     public static String UserInfoTable_unlock_error_msg;
 

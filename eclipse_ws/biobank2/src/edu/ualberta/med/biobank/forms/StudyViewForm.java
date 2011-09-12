@@ -99,6 +99,7 @@ public class StudyViewForm extends BiobankViewForm {
 
         contactsTable = new StudyContactInfoTable(client, study);
         contactsTable.addClickListener(collectionDoubleClickListener);
+        contactsTable.createDefaultEditItem();
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
 

@@ -7,13 +7,12 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 /**
  * this need to be rename ? to study source specimen ??
  */
-public class SourceSpecimenInfoTable extends
-    InfoTableWidget<SourceSpecimenWrapper> {
+public class SourceSpecimenInfoTable extends InfoTableWidget {
 
     private static final int PAGE_SIZE_ROWS = 5;
 
@@ -42,8 +41,8 @@ public class SourceSpecimenInfoTable extends
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
@@ -66,15 +65,18 @@ public class SourceSpecimenInfoTable extends
     }
 
     @Override
-    public TableRowData getCollectionModelObject(
-        SourceSpecimenWrapper studySourceVessel) throws Exception {
+    public TableRowData getCollectionModelObject(Object studySourceVessel)
+        throws Exception {
         TableRowData info = new TableRowData();
-        info.studySourceVessel = studySourceVessel;
-        Assert.isNotNull(studySourceVessel.getSpecimenType(),
+        info.studySourceVessel = (SourceSpecimenWrapper) studySourceVessel;
+        Assert.isNotNull(info.studySourceVessel.getSpecimenType(),
             "study specimen type is null"); //$NON-NLS-1$
-        info.name = studySourceVessel.getSpecimenType().getName();
-        info.needOriginalVolume = (studySourceVessel.getNeedOriginalVolume() != null) ? (studySourceVessel
-            .getNeedOriginalVolume() ? Messages.SourceSpecimenInfoTable_yes_label : Messages.SourceSpecimenInfoTable_no_label) : Messages.SourceSpecimenInfoTable_no_label;
+        info.name = info.studySourceVessel.getSpecimenType().getName();
+        info.needOriginalVolume = (info.studySourceVessel
+            .getNeedOriginalVolume() != null) ? (info.studySourceVessel
+            .getNeedOriginalVolume() ? Messages.SourceSpecimenInfoTable_yes_label
+            : Messages.SourceSpecimenInfoTable_no_label)
+            : Messages.SourceSpecimenInfoTable_no_label;
         return info;
     }
 

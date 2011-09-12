@@ -7,9 +7,9 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
+public class ClinicStudyInfoTable extends InfoTableWidget {
 
     private static class TableRowData {
         public StudyWrapper study;
@@ -39,8 +39,8 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
@@ -66,15 +66,15 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
     }
 
     @Override
-    public Object getCollectionModelObject(StudyWrapper study) throws Exception {
+    public Object getCollectionModelObject(Object study) throws Exception {
         TableRowData info = new TableRowData();
-        info.study = study;
-        info.studyShortName = study.getNameShort();
+        info.study = (StudyWrapper) study;
+        info.studyShortName = info.study.getNameShort();
         if (info.studyShortName == null) {
             info.studyShortName = ""; //$NON-NLS-1$
         }
-        info.patientCount = clinic.getPatientCountForStudy(study);
-        info.visitCount = clinic.getCollectionEventCountForStudy(study);
+        info.patientCount = clinic.getPatientCountForStudy(info.study);
+        info.visitCount = clinic.getCollectionEventCountForStudy(info.study);
         return info;
     }
 

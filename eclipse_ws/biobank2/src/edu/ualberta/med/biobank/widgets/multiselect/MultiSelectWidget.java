@@ -1,15 +1,16 @@
 package edu.ualberta.med.biobank.widgets.multiselect;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.ByteArrayTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -27,7 +28,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDragListener;
 import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDropListener;
 
-public class MultiSelectWidget extends BgcBaseWidget {
+public abstract class MultiSelectWidget<T> extends BgcBaseWidget {
 
     private TreeViewer selTree;
 
@@ -37,19 +38,34 @@ public class MultiSelectWidget extends BgcBaseWidget {
 
     private Button moveLeftButton;
 
-    private MultiSelectNode selTreeRootNode = new MultiSelectNode(null, 0,
-        "selRoot"); //$NON-NLS-1$
+    private MultiSelectNode<T> selTreeRootNode = new MultiSelectNode<T>(null,
+        null);
 
-    private MultiSelectNode availTreeRootNode = new MultiSelectNode(null, 0,
-        "availRoot"); //$NON-NLS-1$
+    private MultiSelectNode<T> availTreeRootNode = new MultiSelectNode<T>(null,
+        null);
 
     private int minHeight;
 
     protected boolean ctrl;
 
+    private List<T> allObjectsList = new ArrayList<T>();
+
+    private Transfer dndTransfer;
+
+    /**
+     * Default will drag and drop for ModelWrapper. Should use the other
+     * constructor if want to use another one
+     */
     public MultiSelectWidget(Composite parent, int style, String leftLabel,
         String rightLabel, int minHeight) {
+        this(parent, style, leftLabel, rightLabel, minHeight,
+            MultiSelectNodeTransfer.getInstance());
+    }
+
+    public MultiSelectWidget(Composite parent, int style, String leftLabel,
+        String rightLabel, int minHeight, ByteArrayTransfer dndTransfer) {
         super(parent, style);
+        this.dndTransfer = dndTransfer;
 
         this.minHeight = minHeight;
 
@@ -94,6 +110,31 @@ public class MultiSelectWidget extends BgcBaseWidget {
                 moveTreeViewerSelection(selTree, availTree);
             }
         });
+
+    }
+
+    public void addSelections(List<T> allObjects, List<T> selectedObjects) {
+        allObjectsList.addAll(allObjects);
+        for (T o : allObjects) {
+            if (selectedObjects.contains(o)) {
+                selTreeRootNode.addChild(new MultiSelectNode<T>(
+                    selTreeRootNode, o));
+            } else {
+                availTreeRootNode.addChild(new MultiSelectNode<T>(
+                    availTreeRootNode, o));
+            }
+        }
+    }
+
+    /**
+     * same as addSelections but remove previously set elements
+     */
+    public void setSelections(List<T> allObjects, List<T> selectedObjects) {
+        selTreeRootNode.clear();
+        availTreeRootNode.clear();
+        addSelections(allObjects, selectedObjects);
+        selTreeRootNode.reset();
+        availTreeRootNode.reset();
     }
 
     public void setFilter(ViewerFilter filter) {
@@ -102,14 +143,17 @@ public class MultiSelectWidget extends BgcBaseWidget {
         selTree.setFilters(filters);
     }
 
+    @SuppressWarnings("unchecked")
     private void moveTreeViewerSelection(TreeViewer srcTree, TreeViewer destTree) {
-        MultiSelectNode srcRootNode = (MultiSelectNode) srcTree.getInput();
-        MultiSelectNode destRootNode = (MultiSelectNode) destTree.getInput();
+        MultiSelectNode<T> srcRootNode = (MultiSelectNode<T>) srcTree
+            .getInput();
+        MultiSelectNode<T> destRootNode = (MultiSelectNode<T>) destTree
+            .getInput();
         List<?> fromSelection = ((IStructuredSelection) srcTree.getSelection())
             .toList();
 
         for (Object obj : fromSelection) {
-            MultiSelectNode node = (MultiSelectNode) obj;
+            MultiSelectNode<T> node = (MultiSelectNode<T>) obj;
             destRootNode.addChild(node);
             srcRootNode.removeChild(node);
             destTree.reveal(node);
@@ -167,68 +211,50 @@ public class MultiSelectWidget extends BgcBaseWidget {
             }
         });
 
-        tv.setLabelProvider(new MultiSelectNodeLabelProvider());
-        tv.setContentProvider(new MultiSelectNodeContentProvider());
+        tv.setLabelProvider(new LabelProvider() {
+            @SuppressWarnings("unchecked")
+            @Override
+            public String getText(Object element) {
+                MultiSelectNode<T> node = ((MultiSelectNode<T>) element);
+                return getTextForObject(node.getNodeObject());
+            }
+        });
+        tv.setContentProvider(new MultiSelectNodeContentProvider<T>());
 
         return tv;
     }
 
+    protected abstract String getTextForObject(T nodeObject);
+
     private void dragAndDropSupport(TreeViewer fromList, TreeViewer toList) {
-        new TreeViewerDragListener(fromList);
-        new TreeViewerDropListener(toList, this);
-    }
-
-    public void addSelections(LinkedHashMap<Integer, String> available,
-        List<Integer> selected) {
-        for (Entry<Integer, String> entry : available.entrySet()) {
-            Integer key = entry.getKey();
-            String string = entry.getValue();
-            if (selected.contains(key)) {
-                selTreeRootNode.addChild(new MultiSelectNode(selTreeRootNode,
-                    key, string));
-            } else {
-                availTreeRootNode.addChild(new MultiSelectNode(
-                    availTreeRootNode, key, string));
-            }
-        }
-    }
-
-    /**
-     * same as addSelections but remove previously set elements
-     */
-    public void setSelections(LinkedHashMap<Integer, String> available,
-        List<Integer> selected) {
-        selTreeRootNode.clear();
-        availTreeRootNode.clear();
-        addSelections(available, selected);
-        selTreeRootNode.reset();
-        availTreeRootNode.reset();
+        new TreeViewerDragListener<T>(fromList, dndTransfer);
+        new TreeViewerDropListener<T>(toList, this);
     }
 
     /**
      * Return the selected items in the order specified by user.
      * 
      */
-    public List<Integer> getSelected() {
-        List<Integer> result = new ArrayList<Integer>();
-        for (MultiSelectNode node : selTreeRootNode.getChildren()) {
-            result.add(node.getId());
+    public List<T> getSelected() {
+        List<T> result = new ArrayList<T>();
+        for (MultiSelectNode<T> node : selTreeRootNode.getChildren()) {
+            result.add(node.getNodeObject());
         }
         return result;
     }
 
-    public List<Integer> getAddedToSelection() {
-        List<Integer> result = new ArrayList<Integer>();
-        for (MultiSelectNode node : selTreeRootNode.getAddedChildren()) {
-            result.add(node.getId());
+    public List<T> getAddedToSelection() {
+        List<T> result = new ArrayList<T>();
+        for (MultiSelectNode<T> node : selTreeRootNode.getAddedChildren()) {
+            result.add(node.getNodeObject());
         }
         return result;
     }
 
-    public List<Integer> getRemovedToSelection() {
-        List<Integer> result = new ArrayList<Integer>();
-        for (MultiSelectNode node : selTreeRootNode.getRemovedChildren()) {
-            result.add(node.getId());
+    public List<T> getRemovedFromSelection() {
+        List<T> result = new ArrayList<T>();
+        for (MultiSelectNode<T> node : selTreeRootNode.getRemovedChildren()) {
+            result.add(node.getNodeObject());
         }
         return result;
     }
@@ -244,4 +270,9 @@ public class MultiSelectWidget extends BgcBaseWidget {
         availTree.refresh();
         selTree.refresh();
     }
+
+    public Transfer getDndTransfer() {
+        return dndTransfer;
+    }
+
 }

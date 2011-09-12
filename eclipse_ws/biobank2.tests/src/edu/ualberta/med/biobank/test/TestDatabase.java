@@ -20,13 +20,17 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.StringValueLengthServerException;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
+import edu.ualberta.med.biobank.test.internal.GroupHelper;
 import edu.ualberta.med.biobank.test.internal.RequestHelper;
 import edu.ualberta.med.biobank.test.internal.ResearchGroupHelper;
+import edu.ualberta.med.biobank.test.internal.RightHelper;
+import edu.ualberta.med.biobank.test.internal.RoleHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentInfoHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
+import edu.ualberta.med.biobank.test.internal.UserHelper;
 
 public class TestDatabase {
     protected static BiobankApplicationService appService;
@@ -71,7 +75,10 @@ public class TestDatabase {
             ClinicHelper.deleteCreatedClinics();
             SpecimenTypeHelper.deleteCreatedSpecimenTypes();
             ShippingMethodHelper.deleteCreateShippingMethods();
-
+            GroupHelper.deleteCreatedGroups();
+            UserHelper.deleteCreatedUsers();
+            RoleHelper.deleteCreatedRoles();
+            RightHelper.deleteCreatedRights();
         } catch (Exception e) {
             e.printStackTrace(System.err);
             Assert.fail();
@@ -164,6 +171,8 @@ public class TestDatabase {
                     parameter = new Boolean(r.nextBoolean());
                 } else if (returnType.equals(java.lang.Integer.class)) {
                     parameter = new Integer(r.nextInt(Integer.MAX_VALUE));
+                } else if (returnType.equals(java.lang.Long.class)) {
+                    parameter = new Long(r.nextLong());
                 } else if (returnType.equals(java.lang.Double.class)) {
                     parameter = new Double(r.nextDouble());
                 } else if (returnType.equals(java.lang.String.class)) {

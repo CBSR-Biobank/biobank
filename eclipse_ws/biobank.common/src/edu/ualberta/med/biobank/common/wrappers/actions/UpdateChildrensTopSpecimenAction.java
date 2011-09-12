@@ -31,7 +31,7 @@ public class UpdateChildrensTopSpecimenAction extends WrapperAction<Specimen> {
 
     public UpdateChildrensTopSpecimenAction(SpecimenWrapper wrapper) {
         super(wrapper);
-        this.topSpecimen = (Specimen) ProxyUtil.convertProxyToObject(wrapper
+        this.topSpecimen = ProxyUtil.convertProxyToObject(wrapper
             .getTopSpecimen().getWrappedObject());
     }
 

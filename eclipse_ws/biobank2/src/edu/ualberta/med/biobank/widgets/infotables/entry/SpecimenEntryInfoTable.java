@@ -38,8 +38,8 @@ public class SpecimenEntryInfoTable extends SpecimenInfoTable {
             @Override
             public int compare(Object e1, Object e2) {
                 try {
-                    TableRowData i1 = getCollectionModelObject((SpecimenWrapper) e1);
-                    TableRowData i2 = getCollectionModelObject((SpecimenWrapper) e2);
+                    TableRowData i1 = getCollectionModelObject(e1);
+                    TableRowData i2 = getCollectionModelObject(e2);
                     return super.compare(i1.inventoryId, i2.inventoryId);
                 } catch (Exception e) {
                     return 0;

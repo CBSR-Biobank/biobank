@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets.infotables;
+package edu.ualberta.med.biobank.gui.common.widgets;
 
 import org.eclipse.jface.viewers.ISelection;
 

@@ -1,35 +1,31 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.Group;
-import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
-import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.peer.BbGroupPeer;
+import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.gui.common.widgets.utils.TableFilter;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankSecurityUtil;
-import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNode;
+import edu.ualberta.med.biobank.widgets.infotables.MembershipInfoTable;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -37,20 +33,15 @@ public class GroupEditDialog extends BgcBaseDialog {
     private final String currentTitle;
     private final String titleAreaMessage;
 
-    private Group originalGroup, modifiedGroup;
-    private MultiSelectWidget workingCentersWidget;
-    private List<CenterWrapper<?>> allCenters;
-    private MultiSelectWidget centerFeaturesWidget;
-    private Text centersFilterText;
-    private LinkedHashMap<Integer, String> allFeaturesMap;
+    private BbGroupWrapper originalGroup;
+    private MembershipInfoTable membershipInfoTable;
+    private MultiSelectWidget<UserWrapper> usersWidget;
 
-    public GroupEditDialog(Shell parent, Group originalGroup, boolean isNewGroup) {
+    public GroupEditDialog(Shell parent, BbGroupWrapper originalGroup) {
         super(parent);
         Assert.isNotNull(originalGroup);
         this.originalGroup = originalGroup;
-        this.modifiedGroup = new Group();
-        this.modifiedGroup.copy(originalGroup);
-        if (isNewGroup) {
+        if (originalGroup.isNew()) {
             currentTitle = Messages.GroupEditDialog_title_add;
             titleAreaMessage = Messages.GroupEditDialog_titlearea_add;
         } else {
@@ -78,103 +69,92 @@ public class GroupEditDialog extends BgcBaseDialog {
     protected void createDialogAreaInternal(Composite parent)
         throws ApplicationException {
         Composite contents = new Composite(parent, SWT.NONE);
-        contents.setLayout(new GridLayout(2, false));
+        contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Messages.GroupEditDialog_property_title_name, null, modifiedGroup,
-            "name", new NonEmptyStringValidator( //$NON-NLS-1$
+        TabFolder tb = new TabFolder(contents, SWT.TOP);
+        tb.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        createGeneralFields(createTabItem(tb,
+            Messages.GroupEditDialog_general_tab_title, 2));
+
+        createMembershipsSection(createTabItem(tb,
+            Messages.UserEditDialog_roles_permissions_title, 1));
+
+        createUsersSection(createTabItem(tb,
+            Messages.GroupEditDialog_users_tab_title, 1));
+
+    }
+
+    private void createGeneralFields(Composite createTabItem) {
+        createBoundWidgetWithLabel(createTabItem, BgcBaseText.class,
+            SWT.BORDER, Messages.GroupEditDialog_property_title_name, null,
+            originalGroup, BbGroupPeer.NAME.getName(),
+            new NonEmptyStringValidator(
                 Messages.GroupEditDialog_msg_name_required));
-
-        createBoundWidgetWithLabel(contents, Button.class, SWT.CHECK,
-            Messages.GroupEditDialog_center_administrator_title, null,
-            modifiedGroup, "isWorkingCentersAdministrator", null); //$NON-NLS-1$
-
-        List<String> centerNames = new ArrayList<String>();
-        final LinkedHashMap<Integer, String> centerMap = new LinkedHashMap<Integer, String>();
-        if (getAllCenters() != null)
-            for (CenterWrapper<?> center : getAllCenters()) {
-                Integer centerId = center.getId();
-                String centerName = center.getNameShort();
-                centerNames.add(centerName);
-                centerMap.put(centerId, centerName);
-            }
-
-        workingCentersWidget = new MultiSelectWidget(parent, SWT.NONE,
-            Messages.GroupEditDialog_center_list_available,
-            Messages.GroupEditDialog_center_list_working, 110);
-        workingCentersWidget.setSelections(centerMap,
-            modifiedGroup.getWorkingCenterIds());
-        workingCentersWidget.setFilter(new ViewerFilter() {
-            @Override
-            public boolean select(Viewer viewer, Object parentElement,
-                Object element) {
-                if (centersFilterText == null)
-                    return true;
-                MultiSelectNode node = (MultiSelectNode) element;
-                return TableFilter.contains(node.getName(),
-                    centersFilterText.getText());
-            }
-        });
-        Label label = new Label(parent, SWT.NONE);
-        label.setText(Messages.GroupEditDialog_filter_centers);
-        centersFilterText = new Text(parent, SWT.BORDER);
-        GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
-        centersFilterText.setLayoutData(gd);
-        centersFilterText.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                workingCentersWidget.refreshLists();
-            }
-        });
-
-        Label separator = new Label(parent, SWT.HORIZONTAL | SWT.SEPARATOR);
-        gd = new GridData();
-        gd.horizontalAlignment = SWT.CENTER;
-        gd.widthHint = 250;
-        separator.setLayoutData(gd);
-
-        centerFeaturesWidget = createFeaturesSelectionWidget(
-            parent,
-            SessionManager.getAppService().getSecurityCenterFeatures(
-                SessionManager.getUser()),
-            modifiedGroup.getCenterFeaturesEnabled(),
-            BiobankSecurityUtil.CENTER_FEATURE_START_NAME,
-            Messages.GroupEditDialog_feature_center_list_available,
-            Messages.GroupEditDialog_feature_center_list_selected);
     }
 
-    private MultiSelectWidget createFeaturesSelectionWidget(Composite parent,
-        List<ProtectionGroupPrivilege> availableFeatures,
-        List<Integer> selectedFeatures, String replaceString,
-        String availableString, String enabledString) {
-        allFeaturesMap = new LinkedHashMap<Integer, String>();
-        for (ProtectionGroupPrivilege pgp : availableFeatures) {
-            allFeaturesMap.put(pgp.getId().intValue(),
-                pgp.getName().replace(replaceString, "")); //$NON-NLS-1$
-        }
-        MultiSelectWidget featuresWidget = new MultiSelectWidget(parent,
-            SWT.NONE, availableString, enabledString, 110);
-        featuresWidget.setSelections(allFeaturesMap, selectedFeatures);
-        return featuresWidget;
+    private void createMembershipsSection(Composite contents) {
+        Button addButton = new Button(contents, SWT.PUSH);
+        addButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                addMembership();
+            }
+        });
+        addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ADD));
+        GridData gd = new GridData();
+        gd.horizontalAlignment = SWT.RIGHT;
+        addButton.setLayoutData(gd);
+
+        membershipInfoTable = new MembershipInfoTable(contents, originalGroup);
     }
 
-    private List<CenterWrapper<?>> getAllCenters() {
-        if (allCenters == null) {
-            if (!SessionManager.getUser().isSuperAdministrator())
-                allCenters = Arrays
-                    .asList(new CenterWrapper<?>[] { SessionManager.getUser()
-                        .getCurrentWorkingCenter() });
-            else
-                try {
-                    allCenters = CenterWrapper.getCenters(SessionManager
-                        .getAppService());
-                } catch (Exception e) {
-                    BgcPlugin.openAsyncError(
-                        Messages.GroupEditDialog_msg_error_retrieve_centers, e);
+    private void createUsersSection(Composite contents)
+        throws ApplicationException {
+        // FIXME something else than a double list selection might be better
+        usersWidget = new MultiSelectWidget<UserWrapper>(contents, SWT.NONE,
+            Messages.GroupEditDialog_available_users_label,
+            Messages.GroupEditDialog_selected_users_label, 200) {
+            @Override
+            protected String getTextForObject(UserWrapper nodeObject) {
+                return nodeObject.getFullName() + " (" + nodeObject.getLogin() //$NON-NLS-1$
+                    + ")"; //$NON-NLS-1$
+            }
+        };
+
+        usersWidget.setSelections(
+            UserWrapper.getAllUsers(SessionManager.getAppService()),
+            originalGroup.getUserCollection(false));
+    }
+
+    private Composite createTabItem(TabFolder tb, String title, int columns) {
+        TabItem item = new TabItem(tb, SWT.NONE);
+        item.setText(title);
+        Composite contents = new Composite(tb, SWT.NONE);
+        contents.setLayout(new GridLayout(columns, false));
+        item.setControl(contents);
+        return contents;
+    }
+
+    protected void addMembership() {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
+            public void run() {
+                MembershipWrapper ms = new MembershipWrapper(SessionManager
+                    .getAppService());
+                ms.setPrincipal(originalGroup);
+
+                MembershipEditDialog dlg = new MembershipEditDialog(PlatformUI
+                    .getWorkbench().getActiveWorkbenchWindow().getShell(), ms);
+                int res = dlg.open();
+                if (res == Status.OK) {
+                    membershipInfoTable.reloadCollection(
+                        originalGroup.getMembershipCollection(true), null);
                 }
-        }
-        return allCenters;
+            }
+        });
     }
 
     @Override
@@ -182,15 +162,11 @@ public class GroupEditDialog extends BgcBaseDialog {
         // try saving or updating the group inside this dialog so that if there
         // is an error the entered information is not lost
         try {
-            modifiedGroup.setWorkingCenterIds(workingCentersWidget
-                .getSelected());
-            modifiedGroup.setCenterFeaturesEnabled(centerFeaturesWidget
-                .getSelected());
-            Group groupeResult = SessionManager.getAppService().persistGroup(
-                SessionManager.getUser(), modifiedGroup);
-            originalGroup.copy(groupeResult);
+            originalGroup
+                .addToUserCollection(usersWidget.getAddedToSelection());
+            originalGroup.persist();
             close();
-        } catch (ApplicationException e) {
+        } catch (Exception e) {
             if (e.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
                 BgcPlugin.openAsyncError(
                     Messages.GroupEditDialog_msg_persit_error,
@@ -200,5 +176,15 @@ public class GroupEditDialog extends BgcBaseDialog {
                     Messages.GroupEditDialog_msg_persit_error, e);
             }
         }
+    }
+
+    @Override
+    protected void cancelPressed() {
+        try {
+            originalGroup.reset();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        super.cancelPressed();
     }
 }

@@ -247,6 +247,7 @@ public class ModelUmlParser {
                 }
 
                 modelClass.setExtendsClass(g.getParentClass());
+                g.getParentClass().setIsParentClass(true);
 
                 LOGGER.debug("LM class/" + modelClass.getName() + " parent/"
                     + g.getParentClass().getName() + " child/"

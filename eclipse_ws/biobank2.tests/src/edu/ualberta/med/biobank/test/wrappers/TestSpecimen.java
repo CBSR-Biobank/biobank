@@ -638,8 +638,8 @@ public class TestSpecimen extends TestDatabase {
         System.out.println(childSpc.getProcessingEvent());
 
         ProcessingEventWrapper pevent = ProcessingEventHelper
-            .addProcessingEvent(childSpc.getCurrentCenter(), childSpc
-                .getCollectionEvent().getPatient(), Utils.getRandomDate());
+            .addProcessingEvent(childSpc.getCurrentCenter(),
+                Utils.getRandomDate());
 
         // add aliquoted specimen
         SpecimenWrapper specimen = SpecimenHelper.newSpecimen(parentSpc,

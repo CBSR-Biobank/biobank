@@ -85,7 +85,7 @@ public class DispatchAdapter extends AdapterBase {
             && SessionManager.getUser().getCurrentWorkingCenter() != null)
             return SessionManager.getUser().getCurrentWorkingCenter()
                 .equals(getDispatchWrapper().getSenderCenter())
-                && getDispatchWrapper().canDelete(SessionManager.getUser())
+                && SessionManager.canDelete(getDispatchWrapper())
                 && getDispatchWrapper().isInCreationState();
         else
             return false;
@@ -101,7 +101,7 @@ public class DispatchAdapter extends AdapterBase {
                 addDeleteMenu(menu, Messages.DispatchAdapter_dispatch_label);
             }
             if (siteParent.equals(getDispatchWrapper().getSenderCenter())
-                && getDispatchWrapper().canUpdate(SessionManager.getUser())
+                && SessionManager.canUpdate(getDispatchWrapper())
                 && getDispatchWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
                 mi.setText(Messages.DispatchAdapter_move_creation_label);

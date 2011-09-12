@@ -37,8 +37,8 @@ public class InfoTreeEvent extends EventObject {
      * 
      * @return the originating viewer
      */
-    public InfoTableWidget<?> getInfoTable() {
-        return (InfoTableWidget<?>) getSource();
+    public InfoTableWidget getInfoTable() {
+        return (InfoTableWidget) getSource();
     }
 
 }

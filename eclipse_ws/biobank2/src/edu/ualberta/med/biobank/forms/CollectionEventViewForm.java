@@ -40,7 +40,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private BgcBaseText activityStatusLabel;
 
-    private SpecimenInfoTable aliquotedSpecimenTable;
+    private SpecimenInfoTable aliquotedSpcTable;
 
     private static class FormPvCustomInfo extends PvAttrCustom {
         BgcBaseText widget;
@@ -149,16 +149,18 @@ public class CollectionEventViewForm extends BiobankViewForm {
             ColumnsShown.SOURCE_SPECIMENS, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
         sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
+        sourceSpecimenTable.createDefaultEditItem();
     }
 
     private void createAliquotedSpecimensSection() {
         // FIXME should we show that to clinics ?
         Composite client = createSectionWithClient(Messages.CollectionEventViewForm_aliquotedspecimens_title);
-        aliquotedSpecimenTable = new SpecimenInfoTable(client,
+        aliquotedSpcTable = new SpecimenInfoTable(client,
             cevent.getAliquotedSpecimenCollection(true), ColumnsShown.ALIQUOTS,
             10);
-        aliquotedSpecimenTable.adaptToToolkit(toolkit, true);
-        aliquotedSpecimenTable.addClickListener(collectionDoubleClickListener);
+        aliquotedSpcTable.adaptToToolkit(toolkit, true);
+        aliquotedSpcTable.addClickListener(collectionDoubleClickListener);
+        aliquotedSpcTable.createDefaultEditItem();
     }
 
     @Override
@@ -171,7 +173,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
         setCollectionEventValues();
         sourceSpecimenTable.setCollection(cevent
             .getOriginalSpecimenCollection(true));
-        aliquotedSpecimenTable.setCollection(cevent
+        aliquotedSpcTable.setCollection(cevent
             .getAliquotedSpecimenCollection(true));
     }
 

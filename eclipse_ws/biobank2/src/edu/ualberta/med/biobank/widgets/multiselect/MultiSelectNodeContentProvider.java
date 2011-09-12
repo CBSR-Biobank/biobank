@@ -8,15 +8,16 @@ import org.eclipse.jface.viewers.Viewer;
 import edu.ualberta.med.biobank.treeview.util.DeltaEvent;
 import edu.ualberta.med.biobank.treeview.util.IDeltaListener;
 
-public class MultiSelectNodeContentProvider implements ITreeContentProvider,
+public class MultiSelectNodeContentProvider<T> implements ITreeContentProvider,
     IDeltaListener {
     protected TreeViewer viewer;
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object[] getChildren(Object parentElement) {
         Assert.isTrue(parentElement instanceof MultiSelectNode,
             "Invalid object"); //$NON-NLS-1$
-        return ((MultiSelectNode) parentElement).getChildren().toArray();
+        return ((MultiSelectNode<T>) parentElement).getChildren().toArray();
     }
 
     @Override
@@ -24,10 +25,11 @@ public class MultiSelectNodeContentProvider implements ITreeContentProvider,
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean hasChildren(Object element) {
         Assert.isTrue(element instanceof MultiSelectNode, "Invalid object"); //$NON-NLS-1$
-        return (((MultiSelectNode) element).getChildCount() > 0);
+        return (((MultiSelectNode<T>) element).getChildCount() > 0);
     }
 
     @Override
@@ -40,34 +42,37 @@ public class MultiSelectNodeContentProvider implements ITreeContentProvider,
         //
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         this.viewer = (TreeViewer) viewer;
         if (oldInput != null) {
-            removeListenerFrom((MultiSelectNode) oldInput);
+            removeListenerFrom((MultiSelectNode<T>) oldInput);
         }
         if (newInput != null) {
-            addListenerTo((MultiSelectNode) newInput);
+            addListenerTo((MultiSelectNode<T>) newInput);
         }
     }
 
-    protected void addListenerTo(MultiSelectNode node) {
+    protected void addListenerTo(MultiSelectNode<T> node) {
         node.addListener(this);
-        for (MultiSelectNode child : node.getChildren()) {
+        for (MultiSelectNode<T> child : node.getChildren()) {
             addListenerTo(child);
         }
     }
 
-    protected void removeListenerFrom(MultiSelectNode node) {
+    protected void removeListenerFrom(MultiSelectNode<T> node) {
         node.removeListener(this);
-        for (MultiSelectNode child : node.getChildren()) {
+        for (MultiSelectNode<T> child : node.getChildren()) {
             removeListenerFrom(child);
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void add(DeltaEvent event) {
-        MultiSelectNode node = ((MultiSelectNode) event.receiver()).getParent();
+        MultiSelectNode<T> node = ((MultiSelectNode<T>) event.receiver())
+            .getParent();
         viewer.refresh(node, false);
     }
 

@@ -16,12 +16,12 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.dialogs.ActivityStatusDialog;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.ActivityStatusInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
@@ -186,6 +186,7 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
         reloadCollection(activityStatusCollection);
     }
 
+    @Override
     public void reload() {
         try {
             setLists(ActivityStatusWrapper

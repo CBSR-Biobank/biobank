@@ -86,6 +86,7 @@ public class PatientViewForm extends BiobankViewForm {
         section.setClient(collectionEventTable);
         collectionEventTable.adaptToToolkit(toolkit, true);
         collectionEventTable.addClickListener(collectionDoubleClickListener);
+        collectionEventTable.createDefaultEditItem();
     }
 
     private void setValues() throws ApplicationException, BiobankException {

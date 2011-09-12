@@ -107,7 +107,6 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     /**
      * return number of patients that came for a visit in this clinic
      */
-    @Override
     public Long getPatientCount() throws BiobankException, ApplicationException {
         HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
@@ -129,7 +128,6 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         + "=? and patients."
         + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID) + "=?";
 
-    @Override
     public long getPatientCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_STUDY_QRY,
@@ -195,7 +193,6 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     /**
      * Count events for specimen that are been drawn at this clinic
      */
-    @Override
     public long getCollectionEventCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(COLLECTION_EVENT_COUNT_FOR_STUDY_QRY,

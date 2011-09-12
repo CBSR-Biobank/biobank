@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
@@ -47,7 +48,7 @@ public class TestStudy extends TestDatabase {
         SiteHelper.addSites(name, sitesNber);
 
         SiteWrapper site = SiteHelper.addSite(name, false);
-        List<SiteWrapper> sites = SiteWrapper.getSites(appService);
+        List<SiteWrapper> sites = SiteQuery.getSites(appService);
         for (SiteWrapper s : sites) {
             s.addToStudyCollection(Arrays.asList(study));
             s.persist();
@@ -76,7 +77,7 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         SiteHelper.addSites(name, r.nextInt(15) + 5);
 
-        List<SiteWrapper> sites = SiteWrapper.getSites(appService);
+        List<SiteWrapper> sites = SiteQuery.getSites(appService);
         for (SiteWrapper s : sites) {
             s.addToStudyCollection(Arrays.asList(study));
             s.persist();

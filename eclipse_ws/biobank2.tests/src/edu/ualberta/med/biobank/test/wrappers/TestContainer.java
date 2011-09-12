@@ -1350,7 +1350,7 @@ public class TestContainer extends TestDatabase {
             Utils.getRandomString(5), StudyHelper.addStudy(name));
 
         ProcessingEventWrapper pe = ProcessingEventHelper.addProcessingEvent(
-            site, patient, Utils.getRandomDate());
+            site, Utils.getRandomDate());
 
         SpecimenWrapper spc = SpecimenHelper.addSpecimen(parentSpc, spcType,
             pe, childL4, 3, 3);

@@ -34,10 +34,10 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -202,7 +202,6 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             public List<DispatchSpecimenWrapper> getInternalDispatchSpecimens() {
                 return dispatch.getNonProcessedDispatchSpecimenCollection();
             }
-
         };
         specimensNonProcessedTable.adaptToToolkit(toolkit, true);
         specimensNonProcessedTable.addClickListener(new IDoubleClickListener() {
@@ -219,6 +218,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 }
             }
         });
+        specimensNonProcessedTable.createDefaultEditItem();
         specimensNonProcessedTable.addSelectionChangedListener(biobankListener);
     }
 
@@ -238,7 +238,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         try {
             CellProcessResult res = appService.processCellStatus(new Cell(-1,
                 -1, inventoryId, null), new ShipmentProcessData(null, dispatch,
-                true, true), SessionManager.getUser(), Locale.getDefault());
+                true, true), SessionManager.getUser().getCurrentWorkingCenter()
+                .getId(), Locale.getDefault());
             switch (res.getProcessStatus()) {
             case FILLED:
                 // ok

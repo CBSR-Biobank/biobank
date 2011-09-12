@@ -112,7 +112,7 @@ public class TestProcessingEvent extends TestDatabase {
     @Test
     public void testGettersAndSetters() throws Exception {
         ProcessingEventWrapper pevent = ProcessingEventHelper
-            .addProcessingEvent(site, patient, Utils.getRandomDate());
+            .addProcessingEvent(site, Utils.getRandomDate());
         testGettersAndSetters(pevent);
     }
 
@@ -121,14 +121,14 @@ public class TestProcessingEvent extends TestDatabase {
         // visit2's date processed is 1 day after visit1's
         Date date = Utils.getRandomDate();
         ProcessingEventWrapper pevent1 = ProcessingEventHelper
-            .addProcessingEvent(site, patient, date);
+            .addProcessingEvent(site, date);
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DATE, 1);
 
         ProcessingEventWrapper pevent2 = ProcessingEventHelper
-            .addProcessingEvent(site, patient, cal.getTime());
+            .addProcessingEvent(site, cal.getTime());
 
         Assert.assertEquals(-1, pevent1.compareTo(pevent2));
 
@@ -147,7 +147,7 @@ public class TestProcessingEvent extends TestDatabase {
     public void testReset() throws Exception {
         Date dateProcessed = Utils.getRandomDate();
         ProcessingEventWrapper pevent = ProcessingEventHelper
-            .addProcessingEvent(site, patient, dateProcessed);
+            .addProcessingEvent(site, dateProcessed);
         Calendar cal = Calendar.getInstance();
         pevent.setCreatedAt(cal.getTime());
         pevent.reset();
@@ -158,7 +158,7 @@ public class TestProcessingEvent extends TestDatabase {
     public void testReload() throws Exception {
         Date dateProcessed = Utils.getRandomDate();
         ProcessingEventWrapper pevent = ProcessingEventHelper
-            .addProcessingEvent(site, patient, dateProcessed);
+            .addProcessingEvent(site, dateProcessed);
         Calendar cal = Calendar.getInstance();
         pevent.setCreatedAt(cal.getTime());
         pevent.reload();
@@ -168,7 +168,7 @@ public class TestProcessingEvent extends TestDatabase {
     @Test
     public void testDelete() throws Exception {
         ProcessingEventWrapper pevent = ProcessingEventHelper
-            .addProcessingEvent(site, patient, Utils.getRandomDate());
+            .addProcessingEvent(site, Utils.getRandomDate());
         pevent.delete();
 
         List<SpecimenTypeWrapper> allSpcTypes = SpecimenTypeWrapper
@@ -238,7 +238,7 @@ public class TestProcessingEvent extends TestDatabase {
     @Test
     public void testGetWrappedClass() throws Exception {
         ProcessingEventWrapper pevent = ProcessingEventHelper
-            .addProcessingEvent(site, patient, Utils.getRandomDate());
+            .addProcessingEvent(site, Utils.getRandomDate());
         Assert.assertEquals(ProcessingEvent.class, pevent.getWrappedClass());
     }
 
@@ -247,7 +247,7 @@ public class TestProcessingEvent extends TestDatabase {
         SpecimenWrapper parentSpc = SpecimenHelper.addParentSpecimen();
 
         ProcessingEventWrapper pevent = ProcessingEventHelper
-            .addProcessingEvent(site, patient, Utils.getRandomDate());
+            .addProcessingEvent(site, Utils.getRandomDate());
         pevent.addToSpecimenCollection(Arrays.asList(parentSpc));
         pevent.persist();
 
@@ -305,8 +305,7 @@ public class TestProcessingEvent extends TestDatabase {
     @Test
     public void testPersist() throws Exception {
         ProcessingEventWrapper pv = ProcessingEventHelper.newProcessingEvent(
-            site, patient,
-            DateFormatter.dateFormatter.parse("2009-12-25 00:00"));
+            site, DateFormatter.dateFormatter.parse("2009-12-25 00:00"));
         pv.persist();
     }
 
@@ -315,7 +314,7 @@ public class TestProcessingEvent extends TestDatabase {
         SpecimenWrapper parentSpc = SpecimenHelper.addParentSpecimen();
 
         ProcessingEventWrapper pevent = ProcessingEventHelper
-            .addProcessingEvent(site, patient, Utils.getRandomDate());
+            .addProcessingEvent(site, Utils.getRandomDate());
         pevent.addToSpecimenCollection(Arrays.asList(parentSpc));
         pevent.persist();
 
@@ -375,15 +374,18 @@ public class TestProcessingEvent extends TestDatabase {
             SpecimenWrapper parentSpc = SpecimenHelper.addParentSpecimen();
             parentSpcs.add(parentSpc);
 
-            ProcessingEventWrapper pevent = ProcessingEventHelper
-                .addProcessingEvent(site, patient, Utils.getRandomDate());
-            pevents.add(pevent);
+            Assert.fail("Commented out because broke with a merge, FIXME!");
+
+            // ProcessingEventWrapper pevent = ProcessingEventHelper
+            // .addProcessingEvent(site, patient, Utils.getRandomDate());
+            // pevents.add(pevent);
 
             // create children
-            for (int j = 0; j < NUM_CHILDREN; j++) {
-                SpecimenHelper.addSpecimen(parentSpc,
-                    allSpcTypes.get(j % allSpcTypes.size()), pevent);
-            }
+            Assert.fail("Commented out because broke with a merge, FIXME!");
+            // for (int j = 0; j < NUM_CHILDREN; j++) {
+            // SpecimenHelper.addSpecimen(parentSpc,
+            // allSpcTypes.get(j % allSpcTypes.size()), pevent);
+            // }
         }
 
         for (ProcessingEventWrapper pevent : pevents) {

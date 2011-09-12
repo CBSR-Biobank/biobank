@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableColumn;
 
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 public class ReportResultsTableWidget<T> extends ReportTableWidget<T> {
     public ReportResultsTableWidget(Composite parent, List<T> collection,
@@ -23,8 +23,8 @@ public class ReportResultsTableWidget<T> extends ReportTableWidget<T> {
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider(final boolean formatNumbers) {
-        return new BiobankLabelProvider() {
+    public BgcLabelProvider getLabelProvider(final boolean formatNumbers) {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 if (element instanceof Object[]) {

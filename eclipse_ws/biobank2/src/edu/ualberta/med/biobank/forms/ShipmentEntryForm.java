@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.dialogs.SpecimenOriginSelectDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -158,7 +159,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         receiverComboViewer = createComboViewer(client,
             Messages.ShipmentEntryForm_receiver_label,
-            SiteWrapper.getSites(appService), originInfo.getReceiverSite(),
+            SiteQuery.getSites(appService), originInfo.getReceiverSite(),
             Messages.ShipmentEntryForm_receiver_validation_msg,
             new ComboSelectionUpdate() {
                 @Override

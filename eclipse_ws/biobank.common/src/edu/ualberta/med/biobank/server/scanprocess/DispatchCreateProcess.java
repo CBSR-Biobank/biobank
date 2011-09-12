@@ -5,7 +5,6 @@ import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
 import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.ItemState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -19,8 +18,8 @@ import java.util.Map;
 public class DispatchCreateProcess extends ServerProcess {
 
     public DispatchCreateProcess(WritableApplicationService appService,
-        ShipmentProcessData data, User user, Locale locale) {
-        super(appService, data, user, locale);
+        ShipmentProcessData data, Integer currentWorkingCenterId, Locale locale) {
+        super(appService, data, currentWorkingCenterId, locale);
     }
 
     /**

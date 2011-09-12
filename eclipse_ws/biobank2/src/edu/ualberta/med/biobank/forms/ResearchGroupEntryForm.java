@@ -126,7 +126,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
                 }
             });
         studyComboViewer.getControl().setEnabled(
-            SessionManager.getUser().isSuperAdministrator());
+            SessionManager.getUser().isSuperAdmin());
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,

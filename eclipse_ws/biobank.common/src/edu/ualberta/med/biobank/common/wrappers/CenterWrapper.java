@@ -4,16 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
@@ -38,8 +35,6 @@ public abstract class CenterWrapper<E extends Center> extends
 
     private static final String ALL_CENTERS_HQL_STRING = "from "
         + Center.class.getName();
-
-    private Set<CollectionEventWrapper> deletedCollectionEvents = new HashSet<CollectionEventWrapper>();
 
     public CenterWrapper(WritableApplicationService appService) {
         super(appService);
@@ -174,20 +169,6 @@ public abstract class CenterWrapper<E extends Center> extends
         throws ApplicationException, BiobankException {
         return getPropertyCount(CenterPeer.PROCESSING_EVENT_COLLECTION, fast);
     }
-
-    /**
-     * Collection event count for this center. This count is different for each
-     * center: the method should be defined in each center type
-     */
-    public abstract long getCollectionEventCountForStudy(StudyWrapper study)
-        throws ApplicationException, BiobankException;
-
-    /**
-     * Collection event count for this center. This count is different for each
-     * center: the method should be defined in each center type
-     */
-    public abstract long getPatientCountForStudy(StudyWrapper study)
-        throws ApplicationException, BiobankException;
 
     public static List<CenterWrapper<?>> getCenters(
         WritableApplicationService appService) throws ApplicationException {
@@ -354,8 +335,6 @@ public abstract class CenterWrapper<E extends Center> extends
         return getCountResult(appService, criteria);
     }
 
-    public abstract Long getPatientCount() throws Exception;
-
     public static final String COLLECTION_EVENT_COUNT_QRY = "select count(distinct cevent) from "
         + Center.class.getName()
         + " as c join c."
@@ -471,9 +450,4 @@ public abstract class CenterWrapper<E extends Center> extends
         return Collections.emptyList();
     }
 
-    @Override
-    public boolean canUpdate(User user) {
-        return user.isInSuperAdminMode()
-            || user.isAdministratorForCurrentCenter();
-    }
 }

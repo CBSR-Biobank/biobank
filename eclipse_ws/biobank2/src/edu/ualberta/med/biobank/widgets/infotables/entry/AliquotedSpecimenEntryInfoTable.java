@@ -22,12 +22,12 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
 import edu.ualberta.med.biobank.dialogs.StudyAliquotedSpecimenDialog;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 
 /**
  * Displays the current aliquoted specimen collection and allows the user to add
@@ -172,6 +172,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
         return deletedAliquotedSpecimen;
     }
 
+    @Override
     public void reload() {
         selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection(true);
         if (selectedAliquotedSpecimen == null) {
@@ -190,8 +191,8 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
             @Override
             public int compare(Object e1, Object e2) {
                 try {
-                    TableRowData i1 = getCollectionModelObject((AliquotedSpecimenWrapper) e1);
-                    TableRowData i2 = getCollectionModelObject((AliquotedSpecimenWrapper) e2);
+                    TableRowData i1 = getCollectionModelObject(e1);
+                    TableRowData i2 = getCollectionModelObject(e2);
                     return super.compare(i1.typeName, i2.typeName);
                 } catch (Exception e) {
                     return 0;

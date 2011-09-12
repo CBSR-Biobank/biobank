@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets.infotables;
+package edu.ualberta.med.biobank.gui.common.widgets;
 
 import java.util.EventObject;
 
@@ -14,7 +14,7 @@ public class InfoTableEvent extends EventObject {
 
     protected transient ISelection selection;
 
-    public InfoTableEvent(InfoTableWidget<?> source, ISelection selection) {
+    public InfoTableEvent(AbstractInfoTableWidget source, ISelection selection) {
         super(source);
         Assert.isNotNull(selection);
         this.selection = selection;
@@ -34,8 +34,8 @@ public class InfoTableEvent extends EventObject {
      * 
      * @return the originating viewer
      */
-    public InfoTableWidget<?> getInfoTable() {
-        return (InfoTableWidget<?>) getSource();
+    public AbstractInfoTableWidget getInfoTable() {
+        return (AbstractInfoTableWidget) getSource();
     }
 
 }

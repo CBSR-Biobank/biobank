@@ -48,7 +48,7 @@ public class UpdateContainerChildrenAction extends WrapperAction<Container> {
 
     public UpdateContainerChildrenAction(ContainerWrapper wrapper) {
         super(wrapper);
-        this.topContainer = (Container) ProxyUtil.convertProxyToObject(wrapper
+        this.topContainer = ProxyUtil.convertProxyToObject(wrapper
             .getTopContainer().getWrappedObject());
     }
 

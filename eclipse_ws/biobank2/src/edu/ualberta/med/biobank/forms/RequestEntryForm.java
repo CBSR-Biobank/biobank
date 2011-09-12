@@ -169,6 +169,7 @@ public class RequestEntryForm extends BiobankViewForm {
         dispatchTable = new RequestDispatchInfoTable(dispatchCreation,
             request.getDispatchCollection(false));
         dispatchTable.addClickListener(collectionDoubleClickListener);
+        dispatchTable.createDefaultEditItem();
         dispatchTable.addSelectionListener(new SelectionListener() {
 
             @Override
@@ -237,7 +238,7 @@ public class RequestEntryForm extends BiobankViewForm {
                             .equals(newSpecimenText.getText())) {
                             if (spec.getClaimedBy() == null
                                 || !spec.getClaimedBy().equals(
-                                    SessionManager.getUser().getFirstName()))
+                                    SessionManager.getUser().getLogin()))
                                 throw new Exception(
                                     Messages.RequestEntryForm_claim_error_msg);
                             request.flagSpecimens(Arrays.asList(spec));

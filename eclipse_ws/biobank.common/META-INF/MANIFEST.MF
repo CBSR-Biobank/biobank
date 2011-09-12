@@ -4,7 +4,7 @@ Created-By: 1.6.0_22-b04 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
 Bundle-Name: BioBank2 Common
 Bundle-SymbolicName: biobank.common
-Bundle-Version: 3.1.1
+Bundle-Version: 3.2.0.rc1
 Bundle-ClassPath: conf/,lib/client/acegi-security-1.0.4.jar,lib/client
  /antlr-2.7.6.jar,lib/client/asm.jar,lib/client/axis.jar,lib/client/bi
  obank-beans.jar,lib/client/caGrid-CQL-cql.1.0-1.2.jar,lib/client/cast
@@ -74,6 +74,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.common.wrappers.base,
  edu.ualberta.med.biobank.common.wrappers.listener,
  edu.ualberta.med.biobank.common.wrappers.util,
+ edu.ualberta.med.biobank.common.wrappers.helpers,
  edu.ualberta.med.biobank.model,
  edu.ualberta.med.biobank.server.applicationservice;uses:="edu.ualberta.med.biobank.server.query,gov.nih.nci.system.applicationservice",
  edu.ualberta.med.biobank.server.applicationservice.exceptions,
@@ -118,4 +119,5 @@ Export-Package: antlr;
  org.apache.log4j.spi;uses:="org.apache.log4j,org.apache.log4j.or",
  org.springframework.remoting;uses:="org.springframework.core"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: edu.ualberta.med.biobank.model
 
