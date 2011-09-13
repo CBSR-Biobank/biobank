@@ -498,7 +498,7 @@
       <transaction src="${data.sql.dir}/privileges.sql" />
       <transaction src="${data.sql.dir}/rights.sql" />
       <transaction src="${data.sql.dir}/groups.sql" />
-      <transaction src="${secu-log.dir}/schemaSecurity.sql" />    	
+      <transaction src="${secu-log.dir}/schemaSecurity.sql" />
       <transaction>commit;</transaction>
       <classpath>
         <fileset dir="${cacore.sdk.dir}/system/lib">
@@ -949,7 +949,7 @@
       <fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.gui.common}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.junit}/lib" includes="**/*.jar" />    	
+      <fileset dir="${eclipse.proj.dir.junit}/lib" includes="**/*.jar" />
     </delete>
   </target>
 
@@ -975,7 +975,7 @@
   </target>
 
   <target name="clean-all"
-          depends="clean-tests,clean-jars"
+          depends="clean-tests,clean-jars,clean"
           description="deletes caCORE SDK directory and deletes jars from eclipse projects">
     <delete dir="${cacore.sdk.dir}" />
     <delete dir="${buildDirectory}" />
