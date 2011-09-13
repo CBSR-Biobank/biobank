@@ -110,7 +110,10 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
     }
 
     protected void filterContacts(ClinicWrapper clinic) {
-        contactInfoTable.setCollection(clinic.getContactCollection(true));
+        List<ContactWrapper> clinicContacts = clinic.getContactCollection(true);
+        for (ContactWrapper contact : contacts)
+            clinicContacts.remove(contact);
+        contactInfoTable.setCollection(clinicContacts);
     }
 
     @Override

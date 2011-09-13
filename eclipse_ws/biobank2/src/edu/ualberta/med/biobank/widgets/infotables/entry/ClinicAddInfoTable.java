@@ -9,7 +9,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectClinicContactDialog;
@@ -40,11 +39,9 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
     public void createClinicContact() {
         SelectClinicContactDialog dlg;
         try {
-            List<ContactWrapper> availableContacts = ContactWrapper
-                .getAllContacts(SessionManager.getAppService());
-            availableContacts.removeAll(study.getContactCollection(true));
             dlg = new SelectClinicContactDialog(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), availableContacts);
+                .getActiveWorkbenchWindow().getShell(),
+                study.getContactCollection(true));
             if (dlg.open() == Dialog.OK) {
                 notifyListeners();
                 ContactWrapper contact = dlg.getSelection();
