@@ -1,5 +1,10 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
@@ -17,19 +22,19 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 public class StudyContactInfoTable extends InfoTableWidget {
 
     protected static class TableRowData {
-        ContactWrapper contact;
+        ClinicWrapper clinic;
         String clinicNameShort;
         Long patientCount;
         Long ceventCount;
-        String contactName;
-        String contactTitle;
+        String contactNames;
+        String contactTitles;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { clinicNameShort,
                 (patientCount != null) ? patientCount.toString() : "", //$NON-NLS-1$
                 (ceventCount != null) ? ceventCount.toString() : "", //$NON-NLS-1$
-                contactName, contactTitle }, "\t"); //$NON-NLS-1$
+                contactNames, contactTitles }, "\t"); //$NON-NLS-1$
 
         }
     }
@@ -46,7 +51,41 @@ public class StudyContactInfoTable extends InfoTableWidget {
     public StudyContactInfoTable(Composite parent, StudyWrapper study) {
         super(parent, null, HEADINGS, 10, ContactWrapper.class);
         this.study = study;
-        this.setCollection(study.getContactCollection(true));
+        this.setCollection(new ArrayList<ClinicContacts>(processClinics(study
+            .getContactCollection(true))));
+    }
+
+    private class ClinicContacts {
+        public ClinicWrapper clinic;
+        public String contacts;
+        public String titles;
+
+        public ClinicContacts(ClinicWrapper clinic, String contacts,
+            String titles) {
+            this.clinic = clinic;
+            this.contacts = contacts;
+            this.titles = titles;
+        }
+    }
+
+    private Collection<ClinicContacts> processClinics(
+        List<ContactWrapper> contactCollection) {
+        HashMap<ClinicWrapper, ClinicContacts> tableData = new HashMap<ClinicWrapper, ClinicContacts>();
+        for (ContactWrapper contact : contactCollection) {
+            ClinicWrapper clinic = contact.getClinic();
+            if (tableData.containsKey(clinic)) {
+                ClinicContacts prevEntry = tableData.get(clinic);
+                ClinicContacts newEntry = new ClinicContacts(clinic,
+                    prevEntry.contacts + ";" + contact.getName(), //$NON-NLS-1$
+                    prevEntry.titles + ";" + contact.getTitle()); //$NON-NLS-1$
+                tableData.put(clinic, newEntry);
+            } else
+                tableData.put(
+                    clinic,
+                    new ClinicContacts(clinic, contact.getName(), contact
+                        .getTitle()));
+        }
+        return tableData.values();
     }
 
     @Override
@@ -56,7 +95,7 @@ public class StudyContactInfoTable extends InfoTableWidget {
             return null;
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
-        return row.contact.getClinic();
+        return row.clinic;
     }
 
     @Override
@@ -79,9 +118,9 @@ public class StudyContactInfoTable extends InfoTableWidget {
                 case 2:
                     return NumberFormatter.format(item.ceventCount);
                 case 3:
-                    return item.contactName;
+                    return item.contactNames;
                 case 4:
-                    return item.contactTitle;
+                    return item.contactTitles;
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -92,15 +131,13 @@ public class StudyContactInfoTable extends InfoTableWidget {
     @Override
     public TableRowData getCollectionModelObject(Object o) throws Exception {
         TableRowData info = new TableRowData();
-        info.contact = (ContactWrapper) o;
-        ClinicWrapper clinic = info.contact.getClinic();
-        if (clinic != null) {
-            info.clinicNameShort = clinic.getNameShort();
-            info.patientCount = clinic.getPatientCountForStudy(study);
-            info.ceventCount = clinic.getCollectionEventCountForStudy(study);
-        }
-        info.contactName = info.contact.getName();
-        info.contactTitle = info.contact.getTitle();
+        ClinicContacts cc = (ClinicContacts) o;
+        info.clinic = cc.clinic;
+        info.clinicNameShort = info.clinic.getNameShort();
+        info.patientCount = info.clinic.getPatientCountForStudy(study);
+        info.ceventCount = info.clinic.getCollectionEventCountForStudy(study);
+        info.contactNames = cc.contacts;
+        info.contactTitles = cc.titles;
         return info;
     }
 
