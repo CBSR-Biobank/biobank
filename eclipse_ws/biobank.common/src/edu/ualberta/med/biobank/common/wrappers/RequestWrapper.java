@@ -115,10 +115,10 @@ public class RequestWrapper extends RequestBaseWrapper {
         + Request.class.getName() + " where " + RequestPeer.ID.getName() + "=?";
 
     public static List<RequestWrapper> getRequestByNumber(
-        WritableApplicationService appService, String requestNumber)
+        WritableApplicationService appService, Integer requestNumber)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(REQUEST_BY_NUMBER_QRY,
-            Arrays.asList(new Object[] { Integer.parseInt(requestNumber) }));
+            Arrays.asList(new Object[] { requestNumber }));
         List<Request> shipments = appService.query(criteria);
         List<RequestWrapper> wrappers = new ArrayList<RequestWrapper>();
         for (Request s : shipments) {
