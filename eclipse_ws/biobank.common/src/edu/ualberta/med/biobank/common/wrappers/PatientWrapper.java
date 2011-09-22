@@ -364,6 +364,19 @@ public class PatientWrapper extends PatientBaseWrapper {
         return (long) getCollectionEventCollection(false).size();
     }
 
+    public static Integer getNextVisitNumber(
+        WritableApplicationService appService, PatientWrapper patient)
+        throws Exception {
+        HQLCriteria c = new HQLCriteria("select max(ce.visitNumber) from "
+            + CollectionEvent.class.getName() + " ce where ce.patient.id=?",
+            Arrays.asList(patient.getId()));
+        List<Object> result = appService.query(c);
+        if (result == null || result.size() == 0 || result.get(0) == null)
+            return 1;
+        else
+            return (Integer) result.get(0) + 1;
+    }
+
     /**
      * return true if the user can delete this object
      */
