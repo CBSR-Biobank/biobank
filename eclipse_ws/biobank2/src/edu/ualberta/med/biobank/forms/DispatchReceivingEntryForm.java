@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.SessionSecurityHelper;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
@@ -108,7 +109,8 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         try {
             doSpecimenTextAction(inventoryId, true);
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.DispatchReceivingEntryForm_problem_spec_error, e);
+            BgcPlugin.openAsyncError(
+                Messages.DispatchReceivingEntryForm_problem_spec_error, e);
         }
     }
 
@@ -242,6 +244,19 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             throw new BiobankException(
                 Messages.ProcessingEventEntryForm_try_again_error_msg
                     + msg.toString());
+        }
+    }
+
+    // FIXME very ugly
+    @Override
+    protected void checkEditAccess() {
+        if (adapter != null
+            && adapter.getModelObject() != null
+            && !SessionManager
+                .isAllowed(SessionSecurityHelper.DISPATCH_RECEIVE_KEY_DESC)) {
+            BgcPlugin.openAccessDeniedErrorMessage();
+            throw new RuntimeException(
+                Messages.BiobankEntryForm_access_denied_error_msg);
         }
     }
 }
