@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -345,26 +346,34 @@ public class LoginDialog extends TitleAreaDialog {
             .getActiveWorkbenchWindow().getShell().getDisplay(), sessionHelper);
 
         if (sessionHelper.getUser() != null) {
-            if (superAdminWidget.getSelection()) {
-                // super admin mode
-                sessionHelper.getUser().setInSuperAdminMode(true);
-                if (!sessionHelper.getUser().isInSuperAdminMode())
-                    BgcPlugin.openAsyncError(
-                        Messages.LoginDialog_superAdmin_error_title,
-                        Messages.LoginDialog_superAdmin_error_msg);
-            }
-            selectWorkingCenter(sessionHelper);
-            if (sessionHelper.getUser().isInSuperAdminMode()
-                || sessionHelper.getUser().getCurrentWorkingCenter() != null) {
-                // login successful
-                savePreferences();
-                SessionManager.getInstance().addSession(
-                    sessionHelper.getAppService(), serverWidget.getText(),
-                    sessionHelper.getUser());
-            }
-
+            finalizeConnection(sessionHelper);
         }
         super.okPressed();
+    }
+
+    protected void finalizeConnection(final SessionHelper sessionHelper) {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
+            public void run() {
+                if (superAdminWidget.getSelection()) {
+                    // super admin mode
+                    sessionHelper.getUser().setInSuperAdminMode(true);
+                    if (!sessionHelper.getUser().isInSuperAdminMode())
+                        BgcPlugin.openAsyncError(
+                            Messages.LoginDialog_superAdmin_error_title,
+                            Messages.LoginDialog_superAdmin_error_msg);
+                }
+                selectWorkingCenter(sessionHelper);
+                if (sessionHelper.getUser().isInSuperAdminMode()
+                    || sessionHelper.getUser().getCurrentWorkingCenter() != null) {
+                    // login successful
+                    savePreferences();
+                    SessionManager.getInstance().addSession(
+                        sessionHelper.getAppService(), serverWidget.getText(),
+                        sessionHelper.getUser());
+                }
+            }
+        });
     }
 
     private void savePreferences() {
@@ -401,7 +410,8 @@ public class LoginDialog extends TitleAreaDialog {
         }
     }
 
-    private void selectWorkingCenter(SessionHelper sessionHelper) {
+    private void selectWorkingCenter(final SessionHelper sessionHelper) {
+
         List<CenterWrapper<?>> workingCenters = null;
         try {
             workingCenters = sessionHelper.getUser().getWorkingCenters();
