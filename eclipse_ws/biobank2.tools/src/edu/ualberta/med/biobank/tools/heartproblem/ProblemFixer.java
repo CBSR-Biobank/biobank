@@ -7,15 +7,20 @@ import jargs.gnu.CmdLineParser.OptionException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -59,26 +64,41 @@ public class ProblemFixer {
         + " from edu.ualberta.med.biobank.model.CollectionEvent cevents"
         + " inner join cevents.patient patients "
         + " inner join fetch cevents.allSpecimenCollection as spcs"
-        + " inner join fetch spcs.processingEvent pevents "
-        + " inner join fetch spcs.childSpecimenCollection childSpcs "
+        + " left outer join fetch spcs.processingEvent pevents "
+        + " left outer join fetch spcs.childSpecimenCollection childSpcs "
+        + " inner join fetch spcs.activityStatus "
+        + " inner join fetch spcs.specimenType "
         + " where spcs.createdAt > '2011-06-18' and patients.pnumber=?";
 
-    public ProblemFixer(AppArgs appArgs) throws Exception {
+    private Map<String, SpecimenTypeWrapper> specimenTypes;
 
-        BiobankApplicationService tsAppService = ServiceConnection
-            .getAppService("https://cbsr-training.med.ualberta.ca/biobank",
-                appArgs.username, appArgs.password);
+    private BiobankApplicationService tsAppService;
+
+    private BiobankApplicationService appService;
+
+    private StudyWrapper heartStudy;
+
+    private SiteWrapper calgarySite;
+
+    private String heartEventAttrLabel;
+
+    public ProblemFixer(AppArgs appArgs) throws Exception {
+        specimenTypes = new HashMap<String, SpecimenTypeWrapper>();
+
+        tsAppService = ServiceConnection.getAppService(
+            "https://cbsr-training.med.ualberta.ca/biobank", appArgs.username,
+            appArgs.password);
 
         // BiobankApplicationService appService =
         // ServiceConnection.getAppService(
         // "https://cbsr.med.ualberta.ca/biobank", appArgs.username,
         // appArgs.password);
 
-        BiobankApplicationService appService = ServiceConnection
+        appService = ServiceConnection
             .getAppService("http://localhost:8080/biobank", appArgs.username,
                 appArgs.password);
 
-        SiteWrapper calgarySite = null;
+        calgarySite = null;
         for (SiteWrapper site : SiteWrapper.getSites(appService)) {
             if (site.getName().equals("Calgary Foothills")) {
                 calgarySite = site;
@@ -89,7 +109,7 @@ public class ProblemFixer {
             throw new Exception("could not find calgary site on main server");
         }
 
-        StudyWrapper heartStudy = null;
+        heartStudy = null;
         for (StudyWrapper study : calgarySite.getStudyCollection()) {
             if (study.getNameShort().equals("HEART")) {
                 heartStudy = study;
@@ -105,7 +125,35 @@ public class ProblemFixer {
                 "unexpected number of event attrs in HEART study");
         }
 
-        String eventAttrLabel = heartStudy.getStudyEventAttrLabels()[0];
+        for (SpecimenTypeWrapper spcType : SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, true)) {
+            specimenTypes.put(spcType.getName(), spcType);
+        }
+
+        heartEventAttrLabel = heartStudy.getStudyEventAttrLabels()[0];
+
+        processPatients();
+    }
+
+    public static final String CEVENT_HQL_QUERY = "select count(cevents)"
+        + " from edu.ualberta.med.biobank.model.CollectionEvent cevents"
+        + " inner join cevents.allSpecimenCollection as spcs"
+        + " where spcs.inventoryId=?";
+
+    private boolean collectionEventExists(BiobankApplicationService appService,
+        String inventoryId) throws Exception {
+        HQLCriteria c = new HQLCriteria(CEVENT_HQL_QUERY,
+            Arrays.asList(new Object[] { inventoryId }));
+        Long result = CollectionEventWrapper.getCountResult(appService, c);
+        if (result > 1) {
+            throw new Exception(
+                "invalid count on collection event for specimen inv id "
+                    + inventoryId);
+        }
+        return (result == 1);
+    }
+
+    private void processPatients() throws Exception {
 
         for (String pnumber : PNUMBERS) {
             HQLCriteria c = new HQLCriteria(CEVENTS_HQL_QUERY,
@@ -132,6 +180,7 @@ public class ProblemFixer {
                     patient = new PatientWrapper(appService);
                     patient.setPnumber(pnumber);
                     patient.setCreatedAt(cevent.getPatient().getCreatedAt());
+                    patient.setStudy(heartStudy);
                     patient.persist();
                     patient.reload();
                 }
@@ -142,8 +191,8 @@ public class ProblemFixer {
                 newCe.setVisitNumber(PatientWrapper.getNextVisitNumber(
                     appService, patient));
                 newCe.setComment(cevent.getComment());
-                newCe.setEventAttrValue(eventAttrLabel,
-                    cevent.getEventAttrValue(eventAttrLabel));
+                newCe.setEventAttrValue(heartEventAttrLabel,
+                    cevent.getEventAttrValue(heartEventAttrLabel));
                 newCe.setActivityStatus(ActivityStatusWrapper
                     .getActivityStatus(appService, cevent.getActivityStatus()
                         .getName()));
@@ -154,7 +203,11 @@ public class ProblemFixer {
                     + cevent.getVisitNumber());
 
                 for (SpecimenWrapper spc : cevent
-                    .getAllSpecimenCollection(false)) {
+                    .getOriginalSpecimenCollection(false)) {
+
+                    OriginInfoWrapper oi = new OriginInfoWrapper(appService);
+                    oi.setCenter(calgarySite);
+                    oi.persist();
 
                     SpecimenWrapper newSpc = new SpecimenWrapper(appService);
                     newSpc.setInventoryId(spc.getInventoryId());
@@ -162,44 +215,40 @@ public class ProblemFixer {
                     newSpc.setQuantity(spc.getQuantity());
                     newSpc.setCreatedAt(spc.getCreatedAt());
                     newSpc.setCollectionEvent(newCe);
+                    newSpc.setOriginalCollectionEvent(newCe);
                     newSpc.setCurrentCenter(calgarySite);
+                    newSpc.setActivityStatus(ActivityStatusWrapper
+                        .getActivityStatus(appService, spc.getActivityStatus()
+                            .getName()));
+                    newSpc.setSpecimenType(specimenTypes.get(spc
+                        .getSpecimenType().getName()));
+                    newSpc.setOriginInfo(oi);
                     newSpc.persist();
                     newSpc.reload();
 
-                    System.out.println("  inventory id: "
-                        + spc.getInventoryId() + ", created at: "
-                        + spc.getCreatedAt() + ", processing event: "
-                        + spc.getProcessingEvent().getId() + " - "
-                        + spc.getProcessingEvent().getCreatedAt());
-                    for (SpecimenWrapper childSpc : spc
-                        .getChildSpecimenCollection(false)) {
-                        System.out.println("    child: inventory id: "
-                            + childSpc.getInventoryId() + ", created at: "
-                            + childSpc.getCreatedAt());
+                    ProcessingEventWrapper pevent = spc.getProcessingEvent();
+
+                    System.out.print("  inventory id: " + spc.getInventoryId()
+                        + ", created at: " + spc.getCreatedAt());
+
+                    if (pevent != null) {
+                        System.out.print("  inventory id: "
+                            + spc.getInventoryId() + ", created at: "
+                            + spc.getCreatedAt() + ", processing event: "
+                            + pevent.getId() + " - " + pevent.getCreatedAt());
+                        for (SpecimenWrapper childSpc : spc
+                            .getChildSpecimenCollection(false)) {
+                            System.out.println("    child: inventory id: "
+                                + childSpc.getInventoryId() + ", created at: "
+                                + childSpc.getCreatedAt());
+                        }
                     }
+                    System.out.println();
                 }
 
                 patients.add(cevent.getPatient());
             }
         }
-    }
-
-    public static final String CEVENT_HQL_QUERY = "select count(cevents)"
-        + " from edu.ualberta.med.biobank.model.CollectionEvent cevents"
-        + " inner join cevents.allSpecimenCollection as spcs"
-        + " where spcs.inventoryId=?";
-
-    private boolean collectionEventExists(BiobankApplicationService appService,
-        String inventoryId) throws Exception {
-        HQLCriteria c = new HQLCriteria(CEVENT_HQL_QUERY,
-            Arrays.asList(new Object[] { inventoryId }));
-        Long result = CollectionEventWrapper.getCountResult(appService, c);
-        if (result > 1) {
-            throw new Exception(
-                "invalid count on collection event for specimen inv id "
-                    + inventoryId);
-        }
-        return (result == 1);
     }
 
     /*

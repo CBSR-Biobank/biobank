@@ -963,7 +963,7 @@
   </target>
 
   <target name="clean-all"
-          depends="clean-tests,clean-jars"
+          depends="clean-tests,clean-jars,clean"
           description="deletes caCORE SDK directory and deletes jars from eclipse projects">
     <delete dir="${cacore.sdk.dir}" />
     <delete dir="${buildDirectory}" />
