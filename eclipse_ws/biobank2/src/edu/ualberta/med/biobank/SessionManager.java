@@ -16,9 +16,8 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.security.Privilege;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcSessionState;
@@ -80,7 +79,7 @@ public class SessionManager {
     }
 
     public void addSession(final BiobankApplicationService appService,
-        String serverName, User user) {
+        String serverName, UserWrapper user) {
         logger.debug("addSession: " + serverName + ", user/" + user.getLogin()); //$NON-NLS-1$ //$NON-NLS-2$
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, user);
@@ -231,7 +230,7 @@ public class SessionManager {
         getInstance().currentAdministrationViewId = view.getId();
     }
 
-    public static User getUser() {
+    public static UserWrapper getUser() {
         return getInstance().getSession().getUser();
     }
 
@@ -240,23 +239,58 @@ public class SessionManager {
     }
 
     public static boolean canCreate(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.CREATE, clazz);
+        return SessionSecurityHelper.canCreate(getAppService(), getUser(),
+            clazz);
     }
 
     public static boolean canDelete(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.DELETE, clazz);
+        return SessionSecurityHelper.canDelete(getAppService(), getUser(),
+            clazz);
     }
 
     public static boolean canDelete(ModelWrapper<?> wrapper) {
-        return wrapper.canDelete(getUser());
+        return SessionSecurityHelper.canDelete(getUser(), wrapper);
     }
 
     public static boolean canView(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.READ, clazz);
+        try {
+            return SessionSecurityHelper.canView(getAppService(), getUser(),
+                clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // FIXME is using current working center and no study
+    public static boolean isAllowed(String... keyDesc) {
+        try {
+            return SessionSecurityHelper.isAllowed(getAppService(), getUser(),
+                keyDesc);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean isAllowedorCanRead(String... keyDesc) {
+        try {
+            return SessionSecurityHelper.isAllowedorCanRead(getAppService(),
+                getUser(), keyDesc);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static boolean canUpdate(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.UPDATE, clazz);
+        try {
+            return SessionSecurityHelper.canUpdate(getAppService(), getUser(),
+                clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean canUpdate(ModelWrapper<?> wrapper) {
+        return SessionSecurityHelper.canUpdate(getUser(), wrapper);
     }
 
     public boolean isConnected() {
@@ -271,13 +305,14 @@ public class SessionManager {
 
     public static void logLookup(ModelWrapper<?> wrapper) throws Exception {
         if (!wrapper.isNew())
-            wrapper.logLookup(getUser().getCurrentWorkingCenter()
-                .getNameShort());
+            wrapper.logLookup(getUser().getCurrentWorkingCenter() == null ? "" //$NON-NLS-1$
+                : getUser().getCurrentWorkingCenter().getNameShort());
     }
 
     public static void logEdit(ModelWrapper<?> wrapper) throws Exception {
         if (!wrapper.isNew())
-            wrapper.logEdit(getUser().getCurrentWorkingCenter().getNameShort());
+            wrapper.logEdit(getUser().getCurrentWorkingCenter() == null ? "" //$NON-NLS-1$
+                : getUser().getCurrentWorkingCenter().getNameShort());
     }
 
     /**

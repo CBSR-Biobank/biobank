@@ -4,16 +4,13 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
-import edu.ualberta.med.biobank.common.security.Privilege;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
 import edu.ualberta.med.biobank.common.wrappers.loggers.LogAction;
 import edu.ualberta.med.biobank.common.wrappers.loggers.LogGroup;
 import edu.ualberta.med.biobank.common.wrappers.loggers.WrapperLogProvider;
-import edu.ualberta.med.biobank.common.wrappers.util.ModelWrapperHelper;
-import edu.ualberta.med.biobank.common.wrappers.util.ProxyUtil;
+import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -24,9 +21,9 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,11 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.cglib.proxy.Enhancer;
-
 import org.hibernate.Hibernate;
-import org.hibernate.proxy.HibernateProxy;
-import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
@@ -58,14 +51,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private final ElementQueue<E> elementQueue = new ElementQueue<E>(this);
     private final WrapperCascader<E> cascader = new WrapperCascader<E>(this);
     private final WrapperChecker<E> preChecker = new WrapperChecker<E>(this);
-
-    private HashMap<Object, ModelWrapper<?>> modelWrapperMap = new HashMap<Object, ModelWrapper<?>>();
+    WrapperSession session;
 
     public ModelWrapper(WritableApplicationService appService, E wrappedObject) {
         this.appService = appService;
         this.wrappedObject = wrappedObject;
 
-        addSelfToModelWrapperMap();
+        this.session = new WrapperSession(this);
     }
 
     public ModelWrapper(WritableApplicationService appService) {
@@ -84,17 +76,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             }
         }
 
-        addSelfToModelWrapperMap();
-    }
-
-    private void addSelfToModelWrapperMap() {
-        if (wrappedObject != null) {
-            // TODO: extract into method that unproxies for us so not repeated
-            // here and in wrap*Smarter()
-            E unproxiedModel = ProxyUtil.convertProxyToObject(wrappedObject);
-
-            modelWrapperMap.put(unproxiedModel, this);
-        }
+        this.session = new WrapperSession(this);
     }
 
     public E getWrappedObject() {
@@ -108,7 +90,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         wrappedObject = newWrappedObject;
 
         clear();
-        addSelfToModelWrapperMap();
+        session = new WrapperSession(this);
 
         firePropertyChanges(oldWrappedObject, newWrappedObject);
     }
@@ -171,7 +153,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             }
         }
 
-        addSelfToModelWrapperMap();
+        session = new WrapperSession(this);
 
         firePropertyChanges(oldWrappedObject, wrappedObject);
     }
@@ -344,9 +326,33 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         E oldWrappedObject = wrappedObject;
         wrappedObject = getNewObject();
 
-        addSelfToModelWrapperMap();
+        session = new WrapperSession(this);
 
         firePropertyChanges(oldWrappedObject, wrappedObject);
+    }
+
+    private static final String PROPERTY_COUNT_HQL = "SELECT COUNT(DISTINCT m.{0}) FROM {1} m WHERE m.id = ?";
+
+    protected final <T> Long getPropertyCount(
+        Property<Collection<T>, ? super E> property, boolean fast)
+        throws BiobankQueryResultSizeException, ApplicationException {
+        long count = 0;
+
+        if (fast && !isInitialized(property)) {
+            String prop = property.getName();
+            String klazz = getWrappedClass().getName();
+            String hql = MessageFormat.format(PROPERTY_COUNT_HQL, prop, klazz);
+
+            List<Object> params = Arrays.asList(new Object[] { getId() });
+            HQLCriteria criteria = new HQLCriteria(hql, params);
+
+            count = getCountResult(appService, criteria);
+        } else {
+            Collection<T> collection = property.get(wrappedObject);
+            count = collection != null ? collection.size() : 0;
+        }
+
+        return count;
     }
 
     /**
@@ -388,38 +394,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
     }
 
-    private static final String CHECK_NO_DUPLICATES_IN_SITE = "select count(o) "
-        + "from {0} as o where {1}=? and site.id{2} {3}";
-
-    protected void checkNoDuplicatesInSite(Class<?> objectClass,
-        String propertyName, String value, Integer siteId, String errorName)
-        throws ApplicationException, BiobankException {
-        List<Object> params = new ArrayList<Object>();
-        params.add(value);
-        String siteIdTest = "=?";
-        if (siteId == null) {
-            siteIdTest = " is null";
-        } else {
-            params.add(siteId);
-        }
-        String equalsTest = "";
-        if (!isNew()) {
-            equalsTest = " and id <> ?";
-            params.add(getId());
-        }
-        HQLCriteria criteria = new HQLCriteria(MessageFormat.format(
-            CHECK_NO_DUPLICATES_IN_SITE, objectClass.getName(), propertyName,
-            siteIdTest, equalsTest), params);
-        if (getCountResult(appService, criteria) > 0) {
-            throw new DuplicateEntryException(errorName + " \"" + value
-                + "\" already exists.");
-        }
-    }
-
     /**
      * The query should be a count query. The value returned is the result of
      * the count.
      */
+    // TODO: move this to some Util class somewhere else
     public static Long getCountResult(WritableApplicationService appService,
         HQLCriteria criteria) throws BiobankQueryResultSizeException,
         ApplicationException {
@@ -471,11 +450,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         // default do nothing
     }
 
-    /**
-     * this method is used in the equals method. If it is not redefined in
-     * subclasses, we want it to return something better than the default
-     * toString
-     */
+    // TODO: switch to using the properties?
     @Override
     public String toString() {
         Class<E> classType = getWrappedClass();
@@ -508,26 +483,31 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
-     * return true if the user can view this object
-     */
-    public boolean canRead(User user) {
-        return user.hasPrivilegeOnObject(Privilege.READ, getWrappedClass());
-    }
-
-    /**
      * return true if the user can edit this object
      */
-    public boolean canUpdate(User user) {
-        return user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass(),
-            getSecuritySpecificCenters());
+    public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        try {
+            return user.hasPrivilegeOnKeyDesc(
+                PrivilegeWrapper.getUpdatePrivilege(appService), center, study,
+                getWrappedClass().getSimpleName());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
      * return true if the user can delete this object
      */
-    public boolean canDelete(User user) {
-        return user.hasPrivilegeOnObject(Privilege.DELETE, getWrappedClass(),
-            getSecuritySpecificCenters());
+    public boolean canDelete(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        try {
+            return user.hasPrivilegeOnKeyDesc(
+                PrivilegeWrapper.getDeletePrivilege(appService), center, study,
+                getWrappedClass().getSimpleName());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void addWrapperListener(WrapperListener listener) {
@@ -606,116 +586,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     @Override
-    public int compareTo(ModelWrapper<E> arg0) {
-        return this.getId().compareTo(arg0.getId());
-    }
-
-    // TODO: rename this
-    private <W extends ModelWrapper<? extends M>, M> W wrapModelSmarter(
-        M model, Class<W> wrapperKlazz) throws Exception {
-
-        M unproxiedModel = ProxyUtil.convertProxyToObject(model);
-
-        // several proxies exist for the exact same model object? okay...
-        @SuppressWarnings("unchecked")
-        W wrapper = (W) modelWrapperMap.get(unproxiedModel);
-
-        if (wrapper == null) {
-            wrapper = wrapModel(appService, model, wrapperKlazz);
-            wrapper.modelWrapperMap = modelWrapperMap;
-            modelWrapperMap.put(unproxiedModel, wrapper);
-        }
-
-        return wrapper;
-    }
-
-    private <W extends ModelWrapper<? extends R>, R, M> List<W> wrapModelCollectionSmarter(
-        List<? extends R> modelCollection, Class<W> wrapperKlazz) {
-        List<W> wrappers = new ArrayList<W>();
-
-        if (modelCollection != null) {
-            for (R element : modelCollection) {
-                try {
-                    W wrapper = wrapModelSmarter(element, wrapperKlazz);
-                    wrappers.add(wrapper);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        return wrappers;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <W extends ModelWrapper<? extends M>, M> W wrapModel(
-        WritableApplicationService appService, M model, Class<W> wrapperKlazz)
-        throws Exception {
-
-        Class<?> modelKlazz = model.getClass();
-        if (Enhancer.isEnhanced(modelKlazz)) {
-            // if the given model's Class is 'enhanced' by CGLIB, then the
-            // superclass container the real class
-            modelKlazz = modelKlazz.getSuperclass();
-            if (Modifier.isAbstract(modelKlazz.getModifiers())) {
-                // The super class can be a problem when the class is abstract,
-                // but it should be an instance of Advised, that contain the
-                // real (non-proxied/non-enhanced) model object.
-                if (model instanceof Advised) { // ok for client side
-                    TargetSource ts = ((Advised) model).getTargetSource();
-                    modelKlazz = ts.getTarget().getClass();
-                } else if (model instanceof HibernateProxy) {
-                    // only on server side (?).
-                    Object implementation = ((HibernateProxy) model)
-                        .getHibernateLazyInitializer().getImplementation();
-                    modelKlazz = implementation.getClass();
-                    // Is this bad to do that ? On server side, will get a proxy
-                    // that inherit from Center, not from Site, so won't be able
-                    // to create a SiteWrapper unless is using the direct
-                    // implementation
-                    model = (M) implementation;
-                }
-            }
-        }
-
-        if (wrapperKlazz == null
-            || Modifier.isAbstract(wrapperKlazz.getModifiers())) {
-            Class<W> tmp = (Class<W>) ModelWrapperHelper
-                .getWrapperClass(modelKlazz);
-            wrapperKlazz = tmp;
-        }
-
-        Class<?>[] params = new Class[] { WritableApplicationService.class,
-            modelKlazz };
-        Constructor<W> constructor = wrapperKlazz.getConstructor(params);
-
-        Object[] args = new Object[] { appService, model };
-
-        W wrapper = constructor.newInstance(args);
-        return wrapper;
-    }
-
-    public static ModelWrapper<?> wrapObject(
-        WritableApplicationService appService, Object nakedObject)
-        throws Exception {
-
-        Class<?> nakedKlazz = nakedObject.getClass();
-        String wrapperClassName = ModelWrapper.class.getPackage().getName()
-            + "." + nakedObject.getClass().getSimpleName() + "Wrapper";
-
-        try {
-            Class<?> wrapperKlazz = Class.forName(wrapperClassName);
-
-            Class<?>[] params = new Class[] { WritableApplicationService.class,
-                nakedKlazz };
-            Constructor<?> constructor = wrapperKlazz.getConstructor(params);
-
-            Object[] args = new Object[] { appService, nakedObject };
-
-            return (ModelWrapper<?>) constructor.newInstance(args);
-        } catch (Exception e) {
-            throw new Exception("cannot find or create expected Wrapper ("
-                + wrapperClassName + ") for " + nakedKlazz.getName(), e);
-        }
+    public int compareTo(ModelWrapper<E> other) {
+        return nullSafeComparator(getId(), other.getId());
     }
 
     /**
@@ -745,57 +617,41 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         if (modelCollection != null) {
             for (R element : modelCollection) {
-                try {
-                    W wrapper = ModelWrapper.wrapModel(appService, element,
-                        wrapperKlazz);
-                    wrappers.add(wrapper);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                W wrapper = WrapperUtil.wrapModel(appService, element,
+                    wrapperKlazz);
+                wrappers.add(wrapper);
             }
         }
         return wrappers;
     }
 
-    public static <M> Collection<M> unwrapModelCollection(
-        Collection<ModelWrapper<M>> wrappers) {
-        Collection<M> unwrapped = new ArrayList<M>();
+    protected <W extends ModelWrapper<? extends M>, M> W getWrappedProperty(
+        Property<M, ? super E> property, Class<W> klazz) {
+        @SuppressWarnings("unchecked")
+        W wrapper = (W) recallProperty(property);
 
-        for (ModelWrapper<M> wrapper : wrappers) {
-            unwrapped.add(wrapper.getWrappedObject());
+        if (wrapper == null && !isPropertyCached(property)) {
+            wrapper = wrapProperty(property, klazz);
+            cacheProperty(property, wrapper);
         }
 
-        return unwrapped;
+        return wrapper;
     }
 
-    protected <W extends ModelWrapper<? extends R>, R> W getWrappedProperty(
-        Property<R, ? super E> property, Class<W> wrapperKlazz) {
-        return getWrappedProperty(this, property, wrapperKlazz);
-    }
-
-    private <W extends ModelWrapper<? extends R>, R, M> W getWrappedProperty(
-        ModelWrapper<M> modelWrapper, Property<R, ? super M> property,
-        Class<W> wrapperKlazz) {
-        if (modelWrapper == null) {
-            return null;
-        }
+    private <W extends ModelWrapper<? extends M>, M> W wrapProperty(
+        Property<M, ? super E> property, Class<W> klazz) {
+        M model = property.get(wrappedObject);
 
         @SuppressWarnings("unchecked")
-        W wrapper = (W) modelWrapper.recallProperty(property);
+        W wrapper = (W) session.get(model);
 
-        if (wrapper == null && !modelWrapper.isPropertyCached(property)) {
-            R raw = getModelProperty(modelWrapper, property);
-
-            if (raw != null) {
-                try {
-                    W tmp = wrapModelSmarter(raw, wrapperKlazz);
-                    wrapper = tmp;
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            modelWrapper.cacheProperty(property, wrapper);
+        if (wrapper == null) {
+            wrapper = WrapperUtil.wrapModel(appService, model, klazz);
+            session.add(wrapper);
+        } else {
+            // if we're replacing the value with one from the cache, then make
+            // sure that we set it on the underlying model object as well
+            property.set(wrappedObject, wrapper.wrappedObject);
         }
 
         return wrapper;
@@ -803,68 +659,67 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     protected <W extends ModelWrapper<? extends R>, R> void setWrappedProperty(
         Property<R, ? super E> property, W wrapper) {
-        setWrappedProperty(this, property, wrapper);
+        elementTracker.trackProperty(property);
+        R newValue = wrapper != null ? wrapper.wrappedObject : null;
+        setProperty(this, property, newValue, wrapper);
     }
 
-    private <W extends ModelWrapper<? extends R>, R, M> void setWrappedProperty(
-        ModelWrapper<M> modelWrapper, Property<R, ? super M> property, W wrapper) {
-        R newValue = (wrapper == null ? null : wrapper.getWrappedObject());
-
-        modelWrapper.elementTracker.trackProperty(property);
-        setProperty(modelWrapper, property, newValue, wrapper);
-    }
-
-    public <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
+    protected <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
         Property<Collection<R>, ? super E> property, Collection<W> wrappers) {
-        setWrapperCollection(this, property, wrappers);
-    }
-
-    // TODO: make methods static that take a ModelWrapper instance
-    private <W extends ModelWrapper<? extends R>, R, M> void setWrapperCollection(
-        ModelWrapper<M> modelWrapper,
-        Property<Collection<R>, ? super M> property, Collection<W> wrappers) {
         Collection<R> newValues = new HashSet<R>();
         for (W element : wrappers) {
             newValues.add(element.getWrappedObject());
         }
 
-        modelWrapper.elementTracker.trackCollection(property);
-        setModelProperty(modelWrapper, property, newValues, wrappers);
+        elementTracker.trackCollection(property);
+        setModelProperty(this, property, newValues, wrappers);
+    }
+
+    private <W extends ModelWrapper<? extends M>, M> List<W> wrapCollectionProperty(
+        Property<Collection<M>, ? super E> property, Class<W> klazz) {
+        List<W> wrappers = new ArrayList<W>();
+
+        Collection<M> modelCollection = property.get(wrappedObject);
+        if (modelCollection != null) {
+            Set<M> newModels = new HashSet<M>();
+            for (M model : modelCollection) {
+                @SuppressWarnings("unchecked")
+                W wrapper = (W) session.get(model);
+
+                if (wrapper == null) {
+                    wrapper = WrapperUtil.wrapModel(appService, model, klazz);
+                    session.add(wrapper);
+                }
+
+                // the wrapper might have come from the session so remember it
+                // to re-set the value of this property later.
+                newModels.add(wrapper.wrappedObject);
+
+                wrappers.add(wrapper);
+            }
+            property.set(wrappedObject, newModels);
+        }
+
+        return wrappers;
     }
 
     protected <W extends ModelWrapper<? extends R>, R> List<W> getWrapperCollection(
-        Property<? extends Collection<? extends R>, ? super E> property,
-        Class<W> wrapperKlazz, boolean sort) {
-        return getWrapperCollection(this, property, wrapperKlazz, sort);
-    }
-
-    private <W extends ModelWrapper<? extends R>, R, M> List<W> getWrapperCollection(
-        ModelWrapper<M> modelWrapper,
-        Property<? extends Collection<? extends R>, ? super M> property,
-        Class<W> wrapperKlazz, boolean sort) {
-        if (modelWrapper == null) {
-            return null;
-        }
+        Property<Collection<R>, ? super E> property, Class<W> wrapperKlazz,
+        boolean sort) {
 
         @SuppressWarnings("unchecked")
-        List<W> wrappers = (List<W>) modelWrapper.recallProperty(property);
+        List<W> wrappers = (List<W>) recallProperty(property);
 
-        if (wrappers == null && !modelWrapper.isPropertyCached(property)) {
-            Collection<? extends R> raw = getModelProperty(modelWrapper,
-                property);
+        if (wrappers == null && !isPropertyCached(property)) {
+            wrappers = wrapCollectionProperty(property, wrapperKlazz);
+            // TODO: if an object or collection of objects is lazily loaded, if
+            // there are any references between the objects, ALL references must
+            // be replaced with the object in the session, if an object exists
+            // in the session. This can be done later since it is probably
+            // unlikely. But if not done, will yield incorrect results.
 
-            List<? extends R> list = new ArrayList<R>();
-            if (raw != null) {
-                if (raw instanceof List) {
-                    list = (List<? extends R>) raw;
-                } else {
-                    list = new ArrayList<R>(raw);
-                }
-            }
-
-            wrappers = wrapModelCollectionSmarter(list, wrapperKlazz);
-            modelWrapper.cacheProperty(property, wrappers);
-            modelWrapper.elementQueue.flush(property);
+            cacheProperty(property, wrappers);
+            elementQueue.flush(property);
         }
 
         if (wrappers != null && sort) {
@@ -872,7 +727,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             Collections.sort(wrappers);
         }
 
-        return wrappers;
+        // return a copy of the internally stored list so that someone
+        // externally modifying the collection does not modify the internal
+        // collection.
+        return new ArrayList<W>(wrappers);
     }
 
     protected <W extends ModelWrapper<? extends R>, R> void addToWrapperCollection(
@@ -954,7 +812,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         T value = (T) modelWrapper.recallProperty(property);
 
         if (value == null && !modelWrapper.isPropertyCached(property)) {
-            value = getModelProperty(modelWrapper, property);
+            value = property.get(modelWrapper.getWrappedObject());
             modelWrapper.cacheProperty(property, value);
         }
 
@@ -968,14 +826,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private <T, M> void setProperty(ModelWrapper<M> modelWrapper,
         Property<T, ? super M> property, T newValue, Object valueToCache) {
         setModelProperty(modelWrapper, property, newValue, valueToCache);
-    }
-
-    private static <T, M> T getModelProperty(ModelWrapper<M> modelWrapper,
-        Property<T, ? super M> property) {
-        M model = modelWrapper.getWrappedObject();
-        T value = property.get(model);
-
-        return value;
     }
 
     /**
@@ -1065,7 +915,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     /**
      * @return a list of center security should check for modifications
+     * 
+     *         is not used anymore for now. But we will need something like that
+     *         so I keep it until I reuse what subclasses are doing with it.
      */
+    @Deprecated
     public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
         return Collections.emptyList();
     }
@@ -1079,12 +933,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         propertyCache.clear();
         cache.clear();
 
-        // Don't clear the map because it might be shared with other
-        // ModelWrapper-s. Instead, start a new map.
-        // TODO: remove ModelWrapper.this from the propertyCache of all
-        // ModelWrapper-s in the modelWrapperMap? reload() really messes things
-        // up.
-        modelWrapperMap = new HashMap<Object, ModelWrapper<?>>();
+        session = new WrapperSession(this);
 
         resetInternalFields();
     }
@@ -1108,6 +957,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * Will consider the date and not the time.
      */
+    // TODO: why is this in ModelWrapper? It's a DateUtil function.
     public static Date endOfDay(Date date) {
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -1121,6 +971,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * Remove time on this date to get time set to 00:00
      */
+    // TODO: why is this in ModelWrapper? It's a DateUtil function.
     public static Date startOfDay(Date date) {
         Calendar c = Calendar.getInstance();
         c.setTime(date);

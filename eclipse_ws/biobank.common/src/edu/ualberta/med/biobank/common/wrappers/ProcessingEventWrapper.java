@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.loggers.ProcessingEventLogProvider;
@@ -44,20 +43,9 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         super(appService);
     }
 
-    private static final String SPECIMEN_COUNT_QRY = "select count(specimen) from "
-        + Specimen.class.getName()
-        + " as specimen where specimen."
-        + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
-            ProcessingEventPeer.ID) + "=?";
-
     public long getSpecimenCount(boolean fast) throws BiobankException,
         ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(SPECIMEN_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        return getSpecimenCollection(false).size();
+        return getPropertyCount(ProcessingEventPeer.SPECIMEN_COLLECTION, fast);
     }
 
     public List<SpecimenWrapper> getDerivedSpecimenCollection(boolean sort) {
@@ -233,20 +221,22 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
      * return true if the user can delete this object
      */
     @Override
-    public boolean canDelete(User user) {
-        return super.canDelete(user)
-            && (getCenter() == null || user.getCurrentWorkingCenter().equals(
-                getCenter()));
+    public boolean canDelete(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canDelete(user, center, study)
+            && (getCenter() == null || getCenter().equals(
+                user.getCurrentWorkingCenter()));
     }
 
     /**
      * return true if the user can edit this object
      */
     @Override
-    public boolean canUpdate(User user) {
-        return super.canUpdate(user)
-            && (getCenter() == null || user.getCurrentWorkingCenter().equals(
-                getCenter()));
+    public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canUpdate(user, center, study)
+            && (getCenter() == null || getCenter().equals(
+                user.getCurrentWorkingCenter()));
     }
 
     public static String PE_BY_PATIENT_STRING = "select distinct s."

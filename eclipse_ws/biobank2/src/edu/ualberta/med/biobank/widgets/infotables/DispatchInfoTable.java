@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
+public class DispatchInfoTable extends InfoTableWidget {
 
     SpecimenWrapper a;
 
@@ -85,18 +85,17 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     }
 
     @Override
-    public TableRowData getCollectionModelObject(DispatchWrapper ds)
-        throws Exception {
+    public TableRowData getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
-        info.ds = ds;
-        info.dispatchTime = ds.getShipmentInfo() == null ? null : ds
+        info.ds = (DispatchWrapper) obj;
+        info.dispatchTime = info.ds.getShipmentInfo() == null ? null : info.ds
             .getShipmentInfo().getPackedAt();
-        info.dateReceived = ds.getShipmentInfo() == null ? null : ds
+        info.dateReceived = info.ds.getShipmentInfo() == null ? null : info.ds
             .getShipmentInfo().getReceivedAt();
-        info.dstatus = ds.getStateDescription();
-        info.astatus = ds.getDispatchSpecimen(a.getInventoryId())
+        info.dstatus = info.ds.getStateDescription();
+        info.astatus = info.ds.getDispatchSpecimen(a.getInventoryId())
             .getStateDescription();
-        info.waybill = ds.getShipmentInfo() == null ? null : ds
+        info.waybill = info.ds.getShipmentInfo() == null ? null : info.ds
             .getShipmentInfo().getWaybill();
         return info;
     }

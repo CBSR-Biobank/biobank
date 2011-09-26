@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
-public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
+public class ContainerInfoTable extends InfoTableWidget {
 
     private static class TableRowData {
         ContainerWrapper container;
@@ -84,19 +84,18 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
     }
 
     @Override
-    public Object getCollectionModelObject(ContainerWrapper container)
-        throws Exception {
+    public Object getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
 
-        info.container = container;
-        info.label = container.getLabel();
-        ContainerTypeWrapper type = container.getContainerType();
+        info.container = (ContainerWrapper) obj;
+        info.label = info.container.getLabel();
+        ContainerTypeWrapper type = info.container.getContainerType();
         if (type != null) {
             info.typeNameShort = type.getNameShort();
         }
-        info.status = container.getActivityStatus().getName();
-        info.barcode = container.getProductBarcode();
-        info.temperature = container.getTopContainer().getTemperature();
+        info.status = info.container.getActivityStatus().getName();
+        info.barcode = info.container.getProductBarcode();
+        info.temperature = info.container.getTopContainer().getTemperature();
         return info;
     }
 

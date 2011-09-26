@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.wrappers;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -11,7 +12,15 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.test.TestDatabase;
+import edu.ualberta.med.biobank.test.internal.ContainerHelper;
+import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
+import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestContainerLabelingScheme extends TestDatabase {
 
@@ -140,7 +149,7 @@ public class TestContainerLabelingScheme extends TestDatabase {
         }
 
         for (int i = 0; i < totalRows; ++i) {
-            Integer row = i % totalRows + 1;
+            Integer row = (i % totalRows) + 1;
             Integer col = i / totalRows;
             String label = col.toString() + row.toString();
             RowColPos pos = ContainerLabelingSchemeWrapper
@@ -164,23 +173,39 @@ public class TestContainerLabelingScheme extends TestDatabase {
                     pos, totalRows, totalCols);
                 Assert.assertTrue(cbsrString.length() == 2);
                 Assert.assertEquals(
-                    ALPHA.get((row + col * totalRows) % ALPHA.size()),
+                    ALPHA.get((row + (col * totalRows)) % ALPHA.size()),
                     cbsrString.substring(1));
                 Assert.assertEquals(
-                    ALPHA.get((row + col * totalRows) / ALPHA.size()),
+                    ALPHA.get((row + (col * totalRows)) / ALPHA.size()),
                     cbsrString.substring(0, 1));
             }
         }
 
-        for (int col = 0; col < totalCols; ++col) {
-            for (int row = 0; row < totalRows; ++row) {
-                cbsrString = ALPHA.get((row + col * totalRows) / ALPHA.size())
-                    + ALPHA.get((row + col * totalRows) % ALPHA.size());
+        for (int col = 0; col < (totalCols); ++col) {
+            for (int row = 0; row < (totalRows); ++row) {
+                cbsrString = ALPHA
+                    .get((row + (col * totalRows)) / ALPHA.size())
+                    + ALPHA.get((row + (col * totalRows)) % ALPHA.size());
+
                 RowColPos pos = ContainerLabelingSchemeWrapper.twoCharToRowCol(
                     appService, cbsrString, totalRows, totalCols, "test");
                 Assert.assertEquals(new Integer(row), pos.getRow());
                 Assert.assertEquals(new Integer(col), pos.getCol());
             }
+        }
+
+        try {
+            cbsrString = ALPHA.get(((totalRows - 1)
+                + ((totalCols - 1) * totalRows) + 15)
+                / ALPHA.size())
+                + ALPHA
+                    .get(((totalRows - 1) + ((totalCols - 1) * totalRows) + 15)
+                        % ALPHA.size());
+            ContainerLabelingSchemeWrapper.twoCharToRowCol(appService,
+                cbsrString, totalRows, totalCols, "test");
+            Assert.fail("Should not be allowed to go out of bounds.");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
         }
 
         try {
@@ -205,22 +230,20 @@ public class TestContainerLabelingScheme extends TestDatabase {
                 cbsrString = ContainerLabelingSchemeWrapper
                     .rowColToCbsrTwoChar(pos, totalRows, totalCols);
                 Assert.assertTrue(cbsrString.length() == 2);
-                Assert
-                    .assertEquals(
-                        CBSR_ALPHA.get((row + col * totalRows)
-                            % CBSR_ALPHA.size()), cbsrString.substring(1));
-                Assert
-                    .assertEquals(
-                        CBSR_ALPHA.get((row + col * totalRows)
-                            / CBSR_ALPHA.size()), cbsrString.substring(0, 1));
+                Assert.assertEquals(
+                    CBSR_ALPHA.get((row + (col * totalRows))
+                        % CBSR_ALPHA.size()), cbsrString.substring(1));
+                Assert.assertEquals(
+                    CBSR_ALPHA.get((row + (col * totalRows))
+                        / CBSR_ALPHA.size()), cbsrString.substring(0, 1));
             }
         }
 
         for (int col = 0; col < totalCols; ++col) {
             for (int row = 0; row < totalRows; ++row) {
-                cbsrString = CBSR_ALPHA.get((row + col * totalRows)
+                cbsrString = CBSR_ALPHA.get((row + (col * totalRows))
                     / CBSR_ALPHA.size())
-                    + CBSR_ALPHA.get((row + col * totalRows)
+                    + CBSR_ALPHA.get((row + (col * totalRows))
                         % CBSR_ALPHA.size());
                 RowColPos pos = ContainerLabelingSchemeWrapper
                     .cbsrTwoCharToRowCol(appService, cbsrString, totalRows,
@@ -300,16 +323,18 @@ public class TestContainerLabelingScheme extends TestDatabase {
                 RowColPos pos = new RowColPos(row, col);
                 posString = ContainerLabelingSchemeWrapper.rowColToDewar(pos,
                     DEWAR_MAX_COLS);
-                Assert.assertEquals(DEWAR_ALPHA.get(row * DEWAR_MAX_COLS + col)
-                    .charAt(0), posString.charAt(0));
-                Assert.assertEquals(DEWAR_ALPHA.get(row * DEWAR_MAX_COLS + col)
-                    .charAt(0), posString.charAt(1));
+                Assert.assertEquals(
+                    DEWAR_ALPHA.get((row * DEWAR_MAX_COLS) + col).charAt(0),
+                    posString.charAt(0));
+                Assert.assertEquals(
+                    DEWAR_ALPHA.get((row * DEWAR_MAX_COLS) + col).charAt(0),
+                    posString.charAt(1));
             }
         }
 
         for (int row = 0; row < DEWAR_MAX_ROWS; ++row) {
             for (int col = 0; col < DEWAR_MAX_COLS; ++col) {
-                String label = DEWAR_ALPHA.get(row * DEWAR_MAX_COLS + col);
+                String label = DEWAR_ALPHA.get((row * DEWAR_MAX_COLS) + col);
                 label += label;
                 RowColPos pos = ContainerLabelingSchemeWrapper.dewarToRowCol(
                     appService, label, DEWAR_MAX_COLS);
@@ -320,4 +345,167 @@ public class TestContainerLabelingScheme extends TestDatabase {
 
     }
 
+    @Test
+    public void testDelete() throws Exception {
+        SiteWrapper site = SiteHelper.addSite("testSite");
+        ContainerWrapper container = ContainerHelper.addContainer("01AA",
+            "asd", site, ContainerTypeHelper.addContainerType(site, "testCT",
+                "tct", ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA, 1,
+                1, true));
+
+        ContainerLabelingSchemeWrapper newCLSW = new ContainerLabelingSchemeWrapper(
+            appService);
+        newCLSW.persist();
+        newCLSW.delete();
+
+        try {
+            ContainerLabelingSchemeWrapper.getLabelingSchemeById(appService,
+                ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA).delete();
+            Assert.fail("Should not be able to delete schemes that are in use");
+        } catch (BiobankSessionException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testBounds() throws Exception {
+        if (ContainerLabelingSchemeWrapper.checkBounds(appService,
+            ContainerLabelingSchemeWrapper.SCHEME_DEWAR, 9, 1) == true)
+            Assert.fail("Should be out of bounds");
+        else if (ContainerLabelingSchemeWrapper.checkBounds(appService,
+            ContainerLabelingSchemeWrapper.SCHEME_CBSR_SBS, 8, 13) == true)
+            Assert.fail("Should be out of bounds");
+        else if (ContainerLabelingSchemeWrapper.getLabelingSchemeById(
+            appService, ContainerLabelingSchemeWrapper.SCHEME_CBSR_SBS)
+            .checkBounds(14, 1) == true)
+            Assert.fail("Should be out of bounds");
+        else if (ContainerLabelingSchemeWrapper.getLabelingSchemeById(
+            appService, ContainerLabelingSchemeWrapper.SCHEME_CBSR_SBS)
+            .checkBounds(8, 13) == true)
+            Assert.fail("Should be out of bounds");
+
+        // test canlabel
+        CapacityWrapper cap = new CapacityWrapper(appService);
+        cap.setCol(4);
+        cap.setRow(2);
+
+        Assert.assertTrue(ContainerLabelingSchemeWrapper.canLabel(
+            ContainerLabelingSchemeWrapper.getLabelingSchemeById(appService,
+                ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA)
+                .getWrappedObject(), cap.getWrappedObject()));
+
+    }
+
+    @Test
+    public void testGetPosition() throws Exception {
+        String output = ContainerLabelingSchemeWrapper.getPositionString(
+            new RowColPos(8, 0),
+            ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA, 9, 9);
+        Assert.assertEquals("AI", output);
+
+        Assert.assertEquals(new RowColPos(8, 0), ContainerLabelingSchemeWrapper
+            .getRowColFromPositionString(appService, "AI",
+                ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA, 9, 9));
+
+        output = ContainerLabelingSchemeWrapper.getPositionString(
+            new RowColPos(8, 0),
+            ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_NUMERIC, 9, 9);
+        Assert.assertEquals("09", output);
+
+        Assert.assertEquals(new RowColPos(8, 0), ContainerLabelingSchemeWrapper
+            .getRowColFromPositionString(appService, "09",
+                ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_NUMERIC, 9, 9));
+
+        output = ContainerLabelingSchemeWrapper.getPositionString(
+            new RowColPos(8, 0),
+            ContainerLabelingSchemeWrapper.SCHEME_CBSR_2_CHAR_ALPHA, 9, 9);
+        Assert.assertEquals("AJ", output);
+
+        Assert.assertEquals(new RowColPos(8, 0), ContainerLabelingSchemeWrapper
+            .getRowColFromPositionString(appService, "AJ",
+                ContainerLabelingSchemeWrapper.SCHEME_CBSR_2_CHAR_ALPHA, 9, 9));
+
+        output = ContainerLabelingSchemeWrapper.getPositionString(
+            new RowColPos(8, 0), ContainerLabelingSchemeWrapper.SCHEME_DEWAR,
+            9, 1);
+        Assert.assertEquals("II", output);
+
+        Assert.assertEquals(new RowColPos(8, 0), ContainerLabelingSchemeWrapper
+            .getRowColFromPositionString(appService, "II",
+                ContainerLabelingSchemeWrapper.SCHEME_DEWAR, 9, 1));
+
+        output = ContainerLabelingSchemeWrapper.getPositionString(
+            new RowColPos(8, 0), ContainerLabelingSchemeWrapper.SCHEME_SBS, 9,
+            9);
+        Assert.assertEquals("I1", output);
+
+        Assert.assertEquals(new RowColPos(8, 0), ContainerLabelingSchemeWrapper
+            .getRowColFromPositionString(appService, "I1",
+                ContainerLabelingSchemeWrapper.SCHEME_SBS, 9, 9));
+
+        output = ContainerLabelingSchemeWrapper.getPositionString(
+            new RowColPos(8, 0),
+            ContainerLabelingSchemeWrapper.SCHEME_CBSR_SBS, 9, 9);
+        Assert.assertEquals("J1", output);
+
+        Assert.assertEquals(new RowColPos(8, 0), ContainerLabelingSchemeWrapper
+            .getRowColFromPositionString(appService, "J1",
+                ContainerLabelingSchemeWrapper.SCHEME_CBSR_SBS, 9, 9));
+    }
+
+    @Test
+    public void testLabelLength() throws Exception {
+        List<Integer> lengths = ContainerLabelingSchemeWrapper
+            .getPossibleLabelLength(appService);
+        for (Integer i : lengths)
+            Assert.assertTrue(i <= 3);
+    }
+
+    @Test
+    public void testCBSRSbs() throws Exception {
+        RowColPos pos = new RowColPos(0, 8);
+        Assert.assertEquals(pos,
+            ContainerLabelingSchemeWrapper.cbsrSbsToRowCol(appService, "A9"));
+    }
+
+    @Test
+    public void testCompareTo() throws Exception {
+        // fake test... this wrapper always returns 0
+        ContainerLabelingSchemeWrapper.getLabelingSchemeById(appService,
+            ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA).compareTo(
+            ContainerLabelingSchemeWrapper.getLabelingSchemeById(appService,
+                ContainerLabelingSchemeWrapper.SCHEME_2_CHAR_ALPHA));
+    }
+
+    @Test
+    public void testErrors() throws Exception {
+        try {
+            ContainerLabelingSchemeWrapper.getLabelingSchemeById(appService,
+                13123);
+            Assert.fail("Should have received an exception.");
+        } catch (ApplicationException e) {
+            Assert.assertTrue(true);
+        }
+
+        String original;
+        ContainerLabelingSchemeWrapper scheme;
+        for (int i = 1; i < 7; i++) {
+            Map<Integer, ContainerLabelingSchemeWrapper> map = ContainerLabelingSchemeWrapper
+                .getAllLabelingSchemesMap(appService);
+            scheme = map.get(i);
+            original = scheme.getName();
+            try {
+                scheme.setName("asds");
+                scheme.persist();
+                ContainerLabelingSchemeWrapper
+                    .getAllLabelingSchemesMap(appService);
+                Assert.fail("Should have thrown an exception");
+            } catch (Exception e) {
+                Assert.assertTrue(true);
+            } finally {
+                scheme.setName(original);
+                scheme.persist();
+            }
+        }
+    }
 }

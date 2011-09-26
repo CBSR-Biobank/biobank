@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.CollectionEventBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
@@ -154,44 +153,16 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             CollectionEventWrapper.class);
     }
 
-    private static final String SOURCE_SPECIMEN_COUNT_QRY = "select count(specimens) from "
-        + CollectionEvent.class.getName()
-        + " as cEvent join cEvent."
-        + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName()
-        + " as specimens where cEvent."
-        + CollectionEventPeer.ID.getName()
-        + "=?";
-
     public long getSourceSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(SOURCE_SPECIMEN_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        List<SpecimenWrapper> list = getOriginalSpecimenCollection(false);
-        if (list == null)
-            return 0;
-        return list.size();
+        return getPropertyCount(
+            CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION, fast);
     }
-
-    private static final String ALL_SPECIMEN_COUNT_QRY = "select count(spc) from "
-        + Specimen.class.getName()
-        + " as spc where spc."
-        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-            CollectionEventPeer.ID) + "=?";
 
     public long getAllSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(ALL_SPECIMEN_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        List<SpecimenWrapper> list = getOriginalSpecimenCollection(false);
-        if (list == null)
-            return 0;
-        return list.size();
+        return getPropertyCount(CollectionEventPeer.ALL_SPECIMEN_COLLECTION,
+            fast);
     }
 
     private static final String ALIQUOTED_SPECIMEN_COUNT_QRY = "select count(spc) from "
@@ -204,16 +175,20 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     public long getAliquotedSpecimensCount(boolean fast)
         throws BiobankException, ApplicationException {
-        if (fast) {
+        long count = 0;
+
+        if (fast
+            && !isInitialized(CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION)
+            && !isInitialized(CollectionEventPeer.ALL_SPECIMEN_COLLECTION)) {
             HQLCriteria criteria = new HQLCriteria(
                 ALIQUOTED_SPECIMEN_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
+            count = getCountResult(appService, criteria);
+        } else {
+            count = getAllSpecimensCount(fast) - getSourceSpecimensCount(fast);
         }
-        List<SpecimenWrapper> aliquotedSpecimens = getAliquotedSpecimenCollection(false);
-        if (aliquotedSpecimens == null)
-            return 0;
-        return aliquotedSpecimens.size();
+
+        return count;
     }
 
     public List<SpecimenWrapper> getAliquotedSpecimenCollection(boolean sort) {
@@ -512,9 +487,11 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
      * return true if the user can delete this object
      */
     @Override
-    public boolean canDelete(User user) {
-        return super.canDelete(user)
-            && (getPatient() == null || getPatient().getStudy() == null || user
+    public boolean canDelete(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canDelete(user, center, study)
+            && (getPatient() == null || getPatient().getStudy() == null
+                || user.getCurrentWorkingCenter() == null || user
                 .getCurrentWorkingCenter().getStudyCollection()
                 .contains(getPatient().getStudy()));
     }
@@ -523,9 +500,11 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
      * return true if the user can edit this object
      */
     @Override
-    public boolean canUpdate(User user) {
-        return super.canUpdate(user)
-            && (getPatient() == null || getPatient().getStudy() == null || user
+    public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canUpdate(user, center, study)
+            && (getPatient() == null || getPatient().getStudy() == null
+                || user.getCurrentWorkingCenter() == null || user
                 .getCurrentWorkingCenter().getStudyCollection()
                 .contains(getPatient().getStudy()));
     }

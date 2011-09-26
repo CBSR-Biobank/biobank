@@ -4,7 +4,6 @@ import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -16,17 +15,16 @@ import java.util.Map;
 public abstract class ServerProcess {
     protected WritableApplicationService appService;
     protected ProcessData data;
-    protected User user;
+    protected Integer currentWorkingCenterId;
     private List<String> logs;
     protected Locale locale;
 
     public ServerProcess(WritableApplicationService appService,
-        ProcessData data, User user, Locale locale) {
+        ProcessData data, Integer currentWorkingCenterId, Locale locale) {
         this.appService = appService;
         this.data = data;
-        this.user = user;
+        this.currentWorkingCenterId = currentWorkingCenterId;
         this.locale = locale;
-        user.initCurrentWorkingCenter(appService);
         logs = new ArrayList<String>();
     }
 

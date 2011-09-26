@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
+public class SpecimenInfoTable extends InfoTableWidget {
 
     public static enum ColumnsShown {
         ALL(new String[] { Messages.SpecimenInfoTable_inventoryid_label,
@@ -254,15 +254,14 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
     }
 
     @Override
-    public TableRowData getCollectionModelObject(SpecimenWrapper specimen)
-        throws Exception {
+    public TableRowData getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
-        info.specimen = specimen;
-        info.inventoryId = specimen.getInventoryId();
-        SpecimenTypeWrapper type = specimen.getSpecimenType();
+        info.specimen = (SpecimenWrapper) obj;
+        info.inventoryId = info.specimen.getInventoryId();
+        SpecimenTypeWrapper type = info.specimen.getSpecimenType();
         Assert.isNotNull(type, "specimen with null for specimen type"); //$NON-NLS-1$
         info.type = type.getName();
-        CollectionEventWrapper cEvent = specimen.getCollectionEvent();
+        CollectionEventWrapper cEvent = info.specimen.getCollectionEvent();
 
         info.patient = ""; //$NON-NLS-1$
         info.studyName = ""; //$NON-NLS-1$
@@ -283,19 +282,19 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             info.pvNumber = (visitNumber == null) ? "" : visitNumber.toString(); //$NON-NLS-1$
         }
 
-        info.createdAt = specimen.getFormattedCreatedAt();
-        info.worksheet = specimen.getParentSpecimen() == null ? "" : specimen //$NON-NLS-1$
-            .getParentSpecimen().getProcessingEvent().getWorksheet();
-        Double quantity = specimen.getQuantity();
+        info.createdAt = info.specimen.getFormattedCreatedAt();
+        info.worksheet = info.specimen.getParentSpecimen() == null ? "" : info.specimen //$NON-NLS-1$
+                .getParentSpecimen().getProcessingEvent().getWorksheet();
+        Double quantity = info.specimen.getQuantity();
         info.quantity = quantity;
-        info.position = specimen.getPositionString();
-        ActivityStatusWrapper status = specimen.getActivityStatus();
+        info.position = info.specimen.getPositionString();
+        ActivityStatusWrapper status = info.specimen.getActivityStatus();
         info.activityStatus = (status == null) ? "" : status.getName(); //$NON-NLS-1$
-        info.comment = specimen.getComment();
-        info.center = specimen.getCurrentCenter().getNameShort();
+        info.comment = info.specimen.getComment();
+        info.center = info.specimen.getCurrentCenter().getNameShort();
 
         info.originCenter = ""; //$NON-NLS-1$
-        OriginInfoWrapper oi = specimen.getOriginInfo();
+        OriginInfoWrapper oi = info.specimen.getOriginInfo();
         if (oi != null) {
             CenterWrapper<?> originCenter = oi.getCenter();
             if (originCenter != null)

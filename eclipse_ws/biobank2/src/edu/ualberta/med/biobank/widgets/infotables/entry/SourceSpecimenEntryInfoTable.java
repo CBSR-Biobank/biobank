@@ -183,6 +183,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         }
     }
 
+    @Override
     public void reload() {
         selectedSourceSpecimen = study.getSourceSpecimenCollection(true);
         if (selectedSourceSpecimen == null) {
@@ -198,8 +199,8 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
             @Override
             public int compare(Object e1, Object e2) {
                 try {
-                    TableRowData i1 = getCollectionModelObject((SourceSpecimenWrapper) e1);
-                    TableRowData i2 = getCollectionModelObject((SourceSpecimenWrapper) e2);
+                    TableRowData i1 = getCollectionModelObject(e1);
+                    TableRowData i2 = getCollectionModelObject(e2);
                     return super.compare(i1.name, i2.name);
                 } catch (Exception e) {
                     return 0;

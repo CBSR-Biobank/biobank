@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets.infotables;
+package edu.ualberta.med.biobank.widgets.infotables.entry;
 
 import java.util.List;
 
@@ -9,8 +9,12 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
+import edu.ualberta.med.biobank.widgets.infotables.Messages;
 
-public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> {
+public class StudyContactEntryInfoTable extends InfoTableWidget {
 
     private static final int PAGE_SIZE_ROWS = 10;
 
@@ -82,24 +86,23 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
     }
 
     @Override
-    public TableRowData getCollectionModelObject(ContactWrapper contact)
-        throws Exception {
-        if (contact == null)
+    public TableRowData getCollectionModelObject(Object o) throws Exception {
+        if (o == null)
             return null;
         TableRowData info = new TableRowData();
-        info.contact = contact;
-        ClinicWrapper clinic = contact.getClinic();
+        info.contact = (ContactWrapper) o;
+        ClinicWrapper clinic = info.contact.getClinic();
         Assert.isNotNull(clinic, "contact's clinic is null"); //$NON-NLS-1$
         info.clinicNameShort = clinic.getNameShort();
-        info.name = contact.getName();
-        info.title = contact.getTitle();
+        info.name = info.contact.getName();
+        info.title = info.contact.getTitle();
         if (info.title == null) {
             info.title = ""; //$NON-NLS-1$
         }
-        info.emailAddress = contact.getEmailAddress();
-        info.mobileNumber = contact.getMobileNumber();
-        info.pagerNumber = contact.getPagerNumber();
-        info.officeNumber = contact.getOfficeNumber();
+        info.emailAddress = info.contact.getEmailAddress();
+        info.mobileNumber = info.contact.getMobileNumber();
+        info.pagerNumber = info.contact.getPagerNumber();
+        info.officeNumber = info.contact.getOfficeNumber();
         return info;
     }
 
@@ -127,8 +130,8 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
             @Override
             public int compare(Object e1, Object e2) {
                 try {
-                    TableRowData i1 = getCollectionModelObject((ContactWrapper) e1);
-                    TableRowData i2 = getCollectionModelObject((ContactWrapper) e2);
+                    TableRowData i1 = getCollectionModelObject(e1);
+                    TableRowData i2 = getCollectionModelObject(e2);
                     return super
                         .compare(i1.clinicNameShort, i2.clinicNameShort);
                 } catch (Exception e) {

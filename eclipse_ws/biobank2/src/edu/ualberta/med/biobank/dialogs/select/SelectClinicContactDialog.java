@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
-import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.StudyContactEntryInfoTable;
 
 public class SelectClinicContactDialog extends BgcBaseDialog {
 
@@ -110,7 +110,10 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
     }
 
     protected void filterContacts(ClinicWrapper clinic) {
-        contactInfoTable.setCollection(clinic.getContactCollection(true));
+        List<ContactWrapper> clinicContacts = clinic.getContactCollection(true);
+        for (ContactWrapper contact : contacts)
+            clinicContacts.remove(contact);
+        contactInfoTable.setCollection(clinicContacts);
     }
 
     @Override

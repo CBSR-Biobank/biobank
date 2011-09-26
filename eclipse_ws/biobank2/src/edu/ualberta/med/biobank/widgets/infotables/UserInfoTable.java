@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -18,8 +17,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.Group;
-import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.dialogs.user.UserEditDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
@@ -28,35 +26,46 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public abstract class UserInfoTable extends InfoTableWidget<User> {
+public abstract class UserInfoTable extends InfoTableWidget {
+
     public static final int ROWS_PER_PAGE = 12;
+
     private static final String[] HEADINGS = new String[] {
-        Messages.UserInfoTable_login_label, Messages.UserInfoTable_email_label,
-        Messages.UserInfoTable_firstname_label,
-        Messages.UserInfoTable_lastname_label };
-    private static final String LOADING_ROW = Messages.UserInfoTable_loading;
-    private static final String USER_DELETE_ERROR = Messages.UserInfoTable_delete_error_msg;
-    private static final String CANNOT_UNLOCK_USER = Messages.UserInfoTable_unlock_error_msg;
-    private static final String CONFIRM_DELETE_TITLE = Messages.UserInfoTable_confirm_delete_title;
-    private static final String CONFIRM_DELETE_MESSAGE = Messages.UserInfoTable_confirm_delete_msg;
-    private static final String CONFIRM_SUICIDE_MESSAGE = Messages.UserInfoTable_confirm_delete_suicide_msg;
+        Messages.UserInfoTable_login_label,
+        Messages.UserInfoTable_fullname_label,
+        Messages.UserInfoTable_email_label };
 
     private MenuItem unlockMenuItem;
 
-    public UserInfoTable(Composite parent, List<User> collection) {
-        super(parent, collection, HEADINGS, ROWS_PER_PAGE, User.class);
+    protected static class TableRowData {
+        UserWrapper user;
+        String login;
+        String email;
+        String fullName;
+        boolean lockedOut;
 
+        @Override
+        public String toString() {
+            return StringUtils.join(new String[] { login, email, fullName,
+                String.valueOf(lockedOut) }, "\t"); //$NON-NLS-1$
+        }
+    }
+
+    public UserInfoTable(Composite parent, List<UserWrapper> collection) {
+        super(parent, collection, HEADINGS, ROWS_PER_PAGE, UserWrapper.class);
         addEditItemListener(new IInfoTableEditItemListener() {
             @Override
             public void editItem(InfoTableEvent event) {
-                editUser((User) getSelection());
+                UserWrapper user = ((TableRowData) getSelection()).user;
+                editUser(user);
             }
         });
 
         addDeleteItemListener(new IInfoTableDeleteItemListener() {
             @Override
             public void deleteItem(InfoTableEvent event) {
-                deleteUser((User) getSelection());
+                UserWrapper user = ((TableRowData) getSelection()).user;
+                deleteUser(user);
             }
         });
 
@@ -65,17 +74,16 @@ public abstract class UserInfoTable extends InfoTableWidget<User> {
         unlockMenuItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                User selectedUser = (User) getSelection();
-                String userName = selectedUser.getLogin();
+                UserWrapper user = ((TableRowData) getSelection()).user;
+                String userName = user.getLogin();
                 try {
-                    SessionManager.getAppService().unlockUser(
-                        SessionManager.getUser(),
-                        ((User) getSelection()).getLogin());
-                    selectedUser.setLockedOut(false);
-                    reloadCollection(getCollection(), selectedUser);
+                    SessionManager.getAppService().unlockUser(userName);
+                    user.setLockedOut(false);
+                    reloadCollection(getCollection(), user);
                 } catch (ApplicationException e) {
                     BgcPlugin.openAsyncError(MessageFormat.format(
-                        CANNOT_UNLOCK_USER, new Object[] { userName }), e);
+                        Messages.UserInfoTable_unlock_error_msg,
+                        new Object[] { userName }), e);
                 }
             }
         });
@@ -83,7 +91,8 @@ public abstract class UserInfoTable extends InfoTableWidget<User> {
         menu.addListener(SWT.Show, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                unlockMenuItem.setEnabled(((User) getSelection()).isLockedOut());
+                UserWrapper user = ((TableRowData) getSelection()).user;
+                unlockMenuItem.setEnabled(user.isLockedOut());
             }
         });
     }
@@ -94,14 +103,8 @@ public abstract class UserInfoTable extends InfoTableWidget<User> {
         return new BiobankTableSorter() {
             @Override
             public int compare(Object o1, Object o2) {
-                if (o1 instanceof User && o2 instanceof User) {
-                    User u1 = (User) o1;
-                    User u2 = (User) o2;
-
-                    int cmp = u1.getLogin().compareToIgnoreCase(u2.getLogin());
-                    if (cmp != 0) {
-                        return cmp;
-                    }
+                if (o1 instanceof UserWrapper && o2 instanceof UserWrapper) {
+                    return ((UserWrapper) o1).compareTo((UserWrapper) o2);
                 }
                 return 0;
             }
@@ -109,23 +112,12 @@ public abstract class UserInfoTable extends InfoTableWidget<User> {
     }
 
     @Override
-    protected String getCollectionModelObjectToString(Object o) {
-        if (o == null) {
-            return null;
-        }
-
-        User user = (User) o;
-        return StringUtils.join(Arrays.asList(user.getLogin(), user.getEmail(),
-            user.getFirstName(), user.getLastName()), "\t"); //$NON-NLS-1$
-    }
-
-    @Override
     protected BgcLabelProvider getLabelProvider() {
         return new BgcLabelProvider() {
             @Override
             public Image getColumnImage(Object element, int columnIndex) {
-                User user = (User) ((BiobankCollectionModel) element).o;
-                if (user != null && user.isLockedOut() && columnIndex == 0) {
+                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                if (info != null && info.lockedOut && columnIndex == 0) {
                     return BiobankPlugin.getDefault().getImage(
                         BgcPlugin.IMG_LOCK);
                 }
@@ -134,23 +126,20 @@ public abstract class UserInfoTable extends InfoTableWidget<User> {
 
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                User user = (User) ((BiobankCollectionModel) element).o;
-                if (user == null) {
+                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                if (info == null) {
                     if (columnIndex == 0) {
-                        return LOADING_ROW;
+                        return Messages.UserInfoTable_loading;
                     }
                     return ""; //$NON-NLS-1$
                 }
-
                 switch (columnIndex) {
                 case 0:
-                    return user.getLogin();
+                    return info.login;
                 case 1:
-                    return user.getEmail();
+                    return info.fullName;
                 case 2:
-                    return user.getFirstName();
-                case 3:
-                    return user.getLastName();
+                    return info.email;
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -161,16 +150,9 @@ public abstract class UserInfoTable extends InfoTableWidget<User> {
     /**
      * return an integer representing the type of result
      */
-    protected int editUser(User user) {
-        List<Group> groups = getGroups();
-        if (groups == null) {
-            BgcPlugin.openAsyncError(Messages.UserInfoTable_error_title,
-                Messages.UserInfoTable_nogroups_msg);
-            return Dialog.CANCEL;
-        }
-
+    protected int editUser(UserWrapper user) {
         UserEditDialog dlg = new UserEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), user, groups, false);
+            .getActiveWorkbenchWindow().getShell(), user);
         int res = dlg.open();
         if (res == Dialog.OK) {
             reloadCollection(getCollection(), user);
@@ -179,23 +161,22 @@ public abstract class UserInfoTable extends InfoTableWidget<User> {
         return res;
     }
 
-    protected abstract List<Group> getGroups();
-
-    protected boolean deleteUser(User user) {
+    protected boolean deleteUser(UserWrapper user) {
         try {
             String loginName = user.getLogin();
             String message;
 
             if (SessionManager.getUser().equals(user)) {
-                message = CONFIRM_SUICIDE_MESSAGE;
+                message = Messages.UserInfoTable_confirm_delete_suicide_msg;
             } else {
-                message = MessageFormat.format(CONFIRM_DELETE_MESSAGE,
+                message = MessageFormat.format(
+                    Messages.UserInfoTable_confirm_delete_msg,
                     new Object[] { loginName });
             }
 
-            if (BgcPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
-                SessionManager.getAppService().deleteUser(
-                    SessionManager.getUser(), loginName);
+            if (BgcPlugin.openConfirm(
+                Messages.UserInfoTable_confirm_delete_title, message)) {
+                user.delete();
 
                 // remove the user from the collection
                 getCollection().remove(user);
@@ -204,9 +185,31 @@ public abstract class UserInfoTable extends InfoTableWidget<User> {
                 notifyListeners();
                 return true;
             }
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(USER_DELETE_ERROR, e);
+        } catch (Exception e) {
+            BgcPlugin
+                .openAsyncError(Messages.UserInfoTable_delete_error_msg, e);
         }
         return false;
     }
+
+    @Override
+    public Object getCollectionModelObject(Object o) throws Exception {
+        TableRowData info = new TableRowData();
+        info.user = (UserWrapper) o;
+        info.email = info.user.getEmail();
+        info.fullName = info.user.getFullName();
+        info.login = info.user.getLogin();
+        info.lockedOut = info.user.isLockedOut();
+
+        info.user.reload();
+        return info;
+    }
+
+    @Override
+    protected String getCollectionModelObjectToString(Object o) {
+        if (o == null)
+            return null;
+        return ((TableRowData) o).toString();
+    }
+
 }

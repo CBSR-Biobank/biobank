@@ -108,6 +108,7 @@ public class StudyAddInfoTable extends StudyInfoTable {
         setCollection(studies);
     }
 
+    @Override
     public void reload() {
         setCollection(site.getStudyCollection(true));
     }

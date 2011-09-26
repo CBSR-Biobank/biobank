@@ -7,8 +7,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.treeview.Node;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 
@@ -26,8 +26,8 @@ public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 SpecimenTypeWrapper item = null;

@@ -13,10 +13,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -32,7 +36,9 @@ import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class TestContainerType extends TestDatabase {
     private static final int CONTAINER_TOP_ROWS = 5;
@@ -235,21 +241,6 @@ public class TestContainerType extends TestDatabase {
 
         Assert.assertEquals("[gs]etColCapacity() failed.", numCols,
             wrapper.getColCapacity());
-    }
-
-    @Test
-    public void testCompareTo() throws Exception {
-        ContainerTypeWrapper topType, childTypeL1, childTypeL2, childTypeL3;
-
-        topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
-        childTypeL1 = containerTypeMap.get("ChildCtL1");
-        childTypeL2 = containerTypeMap.get("ChildCtL2");
-        childTypeL3 = containerTypeMap.get("ChildCtL3");
-
-        Assert.assertEquals(1, topType.compareTo(childTypeL1));
-        Assert.assertEquals(-1, childTypeL1.compareTo(childTypeL2));
-        Assert.assertEquals(-1, childTypeL2.compareTo(childTypeL3));
-        Assert.assertEquals(0, topType.compareTo(topType));
     }
 
     @Test
@@ -1093,5 +1084,120 @@ public class TestContainerType extends TestDatabase {
         childTypeL1.reload();
         Assert.assertEquals(1, topType.getContainersCount());
         Assert.assertEquals(3, childTypeL1.getContainersCount());
+    }
+
+    @Test(expected = Exception.class)
+    public void testSetChildLabelingSchemeById() throws Exception {
+        ContainerTypeWrapper type = new ContainerTypeWrapper(appService);
+        type.setChildLabelingSchemeById(-1);
+    }
+
+    @Test(expected = Exception.class)
+    public void testSetChildLabelingSchemeByNameMissing() throws Exception {
+        ContainerTypeWrapper type = new ContainerTypeWrapper(appService);
+        type.setChildLabelingSchemeName(null);
+    }
+
+    @Test
+    public void testSetChildLabelingSchemeByName() throws Exception {
+        ContainerTypeWrapper type = new ContainerTypeWrapper(appService);
+
+        for (ContainerLabelingSchemeWrapper scheme : ContainerLabelingSchemeWrapper
+            .getAllLabelingSchemesMap(appService).values()) {
+            type.setChildLabelingSchemeName(scheme.getName());
+        }
+    }
+
+    @Test
+    public void testGetContainerTypesByCapacity() throws BiobankCheckException,
+        Exception {
+        ContainerTypeWrapper topType = containerTypeMap.get("TopCT");
+
+        ContainerTypeWrapper childType = ContainerTypeHelper.addContainerType(
+            site, "Some Pallet 96 Thing", "SP96T", 1,
+            RowColPos.PALLET_96_ROW_MAX, RowColPos.PALLET_96_COL_MAX, false);
+
+        SpecimenTypeWrapper specimenType = SpecimenTypeHelper
+            .addSpecimenType("asdf");
+
+        childType.addToSpecimenTypeCollection(Arrays.asList(specimenType));
+        childType.persist();
+
+        topType.addToChildContainerTypeCollection(Arrays.asList(childType));
+        topType.persist();
+
+        List<ContainerTypeWrapper> types = ContainerTypeWrapper
+            .getContainerTypesByCapacity(appService, topType.getSite(),
+                childType.getRowCapacity(), childType.getColCapacity());
+
+        Assert.assertTrue(types.contains(childType));
+    }
+
+    @Test
+    public void testGetContainerTypesPallet96() throws BiobankCheckException,
+        Exception {
+        ContainerTypeWrapper topType = containerTypeMap.get("TopCT");
+
+        ContainerTypeWrapper childType = ContainerTypeHelper.addContainerType(
+            site, "Some Pallet 96 Thing", "SP96T", 1,
+            RowColPos.PALLET_96_ROW_MAX, RowColPos.PALLET_96_COL_MAX, false);
+
+        SpecimenTypeWrapper specimenType = SpecimenTypeHelper
+            .addSpecimenType("asdf");
+
+        childType.addToSpecimenTypeCollection(Arrays.asList(specimenType));
+        childType.persist();
+
+        topType.addToChildContainerTypeCollection(Arrays.asList(childType));
+        topType.persist();
+
+        Assert.assertTrue(childType.isPallet96());
+
+        List<ContainerTypeWrapper> pallet96s = ContainerTypeWrapper
+            .getContainerTypesPallet96(appService, site);
+        Assert.assertTrue(pallet96s.contains(childType));
+        Assert.assertTrue(!pallet96s.contains(topType));
+    }
+
+    @Test
+    public void testCompareTo() throws Exception {
+        ContainerTypeWrapper topType, childTypeL1, childTypeL2, childTypeL3;
+
+        topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
+        childTypeL1 = containerTypeMap.get("ChildCtL1");
+        childTypeL2 = containerTypeMap.get("ChildCtL2");
+        childTypeL3 = containerTypeMap.get("ChildCtL3");
+
+        Assert.assertEquals(1, topType.compareTo(childTypeL1));
+        Assert.assertEquals(-1, childTypeL1.compareTo(childTypeL2));
+        Assert.assertEquals(-1, childTypeL2.compareTo(childTypeL3));
+        Assert.assertEquals(0, topType.compareTo(topType));
+
+        ContainerTypeWrapper2 newType = new ContainerTypeWrapper2(appService);
+        Assert.assertTrue(topType.compareTo(newType) == 0);
+    }
+
+    private static final class ContainerTypeWrapper2 extends
+        ModelWrapper<ContainerType> {
+
+        public ContainerTypeWrapper2(WritableApplicationService appService) {
+            super(appService);
+        }
+
+        @Override
+        public Property<Integer, ? super ContainerType> getIdProperty() {
+            return ContainerTypePeer.ID;
+        }
+
+        @Override
+        protected List<Property<?, ? super ContainerType>> getProperties() {
+            return new ArrayList<Property<?, ? super ContainerType>>();
+        }
+
+        @Override
+        public Class<ContainerType> getWrappedClass() {
+            return ContainerType.class;
+        }
+
     }
 }

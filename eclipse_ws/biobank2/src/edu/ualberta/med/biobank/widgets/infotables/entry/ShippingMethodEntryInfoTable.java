@@ -186,6 +186,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
         reloadCollection(shippingMethodCollection);
     }
 
+    @Override
     public void reload() {
         try {
             setLists(ShippingMethodWrapper.getShippingMethods(SessionManager

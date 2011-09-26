@@ -8,31 +8,35 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.DispatchSpecimenPeer;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
@@ -42,6 +46,7 @@ import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class TestDispatch extends TestDatabase {
 
@@ -157,6 +162,7 @@ public class TestDispatch extends TestDatabase {
             Utils.getRandomDate());
         try {
             dispatch.persist();
+            dispatch.delete();
             Assert
                 .fail("should not be allowed to persist a dispatch shipment without a sender");
         } catch (BiobankSessionException e) {
@@ -168,6 +174,7 @@ public class TestDispatch extends TestDatabase {
             TestCommon.getNewWaybill(r), Utils.getRandomDate());
         try {
             dispatch.persist();
+            dispatch.delete();
             Assert
                 .fail("should not be allowed to persist a dispatch shipment without a receiver");
         } catch (BiobankSessionException e) {
@@ -180,17 +187,18 @@ public class TestDispatch extends TestDatabase {
         DispatchWrapper dispatch2 = DispatchHelper.newDispatch(senderSite,
             senderSite, method, waybill, Utils.getRandomDate());
         dispatch2.persist();
-        dispatch = DispatchHelper.newDispatch(senderSite, senderSite, method,
-            waybill, Utils.getRandomDate());
+        DispatchWrapper dispatch3 = DispatchHelper.newDispatch(senderSite,
+            senderSite, method, waybill, Utils.getRandomDate());
         try {
-            dispatch.persist();
+            dispatch3.persist();
+            dispatch3.delete();
             Assert
                 .fail("should not be allowed to persist a dispatch with a used waybill");
         } catch (BiobankCheckException e) {
             Assert.assertTrue(true);
+        } finally {
+            dispatch2.delete();
         }
-        dispatch2.delete();
-
     }
 
     @Test
@@ -317,7 +325,7 @@ public class TestDispatch extends TestDatabase {
     }
 
     private List<SpecimenWrapper> addSpecimensToContainerRow(
-        CollectionEventWrapper cevent, ContainerWrapper container, int row,
+        ContainerWrapper container, int row,
         List<SpecimenTypeWrapper> sampleTypes) throws Exception {
         int numSampletypes = sampleTypes.size();
         int colCapacity = container.getColCapacity();
@@ -337,10 +345,7 @@ public class TestDispatch extends TestDatabase {
                 sampleTypes.get(r.nextInt(numSampletypes)), pevent, container,
                 row, i));
         }
-        cevent.addToOriginalSpecimenCollection(Arrays.asList(parentSpc));
-        cevent.persist();
         container.reload();
-        cevent.reload();
         return spcs;
     }
 
@@ -378,13 +383,10 @@ public class TestDispatch extends TestDatabase {
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
         study.reload();
-        CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(clinic, patient, 1);
-
-        List<SpecimenWrapper> spcSet1 = addSpecimensToContainerRow(cevent,
-            container, 0, sampleTypes);
-        List<SpecimenWrapper> spcSet2 = addSpecimensToContainerRow(cevent,
-            container, 1, sampleTypes);
+        List<SpecimenWrapper> spcSet1 = addSpecimensToContainerRow(container,
+            0, sampleTypes);
+        List<SpecimenWrapper> spcSet2 = addSpecimensToContainerRow(container,
+            1, sampleTypes);
 
         dispatch.addSpecimens(spcSet1, DispatchSpecimenState.NONE);
         dispatch.persist();
@@ -446,11 +448,9 @@ public class TestDispatch extends TestDatabase {
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
         study.reload();
-        CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(clinic, patient, 1);
 
-        List<SpecimenWrapper> spcSet1 = addSpecimensToContainerRow(cevent,
-            container, 0, sampleTypes);
+        List<SpecimenWrapper> spcSet1 = addSpecimensToContainerRow(container,
+            0, sampleTypes);
 
         dispatch.addSpecimens(spcSet1, DispatchSpecimenState.NONE);
         dispatch.persist();
@@ -537,10 +537,11 @@ public class TestDispatch extends TestDatabase {
             .getDispatchSpecimenCollection(false));
         Assert.assertTrue(!dispatch.hasDispatchSpecimens());
 
-        Assert.assertTrue(!dispatch.canBeSentBy(appService.getCurrentUser()));
-        Assert
-            .assertTrue(!dispatch.canBeReceivedBy(appService.getCurrentUser()));
-        Assert.assertTrue(!dispatch.canBeClosedBy(appService.getCurrentUser()));
+        UserWrapper currentUser = UserWrapper.getUser(appService, "testuser");
+
+        Assert.assertTrue(!dispatch.canBeSentBy(currentUser));
+        Assert.assertTrue(!dispatch.canBeReceivedBy(currentUser));
+        Assert.assertTrue(!dispatch.canBeClosedBy(currentUser));
 
     }
 
@@ -709,11 +710,8 @@ public class TestDispatch extends TestDatabase {
         study.persist();
         study.reload();
 
-        CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(clinic, patient, 1);
-
-        List<SpecimenWrapper> spcSet1 = addSpecimensToContainerRow(cevent,
-            container, 0, specTypes);
+        List<SpecimenWrapper> spcSet1 = addSpecimensToContainerRow(container,
+            0, specTypes);
 
         dispatch.addSpecimens(spcSet1, DispatchSpecimenState.NONE);
         dispatch.persist();
@@ -730,6 +728,66 @@ public class TestDispatch extends TestDatabase {
         for (SpecimenWrapper sp : spcSet1) {
             sp.reload();
             Assert.assertNull(sp.getPosition());
+        }
+    }
+
+    @Test
+    public void testDispatchSpecimenCompareTo() {
+        SpecimenWrapper s1 = new SpecimenWrapper(appService);
+        s1.setInventoryId("a");
+
+        SpecimenWrapper s2 = new SpecimenWrapper(appService);
+        s2.setInventoryId("b");
+
+        DispatchSpecimenWrapper ds1 = new DispatchSpecimenWrapper(appService);
+        ds1.setSpecimen(s1);
+
+        DispatchSpecimenWrapper ds2 = new DispatchSpecimenWrapper(appService);
+        ds2.setSpecimen(s1);
+
+        Assert.assertTrue(ds1.compareTo(ds2) == 0);
+
+        ds2.setSpecimen(s2);
+        Assert.assertTrue(ds1.compareTo(ds2) < 0);
+
+        DispatchSpecimenWrapper2 ds3 = new DispatchSpecimenWrapper2(appService);
+
+        Assert.assertTrue(ds1.compareTo(ds3) == 0);
+    }
+
+    private static final class DispatchSpecimenWrapper2 extends
+        ModelWrapper<DispatchSpecimen> {
+
+        public DispatchSpecimenWrapper2(WritableApplicationService appService) {
+            super(appService);
+        }
+
+        @Override
+        public Property<Integer, ? super DispatchSpecimen> getIdProperty() {
+            return DispatchSpecimenPeer.ID;
+        }
+
+        @Override
+        protected List<Property<?, ? super DispatchSpecimen>> getProperties() {
+            return new ArrayList<Property<?, ? super DispatchSpecimen>>();
+        }
+
+        @Override
+        public Class<DispatchSpecimen> getWrappedClass() {
+            return DispatchSpecimen.class;
+        }
+    }
+
+    @Test
+    public void testDispatchSpecimenState() throws Exception {
+        DispatchSpecimenWrapper ds = new DispatchSpecimenWrapper(appService);
+
+        DispatchSpecimenState[] states = DispatchSpecimenState.values();
+        for (DispatchSpecimenState state : states) {
+            ds.setState(state.getId());
+            Assert
+                .assertTrue(ds.getStateDescription().equals(state.getLabel()));
+            Assert.assertTrue(ds.getSpecimenState().equals(state));
         }
     }
 
@@ -757,9 +815,8 @@ public class TestDispatch extends TestDatabase {
         dispatch2.setShipmentInfo(null);
         try {
             dispatch2.persist();
-            Assert.assertTrue(true);
             DispatchHelper.createdDispatches.add(dispatch2);
-        } catch (Exception e) {
+        } catch (BiobankCheckException e) {
             Assert.fail("Persist should succeed");
         }
         Assert.assertNull(dispatch2.getShipmentInfo());
@@ -770,8 +827,7 @@ public class TestDispatch extends TestDatabase {
         try {
             dispatch3.persist();
             DispatchHelper.createdDispatches.add(dispatch3);
-            Assert.assertTrue(true);
-        } catch (Exception e) {
+        } catch (BiobankCheckException e) {
             Assert.fail("Persist should succeed");
         }
         Assert.assertEquals("", dispatch3.getShipmentInfo().getWaybill());

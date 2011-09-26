@@ -257,8 +257,8 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     /**
-     * Get the rowColPos corresponding to the given CBSR SBS 2 or 3 char string
-     * position. Could be A2 or F12. (CBSR SBS skip I and O)
+     * Get the rowColPos corresponding to the given CBSR SBS 2 char string
+     * position. Could be A2 or F9. (CBSR SBS skip I and O)
      */
     public static RowColPos cbsrSbsToRowCol(
         WritableApplicationService appService, String pos) throws Exception {
@@ -327,7 +327,8 @@ public class ContainerLabelingSchemeWrapper extends
             String maxValue = ContainerLabelingSchemeWrapper
                 .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
                     rowCap, colCap);
-            throw new Exception("Address  " + label + " does not exist"
+            throw new BiobankCheckException("Address  " + label
+                + " does not exist"
                 + (containerTypeName == null ? "" : " in " + containerTypeName)
                 + ". Max value is " + maxValue + ". (Max row: " + rowCap
                 + ". Max col: " + colCap + ".)");
@@ -369,7 +370,8 @@ public class ContainerLabelingSchemeWrapper extends
             String maxValue = ContainerLabelingSchemeWrapper
                 .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
                     rowCap, colCap);
-            throw new Exception("Address  " + label + " does not exist"
+            throw new BiobankCheckException("Address  " + label
+                + " does not exist"
                 + (containerTypeName == null ? "" : " in " + containerTypeName)
                 + ". Max value is " + maxValue + ". (Max row: " + rowCap
                 + ". Max col: " + colCap + ".)");
@@ -482,8 +484,7 @@ public class ContainerLabelingSchemeWrapper extends
      */
     public static String rowColToDewar(RowColPos rcp, Integer colCapacity) {
         int pos = rcp.getCol() + (colCapacity * rcp.getRow());
-        String letter = String.valueOf(CBSR_2_CHAR_LABELLING_PATTERN
-            .charAt(pos));
+        String letter = String.valueOf(SBS_ROW_LABELLING_PATTERN.charAt(pos));
         return letter + letter;
     }
 
@@ -572,6 +573,10 @@ public class ContainerLabelingSchemeWrapper extends
         case 5:
             // Box81
             return cbsrSbsToRowCol(appService, position);
+        case 6:
+            // 2 char alphabetic
+            return twoCharToRowCol(appService, position, rowCapacity,
+                colCapacity, "wtf");
         }
         return null;
     }
@@ -582,6 +587,6 @@ public class ContainerLabelingSchemeWrapper extends
         tasks.add(check().notUsedBy(ContainerType.class,
             ContainerTypePeer.CHILD_LABELING_SCHEME));
 
-        super.addPersistTasks(tasks);
+        super.addDeleteTasks(tasks);
     }
 }

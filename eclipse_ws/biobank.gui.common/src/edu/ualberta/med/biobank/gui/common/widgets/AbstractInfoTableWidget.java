@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.gui.common.widgets;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.SafeRunnable;
@@ -27,6 +25,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * This abstract class is used to create most the tables used in the client. The
@@ -46,11 +45,13 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
  * <li>copy row to clipboard</li>
  * <li>pagination widget</li>
  * </ul>
- * 
- * @param <T> The information to be displayed in the table.
  */
-public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
-    implements IInfoTalePagination, IDoubleClickListener {
+public abstract class AbstractInfoTableWidget extends BgcBaseWidget implements
+    IInfoTalePagination, IDoubleClickListener {
+
+    public static class RowItem {
+        int itemNumber;
+    }
 
     protected TableViewer tableViewer;
 
@@ -82,8 +83,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
     protected ListenerList doubleClickListeners = new ListenerList();
 
-    public AbstractInfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int[] columnWidths, int rowsPerPage) {
+    public AbstractInfoTableWidget(Composite parent, String[] headings,
+        int[] columnWidths, int rowsPerPage) {
         super(parent, SWT.NONE);
 
         GridLayout gl = new GridLayout(1, false);
@@ -132,9 +133,6 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
         BgcClipboard.addClipboardCopySupport(tableViewer, menu, labelProvider,
             headings.length);
-
-        // load the data
-        setCollection(collection);
     }
 
     public void setHeadings(String[] headings) {
@@ -161,17 +159,18 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                     @Override
                     public void widgetSelected(SelectionEvent e) {
                         col.pack();
+                        Table table = tableViewer.getTable();
 
                         if (tableSorter != null) {
                             tableSorter.setColumn(fIndex);
-                            int dir = tableViewer.getTable().getSortDirection();
+                            int dir = table.getSortDirection();
                             if (tableViewer.getTable().getSortColumn() == col) {
-                                dir = (dir == SWT.UP ? SWT.DOWN : SWT.UP);
+                                dir = (dir == SWT.UP) ? SWT.DOWN : SWT.UP;
                             } else {
                                 dir = SWT.DOWN;
                             }
-                            tableViewer.getTable().setSortDirection(dir);
-                            tableViewer.getTable().setSortColumn(col);
+                            table.setSortDirection(dir);
+                            table.setSortColumn(col);
                             tableViewer.refresh();
                         }
                     }
@@ -188,6 +187,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
     protected abstract BgcTableSorter getTableSorter();
 
+    public abstract void reload() throws ApplicationException;
+
     @Override
     public boolean setFocus() {
         tableViewer.getControl().setFocus();
@@ -201,8 +202,6 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     protected TableViewer getTableViewer() {
         return tableViewer;
     }
-
-    public abstract void setCollection(final List<T> collection);
 
     protected void autoSizeColumns() {
         // TODO: auto-size table initially based on headers? Sort of already
@@ -251,7 +250,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
             sumOfMaxTextWidths += width;
         }
 
-        // need to give default max=500 when can't know the size of the table
+        // need to give default max=500 when can't know the size of
+        // the table
         // yet (see UserManagementDialog)
         int tableWidth = Math.max(500, tableViewer.getTable().getSize().x);
 
@@ -269,8 +269,6 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         table.setVisible(true);
     }
 
-    protected abstract void init(List<T> collection);
-
     protected void resizeTable() {
         Table table = getTableViewer().getTable();
         GridData gd = (GridData) table.getLayoutData();
@@ -278,8 +276,6 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         gd.heightHint = ((rows - 1) * table.getItemHeight())
             + table.getHeaderHeight() + table.getBorderWidth();
     }
-
-    protected abstract void setPaginationParams(List<T> collection);
 
     @Override
     public void setEnabled(boolean enabled) {

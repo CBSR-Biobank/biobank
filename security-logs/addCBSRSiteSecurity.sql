@@ -1,66 +1,228 @@
-/**** sites *****/
+-- add a membership to testuser for center CBSR
+insert into membership(id, version, principal_id, center_id)
+select max(membership.id) + 1, 0, max(principal.id), center.id from principal, membership, center where center.name_short = 'CBSR';
 
-/* add protection element for all sites */
-INSERT INTO csm_protection_element (protection_element_name, protection_element_description, object_id, attribute, attribute_value, application_id, update_date)
-select concat('Site/',name_short), name_short, 'edu.ualberta.med.biobank.model.Site', 'id', id, 2, sysdate() 
-from center where discriminator='Site';
+-- add a permissions for all rights (except user management and administrator)
+-- and add all privileges to all permissions added to testuser
+-- specimen link
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 0, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 5 from permission;
 
-/* add protection group for all sites */
-INSERT INTO csm_protection_group (PROTECTION_GROUP_NAME, PROTECTION_GROUP_DESCRIPTION, APPLICATION_ID, UPDATE_DATE)
-select concat('Site ',name_short), concat('Protection group for site ', name_short), 2, sysdate()
-from center where discriminator='Site';
+-- specimen assign
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 1, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 5 from permission;
 
-/**** clinics *****/
+-- study
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 2, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 1 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 2 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 3 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 4 from permission;
 
-/* add protection element for all clinics */
-INSERT INTO csm_protection_element (protection_element_name, protection_element_description, object_id, attribute, attribute_value, application_id, update_date)
-select concat('Clinic/',name_short), name_short, 'edu.ualberta.med.biobank.model.Clinic', 'id', id, 2, sysdate() 
-from center where discriminator='Clinic';
+-- clinic
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 3, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 1 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 2 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 3 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 4 from permission;
 
-/* add protection group for all clinics */
-INSERT INTO csm_protection_group (PROTECTION_GROUP_NAME, PROTECTION_GROUP_DESCRIPTION, APPLICATION_ID, UPDATE_DATE)
-select concat('Clinic ',name_short), concat('Protection group for clinic ', name_short), 2, sysdate()
-from center where discriminator='Clinic';
+-- site
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 4, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 1 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 2 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 3 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 4 from permission;
 
+-- research group
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 5, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 1 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 2 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 3 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 4 from permission;
 
-/**** Common ****/
-/* add the center protection element corresponding protection group */
-/* FYI: the 'BINARY' keyword is there to avoid a collate exception on like and = between the 2 tables results*/
-INSERT INTO csm_pg_pe (protection_group_id, protection_element_id, update_date) 
-select protection_group_id, protection_element_id,  sysdate() 
-from csm_protection_group, csm_protection_element, center 
-where BINARY protection_group_name like BINARY concat('% ',center.name_short) 
-and BINARY protection_element_description=BINARY center.name_short;
+-- logging
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 6, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 5 from permission;
 
+-- reports 
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 7, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 5 from permission;
 
+-- container
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 8, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 1 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 2 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 3 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 4 from permission;
 
-/************** CBSR groups ***********************/
-/* add CBSR Tech 1 and 2 read/update on CBSR site*/
-INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() 
-from csm_group, csm_role, csm_protection_group 
-where group_name='CBSR Technician Level 1' and role_name='Center Full Access' and protection_group_name='Site CBSR';
+-- container type
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 9, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 1 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 2 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 3 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 4 from permission;
 
-INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() 
-from csm_group, csm_role, csm_protection_group 
-where group_name='CBSR Technician Level 2' and role_name='Center Full Access' and protection_group_name='Site CBSR';
+-- patient
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 10, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 1 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 2 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 3 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 4 from permission;
 
-/************** CBSR groups ***********************/
+-- collection event
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 11, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 1 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 2 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 3 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 4 from permission;
 
+-- processing event
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 12, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 1 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 2 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 3 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 4 from permission;
 
-/************** Calgary groups ***********************/
-/* add Calgary Admin ant Calgary Tech read/update on Calgary-F site*/
-INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() 
-from csm_group, csm_role, csm_protection_group 
-where group_name='Calgary Administrator' and role_name='Center Full Access' and protection_group_name='Site Calgary-F';
+-- send dispatch
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 13, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 5 from permission;
 
-INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() 
-from csm_group, csm_role, csm_protection_group 
-where group_name='Calgary Technicians' and role_name='Center Full Access' and protection_group_name='Site Calgary-F';
-/************** Calgary groups ***********************/
+-- receive dispatch
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 14, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 5 from permission;
 
+-- create specimen request
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 15, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 5 from permission;
 
+-- receive specimen request	
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 16, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 5 from permission;
+
+-- clinic shipment
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 17, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 1 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 2 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 3 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 4 from permission;
+
+-- print labels	
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 18, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 5 from permission;
+
+-- specimen types
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 19, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 1 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 2 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 3 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 4 from permission;
+
+-- shipping methods
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 20, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 1 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 2 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 3 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 4 from permission;
+
+-- activity status
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 21, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 1 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 2 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 3 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 4 from permission;
+
+-- specimen
+insert into permission(id, version, right_id, membership_id) 
+select max(permission.id) + 1, 0, 22, max(membership.id) from permission, bb_right, membership;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 1 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 2 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 3 from permission;
+insert into permission_privilege(permission_id, privilege_id) 
+select max(permission.id), 4 from permission;
 

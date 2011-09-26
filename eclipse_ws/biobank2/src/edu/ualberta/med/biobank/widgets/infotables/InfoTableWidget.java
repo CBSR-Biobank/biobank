@@ -55,7 +55,7 @@ import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
  * @param <T> The model object wrapper the table is based on.
  * 
  */
-public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
+public abstract class InfoTableWidget extends InfoTableBgrLoader {
 
     /*
      * see http://lekkimworld.com/2008/03/27/setting_table_row_height_in_swt
@@ -69,18 +69,19 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
 
     protected boolean useDefaultEditItem;
 
-    private Class<T> wrapperClass;
+    private Class<?> wrapperClass;
 
-    public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int rowsPerPage, Class<T> wrapperClass) {
+    public InfoTableWidget(Composite parent, List<?> collection,
+        String[] headings, int rowsPerPage, Class<?> wrapperClass) {
         super(parent, collection, headings, null, rowsPerPage);
+
         this.wrapperClass = wrapperClass;
         addTableClickListener();
         useDefaultEditItem = false;
     }
 
-    public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, Class<T> wrapperClass) {
+    public InfoTableWidget(Composite parent, List<?> collection,
+        String[] headings, Class<?> wrapperClass) {
         this(parent, collection, headings, 5, wrapperClass);
     }
 
@@ -107,7 +108,7 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
     }
 
     @Override
-    protected void init(List<T> collection) {
+    protected void init(List<?> collection) {
         reloadData = true;
 
         model = new ArrayList<BiobankCollectionModel>();
@@ -115,7 +116,7 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
     }
 
     @Override
-    protected void setPaginationParams(List<T> collection) {
+    protected void setPaginationParams(List<?> collection) {
         paginationRequired = paginationWidget
             .setTableMaxRows(collection.size());
         if (paginationRequired) {
@@ -143,7 +144,7 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
         return (BiobankCollectionModel) stSelection.getFirstElement();
     }
 
-    protected void initModel(List<T> collection) {
+    protected void initModel(List<?> collection) {
         if ((collection == null) || (model.size() == collection.size()))
             return;
 
@@ -174,17 +175,17 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
      * 
      * @param collection
      */
-    public void reloadCollection(final List<T> collection, T selection) {
+    public void reloadCollection(final List<?> collection, Object selection) {
         reloadData = true;
         setCollection(collection, selection);
     }
 
-    public void reloadCollection(final List<T> collection) {
+    public void reloadCollection(final List<?> collection) {
         reloadCollection(collection, null);
     }
 
     @Override
-    protected void tableLoader(final List<T> collection, final T selection) {
+    protected void tableLoader(final List<?> collection, final Object selection) {
         final TableViewer viewer = getTableViewer();
         final Table table = viewer.getTable();
         Display display = viewer.getTable().getDisplay();
@@ -260,7 +261,7 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
     }
 
     @SuppressWarnings("unused")
-    public Object getCollectionModelObject(T item) throws Exception {
+    public Object getCollectionModelObject(Object item) throws Exception {
         return item;
     }
 

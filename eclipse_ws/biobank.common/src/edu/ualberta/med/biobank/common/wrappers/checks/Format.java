@@ -18,7 +18,8 @@ class Format {
         int n = properties.size();
         int i = 0;
         for (Property<?, ? super E> property : properties) {
-            sb.append(property.get(model).toString());
+            Object pValue = property.get(model);
+            sb.append(pValue == null ? "null" : pValue.toString());
             i++;
             if (i < n) {
                 sb.append(DELIMITER);

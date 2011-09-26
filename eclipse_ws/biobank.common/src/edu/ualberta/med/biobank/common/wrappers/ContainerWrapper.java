@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
@@ -37,7 +36,6 @@ import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrappe
 import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -363,20 +361,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return getLabel() + " (" + getContainerType().getNameShort() + ")";
     }
 
-    // TODO: replace with generic child-count action?
-    private static final String CHILD_COUNT_QRY = "select count(pos) from "
-        + ContainerPosition.class.getName() + " as pos where pos."
-        + ContainerPositionPeer.PARENT_CONTAINER.to(ContainerPeer.ID).getName()
-        + "=?";
-
     public long getChildCount(boolean fast) throws BiobankException,
         ApplicationException {
-        if (!isPropertyCached(ContainerPeer.CHILD_POSITION_COLLECTION) && fast) {
-            HQLCriteria criteria = new HQLCriteria(CHILD_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        return getChildren().size();
+        return getPropertyCount(ContainerPeer.CHILD_POSITION_COLLECTION, fast);
     }
 
     public Map<RowColPos, ContainerWrapper> getChildren() {
@@ -830,9 +817,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @throws BiobankException
      */
     public static List<ContainerWrapper> getPossibleContainersFromPosition(
-        BiobankApplicationService appService, User user, String positionText,
-        boolean isContainerPosition, ContainerTypeWrapper contType)
-        throws ApplicationException, BiobankException {
+        BiobankApplicationService appService, UserWrapper user,
+        String positionText, boolean isContainerPosition,
+        ContainerTypeWrapper contType) throws ApplicationException,
+        BiobankException {
         List<ContainerWrapper> foundContainers;
         List<ContainerWrapper> possibles = getPossibleParents(appService,
             positionText, user.getCurrentWorkingSite(), contType);

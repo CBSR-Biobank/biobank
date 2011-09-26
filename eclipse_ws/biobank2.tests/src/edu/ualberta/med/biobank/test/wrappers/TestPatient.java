@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -422,12 +423,6 @@ public class TestPatient extends TestDatabase {
             Assert.assertEquals(1, patient.getSourceSpecimenCount(true));
             Assert.assertEquals(1, patient.getSourceSpecimenCount(false));
         }
-
-        Assert.assertEquals(3, patient1.getAllSpecimensCount(true));
-        Assert.assertEquals(3, patient2.getAllSpecimensCount(true));
-        Assert.assertEquals(3, patient1.getAllSpecimensCount(false));
-        Assert.assertEquals(3, patient2.getAllSpecimensCount(false));
-
     }
 
     @Test
@@ -465,8 +460,6 @@ public class TestPatient extends TestDatabase {
 
             List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
             for (SpecimenWrapper parentSpc : parentSpcs) {
-                PatientWrapper patient = parentSpc.getCollectionEvent()
-                    .getPatient();
                 List<ProcessingEventWrapper> patientPevents = ProcessingEventHelper
                     .addProcessingEvents(site, Utils.getRandomDate(),
                         parentSpc, contSampleTypes, 5, 2);
@@ -479,9 +472,7 @@ public class TestPatient extends TestDatabase {
                             .getSpecimenCollection(false).get(0));
                     storedSpecimenCount++;
                 }
-
                 pevents.addAll(patientPevents);
-
             }
 
             patient1.reload();
@@ -553,7 +544,8 @@ public class TestPatient extends TestDatabase {
         try {
             Assert.assertEquals(
                 PatientWrapper.getPatient(appService, "testp",
-                    appService.getCurrentUser()).getPnumber(), "testp");
+                    UserWrapper.getUser(appService, "testuser")).getPnumber(),
+                "testp");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
@@ -563,8 +555,10 @@ public class TestPatient extends TestDatabase {
     public void testCanDo() throws Exception {
         PatientWrapper p = PatientHelper.addPatient("testp",
             StudyHelper.addStudy("testst"));
-        Assert.assertEquals(false, p.canDelete(appService.getCurrentUser()));
-        Assert.assertEquals(false, p.canUpdate(appService.getCurrentUser()));
+        Assert.assertEquals(true, p.canDelete(
+            UserWrapper.getUser(appService, "testuser"), null, null));
+        Assert.assertEquals(true, p.canUpdate(
+            UserWrapper.getUser(appService, "testuser"), null, null));
     }
 
 }

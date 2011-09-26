@@ -186,6 +186,7 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
         reloadCollection(activityStatusCollection);
     }
 
+    @Override
     public void reload() {
         try {
             setLists(ActivityStatusWrapper

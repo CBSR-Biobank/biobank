@@ -66,8 +66,7 @@ public class ElementTracker<E> {
      * @param <T>
      * @param property
      */
-    public <T> void trackCollection(
-        Property<? extends Collection<T>, ? super E> property) {
+    public <T> void trackCollection(Property<Collection<T>, ? super E> property) {
         if (!originalElementsMap.containsKey(property)) {
             Collection<ModelWrapper<T>> originalValues = getCurrentElements(property);
             originalElementsMap.put(property, originalValues);
@@ -83,7 +82,7 @@ public class ElementTracker<E> {
      * @return
      */
     public <T> Collection<ModelWrapper<T>> getAddedElements(
-        Property<? extends Collection<? extends T>, ? super E> property) {
+        Property<Collection<T>, ? super E> property) {
         Collection<ModelWrapper<T>> addedElements = new ArrayList<ModelWrapper<T>>();
 
         if (originalElementsMap.containsKey(property)) {
@@ -113,7 +112,7 @@ public class ElementTracker<E> {
      * @return
      */
     public <T> Collection<ModelWrapper<T>> getRemovedElements(
-        Property<? extends Collection<? extends T>, ? super E> property) {
+        Property<Collection<T>, ? super E> property) {
         Collection<ModelWrapper<T>> removedElements = new ArrayList<ModelWrapper<T>>();
 
         if (originalElementsMap.containsKey(property)) {
@@ -163,7 +162,7 @@ public class ElementTracker<E> {
     }
 
     private <T> Collection<ModelWrapper<T>> getCurrentElements(
-        Property<? extends Collection<? extends T>, ? super E> property) {
+        Property<Collection<T>, ? super E> property) {
         Collection<ModelWrapper<T>> current = new ArrayList<ModelWrapper<T>>();
 
         List<ModelWrapper<T>> tmp = wrapper.getWrapperCollection(property,

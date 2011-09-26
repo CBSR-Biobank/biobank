@@ -10,9 +10,6 @@ import org.springframework.util.Assert;
 
 public class ModelUtils {
 
-    // private static final Logger logger = Logger.getLogger(ModelUtils.class
-    // .getName());
-
     public static <E> E getObjectWithId(WritableApplicationService appService,
         Class<E> classType, Integer id) throws Exception {
         Constructor<?> constructor = classType.getConstructor();

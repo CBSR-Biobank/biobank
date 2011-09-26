@@ -16,4 +16,5 @@ public class UserManagementHandler extends AbstractHandler implements IHandler {
             .getActiveWorkbenchWindow().getShell()).open();
         return null;
     }
+
 }

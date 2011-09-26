@@ -343,6 +343,7 @@
       <fileset file="${cacore.sdk.dir}/system/dist/sdk-core.jar" />
       <fileset file="${cacore.sdk.dir}/system/lib/csmapi-4.1.jar" />
       <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-core.jar" />
+      <fileset file="${cacore.sdk.dir}/system/lib/jta.jar" />
     </copy>
     <copy todir="${eclipse.proj.dir.common}/conf" overwrite="true">
       <filelist dir="${cacore.sdk.dir}/output/biobank/package/remote-client/conf"
@@ -367,6 +368,19 @@
     <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
       <fileset file="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
     </copy>
+    <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
+      <fileset file="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
+    </copy>
+  	<!-- The following files and jars are needed in the test project to call csm api methods -->
+  	<copy todir="${eclipse.proj.dir.junit}/src" overwrite="true">
+  		<filelist dir="${cacore.sdk.dir}/output/biobank/src" files="biobank.csm.new.hibernate.cfg.xml" />
+  	</copy>
+  	<copy todir="${eclipse.proj.dir.junit}/lib" overwrite="true">
+  	  <fileset file="${cacore.sdk.dir}/system/lib/dom4j-1.4.jar" />
+  	  <fileset file="${cacore.sdk.dir}/system/lib/c3p0-0.9.0.jar" />
+  	  <fileset file="${cacore.sdk.dir}/system/lib/clm-4.1.jar" />
+      <fileset file="${cacore.sdk.dir}/system/lib/jta.jar" />
+  	</copy>
   </target>
   <!-- JBoss -->
   <target name="check-jboss-uptodate">
@@ -485,6 +499,9 @@
       <transaction src="${data.sql.dir}/shippingMethod.sql" />
       <transaction src="${data.sql.dir}/patientLabels.sql" />
       <transaction src="${data.sql.dir}/advancedReportsData.sql" />
+      <transaction src="${data.sql.dir}/privileges.sql" />
+      <transaction src="${data.sql.dir}/rights.sql" />
+      <transaction src="${data.sql.dir}/groups.sql" />
       <transaction src="${secu-log.dir}/schemaSecurity.sql" />
       <transaction>commit;</transaction>
       <classpath>
@@ -936,6 +953,7 @@
       <fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.gui.common}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
+      <fileset dir="${eclipse.proj.dir.junit}/lib" includes="**/*.jar" />
     </delete>
   </target>
 
@@ -961,7 +979,7 @@
   </target>
 
   <target name="clean-all"
-          depends="clean-tests,clean-jars"
+          depends="clean-tests,clean-jars,clean"
           description="deletes caCORE SDK directory and deletes jars from eclipse projects">
     <delete dir="${cacore.sdk.dir}" />
     <delete dir="${buildDirectory}" />
@@ -996,7 +1014,19 @@
     <mkdir dir="${test.output.raw}" />
   </target>
 
-  <target name="tests-compile" depends="build-common-project,prepare">
+	<!---->
+  <target name="tests-compile" depends="build-common-project,prepare" >
+    <copy includeemptydirs="false"
+  	      todir="${test.build.dir}" overwrite="true">
+  	  <fileset dir="${eclipse.proj.dir.junit}/src">
+  	    <exclude name="**/*.launch" />
+  	    <exclude name="**/*.java" />
+  	  </fileset>
+      <fileset dir="${eclipse.proj.dir.tools}/src">
+    	<exclude name="**/*.launch" />
+    	<exclude name="**/*.java" />
+      </fileset>
+  	</copy>
     <javac destdir="${test.build.dir}"
            debug="true"
            debuglevel="lines,source"

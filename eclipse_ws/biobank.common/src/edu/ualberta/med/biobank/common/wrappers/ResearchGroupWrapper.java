@@ -61,22 +61,19 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
         return wrappers;
     }
 
-    @Override
-    public long getCollectionEventCountForStudy(StudyWrapper study)
-        throws ApplicationException, BiobankException {
+    public long getCollectionEventCountForStudy(
+        @SuppressWarnings("unused") StudyWrapper study) {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    @Override
-    public long getPatientCountForStudy(StudyWrapper study)
-        throws ApplicationException, BiobankException {
+    public long getPatientCountForStudy(
+        @SuppressWarnings("unused") StudyWrapper study) {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    @Override
-    public Long getPatientCount() throws Exception {
+    public Long getPatientCount() {
         return (long) 0;
     }
 

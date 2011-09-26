@@ -3,75 +3,58 @@ package edu.ualberta.med.biobank.widgets.multiselect;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.util.DeltaEvent;
 import edu.ualberta.med.biobank.treeview.util.IDeltaListener;
 import edu.ualberta.med.biobank.treeview.util.NullDeltaListener;
 
-public class MultiSelectNode {
-    private int id;
+public class MultiSelectNode<T> {
 
-    private String name;
+    private T nodeObject;
 
-    protected MultiSelectNode parent;
+    protected MultiSelectNode<T> parent;
 
-    protected List<MultiSelectNode> children;
+    protected List<MultiSelectNode<T>> children;
 
-    protected List<MultiSelectNode> addedChildren;
+    protected List<MultiSelectNode<T>> addedChildren;
 
-    protected List<MultiSelectNode> removedChildren;
+    protected List<MultiSelectNode<T>> removedChildren;
 
     protected IDeltaListener listener = NullDeltaListener.getSoleInstance();
 
-    public MultiSelectNode(MultiSelectNode parent) {
+    public MultiSelectNode(MultiSelectNode<T> parent) {
         this.parent = parent;
-        children = new ArrayList<MultiSelectNode>();
+        children = new ArrayList<MultiSelectNode<T>>();
     }
 
-    public MultiSelectNode(MultiSelectNode parent, int id, String name) {
+    public MultiSelectNode(MultiSelectNode<T> parent, T nodeObject) {
         this(parent);
-        setId(id);
-        setName(name);
-        addedChildren = new ArrayList<MultiSelectNode>();
-        removedChildren = new ArrayList<MultiSelectNode>();
+        this.nodeObject = nodeObject;
+        addedChildren = new ArrayList<MultiSelectNode<T>>();
+        removedChildren = new ArrayList<MultiSelectNode<T>>();
     }
 
-    public void setParent(MultiSelectNode parent) {
+    public void setParent(MultiSelectNode<T> parent) {
         this.parent = parent;
     }
 
-    public MultiSelectNode getParent() {
+    public MultiSelectNode<T> getParent() {
         return parent;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<MultiSelectNode> getChildren() {
+    public List<MultiSelectNode<T>> getChildren() {
         return children;
     }
 
-    public List<MultiSelectNode> getAddedChildren() {
+    public List<MultiSelectNode<T>> getAddedChildren() {
         return addedChildren;
     }
 
-    public List<MultiSelectNode> getRemovedChildren() {
+    public List<MultiSelectNode<T>> getRemovedChildren() {
         return removedChildren;
     }
 
-    public void addChild(MultiSelectNode child) {
+    public void addChild(MultiSelectNode<T> child) {
         child.setParent(this);
         children.add(child);
         addedChildren.add(child);
@@ -80,13 +63,13 @@ public class MultiSelectNode {
         fireAdd(child);
     }
 
-    public void removeChild(MultiSelectNode item) {
+    public void removeChild(MultiSelectNode<T> item) {
         if (children.size() == 0)
             return;
 
-        MultiSelectNode itemToRemove = null;
+        MultiSelectNode<T> itemToRemove = null;
 
-        for (MultiSelectNode child : children) {
+        for (MultiSelectNode<T> child : children) {
             if (child == item)
                 itemToRemove = child;
         }
@@ -103,12 +86,8 @@ public class MultiSelectNode {
         return children.size();
     }
 
-    public boolean hasChild(String name) {
-        for (MultiSelectNode child : children) {
-            if (child.getName().equals(name))
-                return true;
-        }
-        return false;
+    public boolean hasChild(ModelWrapper<?> child) {
+        return children.contains(child);
     }
 
     public void addListener(IDeltaListener listener) {
@@ -129,16 +108,12 @@ public class MultiSelectNode {
         listener.remove(new DeltaEvent(removed));
     }
 
-    @Override
-    public String toString() {
-        return name;
-    }
-
     /**
      * remove all current selections
      */
     public void clear() {
-        for (MultiSelectNode node : new ArrayList<MultiSelectNode>(children)) {
+        for (MultiSelectNode<T> node : new ArrayList<MultiSelectNode<T>>(
+            children)) {
             removeChild(node);
         }
         children.clear();
@@ -152,6 +127,10 @@ public class MultiSelectNode {
     public void reset() {
         addedChildren.clear();
         removedChildren.clear();
+    }
+
+    public T getNodeObject() {
+        return nodeObject;
     }
 
 }

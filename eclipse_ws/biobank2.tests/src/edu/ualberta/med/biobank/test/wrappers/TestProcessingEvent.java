@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -355,6 +356,42 @@ public class TestProcessingEvent extends TestDatabase {
         } catch (Exception e) {
             System.out.println("oops!");
             System.out.println(e.getStackTrace());
+        }
+    }
+
+    @Test
+    public void testSpecimenCounts() throws Exception {
+        List<SpecimenWrapper> parentSpcs = new ArrayList<SpecimenWrapper>();
+        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+        List<SpecimenTypeWrapper> allSpcTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, true);
+
+        final int NUM_PARENTS = 3;
+        final int NUM_CHILDREN = 4;
+
+        // create parents
+        for (int i = 0; i < NUM_PARENTS; i++) {
+            SpecimenWrapper parentSpc = SpecimenHelper.addParentSpecimen();
+            parentSpcs.add(parentSpc);
+
+            ProcessingEventWrapper pevent = ProcessingEventHelper
+                .addProcessingEvent(site, Utils.getRandomDate());
+            pevents.add(pevent);
+
+            // create children
+            Assert.fail("Commented out because broke with a merge, FIXME!");
+            // for (int j = 0; j < NUM_CHILDREN; j++) {
+            // SpecimenHelper.addSpecimen(parentSpc,
+            // allSpcTypes.get(j % allSpcTypes.size()), pevent);
+            // }
+        }
+
+        for (ProcessingEventWrapper pevent : pevents) {
+            long count = pevent.getSpecimenCount(true);
+            Assert.assertTrue(count == NUM_CHILDREN);
+
+            count = pevent.getSpecimenCount(false);
+            Assert.assertTrue(count == NUM_CHILDREN);
         }
     }
 }

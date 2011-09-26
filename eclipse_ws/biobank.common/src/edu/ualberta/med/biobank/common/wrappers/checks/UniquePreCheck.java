@@ -32,7 +32,7 @@ public class UniquePreCheck<E> extends UncachedAction<E> {
     private static final String HQL = "SELECT COUNT(*) FROM {0} o WHERE ({1}) = ({2}) {3}";
     private static final String EXCEPTION_STRING = "There already exists a {0} with property value(s) ({1}) for ({2}), respectively. These field(s) must be unique.";
 
-    private final Collection<Property<?, ? super E>> properties;
+    protected final Collection<Property<?, ? super E>> properties;
 
     /**
      * 
@@ -46,7 +46,8 @@ public class UniquePreCheck<E> extends UncachedAction<E> {
     }
 
     @Override
-    public void doUncachedAction(Session session) throws BiobankSessionException {
+    public void doUncachedAction(Session session)
+        throws BiobankSessionException {
         Query query = getQuery(session);
         Long count = HibernateUtil.getCountFromQuery(query);
 

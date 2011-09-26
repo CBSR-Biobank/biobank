@@ -741,21 +741,21 @@
                   <reference
                         definitionId="biobank.isSuperAdminMode">
                   </reference>
-                  <reference
-                        definitionId="biobank.isCurrentCenterAdmin">
+                   <reference
+                        definitionId="biobank.hasUserManagementRights">
                   </reference>
                </or>
             </and>
          </activeWhen>
          <enabledWhen>
-            <or>
+         <or>
                <reference
                      definitionId="biobank.isSuperAdminMode">
                </reference>
-               <reference
-                     definitionId="biobank.isCurrentCenterAdmin">
-               </reference>
-            </or>
+                <reference
+                        definitionId="biobank.hasUserManagementRights">
+                  </reference>
+               </or>
          </enabledWhen>
       </handler>
       <handler
@@ -1010,14 +1010,14 @@
                       style="push">
                    <visibleWhen
                          checkEnabled="false">
-                      <or>
+                         <or>
                          <reference
                                definitionId="biobank.isSuperAdminMode">
                          </reference>
-                         <reference
-                               definitionId="biobank.isCurrentCenterAdmin">
-                         </reference>
-                      </or>
+                           <reference
+                        definitionId="biobank.hasUserManagementRights">
+                  </reference>
+               </or>
                    </visibleWhen>
                 </command>
                 <command
@@ -2465,15 +2465,6 @@
          </with>
       </definition>
       <definition
-            id="biobank.isCurrentCenterAdmin">
-         <with
-               variable="edu.ualberta.med.biobank.sourceprovider.isCurrentCenterAdmin">
-            <equals
-                  value="true">
-            </equals>
-         </with>
-      </definition>
-      <definition
             id="biobank.hasPrinterLabelsRights">
          <with
                variable="edu.ualberta.med.biobank.sourceprovider.hasPrinterLabelsRights">
@@ -2506,6 +2497,15 @@
                variable="edu.ualberta.med.biobank.sourceprovider.currentCenterType">
             <equals
                   value="ResearchGroup">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank.hasUserManagementRights">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.hasUserManagementRights">
+            <equals
+                  value="true">
             </equals>
          </with>
       </definition>       

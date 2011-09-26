@@ -125,7 +125,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private void createStudySection() {
         Section section = createSection(Messages.SiteEntryForm_studies_title);
-        boolean superAdmin = SessionManager.getUser().isSuperAdministrator();
+        boolean superAdmin = SessionManager.getUser().isSuperAdmin();
         if (superAdmin) {
             addSectionToolbar(section, Messages.SiteEntryForm_studies_add,
                 new SelectionAdapter() {
@@ -138,7 +138,9 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         studiesTable = new StudyAddInfoTable(section, site, superAdmin);
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addClickListener(collectionDoubleClickListener);
-        studiesTable.createDefaultEditItem();
+        // TODO: the new style info table needs to support editing of items
+        // via the context menu
+        // studiesTable.createDefaultEditItem();
         studiesTable.addSelectionChangedListener(listener);
         section.setClient(studiesTable);
     }

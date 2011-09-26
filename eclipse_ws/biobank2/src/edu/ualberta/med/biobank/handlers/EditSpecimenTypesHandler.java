@@ -28,7 +28,8 @@ public class EditSpecimenTypesHandler extends AbstractHandler {
                 .openEditor(new FormInput(sessionAdapter),
                     SpecimenTypesViewForm.ID, false, 0);
         } catch (Exception e) {
-            throw new ExecutionException(Messages.EditSpecimenTypesHandler_handler_error_msg, e);
+            throw new ExecutionException(
+                Messages.EditSpecimenTypesHandler_handler_error_msg, e);
         }
 
         return null;
@@ -36,10 +37,10 @@ public class EditSpecimenTypesHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.getUser().isInSuperAdminMode()
+        return SessionManager.getInstance().getSession() != null
+            && SessionManager.getUser().isInSuperAdminMode()
             && (SessionManager.canCreate(SpecimenTypeWrapper.class)
                 || SessionManager.canUpdate(SpecimenTypeWrapper.class) || SessionManager
-                .canDelete(SpecimenTypeWrapper.class))
-            && SessionManager.getInstance().getSession() != null;
+                    .canDelete(SpecimenTypeWrapper.class));
     }
 }

@@ -136,6 +136,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         return deletedContacts;
     }
 
+    @Override
     public void reload() {
         selectedContacts = clinic.getContactCollection(false);
         if (selectedContacts == null) {
@@ -153,8 +154,8 @@ public class ContactEntryInfoTable extends ContactInfoTable {
             @Override
             public int compare(Object e1, Object e2) {
                 try {
-                    TableRowData i1 = getCollectionModelObject((ContactWrapper) e1);
-                    TableRowData i2 = getCollectionModelObject((ContactWrapper) e2);
+                    TableRowData i1 = getCollectionModelObject(e1);
+                    TableRowData i2 = getCollectionModelObject(e2);
                     return super.compare(i1.name, i2.name);
                 } catch (Exception e) {
                     return 0;

@@ -20,8 +20,6 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
-import edu.ualberta.med.biobank.common.security.Privilege;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
@@ -269,29 +267,9 @@ public class StudyWrapper extends StudyBaseWrapper {
         return getPatientCount(true) > 0;
     }
 
-    public static final String PATIENT_COUNT_HQL = "select count(patients) from "
-        + Study.class.getName()
-        + " as study inner join study."
-        + StudyPeer.PATIENT_COLLECTION.getName()
-        + " as patients where study."
-        + StudyPeer.ID.getName() + "= ?";
-
-    /**
-     * fast = true will execute a hql query. fast = false will call the
-     * getpatientCollection method
-     */
     public long getPatientCount(boolean fast) throws ApplicationException,
         BiobankException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_HQL,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        List<PatientWrapper> list = getPatientCollection(false);
-        if (list == null) {
-            return 0;
-        }
-        return list.size();
+        return getPropertyCount(StudyPeer.PATIENT_COLLECTION, fast);
     }
 
     @Override
@@ -368,30 +346,19 @@ public class StudyWrapper extends StudyBaseWrapper {
         + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.STUDY,
             StudyPeer.ID) + "=?";
 
-    public long getCollectionEventCount(boolean fast)
-        throws ApplicationException, BiobankException {
-        if (fast) {
-            HQLCriteria c = new HQLCriteria(COLLECTION_EVENT_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, c);
-        }
-        return getCollectionEventWrapper().size();
-    }
-
-    // WARNING: this runs very slow and generates a lot of network traffic
-    public List<CollectionEventWrapper> getCollectionEventWrapper() {
-        List<CollectionEventWrapper> cEvents = new ArrayList<CollectionEventWrapper>();
-        for (PatientWrapper p : getPatientCollection(false)) {
-            cEvents.addAll(p.getCollectionEventCollection(false));
-        }
-        return cEvents;
+    public long getCollectionEventCount() throws ApplicationException,
+        BiobankException {
+        HQLCriteria c = new HQLCriteria(COLLECTION_EVENT_COUNT_QRY,
+            Arrays.asList(new Object[] { getId() }));
+        return getCountResult(appService, c);
     }
 
     @Override
-    public boolean canUpdate(User user) {
-        return user.isInSuperAdminMode()
-            && user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass(),
-                getSecuritySpecificCenters());
+    // FIXME need to call super method ?
+    public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canUpdate(user, center, study)
+            && user.isInSuperAdminMode();
     }
 
     @Override

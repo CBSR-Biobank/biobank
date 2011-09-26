@@ -40,9 +40,9 @@ public class RequestHelper extends DbHelper {
     }
 
     public static RequestWrapper addRequest(StudyWrapper study,
-        boolean addToCreatedList, SpecimenWrapper... containers)
+        boolean addToCreatedList, SpecimenWrapper... specs)
         throws Exception {
-        RequestWrapper request = newRequest(study, containers);
+        RequestWrapper request = newRequest(study, specs);
         request.persist();
         request.reload();
         if (addToCreatedList) {

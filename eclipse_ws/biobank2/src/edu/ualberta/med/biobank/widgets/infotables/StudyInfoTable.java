@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
+public class StudyInfoTable extends InfoTableWidget {
 
     protected static class TableRowData {
         StudyWrapper study;
@@ -69,43 +69,19 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         };
     }
 
-    // @Override
-    // protected BgcTableSorter getTableSorter() {
-    // return new BgcTableSorter() {
-    //
-    // @Override
-    // public int compare(Viewer viewer, Object e1, Object e2) {
-    // TableRowData row1 = (TableRowData) e1;
-    // TableRowData row2 = (TableRowData) e2;
-    // int rc = 0;
-    //
-    // switch (propertyIndex) {
-    // case 0:
-    // rc = row1.name.compareTo(row2.name);
-    // break;
-    // case 1:
-    // rc = row1.nameShort.compareTo(row2.nameShort);
-    // break;
-    // }
-    // return rc;
-    // }
-    //
-    // };
-    // }
-
     @Override
-    public Object getCollectionModelObject(StudyWrapper study) throws Exception {
+    public Object getCollectionModelObject(Object study) throws Exception {
         TableRowData info = new TableRowData();
-        info.study = study;
-        info.name = study.getName();
-        info.nameShort = study.getNameShort();
-        info.status = study.getActivityStatus().getName();
+        info.study = (StudyWrapper) study;
+        info.name = info.study.getName();
+        info.nameShort = info.study.getNameShort();
+        info.status = info.study.getActivityStatus().getName();
         if (info.status == null) {
             info.status = ""; //$NON-NLS-1$
         }
-        info.patientCount = study.getPatientCount(true);
-        info.visitCount = study.getCollectionEventCount(true);
-        study.reload();
+        info.patientCount = info.study.getPatientCount(true);
+        info.visitCount = info.study.getCollectionEventCount();
+        info.study.reload();
         return info;
     }
 

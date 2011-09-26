@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.PatientBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.CollectionIsEmptyCheck;
@@ -85,16 +84,15 @@ public class PatientWrapper extends PatientBaseWrapper {
      * @throws Exception
      */
     public static PatientWrapper getPatient(
-        WritableApplicationService appService, String patientNumber, User user)
-        throws Exception {
+        WritableApplicationService appService, String patientNumber,
+        UserWrapper user) throws Exception {
         PatientWrapper patient = getPatient(appService, patientNumber);
         if (patient != null) {
             StudyWrapper study = patient.getStudy();
             List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>(
                 study.getSiteCollection(false));
             centers.addAll(study.getClinicCollection());
-            if (Collections.disjoint(centers,
-                user.getWorkingCenters(appService))) {
+            if (Collections.disjoint(centers, user.getWorkingCenters())) {
                 throw new ApplicationException(
                     "Patient "
                         + patientNumber
@@ -220,7 +218,7 @@ public class PatientWrapper extends PatientBaseWrapper {
                 .getCollectionEventCollection(false);
 
             if (!cevents.isEmpty()) {
-                patient2.removeFromCollectionEventCollection(cevents);
+
                 Set<CollectionEventWrapper> toAdd = new HashSet<CollectionEventWrapper>();
                 boolean merged = false;
                 for (CollectionEventWrapper p2event : cevents) {
@@ -296,19 +294,9 @@ public class PatientWrapper extends PatientBaseWrapper {
         }
     }
 
-    private static final String CEVENT_COUNT_QRY = "select count(cevent) from "
-        + CollectionEvent.class.getName() + " as cevent where cevent."
-        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
-        + "=?";
-
     public Long getCollectionEventCount(boolean fast)
         throws BiobankQueryResultSizeException, ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(CEVENT_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        return (long) getCollectionEventCollection(false).size();
+        return getPropertyCount(PatientPeer.COLLECTION_EVENT_COLLECTION, fast);
     }
 
     @Override
@@ -337,21 +325,23 @@ public class PatientWrapper extends PatientBaseWrapper {
      * return true if the user can delete this object
      */
     @Override
-    public boolean canDelete(User user) {
-        return super.canDelete(user)
-            && (getStudy() == null || (user.getCurrentWorkingCenter() != null && user
+    public boolean canDelete(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canDelete(user, center, study)
+            && (getStudy() == null || user.getCurrentWorkingCenter() == null || user
                 .getCurrentWorkingCenter().getStudyCollection()
-                .contains(getStudy())));
+                .contains(getStudy()));
     }
 
     /**
      * return true if the user can edit this object
      */
     @Override
-    public boolean canUpdate(User user) {
-        return super.canUpdate(user)
-            && (getStudy() == null || (user.getCurrentWorkingCenter() != null && user
+    public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canUpdate(user, center, study)
+            && (getStudy() == null || user.getCurrentWorkingCenter() == null || user
                 .getCurrentWorkingCenter().getStudyCollection()
-                .contains(getStudy())));
+                .contains(getStudy()));
     }
 }

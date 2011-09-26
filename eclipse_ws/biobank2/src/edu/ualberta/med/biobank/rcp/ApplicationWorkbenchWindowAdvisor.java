@@ -22,8 +22,8 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcSessionState;
@@ -166,7 +166,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         mainWindowUpdateTitle(null);
     }
 
-    private void mainWindowUpdateTitle(User user) {
+    private void mainWindowUpdateTitle(UserWrapper user) {
         if (user == null) {
             this.currentCenterText = null;
         } else {

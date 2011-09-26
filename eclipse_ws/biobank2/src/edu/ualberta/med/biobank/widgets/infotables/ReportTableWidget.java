@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.PaginationWidget;
 
-public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
+public class ReportTableWidget<T> extends InfoTableBgrLoader {
 
     private static BgcLogger logger = BgcLogger
         .getLogger(ReportTableWidget.class.getName());
@@ -35,16 +35,18 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
     }
 
     @Override
-    protected void setPaginationParams(List<T> collection) {
-        int rowsPerPage = paginationWidget.getRowsPerPage();
-        if (collection != null
-            && (collection.size() == -1 || collection.size() > rowsPerPage)) {
-            if (collection.get(rowsPerPage) != null) {
+    protected void setPaginationParams(List<?> collection) {
+        if (collection != null) {
+            int rowsPerPage = paginationWidget.getRowsPerPage();
+            int size = collection.size();
+            if (((size == -1) || (size > rowsPerPage))
+                && (collection.get(rowsPerPage) != null)) {
                 paginationRequired = true;
                 init(collection);
             }
-        } else
+        } else {
             paginationRequired = false;
+        }
     }
 
     @Override
@@ -77,7 +79,7 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
     }
 
     @Override
-    public void tableLoader(final List<T> collection, final T selection) {
+    public void tableLoader(final List<?> collection, final Object selection) {
         final TableViewer viewer = getTableViewer();
         final Table table = viewer.getTable();
         Display display = viewer.getTable().getDisplay();
@@ -90,7 +92,7 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
             start = 0;
             end = rowsPerPage;
         }
-        final Collection<T> collSubList;
+        final Collection<?> collSubList;
 
         // if we are not dealing with a biobanklistproxy we need to
         // check for bounds
@@ -117,7 +119,7 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
 
         try {
             Object selItem = null;
-            Iterator<T> it = collSubList.iterator();
+            Iterator<?> it = collSubList.iterator();
             for (int i = start; i < end && it.hasNext(); ++i) {
                 if (table.isDisposed())
                     return;
@@ -163,7 +165,7 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
     }
 
     @Override
-    protected void init(List<T> collection) {
+    protected void init(List<?> collection) {
         if (paginationWidget.getTotalPages() == PaginationWidget.TOTAL_PAGES_UNKNOWN) {
             int size;
             if (collection instanceof AbstractBiobankListProxy) {

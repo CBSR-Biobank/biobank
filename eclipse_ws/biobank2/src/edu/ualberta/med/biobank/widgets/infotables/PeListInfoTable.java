@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
-public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
+public class PeListInfoTable extends InfoTableWidget {
 
     private static final int PAGE_SIZE_ROWS = 24;
 
@@ -68,20 +68,19 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
     }
 
     @Override
-    public TableRowData getCollectionModelObject(ProcessingEventWrapper pEvent)
-        throws Exception {
+    public TableRowData getCollectionModelObject(Object o) throws Exception {
         TableRowData info = new TableRowData();
-        info.pe = pEvent;
-        info.startDate = pEvent.getFormattedCreatedAt();
-        StudyWrapper study = pEvent.getSpecimenCollection(false).get(0)
+        info.pe = (ProcessingEventWrapper) o;
+        info.startDate = info.pe.getFormattedCreatedAt();
+        StudyWrapper study = info.pe.getSpecimenCollection(false).get(0)
             .getCollectionEvent().getPatient().getStudy();
         if (study != null) {
             info.studyNameShort = study.getNameShort();
         } else {
             info.studyNameShort = ""; //$NON-NLS-1$
         }
-        info.numSVs = pEvent.getSpecimenCount(false);
-        info.numAliquots = pEvent.getChildSpecimenCount();
+        info.numSVs = info.pe.getSpecimenCount(false);
+        info.numAliquots = info.pe.getChildSpecimenCount();
         return info;
     }
 

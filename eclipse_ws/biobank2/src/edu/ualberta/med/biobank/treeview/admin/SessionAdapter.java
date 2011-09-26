@@ -15,10 +15,10 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -39,12 +39,12 @@ public class SessionAdapter extends AdapterBase {
 
     private BiobankApplicationService appService;
 
-    private User user;
+    private UserWrapper user;
     private String serverName;
 
     public SessionAdapter(AdapterBase parent,
         BiobankApplicationService appService, int sessionId, String serverName,
-        User user) {
+        UserWrapper user) {
         super(parent, null, false);
         this.appService = appService;
         setId(sessionId);
@@ -160,7 +160,7 @@ public class SessionAdapter extends AdapterBase {
         });
     }
 
-    public User getUser() {
+    public UserWrapper getUser() {
         return user;
     }
 
