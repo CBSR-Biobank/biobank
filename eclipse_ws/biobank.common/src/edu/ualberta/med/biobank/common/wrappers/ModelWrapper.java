@@ -331,7 +331,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         firePropertyChanges(oldWrappedObject, wrappedObject);
     }
 
-    private static final String PROPERTY_COUNT_HQL = "SELECT COUNT(DISTINCT m.{0}) FROM {1} m WHERE m.id = ?";
+    private static final String PROPERTY_COUNT_HQL = "SELECT m.{0}.size FROM {1} m WHERE m.id = ?";
 
     protected final <T> Long getPropertyCount(
         Property<Collection<T>, ? super E> property, boolean fast)
@@ -402,11 +402,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     public static Long getCountResult(WritableApplicationService appService,
         HQLCriteria criteria) throws BiobankQueryResultSizeException,
         ApplicationException {
-        List<Long> results = appService.query(criteria);
+        List<Number> results = appService.query(criteria);
         if (results.size() != 1) {
             throw new BiobankQueryResultSizeException();
         }
-        return results.get(0);
+        return new Long(results.get(0).longValue());
     }
 
     /**
@@ -865,7 +865,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             }
         }
 
-        return Hibernate.isPropertyInitialized(model, property.getName());
+        return Hibernate.isPropertyInitialized(model, property.getName())
+            && Hibernate.isInitialized(property.get(model));
     }
 
     private <T, M, R> void setModelProperty(ModelWrapper<M> modelWrapper,
