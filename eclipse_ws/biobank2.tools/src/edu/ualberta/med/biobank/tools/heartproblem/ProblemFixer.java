@@ -157,8 +157,8 @@ public class ProblemFixer {
                         LOGGER.info("creating patient " + pnumber);
                         patient = new PatientWrapper(appService);
                         patient.setPnumber(pnumber);
-                        patient
-                            .setCreatedAt(ceventOnTraining.getPatient().getCreatedAt());
+                        patient.setCreatedAt(ceventOnTraining.getPatient()
+                            .getCreatedAt());
                         patient.setStudy(heartStudy);
                         patient.persist();
                         patient.reload();
@@ -172,9 +172,12 @@ public class ProblemFixer {
                     ceventOnProduction.setPatient(patient);
                     ceventOnProduction.setVisitNumber(PatientWrapper
                         .getNextVisitNumber(appService, patient));
-                    ceventOnProduction.setComment(ceventOnTraining.getComment());
-                    ceventOnProduction.setEventAttrValue(heartEventAttrLabel,
-                        ceventOnTraining.getEventAttrValue(heartEventAttrLabel));
+                    ceventOnProduction
+                        .setComment(ceventOnTraining.getComment());
+                    ceventOnProduction
+                        .setEventAttrValue(heartEventAttrLabel,
+                            ceventOnTraining
+                                .getEventAttrValue(heartEventAttrLabel));
                     ceventOnProduction.setActivityStatus(ActivityStatusWrapper
                         .getActivityStatus(appService, ceventOnTraining
                             .getActivityStatus().getName()));
@@ -213,6 +216,8 @@ public class ProblemFixer {
             spcOnProduction.setCreatedAt(spcOnTraining.getCreatedAt());
             spcOnProduction.setCollectionEvent(ceventOnProduction);
             spcOnProduction.setOriginalCollectionEvent(ceventOnProduction);
+            // TODO just to be sure, check that the spcOnTraining current center
+            // is calgary
             spcOnProduction.setCurrentCenter(calgarySiteOnProduction);
             spcOnProduction.setActivityStatus(ActivityStatusWrapper
                 .getActivityStatus(appService, spcOnTraining
@@ -248,6 +253,8 @@ public class ProblemFixer {
                 peventOnProduction
                     .setCreatedAt(peventOnTraining.getCreatedAt());
                 peventOnProduction.setComment(peventOnTraining.getComment());
+                // TODO just to be sure, check that the peventOnTraining center
+                // is calgary
                 peventOnProduction.setCenter(calgarySiteOnProduction);
                 peventOnProduction.setActivityStatus(ActivityStatusWrapper
                     .getActivityStatus(appService, peventOnTraining
@@ -276,6 +283,9 @@ public class ProblemFixer {
                 spcOnProduction.persist();
                 spcOnProduction.reload();
             }
+            // TODO throw an exception if getProcessingEvent is not null
+
+            // TODO throw an exception if position or has dispatch ?
 
             for (SpecimenWrapper childSpcOnTraining : spcOnTraining
                 .getChildSpecimenCollection(false)) {
@@ -293,6 +303,8 @@ public class ProblemFixer {
             LOGGER.info("  aliquoted specimen exists: inventory_id/"
                 + spcOnTraining.getInventoryId() + " created_at/"
                 + spcOnTraining.getCreatedAt());
+            // TODO check the existing specimen has parentSpc as a parent and
+            // ceventOnProduction as a cEvent
             return;
         }
 
@@ -308,8 +320,11 @@ public class ProblemFixer {
         spcOnProduction.setQuantity(spcOnTraining.getQuantity());
         spcOnProduction.setCreatedAt(spcOnTraining.getCreatedAt());
         spcOnProduction.setCollectionEvent(ceventOnProduction);
+        // TODO processing event should not be set
         spcOnProduction.setProcessingEvent(peventOnProduction);
         spcOnProduction.setCollectionEvent(ceventOnProduction);
+        // TODO just to be sure, check that the spcOnTraining current center is
+        // calgary
         spcOnProduction.setCurrentCenter(calgarySiteOnProduction);
         spcOnProduction.setParentSpecimen(parentSpc);
         spcOnProduction.setActivityStatus(ActivityStatusWrapper
