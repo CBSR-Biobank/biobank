@@ -54,10 +54,14 @@ Export-Package: antlr;
    edu.ualberta.med.biobank.server.applicationservice,
    gov.nih.nci.system.applicationservice,
    edu.ualberta.med.biobank.common.wrappers",
+ edu.ualberta.med.biobank.common.action,
+ edu.ualberta.med.biobank.common.action.site,
+ edu.ualberta.med.biobank.common.action.util,
  edu.ualberta.med.biobank.common.debug;uses:="gov.nih.nci.system.applicationservice",
  edu.ualberta.med.biobank.common.exception,
  edu.ualberta.med.biobank.common.formatters,
  edu.ualberta.med.biobank.common.peer,
+ edu.ualberta.med.biobank.common.permission,
  edu.ualberta.med.biobank.common.reports,
  edu.ualberta.med.biobank.common.reports.filters,
  edu.ualberta.med.biobank.common.scanprocess,
@@ -72,9 +76,9 @@ Export-Package: antlr;
    gov.nih.nci.system.applicationservice,
    edu.ualberta.med.biobank.common.wrappers.listener",
  edu.ualberta.med.biobank.common.wrappers.base,
+ edu.ualberta.med.biobank.common.wrappers.helpers,
  edu.ualberta.med.biobank.common.wrappers.listener,
  edu.ualberta.med.biobank.common.wrappers.util,
- edu.ualberta.med.biobank.common.wrappers.helpers,
  edu.ualberta.med.biobank.model,
  edu.ualberta.med.biobank.server.applicationservice;uses:="edu.ualberta.med.biobank.server.query,gov.nih.nci.system.applicationservice",
  edu.ualberta.med.biobank.server.applicationservice.exceptions,
@@ -119,5 +123,6 @@ Export-Package: antlr;
  org.apache.log4j.spi;uses:="org.apache.log4j,org.apache.log4j.or",
  org.springframework.remoting;uses:="org.springframework.core"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: edu.ualberta.med.biobank.model
+Import-Package: edu.ualberta.med.biobank.common,
+ edu.ualberta.med.biobank.model
 

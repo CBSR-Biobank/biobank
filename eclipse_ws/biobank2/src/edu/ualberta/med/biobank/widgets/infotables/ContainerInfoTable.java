@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -13,8 +15,8 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
@@ -46,10 +48,9 @@ public class ContainerInfoTable extends InfoTableWidget {
 
     private SiteAdapter siteAdapter;
 
-    public ContainerInfoTable(Composite parent, SiteAdapter site)
-        throws Exception {
-        super(parent, ((SiteWrapper) site.getModelObject())
-            .getTopContainerCollection(), HEADINGS, 10, ContainerWrapper.class);
+    public ContainerInfoTable(Composite parent, SiteAdapter site,
+        List<Container> containers) {
+        super(parent, containers, HEADINGS, 10, ContainerWrapper.class);
         siteAdapter = site;
     }
 
@@ -87,7 +88,10 @@ public class ContainerInfoTable extends InfoTableWidget {
     public Object getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
 
-        info.container = (ContainerWrapper) obj;
+        Container container = (Container) obj;
+
+        info.container = new ContainerWrapper(siteAdapter.getAppService(),
+            container);
         info.label = info.container.getLabel();
         ContainerTypeWrapper type = info.container.getContainerType();
         if (type != null) {

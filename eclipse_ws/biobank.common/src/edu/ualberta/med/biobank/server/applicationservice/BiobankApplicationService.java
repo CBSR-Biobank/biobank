@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
@@ -74,4 +76,7 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public boolean isUserLockedOut(Long csmUserId) throws ApplicationException;
 
+    public <T> T doAction(Action<T> action) throws ApplicationException;
+
+    public boolean isAllowed(Permission permission) throws ApplicationException;
 }
