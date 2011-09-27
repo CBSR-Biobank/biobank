@@ -193,6 +193,23 @@ public class ProblemFixer {
 
                 for (SpecimenWrapper spc : ceventOnTraining
                     .getOriginalSpecimenCollection(false)) {
+                    if (!spc.getCurrentCenter().getNameShort()
+                        .equals("Calgary-F")) {
+                        throw new Exception("invalid center for specimen: "
+                            + spc.getCurrentCenter().getNameShort());
+                    }
+
+                    if (spc.getSpecimenPosition() != null) {
+                        throw new Exception("specimen already has a position: "
+                            + spc.getInventoryId());
+                    }
+
+                    if (!spc.getDispatchSpecimenCollection().isEmpty()) {
+                        throw new Exception(
+                            "specimen has dispatch information: "
+                                + spc.getInventoryId());
+                    }
+
                     processSourceSpecimen(spc, ceventOnProduction);
                 }
             }
@@ -202,9 +219,10 @@ public class ProblemFixer {
     private void processSourceSpecimen(SpecimenWrapper spcOnTraining,
         CollectionEventWrapper ceventOnProduction) throws Exception {
         // ensure specimen is not present on production server
-        SpecimenWrapper spcOnProduction = null;
+        SpecimenWrapper spcOnProduction = SpecimenWrapper.getSpecimen(
+            appService, spcOnTraining.getInventoryId());
 
-        if (!specimenExists(appService, spcOnTraining.getInventoryId())) {
+        if (spcOnProduction == null) {
             OriginInfoWrapper oi = new OriginInfoWrapper(appService);
             oi.setCenter(calgarySiteOnProduction);
             oi.persist();
@@ -216,8 +234,6 @@ public class ProblemFixer {
             spcOnProduction.setCreatedAt(spcOnTraining.getCreatedAt());
             spcOnProduction.setCollectionEvent(ceventOnProduction);
             spcOnProduction.setOriginalCollectionEvent(ceventOnProduction);
-            // TODO just to be sure, check that the spcOnTraining current center
-            // is calgary
             spcOnProduction.setCurrentCenter(calgarySiteOnProduction);
             spcOnProduction.setActivityStatus(ActivityStatusWrapper
                 .getActivityStatus(appService, spcOnTraining
@@ -232,14 +248,20 @@ public class ProblemFixer {
                 + spcOnTraining.getInventoryId() + " created_at/"
                 + spcOnTraining.getCreatedAt());
         } else {
-            spcOnProduction = SpecimenWrapper.getSpecimen(appService,
-                spcOnTraining.getInventoryId());
+            LOGGER.info("  source specimen exists: inventory_id/"
+                + spcOnTraining.getInventoryId() + " created_at/"
+                + spcOnTraining.getCreatedAt());
         }
 
         ProcessingEventWrapper peventOnTraining = spcOnTraining
             .getProcessingEvent();
 
         if (peventOnTraining != null) {
+            if (!peventOnTraining.getCenter().getNameShort()
+                .equals("Calgary-F")) {
+                throw new Exception("invalid center for processing event: "
+                    + peventOnTraining.getCenter().getNameShort());
+            }
 
             ProcessingEventWrapper peventOnProduction;
             List<ProcessingEventWrapper> peventsOnProduction = ProcessingEventWrapper
@@ -253,8 +275,6 @@ public class ProblemFixer {
                 peventOnProduction
                     .setCreatedAt(peventOnTraining.getCreatedAt());
                 peventOnProduction.setComment(peventOnTraining.getComment());
-                // TODO just to be sure, check that the peventOnTraining center
-                // is calgary
                 peventOnProduction.setCenter(calgarySiteOnProduction);
                 peventOnProduction.setActivityStatus(ActivityStatusWrapper
                     .getActivityStatus(appService, peventOnTraining
@@ -282,33 +302,50 @@ public class ProblemFixer {
                 spcOnProduction.setProcessingEvent(peventOnProduction);
                 spcOnProduction.persist();
                 spcOnProduction.reload();
+            } else if (!spcOnProduction.getProcessingEvent().getCreatedAt()
+                .equals(peventOnTraining.getCreatedAt())) {
+                throw new Exception("specimen has an invalid processing event"
+                    + spcOnProduction.getProcessingEvent().getCreatedAt());
             }
-            // TODO throw an exception if getProcessingEvent is not null
-
-            // TODO throw an exception if position or has dispatch ?
 
             for (SpecimenWrapper childSpcOnTraining : spcOnTraining
                 .getChildSpecimenCollection(false)) {
+                if (!childSpcOnTraining.getCurrentCenter().getNameShort()
+                    .equals("Calgary-F")) {
+                    throw new Exception("invalid center for specimen: "
+                        + childSpcOnTraining.getCurrentCenter().getNameShort());
+                }
+
                 processAliquotedSpecimen(childSpcOnTraining, spcOnProduction,
-                    ceventOnProduction, peventOnProduction);
+                    ceventOnProduction);
             }
         }
     }
 
     private void processAliquotedSpecimen(SpecimenWrapper spcOnTraining,
-        SpecimenWrapper parentSpc, CollectionEventWrapper ceventOnProduction,
-        ProcessingEventWrapper peventOnProduction) throws Exception {
+        SpecimenWrapper parentSpc, CollectionEventWrapper ceventOnProduction)
+        throws Exception {
+        SpecimenWrapper spcOnProduction = SpecimenWrapper.getSpecimen(
+            appService, spcOnTraining.getInventoryId());
 
-        if (specimenExists(appService, spcOnTraining.getInventoryId())) {
+        if (spcOnProduction != null) {
+            if (!spcOnProduction.getParentSpecimen().getInventoryId()
+                .equals(parentSpc.getInventoryId())) {
+                throw new Exception("parent specimen mismatch: "
+                    + spcOnProduction.getInventoryId());
+            }
+
+            if (!spcOnProduction.getCollectionEvent().getVisitNumber()
+                .equals(ceventOnProduction.getVisitNumber())) {
+                throw new Exception("parent specimen cevent mismatch: "
+                    + spcOnProduction.getInventoryId());
+            }
+
             LOGGER.info("  aliquoted specimen exists: inventory_id/"
                 + spcOnTraining.getInventoryId() + " created_at/"
                 + spcOnTraining.getCreatedAt());
-            // TODO check the existing specimen has parentSpc as a parent and
-            // ceventOnProduction as a cEvent
             return;
         }
-
-        SpecimenWrapper spcOnProduction = null;
 
         OriginInfoWrapper oi = new OriginInfoWrapper(appService);
         oi.setCenter(calgarySiteOnProduction);
@@ -320,8 +357,6 @@ public class ProblemFixer {
         spcOnProduction.setQuantity(spcOnTraining.getQuantity());
         spcOnProduction.setCreatedAt(spcOnTraining.getCreatedAt());
         spcOnProduction.setCollectionEvent(ceventOnProduction);
-        // TODO processing event should not be set
-        spcOnProduction.setProcessingEvent(peventOnProduction);
         spcOnProduction.setCollectionEvent(ceventOnProduction);
         // TODO just to be sure, check that the spcOnTraining current center is
         // calgary
@@ -362,22 +397,6 @@ public class ProblemFixer {
         }
         return CollectionEventWrapper.wrapModel(appService, rawList.get(0),
             CollectionEventWrapper.class);
-    }
-
-    public static final String SPECIMEN_HQL_QUERY = "select count(spc)"
-        + " from edu.ualberta.med.biobank.model.Specimen spc"
-        + " where spc.inventoryId=?";
-
-    private boolean specimenExists(BiobankApplicationService appService,
-        String inventoryId) throws Exception {
-        HQLCriteria c = new HQLCriteria(SPECIMEN_HQL_QUERY,
-            Arrays.asList(new Object[] { inventoryId }));
-        Long result = SpecimenWrapper.getCountResult(appService, c);
-        if (result > 1) {
-            throw new Exception("invalid count for specimen inv id "
-                + inventoryId);
-        }
-        return (result == 1);
     }
 
     /*
