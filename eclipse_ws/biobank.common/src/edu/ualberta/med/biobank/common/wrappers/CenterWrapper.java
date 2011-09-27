@@ -27,13 +27,13 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class CenterWrapper<E extends Center> extends
     CenterBaseWrapper<E> {
-    private static final String RECEIVING_WITH_ERRORS_DISPATCH_COLLECTION_CACHE_KEY = "receivingWithErrorsDispatchCollection";
-    private static final String RECEIVING_DISPATCH_COLLECTION_CACHE_KEY = "receivingDispatchCollection";
-    private static final String IN_TRANSIT_RECEIVE_DISPATCH_COLLECTION_CACHE_KEY = "inTransitReceiveDispatchCollection";
-    private static final String IN_CREATION_DISPATCH_COLLECTION_CACHE_KEY = "inCreationDispatchCollection";
-    private static final String IN_TRANSIT_SENT_DISPATCH_COLLECTION_CACHE_KEY = "inTransitSentDispatchCollection";
+    private static final String RECEIVING_WITH_ERRORS_DISPATCH_COLLECTION_CACHE_KEY = "receivingWithErrorsDispatchCollection"; //$NON-NLS-1$
+    private static final String RECEIVING_DISPATCH_COLLECTION_CACHE_KEY = "receivingDispatchCollection"; //$NON-NLS-1$
+    private static final String IN_TRANSIT_RECEIVE_DISPATCH_COLLECTION_CACHE_KEY = "inTransitReceiveDispatchCollection"; //$NON-NLS-1$
+    private static final String IN_CREATION_DISPATCH_COLLECTION_CACHE_KEY = "inCreationDispatchCollection"; //$NON-NLS-1$
+    private static final String IN_TRANSIT_SENT_DISPATCH_COLLECTION_CACHE_KEY = "inTransitSentDispatchCollection"; //$NON-NLS-1$
 
-    private static final String ALL_CENTERS_HQL_STRING = "from "
+    private static final String ALL_CENTERS_HQL_STRING = "from " //$NON-NLS-1$
         + Center.class.getName();
 
     public CenterWrapper(WritableApplicationService appService) {
@@ -321,6 +321,7 @@ public abstract class CenterWrapper<E extends Center> extends
         return center.getInTransitSentDispatchCollection();
     }
 
+    @SuppressWarnings("nls")
     private static final String CHILD_SPECIMENS_COUNT_QRY = "select count(childSpcs) from "
         + Specimen.class.getName()
         + " sp join sp."
@@ -335,6 +336,7 @@ public abstract class CenterWrapper<E extends Center> extends
         return getCountResult(appService, criteria);
     }
 
+    @SuppressWarnings("nls")
     public static final String COLLECTION_EVENT_COUNT_QRY = "select count(distinct cevent) from "
         + Specimen.class.getName()
         + " as spc join spc."
@@ -359,6 +361,7 @@ public abstract class CenterWrapper<E extends Center> extends
         return Arrays.asList(this);
     }
 
+    @SuppressWarnings("nls")
     public static final String CENTER_FROM_ID_QRY = "from "
         + Center.class.getName() + " where " + CenterPeer.ID.getName() + " = ?";
 
@@ -422,6 +425,7 @@ public abstract class CenterWrapper<E extends Center> extends
     // ProcessingEventWrapper.class, sort);
     // }
 
+    @SuppressWarnings("nls")
     private static final String PENDING_REQUEST_STRING = "select distinct(ra."
         + RequestSpecimenPeer.REQUEST.getName()
         + ") from "

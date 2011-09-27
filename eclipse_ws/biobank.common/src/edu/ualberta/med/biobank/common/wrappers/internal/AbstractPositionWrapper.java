@@ -31,14 +31,14 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     @Deprecated
     public void setRow(Integer row) {
         throw new UnsupportedOperationException(
-            "Use setPosition() instead of setRow().");
+            "Use setPosition() instead of setRow()."); //$NON-NLS-1$
     }
 
     @Override
     @Deprecated
     public void setCol(Integer col) {
         throw new UnsupportedOperationException(
-            "Use setPosition() instead of setCol().");
+            "Use setPosition() instead of setCol()."); //$NON-NLS-1$
     }
 
     public RowColPos getPosition() {
@@ -51,7 +51,7 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     private void setPosition(RowColPos newPosition) {
         if (newPosition == null) {
             throw new IllegalArgumentException(
-                "Position cannot be set to null.");
+                "Position cannot be set to null."); //$NON-NLS-1$
         }
 
         RowColPos oldPosition = getPosition();
@@ -71,7 +71,7 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     public void setParent(ContainerWrapper parent, RowColPos position) {
         if (parent == null) {
             throw new IllegalArgumentException(
-                "Parent container cannot be set null.");
+                "Parent container cannot be set null."); //$NON-NLS-1$
         }
         setParent(parent);
         setPosition(position);

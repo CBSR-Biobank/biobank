@@ -14,6 +14,7 @@ public class PnumberProb {
 
     private static String USAGE = "Usage: pnumberprob PNUMBER1 PNUMBER2 ... PNUMBERn";
 
+    @SuppressWarnings("unused")
     private boolean verbose = false;
 
     private static Map<String, Double> pnumberProbMap;

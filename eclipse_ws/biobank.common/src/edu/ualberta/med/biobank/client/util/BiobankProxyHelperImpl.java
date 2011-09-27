@@ -63,7 +63,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "nls" })
     private Object convertToObject(Map<Object, Object> map, Object proxyObject)
         throws Exception {
         if (isPrimitiveObject(proxyObject) || proxyObject instanceof Class
@@ -79,7 +79,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
         map.put(plainObject, plainObject);
         Method[] methods = plainObject.getClass().getMethods();
         for (Method method : methods) {
-            if (method.getName().startsWith("get") //$NON-NLS-1$
+            if (method.getName().startsWith("get")
                 && method.getParameterTypes().length == 0) {
                 Object childObject = method.invoke(plainObject);
                 if (!(childObject == null || isPrimitiveObject(childObject) || childObject instanceof Class)
@@ -95,26 +95,26 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                                 String cglibClassName = objectProxy
                                     .getListChunk().get(0).getClass().getName();
                                 int startindex = cglibClassName
-                                    .indexOf("$$EnhancerByCGLIB"); //$NON-NLS-1$
+                                    .indexOf("$$EnhancerByCGLIB");
                                 associationName = cglibClassName.substring(0,
                                     startindex);
                             }
                             String className = objectProxy.getTargetClassName();
                             throw new Exception(
-                                "update or delete elements for the association " //$NON-NLS-1$
+                                "update or delete elements for the association "
                                     + associationName
-                                    + " is not allowed.association " //$NON-NLS-1$
+                                    + " is not allowed.association "
                                     + associationName
-                                    + " for Class " //$NON-NLS-1$
+                                    + " for Class "
                                     + className
-                                    + " is not fully initialized. Total size of assocation in database " //$NON-NLS-1$
-                                    + associationSize + " retrieved size is " //$NON-NLS-1$
-                                    + objectProxy.getListChunk().size() + "."); //$NON-NLS-1$
+                                    + " is not fully initialized. Total size of assocation in database "
+                                    + associationSize + " retrieved size is "
+                                    + objectProxy.getListChunk().size() + ".");
                         }
                     }
-                    log.debug("invoking " + method.getName() + " on class " //$NON-NLS-1$ //$NON-NLS-2$
+                    log.debug("invoking " + method.getName() + " on class "
                         + plainObject.getClass());
-                    String setterMethodName = "set" //$NON-NLS-1$
+                    String setterMethodName = "set"
                         + method.getName().substring(3);
                     if (childObject instanceof List
                         && !(childObject instanceof Set)) {
