@@ -52,12 +52,12 @@ public class PermissionCheckTreeWidget extends Composite {
         }
 
         Label filterLabel = new Label(this, SWT.NONE);
-        filterLabel.setText("Show rights for:");
+        filterLabel.setText(Messages.PermissionCheckTreeWidget_show_label);
         final Combo comboShowRights = new Combo(this, SWT.READ_ONLY);
-        comboShowRights.add("All centers");
-        comboShowRights.add("Sites only");
-        comboShowRights.add("Clinics only");
-        comboShowRights.add("Research Groups only");
+        comboShowRights.add(Messages.PermissionCheckTreeWidget_allcenters_label);
+        comboShowRights.add(Messages.PermissionCheckTreeWidget_sites_label);
+        comboShowRights.add(Messages.PermissionCheckTreeWidget_clinics_label);
+        comboShowRights.add(Messages.PermissionCheckTreeWidget_rgs_labels);
         comboShowRights.select(0);
         comboShowRights.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true,
             false));
