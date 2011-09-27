@@ -218,10 +218,10 @@ public class UserWrapper extends UserBaseWrapper {
      * This method should be called by the user itself. If another user is
      * connected to the server, the method will fail
      */
-    public void modifyPassword(String oldPassword, String newPassword)
-        throws Exception {
+    public void modifyPassword(String oldPassword, String newPassword,
+        Boolean bulkEmails) throws Exception {
         ((BiobankApplicationService) appService).executeModifyPassword(
-            getCsmUserId(), oldPassword, newPassword);
+            getCsmUserId(), oldPassword, newPassword, bulkEmails);
     }
 
     /**

@@ -41,7 +41,7 @@ public interface BiobankApplicationService extends WritableApplicationService {
      * csmUserId will help to check this method is called by the user itself.
      */
     public void executeModifyPassword(Long csmUserId, String oldPassword,
-        String newPassword) throws ApplicationException;
+        String newPassword, Boolean bulkEmails) throws ApplicationException;
 
     public void unlockUser(String userNameToUnlock) throws ApplicationException;
 
