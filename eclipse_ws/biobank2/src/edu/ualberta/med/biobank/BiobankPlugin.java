@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
@@ -207,6 +208,11 @@ public class BiobankPlugin extends AbstractUIPlugin {
 
     public int getPlateNumber(String barcode) {
         return ScannerConfigPlugin.getDefault().getPlateNumber(barcode,
+            isRealScanEnabled());
+    }
+
+    public List<String> getPossibleBarcodes() {
+        return ScannerConfigPlugin.getDefault().getPossibleBarcodes(
             isRealScanEnabled());
     }
 

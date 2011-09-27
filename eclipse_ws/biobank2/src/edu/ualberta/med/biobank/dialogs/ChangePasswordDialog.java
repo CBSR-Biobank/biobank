@@ -6,6 +6,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -27,6 +28,8 @@ public class ChangePasswordDialog extends BgcBaseDialog {
     private Text oldPassText;
     private Text newPass1Text;
     private Text newPass2Text;
+
+    private Button checkBulk;
 
     public ChangePasswordDialog(Shell parentShell) {
         super(parentShell);
@@ -97,6 +100,13 @@ public class ChangePasswordDialog extends BgcBaseDialog {
                 }
             }
         });
+
+        if (forceChange) {
+            // will ask about bulk email on the same time
+            checkBulk = new Button(contents, SWT.CHECK);
+            checkBulk.setText("I want to receive emails about new versions");
+            checkBulk.setSelection(SessionManager.getUser().getBulkEmails());
+        }
     }
 
     private Text createPassWordText(Composite parent, String labelText) {
@@ -126,17 +136,18 @@ public class ChangePasswordDialog extends BgcBaseDialog {
 
     @Override
     protected void okPressed() {
-        if ((this.newPass1Text.getText().length() < MIN_PASSWORD_LENGTH)) {
+        if ((newPass1Text.getText().length() < MIN_PASSWORD_LENGTH)) {
             newPass1Text.notifyListeners(SWT.Modify, new Event());
             return;
         }
-        if (!this.newPass1Text.getText().equals(this.newPass2Text.getText())) {
+        if (!newPass1Text.getText().equals(this.newPass2Text.getText())) {
             newPass2Text.notifyListeners(SWT.Modify, new Event());
             return;
         }
         try {
-            SessionManager.getUser().modifyPassword(this.oldPassText.getText(),
-                this.newPass2Text.getText());
+            SessionManager.getUser().modifyPassword(oldPassText.getText(),
+                newPass2Text.getText(),
+                checkBulk == null ? null : checkBulk.getSelection());
 
             SessionManager.getInstance().getSession().resetAppService();
             BgcPlugin.openInformation(

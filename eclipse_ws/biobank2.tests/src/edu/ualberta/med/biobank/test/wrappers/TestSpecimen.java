@@ -717,8 +717,8 @@ public class TestSpecimen extends TestDatabase {
 
         // make sure spc now belongs to destSite
         destSite.reload();
-        Assert.assertTrue(destSite.getSpecimenCollection(false).contains(
-            childSpc));
+        childSpc.reload();
+        Assert.assertEquals(destSite, childSpc.getCurrentCenter());
 
         // dispatch specimen to second site
         SiteWrapper destSite2 = SiteHelper.addSite(name + "_2");
@@ -752,8 +752,8 @@ public class TestSpecimen extends TestDatabase {
 
         // make sure spc still belongs to destSite
         destSite2.reload();
-        Assert.assertTrue(destSite.getSpecimenCollection(false).contains(
-            childSpc));
+        childSpc.reload();
+        Assert.assertEquals(destSite2, childSpc.getCurrentCenter());
 
         childSpc.reload();
         specimenDispatches = childSpc.getDispatches();

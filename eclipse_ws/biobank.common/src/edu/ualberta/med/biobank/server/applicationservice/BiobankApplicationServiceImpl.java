@@ -154,7 +154,7 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public void executeModifyPassword(Long csmUserId, String oldPassword,
-        String newPassword) throws ApplicationException {
+        String newPassword, Boolean bulkEmails) throws ApplicationException {
         BiobankCSMSecurityUtil.modifyPassword(csmUserId, oldPassword,
             newPassword);
         List<User> users = query(new HQLCriteria(GET_USER_QRY,
@@ -164,6 +164,8 @@ public class BiobankApplicationServiceImpl extends
         }
         User user = users.get(0);
         user.setNeedChangePwd(false);
+        if (bulkEmails != null)
+            user.setBulkEmails(bulkEmails);
         executeQuery(new UpdateExampleQuery(user));
     }
 

@@ -336,13 +336,12 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     public static final String COLLECTION_EVENT_COUNT_QRY = "select count(distinct cevent) from "
-        + Center.class.getName()
-        + " as c join c."
-        + CenterPeer.SPECIMEN_COLLECTION.getName()
-        + " as spcs join spcs."
+        + Specimen.class.getName()
+        + " as spc join spc."
         + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cevent where c."
-        + CenterPeer.ID.getName() + "=?";
+        + " as cevent where spc."
+        + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
+        + "=?";
 
     /**
      * Count events for specimen that are currently at this site

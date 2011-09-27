@@ -2,10 +2,12 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.NoRightForKeyDescException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.actions.DeleteCsmUserAction;
@@ -21,6 +23,8 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class UserWrapper extends UserBaseWrapper {
+
+    private static final String ADMIN_KEY_DESC = "admin";
 
     private String password;
 
@@ -141,9 +145,9 @@ public class UserWrapper extends UserBaseWrapper {
 
     public boolean isSuperAdmin() {
         try {
-            return hasPrivilegeOnKeyDesc(
+            return super.hasPrivilegeOnKeyDesc(
                 PrivilegeWrapper.getAllowedPrivilege(appService), null, null,
-                "admin");
+                ADMIN_KEY_DESC);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -214,10 +218,10 @@ public class UserWrapper extends UserBaseWrapper {
      * This method should be called by the user itself. If another user is
      * connected to the server, the method will fail
      */
-    public void modifyPassword(String oldPassword, String newPassword)
-        throws Exception {
+    public void modifyPassword(String oldPassword, String newPassword,
+        Boolean bulkEmails) throws Exception {
         ((BiobankApplicationService) appService).executeModifyPassword(
-            getCsmUserId(), oldPassword, newPassword);
+            getCsmUserId(), oldPassword, newPassword, bulkEmails);
     }
 
     /**
@@ -254,6 +258,14 @@ public class UserWrapper extends UserBaseWrapper {
 
     @Override
     protected Set<CenterWrapper<?>> getWorkingCentersInternal() {
+        if (isInSuperAdminMode()) {
+            try {
+                return new HashSet<CenterWrapper<?>>(
+                    CenterWrapper.getCenters(appService));
+            } catch (ApplicationException e) {
+                throw new RuntimeException(e);
+            }
+        }
         Set<CenterWrapper<?>> setOfWorkingCenter = super
             .getWorkingCentersInternal();
         for (BbGroupWrapper g : getGroupCollection(false)) {
@@ -265,5 +277,22 @@ public class UserWrapper extends UserBaseWrapper {
     @Override
     public String toString() {
         return getLogin();
+    }
+
+    @Override
+    public boolean hasPrivilegeOnKeyDesc(PrivilegeWrapper privilege,
+        CenterWrapper<?> center, StudyWrapper study, String keyDesc)
+        throws ApplicationException, NoRightForKeyDescException {
+        return isSuperAdmin()
+            || super.hasPrivilegeOnKeyDesc(privilege, center, study, keyDesc);
+    }
+
+    @Override
+    public boolean hasPrivilegeOnClassObject(PrivilegeWrapper privilege,
+        CenterWrapper<?> center, StudyWrapper study, Class<?> objectClazz)
+        throws NoRightForKeyDescException, ApplicationException {
+        return isSuperAdmin()
+            || super.hasPrivilegeOnClassObject(privilege, center, study,
+                objectClazz);
     }
 }

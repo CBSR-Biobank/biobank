@@ -18,6 +18,7 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
@@ -102,7 +103,10 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
     }
 
     public boolean onClose() {
-        if (finished) {
+        IEditorReference[] refs = getSite().getPage().getEditorReferences();
+        // will really finish only if this is the last editor open (in case user
+        // used the 'new editor' menu to have more than one editor opened)
+        if (finished && refs.length == 0) {
             if (!printed && appender.getLogsList().size() > 0) {
                 if (BiobankPlugin.isAskPrintActivityLog()) {
                     boolean doPrint = MessageDialog

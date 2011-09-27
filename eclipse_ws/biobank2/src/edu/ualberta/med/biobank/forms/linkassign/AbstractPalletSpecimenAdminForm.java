@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.forms.linkassign;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,6 +41,7 @@ import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
@@ -343,6 +345,13 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                         .getValue() && fieldsValid());
             }
         });
+        String tooltip = Messages.AbstractPalletSpecimenAdminForm_nobarcodes_msg;
+        List<String> barcodes = BiobankPlugin.getDefault()
+            .getPossibleBarcodes();
+        if (barcodes.size() > 0)
+            tooltip = Messages.AbstractPalletSpecimenAdminForm_barcodes_tooltip_msg
+                + StringUtil.join(barcodes, ", ");//$NON-NLS-1$
+        plateToScanText.setToolTipText(tooltip);
         GridData gd = (GridData) plateToScanText.getLayoutData();
         gd.horizontalAlignment = SWT.FILL;
         int parentNumColumns = ((GridLayout) fieldsComposite.getLayout()).numColumns;
