@@ -25,7 +25,7 @@ public class PersistCsmUserAction extends WrapperAction<User> {
                 password);
             getModel().setCsmUserId(csmUserId);
         } catch (ApplicationException e) {
-            throw new BiobankSessionException("Error persisting csm user", e);
+            throw new BiobankSessionException("Error persisting csm user", e); //$NON-NLS-1$
         }
         return null;
     }

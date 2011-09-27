@@ -16,14 +16,14 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
 public class RolePreDeleteChecks extends UncachedAction<Role> {
     private static final long serialVersionUID = 1L;
 
-    private static final String HAS_MBERSHIP_MSG = "Unable to delete role {0}. It is used in at least one membership. Please remove it first.";
+    private static final String HAS_MBERSHIP_MSG = Messages.getString("RolePreDeleteChecks.has.membership.msg"); //$NON-NLS-1$
 
     // @formatter:off
-    private static final String USED_IN_MEMBERSHIP_QRY = "select count(ms) from "
+    private static final String USED_IN_MEMBERSHIP_QRY = "select count(ms) from " //$NON-NLS-1$
         + Membership.class.getName()
-        + " as ms join ms."
+        + " as ms join ms." //$NON-NLS-1$
         + MembershipPeer.ROLE_COLLECTION.getName()
-        + " as roles where roles=?";
+        + " as roles where roles=?"; //$NON-NLS-1$
     // @formatter:on
 
     public RolePreDeleteChecks(ModelWrapper<Role> wrapper) {

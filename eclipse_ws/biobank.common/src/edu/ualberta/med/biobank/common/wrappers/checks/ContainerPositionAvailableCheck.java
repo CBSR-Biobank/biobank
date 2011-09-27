@@ -21,14 +21,15 @@ public class ContainerPositionAvailableCheck<E extends AbstractPosition>
     extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
-        private static final String HQL = "SELECT pos.{1}." + ContainerPeer.ID.getName() +
-            " FROM {0} pos" +
-            " WHERE pos." + AbstractPositionPeer.ROW.getName() + " = ?" +
-            " AND pos." + AbstractPositionPeer.COL.getName() + " = ?" +
-            " AND pos.{1} = (SELECT this.{1} FROM {0} this WHERE this = ?)" +
-            " AND pos <> ?";
+        private static final String HQL = "SELECT pos.{1}." + ContainerPeer.ID.getName() + //$NON-NLS-1$
+            " FROM {0} pos" + //$NON-NLS-1$
+            " WHERE pos." + AbstractPositionPeer.ROW.getName() + " = ?" + //$NON-NLS-1$ //$NON-NLS-2$
+            " AND pos." + AbstractPositionPeer.COL.getName() + " = ?" + //$NON-NLS-1$ //$NON-NLS-2$
+            " AND pos.{1} = (SELECT this.{1} FROM {0} this WHERE this = ?)" + //$NON-NLS-1$
+            " AND pos <> ?"; //$NON-NLS-1$
         // @formatter:on
-    private static final String UNAVAILABLE_POSITION_MSG = "Position {0}:{1} in container {2} is not available.";
+    private static final String UNAVAILABLE_POSITION_MSG = Messages
+        .getString("ContainerPositionAvailableCheck.unavailable.position.msg"); //$NON-NLS-1$
 
     private final Property<Container, ? super E> containerProperty;
 
@@ -72,7 +73,7 @@ public class ContainerPositionAvailableCheck<E extends AbstractPosition>
         LazyArg barcode = LazyMessage.newArg(Container.class, ContainerPeer.ID,
             containerId, ContainerPeer.PRODUCT_BARCODE);
 
-        LazyMessage containerLazyMessage = new LazyMessage("{0} ({1})", label,
+        LazyMessage containerLazyMessage = new LazyMessage("{0} ({1})", label, //$NON-NLS-1$
             barcode);
 
         String containerString = containerLazyMessage.format(session);

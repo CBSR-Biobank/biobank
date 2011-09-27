@@ -36,7 +36,7 @@ public class RoleWrapper extends RoleBaseWrapper {
         return 0;
     }
 
-    private static final String ALL_ROLES_QRY = " from " + Role.class.getName();
+    private static final String ALL_ROLES_QRY = " from " + Role.class.getName(); //$NON-NLS-1$
 
     public static List<RoleWrapper> getAllRoles(
         BiobankApplicationService appService) throws ApplicationException {

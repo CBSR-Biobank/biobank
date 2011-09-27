@@ -48,20 +48,20 @@ public class OnLockVisitor extends ReattachVisitor {
                     // same entity
                     if (persistentCollection.isDirty()) {
                         throw new HibernateException(
-                            "reassociated object has dirty collection");
+                            "reassociated object has dirty collection"); //$NON-NLS-1$
                     }
                     reattachCollection(persistentCollection, type);
                 } else {
                     // a "detached" collection that belonged to a different
                     // entity
                     throw new HibernateException(
-                        "reassociated object has dirty collection reference");
+                        "reassociated object has dirty collection reference"); //$NON-NLS-1$
                 }
 
             } else {
                 if (persistentCollection.isDirty()) {
                     throw new HibernateException(
-                        "reassociated object has dirty collection reference");
+                        "reassociated object has dirty collection reference"); //$NON-NLS-1$
                 }
                 reattachCollection(persistentCollection, type);
             }
@@ -70,7 +70,7 @@ public class OnLockVisitor extends ReattachVisitor {
             // brand new collection
             // TODO: or an array!! we can't lock objects with arrays now??
             throw new HibernateException(
-                "reassociated object has dirty collection reference (or an array)");
+                "reassociated object has dirty collection reference (or an array)"); //$NON-NLS-1$
         }
 
         return null;

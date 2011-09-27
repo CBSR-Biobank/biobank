@@ -17,10 +17,12 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
 public class UpdateChildrensTopSpecimenAction extends WrapperAction<Specimen> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
+    @SuppressWarnings("nls")
     private static final String UPDATE_CHILDREN_HQL =
         "UPDATE "+Specimen.class.getName()+" s " +
         "SET s."+SpecimenPeer.TOP_SPECIMEN.getName()+" = ? " +
         "WHERE s."+SpecimenPeer.PARENT_SPECIMEN.to(SpecimenPeer.ID).getName()+" IN ({0})";
+    @SuppressWarnings("nls")
     private static final String SELECT_CHILDREN_HQL = 
         "SELECT s."+Property.concatNames(SpecimenPeer.CHILD_SPECIMEN_COLLECTION, SpecimenPeer.ID)+" " +
         "FROM "+Specimen.class.getName()+" s " +
@@ -87,9 +89,9 @@ public class UpdateChildrensTopSpecimenAction extends WrapperAction<Specimen> {
         StringBuilder buffer = new StringBuilder(numParams * 2);
 
         for (int i = 0; i < numParams; i++) {
-            buffer.append("?");
+            buffer.append("?"); //$NON-NLS-1$
             if (i < numParams - 1) {
-                buffer.append(", ");
+                buffer.append(", "); //$NON-NLS-1$
             }
         }
 

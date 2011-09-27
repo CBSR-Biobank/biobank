@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,8 +39,9 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenWrapper extends SpecimenBaseWrapper {
-    private static final String BAD_SAMPLE_TYPE_MSG = "Container {0} does not allow inserts of sample type {1}.";
-    private static final String DISPATCHS_CACHE_KEY = "dispatchs";
+    private static final String BAD_SAMPLE_TYPE_MSG = Messages
+        .getString("SpecimenWrapper.bad.specimen.type.msg"); //$NON-NLS-1$
+    private static final String DISPATCHS_CACHE_KEY = "dispatchs"; //$NON-NLS-1$
     private static final SpecimenLogProvider LOG_PROVIDER = new SpecimenLogProvider();
 
     private boolean topSpecimenChanged = false;
@@ -65,7 +67,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     public void checkInventoryIdUnique() throws BiobankException,
         ApplicationException {
         checkNoDuplicates(Specimen.class, SpecimenPeer.INVENTORY_ID.getName(),
-            getInventoryId(), "A specimen with inventoryId");
+            getInventoryId(),
+            Messages.getString("SpecimenWrapper.spec.with.id.text")); //$NON-NLS-1$
     }
 
     public String getFormattedCreatedAt() {
@@ -123,7 +126,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         }
         // FIXME should never see that ? should never retrieve a Specimen which
         // site cannot be displayed ?
-        return "CANNOT DISPLAY INFORMATION";
+        return "CANNOT DISPLAY INFORMATION"; //$NON-NLS-1$
     }
 
     @Override
@@ -138,11 +141,14 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         ContainerWrapper parentContainer) throws Exception {
         RowColPos rcp = parentContainer.getContainerType()
             .getRowColFromPositionString(
-                positionString.replaceFirst(parentContainer.getLabel(), ""));
+                positionString.replaceFirst(parentContainer.getLabel(), "")); //$NON-NLS-1$
         if ((rcp.getRow() > -1) && (rcp.getCol() > -1)) {
             setParent(parentContainer, rcp);
         } else {
-            throw new Exception("Position " + positionString + " not valid");
+            throw new Exception(
+                MessageFormat.format(
+                    Messages
+                        .getString("SpecimenWrapper.position.not.valid.msg"), positionString)); //$NON-NLS-1$
         }
     }
 
@@ -162,8 +168,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             .getNameShort();
         if (addTopParentShortName && nameShort != null)
             return directParent.getLabel()
-                + getPositionStringInParent(position, directParent) + " ("
-                + nameShort + ")";
+                + getPositionStringInParent(position, directParent) + " (" //$NON-NLS-1$
+                + nameShort + ")"; //$NON-NLS-1$
         return directParent.getLabel()
             + getPositionStringInParent(position, directParent);
     }
@@ -191,9 +197,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         }
     }
 
-    private static final String Specimen_QRY = "from "
-        + Specimen.class.getName() + " where "
-        + SpecimenPeer.INVENTORY_ID.getName() + " = ?";
+    private static final String Specimen_QRY = "from " //$NON-NLS-1$
+        + Specimen.class.getName() + " where " //$NON-NLS-1$
+        + SpecimenPeer.INVENTORY_ID.getName() + " = ?"; //$NON-NLS-1$
 
     /**
      * search in all Specimens list. No matter which site added it.
@@ -208,17 +214,17 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             return null;
         if (specimens.size() == 1)
             return new SpecimenWrapper(appService, specimens.get(0));
-        throw new BiobankCheckException("Error retrieving specimens: found "
-            + specimens.size() + " results.");
+        throw new BiobankCheckException("Error retrieving specimens: found " //$NON-NLS-1$
+            + specimens.size() + " results."); //$NON-NLS-1$
     }
 
-    private static final String SPECIMENS_NON_ACTIVE_QRY = "from "
+    private static final String SPECIMENS_NON_ACTIVE_QRY = "from " //$NON-NLS-1$
         + Specimen.class.getName()
-        + " spec where spec."
+        + " spec where spec." //$NON-NLS-1$
         + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
-        + " = ? and "
+        + " = ? and " //$NON-NLS-1$
         + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
-            ActivityStatusPeer.NAME) + " != ?";
+            ActivityStatusPeer.NAME) + " != ?"; //$NON-NLS-1$
 
     public static List<SpecimenWrapper> getSpecimensNonActiveInCenter(
         WritableApplicationService appService, CenterWrapper<?> center)
@@ -245,7 +251,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             RowColPos rcp = null;
             try {
                 rcp = container.getContainerType().getRowColFromPositionString(
-                    positionString.replaceFirst(container.getLabel(), ""));
+                    positionString.replaceFirst(container.getLabel(), "")); //$NON-NLS-1$
             } catch (Exception e) {
                 // Should never happen: it has been already tested in
                 // getPossibleParentsMethod
@@ -360,7 +366,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     @Deprecated
     public void setTopSpecimen(SpecimenBaseWrapper specimen) {
         throw new UnsupportedOperationException(
-            "Not allowed to directly set the top Specimen. Set the parent Specimen instead.");
+            "Not allowed to directly set the top Specimen. Set the parent Specimen instead."); //$NON-NLS-1$
     }
 
     protected void setTopSpecimenInternal(SpecimenWrapper specimen,
@@ -510,9 +516,10 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
      * an aliquoted specimen) + the collection center
      */
     public String getCollectionInfo() {
-        return getTopSpecimen().getFormattedCreatedAt() + " in "
+        return getTopSpecimen().getFormattedCreatedAt()
+            + " in " //$NON-NLS-1$
             + getTopSpecimen().getOriginInfo().getCenter().getNameShort()
-            + " (visit #" + getCollectionEvent().getVisitNumber() + ")";
+            + " (visit #" + getCollectionEvent().getVisitNumber() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     public boolean hasUnknownImportType() {

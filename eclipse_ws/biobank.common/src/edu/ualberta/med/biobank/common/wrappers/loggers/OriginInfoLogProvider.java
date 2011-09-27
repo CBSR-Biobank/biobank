@@ -28,12 +28,12 @@ public class OriginInfoLogProvider implements WrapperLogProvider<OriginInfo> {
         log.setCenter(originInfo.getCenter().getNameShort());
 
         List<String> detailsList = new ArrayList<String>();
-        detailsList.add(new StringBuilder("waybill:").append(
+        detailsList.add(new StringBuilder("waybill:").append( //$NON-NLS-1$
             shipmentInfo.getWaybill()).toString());
-        detailsList.add(new StringBuilder("specimens:").append(
+        detailsList.add(new StringBuilder("specimens:").append( //$NON-NLS-1$
             getSpecimenCollectionSize(originInfo)).toString());
 
-        log.setDetails(StringUtil.join(detailsList, ", "));
+        log.setDetails(StringUtil.join(detailsList, ", ")); //$NON-NLS-1$
 
         return log;
     }

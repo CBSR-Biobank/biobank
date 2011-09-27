@@ -25,6 +25,7 @@ public class StudyEventAttrWrapper extends StudyEventAttrBaseWrapper {
         super(appService);
     }
 
+    @SuppressWarnings("nls")
     public static final String IS_USED_BY_COL_EVENTS_QRY = "select count(ea) from "
         + EventAttr.class.getName()
         + " as ea where ea."
@@ -40,6 +41,7 @@ public class StudyEventAttrWrapper extends StudyEventAttrBaseWrapper {
         return getCountResult(appService, c) > 0;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String toString() {
         return "" + getId() + ":\"" + getLabel() + "\":\"" + getPermissible()

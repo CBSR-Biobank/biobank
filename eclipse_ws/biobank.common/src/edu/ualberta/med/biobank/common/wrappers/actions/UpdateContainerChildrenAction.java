@@ -29,12 +29,14 @@ public class UpdateContainerChildrenAction extends WrapperAction<Container> {
     private static final Property<String, Container> PARENT_CONTAINER_LABEL = PARENT_CONTAINER
         .to(ContainerPeer.LABEL);
     // @formatter:off
+    @SuppressWarnings("nls")
     private static final String UPDATE_HQL =
         "\nUPDATE " + Container.class.getName() + " o" +
         "\n SET o." + ContainerPeer.TOP_CONTAINER.getName() + " = ? " +
         "\n    ,o." + ContainerPeer.LABEL.getName() + " = ?" +
         "\n    ,o." + ContainerPeer.PATH.getName() + " = ?" +
         "\n WHERE o." + ContainerPeer.ID.getName() + " = ?";
+    @SuppressWarnings("nls")
     private static final String SELECT_CHILDREN_HQL = 
         "\nSELECT o." + ContainerPeer.ID.getName() +
         "\n      ,o." + PARENT_CONTAINER_LABEL.getName() +

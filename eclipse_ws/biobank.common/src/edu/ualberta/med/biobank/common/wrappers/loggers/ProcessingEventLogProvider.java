@@ -20,16 +20,16 @@ public class ProcessingEventLogProvider implements
 
         List<String> detailsList = new ArrayList<String>();
 
-        detailsList.add(new StringBuilder("Source Specimens: ").append(
+        detailsList.add(new StringBuilder("Source Specimens: ").append( //$NON-NLS-1$
             getSpecimenCount(processingEvent)).toString());
 
         String worksheet = processingEvent.getWorksheet();
         if (worksheet != null) {
-            detailsList.add(new StringBuilder("Worksheet: ").append(worksheet)
+            detailsList.add(new StringBuilder("Worksheet: ").append(worksheet) //$NON-NLS-1$
                 .toString());
         }
 
-        log.setDetails(StringUtil.join(detailsList, ", "));
+        log.setDetails(StringUtil.join(detailsList, ", ")); //$NON-NLS-1$
 
         return log;
     }

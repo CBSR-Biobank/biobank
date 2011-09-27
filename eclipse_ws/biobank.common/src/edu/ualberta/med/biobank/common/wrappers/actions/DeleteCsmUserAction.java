@@ -20,7 +20,7 @@ public class DeleteCsmUserAction extends WrapperAction<User> {
         try {
             BiobankCSMSecurityUtil.deleteUser(getModel());
         } catch (ApplicationException e) {
-            throw new BiobankSessionException("Error persisting csm user", e);
+            throw new BiobankSessionException("Error persisting csm user", e); //$NON-NLS-1$
         }
         return null;
     }

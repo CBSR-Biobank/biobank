@@ -19,13 +19,13 @@ import edu.ualberta.med.biobank.model.ReportFilterValue;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ReportWrapper extends ReportBaseWrapper {
-    public static final String PROPERTY_NAME = "name";
-    public static final String PROPERTY_DESCRIPTION = "description";
-    public static final String PROPERTY_IS_COUNT = "isCount";
-    public static final String PROPERTY_IS_PUBLIC = "isPublic";
-    public static final String PROPERTY_USER_ID = "userId";
-    public static final String REPORT_COLUMN_COLLECTION_CACHE_KEY = "reportColumnCollection";
-    public static final String REPORT_FILTER_COLLECTION_CACHE_KEY = "reportFilterCollection";
+    public static final String PROPERTY_NAME = "name"; //$NON-NLS-1$
+    public static final String PROPERTY_DESCRIPTION = "description"; //$NON-NLS-1$
+    public static final String PROPERTY_IS_COUNT = "isCount"; //$NON-NLS-1$
+    public static final String PROPERTY_IS_PUBLIC = "isPublic"; //$NON-NLS-1$
+    public static final String PROPERTY_USER_ID = "userId"; //$NON-NLS-1$
+    public static final String REPORT_COLUMN_COLLECTION_CACHE_KEY = "reportColumnCollection"; //$NON-NLS-1$
+    public static final String REPORT_FILTER_COLLECTION_CACHE_KEY = "reportFilterCollection"; //$NON-NLS-1$
 
     public ReportWrapper(WritableApplicationService appService, Report report) {
         super(appService, report);

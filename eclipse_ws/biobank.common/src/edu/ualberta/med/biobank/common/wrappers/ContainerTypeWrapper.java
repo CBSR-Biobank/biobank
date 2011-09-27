@@ -35,7 +35,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         .wrap(CapacityPeer.COL_CAPACITY);
     private static final Collection<Property<?, ? super ContainerType>> UNIQUE_NAME_PROPS,
         UNIQUE_NAME_SHORT_PROPS;
-    private static final String CONTAINER_TYPE_IS_USED_MSG = "Unable to delete container type {0}. A container of this type exists in storage. Remove all instances before deleting this type.";
+    private static final String CONTAINER_TYPE_IS_USED_MSG = Messages.getString("ContainerTypeWrapper.container.type.isused.msg"); //$NON-NLS-1$
 
     public static final List<Property<?, ? super ContainerType>> PROPERTIES;
     static {
@@ -44,7 +44,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         aList.add(ROW_CAPACITY);
         aList.add(COL_CAPACITY);
         aList.add(ContainerTypePeer.CHILD_LABELING_SCHEME.wrap(
-            "childLabelingSchemeName", ContainerLabelingSchemePeer.NAME));
+            "childLabelingSchemeName", ContainerLabelingSchemePeer.NAME)); //$NON-NLS-1$
         PROPERTIES = Collections.unmodifiableList(aList);
 
         UNIQUE_NAME_PROPS = new ArrayList<Property<?, ? super ContainerType>>();
@@ -83,10 +83,10 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         return allChildren;
     }
 
-    private static final String IS_USED_BY_CONTAINERS_QRY = "select count(c) from "
+    private static final String IS_USED_BY_CONTAINERS_QRY = "select count(c) from " //$NON-NLS-1$
         + Container.class.getName()
-        + " as c where c."
-        + ContainerPeer.CONTAINER_TYPE.getName() + "=?";
+        + " as c where c." //$NON-NLS-1$
+        + ContainerPeer.CONTAINER_TYPE.getName() + "=?"; //$NON-NLS-1$
 
     public boolean isUsedByContainers() throws ApplicationException,
         BiobankQueryResultSizeException {
@@ -168,14 +168,14 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
                 return;
             }
         }
-        throw new Exception("labeling scheme with name \"" + name
-            + "\" does not exist");
+        throw new Exception("labeling scheme with name \"" + name //$NON-NLS-1$
+            + "\" does not exist"); //$NON-NLS-1$
     }
 
-    private static final String TOP_CONTAINERS_IN_SITE_QRY = "from "
-        + ContainerType.class.getName() + " where "
-        + Property.concatNames(ContainerTypePeer.SITE, SitePeer.ID) + "=? and "
-        + ContainerTypePeer.TOP_LEVEL.getName() + "=true";
+    private static final String TOP_CONTAINERS_IN_SITE_QRY = "from " //$NON-NLS-1$
+        + ContainerType.class.getName() + " where " //$NON-NLS-1$
+        + Property.concatNames(ContainerTypePeer.SITE, SitePeer.ID) + "=? and " //$NON-NLS-1$
+        + ContainerTypePeer.TOP_LEVEL.getName() + "=true"; //$NON-NLS-1$
 
     public static List<ContainerTypeWrapper> getTopContainerTypesInSite(
         WritableApplicationService appService, SiteWrapper site)
@@ -187,9 +187,9 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
             ContainerTypeWrapper.class);
     }
 
-    private static final String SITE_CONTAINER_TYPES_QRY = "from "
-        + ContainerType.class.getName() + " where "
-        + ContainerTypePeer.SITE.getName() + "=? and ";
+    private static final String SITE_CONTAINER_TYPES_QRY = "from " //$NON-NLS-1$
+        + ContainerType.class.getName() + " where " //$NON-NLS-1$
+        + ContainerTypePeer.SITE.getName() + "=? and "; //$NON-NLS-1$
 
     /**
      * Get containers types defined in a site. if useStrictName is true, then
@@ -200,15 +200,15 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String containerName, boolean useStrictName)
         throws ApplicationException {
-        String nameComparison = "name =";
+        String nameComparison = "name ="; //$NON-NLS-1$
         String containerNameParameter = containerName;
         if (!useStrictName) {
-            nameComparison = "lower(name) like";
-            containerNameParameter = new StringBuilder("%")
-                .append(containerName.toLowerCase()).append("%").toString();
+            nameComparison = "lower(name) like"; //$NON-NLS-1$
+            containerNameParameter = new StringBuilder("%") //$NON-NLS-1$
+                .append(containerName.toLowerCase()).append("%").toString(); //$NON-NLS-1$
         }
         StringBuilder query = new StringBuilder(SITE_CONTAINER_TYPES_QRY)
-            .append(nameComparison).append(" ?");
+            .append(nameComparison).append(" ?"); //$NON-NLS-1$
         HQLCriteria criteria = new HQLCriteria(query.toString(),
             Arrays.asList(new Object[] { siteWrapper.getWrappedObject(),
                 containerNameParameter.toString() }));
@@ -217,21 +217,21 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
             ContainerTypeWrapper.class);
     }
 
-    private static final String CONTAINER_TYPES_BY_CAPACITY_QRY = "select ct from "
+    private static final String CONTAINER_TYPES_BY_CAPACITY_QRY = "select ct from " //$NON-NLS-1$
         + ContainerType.class.getName()
-        + " as ct join ct."
+        + " as ct join ct." //$NON-NLS-1$
         + ContainerTypePeer.CAPACITY.getName()
-        + " as cap where ct."
+        + " as cap where ct." //$NON-NLS-1$
         + ContainerTypePeer.SITE.getName()
-        + "=? and cap."
+        + "=? and cap." //$NON-NLS-1$
         + CapacityPeer.ROW_CAPACITY.getName()
-        + "=? and cap."
+        + "=? and cap." //$NON-NLS-1$
         + CapacityPeer.COL_CAPACITY.getName()
-        + "=? and ct."
+        + "=? and ct." //$NON-NLS-1$
         + ContainerTypePeer.SPECIMEN_TYPE_COLLECTION.getName()
-        + " is not empty and ct."
+        + " is not empty and ct." //$NON-NLS-1$
         + ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION.getName()
-        + " is empty";
+        + " is empty"; //$NON-NLS-1$
 
     /**
      * Get containers types with the given capacity in the given site. The
@@ -255,8 +255,8 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
             RowColPos.PALLET_96_ROW_MAX, RowColPos.PALLET_96_COL_MAX);
     }
 
-    private static final String CONTAINER_COUNT_QRY = "select count(*) from "
-        + Container.class.getName() + " where containerType.id=?";
+    private static final String CONTAINER_COUNT_QRY = "select count(*) from " //$NON-NLS-1$
+        + Container.class.getName() + " where containerType.id=?"; //$NON-NLS-1$
 
     /**
      * get count of container which type is this
@@ -281,7 +281,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
     @Override
     public String toString() {
-        return getName() + " (" + getNameShort() + ")";
+        return getName() + " (" + getNameShort() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     public String getPositionString(RowColPos position) {

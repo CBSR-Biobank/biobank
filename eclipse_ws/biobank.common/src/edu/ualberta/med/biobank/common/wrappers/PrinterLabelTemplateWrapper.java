@@ -26,7 +26,7 @@ public class PrinterLabelTemplateWrapper extends
         return 0;
     }
 
-    private static final String TEMPLATES_QRY = "from "
+    private static final String TEMPLATES_QRY = "from " //$NON-NLS-1$
         + PrinterLabelTemplate.class.getName();
 
     public static List<PrinterLabelTemplateWrapper> getAllTemplates(
@@ -42,7 +42,7 @@ public class PrinterLabelTemplateWrapper extends
         return wrappers;
     }
 
-    private static final String TEMPLATE_NAMES_QRY = "select name from "
+    private static final String TEMPLATE_NAMES_QRY = "select name from " //$NON-NLS-1$
         + PrinterLabelTemplate.class.getName();
 
     public static List<String> getTemplateNames(
@@ -53,8 +53,8 @@ public class PrinterLabelTemplateWrapper extends
         return appService.query(criteria);
     }
 
-    private static final String TEMPLATE_BY_NAME_QRY = "from "
-        + PrinterLabelTemplate.class.getName() + " where name=?";
+    private static final String TEMPLATE_BY_NAME_QRY = "from " //$NON-NLS-1$
+        + PrinterLabelTemplate.class.getName() + " where name=?"; //$NON-NLS-1$
 
     public static PrinterLabelTemplateWrapper getTemplateByName(
         WritableApplicationService appService, String name)

@@ -34,7 +34,7 @@ public class ContainerPositionWrapper extends ContainerPositionBaseWrapper {
 
     @Override
     public String toString() {
-        return "[" + getRow() + ", " + getCol() + "] "
+        return "[" + getRow() + ", " + getCol() + "] " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             + getContainer().toString();
     }
 

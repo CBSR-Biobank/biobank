@@ -8,7 +8,6 @@ import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.MembershipBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.MembershipUniquePreCheck;
 import edu.ualberta.med.biobank.model.Membership;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class MembershipWrapper extends MembershipBaseWrapper {
@@ -43,8 +42,7 @@ public class MembershipWrapper extends MembershipBaseWrapper {
     }
 
     public List<PrivilegeWrapper> getPrivilegesForRight(BbRightWrapper right,
-        CenterWrapper<?> center, StudyWrapper study)
-        throws ApplicationException {
+        CenterWrapper<?> center, StudyWrapper study) {
         // if this membership center is null, then can apply to all centers.
         // Otherwise it should be the same center.
         // if this membership study is null, then can apply to all studies.

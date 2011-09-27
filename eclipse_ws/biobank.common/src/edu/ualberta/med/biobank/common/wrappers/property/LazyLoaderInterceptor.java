@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.Property;
 public class LazyLoaderInterceptor implements GetterInterceptor, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private static final String HQL = "SELECT o.{0} FROM {1} o WHERE o = ?";
+    private static final String HQL = "SELECT o.{0} FROM {1} o WHERE o = ?"; //$NON-NLS-1$
 
     private final Session session;
     private final Integer maxMemoryDepth;

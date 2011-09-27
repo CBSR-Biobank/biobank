@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
 public abstract class LoadModelAction<E> extends UncachedAction<E> {
     private static final long serialVersionUID = 1L;
 
-    private static final String CANNOT_LOAD_MSG = "Unable to load object type {0} with id ''{1}''.";
+    private static final String CANNOT_LOAD_MSG = "Unable to load object type {0} with id ''{1}''."; //$NON-NLS-1$
 
     public LoadModelAction(ModelWrapper<E> wrapper) {
         super(wrapper);
