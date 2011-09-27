@@ -228,7 +228,7 @@ public class TestUser extends TestDatabase {
         // search the user again otherwise the appService will still try with
         // testuser
         user = UserWrapper.getUser(newUserAppService, name);
-        user.modifyPassword(password, newPwd);
+        user.modifyPassword(password, newPwd, null);
 
         // check user can't connect with old password
         try {
