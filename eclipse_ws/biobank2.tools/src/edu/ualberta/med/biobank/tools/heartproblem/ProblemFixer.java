@@ -25,22 +25,14 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import edu.ualberta.med.biobank.tools.hbmpostproc.HbmPostProcess;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 /**
- * Fixes the HEAR study problem where the tech's in Calgary entered processing
- * information into the cbsr-training server instead of the real server.
+ * Fixes the HEART study problem where the tech's in Calgary entered processing
+ * information into the cbsr-training server instead of the production server.
  * 
- * select ce.* from collection_event ce join patient pt on pt.id=ce.patient_id
- * where pt.pnumber in ('DB0026','DB0074','DB0093','DB0094','DB0095','DB0102');
- * 
- * select spc.* from specimen spc join collection_event ce on
- * ce.id=spc.collection_event_id join patient pt on pt.id=ce.patient_id where
- * pt.pnumber in ('DB0026','DB0074','DB0093','DB0094','DB0095','DB0102') and
- * spc.created_at > '2011-06-18';
- * 
- * The extracted information is then hardcoded here and added to
+ * See the PNUMBERS array below for the patient numbers who's information must
+ * be copied over.
  * 
  */
 public class ProblemFixer {
@@ -48,7 +40,7 @@ public class ProblemFixer {
     private static String USAGE = "Usage: probfix [options]\n\n" + "Options\n"
         + "  -v, --verbose    Shows verbose output";
 
-    private static final Logger LOGGER = Logger.getLogger(HbmPostProcess.class
+    private static final Logger LOGGER = Logger.getLogger(ProblemFixer.class
         .getName());
 
     private static class AppArgs {
@@ -78,11 +70,13 @@ public class ProblemFixer {
 
     private StudyWrapper heartStudy;
 
-    private SiteWrapper calgarySite;
+    private SiteWrapper calgarySiteOnProduction;
 
     private String heartEventAttrLabel;
 
     public ProblemFixer(AppArgs appArgs) throws Exception {
+        LOGGER.debug("username: " + appArgs.username);
+
         specimenTypes = new HashMap<String, SpecimenTypeWrapper>();
 
         tsAppService = ServiceConnection.getAppService(
@@ -98,19 +92,19 @@ public class ProblemFixer {
             .getAppService("http://localhost:8080/biobank", appArgs.username,
                 appArgs.password);
 
-        calgarySite = null;
+        calgarySiteOnProduction = null;
         for (SiteWrapper site : SiteWrapper.getSites(appService)) {
             if (site.getName().equals("Calgary Foothills")) {
-                calgarySite = site;
+                calgarySiteOnProduction = site;
             }
         }
 
-        if (calgarySite == null) {
+        if (calgarySiteOnProduction == null) {
             throw new Exception("could not find calgary site on main server");
         }
 
         heartStudy = null;
-        for (StudyWrapper study : calgarySite.getStudyCollection()) {
+        for (StudyWrapper study : calgarySiteOnProduction.getStudyCollection()) {
             if (study.getNameShort().equals("HEART")) {
                 heartStudy = study;
             }
@@ -135,24 +129,6 @@ public class ProblemFixer {
         processPatients();
     }
 
-    public static final String CEVENT_HQL_QUERY = "select count(cevents)"
-        + " from edu.ualberta.med.biobank.model.CollectionEvent cevents"
-        + " inner join cevents.allSpecimenCollection as spcs"
-        + " where spcs.inventoryId=?";
-
-    private boolean collectionEventExists(BiobankApplicationService appService,
-        String inventoryId) throws Exception {
-        HQLCriteria c = new HQLCriteria(CEVENT_HQL_QUERY,
-            Arrays.asList(new Object[] { inventoryId }));
-        Long result = CollectionEventWrapper.getCountResult(appService, c);
-        if (result > 1) {
-            throw new Exception(
-                "invalid count on collection event for specimen inv id "
-                    + inventoryId);
-        }
-        return (result == 1);
-    }
-
     private void processPatients() throws Exception {
 
         for (String pnumber : PNUMBERS) {
@@ -160,95 +136,233 @@ public class ProblemFixer {
                 Arrays.asList(new Object[] { pnumber }));
             List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
 
+            LOGGER.info("processing patient " + pnumber);
+
             for (Object raw : tsAppService.query(c)) {
-                CollectionEventWrapper cevent = new CollectionEventWrapper(
+                CollectionEventWrapper ceventOnTraining = new CollectionEventWrapper(
                     tsAppService, (CollectionEvent) raw);
 
-                String firstSourceSpecimenInvId = cevent
+                String firstSourceSpecimenInvId = ceventOnTraining
                     .getOriginalSpecimenCollection(false).get(0)
                     .getInventoryId();
 
-                if (collectionEventExists(appService, firstSourceSpecimenInvId)) {
-                    System.out.println("collection event for "
-                        + firstSourceSpecimenInvId + " already in database");
-                    continue;
-                }
+                CollectionEventWrapper ceventOnProduction = collectionEventExists(
+                    appService, firstSourceSpecimenInvId);
 
-                PatientWrapper patient = PatientWrapper.getPatient(appService,
-                    pnumber);
-                if (patient == null) {
-                    patient = new PatientWrapper(appService);
-                    patient.setPnumber(pnumber);
-                    patient.setCreatedAt(cevent.getPatient().getCreatedAt());
-                    patient.setStudy(heartStudy);
-                    patient.persist();
-                    patient.reload();
-                }
+                if (ceventOnProduction == null) {
 
-                CollectionEventWrapper newCe = new CollectionEventWrapper(
-                    appService);
-                newCe.setPatient(patient);
-                newCe.setVisitNumber(PatientWrapper.getNextVisitNumber(
-                    appService, patient));
-                newCe.setComment(cevent.getComment());
-                newCe.setEventAttrValue(heartEventAttrLabel,
-                    cevent.getEventAttrValue(heartEventAttrLabel));
-                newCe.setActivityStatus(ActivityStatusWrapper
-                    .getActivityStatus(appService, cevent.getActivityStatus()
-                        .getName()));
-                newCe.persist();
-                newCe.reload();
-
-                System.out.println("patient: " + pnumber + ", visit number: "
-                    + cevent.getVisitNumber());
-
-                for (SpecimenWrapper spc : cevent
-                    .getOriginalSpecimenCollection(false)) {
-
-                    OriginInfoWrapper oi = new OriginInfoWrapper(appService);
-                    oi.setCenter(calgarySite);
-                    oi.persist();
-
-                    SpecimenWrapper newSpc = new SpecimenWrapper(appService);
-                    newSpc.setInventoryId(spc.getInventoryId());
-                    newSpc.setComment(spc.getComment());
-                    newSpc.setQuantity(spc.getQuantity());
-                    newSpc.setCreatedAt(spc.getCreatedAt());
-                    newSpc.setCollectionEvent(newCe);
-                    newSpc.setOriginalCollectionEvent(newCe);
-                    newSpc.setCurrentCenter(calgarySite);
-                    newSpc.setActivityStatus(ActivityStatusWrapper
-                        .getActivityStatus(appService, spc.getActivityStatus()
-                            .getName()));
-                    newSpc.setSpecimenType(specimenTypes.get(spc
-                        .getSpecimenType().getName()));
-                    newSpc.setOriginInfo(oi);
-                    newSpc.persist();
-                    newSpc.reload();
-
-                    ProcessingEventWrapper pevent = spc.getProcessingEvent();
-
-                    System.out.print("  inventory id: " + spc.getInventoryId()
-                        + ", created at: " + spc.getCreatedAt());
-
-                    if (pevent != null) {
-                        System.out.print("  inventory id: "
-                            + spc.getInventoryId() + ", created at: "
-                            + spc.getCreatedAt() + ", processing event: "
-                            + pevent.getId() + " - " + pevent.getCreatedAt());
-                        for (SpecimenWrapper childSpc : spc
-                            .getChildSpecimenCollection(false)) {
-                            System.out.println("    child: inventory id: "
-                                + childSpc.getInventoryId() + ", created at: "
-                                + childSpc.getCreatedAt());
-                        }
+                    PatientWrapper patient = PatientWrapper.getPatient(
+                        appService, pnumber);
+                    if (patient == null) {
+                        LOGGER.info("creating patient " + pnumber);
+                        patient = new PatientWrapper(appService);
+                        patient.setPnumber(pnumber);
+                        patient
+                            .setCreatedAt(ceventOnTraining.getPatient().getCreatedAt());
+                        patient.setStudy(heartStudy);
+                        patient.persist();
+                        patient.reload();
+                    } else {
+                        LOGGER.info("patient " + pnumber + " already exists");
                     }
-                    System.out.println();
+
+                    patients.add(ceventOnTraining.getPatient());
+
+                    ceventOnProduction = new CollectionEventWrapper(appService);
+                    ceventOnProduction.setPatient(patient);
+                    ceventOnProduction.setVisitNumber(PatientWrapper
+                        .getNextVisitNumber(appService, patient));
+                    ceventOnProduction.setComment(ceventOnTraining.getComment());
+                    ceventOnProduction.setEventAttrValue(heartEventAttrLabel,
+                        ceventOnTraining.getEventAttrValue(heartEventAttrLabel));
+                    ceventOnProduction.setActivityStatus(ActivityStatusWrapper
+                        .getActivityStatus(appService, ceventOnTraining
+                            .getActivityStatus().getName()));
+                    ceventOnProduction.persist();
+                    ceventOnProduction.reload();
+
+                    LOGGER.info("collection event created: patient/" + pnumber
+                        + " visit number/" + ceventOnTraining.getVisitNumber());
+                } else {
+                    LOGGER.info("collection event for "
+                        + firstSourceSpecimenInvId + " already in database");
                 }
 
-                patients.add(cevent.getPatient());
+                for (SpecimenWrapper spc : ceventOnTraining
+                    .getOriginalSpecimenCollection(false)) {
+                    processSourceSpecimen(spc, ceventOnProduction);
+                }
             }
         }
+    }
+
+    private void processSourceSpecimen(SpecimenWrapper spcOnTraining,
+        CollectionEventWrapper ceventOnProduction) throws Exception {
+        // ensure specimen is not present on production server
+        SpecimenWrapper spcOnProduction = null;
+
+        if (!specimenExists(appService, spcOnTraining.getInventoryId())) {
+            OriginInfoWrapper oi = new OriginInfoWrapper(appService);
+            oi.setCenter(calgarySiteOnProduction);
+            oi.persist();
+
+            spcOnProduction = new SpecimenWrapper(appService);
+            spcOnProduction.setInventoryId(spcOnTraining.getInventoryId());
+            spcOnProduction.setComment(spcOnTraining.getComment());
+            spcOnProduction.setQuantity(spcOnTraining.getQuantity());
+            spcOnProduction.setCreatedAt(spcOnTraining.getCreatedAt());
+            spcOnProduction.setCollectionEvent(ceventOnProduction);
+            spcOnProduction.setOriginalCollectionEvent(ceventOnProduction);
+            spcOnProduction.setCurrentCenter(calgarySiteOnProduction);
+            spcOnProduction.setActivityStatus(ActivityStatusWrapper
+                .getActivityStatus(appService, spcOnTraining
+                    .getActivityStatus().getName()));
+            spcOnProduction.setSpecimenType(specimenTypes.get(spcOnTraining
+                .getSpecimenType().getName()));
+            spcOnProduction.setOriginInfo(oi);
+            spcOnProduction.persist();
+            spcOnProduction.reload();
+
+            LOGGER.info("  created source specimen: inventory_id/"
+                + spcOnTraining.getInventoryId() + " created_at/"
+                + spcOnTraining.getCreatedAt());
+        } else {
+            spcOnProduction = SpecimenWrapper.getSpecimen(appService,
+                spcOnTraining.getInventoryId());
+        }
+
+        ProcessingEventWrapper peventOnTraining = spcOnTraining
+            .getProcessingEvent();
+
+        if (peventOnTraining != null) {
+
+            ProcessingEventWrapper peventOnProduction;
+            List<ProcessingEventWrapper> peventsOnProduction = ProcessingEventWrapper
+                .getProcessingEventsWithDateForCenter(appService,
+                    peventOnTraining.getCreatedAt(), calgarySiteOnProduction);
+
+            if (peventsOnProduction.isEmpty()) {
+                peventOnProduction = new ProcessingEventWrapper(appService);
+                peventOnProduction
+                    .setWorksheet(peventOnTraining.getWorksheet());
+                peventOnProduction
+                    .setCreatedAt(peventOnTraining.getCreatedAt());
+                peventOnProduction.setComment(peventOnTraining.getComment());
+                peventOnProduction.setCenter(calgarySiteOnProduction);
+                peventOnProduction.setActivityStatus(ActivityStatusWrapper
+                    .getActivityStatus(appService, peventOnTraining
+                        .getActivityStatus().getName()));
+                peventOnProduction.persist();
+                peventOnProduction.reload();
+
+                LOGGER.info("  created processing event: createdAt/"
+                    + peventOnTraining.getCreatedAt() + " worksheet/"
+                    + peventOnTraining.getWorksheet());
+            } else {
+                if (peventsOnProduction.size() > 1) {
+                    throw new Exception(
+                        "more than one processing event with date "
+                            + peventOnTraining.getCreatedAt());
+                }
+                peventOnProduction = peventsOnProduction.get(0);
+
+                LOGGER.info("  found processing event: createdAt/"
+                    + peventOnTraining.getCreatedAt() + " worksheet/"
+                    + peventOnTraining.getWorksheet());
+            }
+
+            if (spcOnProduction.getProcessingEvent() == null) {
+                spcOnProduction.setProcessingEvent(peventOnProduction);
+                spcOnProduction.persist();
+                spcOnProduction.reload();
+            }
+
+            for (SpecimenWrapper childSpcOnTraining : spcOnTraining
+                .getChildSpecimenCollection(false)) {
+                processAliquotedSpecimen(childSpcOnTraining, spcOnProduction,
+                    ceventOnProduction, peventOnProduction);
+            }
+        }
+    }
+
+    private void processAliquotedSpecimen(SpecimenWrapper spcOnTraining,
+        SpecimenWrapper parentSpc, CollectionEventWrapper ceventOnProduction,
+        ProcessingEventWrapper peventOnProduction) throws Exception {
+
+        if (specimenExists(appService, spcOnTraining.getInventoryId())) {
+            LOGGER.info("  aliquoted specimen exists: inventory_id/"
+                + spcOnTraining.getInventoryId() + " created_at/"
+                + spcOnTraining.getCreatedAt());
+            return;
+        }
+
+        SpecimenWrapper spcOnProduction = null;
+
+        OriginInfoWrapper oi = new OriginInfoWrapper(appService);
+        oi.setCenter(calgarySiteOnProduction);
+        oi.persist();
+
+        spcOnProduction = new SpecimenWrapper(appService);
+        spcOnProduction.setInventoryId(spcOnTraining.getInventoryId());
+        spcOnProduction.setComment(spcOnTraining.getComment());
+        spcOnProduction.setQuantity(spcOnTraining.getQuantity());
+        spcOnProduction.setCreatedAt(spcOnTraining.getCreatedAt());
+        spcOnProduction.setCollectionEvent(ceventOnProduction);
+        spcOnProduction.setProcessingEvent(peventOnProduction);
+        spcOnProduction.setCollectionEvent(ceventOnProduction);
+        spcOnProduction.setCurrentCenter(calgarySiteOnProduction);
+        spcOnProduction.setParentSpecimen(parentSpc);
+        spcOnProduction.setActivityStatus(ActivityStatusWrapper
+            .getActivityStatus(appService, spcOnTraining.getActivityStatus()
+                .getName()));
+        spcOnProduction.setSpecimenType(specimenTypes.get(spcOnTraining
+            .getSpecimenType().getName()));
+        spcOnProduction.setOriginInfo(oi);
+        spcOnProduction.persist();
+        spcOnProduction.reload();
+
+        LOGGER.info("    created aliquoted specimen: inventory_id/"
+            + spcOnTraining.getInventoryId() + " created_at/"
+            + spcOnTraining.getCreatedAt());
+
+    }
+
+    public static final String CEVENT_HQL_QUERY = "select cevents"
+        + " from edu.ualberta.med.biobank.model.CollectionEvent cevents"
+        + " inner join cevents.allSpecimenCollection as spcs"
+        + " where spcs.inventoryId=?";
+
+    private CollectionEventWrapper collectionEventExists(
+        BiobankApplicationService appService, String inventoryId)
+        throws Exception {
+        List<CollectionEvent> rawList = appService.query(new HQLCriteria(
+            CEVENT_HQL_QUERY, Arrays.asList(new Object[] { inventoryId })));
+        if ((rawList == null) || rawList.isEmpty()) {
+            return null;
+        }
+        if (rawList.size() > 1) {
+            throw new Exception(
+                "more than one collection event with inventory id "
+                    + inventoryId);
+        }
+        return CollectionEventWrapper.wrapModel(appService, rawList.get(0),
+            CollectionEventWrapper.class);
+    }
+
+    public static final String SPECIMEN_HQL_QUERY = "select count(spc)"
+        + " from edu.ualberta.med.biobank.model.Specimen spc"
+        + " where spc.inventoryId=?";
+
+    private boolean specimenExists(BiobankApplicationService appService,
+        String inventoryId) throws Exception {
+        HQLCriteria c = new HQLCriteria(SPECIMEN_HQL_QUERY,
+            Arrays.asList(new Object[] { inventoryId }));
+        Long result = SpecimenWrapper.getCountResult(appService, c);
+        if (result > 1) {
+            throw new Exception("invalid count for specimen inv id "
+                + inventoryId);
+        }
+        return (result == 1);
     }
 
     /*
