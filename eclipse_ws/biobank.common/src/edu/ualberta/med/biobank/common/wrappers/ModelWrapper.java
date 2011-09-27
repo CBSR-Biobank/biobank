@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
 import edu.ualberta.med.biobank.common.wrappers.loggers.LogAction;
 import edu.ualberta.med.biobank.common.wrappers.loggers.LogGroup;
 import edu.ualberta.med.biobank.common.wrappers.loggers.WrapperLogProvider;
+import edu.ualberta.med.biobank.common.wrappers.util.ProxyUtil;
 import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -35,7 +36,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Hibernate;
-import org.springframework.aop.framework.Advised;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     final Map<Property<?, ?>, Object> propertyCache = new HashMap<Property<?, ?>, Object>();
@@ -853,20 +853,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     private static <E> boolean isInitialized(E model,
         Property<?, ? super E> property) {
-        if (model instanceof Advised) {
-            Advised proxy = (Advised) model;
-            try {
-                @SuppressWarnings("unchecked")
-                E tmp = (E) proxy.getTargetSource().getTarget();
-                model = tmp;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
+        E unproxiedModel = ProxyUtil.convertProxyToObject(model);
 
-        return Hibernate.isPropertyInitialized(model, property.getName())
-            && Hibernate.isInitialized(property.get(model));
+        return Hibernate.isPropertyInitialized(unproxiedModel,
+            property.getName())
+            && Hibernate.isInitialized(property.get(unproxiedModel));
     }
 
     private <T, M, R> void setModelProperty(ModelWrapper<M> modelWrapper,
