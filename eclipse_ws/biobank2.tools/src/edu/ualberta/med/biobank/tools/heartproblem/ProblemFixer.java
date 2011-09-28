@@ -23,6 +23,8 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
+import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -93,7 +95,7 @@ public class ProblemFixer {
                 appArgs.password);
 
         calgarySiteOnProduction = null;
-        for (SiteWrapper site : SiteWrapper.getSites(appService)) {
+        for (SiteWrapper site : SiteQuery.getSites(appService)) {
             if (site.getName().equals("Calgary Foothills")) {
                 calgarySiteOnProduction = site;
             }
@@ -395,7 +397,7 @@ public class ProblemFixer {
                 "more than one collection event with inventory id "
                     + inventoryId);
         }
-        return CollectionEventWrapper.wrapModel(appService, rawList.get(0),
+        return WrapperUtil.wrapModel(appService, rawList.get(0),
             CollectionEventWrapper.class);
     }
 
