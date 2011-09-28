@@ -10,6 +10,7 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionException;
 import edu.ualberta.med.biobank.common.action.site.SiteViewAction.SiteInfo;
+import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
@@ -38,7 +39,7 @@ public class SiteViewAction implements Action<SiteInfo> {
         + " AND containerType.topLevel IS TRUE"; // only select top-level Container-s
     private static final String CONTAINER_TYPE_INFO_HQL = "SELECT containerType, (SELECT COUNT(*) FROM " + Container.class.getName() + " c WHERE c.containerType = containerType)"
         + " FROM " + ContainerType.class.getName() + " containerType"
-        + " INNER JOIN FETCH containerType.acticityStatus AS activityStatus"
+        + " INNER JOIN FETCH containerType.activityStatus AS activityStatus"
         + " INNER JOIN FETCH containerType.capacity capacity"
         + " WHERE containerType.site.id = ?"
         + " ORDER BY containerType.nameShort";
@@ -149,7 +150,7 @@ public class SiteViewAction implements Action<SiteInfo> {
         return topContainers;
     }
 
-    public static class SiteInfo implements Serializable {
+    public static class SiteInfo implements Serializable, NotAProxy {
         private static final long serialVersionUID = 1L;
 
         public Site site;

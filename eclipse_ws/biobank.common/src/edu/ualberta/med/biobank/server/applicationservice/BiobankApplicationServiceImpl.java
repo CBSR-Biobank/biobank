@@ -293,9 +293,12 @@ public class BiobankApplicationServiceImpl extends
         Request request = new Request(action);
         request.setDomainObjectName(Site.class.getName());
 
+        Response response = query(request);
+
         @SuppressWarnings("unchecked")
-        T result = (T) query(request);
-        return result;
+        T tmp = (T) response.getResponse();
+
+        return tmp;
     }
 
     @Override
