@@ -98,8 +98,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             tabName = Messages.CollectionEventEntryForm_title_new;
             cevent.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
-            cevent.setVisitNumber(CollectionEventWrapper.getNextVisitNumber(
-                appService, cevent));
+            cevent.setVisitNumber(PatientWrapper.getNextVisitNumber(appService,
+                cevent.getPatient()));
         } else {
             tabName = NLS.bind(Messages.CollectionEventEntryForm_title_edit,
                 cevent.getVisitNumber());
@@ -360,8 +360,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         if (cevent.isNew()) {
             cevent.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
-            Integer next = CollectionEventWrapper.getNextVisitNumber(
-                appService, cevent);
+            Integer next = PatientWrapper.getNextVisitNumber(appService,
+                cevent.getPatient());
             cevent.setVisitNumber(next);
         }
 
