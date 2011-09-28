@@ -59,8 +59,16 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     private void removeFromSpecimenCollections(
         List<? extends SpecimenBaseWrapper> specimenCollection) {
-        super.removeFromAllSpecimenCollection(specimenCollection);
-        super.removeFromOriginalSpecimenCollection(specimenCollection);
+        // super.removeFromAllSpecimenCollection(specimenCollection); is not
+        // called because it will set the collectionEvent of specimens to null
+        // Since hibernate will check that it is not null, it is a problem.
+        // Specimens are deleted after that, so that's ok to keep the cevent
+        // reference
+        removeFromWrapperCollection(
+            CollectionEventPeer.ALL_SPECIMEN_COLLECTION, specimenCollection);
+        removeFromWrapperCollection(
+            CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION,
+            specimenCollection);
     }
 
     private void removeFromSpecimenCollectionsWithCheck(
@@ -456,8 +464,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
         tasks.add(check().unique(UNIQUE_VISIT_NUMBER_PROPS));
 
-        tasks.persistRemoved(this, CollectionEventPeer.ALL_SPECIMEN_COLLECTION);
-        tasks.persistRemoved(this,
+        tasks.deleteRemoved(this, CollectionEventPeer.ALL_SPECIMEN_COLLECTION);
+        tasks.deleteRemoved(this,
             CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION);
 
         super.addPersistTasks(tasks);
@@ -470,6 +478,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
         super.addDeleteTasks(tasks);
     }
+
     public void merge(CollectionEventWrapper p2event) throws Exception {
         List<SpecimenWrapper> ospecs = p2event
             .getOriginalSpecimenCollection(false);
