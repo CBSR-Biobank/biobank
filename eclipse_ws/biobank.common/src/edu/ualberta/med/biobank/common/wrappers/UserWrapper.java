@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.NoRightForKeyDescException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.actions.DeleteCsmUserAction;
@@ -23,8 +22,6 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class UserWrapper extends UserBaseWrapper {
-
-    private static final String ADMIN_KEY_DESC = "admin"; //$NON-NLS-1$
 
     private String password;
 
@@ -144,13 +141,14 @@ public class UserWrapper extends UserBaseWrapper {
     }
 
     public boolean isSuperAdmin() {
-        try {
-            return super.hasPrivilegeOnKeyDesc(
-                PrivilegeWrapper.getAllowedPrivilege(appService), null, null,
-                ADMIN_KEY_DESC);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // try {
+        // return super.hasPrivilegeOnKeyDesc(
+        // PrivilegeWrapper.getAllowedPrivilege(appService), null, null,
+        // ADMIN_KEY_DESC);
+        // } catch (Exception e) {
+        // throw new RuntimeException(e);
+        // }
+        return true;
     }
 
     public boolean needChangePassword() {
@@ -241,20 +239,6 @@ public class UserWrapper extends UserBaseWrapper {
         return (UserWrapper) super.duplicate();
     }
 
-    /**
-     * User needs to go through its groups as well.
-     */
-    @Override
-    protected List<PrivilegeWrapper> getPrivilegesForRight(
-        BbRightWrapper right, CenterWrapper<?> center, StudyWrapper study) {
-        List<PrivilegeWrapper> privileges = super.getPrivilegesForRight(right,
-            center, study);
-        for (BbGroupWrapper g : getGroupCollection(false)) {
-            privileges.addAll(g.getPrivilegesForRight(right, center, study));
-        }
-        return privileges;
-    }
-
     @Override
     protected Set<CenterWrapper<?>> getWorkingCentersInternal() {
         if (isInSuperAdminMode()) {
@@ -278,20 +262,4 @@ public class UserWrapper extends UserBaseWrapper {
         return getLogin();
     }
 
-    @Override
-    public boolean hasPrivilegeOnKeyDesc(PrivilegeWrapper privilege,
-        CenterWrapper<?> center, StudyWrapper study, String keyDesc)
-        throws ApplicationException, NoRightForKeyDescException {
-        return isSuperAdmin()
-            || super.hasPrivilegeOnKeyDesc(privilege, center, study, keyDesc);
-    }
-
-    @Override
-    public boolean hasPrivilegeOnClassObject(PrivilegeWrapper privilege,
-        CenterWrapper<?> center, StudyWrapper study, Class<?> objectClazz)
-        throws NoRightForKeyDescException, ApplicationException {
-        return isSuperAdmin()
-            || super.hasPrivilegeOnClassObject(privilege, center, study,
-                objectClazz);
-    }
 }

@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.RolePeer;
-import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
@@ -67,7 +67,7 @@ public class RoleEditDialog extends BgcBaseDialog {
                 Messages.RoleEditDialog_msg_name_required));
 
         tree = new PermissionCheckTreeWidget(contents, true,
-            BbRightWrapper.getAllRights(SessionManager.getAppService()));
+            PermissionWrapper.getAllPermissions(SessionManager.getAppService()));
         tree.setSelections(role.getPermissionCollection(false));
 
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -80,7 +80,7 @@ public class RoleEditDialog extends BgcBaseDialog {
         try {
             PermissionTreeRes res = tree.getAddedAndRemovedNodes();
             role.addToPermissionCollection(res.addedPermissions);
-            role.removeFromPermissionCollection(res.deletedPermissions);
+            role.removeFromPermissionCollection(res.removedPermissions);
             role.persist();
             close();
         } catch (Exception e) {

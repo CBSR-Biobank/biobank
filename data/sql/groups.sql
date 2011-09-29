@@ -9,10 +9,7 @@ select max(id), 'Super Administrators' from principal;
 insert into membership(id, version, principal_id)
 select 1, 0, max(id) from principal;
 
--- add a permission to this membership that contains right 'administrator' (id=24)
-insert into permission(id, version, right_id, membership_id) values
-(1, 0, 24, 1);
+-- add a 'AdministratorPersmission permission (id = 1 ) to this membership 
+insert into membership_permission(membership_id, permission_id) values
+(1, 1);
 
--- add privilege 'allowed' (id = 5) to this permission
-insert into permission_privilege(permission_id, privilege_id) values
-(1, 5);
