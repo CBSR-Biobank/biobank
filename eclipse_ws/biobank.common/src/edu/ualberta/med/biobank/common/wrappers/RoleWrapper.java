@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.peer.RolePeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.RoleBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.checks.RolePreDeleteChecks;
@@ -54,23 +53,8 @@ public class RoleWrapper extends RoleBaseWrapper {
     public RoleWrapper duplicate() {
         RoleWrapper newRole = new RoleWrapper(appService);
         newRole.setName(getName());
-        List<PermissionWrapper> newRpList = new ArrayList<PermissionWrapper>();
-        for (PermissionWrapper rp : getPermissionCollection(false)) {
-            PermissionWrapper newRp = new PermissionWrapper(appService);
-            newRp.setRight(rp.getRight());
-            newRp.addToPrivilegeCollection(rp.getPrivilegeCollection(false));
-            newRpList.add(newRp);
-        }
-        newRole.addToPermissionCollection(newRpList);
+        newRole.addToPermissionCollection(getPermissionCollection(false));
         return newRole;
-    }
-
-    public List<BbRightWrapper> getRightsInUse() {
-        List<BbRightWrapper> rights = new ArrayList<BbRightWrapper>();
-        for (PermissionWrapper rp : getPermissionCollection(false)) {
-            rights.add(rp.getRight());
-        }
-        return rights;
     }
 
     @Override
@@ -80,19 +64,4 @@ public class RoleWrapper extends RoleBaseWrapper {
         super.addDeleteTasks(tasks);
     }
 
-    @Override
-    protected void addPersistTasks(TaskList tasks) {
-        // if a permission is removed, it should be deleted.
-        tasks.deleteRemoved(this, RolePeer.PERMISSION_COLLECTION);
-        super.addPersistTasks(tasks);
-    }
-
-    public boolean isUsingRight(BbRightWrapper right) {
-        if (right != null)
-            for (PermissionWrapper rp : getPermissionCollection(false)) {
-                if (rp.getRight().equals(right))
-                    return true;
-            }
-        return false;
-    }
 }

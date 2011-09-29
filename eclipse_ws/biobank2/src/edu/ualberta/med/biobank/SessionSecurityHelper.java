@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank;
 
-import edu.ualberta.med.biobank.common.exception.NoRightForKeyDescException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
@@ -27,30 +25,32 @@ public class SessionSecurityHelper {
 
     public static boolean canCreate(BiobankApplicationService appService,
         UserWrapper user, Class<?> clazz) {
-        try {
-            return user.hasPrivilegeOnClassObject(
-                PrivilegeWrapper.getCreatePrivilege(appService),
-                user.getCurrentWorkingCenter(), null, clazz);
-        } catch (NoRightForKeyDescException nre) {
-            // If there is no right corresponding to this class, then can create
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // try {
+        // return user.hasPrivilegeOnClassObject(
+        // PrivilegeWrapper.getCreatePrivilege(appService),
+        // user.getCurrentWorkingCenter(), null, clazz);
+        // } catch (NoRightForKeyDescException nre) {
+        // // If there is no right corresponding to this class, then can create
+        // return true;
+        // } catch (Exception e) {
+        // throw new RuntimeException(e);
+        // }
+        return true;
     }
 
     public static boolean canDelete(BiobankApplicationService appService,
         UserWrapper user, Class<?> clazz) {
-        try {
-            return user.hasPrivilegeOnClassObject(
-                PrivilegeWrapper.getDeletePrivilege(appService),
-                user.getCurrentWorkingCenter(), null, clazz);
-        } catch (NoRightForKeyDescException nre) {
-            // If there is no right corresponding to this class, then can delete
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // try {
+        // return user.hasPrivilegeOnClassObject(
+        // PrivilegeWrapper.getDeletePrivilege(appService),
+        // user.getCurrentWorkingCenter(), null, clazz);
+        // } catch (NoRightForKeyDescException nre) {
+        // // If there is no right corresponding to this class, then can delete
+        // return true;
+        // } catch (Exception e) {
+        // throw new RuntimeException(e);
+        // }
+        return true;
     }
 
     public static boolean canDelete(UserWrapper user, ModelWrapper<?> wrapper) {
@@ -59,56 +59,60 @@ public class SessionSecurityHelper {
 
     public static boolean canView(BiobankApplicationService appService,
         UserWrapper user, Class<?> clazz) {
-        try {
-            return user.hasPrivilegeOnClassObject(
-                PrivilegeWrapper.getReadPrivilege(appService),
-                user.getCurrentWorkingCenter(), null, clazz);
-        } catch (NoRightForKeyDescException nre) {
-            // If there is no right corresponding to this class, then can view
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // try {
+        // return user.hasPrivilegeOnClassObject(
+        // PrivilegeWrapper.getReadPrivilege(appService),
+        // user.getCurrentWorkingCenter(), null, clazz);
+        // } catch (NoRightForKeyDescException nre) {
+        // // If there is no right corresponding to this class, then can view
+        // return true;
+        // } catch (Exception e) {
+        // throw new RuntimeException(e);
+        // }
+        return true;
     }
 
     public static boolean isAllowed(BiobankApplicationService appService,
         UserWrapper user, String... keyDesc) {
-        try {
-            return user.hasPrivilegesOnKeyDesc(
-                PrivilegeWrapper.getAllowedPrivilege(appService),
-                user.getCurrentWorkingCenter(), null, keyDesc);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // try {
+        // return user.hasPrivilegesOnKeyDesc(
+        // PrivilegeWrapper.getAllowedPrivilege(appService),
+        // user.getCurrentWorkingCenter(), null, keyDesc);
+        // } catch (Exception e) {
+        // throw new RuntimeException(e);
+        // }
+        return true;
     }
 
     public static boolean isAllowedorCanRead(
         BiobankApplicationService appService, UserWrapper user,
         String... keyDesc) {
-        try {
-            return user.hasPrivilegesOnKeyDesc(
-                PrivilegeWrapper.getAllowedPrivilege(appService),
-                user.getCurrentWorkingCenter(), null, keyDesc)
-                || user.hasPrivilegesOnKeyDesc(
-                    PrivilegeWrapper.getReadPrivilege(appService),
-                    user.getCurrentWorkingCenter(), null, keyDesc);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // try {
+        // return user.hasPrivilegesOnKeyDesc(
+        // PrivilegeWrapper.getAllowedPrivilege(appService),
+        // user.getCurrentWorkingCenter(), null, keyDesc)
+        // || user.hasPrivilegesOnKeyDesc(
+        // PrivilegeWrapper.getReadPrivilege(appService),
+        // user.getCurrentWorkingCenter(), null, keyDesc);
+        // } catch (Exception e) {
+        // throw new RuntimeException(e);
+        // }
+        return true;
     }
 
     public static boolean canUpdate(BiobankApplicationService appService,
         UserWrapper user, Class<?> clazz) {
-        try {
-            return user.hasPrivilegeOnClassObject(
-                PrivilegeWrapper.getUpdatePrivilege(appService),
-                user.getCurrentWorkingCenter(), null, clazz);
-        } catch (NoRightForKeyDescException nre) {
-            // If there is no right corresponding to this class, then can update
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // try {
+        // return user.hasPrivilegeOnClassObject(
+        // PrivilegeWrapper.getUpdatePrivilege(appService),
+        // user.getCurrentWorkingCenter(), null, clazz);
+        // } catch (NoRightForKeyDescException nre) {
+        // // If there is no right corresponding to this class, then can update
+        // return true;
+        // } catch (Exception e) {
+        // throw new RuntimeException(e);
+        // }
+        return true;
     }
 
     public static boolean canUpdate(UserWrapper user, ModelWrapper<?> wrapper) {

@@ -29,10 +29,10 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -265,7 +265,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
     private void createPermissionWidgets(Composite contents)
         throws ApplicationException {
         permissionsTree = new PermissionCheckTreeWidget(contents, false,
-            BbRightWrapper.getAllRights(SessionManager.getAppService()));
+            PermissionWrapper.getAllPermissions(SessionManager.getAppService()));
         permissionsTree.setSelections(ms.getPermissionCollection(false));
 
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -293,7 +293,7 @@ public class MembershipEditDialog extends BgcBaseDialog {
         ms.removeFromRoleCollection(rolesWidget.getRemovedFromSelection());
         PermissionTreeRes res = permissionsTree.getAddedAndRemovedNodes();
         ms.addToPermissionCollection(res.addedPermissions);
-        ms.removeFromPermissionCollection(res.deletedPermissions);
+        ms.removeFromPermissionCollection(res.removedPermissions);
         ms.setCenter(getCenterSelection());
         ms.setStudy(getStudySelection());
         super.okPressed();

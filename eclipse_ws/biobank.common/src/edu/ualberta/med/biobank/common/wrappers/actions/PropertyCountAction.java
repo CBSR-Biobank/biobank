@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
  */
 public class PropertyCountAction<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
-    private static final String PROPERTIES_EMPTY_ERRMSG = Messages.getString("PropertyCountAction.properties.empty.errmsg"); //$NON-NLS-1$
+    private static final String PROPERTIES_EMPTY_ERRMSG = "No properties were given to count. At least one property is required."; //$NON-NLS-1$
     private static final String HQL = "SELECT COUNT(*) FROM {0} o WHERE ({1}) = (SELECT {2} FROM {0} o2 WHERE o2 = ?)"; //$NON-NLS-1$
 
     private final Collection<Property<?, ? super E>> properties;

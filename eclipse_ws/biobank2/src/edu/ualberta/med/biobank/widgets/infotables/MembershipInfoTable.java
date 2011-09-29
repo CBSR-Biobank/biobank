@@ -125,7 +125,7 @@ public class MembershipInfoTable extends InfoTableWidget {
     public String getPermissionsString(MembershipWrapper ms) {
         StringBuffer sb = new StringBuffer();
         boolean first = true;
-        for (PermissionWrapper rp : ms.getPermissionCollection(true)) {
+        for (PermissionWrapper perm : ms.getPermissionCollection(true)) {
             if (sb.length() > 25) {
                 sb.setLength(25);
                 sb.append("..."); //$NON-NLS-1$
@@ -135,7 +135,7 @@ public class MembershipInfoTable extends InfoTableWidget {
                 first = false;
             else
                 sb.append(";"); //$NON-NLS-1$
-            sb.append(rp.getRight().getName());
+            sb.append(perm.getClassName());
         }
         return sb.toString();
     }

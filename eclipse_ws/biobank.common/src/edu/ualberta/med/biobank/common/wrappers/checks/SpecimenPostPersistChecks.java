@@ -13,12 +13,9 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
 public class SpecimenPostPersistChecks extends LoadModelAction<Specimen> {
     private static final long serialVersionUID = 1L;
 
-    private static final String WRONG_COLLECTION_EVENT = Messages
-        .getString("SpecimenPostPersistChecks.wrong.collection.event"); //$NON-NLS-1$
-    private static final String TOP_SPECIMEN_COLLECTION_EVENT_UNSET = Messages
-        .getString("SpecimenPostPersistChecks.top.specimen.collection.event.unset"); //$NON-NLS-1$
-    private static final String CHILDREN_WITHOUT_PROCESSING_EVENT = Messages
-        .getString("SpecimenPostPersistChecks.children.without.processing.event"); //$NON-NLS-1$
+    private static final String WRONG_COLLECTION_EVENT = "Specimen {0} has a Collection Event which differs from it's parent or top Specimen."; //$NON-NLS-1$
+    private static final String TOP_SPECIMEN_COLLECTION_EVENT_UNSET = "Specimen {0} is a top Specimen, but not part of its Collection Event's original specimen collection."; //$NON-NLS-1$
+    private static final String CHILDREN_WITHOUT_PROCESSING_EVENT = "Specimen {0} has children but does not have a Processing Event. A Specimen must be part of a Processing Event to have children."; //$NON-NLS-1$
 
     public SpecimenPostPersistChecks(ModelWrapper<Specimen> wrapper) {
         super(wrapper);

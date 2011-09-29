@@ -7,13 +7,11 @@ import org.eclipse.swt.graphics.Image;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
@@ -177,10 +175,6 @@ public class BiobankLabelProvider extends LabelProvider implements
             return ((SiteWrapper) element).getName();
         } else if (element instanceof ActivityStatusWrapper) {
             return ((ActivityStatusWrapper) element).getName();
-        } else if (element instanceof PrivilegeWrapper) {
-            return ((PrivilegeWrapper) element).getName();
-        } else if (element instanceof BbRightWrapper) {
-            return ((BbRightWrapper) element).getName();
         } else if (element instanceof AdapterBase) {
             return ((AdapterBase) element).getLabel();
         }

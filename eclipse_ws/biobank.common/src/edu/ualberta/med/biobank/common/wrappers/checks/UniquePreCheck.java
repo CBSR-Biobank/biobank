@@ -30,8 +30,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePr
 public class UniquePreCheck<E> extends UncachedAction<E> {
     private static final long serialVersionUID = 1L;
     private static final String HQL = "SELECT COUNT(*) FROM {0} o WHERE ({1}) = ({2}) {3}"; //$NON-NLS-1$
-    private static final String EXCEPTION_STRING = Messages
-        .getString("UniquePreCheck.exception.string"); //$NON-NLS-1$
+    private static final String EXCEPTION_STRING = "There already exists a {0} with property value(s) ({1}) for ({2}), respectively. These field(s) must be unique."; //$NON-NLS-1$
 
     protected final Collection<Property<?, ? super E>> properties;
 

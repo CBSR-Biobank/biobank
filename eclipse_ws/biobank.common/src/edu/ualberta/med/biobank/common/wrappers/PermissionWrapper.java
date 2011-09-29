@@ -1,10 +1,13 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.wrappers.base.PermissionBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.PermissionPostCheck;
 import edu.ualberta.med.biobank.model.Permission;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PermissionWrapper extends PermissionBaseWrapper {
 
@@ -17,22 +20,17 @@ public class PermissionWrapper extends PermissionBaseWrapper {
         super(appService, wrappedObject);
     }
 
-    @Override
-    public int compareTo(ModelWrapper<Permission> rp2) {
-        if (rp2 instanceof PermissionWrapper) {
-            BbRightWrapper right1 = getRight();
-            BbRightWrapper right2 = ((PermissionWrapper) rp2).getRight();
-            if (right1 == null || right2 == null)
-                return 0;
-            return right1.compareTo(right2);
-        }
-        return 0;
-    }
+    @SuppressWarnings("nls")
+    private static final String ALL_PERMISSIONS_QRY = "from "
+        + Permission.class.getName();
 
-    @Override
-    protected void addPersistTasks(TaskList tasks) {
-        super.addPersistTasks(tasks);
-        tasks.add(new PermissionPostCheck(this));
+    public static List<PermissionWrapper> getAllPermissions(
+        WritableApplicationService appService) throws ApplicationException {
+        List<PermissionWrapper> wrappers = new ArrayList<PermissionWrapper>();
+        HQLCriteria c = new HQLCriteria(ALL_PERMISSIONS_QRY);
+        List<Permission> permissions = appService.query(c);
+        for (Permission perm : permissions)
+            wrappers.add(new PermissionWrapper(appService, perm));
+        return wrappers;
     }
-
 }
