@@ -30,8 +30,9 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 /**
- * Fixes the HEART study problem where the tech's in Calgary entered processing
- * information into the cbsr-training server instead of the production server.
+ * Fixes Issue #1487 - the HEART study problem where the tech's in Calgary
+ * entered processing information into the cbsr-training server instead of the
+ * production server.
  * 
  * See the PNUMBERS array below for the patient numbers who's information must
  * be copied over.
@@ -39,8 +40,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  */
 public class ProblemFixer {
 
-    private static String USAGE = "Usage: probfix [options]\n\n" + "Options\n"
-        + "  -v, --verbose    Shows verbose output";
+    private static String USAGE = "Usage: heartprobfix [options]\n\n"
+        + "Options\n" + "  -v, --verbose    Shows verbose output";
 
     private static final Logger LOGGER = Logger.getLogger(ProblemFixer.class
         .getName());
@@ -85,14 +86,12 @@ public class ProblemFixer {
             "https://cbsr-training.med.ualberta.ca/biobank", appArgs.username,
             appArgs.password);
 
-        // BiobankApplicationService appService =
-        // ServiceConnection.getAppService(
-        // "https://cbsr.med.ualberta.ca/biobank", appArgs.username,
-        // appArgs.password);
+        appService = ServiceConnection.getAppService(
+            "https://10.8.31.50/biobank", appArgs.username, appArgs.password);
 
-        appService = ServiceConnection
-            .getAppService("http://localhost:8080/biobank", appArgs.username,
-                appArgs.password);
+        // appService = ServiceConnection
+        // .getAppService("http://localhost:8080/biobank", appArgs.username,
+        // appArgs.password);
 
         calgarySiteOnProduction = null;
         for (SiteWrapper site : SiteQuery.getSites(appService)) {
