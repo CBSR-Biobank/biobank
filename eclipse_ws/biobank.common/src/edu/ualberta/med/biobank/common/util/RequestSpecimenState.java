@@ -5,10 +5,10 @@ package edu.ualberta.med.biobank.common.util;
  * anymore.
  */
 public enum RequestSpecimenState implements ItemState {
-    AVAILABLE_STATE(0, "Available"),
-    PULLED_STATE(1, "Pulled"),
-    UNAVAILABLE_STATE(2, "Unavailable"),
-    DISPATCHED_STATE(3, "Dispatched");
+    AVAILABLE_STATE(0, Messages.getString("RequestSpecimenState.available.label")), //$NON-NLS-1$
+    PULLED_STATE(1, Messages.getString("RequestSpecimenState.pulled.label")), //$NON-NLS-1$
+    UNAVAILABLE_STATE(2, Messages.getString("RequestSpecimenState.unavailable.label")), //$NON-NLS-1$
+    DISPATCHED_STATE(3, Messages.getString("RequestSpecimenState.dispatched.label")); //$NON-NLS-1$
 
     private Integer id;
     private String label;

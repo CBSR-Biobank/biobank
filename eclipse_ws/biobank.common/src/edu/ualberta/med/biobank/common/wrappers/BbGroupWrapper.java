@@ -20,7 +20,7 @@ public class BbGroupWrapper extends BbGroupBaseWrapper {
         super(appService);
     }
 
-    private static final String ALL_GROUPS_QRY = " from "
+    private static final String ALL_GROUPS_QRY = " from " //$NON-NLS-1$
         + BbGroup.class.getName();
 
     public static final List<BbGroupWrapper> getAllGroups(

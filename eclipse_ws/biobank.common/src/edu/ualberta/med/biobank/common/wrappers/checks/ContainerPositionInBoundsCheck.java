@@ -21,8 +21,8 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
 public class ContainerPositionInBoundsCheck<E extends AbstractPosition> extends
     WrapperAction<E> {
     private static final long serialVersionUID = 1L;
-    private static final String HQL = "SELECT o.{0}, o.{1} FROM {2} o WHERE o = ?";
-    private static final String OUT_OF_BOUNDS_POSITION_MSG = "Position {0}:{1} is invalid. Row should be between 0 and {2} (exclusive) and Col should be between 0 and {3} (exclusive).";
+    private static final String HQL = "SELECT o.{0}, o.{1} FROM {2} o WHERE o = ?"; //$NON-NLS-1$
+    private static final String OUT_OF_BOUNDS_POSITION_MSG = Messages.getString("ContainerPositionInBoundsCheck.out.of.bounds.position.msg"); //$NON-NLS-1$
     private static final Property<Capacity, Container> CONTAINER_CAPACITY = ContainerPeer.CONTAINER_TYPE
         .to(ContainerTypePeer.CAPACITY);
     private static final Property<Integer, Container> MAX_ROW = CONTAINER_CAPACITY

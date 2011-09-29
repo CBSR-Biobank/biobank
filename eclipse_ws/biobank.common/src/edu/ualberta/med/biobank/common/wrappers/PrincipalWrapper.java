@@ -18,7 +18,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public abstract class PrincipalWrapper<T extends Principal> extends
     PrincipalBaseWrapper<T> {
 
-    private static final String WORKING_CENTERS_KEY = "workingCenters";
+    private static final String WORKING_CENTERS_KEY = "workingCenters"; //$NON-NLS-1$
 
     public PrincipalWrapper(WritableApplicationService appService,
         T wrappedObject) {
@@ -101,8 +101,7 @@ public abstract class PrincipalWrapper<T extends Principal> extends
     }
 
     protected List<PrivilegeWrapper> getPrivilegesForRight(
-        BbRightWrapper right, CenterWrapper<?> center, StudyWrapper study)
-        throws ApplicationException {
+        BbRightWrapper right, CenterWrapper<?> center, StudyWrapper study) {
         List<PrivilegeWrapper> privileges = new ArrayList<PrivilegeWrapper>();
         for (MembershipWrapper ms : getMembershipCollection(false)) {
             privileges.addAll(ms.getPrivilegesForRight(right, center, study));

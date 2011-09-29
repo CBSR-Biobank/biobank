@@ -28,7 +28,7 @@ public class PrivilegeWrapper extends PrivilegeBaseWrapper {
         super(appService, wrappedObject);
     }
 
-    private static final String ALL_PRIVILEGES_QRY = "from "
+    private static final String ALL_PRIVILEGES_QRY = "from " //$NON-NLS-1$
         + Privilege.class.getName();
 
     private static synchronized Map<String, PrivilegeWrapper> getPrivileges(

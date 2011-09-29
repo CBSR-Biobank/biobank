@@ -58,7 +58,7 @@ public class LazyMessage implements Serializable {
 
     private static class ModelIdLazyArg implements LazyArg {
         private static final long serialVersionUID = 1L;
-        private static final String SELECT_PROPERTY_HQL = "SELECT o.{0} FROM {1} o WHERE o.{2} = ?";
+        private static final String SELECT_PROPERTY_HQL = "SELECT o.{0} FROM {1} o WHERE o.{2} = ?"; //$NON-NLS-1$
 
         private final Class<?> modelClass;
         private final Property<?, ?> idProperty;
@@ -95,7 +95,7 @@ public class LazyMessage implements Serializable {
 
     private static class WrapperLazyArg implements LazyArg {
         private static final long serialVersionUID = 1L;
-        private static final String SELECT_PROPERTY_HQL = "SELECT o.{0} FROM {1} o WHERE o = ?";
+        private static final String SELECT_PROPERTY_HQL = "SELECT o.{0} FROM {1} o WHERE o = ?"; //$NON-NLS-1$
 
         private final Object model;
         private final Class<?> modelClass;

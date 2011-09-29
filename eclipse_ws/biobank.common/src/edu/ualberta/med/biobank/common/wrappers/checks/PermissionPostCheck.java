@@ -22,17 +22,16 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
 public class PermissionPostCheck extends LoadModelAction<Permission> {
     private static final long serialVersionUID = 1L;
 
-    private static final String COUNT_PRIVILEGES_NOT_FOR_RIGHT = "select count(distinct privileges)"
-        + " from "
+    private static final String COUNT_PRIVILEGES_NOT_FOR_RIGHT = "select count(distinct privileges)" //$NON-NLS-1$
+        + " from " //$NON-NLS-1$
         + Permission.class.getName()
-        + " as perm join perm."
+        + " as perm join perm." //$NON-NLS-1$
         + PermissionPeer.PRIVILEGE_COLLECTION.getName()
-        + " as privileges join perm."
+        + " as privileges join perm." //$NON-NLS-1$
         + Property.concatNames(PermissionPeer.RIGHT,
             BbRightPeer.AVAILABLE_PRIVILEGE_COLLECTION)
-        + " as rightPriv where perm."
-        + PermissionPeer.ID.getName()
-        + " = ? and privileges != rightPriv";
+        + " as rightPriv where perm." //$NON-NLS-1$
+        + PermissionPeer.ID.getName() + " = ? and privileges != rightPriv"; //$NON-NLS-1$
 
     /**
      * 
@@ -51,7 +50,8 @@ public class PermissionPostCheck extends LoadModelAction<Permission> {
         Long count = HibernateUtil.getCountFromQuery(query);
         if (count != 0)
             throw new BiobankSessionException(
-                "This permission contains privileges that are not supposed to be associated with this right");
+                Messages
+                    .getString("PermissionPostCheck.right.privilege.association.error.msg")); //$NON-NLS-1$
     }
 
 }

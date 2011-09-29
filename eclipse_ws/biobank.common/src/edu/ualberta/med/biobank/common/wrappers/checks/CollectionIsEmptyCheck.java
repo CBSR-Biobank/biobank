@@ -23,8 +23,9 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionN
  */
 public class CollectionIsEmptyCheck<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
-    private static final String EXCEPTION_MESSAGE = "{0} {1} has one or more {2}.";
-    private static final String COUNT_HQL = "SELECT m.{0}.size FROM {1} m WHERE m = ?";
+    private static final String EXCEPTION_MESSAGE = Messages
+        .getString("CollectionIsEmptyCheck.one.or.more.msg"); //$NON-NLS-1$
+    private static final String COUNT_HQL = "SELECT m.{0}.size FROM {1} m WHERE m = ?"; //$NON-NLS-1$
 
     private final Property<?, ? super E> property;
     private final String modelString;

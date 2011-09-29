@@ -20,9 +20,9 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
 
 public class OriginInfoFromClinicCheck extends LoadAction<OriginInfo> {
     private static final long serialVersionUID = 1L;
-    private static final String WAYBILL_REQUIRED_MSG = "A waybill should be set on this shipment.";
-    private static final String WAYBILL_NOT_ALLOWED_MSG = "This clinic does not send shipments: waybill should not be set.";
-    private static final String WAYBILL_USED_MSG = "A shipment with waybill {0} already exist in clinic {1}.";
+    private static final String WAYBILL_REQUIRED_MSG = Messages.getString("OriginInfoFromClinicCheck.waybill.required.msg"); //$NON-NLS-1$
+    private static final String WAYBILL_NOT_ALLOWED_MSG = Messages.getString("OriginInfoFromClinicCheck.waybill.not.allowed.msg"); //$NON-NLS-1$
+    private static final String WAYBILL_USED_MSG = Messages.getString("OriginInfoFromClinicCheck.waybill.used.msg"); //$NON-NLS-1$
     private static final Collection<Property<?, ? super OriginInfo>> UNIQUE_WAYBILL = new ArrayList<Property<?, ? super OriginInfo>>();
 
     static {

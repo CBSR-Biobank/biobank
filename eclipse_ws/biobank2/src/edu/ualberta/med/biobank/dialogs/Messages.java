@@ -37,6 +37,7 @@ public class Messages extends NLS {
     public static String ChangePasswordDialog_password_length_msg;
     public static String ChangePasswordDialog_password_reenter_msg;
     public static String ChangePasswordDialog_password_retype_label;
+    public static String ChangePasswordDialog_receive_email_check;
     public static String ChangePasswordDialog_success_msg;
     public static String ChangePasswordDialog_success_title;
     public static String ChangePasswordDialog_title;

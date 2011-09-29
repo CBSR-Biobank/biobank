@@ -5,7 +5,8 @@ import java.text.MessageFormat;
 public class NoRightForKeyDescException extends BiobankException {
     private static final long serialVersionUID = 1L;
 
-    private final static String MSG = "No right exists with keyDesc=''{0}''";
+    private final static String MSG = Messages
+        .getString("NoRightForKeyDescException.msg"); //$NON-NLS-1$
 
     public NoRightForKeyDescException(String keyDesc) {
         super(MessageFormat.format(MSG, keyDesc));

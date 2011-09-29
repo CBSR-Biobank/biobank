@@ -22,7 +22,7 @@ public class BiobankReport implements QueryCommand {
 
     static {
         ResourceBundle rb = ResourceBundle.getBundle(BiobankReport.class
-            .getPackage().getName() + "." + REPORTS_FILE_NAME,
+            .getPackage().getName() + "." + REPORTS_FILE_NAME, //$NON-NLS-1$
             Locale.getDefault());
         // load map
         Enumeration<String> keysEnum = rb.getKeys();

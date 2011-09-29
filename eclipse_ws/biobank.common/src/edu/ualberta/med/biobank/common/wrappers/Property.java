@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.property.PropertyLink;
 public class Property<P, M> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private static final Pattern NAME_SPLITTER = Pattern.compile("\\.");
+    private static final Pattern NAME_SPLITTER = Pattern.compile("\\."); //$NON-NLS-1$
 
     private final String name;
     private final List<String> splitNames;
@@ -246,7 +246,7 @@ public class Property<P, M> implements Serializable {
 
     @Override
     public String toString() {
-        return name + "(" + typeInfo.toString + ")";
+        return name + "(" + typeInfo.toString + ")"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     public interface Accessor<P, M> extends Serializable {

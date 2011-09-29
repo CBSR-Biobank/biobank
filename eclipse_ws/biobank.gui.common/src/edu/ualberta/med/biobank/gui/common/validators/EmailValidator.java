@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.Status;
  */
 public class EmailValidator extends AbstractValidator {
 
-    public static final String EMAIL_PATTERN = ".+@.+\\..+";
+    public static final String EMAIL_PATTERN = ".+@.+\\..+"; //$NON-NLS-1$
 
     public EmailValidator(String message) {
         super(message);

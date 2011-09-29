@@ -590,7 +590,7 @@
     <java classname="edu.ualberta.med.biobank.tools.modelextender.ModelExtender"
           failonerror="true"
           fork="true">
-      <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
+      <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/src/log4j.properties" />
       <arg value="${model.proj.dir}/biobank.uml" />
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer" />
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/wrappers" />
@@ -660,7 +660,7 @@
     <java classname="edu.ualberta.med.biobank.tools.validator.ValidatorGeneration"
           failonerror="true"
           fork="true">
-      <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
+      <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/src/log4j.properties" />
       <arg value="${model.proj.dir}/biobank.uml" />
       <arg value="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
       <classpath>
@@ -730,7 +730,7 @@
     <java classname="edu.ualberta.med.biobank.tools.hbmpostproc.HbmPostProcess"
           failonerror="true"
           fork="true">
-      <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
+      <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/src/log4j.properties" />
       <arg value="${model.proj.dir}/biobank.uml" />
       <arg value="${cacore.sdk.dir}/output/biobank/src/edu/ualberta/med/biobank/model" />
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/VarCharLengths.java.template" />

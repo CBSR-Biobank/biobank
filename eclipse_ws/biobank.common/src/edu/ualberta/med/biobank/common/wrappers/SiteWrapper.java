@@ -17,8 +17,9 @@ import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SiteWrapper extends SiteBaseWrapper {
-    private static final String TOP_CONTAINER_COLLECTION_CACHE_KEY = "topContainerCollection";
-    private static final String EXISTING_CHILDREN_MSG = "Unable to delete site {0}. All defined children (processing events, container types, and containers) must be removed first.";
+    private static final String TOP_CONTAINER_COLLECTION_CACHE_KEY = "topContainerCollection"; //$NON-NLS-1$
+    private static final String EXISTING_CHILDREN_MSG = Messages
+        .getString("SiteWrapper.existing.children.msg"); //$NON-NLS-1$
 
     @SuppressWarnings("unused")
     private Map<RequestState, List<RequestWrapper>> requestCollectionMap = new HashMap<RequestState, List<RequestWrapper>>();

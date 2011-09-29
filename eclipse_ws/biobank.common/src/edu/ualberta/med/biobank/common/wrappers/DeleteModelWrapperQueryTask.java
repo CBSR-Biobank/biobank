@@ -63,7 +63,7 @@ public class DeleteModelWrapperQueryTask<E> implements
      */
     private static class DeleteAction<E> extends WrapperAction<E> {
         private static final long serialVersionUID = 1L;
-        private static final String HQL = "DELETE FROM {0} WHERE {1} = ?";
+        private static final String HQL = "DELETE FROM {0} WHERE {1} = ?"; //$NON-NLS-1$
 
         public DeleteAction(ModelWrapper<E> wrapper) {
             super(wrapper);

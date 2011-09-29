@@ -16,11 +16,11 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class RequestWrapper extends RequestBaseWrapper {
 
-    private static final String NON_PROCESSED_SPECIMENS_CACHE_KEY = "nonProcessedRequestSpecimenCollection";
+    private static final String NON_PROCESSED_SPECIMENS_CACHE_KEY = "nonProcessedRequestSpecimenCollection"; //$NON-NLS-1$
 
-    private static final String PROCESSED_SPECIMENS_CACHE_KEY = "processedRequestSpecimens";
+    private static final String PROCESSED_SPECIMENS_CACHE_KEY = "processedRequestSpecimens"; //$NON-NLS-1$
 
-    private static final String UNAVAILABLE_SPECIMENS_KEY = "unavailableRequestSpecimens";
+    private static final String UNAVAILABLE_SPECIMENS_KEY = "unavailableRequestSpecimens"; //$NON-NLS-1$
 
     public RequestWrapper(WritableApplicationService appService) {
         super(appService);
@@ -111,8 +111,8 @@ public class RequestWrapper extends RequestBaseWrapper {
         return null;
     }
 
-    private static final String REQUEST_BY_NUMBER_QRY = "from "
-        + Request.class.getName() + " where " + RequestPeer.ID.getName() + "=?";
+    private static final String REQUEST_BY_NUMBER_QRY = "from " //$NON-NLS-1$
+        + Request.class.getName() + " where " + RequestPeer.ID.getName() + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
     public static List<RequestWrapper> getRequestByNumber(
         WritableApplicationService appService, Integer requestNumber)

@@ -19,7 +19,9 @@ public class DispatchInfoTable extends InfoTableWidget {
     protected static class TableRowData {
 
         DispatchWrapper ds;
+        String sender;
         Date dispatchTime;
+        String receiver;
         Date dateReceived;
         String waybill;
         String dstatus;
@@ -28,14 +30,15 @@ public class DispatchInfoTable extends InfoTableWidget {
         @Override
         public String toString() {
             return StringUtils.join(
-                new String[] { DateFormatter.formatAsDate(dispatchTime),
+                new String[] { sender,
+                    DateFormatter.formatAsDate(dispatchTime), receiver,
                     DateFormatter.formatAsDate(dateReceived), waybill, dstatus,
                     astatus }, "\t"); //$NON-NLS-1$
         }
     }
 
-    private static final String[] HEADINGS = new String[] {
-        Messages.DispatchInfoTable_time_label,
+    private static final String[] HEADINGS = new String[] { Messages.DispatchInfoTable_sender_label,
+        Messages.DispatchInfoTable_time_label, Messages.DispatchInfoTable_receiver_label,
         Messages.DispatchInfoTable_received_label,
         Messages.DispatchInfoTable_waybill_label,
         Messages.DispatchInfoTable_state_label,
@@ -68,14 +71,18 @@ public class DispatchInfoTable extends InfoTableWidget {
                 }
                 switch (columnIndex) {
                 case 0:
-                    return DateFormatter.formatAsDate(info.dispatchTime);
+                    return info.sender;
                 case 1:
-                    return DateFormatter.formatAsDate(info.dateReceived);
+                    return DateFormatter.formatAsDate(info.dispatchTime);
                 case 2:
-                    return info.waybill;
+                    return info.receiver;
                 case 3:
-                    return info.dstatus;
+                    return DateFormatter.formatAsDate(info.dateReceived);
                 case 4:
+                    return info.waybill;
+                case 5:
+                    return info.dstatus;
+                case 6:
                     return info.astatus;
                 default:
                     return ""; //$NON-NLS-1$
@@ -88,8 +95,10 @@ public class DispatchInfoTable extends InfoTableWidget {
     public TableRowData getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
         info.ds = (DispatchWrapper) obj;
+        info.sender = info.ds.getSenderCenter().getNameShort();
         info.dispatchTime = info.ds.getShipmentInfo() == null ? null : info.ds
             .getShipmentInfo().getPackedAt();
+        info.receiver = info.ds.getReceiverCenter().getNameShort();
         info.dateReceived = info.ds.getShipmentInfo() == null ? null : info.ds
             .getShipmentInfo().getReceivedAt();
         info.dstatus = info.ds.getStateDescription();

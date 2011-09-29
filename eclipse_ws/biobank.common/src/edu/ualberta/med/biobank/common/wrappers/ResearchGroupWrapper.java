@@ -24,7 +24,7 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
         // TODO Auto-generated constructor stub
     }
 
-    private static final String ALL_RG_QRY = "from "
+    private static final String ALL_RG_QRY = "from " //$NON-NLS-1$
         + ResearchGroup.class.getName();
 
     public static List<ResearchGroupWrapper> getAllResearchGroups(
@@ -37,7 +37,7 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
         return wrappers;
     }
 
-    private static final String RG_COUNT_QRY = "select count (*) from "
+    private static final String RG_COUNT_QRY = "select count (*) from " //$NON-NLS-1$
         + ResearchGroup.class.getName();
 
     public static long getCount(WritableApplicationService appService)
@@ -45,10 +45,10 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
         return getCountResult(appService, new HQLCriteria(RG_COUNT_QRY));
     }
 
-    private static String AVAIL_STUDIES = "select s from "
-        + Study.class.getName() + " s where s not in (select r."
-        + ResearchGroupPeer.STUDY.getName() + " from "
-        + ResearchGroup.class.getName() + " r)";
+    private static String AVAIL_STUDIES = "select s from " //$NON-NLS-1$
+        + Study.class.getName() + " s where s not in (select r." //$NON-NLS-1$
+        + ResearchGroupPeer.STUDY.getName() + " from " //$NON-NLS-1$
+        + ResearchGroup.class.getName() + " r)"; //$NON-NLS-1$
 
     public static List<StudyWrapper> getAvailStudies(
         WritableApplicationService appService) throws ApplicationException {

@@ -46,7 +46,7 @@ public final class Collections {
         } else {
             if (!isCollectionSnapshotValid(collection)) {
                 throw new HibernateException(
-                    "could not reassociate uninitialized transient collection");
+                    "could not reassociate uninitialized transient collection"); //$NON-NLS-1$
             }
             CollectionPersister collectionPersister = session.getFactory()
                 .getCollectionPersister(collection.getRole());
@@ -82,7 +82,7 @@ public final class Collections {
         final CollectionPersister loadedPersister = entry.getLoadedPersister();
 
         if (log.isDebugEnabled() && loadedPersister != null)
-            log.debug("Collection dereferenced: "
+            log.debug("Collection dereferenced: " //$NON-NLS-1$
                 + MessageHelper.collectionInfoString(loadedPersister,
                     entry.getLoadedKey(), session.getFactory()));
 
@@ -108,7 +108,7 @@ public final class Collections {
                 }
                 if (ownerId == null) {
                     throw new AssertionFailure(
-                        "Unable to determine collection owner identifier for orphan-delete processing");
+                        "Unable to determine collection owner identifier for orphan-delete processing"); //$NON-NLS-1$
                 }
             }
             EntityKey key = new EntityKey(ownerId,
@@ -117,7 +117,7 @@ public final class Collections {
             Object owner = persistenceContext.getEntity(key);
             if (owner == null) {
                 throw new AssertionFailure(
-                    "collection owner not associated with session: "
+                    "collection owner not associated with session: " //$NON-NLS-1$
                         + loadedPersister.getRole());
             }
             EntityEntry e = persistenceContext.getEntry(owner);
@@ -126,7 +126,7 @@ public final class Collections {
             if (e != null && e.getStatus() != Status.DELETED
                 && e.getStatus() != Status.GONE) {
                 throw new HibernateException(
-                    "A collection with cascade=\"all-delete-orphan\" was no longer referenced by the owning entity instance: "
+                    "A collection with cascade=\"all-delete-orphan\" was no longer referenced by the owning entity instance: " //$NON-NLS-1$
                         + loadedPersister.getRole());
             }
         }
@@ -147,7 +147,7 @@ public final class Collections {
             .getPersistenceContext();
         CollectionEntry entry = persistenceContext.getCollectionEntry(coll);
 
-        log.debug("Found collection with unloaded owner: "
+        log.debug("Found collection with unloaded owner: " //$NON-NLS-1$
             + MessageHelper.collectionInfoString(entry.getLoadedPersister(),
                 entry.getLoadedKey(), session.getFactory()));
 
@@ -191,7 +191,7 @@ public final class Collections {
                 // refer to comment in
                 // StatefulPersistenceContext.addCollection()
                 throw new HibernateException(
-                    "Found two representations of same collection: "
+                    "Found two representations of same collection: " //$NON-NLS-1$
                         + type.getRole());
             }
         }
@@ -202,7 +202,7 @@ public final class Collections {
         if (ce.isReached()) {
             // We've been here before
             throw new HibernateException(
-                "Found shared references to a collection: " + type.getRole());
+                "Found shared references to a collection: " + type.getRole()); //$NON-NLS-1$
         }
         ce.setReached(true);
 
@@ -213,14 +213,13 @@ public final class Collections {
                                                                // argument?
 
         if (log.isDebugEnabled()) {
-            log.debug("Collection found: "
+            log.debug("Collection found: " //$NON-NLS-1$
                 + MessageHelper.collectionInfoString(persister,
-                    ce.getCurrentKey(), factory)
-                + ", was: "
+                    ce.getCurrentKey(), factory) + ", was: " //$NON-NLS-1$
                 + MessageHelper.collectionInfoString(ce.getLoadedPersister(),
                     ce.getLoadedKey(), factory)
-                + (collection.wasInitialized() ? " (initialized)"
-                    : " (uninitialized)"));
+                + (collection.wasInitialized() ? " (initialized)" //$NON-NLS-1$
+                    : " (uninitialized)")); //$NON-NLS-1$
         }
 
         prepareCollectionForUpdate(collection, ce, session.getEntityMode(),
@@ -240,7 +239,7 @@ public final class Collections {
 
         if (entry.isProcessed()) {
             throw new AssertionFailure(
-                "collection was processed twice by flush()");
+                "collection was processed twice by flush()"); //$NON-NLS-1$
         }
         entry.setProcessed(true);
 
@@ -271,7 +270,7 @@ public final class Collections {
 
                 if (orphanDeleteAndRoleChanged) {
                     throw new HibernateException(
-                        "Don't change the reference to a collection with cascade=\"all-delete-orphan\": "
+                        "Don't change the reference to a collection with cascade=\"all-delete-orphan\": " //$NON-NLS-1$
                             + loadedPersister.getRole());
                 }
 
@@ -285,7 +284,7 @@ public final class Collections {
                     entry.setDoremove(true); // we will need to remove ye olde
                                              // entries
                     if (entry.isDorecreate()) {
-                        log.trace("Forcing collection initialization");
+                        log.trace("Forcing collection initialization"); //$NON-NLS-1$
                         collection.forceInitialization(); // force initialize!
                     }
                 }

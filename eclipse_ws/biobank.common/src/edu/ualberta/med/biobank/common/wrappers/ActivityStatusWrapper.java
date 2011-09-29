@@ -45,11 +45,11 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  */
 public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
 
-    public static final String ACTIVE_STATUS_STRING = "Active";
+    public static final String ACTIVE_STATUS_STRING = "Active"; //$NON-NLS-1$
 
-    public static final String CLOSED_STATUS_STRING = "Closed";
+    public static final String CLOSED_STATUS_STRING = "Closed"; //$NON-NLS-1$
 
-    public static final String FLAGGED_STATUS_STRING = "Flagged";
+    public static final String FLAGGED_STATUS_STRING = "Flagged"; //$NON-NLS-1$
 
     public ActivityStatusWrapper(WritableApplicationService appService,
         ActivityStatus wrappedObject) {
@@ -69,9 +69,9 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
 
         long usedCount = 0;
         for (Class<?> clazz : classes) {
-            StringBuilder sb = new StringBuilder("select count(x) from ")
+            StringBuilder sb = new StringBuilder("select count(x) from ") //$NON-NLS-1$
                 .append(clazz.getName()).append(
-                    " as x where x.activityStatus=?");
+                    " as x where x.activityStatus=?"); //$NON-NLS-1$
             HQLCriteria c = new HQLCriteria(sb.toString(),
                 Arrays.asList(new Object[] { wrappedObject }));
             usedCount += getCountResult(appService, c);
@@ -101,7 +101,7 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
         return 0;
     }
 
-    private static final String ALL_ACTIVITY_STATUSES_QRY = "from "
+    private static final String ALL_ACTIVITY_STATUSES_QRY = "from " //$NON-NLS-1$
         + ActivityStatus.class.getName();
 
     public static List<ActivityStatusWrapper> getAllActivityStatuses(
@@ -118,8 +118,8 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
         return activities;
     }
 
-    private static final String ACTIVITY_STATUS_QRY = "from "
-        + ActivityStatus.class.getName() + " where name = ?";
+    private static final String ACTIVITY_STATUS_QRY = "from " //$NON-NLS-1$
+        + ActivityStatus.class.getName() + " where name = ?"; //$NON-NLS-1$
 
     public static ActivityStatusWrapper getActivityStatus(
         WritableApplicationService appService, String name)
@@ -131,7 +131,7 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
         List<ActivityStatus> result = appService.query(c);
         if (result.size() != 1) {
             throw new BiobankFailedQueryException(
-                "unexpected results from query");
+                "unexpected results from query"); //$NON-NLS-1$
         }
         return new ActivityStatusWrapper(appService, result.get(0));
 

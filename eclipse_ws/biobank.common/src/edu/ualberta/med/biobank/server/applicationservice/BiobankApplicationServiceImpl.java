@@ -151,6 +151,7 @@ public class BiobankApplicationServiceImpl extends
             .getResponse();
     }
 
+    @SuppressWarnings("nls")
     private static final String GET_USER_QRY = "from " + User.class.getName()
         + " where " + UserPeer.CSM_USER_ID.getName() + " = ?";
 
@@ -162,7 +163,7 @@ public class BiobankApplicationServiceImpl extends
         List<User> users = query(new HQLCriteria(GET_USER_QRY,
             Arrays.asList(csmUserId)));
         if (users.size() != 1) {
-            throw new ApplicationException("Problem with HQL result size");
+            throw new ApplicationException("Problem with HQL result size"); //$NON-NLS-1$
         }
         User user = users.get(0);
         user.setNeedChangePwd(false);
@@ -219,6 +220,7 @@ public class BiobankApplicationServiceImpl extends
 
     private static final int SS_INV_ID_LENGTH = 12;
 
+    @SuppressWarnings("nls")
     private static final String SS_INV_ID_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     private static final int SS_INV_ID_ALPHABET_LENGTH = SS_INV_ID_ALPHABET
@@ -227,6 +229,7 @@ public class BiobankApplicationServiceImpl extends
     private static final int SS_INV_ID_GENERATE_RETRIES = (int) Math.pow(
         SS_INV_ID_ALPHABET_LENGTH, SS_INV_ID_ALPHABET_LENGTH);
 
+    @SuppressWarnings("nls")
     private static final String SS_INV_ID_UNIQ_BASE_QRY = "SELECT count(*) "
         + "FROM printed_ss_inv_item where txt=\"{id}\"";
 
@@ -253,7 +256,7 @@ public class BiobankApplicationServiceImpl extends
 
                 // check database if string is unique
                 String potentialInvId = newInvId.toString();
-                String qry = SS_INV_ID_UNIQ_BASE_QRY.replace("{id}",
+                String qry = SS_INV_ID_UNIQ_BASE_QRY.replace("{id}", //$NON-NLS-1$
                     potentialInvId);
 
                 List<BigInteger> count = privateQuery(new BiobankSQLCriteria(
@@ -273,7 +276,7 @@ public class BiobankApplicationServiceImpl extends
             if (genRetries >= SS_INV_ID_GENERATE_RETRIES) {
                 // cannot generate any more unique strings
                 throw new BiobankServerException(
-                    "cannot generate any more source specimen inventory IDs");
+                    "cannot generate any more source specimen inventory IDs"); //$NON-NLS-1$
             }
 
         }

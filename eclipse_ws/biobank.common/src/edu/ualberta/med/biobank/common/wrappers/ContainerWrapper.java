@@ -45,15 +45,22 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends ContainerBaseWrapper {
-    public static final String PATH_DELIMITER = "/";
+    public static final String PATH_DELIMITER = "/"; //$NON-NLS-1$
 
-    private static final String CHILD_POSITION_CONFLICT_MSG = "Position {0} of container {1} already contains container {2} when trying to add container {3}.";
-    private static final String OUT_OF_BOUNDS_POSITION_MSG = "Position {0} is invalid. Row should be between 0 and {1} (exclusive) and column should be between 0 and {2} (exclusive).";
-    private static final String HAS_SPECIMENS_MSG = "Unable to delete container {0}. All specimens must be removed first.";
-    private static final String HAS_CHILD_CONTAINERS_MSG = "Unable to delete container {0}. All subcontainers must be removed first.";
-    private static final String CANNOT_HOLD_SPECIMEN_TYPE_MSG = "Container {0} does not allow inserts of type {1}.";
-    private static final String SAMPLE_EXISTS_AT_POSITION_MSG = "Container {0} is already holding an specimen at position {1} {2}";
-    private static final String CONTAINER_AT_POSITION_MSG = "Container {0} is already holding a container {1} at position {2}.";
+    private static final String CHILD_POSITION_CONFLICT_MSG = Messages
+        .getString("ContainerWrapper.child.position.conflict.msg"); //$NON-NLS-1$
+    private static final String OUT_OF_BOUNDS_POSITION_MSG = Messages
+        .getString("ContainerWrapper.out.of.bounds.position.msg"); //$NON-NLS-1$
+    private static final String HAS_SPECIMENS_MSG = Messages
+        .getString("ContainerWrapper.has.specimens.msg"); //$NON-NLS-1$
+    private static final String HAS_CHILD_CONTAINERS_MSG = Messages
+        .getString("ContainerWrapper.has.child.containers.msg"); //$NON-NLS-1$
+    private static final String CANNOT_HOLD_SPECIMEN_TYPE_MSG = Messages
+        .getString("ContainerWrapper.cannot.hold.specimen.type.msg"); //$NON-NLS-1$
+    private static final String SAMPLE_EXISTS_AT_POSITION_MSG = Messages
+        .getString("ContainerWrapper.specimen.exists.atposition.msg"); //$NON-NLS-1$
+    private static final String CONTAINER_AT_POSITION_MSG = Messages
+        .getString("ContainerWrapper.container.atposition.msg"); //$NON-NLS-1$
 
     private static final Collection<Property<?, ? super Container>> UNIQUE_LABEL_PROPS,
         UNIQUE_BARCODE_PROPS;
@@ -122,10 +129,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public String getPath() {
         if (isNew()) {
             throw new BiobankRuntimeException(
-                "container is not in database yet: no ID");
+                "container is not in database yet: no ID"); //$NON-NLS-1$
         }
 
-        String parentPath = "";
+        String parentPath = ""; //$NON-NLS-1$
 
         if (isPropertyCached(ContainerPeer.POSITION) && getPosition() != null) {
             if (getPosition().isPropertyCached(
@@ -138,7 +145,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             // method returns the parent path plus its id.
             parentPath = super.getPath();
             if (parentPath == null) {
-                parentPath = "";
+                parentPath = ""; //$NON-NLS-1$
             }
         }
 
@@ -202,7 +209,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     @Override
     @Deprecated
     public void setPath(String dummy) {
-        throw new BiobankRuntimeException("cannot set path on container");
+        throw new BiobankRuntimeException("cannot set path on container"); //$NON-NLS-1$
     }
 
     public void setParent(ContainerWrapper container, RowColPos position)
@@ -230,7 +237,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     @Deprecated
     public void setTopContainer(ContainerBaseWrapper container) {
         throw new UnsupportedOperationException(
-            "Not allowed to directly set the top Container. Set the parent Container instead.");
+            "Not allowed to directly set the top Container. Set the parent Container instead."); //$NON-NLS-1$
     }
 
     public void setTopContainerInternal(ContainerWrapper container,
@@ -280,14 +287,17 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         if (rcp != null) {
             if (rcp.getRow() >= type.getRowCapacity()
                 || rcp.getCol() >= type.getColCapacity()) {
-                throw new Exception("Can't use position " + position
-                    + " in container " + getFullInfoLabel()
-                    + ". Reason: capacity = " + type.getRowCapacity() + "*"
-                    + type.getColCapacity());
+                throw new Exception(
+                    MessageFormat
+                        .format(
+                            Messages.getString("ContainerWrapper.position.error.msg"), //$NON-NLS-1$
+                            position, getFullInfoLabel(),
+                            type.getRowCapacity(), type.getColCapacity()));
             }
             if (rcp.getRow() < 0 || rcp.getCol() < 0) {
-                throw new Exception("Position \"" + position
-                    + "\" is invalid for this container " + getFullInfoLabel());
+                throw new Exception(MessageFormat.format(
+                    Messages.getString("ContainerWrapper.invalid.position.error.msg"), //$NON-NLS-1$
+                    position, getFullInfoLabel()));
             }
         }
         return rcp;
@@ -358,7 +368,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             || getContainerType().getNameShort() == null) {
             return getLabel();
         }
-        return getLabel() + " (" + getContainerType().getNameShort() + ")";
+        return getLabel() + " (" + getContainerType().getNameShort() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     public long getChildCount(boolean fast) throws BiobankException,
@@ -425,7 +435,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public ContainerWrapper getChildByLabel(String label) throws Exception {
         ContainerTypeWrapper containerType = getContainerType();
         if (containerType == null) {
-            throw new Exception("container type is null");
+            throw new Exception("container type is null"); //$NON-NLS-1$
         }
         if (label.startsWith(getLabel())) {
             label = label.substring(getLabel().length());
@@ -476,7 +486,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         throws Exception {
         SpecimenTypeWrapper type = specimen.getSpecimenType();
         if (type == null) {
-            throw new BiobankCheckException("sample type is null");
+            throw new BiobankCheckException("specimen type is null"); //$NON-NLS-1$
         }
         return getContainerType().getSpecimenTypeCollection(false).contains(
             type);
@@ -503,15 +513,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             getContainerType());
     }
 
-    private static final String POSSIBLE_PARENTS_BASE_QRY = "select distinct(c) from "
+    private static final String POSSIBLE_PARENTS_BASE_QRY = "select distinct(c) from " //$NON-NLS-1$
         + Container.class.getName()
-        + " as c left join c."
+        + " as c left join c." //$NON-NLS-1$
         + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
             ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION)
-        + " as ct where c."
-        + ContainerPeer.SITE.getName()
-        + "=? and c."
-        + ContainerPeer.LABEL.getName() + " in (";
+        + " as ct where c." //$NON-NLS-1$
+        + ContainerPeer.SITE.getName() + "=? and c." //$NON-NLS-1$
+        + ContainerPeer.LABEL.getName() + " in ("; //$NON-NLS-1$
 
     /**
      * Get containers with a given label that can have a child (container or
@@ -533,10 +542,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         for (Integer crop : validLengths)
             if (crop < childLabel.length())
                 validParents
-                    .add(new StringBuilder("'")
+                    .add(new StringBuilder("'") //$NON-NLS-1$
                         .append(
                             childLabel.substring(0, childLabel.length() - crop))
-                        .append("'").toString());
+                        .append("'").toString()); //$NON-NLS-1$
 
         List<ContainerWrapper> filteredWrappers = new ArrayList<ContainerWrapper>();
         if (validParents.size() > 0) {
@@ -544,9 +553,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             params.add(site.getWrappedObject());
             StringBuilder parentQuery = new StringBuilder(
                 POSSIBLE_PARENTS_BASE_QRY).append(
-                StringUtil.join(validParents, ",")).append(")");
+                StringUtil.join(validParents, ",")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
             if (type != null) {
-                parentQuery.append(" and ct.id=?");
+                parentQuery.append(" and ct.id=?"); //$NON-NLS-1$
                 params.add(type.getId());
             }
             HQLCriteria criteria = new HQLCriteria(parentQuery.toString(),
@@ -570,30 +579,29 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return filteredWrappers;
     }
 
-    private static final String EMPTY_CONTAINERS_HOLDING_SPECIMEN_TYPE_BASE_QRY = "from "
+    private static final String EMPTY_CONTAINERS_HOLDING_SPECIMEN_TYPE_BASE_QRY = "from " //$NON-NLS-1$
         + Container.class.getName()
-        + " where "
+        + " where " //$NON-NLS-1$
         + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
-        + "=? and "
+        + "=? and " //$NON-NLS-1$
         + ContainerPeer.SPECIMEN_POSITION_COLLECTION.getName()
-        + ".size = 0 and "
+        + ".size = 0 and " //$NON-NLS-1$
         + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
             ContainerTypePeer.CAPACITY, CapacityPeer.ROW_CAPACITY)
-        + " >= ? and "
+        + " >= ? and " //$NON-NLS-1$
         + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
             ContainerTypePeer.CAPACITY, CapacityPeer.COL_CAPACITY)
-        + " >= ? and "
+        + " >= ? and " //$NON-NLS-1$
         + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
             ContainerTypePeer.ID)
-        + " in (select ct."
+        + " in (select ct." //$NON-NLS-1$
         + ContainerTypePeer.ID.getName()
-        + " from "
+        + " from " //$NON-NLS-1$
         + ContainerType.class.getName()
-        + " as ct left join ct."
+        + " as ct left join ct." //$NON-NLS-1$
         + ContainerTypePeer.SPECIMEN_TYPE_COLLECTION.getName()
-        + " as sampleType where sampleType."
-        + SpecimenTypePeer.ID.getName()
-        + " in (";
+        + " as sampleType where sampleType." //$NON-NLS-1$
+        + SpecimenTypePeer.ID.getName() + " in ("; //$NON-NLS-1$
 
     /**
      * Retrieve a list of empty containers in a specific site. These containers
@@ -619,7 +627,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         }
         String qry = new StringBuilder(
             EMPTY_CONTAINERS_HOLDING_SPECIMEN_TYPE_BASE_QRY)
-            .append(StringUtil.join(typeIds, ",")).append("))").toString();
+            .append(StringUtil.join(typeIds, ",")).append("))").toString(); //$NON-NLS-1$ //$NON-NLS-2$
         HQLCriteria criteria = new HQLCriteria(qry, Arrays.asList(new Object[] {
             siteWrapper.getId(), minRowCapacity, minColCapacity }));
         List<Container> containers = appService.query(criteria);
@@ -627,10 +635,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             ContainerWrapper.class);
     }
 
-    private static final String CONTAINERS_IN_SITE_QRY = "from "
-        + Container.class.getName() + " where "
-        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and "
-        + ContainerPeer.LABEL.getName() + "=?";
+    private static final String CONTAINERS_IN_SITE_QRY = "from " //$NON-NLS-1$
+        + Container.class.getName() + " where " //$NON-NLS-1$
+        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and " //$NON-NLS-1$
+        + ContainerPeer.LABEL.getName() + "=?"; //$NON-NLS-1$
 
     /**
      * Get all containers form a given site with a given label
@@ -645,9 +653,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             ContainerWrapper.class);
     }
 
-    private static final String CONTAINERS_BY_LABEL = "from "
-        + Container.class.getName() + " where " + ContainerPeer.LABEL.getName()
-        + "=?";
+    private static final String CONTAINERS_BY_LABEL = "from " //$NON-NLS-1$
+        + Container.class.getName() + " where " + ContainerPeer.LABEL.getName() //$NON-NLS-1$
+        + "=?"; //$NON-NLS-1$
 
     /**
      * Get all containers with a given label
@@ -662,12 +670,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             ContainerWrapper.class);
     }
 
-    private static final String CONTAINER_WITH_PRODUCT_BARCODE_IN_SITE_QRY = "from "
-        + Container.class.getName()
-        + " where "
-        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
-        + "=? and "
-        + ContainerPeer.PRODUCT_BARCODE.getName() + "=?";
+    private static final String CONTAINER_WITH_PRODUCT_BARCODE_IN_SITE_QRY = "from " //$NON-NLS-1$
+        + Container.class.getName() + " where " //$NON-NLS-1$
+        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and " //$NON-NLS-1$
+        + ContainerPeer.PRODUCT_BARCODE.getName() + "=?"; //$NON-NLS-1$
 
     /**
      * Get the container with the given productBarcode in a site
@@ -682,9 +688,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         if (containers.size() == 0) {
             return null;
         } else if (containers.size() > 1) {
-            throw new Exception(
-                "Multiples containers registered with product barcode "
-                    + productBarcode);
+            throw new Exception(MessageFormat.format(
+                Messages.getString("ContainerWrapper.multiple.containers.product.barcode.error.msg"), //$NON-NLS-1$
+                productBarcode));
         }
         return new ContainerWrapper(appService, containers.get(0));
     }
@@ -721,7 +727,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         throws Exception {
         if (type == null) {
             throw new Exception(
-                "Error initializing container. That is not a valid container type.");
+                "Error initializing container. That is not a valid container type."); //$NON-NLS-1$
         }
         Boolean filled = (getChild(i, j) != null);
         if (!filled) {
@@ -785,7 +791,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     @Override
     public String toString() {
-        return getLabel() + " (" + getProductBarcode() + ")";
+        return getLabel() + " (" + getProductBarcode() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override
@@ -882,15 +888,15 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return getContainerType().isPallet96();
     }
 
-    private static final String POSITION_FREE_QRY = "from "
+    private static final String POSITION_FREE_QRY = "from " //$NON-NLS-1$
         + Specimen.class.getName()
-        + " where "
+        + " where " //$NON-NLS-1$
         + SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.ROW).getName()
-        + "=? and "
+        + "=? and " //$NON-NLS-1$
         + SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.COL).getName()
-        + "=? and "
+        + "=? and " //$NON-NLS-1$
         + SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.CONTAINER)
-            .getName() + "=?";
+            .getName() + "=?"; //$NON-NLS-1$
 
     /**
      * Method used to check if the current position of this Specimen is

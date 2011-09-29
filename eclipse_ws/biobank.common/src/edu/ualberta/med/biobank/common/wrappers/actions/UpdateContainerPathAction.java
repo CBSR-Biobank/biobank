@@ -23,6 +23,7 @@ public class UpdateContainerPathAction extends WrapperAction<Container> {
     private static final Property<Integer, Container> PARENT_ID_PROPERTY = PARENT_PROPERTY
         .to(ContainerPeer.ID);
     // @formatter:off
+    @SuppressWarnings("nls")
     private static final String SELECT_PARENT_INFO_HQL = 
         "SELECT o." + PARENT_PATH_PROPERTY.getName() + 
         "      ,o." + PARENT_ID_PROPERTY.getName() +

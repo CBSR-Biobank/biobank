@@ -24,7 +24,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class UserWrapper extends UserBaseWrapper {
 
-    private static final String ADMIN_KEY_DESC = "admin";
+    private static final String ADMIN_KEY_DESC = "admin"; //$NON-NLS-1$
 
     private String password;
 
@@ -83,7 +83,7 @@ public class UserWrapper extends UserBaseWrapper {
     public void setPassword(String password) {
         String old = this.password;
         this.password = password;
-        propertyChangeSupport.firePropertyChange("password", old, password);
+        propertyChangeSupport.firePropertyChange("password", old, password); //$NON-NLS-1$
 
     }
 
@@ -105,8 +105,8 @@ public class UserWrapper extends UserBaseWrapper {
         lockedOut = null;
     }
 
-    private static final String GET_USER_QRY = "from " + User.class.getName()
-        + " where " + UserPeer.LOGIN.getName() + " = ?";
+    private static final String GET_USER_QRY = "from " + User.class.getName() //$NON-NLS-1$
+        + " where " + UserPeer.LOGIN.getName() + " = ?"; //$NON-NLS-1$ //$NON-NLS-2$
 
     public static UserWrapper getUser(BiobankApplicationService appService,
         String userName) throws BiobankCheckException, ApplicationException {
@@ -117,8 +117,8 @@ public class UserWrapper extends UserBaseWrapper {
             return null;
         if (users.size() == 1)
             return new UserWrapper(appService, users.get(0));
-        throw new BiobankCheckException("Error retrieving users: found "
-            + users.size() + " results.");
+        throw new BiobankCheckException("Error retrieving users: found " //$NON-NLS-1$
+            + users.size() + " results."); //$NON-NLS-1$
     }
 
     public boolean isInSuperAdminMode() {
@@ -202,7 +202,7 @@ public class UserWrapper extends UserBaseWrapper {
         return lockedOut;
     }
 
-    private static final String ALL_USERS_QRY = " from " + User.class.getName();
+    private static final String ALL_USERS_QRY = " from " + User.class.getName(); //$NON-NLS-1$
 
     public static final List<UserWrapper> getAllUsers(
         WritableApplicationService appService) throws ApplicationException {
@@ -246,8 +246,7 @@ public class UserWrapper extends UserBaseWrapper {
      */
     @Override
     protected List<PrivilegeWrapper> getPrivilegesForRight(
-        BbRightWrapper right, CenterWrapper<?> center, StudyWrapper study)
-        throws ApplicationException {
+        BbRightWrapper right, CenterWrapper<?> center, StudyWrapper study) {
         List<PrivilegeWrapper> privileges = super.getPrivilegesForRight(right,
             center, study);
         for (BbGroupWrapper g : getGroupCollection(false)) {

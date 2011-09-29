@@ -17,7 +17,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * contact
  */
 public class ContactWrapper extends ContactBaseWrapper {
-    private static final String HAS_STUDIES_MSG = "Unable to delete contact {0}. No more study reference should exist.";
+    private static final String HAS_STUDIES_MSG = Messages.getString("ContactWrapper.delete.error.msg"); //$NON-NLS-1$
 
     public ContactWrapper(WritableApplicationService appService,
         Contact wrappedObject) {
@@ -51,10 +51,10 @@ public class ContactWrapper extends ContactBaseWrapper {
 
     @Override
     public String toString() {
-        return getName() + " (" + getMobileNumber() + ")";
+        return getName() + " (" + getMobileNumber() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    private static final String ALL_CONTACTS_QRY = "from "
+    private static final String ALL_CONTACTS_QRY = "from " //$NON-NLS-1$
         + Contact.class.getName();
 
     public static List<ContactWrapper> getAllContacts(

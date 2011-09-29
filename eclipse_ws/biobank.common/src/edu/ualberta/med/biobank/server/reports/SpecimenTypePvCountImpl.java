@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.model.SpecimenPosition;
  * needs one parameters = study.nameShort
  */
 public class SpecimenTypePvCountImpl extends AbstractReport {
+    @SuppressWarnings("nls")
     private static final String QUERY = "SELECT ce.patient.pnumber,"
         + "     min(s.parentSpecimen.processingEvent.createdAt) as first_date_processed,"
         + "     min(s.topSpecimen.createdAt) as first_date_drawn, s.specimenType.name, count(*)"

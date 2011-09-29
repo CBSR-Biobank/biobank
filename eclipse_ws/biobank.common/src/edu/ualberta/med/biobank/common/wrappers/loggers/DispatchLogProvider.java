@@ -15,7 +15,7 @@ public class DispatchLogProvider implements WrapperLogProvider<Dispatch> {
     private static final long serialVersionUID = 1L;
 
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(
-        "yyyy-MM-dd HH:mm");
+        "yyyy-MM-dd HH:mm"); //$NON-NLS-1$
 
     @Override
     public Log getLog(Dispatch dispatch) {
@@ -36,7 +36,7 @@ public class DispatchLogProvider implements WrapperLogProvider<Dispatch> {
         List<String> detailsList = new ArrayList<String>();
 
         if (dispatchState != null) {
-            detailsList.add(new StringBuilder("state: ").append(
+            detailsList.add(new StringBuilder("state: ").append( //$NON-NLS-1$
                 dispatchState.getLabel()).toString());
 
             if (dispatchState.equals(DispatchState.CREATION)
@@ -47,7 +47,7 @@ public class DispatchLogProvider implements WrapperLogProvider<Dispatch> {
                 if (shipmentInfo != null && shipmentInfo.getPackedAt() != null) {
                     String packedAt = DATE_FORMATTER.format(shipmentInfo
                         .getPackedAt());
-                    detailsList.add(new StringBuilder("packed at: ").append(
+                    detailsList.add(new StringBuilder("packed at: ").append( //$NON-NLS-1$
                         packedAt).toString());
                 }
             }
@@ -58,17 +58,17 @@ public class DispatchLogProvider implements WrapperLogProvider<Dispatch> {
             Date receivedAt = shipmentInfo.getReceivedAt();
             if (receivedAt != null) {
                 String receivedAtString = DATE_FORMATTER.format(receivedAt);
-                detailsList.add(new StringBuilder("received at: ").append(
+                detailsList.add(new StringBuilder("received at: ").append( //$NON-NLS-1$
                     receivedAtString).toString());
             }
 
             String waybill = shipmentInfo.getWaybill();
             if (waybill != null) {
-                detailsList.add(new StringBuilder(", waybill: ")
+                detailsList.add(new StringBuilder(", waybill: ") //$NON-NLS-1$
                     .append(waybill).toString());
             }
         }
-        log.setDetails(StringUtil.join(detailsList, ", "));
+        log.setDetails(StringUtil.join(detailsList, ", ")); //$NON-NLS-1$
 
         return log;
     }

@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePr
  */
 public class UniqueCheck<E> extends UncachedAction<E> {
     private static final long serialVersionUID = 1L;
-    private static final String EXCEPTION_STRING = "There already exists a {0} with property value(s) ({1}) for ({2}), respectively. These field(s) must be unique.";
+    private static final String EXCEPTION_STRING = Messages.getString("UniqueCheck.exception.string"); //$NON-NLS-1$
 
     private final Collection<Property<?, ? super E>> properties;
     private final PropertyCountAction<E> countAction;

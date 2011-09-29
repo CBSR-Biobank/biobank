@@ -28,7 +28,7 @@ public class BbRightWrapper extends BbRightBaseWrapper {
         super(appService, wrappedObject);
     }
 
-    private static final String ALL_RIGHT_QRY = "from "
+    private static final String ALL_RIGHT_QRY = "from " //$NON-NLS-1$
         + BbRight.class.getName();
 
     private static synchronized Map<String, BbRightWrapper> getRights(

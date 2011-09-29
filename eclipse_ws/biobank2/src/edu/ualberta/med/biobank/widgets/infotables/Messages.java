@@ -201,6 +201,10 @@ public class Messages extends NLS {
 
     public static String DispatchInfoTable_received_label;
 
+    public static String DispatchInfoTable_receiver_label;
+
+    public static String DispatchInfoTable_sender_label;
+
     public static String DispatchInfoTable_spec_state_label;
 
     public static String DispatchInfoTable_state_label;
