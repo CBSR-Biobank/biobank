@@ -1,10 +1,12 @@
 package edu.ualberta.med.biobank.server.orm;
 
+import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.common.reports.QueryProcess;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
+import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.ReportData;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
@@ -50,8 +52,28 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
             return query(request, (BiobankSQLCriteria) obj);
         } else if (obj instanceof QueryHandleRequest) {
             return query(request, (QueryHandleRequest) obj);
+        } else if (obj instanceof Action) {
+            return query((Action<?>) obj);
         }
         return super.query(request);
+    }
+
+    private <T> Response query(Action<T> action) {
+        Session session = getSession();
+
+        // TODO: pass the logged in user
+        User user = null;
+        action.isAllowed(user, session);
+
+        T actionResult = action.doAction(session);
+
+        session.flush();
+        session.clear();
+
+        Response response = new Response();
+        response.setResponse(actionResult);
+
+        return response;
     }
 
     protected Response query(@SuppressWarnings("unused") Request request,

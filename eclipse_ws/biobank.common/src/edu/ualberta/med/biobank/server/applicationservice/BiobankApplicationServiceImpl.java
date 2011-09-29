@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
+import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
+import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
@@ -286,5 +288,24 @@ public class BiobankApplicationServiceImpl extends
     @Override
     public boolean isUserLockedOut(Long csmUserId) throws ApplicationException {
         return BiobankCSMSecurityUtil.isUserLockedOut(csmUserId);
+    }
+
+    @Override
+    public <T> T doAction(Action<T> action) throws ApplicationException {
+        Request request = new Request(action);
+        request.setDomainObjectName(Site.class.getName());
+
+        Response response = query(request);
+
+        @SuppressWarnings("unchecked")
+        T tmp = (T) response.getResponse();
+
+        return tmp;
+    }
+
+    @Override
+    public boolean isAllowed(Permission permission) throws ApplicationException {
+        // TODO Auto-generated method stub
+        return false;
     }
 }
