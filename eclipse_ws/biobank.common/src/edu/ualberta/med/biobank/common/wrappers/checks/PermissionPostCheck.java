@@ -50,8 +50,7 @@ public class PermissionPostCheck extends LoadModelAction<Permission> {
         Long count = HibernateUtil.getCountFromQuery(query);
         if (count != 0)
             throw new BiobankSessionException(
-                Messages
-                    .getString("PermissionPostCheck.right.privilege.association.error.msg")); //$NON-NLS-1$
+                "This permission contains privileges that are not supposed to be associated with this right"); //$NON-NLS-1$
     }
 
 }
