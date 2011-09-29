@@ -65,7 +65,7 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         User user = null;
         action.isAllowed(user, session);
 
-        T actionResult = action.doAction(session);
+        T actionResult = action.run(session);
 
         session.flush();
         session.clear();

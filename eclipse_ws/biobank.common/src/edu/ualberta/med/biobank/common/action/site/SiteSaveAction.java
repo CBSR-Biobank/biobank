@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.action.site;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.SiteEditPermission;
 import edu.ualberta.med.biobank.model.Site;
@@ -21,11 +21,11 @@ public class SiteSaveAction implements Action<Site> {
     @Override
     public boolean isAllowed(User user, Session session) {
         Permission permission = new SiteEditPermission(site);
-        return permission.isAllowed(user);
+        return permission.isAllowed(user, session);
     }
 
     @Override
-    public Site doAction(Session session) throws ActionException {
+    public Site run(Session session) throws ActionException {
         // PreCheck<Site> preCheck = new PreCheck<Site>(session, site);
         //
         // preCheck.notNull(CenterPeer.NAME);

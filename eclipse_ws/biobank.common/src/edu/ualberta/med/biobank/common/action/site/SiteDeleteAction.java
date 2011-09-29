@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.action.site;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.SiteEditPermission;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
@@ -19,11 +19,11 @@ public class SiteDeleteAction implements Action<Site> {
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        return new SiteEditPermission(site).isAllowed(user);
+        return new SiteEditPermission(site).isAllowed(user, session);
     }
 
     @Override
-    public Site doAction(Session session) throws ActionException {
+    public Site run(Session session) throws ActionException {
         // TODO: checks
         session.delete(site);
         return null;
