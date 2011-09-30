@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public interface IBiobankModel extends Serializable {
 
-    public Serializable getId();
+    public Integer getId();
 
-    public void setId(Serializable id);
+    public void setId(Integer id);
 }
