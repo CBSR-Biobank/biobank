@@ -207,16 +207,16 @@ public class SessionManager {
         return sm.possibleViewMap.get(sm.currentAdministrationViewId);
     }
 
-    public static List<AbstractAdapterBase> searchNodes(ModelWrapper<?> wrapper) {
+    public static List<AbstractAdapterBase> searchNodes(Object o) {
         AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null) {
-            return view.searchNode(wrapper);
+            return view.searchNode(o);
         }
         return new ArrayList<AbstractAdapterBase>();
     }
 
-    public static AbstractAdapterBase searchFirstNode(ModelWrapper<?> wrapper) {
-        List<AbstractAdapterBase> nodes = searchNodes(wrapper);
+    public static AbstractAdapterBase searchFirstNode(Object o) {
+        List<AbstractAdapterBase> nodes = searchNodes(o);
         if (nodes.size() > 0) {
             return nodes.get(0);
         }
@@ -326,14 +326,14 @@ public class SessionManager {
      * @param expandParent if true will expand the parent node of 'adapter'
      * 
      */
-    public static void updateAllSimilarNodes(final AdapterBase adapter,
+    public static void updateAllSimilarNodes(final AbstractAdapterBase adapter,
         final boolean canReset) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
                 try {
                     // add to add the correct node if it is a new adapter:
-                    AdapterBase parent = adapter.getParent();
+                    AbstractAdapterBase parent = adapter.getParent();
                     if (parent != null)
                         parent.addChild(adapter);
                     List<AbstractAdapterBase> res = searchNodes(adapter

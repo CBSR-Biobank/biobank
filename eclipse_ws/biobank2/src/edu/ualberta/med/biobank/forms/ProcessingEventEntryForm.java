@@ -79,7 +79,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         if (pEvent.isNew()) {
             tabName = Messages.ProcessingEventEntryForm_title_new;
             pEvent.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         } else {
             if (pEvent.getWorksheet() == null)
                 tabName = NLS.bind(
@@ -91,7 +91,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     pEvent.getFormattedCreatedAt());
         }
         closedActivityStatus = ActivityStatusWrapper.getActivityStatus(
-            appService, ActivityStatusWrapper.CLOSED_STATUS_STRING);
+            SessionManager.getAppService(),
+            ActivityStatusWrapper.CLOSED_STATUS_STRING);
         setPartName(tabName);
     }
 
@@ -132,8 +133,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            pEvent.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), pEvent.getActivityStatus(),
             Messages.ProcessingEventEntryForm_field_activity_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -164,7 +165,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         List<SpecimenWrapper> specimens = pEvent.getSpecimenCollection(true);
 
         specimenEntryWidget = new SpecimenEntryWidget(client, SWT.NONE,
-            toolkit, appService, true);
+            toolkit, SessionManager.getAppService(), true);
         specimenEntryWidget
             .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
                 @Override
@@ -388,7 +389,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         pEvent.setCenter(center);
         if (pEvent.isNew()) {
             pEvent.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         }
         GuiUtil.reset(activityStatusComboViewer, pEvent.getActivityStatus());
         specimenEntryWidget.setSpecimens(pEvent.getSpecimenCollection(true));

@@ -37,7 +37,7 @@ public class ShippingMethodViewForm extends BiobankFormBase {
     private void createGlobalSampleTypeSection() throws Exception {
         Section section = createSection(Messages.ShippingMethodViewForm_title);
         List<ShippingMethodWrapper> globalShippingMethod = ShippingMethodWrapper
-            .getShippingMethods(appService);
+            .getShippingMethods(SessionManager.getAppService());
         if (globalShippingMethod == null) {
             globalShippingMethod = new ArrayList<ShippingMethodWrapper>();
         }

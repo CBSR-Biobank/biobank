@@ -37,7 +37,7 @@ public class ActivityStatusViewForm extends BiobankFormBase {
     private void createGlobalSampleTypeSection() throws Exception {
         Section section = createSection(Messages.ActivityStatusViewForm_title);
         List<ActivityStatusWrapper> globalActivityStatus = ActivityStatusWrapper
-            .getAllActivityStatuses(appService);
+            .getAllActivityStatuses(SessionManager.getAppService());
         if (globalActivityStatus == null) {
             globalActivityStatus = new ArrayList<ActivityStatusWrapper>();
         }

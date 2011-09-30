@@ -62,6 +62,7 @@ import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.report.ReportAdapter;
 import edu.ualberta.med.biobank.views.AdvancedReportsView;
 import edu.ualberta.med.biobank.widgets.infotables.ReportResultsTableWidget;
@@ -279,7 +280,8 @@ public class ReportEntryForm extends BiobankEntryForm {
                         @Override
                         public void run() {
                             results = (List<Object>) new ReportListProxy(
-                                appService, rawReport).init();
+                                SessionManager.getAppService(), rawReport)
+                                .init();
 
                             if (results instanceof AbstractBiobankListProxy)
                                 ((AbstractBiobankListProxy<?>) results)
@@ -334,7 +336,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
                     Log logMessage = new Log();
                     logMessage.action = "report"; //$NON-NLS-1$
-                    appService.logActivity(logMessage);
+                    SessionManager.getAppService().logActivity(logMessage);
                     addPrintAction();
 
                 } catch (Exception e) {
@@ -415,8 +417,8 @@ public class ReportEntryForm extends BiobankEntryForm {
                             Integer.class);
                         setIdMethod.invoke(instance, id);
 
-                        ModelWrapper<?> wrapper = WrapperUtil
-                            .wrapObject(appService, instance);
+                        ModelWrapper<?> wrapper = WrapperUtil.wrapObject(
+                            SessionManager.getAppService(), instance);
 
                         SessionManager.openViewForm(wrapper);
                     } catch (Exception e) {
@@ -632,8 +634,8 @@ public class ReportEntryForm extends BiobankEntryForm {
                 int userId = SessionManager.getUser().getId().intValue();
                 report.setUserId(userId);
 
-                ReportAdapter reportAdapter = new ReportAdapter(getAdapter()
-                    .getParent(), report);
+                ReportAdapter reportAdapter = new ReportAdapter(
+                    (AdapterBase) getAdapter().getParent(), report);
                 IEditorPart part = reportAdapter.openEntryForm();
 
                 if (part instanceof ReportEntryForm) {

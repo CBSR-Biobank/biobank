@@ -91,7 +91,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         if (study.isNew()) {
             tabName = Messages.StudyEntryForm_title_new;
             study.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         } else {
             tabName = NLS.bind(Messages.StudyEntryForm_title_edit,
                 study.getNameShort());
@@ -124,8 +124,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            study.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), study.getActivityStatus(),
             Messages.StudyEntryForm_activity_validator_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -228,7 +228,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             .getStudyEventAttrLabels());
 
         for (GlobalEventAttrWrapper geAttr : GlobalEventAttrWrapper
-            .getAllGlobalEventAttrs(appService)) {
+            .getAllGlobalEventAttrs(SessionManager.getAppService())) {
             String label = geAttr.getLabel();
             boolean selected = false;
             studyPvAttrCustom = new StudyPvAttrCustom();
@@ -331,7 +331,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         if (study.isNew()) {
             study.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         }
 
         GuiUtil.reset(activityStatusComboViewer, study.getActivityStatus());

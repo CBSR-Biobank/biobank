@@ -143,8 +143,9 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             try {
                 destSiteComboViewer = createComboViewer(client,
                     Messages.DispatchSendingEntryForm_receiver_label,
-                    CenterWrapper.getOtherCenters(appService, SessionManager
-                        .getUser().getCurrentWorkingCenter()),
+                    CenterWrapper.getOtherCenters(SessionManager
+                        .getAppService(), SessionManager.getUser()
+                        .getCurrentWorkingCenter()),
                     dispatch.getReceiverCenter(),
                     Messages.DispatchSendingEntryForm_receiver_validation_msg,
                     new ComboSelectionUpdate() {
@@ -237,14 +238,16 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     @Override
     protected void doSpecimenTextAction(String inventoryId) {
         try {
-            CellProcessResult res = appService.processCellStatus(new Cell(-1,
-                -1, inventoryId, null), new ShipmentProcessData(null, dispatch,
-                true, true), SessionManager.getUser().getCurrentWorkingCenter()
-                .getId(), Locale.getDefault());
+            CellProcessResult res = SessionManager.getAppService()
+                .processCellStatus(new Cell(-1, -1, inventoryId, null),
+                    new ShipmentProcessData(null, dispatch, true, true),
+                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                    Locale.getDefault());
             switch (res.getProcessStatus()) {
             case FILLED:
                 // ok
-                SpecimenWrapper specimen = new SpecimenWrapper(appService);
+                SpecimenWrapper specimen = new SpecimenWrapper(
+                    SessionManager.getAppService());
                 specimen.getWrappedObject()
                     .setId(res.getCell().getSpecimenId());
                 specimen.reload();

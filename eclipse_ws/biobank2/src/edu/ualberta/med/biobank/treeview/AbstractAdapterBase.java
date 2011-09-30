@@ -49,6 +49,8 @@ public abstract class AbstractAdapterBase {
      */
     private boolean editable = true;
 
+    private Object modelObject;
+
     public AbstractAdapterBase(AbstractAdapterBase parent, int id,
         String label, boolean hasChildren) {
         this.parent = parent;
@@ -57,6 +59,12 @@ public abstract class AbstractAdapterBase {
         setLabel(label);
         setHasChildren(hasChildren);
         init();
+    }
+
+    public AbstractAdapterBase(AbstractAdapterBase parent, Object modelObject,
+        String label) {
+        this(parent, -1, label, false);
+        this.modelObject = modelObject;
     }
 
     protected void init() {
@@ -77,6 +85,17 @@ public abstract class AbstractAdapterBase {
 
     public Integer getId() {
         return id;
+    }
+
+    public Object getModelObject() {
+        return modelObject;
+    }
+
+    /*
+     * Used when updating tree nodes from a background thread.
+     */
+    protected void setModelObject(Object modelObject) {
+        this.modelObject = modelObject;
     }
 
     public void setLabel(String label) {

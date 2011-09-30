@@ -187,7 +187,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             @Override
             public void handleEvent(Event event) {
                 SelectCollectionEventWizard wizard = new SelectCollectionEventWizard(
-                    appService);
+                    SessionManager.getAppService());
                 WizardDialog dialog = new BiobankWizardDialog(page.getShell(),
                     wizard);
                 int res = dialog.open();
@@ -268,8 +268,8 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.SpecimenEntryForm_status_label,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            specimen.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), specimen.getActivityStatus(),
             Messages.SpecimenEntryForm_status_validation_msg,
             new ComboSelectionUpdate() {
                 @Override

@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
@@ -70,10 +71,10 @@ public class CollectionView extends AbstractAdministrationView {
             Messages.CollectionView_patient_error_title,
             Messages.CollectionView_patient_error_msg);
         if (create) {
-            PatientWrapper patient = new PatientWrapper(
-                SessionManager.getAppService());
+            Patient patient = new Patient();
             patient.setPnumber(text);
-            AdapterBase adapter = new PatientAdapter(null, patient);
+            AbstractAdapterBase adapter = new PatientAdapter(null, patient,
+                null);
             adapter.openEntryForm();
         }
     }
@@ -136,7 +137,7 @@ public class CollectionView extends AbstractAdministrationView {
         }
     }
 
-    public static AdapterBase addToNode(AdapterBase parentNode,
+    public static AbstractAdapterBase addToNode(AdapterBase parentNode,
         ModelWrapper<?> wrapper) {
         if (wrapper instanceof PatientWrapper) {
             PatientWrapper patient = (PatientWrapper) wrapper;
@@ -158,7 +159,8 @@ public class CollectionView extends AbstractAdministrationView {
             if (patientAdapterList.size() > 0)
                 patientAdapter = (PatientAdapter) patientAdapterList.get(0);
             else {
-                patientAdapter = new PatientAdapter(studyAdapter, patient);
+                patientAdapter = new PatientAdapter(studyAdapter,
+                    patient.getWrappedObject(), "test");
                 studyAdapter.addChild(patientAdapter);
             }
             return patientAdapter;

@@ -44,7 +44,7 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    public void setModelObject(ModelWrapper<?> modelObject) {
+    public void setModelObject(Object modelObject) {
         super.setModelObject(modelObject);
         // assume it has children for now and set it appropriately when user
         // double clicks on node

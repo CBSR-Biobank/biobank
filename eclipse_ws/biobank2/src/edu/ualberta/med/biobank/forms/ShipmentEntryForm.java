@@ -144,7 +144,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         senderComboViewer = createComboViewer(client,
             Messages.ShipmentEntryForm_sender_label,
-            ClinicWrapper.getAllClinics(appService),
+            ClinicWrapper.getAllClinics(SessionManager.getAppService()),
             (ClinicWrapper) originInfo.getCenter(),
             Messages.ShipmentEntryForm_sender_validation_msg,
             new ComboSelectionUpdate() {
@@ -159,7 +159,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         receiverComboViewer = createComboViewer(client,
             Messages.ShipmentEntryForm_receiver_label,
-            SiteQuery.getSites(appService), originInfo.getReceiverSite(),
+            SiteQuery.getSites(SessionManager.getAppService()),
+            originInfo.getReceiverSite(),
             Messages.ShipmentEntryForm_receiver_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -181,9 +182,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         shippingMethodComboViewer = createComboViewer(client,
             Messages.ShipmentEntryForm_shipMethod_label,
-            ShippingMethodWrapper.getShippingMethods(appService), originInfo
-                .getShipmentInfo().getShippingMethod(), null,
-            new ComboSelectionUpdate() {
+            ShippingMethodWrapper.getShippingMethods(SessionManager
+                .getAppService()), originInfo.getShipmentInfo()
+                .getShippingMethod(), null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     ShippingMethodWrapper method = (ShippingMethodWrapper) selectedObject;
@@ -288,7 +289,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             .getSpecimenCollection(true);
 
         specimenEntryWidget = new SpecimenEntryWidget(client, SWT.NONE,
-            toolkit, appService, true);
+            toolkit, SessionManager.getAppService(), true);
         specimenEntryWidget
             .addSelectionChangedListener(new BgcEntryFormWidgetListener() {
                 @Override

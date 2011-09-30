@@ -43,8 +43,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     protected IDeltaListener deltaListener = NullDeltaListener
         .getSoleInstance();
 
-    private ModelWrapper<?> modelObject;
-
     private boolean loadChildrenInBackground;
 
     private Thread childUpdateThread;
@@ -56,8 +54,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
         boolean loadChildrenInBackground) {
-        super(parent, -1, null, false);
-        this.modelObject = object;
+        super(parent, object, null);
         this.loadChildrenInBackground = loadChildrenInBackground;
     }
 
@@ -82,18 +79,11 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     }
 
     public ModelWrapper<?> getModelObject() {
-        return modelObject;
+        return (ModelWrapper<?>) super.getModelObject();
     }
 
     public ModelWrapper<?> getModelObjectClone() throws Exception {
-        return modelObject.getDatabaseClone();
-    }
-
-    /*
-     * Used when updating tree nodes from a background thread.
-     */
-    protected void setModelObject(ModelWrapper<?> modelObject) {
-        this.modelObject = modelObject;
+        return getModelObject().getDatabaseClone();
     }
 
     public void setParent(AdapterBase parent) {
@@ -102,8 +92,8 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     @Override
     public Integer getId() {
-        if (modelObject != null) {
-            return modelObject.getId();
+        if (getModelObject() != null) {
+            return getModelObject().getId();
         }
         return super.getId();
     }
@@ -116,7 +106,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
      */
     @Override
     public String getLabel() {
-        if (modelObject != null) {
+        if (getModelObject() != null) {
             return getLabelInternal();
         } else if (parent != null
             && ((AdapterBase) parent).loadChildrenInBackground) {
@@ -219,8 +209,8 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     @Deprecated
     public WritableApplicationService getAppService() {
-        if (modelObject != null) {
-            return modelObject.getAppService();
+        if (getModelObject() != null) {
+            return getModelObject().getAppService();
         }
         if (parent != null)
             return ((AdapterBase) parent).getAppService();
@@ -282,8 +272,8 @@ public abstract class AdapterBase extends AbstractAdapterBase {
             BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
             String text = getClass().getName();
-            if (modelObject != null) {
-                text = modelObject.toString();
+            if (getModelObject() != null) {
+                text = getModelObject().toString();
             }
             logger.error("Error while loading children of node " + text, e); //$NON-NLS-1$
         } finally {
@@ -350,8 +340,8 @@ public abstract class AdapterBase extends AbstractAdapterBase {
                         BgcPlugin.openRemoteAccessErrorMessage(exp);
                     } catch (Exception e) {
                         String modelString = Messages.AdapterBase_unknow;
-                        if (modelObject != null) {
-                            modelString = modelObject.toString();
+                        if (getModelObject() != null) {
+                            modelString = getModelObject().toString();
                         }
                         logger.error("Error while loading children of node " //$NON-NLS-1$
                             + modelString + " in background", e); //$NON-NLS-1$
@@ -363,8 +353,8 @@ public abstract class AdapterBase extends AbstractAdapterBase {
             childUpdateThread.start();
         } catch (Exception e) {
             String nodeString = "null"; //$NON-NLS-1$
-            if (modelObject != null) {
-                nodeString = modelObject.toString();
+            if (getModelObject() != null) {
+                nodeString = getModelObject().toString();
             }
             logger.error(
                 "Error while expanding children of node " + nodeString, e); //$NON-NLS-1$
@@ -424,22 +414,22 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     @Override
     public void openViewForm() {
-        if (getViewFormId() != null && modelObject != null
-            && modelObject.getWrappedObject() != null) {
+        if (getViewFormId() != null && getModelObject() != null
+            && getModelObject().getWrappedObject() != null) {
             openForm(new FormInput(this), getViewFormId());
         }
     }
 
     @Override
     public List<AbstractAdapterBase> search(Object searchedObject) {
-        if (modelObject != null && modelObject.equals(searchedObject))
+        if (getModelObject() != null && getModelObject().equals(searchedObject))
             return Arrays.asList(new AbstractAdapterBase[] { this });
         return new ArrayList<AbstractAdapterBase>();
     }
 
     public void resetObject() throws Exception {
-        if (modelObject != null) {
-            modelObject.reset();
+        if (getModelObject() != null) {
+            getModelObject().reset();
         }
     }
 
@@ -459,14 +449,14 @@ public abstract class AdapterBase extends AbstractAdapterBase {
                 @Override
                 public void run() {
                     // the order is very important
-                    if (modelObject != null) {
+                    if (getModelObject() != null) {
                         IWorkbenchPage page = PlatformUI.getWorkbench()
                             .getActiveWorkbenchWindow().getActivePage();
                         IEditorPart part = page.findEditor(new FormInput(
                             AdapterBase.this));
                         getParent().removeChild(AdapterBase.this, false);
                         try {
-                            modelObject.delete();
+                            getModelObject().delete();
                             page.closeEditor(part, true);
                         } catch (Exception e) {
                             BgcPlugin.openAsyncError(
@@ -486,13 +476,13 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     @Override
     protected boolean internalIsDeletable() {
-        return super.internalIsDeletable() && modelObject != null
-            && SessionManager.canDelete(modelObject);
+        return super.internalIsDeletable() && getModelObject() != null
+            && SessionManager.canDelete(getModelObject());
     }
 
     @Override
     public boolean isEditable() {
-        return super.isEditable() && SessionManager.canUpdate(modelObject);
+        return super.isEditable() && SessionManager.canUpdate(getModelObject());
     }
 
     public void setLoadChildrenInBackground(boolean loadChildrenInBackground) {

@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 
@@ -63,7 +64,10 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                     }
                 }
             };
-            adapter.addChangedListener(adapterChangedListener);
+            // FIXME
+            if (adapter instanceof AdapterBase)
+                ((AdapterBase) adapter)
+                    .addChangedListener(adapterChangedListener);
         }
     }
 
@@ -71,7 +75,10 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     public void dispose() {
         if (adapter != null) {
             Assert.isNotNull(adapterChangedListener);
-            adapter.removeChangedListener(adapterChangedListener);
+            // FIXME
+            if (adapter instanceof AdapterBase)
+                ((AdapterBase) adapter)
+                    .removeChangedListener(adapterChangedListener);
         }
     }
 

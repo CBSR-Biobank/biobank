@@ -10,8 +10,6 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -23,19 +21,17 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
@@ -43,10 +39,7 @@ import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
-import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 import edu.ualberta.med.biobank.widgets.infotables.entry.CEventSpecimenEntryInfoTable;
-import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionEventEntryForm extends BiobankEntryForm {
 
@@ -58,9 +51,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private CollectionEventAdapter ceventAdapter;
 
-    private CollectionEventWrapper cevent;
+    // will use something else ? an action object ? a ceventData ?
+    private CollectionEvent cevent;
 
-    private PatientWrapper patient;
+    private Patient patient;
 
     private static class FormPvCustomInfo extends PvAttrCustom {
         private Control control;
@@ -89,21 +83,22 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         ceventAdapter = (CollectionEventAdapter) adapter;
-        cevent = (CollectionEventWrapper) getModelObject();
+        cevent = ceventAdapter.getModelObject();
         patient = cevent.getPatient();
 
-        SessionManager.logEdit(cevent);
+        // SessionManager.logEdit(cevent);
         String tabName;
-        if (cevent.isNew()) {
-            tabName = Messages.CollectionEventEntryForm_title_new;
-            cevent.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
-            cevent.setVisitNumber(PatientWrapper.getNextVisitNumber(appService,
-                cevent.getPatient()));
-        } else {
-            tabName = NLS.bind(Messages.CollectionEventEntryForm_title_edit,
-                cevent.getVisitNumber());
-        }
+        // FIXME
+        // if (cevent.isNew()) {
+        // tabName = Messages.CollectionEventEntryForm_title_new;
+        // cevent.setActivityStatus(ActivityStatusWrapper
+        // .getActiveActivityStatus(appService));
+        // cevent.setVisitNumber(PatientWrapper.getNextVisitNumber(appService,
+        // cevent.getPatient()));
+        // } else {
+        tabName = NLS.bind(Messages.CollectionEventEntryForm_title_edit,
+            cevent.getVisitNumber());
+        // }
 
         setPartName(tabName);
     }
@@ -115,9 +110,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         page.setLayout(new GridLayout(1, false));
         createMainSection();
         createSpecimensSection();
-        if (cevent.isNew()) {
-            setDirty(true);
-        }
+        // FIXME
+        // if (cevent.isNew()) {
+        // setDirty(true);
+        // }
     }
 
     private void createMainSection() throws Exception {
@@ -153,8 +149,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            cevent.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()),
+            new ActivityStatusWrapper(null, cevent.getActivityStatus()),
             Messages.CollectionEventEntryForm_field_activity_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -162,7 +159,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                     if (!selectedObject.equals(cevent.getActivityStatus()))
                         setDirty(true);
                     cevent
-                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                        .setActivityStatus(((ActivityStatusWrapper) selectedObject)
+                            .getWrappedObject());
                 }
             });
 
@@ -181,54 +179,58 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private void createSpecimensSection() {
         Section section = createSection(Messages.CollectionEventEntryForm_specimens_title);
-        specimensTable = new CEventSpecimenEntryInfoTable(section,
-            cevent.getOriginalSpecimenCollection(true),
-            ColumnsShown.SOURCE_SPECIMENS);
-        specimensTable.adaptToToolkit(toolkit, true);
-        specimensTable.addSelectionChangedListener(listener);
-
-        try {
-            final List<SpecimenTypeWrapper> allSpecimenTypes = SpecimenTypeWrapper
-                .getAllSpecimenTypes(SessionManager.getAppService(), true);
-            specimensTable.addEditSupport(cevent.getPatient().getStudy()
-                .getSourceSpecimenCollection(true), allSpecimenTypes);
-            addSectionToolbar(section,
-                Messages.CollectionEventEntryForm_specimens_add_title,
-                new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
-                        form.setFocus();
-                        specimensTable.addOrEditSpecimen(true, null, cevent
-                            .getPatient().getStudy()
-                            .getSourceSpecimenCollection(true),
-                            allSpecimenTypes, cevent, timeDrawnWidget.getDate());
-                    }
-                });
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(
-                Messages.CollectionEventEntryForm_specimenstypes_error_msg, e);
-        }
+        // FIXME
+        // specimensTable = new CEventSpecimenEntryInfoTable(section,
+        // cevent.getOriginalSpecimenCollection(true),
+        // ColumnsShown.SOURCE_SPECIMENS);
+        // specimensTable.adaptToToolkit(toolkit, true);
+        // specimensTable.addSelectionChangedListener(listener);
+        //
+        // try {
+        // final List<SpecimenTypeWrapper> allSpecimenTypes =
+        // SpecimenTypeWrapper
+        // .getAllSpecimenTypes(SessionManager.getAppService(), true);
+        // specimensTable.addEditSupport(cevent.getPatient().getStudy()
+        // .getSourceSpecimenCollection(true), allSpecimenTypes);
+        // addSectionToolbar(section,
+        // Messages.CollectionEventEntryForm_specimens_add_title,
+        // new SelectionAdapter() {
+        // @Override
+        // public void widgetSelected(SelectionEvent e) {
+        // form.setFocus();
+        // specimensTable.addOrEditSpecimen(true, null, cevent
+        // .getPatient().getStudy()
+        // .getSourceSpecimenCollection(true),
+        // allSpecimenTypes, cevent, timeDrawnWidget.getDate());
+        // }
+        // });
+        // } catch (ApplicationException e) {
+        // BgcPlugin.openAsyncError(
+        // Messages.CollectionEventEntryForm_specimenstypes_error_msg, e);
+        // }
         section.setClient(specimensTable);
     }
 
     private void createPvDataSection(Composite client) throws Exception {
-        StudyWrapper study = cevent.getPatient().getStudy();
+        StudyWrapper study = new StudyWrapper(SessionManager.getAppService(),
+            cevent.getPatient().getStudy());
         String[] labels = study.getStudyEventAttrLabels();
         if (labels == null)
             return;
 
         pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
 
-        for (String label : labels) {
-            FormPvCustomInfo pvCustomInfo = new FormPvCustomInfo();
-            pvCustomInfo.setLabel(label);
-            pvCustomInfo.setType(study.getStudyEventAttrType(label));
-            pvCustomInfo.setAllowedValues(study
-                .getStudyEventAttrPermissible(label));
-            pvCustomInfo.setValue(cevent.getEventAttrValue(label));
-            pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
-            pvCustomInfoList.add(pvCustomInfo);
-        }
+        // FIXME
+        // for (String label : labels) {
+        // FormPvCustomInfo pvCustomInfo = new FormPvCustomInfo();
+        // pvCustomInfo.setLabel(label);
+        // pvCustomInfo.setType(study.getStudyEventAttrType(label));
+        // pvCustomInfo.setAllowedValues(study
+        // .getStudyEventAttrPermissible(label));
+        // pvCustomInfo.setValue(cevent.getEventAttrValue(label));
+        // pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
+        // pvCustomInfoList.add(pvCustomInfo);
+        // }
     }
 
     private Control getControlForLabel(Composite client,
@@ -273,8 +275,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        return (cevent.isNew()) ? MSG_NEW_PATIENT_VISIT_OK
-            : MSG_PATIENT_VISIT_OK;
+        return "default ok";
+        // FIXME
+        // return (cevent.isNew()) ? MSG_NEW_PATIENT_VISIT_OK
+        // : MSG_PATIENT_VISIT_OK;
     }
 
     @Override
@@ -282,11 +286,13 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         PatientAdapter patientAdapter = (PatientAdapter) ceventAdapter
             .getParent();
         if (patientAdapter != null)
-            cevent.setPatient((PatientWrapper) patientAdapter.getModelObject());
-        cevent.addToOriginalSpecimenCollection(specimensTable
-            .getAddedOrModifiedSpecimens());
-        cevent.removeFromOriginalSpecimenCollection(specimensTable
-            .getRemovedSpecimens());
+            cevent.setPatient(patientAdapter.getModelObject());
+
+        // ACTIOn ? Presenter?
+        // cevent.addToOriginalSpecimenCollection(specimensTable
+        // .getAddedOrModifiedSpecimens());
+        // cevent.removeFromOriginalSpecimenCollection(specimensTable
+        // .getRemovedSpecimens());
         savePvCustomInfo();
     }
 
@@ -307,19 +313,21 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             }
         }
         // save the collection event
-        cevent.persist();
-        SessionManager.updateAllSimilarNodes(ceventAdapter, true);
+        // FIXME action !
+        // cevent.persist();
+        // SessionManager.updateAllSimilarNodes(ceventAdapter, true);
     }
 
     private void savePvCustomInfo() throws Exception {
-        for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
-            savePvInfoValueFromControlType(combinedPvInfo);
-            String value = combinedPvInfo.getValue();
-            if (value == null)
-                continue;
-
-            cevent.setEventAttrValue(combinedPvInfo.getLabel(), value);
-        }
+        // FIXME
+        // for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
+        // savePvInfoValueFromControlType(combinedPvInfo);
+        // String value = combinedPvInfo.getValue();
+        // if (value == null)
+        // continue;
+        //
+        // cevent.setEventAttrValue(combinedPvInfo.getLabel(), value);
+        // }
     }
 
     private void savePvInfoValueFromControlType(FormPvCustomInfo pvCustomInfo) {
@@ -347,54 +355,57 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     @Override
     public void reset() {
         super.reset();
-        if (cevent.isNew())
-            // because we set the visit number and the activity status default
-            setDirty(true);
+        // FIXME
+        // if (cevent.isNew())
+        // // because we set the visit number and the activity status default
+        // setDirty(true);
     }
 
     @Override
     protected void onReset() throws Exception {
-        cevent.reset();
-        cevent.setPatient(patient);
-
-        if (cevent.isNew()) {
-            cevent.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
-            Integer next = PatientWrapper.getNextVisitNumber(appService,
-                cevent.getPatient());
-            cevent.setVisitNumber(next);
-        }
-
-        patient.reset();
-
-        GuiUtil.reset(activityStatusComboViewer, cevent.getActivityStatus());
-
-        specimensTable.reload(cevent.getOriginalSpecimenCollection(true));
-        resetPvCustomInfo();
+        // FIXME
+        // cevent.reset();
+        // cevent.setPatient(patient);
+        //
+        // if (cevent.isNew()) {
+        // cevent.setActivityStatus(ActivityStatusWrapper
+        // .getActiveActivityStatus(SessionManager.getAppService()));
+        // Integer next = PatientWrapper.getNextVisitNumber(
+        // SessionManager.getAppService(), cevent.getPatient());
+        // cevent.setVisitNumber(next);
+        // }
+        //
+        // patient.reset();
+        //
+        // GuiUtil.reset(activityStatusComboViewer, cevent.getActivityStatus());
+        //
+        // specimensTable.reload(cevent.getOriginalSpecimenCollection(true));
+        // resetPvCustomInfo();
     }
 
     private void resetPvCustomInfo() throws Exception {
-        StudyWrapper study = cevent.getPatient().getStudy();
-        String[] labels = study.getStudyEventAttrLabels();
-        if (labels == null)
-            return;
-
-        for (FormPvCustomInfo pvCustomInfo : pvCustomInfoList) {
-            pvCustomInfo.setValue(cevent.getEventAttrValue(pvCustomInfo
-                .getLabel()));
-            if (EventAttrTypeEnum.DATE_TIME == pvCustomInfo.getType()) {
-                DateTimeWidget dateWidget = (DateTimeWidget) pvCustomInfo.control;
-                dateWidget.setDate(DateFormatter.parseToDateTime(pvCustomInfo
-                    .getValue()));
-            } else if (EventAttrTypeEnum.SELECT_MULTIPLE == pvCustomInfo
-                .getType()) {
-                SelectMultipleWidget s = (SelectMultipleWidget) pvCustomInfo.control;
-                if (pvCustomInfo.getValue() != null) {
-                    s.setSelections(pvCustomInfo.getValue().split(
-                        FormPvCustomInfo.VALUE_MULTIPLE_SEPARATOR));
-                } else
-                    s.setSelections(new String[] {});
-            }
-        }
+        // FIXME
+        // StudyWrapper study = cevent.getPatient().getStudy();
+        // String[] labels = study.getStudyEventAttrLabels();
+        // if (labels == null)
+        // return;
+        //
+        // for (FormPvCustomInfo pvCustomInfo : pvCustomInfoList) {
+        // pvCustomInfo.setValue(cevent.getEventAttrValue(pvCustomInfo
+        // .getLabel()));
+        // if (EventAttrTypeEnum.DATE_TIME == pvCustomInfo.getType()) {
+        // DateTimeWidget dateWidget = (DateTimeWidget) pvCustomInfo.control;
+        // dateWidget.setDate(DateFormatter.parseToDateTime(pvCustomInfo
+        // .getValue()));
+        // } else if (EventAttrTypeEnum.SELECT_MULTIPLE == pvCustomInfo
+        // .getType()) {
+        // SelectMultipleWidget s = (SelectMultipleWidget) pvCustomInfo.control;
+        // if (pvCustomInfo.getValue() != null) {
+        // s.setSelections(pvCustomInfo.getValue().split(
+        // FormPvCustomInfo.VALUE_MULTIPLE_SEPARATOR));
+        // } else
+        // s.setSelections(new String[] {});
+        // }
+        // }
     }
 }

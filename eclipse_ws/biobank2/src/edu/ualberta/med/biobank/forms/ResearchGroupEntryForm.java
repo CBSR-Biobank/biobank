@@ -63,7 +63,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         if (researchGroup.isNew()) {
             tabName = Messages.ResearchGroupEntryForm_title_new;
             researchGroup.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         } else
             tabName = NLS.bind(Messages.ResearchGroupEntryForm_title_edit,
                 researchGroup.getNameShort());
@@ -111,7 +111,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         List<StudyWrapper> availableStudies = ResearchGroupWrapper
-            .getAvailStudies(appService);
+            .getAvailStudies(SessionManager.getAppService());
         if (!researchGroup.isNew())
             availableStudies.add(researchGroup.getStudy());
 
@@ -130,8 +130,8 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            researchGroup.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), researchGroup.getActivityStatus(),
             Messages.ResearchGroupEntryForm_activity_validator_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -173,7 +173,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
         if (researchGroup.isNew()) {
             researchGroup.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
             researchGroup.setStudy(null);
         }
 

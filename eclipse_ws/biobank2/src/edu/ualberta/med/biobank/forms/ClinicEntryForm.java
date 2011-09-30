@@ -66,7 +66,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         if (clinic.isNew()) {
             tabName = Messages.ClinicEntryForm_title_new;
             clinic.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         } else
             tabName = NLS.bind(Messages.ClinicEntryForm_title_edit,
                 clinic.getNameShort());
@@ -119,8 +119,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            clinic.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), clinic.getActivityStatus(),
             Messages.ClinicEntryForm_activity_validator_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -183,7 +183,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         if (clinic.isNew()) {
             clinic.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         }
 
         GuiUtil.reset(activityStatusComboViewer, clinic.getActivityStatus());

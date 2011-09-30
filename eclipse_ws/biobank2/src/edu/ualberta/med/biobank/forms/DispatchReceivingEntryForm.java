@@ -121,13 +121,14 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     protected void doSpecimenTextAction(String inventoryId, boolean showMessages)
         throws Exception {
         try {
-            CellProcessResult res = appService.processCellStatus(new Cell(-1,
-                -1, inventoryId, null), new ShipmentProcessData(null, dispatch,
-                false, false), SessionManager.getUser()
-                .getCurrentWorkingCenter().getId(), Locale.getDefault());
+            CellProcessResult res = SessionManager.getAppService()
+                .processCellStatus(new Cell(-1, -1, inventoryId, null),
+                    new ShipmentProcessData(null, dispatch, false, false),
+                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                    Locale.getDefault());
             SpecimenWrapper specimen = null;
             if (res.getCell().getSpecimenId() != null) {
-                specimen = new SpecimenWrapper(appService);
+                specimen = new SpecimenWrapper(SessionManager.getAppService());
                 specimen.getWrappedObject()
                     .setId(res.getCell().getSpecimenId());
                 specimen.reload();

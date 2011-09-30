@@ -130,7 +130,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected void init() throws Exception {
         super.init();
         setCanLaunchScan(true);
-        currentMultipleContainer = new ContainerWrapper(appService);
+        currentMultipleContainer = new ContainerWrapper(
+            SessionManager.getAppService());
         initPalletValues();
     }
 
@@ -140,10 +141,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private void initPalletValues() {
         try {
             currentMultipleContainer.initObjectWith(new ContainerWrapper(
-                appService));
+                SessionManager.getAppService()));
             currentMultipleContainer.reset();
             currentMultipleContainer.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
             currentMultipleContainer.setSite(SessionManager.getUser()
                 .getCurrentWorkingSite());
         } catch (Exception e) {
@@ -345,8 +346,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         appendLog(NLS.bind(
             Messages.SpecimenAssignEntryForm_single_activitylog_gettingInfoId,
             singleSpecimen.getInventoryId()));
-        SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(appService,
-            singleSpecimen.getInventoryId());
+        SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(
+            SessionManager.getAppService(), singleSpecimen.getInventoryId());
         foundSpecNull.setValue(false);
         if (foundSpecimen == null) {
             foundSpecNull.setValue(true);
@@ -761,7 +762,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         try {
             initWithProduct = false;
             ContainerWrapper palletFoundWithProductBarcode = ContainerWrapper
-                .getContainerWithProductBarcodeInSite(appService,
+                .getContainerWithProductBarcodeInSite(
+                    SessionManager.getAppService(),
                     currentMultipleContainer.getSite(),
                     currentMultipleContainer.getProductBarcode());
             isNewMultipleContainer = palletFoundWithProductBarcode == null;
@@ -900,7 +902,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      */
     private void initPalletContainerTypes() throws ApplicationException {
         palletContainerTypes = ContainerTypeWrapper.getContainerTypesPallet96(
-            appService, SessionManager.getUser().getCurrentWorkingSite());
+            SessionManager.getAppService(), SessionManager.getUser()
+                .getCurrentWorkingSite());
     }
 
     private void checkPalletContainerTypes() {
@@ -1242,11 +1245,12 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             return palletScanned;
         } else {
             if (isFakeScanLinkedOnly) {
-                return PalletCell.getRandomSpecimensNotAssigned(appService,
-                    currentMultipleContainer.getSite().getId());
+                return PalletCell.getRandomSpecimensNotAssigned(SessionManager
+                    .getAppService(), currentMultipleContainer.getSite()
+                    .getId());
             }
-            return PalletCell.getRandomSpecimensAlreadyAssigned(appService,
-                currentMultipleContainer.getSite().getId());
+            return PalletCell.getRandomSpecimensAlreadyAssigned(SessionManager
+                .getAppService(), currentMultipleContainer.getSite().getId());
         }
     }
 

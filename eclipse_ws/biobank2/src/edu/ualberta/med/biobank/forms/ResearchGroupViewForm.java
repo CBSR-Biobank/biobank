@@ -21,6 +21,7 @@ import org.supercsv.io.CsvBeanReader;
 import org.supercsv.io.ICsvBeanReader;
 import org.supercsv.prefs.CsvPreference;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
@@ -111,7 +112,8 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
     }
 
     public void saveRequest() throws Exception {
-        RequestWrapper request = new RequestWrapper(appService);
+        RequestWrapper request = new RequestWrapper(
+            SessionManager.getAppService());
 
         FileReader f = new FileReader(csvSelector.getFilePath());
         int newLines = 0;
@@ -150,11 +152,12 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
 
         List<RequestSpecimenWrapper> specs = new ArrayList<RequestSpecimenWrapper>();
         for (RequestInput ob : requests) {
-            RequestSpecimenWrapper r = new RequestSpecimenWrapper(appService);
+            RequestSpecimenWrapper r = new RequestSpecimenWrapper(
+                SessionManager.getAppService());
             r.setRequest(request);
             r.setState(RequestSpecimenState.AVAILABLE_STATE);
-            SpecimenWrapper spec = SpecimenWrapper.getSpecimen(appService,
-                ob.getInventoryID());
+            SpecimenWrapper spec = SpecimenWrapper.getSpecimen(
+                SessionManager.getAppService(), ob.getInventoryID());
             if (spec == null)
                 continue;
             r.setSpecimen(spec);

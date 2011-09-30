@@ -119,9 +119,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
 
     public void formClosed() throws Exception {
         // TODO: is this necessary if making copies?
-        if ((adapter != null) && (adapter.getModelObject() != null)) {
-            adapter.getModelObject().reload();
-        }
+        if (adapter instanceof AdapterBase)
+            if ((adapter != null) && (adapter.getModelObject() != null)) {
+                ((AdapterBase) adapter).getModelObject().reload();
+            }
         SessionManager.updateAdapterTreeNode(adapter);
     }
 
@@ -206,7 +207,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
 
     protected void checkEditAccess() {
         if (adapter != null && adapter.getModelObject() != null
-            && !SessionManager.canUpdate(adapter.getModelObject())) {
+            && !SessionManager.canUpdate(adapter.getModelObject().getClass())) {
             BgcPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 Messages.BiobankEntryForm_access_denied_error_msg);
@@ -455,8 +456,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     @Override
     public void cancel() {
         try {
-            boolean openView = adapter.getModelObject() != null
-                && !adapter.getModelObject().isNew();
+            boolean openView = adapter.getModelObject() != null;
+            if (adapter instanceof AdapterBase)
+                openView &= !((AdapterBase) adapter).getModelObject().isNew();
             closeEntryOpenView(true, openView);
         } catch (Exception e) {
             logger.error("Can't cancel the form", e); //$NON-NLS-1$

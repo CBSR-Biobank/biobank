@@ -471,7 +471,8 @@ public class ContainerViewForm extends BiobankViewForm {
                 if (canCreate) {
                     ContainerWrapper containerToOpen = cell.getContainer();
                     if (containerToOpen == null) {
-                        containerToOpen = new ContainerWrapper(appService);
+                        containerToOpen = new ContainerWrapper(
+                            SessionManager.getAppService());
                     }
                     containerToOpen
                         .setSite((SiteWrapper) containerAdapter

@@ -10,7 +10,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcSessionState;
@@ -69,8 +68,8 @@ public abstract class AbstractViewWithAdapterTree extends
     }
 
     @Override
-    public List<AbstractAdapterBase> searchNode(ModelWrapper<?> wrapper) {
-        return rootNode.search(wrapper);
+    public List<AbstractAdapterBase> searchNode(Object o) {
+        return rootNode.search(o);
     }
 
     public abstract void reload();

@@ -106,8 +106,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         // contain
         if (SessionManager.getUser().getCurrentWorkingSite() != null) {
             List<SpecimenTypeWrapper> res = SpecimenTypeWrapper
-                .getSpecimenTypeForPallet96(appService, SessionManager
-                    .getUser().getCurrentWorkingSite());
+                .getSpecimenTypeForPallet96(SessionManager.getAppService(),
+                    SessionManager.getUser().getCurrentWorkingSite());
             if (res.size() != 0)
                 palletSpecimenTypes = res;
         }
@@ -376,8 +376,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     private void checkInventoryId(BgcBaseText inventoryIdText) {
         boolean ok = true;
         try {
-            SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(appService,
-                inventoryIdText.getText());
+            SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
+                SessionManager.getAppService(), inventoryIdText.getText());
             if (specimen != null) {
                 BgcPlugin
                     .openAsyncError(
@@ -500,7 +500,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             Messages.SpecimenLinkEntryForm_activitylog_specimens_start);
         int nber = 0;
         ActivityStatusWrapper activeStatus = ActivityStatusWrapper
-            .getActiveActivityStatus(appService);
+            .getActiveActivityStatus(SessionManager.getAppService());
         // use a set because do not want to add the same parent twice
         CenterWrapper<?> currentSelectedCenter = SessionManager.getUser()
             .getCurrentWorkingCenter();
@@ -535,7 +535,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
         // persist of parent will automatically persist children
 
-        WrapperTransaction tx = new WrapperTransaction(appService);
+        WrapperTransaction tx = new WrapperTransaction(
+            SessionManager.getAppService());
         tx.persist(modifiedSources);
         tx.commit();
 
@@ -554,7 +555,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         singleSpecimen.setCreatedAt(new Date());
         singleSpecimen.setQuantityFromType();
         singleSpecimen.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+            .getActiveActivityStatus(SessionManager.getAppService()));
         singleSpecimen.setCurrentCenter(SessionManager.getUser()
             .getCurrentWorkingCenter());
 
@@ -642,8 +643,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
         try {
             return PalletCell.getRandomScanLinkWithSpecimensAlreadyLinked(
-                appService, SessionManager.getUser().getCurrentWorkingCenter()
-                    .getId());
+                SessionManager.getAppService(), SessionManager.getUser()
+                    .getCurrentWorkingCenter().getId());
         } catch (Exception ex) {
             BgcPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
         }

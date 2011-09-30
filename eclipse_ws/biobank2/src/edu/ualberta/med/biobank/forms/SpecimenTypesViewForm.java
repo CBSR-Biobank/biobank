@@ -33,8 +33,8 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
         form.setText(Messages.SpecimenTypesViewForm_title);
         page.setLayout(new GridLayout(1, false));
 
-        globalSpecimenTypes = SpecimenTypeWrapper.getAllSpecimenTypes(appService,
-            true);
+        globalSpecimenTypes = SpecimenTypeWrapper.getAllSpecimenTypes(
+            SessionManager.getAppService(), true);
         if (globalSpecimenTypes == null) {
             globalSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
         }

@@ -93,7 +93,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     @Override
     protected void init() throws Exception {
         super.init();
-        singleSpecimen = new SpecimenWrapper(appService);
+        singleSpecimen = new SpecimenWrapper(SessionManager.getAppService());
         canSaveSingleBinding = widgetCreator
             .addBooleanBinding(
                 new WritableValue(Boolean.FALSE, Boolean.class),
@@ -507,7 +507,8 @@ public abstract class AbstractLinkAssignEntryForm extends
     @Override
     protected void onReset() throws Exception {
         super.onReset();
-        singleSpecimen.initObjectWith(new SpecimenWrapper(appService));
+        singleSpecimen.initObjectWith(new SpecimenWrapper(SessionManager
+            .getAppService()));
         singleSpecimen.reset();
         setDirty(false);
         reset(true);
@@ -611,9 +612,9 @@ public abstract class AbstractLinkAssignEntryForm extends
         try {
             parentContainers = null;
             List<ContainerWrapper> foundContainers = ContainerWrapper
-                .getPossibleContainersFromPosition(appService,
-                    SessionManager.getUser(), positionText.getText(),
-                    isContainerPosition, type);
+                .getPossibleContainersFromPosition(
+                    SessionManager.getAppService(), SessionManager.getUser(),
+                    positionText.getText(), isContainerPosition, type);
             if (foundContainers.size() == 1) {
                 initParentContainers(foundContainers.get(0));
             } else if (foundContainers.size() > 1) {

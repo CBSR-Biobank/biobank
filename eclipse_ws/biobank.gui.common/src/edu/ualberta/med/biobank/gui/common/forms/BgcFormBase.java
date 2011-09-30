@@ -43,15 +43,12 @@ import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
 public abstract class BgcFormBase extends EditorPart implements
     ISelectionProvider {
 
     private static BgcLogger logger = BgcLogger.getLogger(BgcFormBase.class
         .getName());
-
-    protected BiobankApplicationService appService;
 
     protected ManagedForm mform;
 

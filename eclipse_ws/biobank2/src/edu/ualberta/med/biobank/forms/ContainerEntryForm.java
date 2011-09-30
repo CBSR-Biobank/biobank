@@ -72,7 +72,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (container.isNew()) {
             tabName = Messages.ContainerEntryForm_new_title;
             container.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
             if (container.hasParentContainer()) {
                 // need to set the label at least for display. But will be set
                 // during persit dependencies of the container
@@ -118,7 +118,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         if (!container.hasParentContainer()) {
             containerTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
-                appService, container.getSite());
+                SessionManager.getAppService(), container.getSite());
         } else {
             containerTypes = container.getParentContainer().getContainerType()
                 .getChildContainerTypeCollection();
@@ -151,8 +151,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.ContainerEntryForm_status_label,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            container.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), container.getActivityStatus(),
             Messages.ContainerEntryForm_status_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -179,7 +179,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 containerTypes = new ArrayList<ContainerTypeWrapper>();
             else
                 containerTypes = ContainerTypeWrapper
-                    .getTopContainerTypesInSite(appService, currentSite);
+                    .getTopContainerTypesInSite(SessionManager.getAppService(),
+                        currentSite);
         } else {
             containerTypes = container.getParentContainer().getContainerType()
                 .getChildContainerTypeCollection();
@@ -285,7 +286,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         if (container.isNew()) {
             container.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         }
 
         GuiUtil.reset(activityStatusComboViewer, container.getActivityStatus());

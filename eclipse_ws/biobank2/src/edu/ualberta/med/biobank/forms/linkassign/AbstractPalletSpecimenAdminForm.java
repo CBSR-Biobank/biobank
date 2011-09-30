@@ -476,11 +476,12 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             palletCell.getValue(), ContainerLabelingSchemeWrapper
                 .rowColToSbs(palletCell.getRowColPos())));
         beforeScanTubeAlone();
-        CellProcessResult res = appService.processCellStatus(
-            palletCell.transformIntoServerCell(), getProcessData(),
-            SessionManager.getUser().getCurrentWorkingCenter().getId(),
-            Locale.getDefault());
-        palletCell.merge(appService, res.getCell());
+        CellProcessResult res = SessionManager.getAppService()
+            .processCellStatus(palletCell.transformIntoServerCell(),
+                getProcessData(),
+                SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                Locale.getDefault());
+        palletCell.merge(SessionManager.getAppService(), res.getCell());
         appendLogs(res.getLogs());
         processCellResult(palletCell.getRowColPos(), palletCell);
         currentScanState = currentScanState.mergeWith(palletCell.getStatus());
@@ -575,9 +576,10 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
         }
         // server side call
-        ScanProcessResult res = appService.processScanResult(serverCells,
-            getProcessData(), isRescanMode(), SessionManager.getUser()
-                .getCurrentWorkingCenter().getId(), Locale.getDefault());
+        ScanProcessResult res = SessionManager.getAppService()
+            .processScanResult(serverCells, getProcessData(), isRescanMode(),
+                SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                Locale.getDefault());
         // print result logs
         appendLogs(res.getLogs());
 
@@ -599,7 +601,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                         servercell.getValue()));
                     cells.put(rcp, palletCell);
                 }
-                palletCell.merge(appService, servercell);
+                palletCell.merge(SessionManager.getAppService(), servercell);
                 // additional cell specific client conversion if needed
                 processCellResult(rcp, palletCell);
             }

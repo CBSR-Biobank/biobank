@@ -7,6 +7,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -65,7 +66,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
         specimenWidget = new SpecimenEntryWidget(client, SWT.NONE, toolkit,
-            appService, false);
+            SessionManager.getAppService(), false);
         specimenWidget.setSpecimens(originInfo.getSpecimenCollection());
         specimenWidget.addDoubleClickListener(collectionDoubleClickListener);
     }

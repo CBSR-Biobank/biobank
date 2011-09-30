@@ -101,7 +101,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         if (containerType.isNew()) {
             tabName = Messages.ContainerTypeEntryForm_new_title;
             containerType.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         } else {
             tabName = NLS.bind(Messages.ContainerTypeEntryForm_edit_title,
                 containerType.getName());
@@ -181,7 +181,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         String currentScheme = containerType.getChildLabelingSchemeName();
         labelingSchemeMap = new HashMap<Integer, String>();
         for (ContainerLabelingSchemeWrapper scheme : ContainerLabelingSchemeWrapper
-            .getAllLabelingSchemesMap(appService).values()) {
+            .getAllLabelingSchemesMap(SessionManager.getAppService()).values()) {
             labelingSchemeMap.put(scheme.getId(), scheme.getName());
         }
         labelingSchemeComboViewer = createComboViewer(client,
@@ -205,8 +205,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            containerType.getActivityStatus(),
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), containerType.getActivityStatus(),
             Messages.ContainerTypeEntryForm_activity_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -266,8 +266,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void createSpecimenTypesSection(Composite parent) throws Exception {
-        allSpecimenTypes = SpecimenTypeWrapper.getAllSpecimenTypes(appService,
-            true);
+        allSpecimenTypes = SpecimenTypeWrapper.getAllSpecimenTypes(
+            SessionManager.getAppService(), true);
 
         specimensMultiSelect = new MultiSelectWidget<SpecimenTypeWrapper>(
             parent, SWT.NONE,
@@ -378,7 +378,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         if (containerType.isNew()) {
             containerType.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+                .getActiveActivityStatus(SessionManager.getAppService()));
         }
 
         setChildContainerTypeSelection();

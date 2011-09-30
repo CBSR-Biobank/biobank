@@ -32,7 +32,6 @@ import edu.ualberta.med.biobank.gui.common.forms.BgcFormBase;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
@@ -50,7 +49,7 @@ import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
  */
 public abstract class BiobankFormBase extends BgcFormBase {
 
-    protected AdapterBase adapter;
+    protected AbstractAdapterBase adapter;
 
     public BiobankFormBase() {
         //
@@ -95,7 +94,6 @@ public abstract class BiobankFormBase extends BgcFormBase {
         adapter = (AdapterBase) formInput.getAdapter(AdapterBase.class);
         if (adapter != null) {
             Assert.isNotNull(adapter, "Bad editor input (null value)"); //$NON-NLS-1$
-            appService = (BiobankApplicationService) adapter.getAppService();
             if (!formInput.hasPreviousForm()) {
                 currentLinkedForms = new ArrayList<BgcFormBase>();
             }
@@ -106,14 +104,15 @@ public abstract class BiobankFormBase extends BgcFormBase {
         getSite().setSelectionProvider(this);
     }
 
-    protected ModelWrapper<?> getModelObject() throws Exception {
-        ModelWrapper<?> modelObject = adapter.getModelObject();
-
-        if (!modelObject.isNew()) {
-            modelObject = modelObject.getDatabaseClone();
+    protected Object getModelObject() throws Exception {
+        Object o = adapter.getModelObject();
+        if (o instanceof ModelWrapper) {
+            ModelWrapper<?> modelObject = (ModelWrapper<?>) o;
+            if (!modelObject.isNew()) {
+                o = modelObject.getDatabaseClone();
+            }
         }
-
-        return modelObject;
+        return o;
     }
 
     @Override
@@ -162,7 +161,7 @@ public abstract class BiobankFormBase extends BgcFormBase {
             listener, wrapperTypeToAdd, imageKey);
     }
 
-    public AdapterBase getAdapter() {
+    public AbstractAdapterBase getAdapter() {
         return adapter;
     }
 

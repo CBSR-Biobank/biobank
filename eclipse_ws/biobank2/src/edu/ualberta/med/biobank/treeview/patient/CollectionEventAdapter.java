@@ -2,74 +2,71 @@ package edu.ualberta.med.biobank.treeview.patient;
 
 import java.util.Collection;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class CollectionEventAdapter extends AdapterBase {
+public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
-    private static BgcLogger logger = BgcLogger
-        .getLogger(CollectionEventAdapter.class.getName());
-
-    public CollectionEventAdapter(AdapterBase parent,
-        CollectionEventWrapper collectionEventWrapper) {
-        super(parent, collectionEventWrapper);
+    public CollectionEventAdapter(AbstractNewAdapterBase parent,
+        CollectionEvent collectionEvent, String label) {
+        super(parent, collectionEvent, label);
         setEditable(parent instanceof PatientAdapter || parent == null);
     }
 
+    // @Override
+    // protected String getLabelInternal() {
+    // CollectionEventWrapper cevent = (CollectionEventWrapper)
+    // getModelObject();
+    //        Assert.isNotNull(cevent, "collection event is null"); //$NON-NLS-1$
+    // long count = -1;
+    // try {
+    // count = cevent.getSourceSpecimensCount(false);
+    // } catch (Exception e) {
+    //            logger.error("Problem counting specimens", e); //$NON-NLS-1$
+    // }
+    //        return new StringBuilder("#") //$NON-NLS-1$ 
+    //            .append(cevent.getVisitNumber()).append(" - ") //$NON-NLS-1$ 
+    // .append(
+    // DateFormatter.formatAsDateTime(cevent
+    //                    .getMinSourceSpecimenDate())).append(" [").append(count) //$NON-NLS-1$ 
+    //            .append("]").toString(); //$NON-NLS-1$ 
+    // }
+
     @Override
-    protected String getLabelInternal() {
-        CollectionEventWrapper cevent = (CollectionEventWrapper) getModelObject();
-        Assert.isNotNull(cevent, "collection event is null"); //$NON-NLS-1$
-        long count = -1;
-        try {
-            count = cevent.getSourceSpecimensCount(false);
-        } catch (Exception e) {
-            logger.error("Problem counting specimens", e); //$NON-NLS-1$
-        }
-        return new StringBuilder("#") //$NON-NLS-1$ 
-            .append(cevent.getVisitNumber()).append(" - ") //$NON-NLS-1$ 
-            .append(
-                DateFormatter.formatAsDateTime(cevent
-                    .getMinSourceSpecimenDate())).append(" [").append(count) //$NON-NLS-1$ 
-            .append("]").toString(); //$NON-NLS-1$ 
+    public CollectionEvent getModelObject() {
+        return (CollectionEvent) super.getModelObject();
     }
 
     @Override
     public String getTooltipText() {
         String tabName = null;
-        CollectionEventWrapper cEvent = (CollectionEventWrapper) getModelObject();
+        CollectionEvent cEvent = getModelObject();
         if (cEvent != null)
-            if (cEvent.isNew()) {
-                tabName = Messages.CollectionEventEntryForm_title_new;
-                try {
-                    cEvent
-                        .setActivityStatus(ActivityStatusWrapper
-                            .getActiveActivityStatus(SessionManager
-                                .getAppService()));
-                } catch (Exception e) {
-                    BgcPlugin.openAsyncError(
-                        Messages.CollectionEventAdapter_error_title,
-                        Messages.CollectionEventAdapter_create_error_msg);
-                }
-            } else {
-                tabName = NLS.bind(
-                    Messages.CollectionEventEntryForm_title_edit,
-                    cEvent.getVisitNumber());
-            }
+            // FIXME
+            // if (cEvent.isNew()) {
+            // tabName = Messages.CollectionEventEntryForm_title_new;
+            // try {
+            // cEvent
+            // .setActivityStatus(ActivityStatusWrapper
+            // .getActiveActivityStatus(SessionManager
+            // .getAppService()));
+            // } catch (Exception e) {
+            // BgcPlugin.openAsyncError(
+            // Messages.CollectionEventAdapter_error_title,
+            // Messages.CollectionEventAdapter_create_error_msg);
+            // }
+            // } else {
+            tabName = NLS.bind(Messages.CollectionEventEntryForm_title_edit,
+                cEvent.getVisitNumber());
+        // }
         return tabName;
     }
 
@@ -96,13 +93,12 @@ public class CollectionEventAdapter extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
-        throws Exception {
+    protected Collection<?> getChildrenObjects() throws Exception {
         return null;
     }
 
     @Override
-    protected int getWrapperChildCount() throws Exception {
+    protected int getChildrenCount() throws Exception {
         return 0;
     }
 
