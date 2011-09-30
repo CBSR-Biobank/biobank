@@ -774,6 +774,10 @@
     <delete>
       <fileset dir="${cacore.sdk.dir}/${build.classes.dir}"/>
     </delete>
+  	<!-- copy the interface that all model object should implements now (thanks to the hbmpostprocess) -->
+  	<copy todir="${cacore.sdk.dir}/${output.src.dir}/edu/ualberta/med/biobank/model" 
+  		file="${eclipse.proj.dir.tools}/src/edu/ualberta/med/biobank/model/IBiobankModel.java"
+  	    overwrite="true"/>
 
     <javac srcdir="${cacore.sdk.dir}/${output.src.dir}" destdir="${cacore.sdk.dir}/${build.classes.dir}"
       debug="true" includeantruntime="false" >

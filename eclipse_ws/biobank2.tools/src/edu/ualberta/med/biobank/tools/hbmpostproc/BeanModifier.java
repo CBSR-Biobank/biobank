@@ -18,8 +18,21 @@ public class BeanModifier {
 
     private static Pattern BEAN_SERIAL_VERSION_DECL = Pattern
         .compile("private static final long serialVersionUID");
-
     private static final String LAST_UPDATE_DECL = "        private Integer version;";
+
+    private static Pattern IMPLEMENTS_SERIALIZABLE_PATTERN = Pattern
+        .compile("^public .* implements Serializable$");
+    private static String SERIALIZABLE_TEXT_TO_REPLACE = "Serializable";
+    private static String IMPLEMENTS_NEW_TEXT = "IBiobankModel";
+
+    private static Pattern GETID_FIELD_PATTERN = Pattern
+        .compile("^\\s*public Integer getId\\(\\)\\{$");
+
+    private static Pattern SETID_FIELD_PATTERN = Pattern
+        .compile("^\\s*public void setId\\(Integer id\\)\\{$");
+
+    private static Pattern SETTER_IMPL_PATTERN = Pattern
+        .compile("^\\s*this.id = id;$");
 
     private static BeanModifier instance = null;
 
@@ -52,13 +65,43 @@ public class BeanModifier {
         while (line != null) {
             String alteredLine = new String(line);
 
+            // add the version field
             Matcher declMatcher = BEAN_SERIAL_VERSION_DECL.matcher(line);
-
-            if (!documentChanged && declMatcher.find()) {
+            if (declMatcher.find()) {
                 alteredLine = new StringBuffer(alteredLine).append("\n\n")
                     .append(LAST_UPDATE_DECL).toString();
+            } else {
+                // implements IBiobankModel interface
+                Matcher implMatcher = IMPLEMENTS_SERIALIZABLE_PATTERN
+                    .matcher(line);
+                if (implMatcher.matches()) {
+                    alteredLine = line.replaceFirst(
+                        SERIALIZABLE_TEXT_TO_REPLACE, IMPLEMENTS_NEW_TEXT);
+                } else {
+                    // set ids Serializable instances instead of Integer
+                    Matcher setidMatcher = SETID_FIELD_PATTERN.matcher(line);
+                    if (setidMatcher.matches()) {
+                        alteredLine = line.replaceFirst("Integer",
+                            "Serializable");
+                    } else {
+                        // getId overrides the interfece getter but return an
+                        // Integer
+                        Matcher getidMatcher = GETID_FIELD_PATTERN
+                            .matcher(line);
+                        if (getidMatcher.matches()) {
+                            alteredLine = "    @Override\n" + line;
+                        } else {
+                            // a cast need to be done on the id
+                            Matcher setterMatcher = SETTER_IMPL_PATTERN
+                                .matcher(line);
+                            if (setterMatcher.matches()) {
+                                alteredLine = line.replaceFirst("id;",
+                                    "(Integer)id;");
+                            }
+                        }
+                    }
+                }
             }
-
             documentChanged |= !line.equals(alteredLine);
 
             writer.write(alteredLine);
