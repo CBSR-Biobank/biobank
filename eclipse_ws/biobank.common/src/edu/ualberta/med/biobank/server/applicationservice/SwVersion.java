@@ -76,8 +76,7 @@ public class SwVersion {
     @SuppressWarnings("nls")
     @Override
     public String toString() {
-        return getMajor() + "." + getMinor() + "." + getService() + "."
-            + getQualifier();
+        return getMajor() + "." + getMinor() + "." + getService()
+            + (qualifier != null ? "." + getQualifier() : "");
     }
-
 }
