@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
@@ -89,7 +90,7 @@ public class CollectionView extends AbstractAdministrationView {
     }
 
     public static PatientAdapter getCurrentPatient() {
-        AdapterBase selectedNode = currentInstance.getSelectedNode();
+        AbstractAdapterBase selectedNode = currentInstance.getSelectedNode();
         if (selectedNode != null && selectedNode instanceof PatientAdapter) {
             return (PatientAdapter) selectedNode;
         }
@@ -121,7 +122,7 @@ public class CollectionView extends AbstractAdministrationView {
     public void showSearchedObjectsInTree(
         List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
         for (ModelWrapper<?> searchedObject : searchedObjects) {
-            List<AdapterBase> nodeRes = rootNode.search(searchedObject);
+            List<AbstractAdapterBase> nodeRes = rootNode.search(searchedObject);
             if (nodeRes.size() == 0) {
                 searchedNode.addSearchObject(searchedObject);
                 searchedNode.performExpand();
@@ -139,7 +140,8 @@ public class CollectionView extends AbstractAdministrationView {
         ModelWrapper<?> wrapper) {
         if (wrapper instanceof PatientWrapper) {
             PatientWrapper patient = (PatientWrapper) wrapper;
-            List<AdapterBase> res = parentNode.search(patient.getStudy());
+            List<AbstractAdapterBase> res = parentNode.search(patient
+                .getStudy());
             StudyWithPatientAdapter studyAdapter = null;
             if (res.size() > 0)
                 studyAdapter = (StudyWithPatientAdapter) res.get(0);
@@ -150,7 +152,8 @@ public class CollectionView extends AbstractAdministrationView {
                 studyAdapter.setLoadChildrenInBackground(false);
                 parentNode.addChild(studyAdapter);
             }
-            List<AdapterBase> patientAdapterList = studyAdapter.search(patient);
+            List<AbstractAdapterBase> patientAdapterList = studyAdapter
+                .search(patient);
             PatientAdapter patientAdapter = null;
             if (patientAdapterList.size() > 0)
                 patientAdapter = (PatientAdapter) patientAdapterList.get(0);
@@ -197,7 +200,7 @@ public class CollectionView extends AbstractAdministrationView {
 
     @Override
     public void reload() {
-        for (AdapterBase adapter : rootNode.getChildren())
+        for (AbstractAdapterBase adapter : rootNode.getChildren())
             adapter.rebuild();
         super.reload();
     }

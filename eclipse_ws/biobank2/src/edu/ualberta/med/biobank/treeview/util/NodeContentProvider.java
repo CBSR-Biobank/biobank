@@ -5,6 +5,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class NodeContentProvider implements ITreeContentProvider,
@@ -92,15 +93,15 @@ public class NodeContentProvider implements ITreeContentProvider,
 
     protected void addListenerTo(AdapterBase node) {
         node.addListener(this);
-        for (AdapterBase child : node.getChildren()) {
-            addListenerTo(child);
+        for (AbstractAdapterBase child : node.getChildren()) {
+            addListenerTo((AdapterBase) child);
         }
     }
 
     protected void removeListenerFrom(AdapterBase node) {
         node.removeListener(this);
-        for (AdapterBase child : node.getChildren()) {
-            removeListenerFrom(child);
+        for (AbstractAdapterBase child : node.getChildren()) {
+            removeListenerFrom((AdapterBase) child);
         }
     }
 

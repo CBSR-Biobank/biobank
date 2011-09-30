@@ -31,6 +31,7 @@ import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ContainerAdapter extends AdapterBase {
@@ -272,8 +273,8 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        List<AdapterBase> res = new ArrayList<AdapterBase>();
+    public List<AbstractAdapterBase> search(Object searchedObject) {
+        List<AbstractAdapterBase> res = new ArrayList<AbstractAdapterBase>();
         if (searchedObject instanceof ContainerWrapper) {
             ContainerWrapper containerWrapper = (ContainerWrapper) searchedObject;
             List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
@@ -293,7 +294,7 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof ContainerWrapper);
         return new ContainerAdapter(this, (ContainerWrapper) child);
     }

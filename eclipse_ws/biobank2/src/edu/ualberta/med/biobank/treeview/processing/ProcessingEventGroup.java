@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
@@ -62,7 +63,7 @@ public class ProcessingEventGroup extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         return findChildFromClass(searchedObject, ClinicWrapper.class);
     }
 
@@ -72,7 +73,7 @@ public class ProcessingEventGroup extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof ProcessingEventWrapper);
         return new ProcessingEventAdapter(this, (ProcessingEventWrapper) child);
     }
@@ -95,10 +96,10 @@ public class ProcessingEventGroup extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        List<AdapterBase> children = getChildren();
+        List<AbstractAdapterBase> children = getChildren();
         List<ModelWrapper<?>> wrappers = new ArrayList<ModelWrapper<?>>();
-        for (AdapterBase child : children)
-            wrappers.add(child.getModelObject());
+        for (AbstractAdapterBase child : children)
+            wrappers.add(((AdapterBase) child).getModelObject());
         return wrappers;
     }
 

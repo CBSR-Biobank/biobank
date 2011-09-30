@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class PatientAdapter extends AdapterBase {
@@ -95,7 +96,7 @@ public class PatientAdapter extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         return findChildFromClass(searchedObject, ProcessingEventWrapper.class);
     }
 
@@ -105,7 +106,7 @@ public class PatientAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof ProcessingEventWrapper);
         return new CollectionEventAdapter(this, (CollectionEventWrapper) child);
     }

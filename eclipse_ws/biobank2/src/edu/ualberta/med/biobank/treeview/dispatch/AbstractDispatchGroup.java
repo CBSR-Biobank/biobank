@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
@@ -69,7 +69,7 @@ public abstract class AbstractDispatchGroup extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
     }
 
@@ -79,7 +79,7 @@ public abstract class AbstractDispatchGroup extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AbstractAdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof DispatchWrapper);
         return new DispatchAdapter(this, (DispatchWrapper) child);
     }

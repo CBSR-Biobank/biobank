@@ -24,7 +24,7 @@ public class DateNode extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         return findChildFromClass(searchedObject, ClinicWrapper.class);
     }
 
@@ -34,7 +34,7 @@ public class DateNode extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 

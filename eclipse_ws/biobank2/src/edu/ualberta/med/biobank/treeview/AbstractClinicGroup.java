@@ -8,7 +8,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
@@ -39,7 +38,7 @@ public abstract class AbstractClinicGroup extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         return findChildFromClass(searchedObject, ClinicWrapper.class);
     }
 
@@ -49,7 +48,7 @@ public abstract class AbstractClinicGroup extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof ClinicWrapper);
         return new ClinicAdapter(this, (ClinicWrapper) child);
     }

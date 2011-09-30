@@ -49,7 +49,7 @@ public class RootNode extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
     }
 
@@ -59,7 +59,7 @@ public class RootNode extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 

@@ -7,7 +7,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
@@ -44,7 +43,7 @@ public abstract class AbstractStudyGroup extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         return findChildFromClass(searchedObject, StudyWrapper.class);
     }
 
@@ -54,7 +53,7 @@ public abstract class AbstractStudyGroup extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof StudyWrapper);
         return new StudyAdapter(this, (StudyWrapper) child);
     }

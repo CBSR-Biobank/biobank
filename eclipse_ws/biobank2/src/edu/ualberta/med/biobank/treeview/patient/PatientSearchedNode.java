@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.Assert;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
@@ -19,7 +20,7 @@ public class PatientSearchedNode extends AbstractSearchedNode {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof SiteWrapper);
         return new SiteAdapter(this, (SiteWrapper) child);
     }
@@ -35,7 +36,7 @@ public class PatientSearchedNode extends AbstractSearchedNode {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         return findChildFromClass(searchedObject, StudyWrapper.class);
     }
 

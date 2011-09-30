@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -49,9 +50,9 @@ public class SessionAdapter extends AdapterBase {
         this.appService = appService;
         setId(sessionId);
         if (user.getLogin().isEmpty()) {
-            setName(serverName);
+            setLabel(serverName);
         } else {
-            setName(serverName + " [" + user.getLogin() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+            setLabel(serverName + " [" + user.getLogin() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         this.serverName = serverName;
         this.user = user;
@@ -169,7 +170,7 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
     }
 
@@ -179,7 +180,7 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 

@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.model.Entity;
 import edu.ualberta.med.biobank.model.Report;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
@@ -53,7 +54,8 @@ public class ReportEntityGroup extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (parent.isModifiable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(NLS.bind(Messages.ReportEntityGroup_new_label, entity.getName()));
+            mi.setText(NLS.bind(Messages.ReportEntityGroup_new_label,
+                entity.getName()));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -79,7 +81,7 @@ public class ReportEntityGroup extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
     }
 
@@ -94,7 +96,7 @@ public class ReportEntityGroup extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof ReportWrapper);
         return new ReportAdapter(this, (ReportWrapper) child);
     }

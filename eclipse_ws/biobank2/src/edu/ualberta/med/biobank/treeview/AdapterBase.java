@@ -3,20 +3,12 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -41,7 +33,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  * Base class for all "Session" tree view nodes. Generally, most of the nodes in
  * the tree are adapters for classes in the ORM model.
  */
-public abstract class AdapterBase {
+public abstract class AdapterBase extends AbstractAdapterBase {
 
     private static BgcLogger logger = BgcLogger.getLogger(AdapterBase.class
         .getName());
@@ -52,21 +44,6 @@ public abstract class AdapterBase {
         .getSoleInstance();
 
     private ModelWrapper<?> modelObject;
-
-    private Integer id;
-
-    private String label;
-
-    protected AdapterBase parent;
-
-    protected boolean hasChildren;
-
-    protected List<AdapterBase> children;
-
-    /**
-     * if true, edit button and actions will be visible
-     */
-    private boolean editable = true;
 
     private boolean loadChildrenInBackground;
 
@@ -79,13 +56,17 @@ public abstract class AdapterBase {
 
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
         boolean loadChildrenInBackground) {
+        super(parent, -1, null, false);
         this.modelObject = object;
-        this.parent = parent;
         this.loadChildrenInBackground = loadChildrenInBackground;
+    }
+
+    @Override
+    protected void init() {
         loadChildrenSemaphore = new Semaphore(10, true);
-        children = new ArrayList<AdapterBase>();
-        if (parent != null) {
-            addListener(parent.deltaListener);
+        children = new ArrayList<AbstractAdapterBase>();
+        if (getParent() != null) {
+            addListener(getParent().deltaListener);
         }
         listeners = new ArrayList<AdapterChangedListener>();
     }
@@ -96,10 +77,8 @@ public abstract class AdapterBase {
 
     public AdapterBase(AdapterBase parent, int id, String name,
         boolean hasChildren, boolean loadChildrenInBackground) {
-        this(parent, null, loadChildrenInBackground);
-        setId(id);
-        setName(name);
-        setHasChildren(hasChildren);
+        super(parent, id, name, hasChildren);
+        this.loadChildrenInBackground = loadChildrenInBackground;
     }
 
     public ModelWrapper<?> getModelObject() {
@@ -121,23 +100,12 @@ public abstract class AdapterBase {
         this.parent = parent;
     }
 
-    public AdapterBase getParent() {
-        return parent;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
+    @Override
     public Integer getId() {
         if (modelObject != null) {
-            return ((ModelWrapper<?>) modelObject).getId();
+            return modelObject.getId();
         }
-        return id;
-    }
-
-    public void setName(String name) {
-        this.label = name;
+        return super.getId();
     }
 
     /**
@@ -146,13 +114,15 @@ public abstract class AdapterBase {
      * 
      * @return the name for the node.
      */
+    @Override
     public String getLabel() {
         if (modelObject != null) {
             return getLabelInternal();
-        } else if (parent != null && parent.loadChildrenInBackground) {
+        } else if (parent != null
+            && ((AdapterBase) parent).loadChildrenInBackground) {
             return BGR_LOADING_LABEL;
         }
-        return label;
+        return super.getLabel();
     }
 
     /**
@@ -164,102 +134,68 @@ public abstract class AdapterBase {
      */
     protected abstract String getLabelInternal();
 
-    /**
-     * The string to display in the tooltip for the form.
-     */
-    public abstract String getTooltipText();
-
-    protected String getTooltipText(String string) {
-        String name = getLabel();
-        if (name == null) {
-            return new StringBuilder(Messages.AdapterBase_new_label).append(
-                string).toString();
-        }
-        return new StringBuilder(string).append(" ").append(name).toString(); //$NON-NLS-1$
+    @Override
+    public AdapterBase getParent() {
+        return (AdapterBase) parent;
     }
 
-    public List<AdapterBase> getItems() {
-        return children;
-    }
-
-    public List<AdapterBase> getChildren() {
-        return children;
-    }
-
-    public AdapterBase getChild(ModelWrapper<?> wrapper) {
-        return getChild(wrapper, false);
-    }
-
-    public AdapterBase getChild(ModelWrapper<?> wrapper, boolean reloadChildren) {
+    @Override
+    public AdapterBase getChild(Object object, boolean reloadChildren) {
         if (reloadChildren) {
             loadChildren(false);
         }
         if (children.size() == 0)
             return null;
 
-        Class<?> wrapperClass = wrapper.getClass();
-        Integer wrapperId = wrapper.getId();
-        for (AdapterBase child : children) {
-            ModelWrapper<?> childModelObject = child.getModelObject();
+        Class<?> wrapperClass = object.getClass();
+        Integer wrapperId = ((ModelWrapper<?>) object).getId();
+        for (AbstractAdapterBase child : children) {
+            ModelWrapper<?> childModelObject = ((AdapterBase) child)
+                .getModelObject();
             if ((childModelObject != null)
                 && childModelObject.getClass().equals(wrapperClass)
                 && child.getId() != null && child.getId().equals(wrapperId))
-                return child;
+                return (AdapterBase) child;
         }
         return null;
     }
 
+    @Override
+    public AdapterBase getChild(Object object) {
+        return getChild(object, false);
+    }
+
+    @Override
     public AdapterBase getChild(int id) {
-        return getChild(id, false);
+        return (AdapterBase) super.getChild(id);
     }
 
+    @Override
     public AdapterBase getChild(int id, boolean reloadChildren) {
-        if (reloadChildren) {
-            loadChildren(false);
-        }
-        if (children.size() == 0)
-            return null;
-
-        for (AdapterBase child : children) {
-            if (child.getId().equals(id))
-                return child;
-        }
-        return null;
+        return (AdapterBase) super.getChild(id, reloadChildren);
     }
 
-    public void addChild(AdapterBase child) {
-        hasChildren = true;
-        AdapterBase existingNode = contains(child);
-        if (existingNode != null) {
-            // don't add - assume our model is up to date
-            return;
-        }
-
-        child.setParent(this);
-        children.add(child);
-        child.addListener(deltaListener);
+    @Override
+    public void addChild(AbstractAdapterBase child) {
+        super.addChild(child);
+        ((AdapterBase) child).addListener(deltaListener);
         fireAdd(child);
     }
 
-    public void insertAfter(AdapterBase existingNode, AdapterBase newNode) {
-        int pos = children.indexOf(existingNode);
-        Assert.isTrue(pos >= 0,
-            "existing node not found: " + existingNode.getLabel()); //$NON-NLS-1$
-        newNode.setParent(this);
-        children.add(pos + 1, newNode);
-        newNode.addListener(deltaListener);
+    @Override
+    public void insertAfter(AbstractAdapterBase existingNode,
+        AbstractAdapterBase newNode) {
+        super.insertAfter(existingNode, newNode);
+        ((AdapterBase) newNode).addListener(deltaListener);
         fireAdd(newNode);
     }
 
-    public void removeChild(AdapterBase item) {
-        removeChild(item, true);
-    }
-
-    public void removeChild(AdapterBase item, boolean closeForm) {
+    @Override
+    public void removeChild(AbstractAdapterBase item, boolean closeForm) {
         if (children.size() == 0)
             return;
-        AdapterBase itemToRemove = null;
-        for (AdapterBase child : children) {
+        AbstractAdapterBase itemToRemove = null;
+        for (AbstractAdapterBase child : children) {
             if ((child.getId() == null && item.getId() == null)
                 || (child.getId().equals(item.getId()) && child.getLabel()
                     .equals(item.getLabel())))
@@ -270,57 +206,24 @@ public abstract class AdapterBase {
                 closeEditor(new FormInput(itemToRemove));
             }
             children.remove(itemToRemove);
+            // override because of fireRemove
             fireRemove(itemToRemove);
         }
     }
 
-    public void removeByName(String name) {
-        if (children.size() == 0)
-            return;
-        AdapterBase itemToRemove = null;
-        for (AdapterBase child : children) {
-            if (child.getLabel().equals(name))
-                itemToRemove = child;
-        }
-        if (itemToRemove != null) {
-            children.remove(itemToRemove);
-            fireRemove(itemToRemove);
-        }
-    }
-
+    @Override
     public void removeAll() {
-        for (AdapterBase child : new ArrayList<AdapterBase>(getChildren())) {
-            removeChild(child);
-        }
+        super.removeAll();
         notifyListeners();
     }
 
-    public AdapterBase contains(AdapterBase item) {
-        if (children.size() == 0)
-            return null;
-
-        for (AdapterBase child : children) {
-            if ((child.getId().equals(item.getId()))
-                && child.getLabel().equals(item.getLabel()))
-                return child;
-        }
-        return null;
-    }
-
-    public void setHasChildren(boolean hasChildren) {
-        this.hasChildren = hasChildren;
-    }
-
-    public boolean hasChildren() {
-        return hasChildren;
-    }
-
+    @Deprecated
     public WritableApplicationService getAppService() {
         if (modelObject != null) {
             return modelObject.getAppService();
         }
         if (parent != null)
-            return parent.getAppService();
+            return ((AdapterBase) parent).getAppService();
         return null;
     }
 
@@ -342,32 +245,12 @@ public abstract class AdapterBase {
         deltaListener.remove(new DeltaEvent(removed));
     }
 
-    protected void executeDoubleClick() {
-        openViewForm();
-    }
-
-    public void performDoubleClick() {
-        executeDoubleClick();
-    }
-
-    public void performExpand() {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                loadChildren(true);
-                RootNode root = getRootNode();
-                if (root != null) {
-                    root.expandChild(AdapterBase.this);
-                }
-            }
-        });
-    }
-
     /**
      * Called to load it's children;
      * 
      * @param updateNode If not null, the node in the treeview to update.
      */
+    @Override
     public void loadChildren(boolean updateNode) {
         try {
             loadChildrenSemaphore.acquire();
@@ -384,7 +267,7 @@ public abstract class AdapterBase {
             Collection<? extends ModelWrapper<?>> children = getWrapperChildren();
             if (children != null) {
                 for (ModelWrapper<?> child : children) {
-                    AdapterBase node = getChild(child);
+                    AbstractAdapterBase node = getChild(child);
                     if (node == null) {
                         node = createChildNode(child);
                         addChild(node);
@@ -421,9 +304,9 @@ public abstract class AdapterBase {
                 setHasChildren(false);
             } else
                 setHasChildren(true);
-            final List<AdapterBase> newNodes = new ArrayList<AdapterBase>();
+            final List<AbstractAdapterBase> newNodes = new ArrayList<AbstractAdapterBase>();
             for (int i = 0, n = childCount - children.size(); i < n; ++i) {
-                final AdapterBase node = createChildNode(-i);
+                final AbstractAdapterBase node = createChildNode(-i);
                 addChild(node);
                 newNodes.add(node);
             }
@@ -438,15 +321,15 @@ public abstract class AdapterBase {
                                 // first see if this object is among the
                                 // children, if not then it is being loaded
                                 // for the first time
-                                AdapterBase node = getChild(child);
+                                AbstractAdapterBase node = getChild(child);
                                 if (node == null) {
                                     Assert.isTrue(newNodes.size() > 0);
                                     node = newNodes.get(0);
                                     newNodes.remove(0);
                                 }
                                 Assert.isNotNull(node);
-                                node.setModelObject(child);
-                                final AdapterBase nodeToUpdate = node;
+                                ((AdapterBase) node).setModelObject(child);
+                                final AbstractAdapterBase nodeToUpdate = node;
                                 Display.getDefault().syncExec(new Runnable() {
                                     @Override
                                     public void run() {
@@ -489,65 +372,6 @@ public abstract class AdapterBase {
         }
     }
 
-    public abstract void popupMenu(TreeViewer tv, Tree tree, Menu menu);
-
-    protected void addEditMenu(Menu menu, String objectName) {
-        if (isEditable()) {
-            MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.AdapterBase_edit_label + objectName);
-            mi.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    AdapterBase.this.openEntryForm();
-                }
-            });
-        }
-    }
-
-    protected void addViewMenu(Menu menu, String objectName) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText(Messages.AdapterBase_view_label + objectName);
-        mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                AdapterBase.this.openViewForm();
-            }
-        });
-    }
-
-    protected void addDeleteMenu(Menu menu, String objectName) {
-        if (isDeletable()) {
-            MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.AdapterBase_delete_label + objectName);
-            mi.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    deleteWithConfirm();
-                }
-            });
-        }
-    }
-
-    /**
-     * Create a adequate child node for this node
-     * 
-     * @param child the child model object
-     */
-    protected abstract AdapterBase createChildNode();
-
-    protected AdapterBase createChildNode(int id) {
-        AdapterBase adapter = createChildNode();
-        adapter.setId(id);
-        return adapter;
-    }
-
-    /**
-     * Create a adequate child node for this node
-     * 
-     * @param child the child model object
-     */
-    protected abstract AdapterBase createChildNode(ModelWrapper<?> child);
-
     /**
      * get the list of this model object children that this node should have as
      * children nodes.
@@ -557,7 +381,17 @@ public abstract class AdapterBase {
     protected abstract Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception;
 
+    @Override
+    protected Collection<?> getChildrenObjects() throws Exception {
+        return getWrapperChildren();
+    }
+
     protected abstract int getWrapperChildCount() throws Exception;
+
+    @Override
+    protected int getChildrenCount() throws Exception {
+        return getWrapperChildCount();
+    }
 
     public static boolean closeEditor(FormInput input) {
         IWorkbenchPage page = PlatformUI.getWorkbench()
@@ -588,19 +422,7 @@ public abstract class AdapterBase {
 
     }
 
-    @SuppressWarnings("unchecked")
-    public <E> E getParentFromClass(Class<E> parentClass) {
-        AdapterBase node = this;
-        while (node != null) {
-            if (node.getClass().equals(parentClass)) {
-                return (E) node;
-            } else {
-                node = node.getParent();
-            }
-        }
-        return null;
-    }
-
+    @Override
     public void openViewForm() {
         if (getViewFormId() != null && modelObject != null
             && modelObject.getWrappedObject() != null) {
@@ -608,68 +430,11 @@ public abstract class AdapterBase {
         }
     }
 
-    public IEditorPart openEntryForm() {
-        return openEntryForm(false);
-    }
-
-    public IEditorPart openEntryForm(boolean hasPreviousForm) {
-        return openForm(new FormInput(this, hasPreviousForm), getEntryFormId());
-    }
-
-    public abstract String getViewFormId();
-
-    public abstract String getEntryFormId();
-
-    public List<AdapterBase> search(Object searchedObject) {
+    @Override
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         if (modelObject != null && modelObject.equals(searchedObject))
-            return Arrays.asList(this);
-        return new ArrayList<AdapterBase>();
-    }
-
-    protected List<AdapterBase> searchChildren(Object searchedObject) {
-        // FIXME children are loading in background most of the time:
-        // they are not loaded then the objects are not found
-        loadChildren(false);
-        List<AdapterBase> result = new ArrayList<AdapterBase>();
-        for (AdapterBase child : getChildren()) {
-            List<AdapterBase> tmpRes = child.search(searchedObject);
-            if (tmpRes.size() > 0)
-                result.addAll(tmpRes);
-        }
-        return result;
-    }
-
-    protected List<AdapterBase> findChildFromClass(Object searchedObject,
-        Class<?>... clazzList) {
-        if (searchedObject != null) {
-            for (Class<?> clazz : clazzList) {
-                if (clazz.isAssignableFrom(searchedObject.getClass())) {
-                    List<AdapterBase> res = new ArrayList<AdapterBase>();
-                    AdapterBase child = null;
-                    if (ModelWrapper.class.isAssignableFrom(clazz))
-                        child = getChild((ModelWrapper<?>) searchedObject, true);
-                    else if (Date.class.isAssignableFrom(clazz))
-                        child = getChild((int) ((Date) searchedObject)
-                            .getTime());
-                    else if (Integer.class.isAssignableFrom(clazz))
-                        child = getChild((Integer) searchedObject);
-                    if (child != null) {
-                        res.add(child);
-                    }
-                    return res;
-                }
-            }
-        }
-        return searchChildren(searchedObject);
-    }
-
-    public RootNode getRootNode() {
-        return getParentFromClass(RootNode.class);
-    }
-
-    public void rebuild() {
-        removeAll();
-        loadChildren(false);
+            return Arrays.asList(new AbstractAdapterBase[] { this });
+        return new ArrayList<AbstractAdapterBase>();
     }
 
     public void resetObject() throws Exception {
@@ -678,6 +443,7 @@ public abstract class AdapterBase {
         }
     }
 
+    @Override
     public void deleteWithConfirm() {
         String msg = getConfirmDeleteMessage();
         if (msg == null) {
@@ -718,28 +484,15 @@ public abstract class AdapterBase {
         }
     }
 
-    protected void additionalRefreshAfterDelete() {
-        // default does nothing
-    }
-
-    public boolean isDeletable() {
-        // should override it to activate deletion
-        return false;
-    }
-
+    @Override
     protected boolean internalIsDeletable() {
-        return editable && modelObject != null
-            && SessionManager.getInstance().isConnected()
+        return super.internalIsDeletable() && modelObject != null
             && SessionManager.canDelete(modelObject);
     }
 
+    @Override
     public boolean isEditable() {
-        return editable && SessionManager.getInstance().isConnected()
-            && SessionManager.canUpdate(modelObject);
-    }
-
-    public void setEditable(boolean editable) {
-        this.editable = editable;
+        return super.isEditable() && SessionManager.canUpdate(modelObject);
     }
 
     public void setLoadChildrenInBackground(boolean loadChildrenInBackground) {
@@ -764,18 +517,16 @@ public abstract class AdapterBase {
         notifyListeners(new AdapterChangedEvent(this));
     }
 
-    protected String getConfirmDeleteMessage() {
-        return null;
-    }
-
-    protected List<AdapterBase> searchChildContainers(Object searchedObject,
-        ContainerAdapter container, final List<ContainerWrapper> parents) {
-        List<AdapterBase> res = new ArrayList<AdapterBase>();
+    protected List<AbstractAdapterBase> searchChildContainers(
+        Object searchedObject, ContainerAdapter container,
+        final List<ContainerWrapper> parents) {
+        List<AbstractAdapterBase> res = new ArrayList<AbstractAdapterBase>();
         if (parents.contains(container.getModelObject())) {
-            AdapterBase child = container.getChild(
-                (ModelWrapper<?>) searchedObject, true);
+            AbstractAdapterBase child = container
+                .getChild(searchedObject, true);
             if (child == null) {
-                for (AdapterBase childContainer : container.getChildren()) {
+                for (AbstractAdapterBase childContainer : container
+                    .getChildren()) {
                     if (childContainer instanceof ContainerAdapter) {
                         res = searchChildContainers(searchedObject,
                             (ContainerAdapter) childContainer, parents);
@@ -790,6 +541,24 @@ public abstract class AdapterBase {
             }
         }
         return res;
+    }
+
+    public RootNode getRootNode() {
+        return getParentFromClass(RootNode.class);
+    }
+
+    @Override
+    public void performExpand() {
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                loadChildren(true);
+                RootNode root = getRootNode();
+                if (root != null) {
+                    root.expandChild(AdapterBase.this);
+                }
+            }
+        });
     }
 
 }

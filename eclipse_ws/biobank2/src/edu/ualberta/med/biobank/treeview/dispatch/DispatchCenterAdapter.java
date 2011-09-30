@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class DispatchCenterAdapter extends AdapterBase {
@@ -56,17 +57,17 @@ public class DispatchCenterAdapter extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
     }
 
     @Override
-    protected AdapterBase createChildNode() {
+    protected AbstractAdapterBase createChildNode() {
         return null;
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AbstractAdapterBase createChildNode(Object child) {
         return null;
     }
 
@@ -92,7 +93,7 @@ public class DispatchCenterAdapter extends AdapterBase {
 
     @Override
     public void rebuild() {
-        for (AdapterBase adaper : getChildren()) {
+        for (AbstractAdapterBase adaper : getChildren()) {
             adaper.rebuild();
         }
     }

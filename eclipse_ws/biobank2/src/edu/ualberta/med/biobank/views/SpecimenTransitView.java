@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -172,7 +173,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 logger.error(Messages.SpecimenTransitView_nodes_error_title, e);
 
             }
-            for (AdapterBase adaper : rootNode.getChildren()) {
+            for (AbstractAdapterBase adaper : rootNode.getChildren()) {
                 adaper.rebuild();
             }
         }
@@ -246,13 +247,14 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     protected void showSearchedObjectsInTree(
         List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
         for (ModelWrapper<?> searchedObject : searchedObjects) {
-            List<AdapterBase> nodeRes = rootNode.search(searchedObject);
+            List<AbstractAdapterBase> nodeRes = rootNode.search(searchedObject);
             if (nodeRes.size() == 0)
                 searchedNode.addSearchObject(searchedObject);
         }
         searchedNode.performExpand();
         if (searchedObjects.size() == 1) {
-            List<AdapterBase> nodeRes = rootNode.search(searchedObjects.get(0));
+            List<AbstractAdapterBase> nodeRes = rootNode.search(searchedObjects
+                .get(0));
             if (nodeRes.size() > 0)
                 nodeRes.get(0).performDoubleClick();
         } else
@@ -262,7 +264,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                     searchedObjects.size()));
     }
 
-    public static AdapterBase addToNode(AdapterBase parentNode,
+    public static AbstractAdapterBase addToNode(AdapterBase parentNode,
         ModelWrapper<?> wrapper) {
         if (currentInstance != null && wrapper instanceof OriginInfoWrapper) {
             OriginInfoWrapper originInfo = (OriginInfoWrapper) wrapper;
@@ -287,24 +289,24 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 c.set(Calendar.MINUTE, 0);
                 c.set(Calendar.HOUR_OF_DAY, 0);
                 date = c.getTime();
-                List<AdapterBase> dateNodeRes = parentNode.search((int) date
-                    .getTime() + text.hashCode());
-                AdapterBase dateNode = null;
+                List<AbstractAdapterBase> dateNodeRes = parentNode
+                    .search((int) date.getTime() + text.hashCode());
+                AbstractAdapterBase dateNode = null;
                 if (dateNodeRes.size() > 0)
                     dateNode = dateNodeRes.get(0);
                 else {
                     dateNode = new DateNode(parentNode, text, date);
                     parentNode.addChild(dateNode);
                 }
-                topNode = dateNode;
+                topNode = (AdapterBase) dateNode;
             }
 
-            List<AdapterBase> centerAdapterList = topNode.search(originInfo
-                .getCenter());
+            List<AbstractAdapterBase> centerAdapterList = topNode
+                .search(originInfo.getCenter());
             AdapterBase centerAdapter = null;
 
             if (centerAdapterList.size() > 0)
-                centerAdapter = centerAdapterList.get(0);
+                centerAdapter = (AdapterBase) centerAdapterList.get(0);
             else if (originInfo.getCenter() instanceof ClinicWrapper) {
                 centerAdapter = new ClinicWithShipmentAdapter(topNode,
                     (ClinicWrapper) originInfo.getCenter());
@@ -315,7 +317,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
             if (centerAdapter != null) {
                 ShipmentAdapter shipmentAdapter = null;
-                List<AdapterBase> shipmentAdapterList = centerAdapter
+                List<AbstractAdapterBase> shipmentAdapterList = centerAdapter
                     .search(originInfo);
                 if (shipmentAdapterList.size() > 0)
                     shipmentAdapter = (ShipmentAdapter) shipmentAdapterList
@@ -329,7 +331,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             }
         } else if (currentInstance != null
             && wrapper instanceof DispatchWrapper) {
-            List<AdapterBase> res = parentNode.search(wrapper);
+            List<AbstractAdapterBase> res = parentNode.search(wrapper);
             if (res.size() == 0) {
                 DispatchAdapter dispatch = new DispatchAdapter(parentNode,
                     (DispatchWrapper) wrapper);
@@ -395,7 +397,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     }
 
     public static ShipmentAdapter getCurrentShipment() {
-        AdapterBase selectedNode = currentInstance.getSelectedNode();
+        AbstractAdapterBase selectedNode = currentInstance.getSelectedNode();
         if (selectedNode != null && selectedNode instanceof ShipmentAdapter) {
             return (ShipmentAdapter) selectedNode;
         }

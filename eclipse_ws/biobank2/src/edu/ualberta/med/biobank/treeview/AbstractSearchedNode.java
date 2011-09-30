@@ -51,16 +51,18 @@ public abstract class AbstractSearchedNode extends AdapterBase {
     public void performExpand() {
         List<ModelWrapper<?>> alreadyHasListener = new ArrayList<ModelWrapper<?>>();
         try {
-            for (AdapterBase child : getChildren()) {
-                ModelWrapper<?> childWrapper = child.getModelObject();
+            for (AbstractAdapterBase child : getChildren()) {
+                ModelWrapper<?> childWrapper = ((AdapterBase) child)
+                    .getModelObject();
                 if (childWrapper != null) {
                     childWrapper.reload();
                 }
-                List<AdapterBase> subChildren = new ArrayList<AdapterBase>(
+                List<AbstractAdapterBase> subChildren = new ArrayList<AbstractAdapterBase>(
                     child.getChildren());
-                List<AdapterBase> toRemove = new ArrayList<AdapterBase>();
-                for (AdapterBase subChild : subChildren) {
-                    ModelWrapper<?> subChildWrapper = subChild.getModelObject();
+                List<AbstractAdapterBase> toRemove = new ArrayList<AbstractAdapterBase>();
+                for (AbstractAdapterBase subChild : subChildren) {
+                    ModelWrapper<?> subChildWrapper = ((AdapterBase) subChild)
+                        .getModelObject();
                     subChildWrapper.reload();
                     if (!searchedObjects.contains(subChildWrapper)) {
                         toRemove.add(subChild);
@@ -69,7 +71,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
                         alreadyHasListener.add(subChildWrapper);
                     }
                 }
-                for (AdapterBase subChild : toRemove)
+                for (AbstractAdapterBase subChild : toRemove)
                     child.removeChild(subChild);
             }
             // add searched objects is not yet there
@@ -88,9 +90,9 @@ public abstract class AbstractSearchedNode extends AdapterBase {
 
             if (!keepDirectLeafChild) {
                 // remove sub children without any children
-                List<AdapterBase> children = new ArrayList<AdapterBase>(
+                List<AbstractAdapterBase> children = new ArrayList<AbstractAdapterBase>(
                     getChildren());
-                for (AdapterBase child : children) {
+                for (AbstractAdapterBase child : children) {
                     if (!(child instanceof DispatchAdapter)
                         && child.getChildren().size() == 0) {
                         removeChild(child);
@@ -150,7 +152,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         ModelWrapper<?> child);
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
     }
 

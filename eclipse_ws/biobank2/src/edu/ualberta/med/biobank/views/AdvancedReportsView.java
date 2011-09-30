@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.views;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.report.AbstractReportGroup;
 import edu.ualberta.med.biobank.treeview.report.PrivateReportsGroup;
 import edu.ualberta.med.biobank.treeview.report.SharedReportsGroup;
@@ -29,7 +29,7 @@ public class AdvancedReportsView extends AbstractAdministrationView {
         rootNode.removeAll();
         createNodes();
 
-        for (AdapterBase adapter : rootNode.getChildren()) {
+        for (AbstractAdapterBase adapter : rootNode.getChildren()) {
             adapter.rebuild();
         }
 

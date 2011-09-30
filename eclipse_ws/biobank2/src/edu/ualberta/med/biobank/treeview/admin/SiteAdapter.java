@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class SiteAdapter extends AdapterBase {
@@ -79,9 +80,9 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         if (searchedObject instanceof SiteWrapper)
-            return Arrays.asList((AdapterBase) this);
+            return Arrays.asList((AbstractAdapterBase) this);
         return searchChildren(searchedObject);
     }
 
@@ -91,7 +92,7 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 

@@ -19,7 +19,7 @@ public class SpecimenAdapter extends AdapterBase {
     }
 
     @Override
-    public void addChild(AdapterBase child) {
+    public void addChild(AbstractAdapterBase child) {
         Assert.isTrue(false, "Cannot add children to this adapter"); //$NON-NLS-1$
     }
 
@@ -45,7 +45,7 @@ public class SpecimenAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 

@@ -83,7 +83,7 @@ public class ReportAdapter extends AdapterBase {
             int userId = SessionManager.getUser().getId().intValue();
             report.setUserId(userId);
 
-            ReportAdapter reportAdapter = new ReportAdapter(this.parent, report);
+            ReportAdapter reportAdapter = new ReportAdapter(getParent(), report);
             reportAdapter.openEntryForm();
         }
     }
@@ -94,7 +94,7 @@ public class ReportAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 

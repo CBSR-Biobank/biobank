@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.PerspectiveSecurity;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
@@ -156,38 +157,38 @@ public class SessionManager {
         return getInstance().getSession().getAppService();
     }
 
-    public static void updateAdapterTreeNode(final AdapterBase node) {
+    public static void updateAdapterTreeNode(final AbstractAdapterBase node) {
         final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if ((view != null) && (node != null)) {
             view.getTreeViewer().update(node, null);
         }
     }
 
-    public static void refreshTreeNode(final AdapterBase node) {
+    public static void refreshTreeNode(final AbstractAdapterBase node) {
         final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null && !view.getTreeViewer().getControl().isDisposed()) {
             view.getTreeViewer().refresh(node, true);
         }
     }
 
-    public static void setSelectedNode(final AdapterBase node) {
+    public static void setSelectedNode(final AbstractAdapterBase node) {
         final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null && node != null) {
             view.setSelectedNode(node);
         }
     }
 
-    public static AdapterBase getSelectedNode() {
+    public static AbstractAdapterBase getSelectedNode() {
         AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null) {
-            AdapterBase selectedNode = view.getSelectedNode();
+            AbstractAdapterBase selectedNode = view.getSelectedNode();
             return selectedNode;
         }
         return null;
     }
 
     public static void openViewForm(ModelWrapper<?> wrapper) {
-        AdapterBase adapter = searchFirstNode(wrapper);
+        AbstractAdapterBase adapter = searchFirstNode(wrapper);
         if (adapter != null) {
             adapter.performDoubleClick();
             return;
@@ -206,16 +207,16 @@ public class SessionManager {
         return sm.possibleViewMap.get(sm.currentAdministrationViewId);
     }
 
-    public static List<AdapterBase> searchNodes(ModelWrapper<?> wrapper) {
+    public static List<AbstractAdapterBase> searchNodes(ModelWrapper<?> wrapper) {
         AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null) {
             return view.searchNode(wrapper);
         }
-        return new ArrayList<AdapterBase>();
+        return new ArrayList<AbstractAdapterBase>();
     }
 
-    public static AdapterBase searchFirstNode(ModelWrapper<?> wrapper) {
-        List<AdapterBase> nodes = searchNodes(wrapper);
+    public static AbstractAdapterBase searchFirstNode(ModelWrapper<?> wrapper) {
+        List<AbstractAdapterBase> nodes = searchNodes(wrapper);
         if (nodes.size() > 0) {
             return nodes.get(0);
         }
@@ -335,15 +336,15 @@ public class SessionManager {
                     AdapterBase parent = adapter.getParent();
                     if (parent != null)
                         parent.addChild(adapter);
-                    List<AdapterBase> res = searchNodes(adapter
+                    List<AbstractAdapterBase> res = searchNodes(adapter
                         .getModelObject());
                     final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
                     if (view != null) {
-                        for (AdapterBase ab : res) {
+                        for (AbstractAdapterBase ab : res) {
                             if (canReset)
                                 try {
                                     if (ab != adapter)
-                                        ab.resetObject();
+                                        ((AdapterBase) ab).resetObject();
                                 } catch (Exception ex) {
                                     logger.error("Problem reseting object", ex); //$NON-NLS-1$
                                 }

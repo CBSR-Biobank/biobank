@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
@@ -65,15 +66,14 @@ public class ContainerGroup extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        List<AdapterBase> res = new ArrayList<AdapterBase>();
+    public List<AbstractAdapterBase> search(Object searchedObject) {
+        List<AbstractAdapterBase> res = new ArrayList<AbstractAdapterBase>();
         if (searchedObject instanceof ContainerWrapper) {
             ContainerWrapper container = (ContainerWrapper) searchedObject;
             if (container.getContainerType() != null) {
                 if (Boolean.TRUE.equals(container.getContainerType()
                     .getTopLevel())) {
-                    AdapterBase child = getChild(
-                        (ModelWrapper<?>) searchedObject, true);
+                    AdapterBase child = getChild(searchedObject, true);
                     if (child != null)
                         res.add(child);
                 } else {
@@ -84,7 +84,7 @@ public class ContainerGroup extends AdapterBase {
                             .getParentContainer();
                         parents.add(currentContainer);
                     }
-                    for (AdapterBase child : getChildren()) {
+                    for (AbstractAdapterBase child : getChildren()) {
                         if (child instanceof ContainerAdapter) {
                             res = searchChildContainers(searchedObject,
                                 (ContainerAdapter) child, parents);
@@ -108,7 +108,7 @@ public class ContainerGroup extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof ContainerWrapper);
         return new ContainerAdapter(this, (ContainerWrapper) child);
     }

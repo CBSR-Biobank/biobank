@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
@@ -26,11 +27,11 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
 
     public ShipmentTodayNode(AdapterBase parent, int id) {
         super(parent, id);
-        setName(Messages.ShipmentTodayNode_today_label);
+        setLabel(Messages.ShipmentTodayNode_today_label);
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof ClinicWrapper);
         return new ClinicAdapter(this, (ClinicWrapper) child);
     }
@@ -61,7 +62,7 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         return findChildFromClass(searchedObject, ClinicWrapper.class);
     }
 

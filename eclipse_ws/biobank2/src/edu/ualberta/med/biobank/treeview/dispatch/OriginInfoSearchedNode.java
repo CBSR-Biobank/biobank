@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.Assert;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
@@ -19,7 +20,7 @@ public class OriginInfoSearchedNode extends AbstractSearchedNode {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof DispatchWrapper
             || child instanceof OriginInfoWrapper);
         if (child instanceof OriginInfoWrapper)
@@ -42,7 +43,7 @@ public class OriginInfoSearchedNode extends AbstractSearchedNode {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Object searchedObject) {
         if (searchedObject instanceof Integer)
             return findChildFromClass(searchedObject, Integer.class);
         else
