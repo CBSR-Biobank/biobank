@@ -25,14 +25,14 @@ public class BeanModifier {
     private static String SERIALIZABLE_TEXT_TO_REPLACE = "Serializable";
     private static String IMPLEMENTS_NEW_TEXT = "IBiobankModel";
 
-    private static Pattern ID_FIELD_PATTERN = Pattern
-        .compile("^\\s*(private)|(public) Integer id;$");
-
     private static Pattern GETID_FIELD_PATTERN = Pattern
         .compile("^\\s*public Integer getId\\(\\)\\{$");
 
     private static Pattern SETID_FIELD_PATTERN = Pattern
         .compile("^\\s*public void setId\\(Integer id\\)\\{$");
+
+    private static Pattern SETTER_IMPL_PATTERN = Pattern
+        .compile("^\\s*this.id = id;$");
 
     private static BeanModifier instance = null;
 
@@ -79,13 +79,26 @@ public class BeanModifier {
                         SERIALIZABLE_TEXT_TO_REPLACE, IMPLEMENTS_NEW_TEXT);
                 } else {
                     // set ids Serializable instances instead of Integer
-                    Matcher idFieldMatcher = ID_FIELD_PATTERN.matcher(line);
                     Matcher setidMatcher = SETID_FIELD_PATTERN.matcher(line);
-                    Matcher getidMatcher = GETID_FIELD_PATTERN.matcher(line);
-                    if (idFieldMatcher.matches() || setidMatcher.matches()
-                        || getidMatcher.matches()) {
+                    if (setidMatcher.matches()) {
                         alteredLine = line.replaceFirst("Integer",
                             "Serializable");
+                    } else {
+                        // getId overrides the interfece getter but return an
+                        // Integer
+                        Matcher getidMatcher = GETID_FIELD_PATTERN
+                            .matcher(line);
+                        if (getidMatcher.matches()) {
+                            alteredLine = "    @Override\n" + line;
+                        } else {
+                            // a cast need to be done on the id
+                            Matcher setterMatcher = SETTER_IMPL_PATTERN
+                                .matcher(line);
+                            if (setterMatcher.matches()) {
+                                alteredLine = line.replaceFirst("id;",
+                                    "(Integer)id;");
+                            }
+                        }
                     }
                 }
             }
