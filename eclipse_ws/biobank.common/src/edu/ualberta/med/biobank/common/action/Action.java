@@ -10,5 +10,5 @@ import edu.ualberta.med.biobank.model.User;
 public interface Action<T> extends Serializable {
     public boolean isAllowed(User user, Session session) throws ActionException;
 
-    public T run(Session session) throws ActionException;
+    public T run(User user, Session session) throws ActionException;
 }

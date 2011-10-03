@@ -49,6 +49,8 @@ public class PermissionUtil {
             for (Membership membership : memberships) {
                 // TODO: compare Permission interface and the Permission model
                 // object, somehow...
+                // Collection<Permission> perms =
+                // membership.getPermissionCollection();
                 if (center != null
                     && !nullSafeEquals(center, membership.getCenter())) {
                     continue;

@@ -76,7 +76,7 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public boolean isUserLockedOut(Long csmUserId) throws ApplicationException;
 
-    public <T> T doAction(Action<T> action) throws ApplicationException;
+    public <T> T doAction(Action<T> action);
 
     public boolean isAllowed(Permission permission) throws ApplicationException;
 }

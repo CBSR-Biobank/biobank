@@ -25,7 +25,7 @@ public class SiteSaveAction implements Action<Site> {
     }
 
     @Override
-    public Site run(Session session) throws ActionException {
+    public Site run(User user, Session session) throws ActionException {
         // PreCheck<Site> preCheck = new PreCheck<Site>(session, site);
         //
         // preCheck.notNull(CenterPeer.NAME);
@@ -38,7 +38,7 @@ public class SiteSaveAction implements Action<Site> {
         //
         // diff.persistRemoved(SitePeer.STUDY_COLLECTION);
 
-        session.saveOrUpdate(site);
+        // session.saveOrUpdate(site);
 
         return site;
     }

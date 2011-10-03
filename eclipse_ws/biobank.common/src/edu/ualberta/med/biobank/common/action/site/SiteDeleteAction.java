@@ -23,7 +23,7 @@ public class SiteDeleteAction implements Action<Site> {
     }
 
     @Override
-    public Site run(Session session) throws ActionException {
+    public Site run(User user, Session session) throws ActionException {
         // TODO: checks
         session.delete(site);
         return null;
