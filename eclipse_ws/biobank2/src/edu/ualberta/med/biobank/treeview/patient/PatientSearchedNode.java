@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
@@ -31,7 +30,7 @@ public class PatientSearchedNode extends AbstractSearchedNode {
     }
 
     @Override
-    protected boolean isParentTo(ModelWrapper<?> parent, ModelWrapper<?> child) {
+    protected boolean isParentTo(Object parent, Object child) {
         return false;
     }
 
@@ -41,8 +40,8 @@ public class PatientSearchedNode extends AbstractSearchedNode {
     }
 
     @Override
-    protected void addNode(ModelWrapper<?> wrapper) {
-        CollectionView.addToNode(this, wrapper);
+    protected void addNode(Object obj) {
+        CollectionView.addToNode(this, obj);
     }
 
     @Override

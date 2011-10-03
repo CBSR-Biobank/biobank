@@ -24,9 +24,6 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
-import edu.ualberta.med.biobank.treeview.util.DeltaEvent;
-import edu.ualberta.med.biobank.treeview.util.IDeltaListener;
-import edu.ualberta.med.biobank.treeview.util.NullDeltaListener;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**
@@ -39,9 +36,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
         .getName());
 
     protected static final String BGR_LOADING_LABEL = Messages.AdapterBase_loading;
-
-    protected IDeltaListener deltaListener = NullDeltaListener
-        .getSoleInstance();
 
     private boolean loadChildrenInBackground;
 
@@ -61,10 +55,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     @Override
     protected void init() {
         loadChildrenSemaphore = new Semaphore(10, true);
-        children = new ArrayList<AbstractAdapterBase>();
-        if (getParent() != null) {
-            addListener(getParent().deltaListener);
-        }
         listeners = new ArrayList<AdapterChangedListener>();
     }
 
@@ -78,6 +68,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
         this.loadChildrenInBackground = loadChildrenInBackground;
     }
 
+    @Override
     public ModelWrapper<?> getModelObject() {
         return (ModelWrapper<?>) super.getModelObject();
     }
@@ -130,28 +121,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     }
 
     @Override
-    public AdapterBase getChild(Object object, boolean reloadChildren) {
-        if (reloadChildren) {
-            loadChildren(false);
-        }
-        if (children.size() == 0)
-            return null;
-
-        Class<?> wrapperClass = object.getClass();
-        Integer wrapperId = ((ModelWrapper<?>) object).getId();
-        for (AbstractAdapterBase child : children) {
-            ModelWrapper<?> childModelObject = ((AdapterBase) child)
-                .getModelObject();
-            if ((childModelObject != null)
-                && childModelObject.getClass().equals(wrapperClass)
-                && child.getId() != null && child.getId().equals(wrapperId))
-                return (AdapterBase) child;
-        }
-        return null;
-    }
-
-    @Override
-    public AdapterBase getChild(Object object) {
+    public AbstractAdapterBase getChild(Object object) {
         return getChild(object, false);
     }
 
@@ -168,7 +138,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     @Override
     public void addChild(AbstractAdapterBase child) {
         super.addChild(child);
-        ((AdapterBase) child).addListener(deltaListener);
         fireAdd(child);
     }
 
@@ -176,7 +145,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     public void insertAfter(AbstractAdapterBase existingNode,
         AbstractAdapterBase newNode) {
         super.insertAfter(existingNode, newNode);
-        ((AdapterBase) newNode).addListener(deltaListener);
         fireAdd(newNode);
     }
 
@@ -215,24 +183,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
         if (parent != null)
             return ((AdapterBase) parent).getAppService();
         return null;
-    }
-
-    public void addListener(IDeltaListener listener) {
-        this.deltaListener = listener;
-    }
-
-    public void removeListener(IDeltaListener listener) {
-        if (this.deltaListener.equals(listener)) {
-            this.deltaListener = NullDeltaListener.getSoleInstance();
-        }
-    }
-
-    protected void fireAdd(Object added) {
-        deltaListener.add(new DeltaEvent(added));
-    }
-
-    protected void fireRemove(Object removed) {
-        deltaListener.remove(new DeltaEvent(removed));
     }
 
     /**

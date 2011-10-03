@@ -27,6 +27,11 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
         super(parent, model, label);
     }
 
+    public AbstractNewAdapterBase(AbstractAdapterBase parent,
+        IBiobankModel model) {
+        this(parent, model, null);
+    }
+
     public AbstractNewAdapterBase(AbstractAdapterBase parent, int id,
         String label, boolean hasChildren) {
         super(parent, id, label, hasChildren);
@@ -40,29 +45,18 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
     }
 
     @Override
-    public IBiobankModel getModelObject() {
-        return (IBiobankModel) super.getModelObject();
+    public String getLabel() {
+        if (super.getLabel() == null && getModelObject() != null) {
+            return getLabelInternal();
+        }
+        return super.getLabel();
     }
 
-    @Override
-    public AbstractNewAdapterBase getChild(Object object, boolean reloadChildren) {
-        if (reloadChildren) {
-            loadChildren(false);
-        }
-        if (children.size() == 0)
-            return null;
+    protected abstract String getLabelInternal();
 
-        Class<?> clazz = object.getClass();
-        Integer wrapperId = ((IBiobankModel) object).getId();
-        for (AbstractAdapterBase child : children) {
-            IBiobankModel childModelObject = ((AbstractNewAdapterBase) child)
-                .getModelObject();
-            if ((childModelObject != null)
-                && childModelObject.getClass().equals(clazz)
-                && child.getId() != null && child.getId().equals(wrapperId))
-                return (AbstractNewAdapterBase) child;
-        }
-        return null;
+    @Override
+    public IBiobankModel getModelObject() {
+        return (IBiobankModel) super.getModelObject();
     }
 
     @Override

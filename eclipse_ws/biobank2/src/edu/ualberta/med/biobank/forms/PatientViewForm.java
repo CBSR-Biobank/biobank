@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CollectionEventInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -40,7 +41,9 @@ public class PatientViewForm extends BiobankViewForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        patient = (PatientWrapper) getModelObject();
+        // FIXME need action
+        patient = new PatientWrapper(SessionManager.getAppService(),
+            (Patient) getModelObject());
         SessionManager.logLookup(patient);
         setPartName(NLS.bind(Messages.PatientViewForm_title,
             patient.getPnumber()));

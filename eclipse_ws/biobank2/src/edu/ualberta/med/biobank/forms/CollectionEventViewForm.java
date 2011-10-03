@@ -10,21 +10,17 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 
 public class CollectionEventViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventViewForm"; //$NON-NLS-1$
 
-    private CollectionEventWrapper cevent;
+    private CollectionEvent cevent;
 
     private BgcBaseText studyLabel;
 
@@ -52,8 +48,10 @@ public class CollectionEventViewForm extends BiobankViewForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        cevent = (CollectionEventWrapper) getModelObject();
-        SessionManager.logLookup(cevent);
+        cevent = ((CollectionEventAdapter) adapter).getModelObject();
+        // FIXME
+        // SessionManager.logLookup(new CollectionEventWrapper(SessionManager
+        // .getAppService(), cevent));
 
         setPartName(NLS.bind(Messages.CollectionEventViewForm_title,
             cevent.getVisitNumber()));
@@ -96,38 +94,43 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void createPvDataSection(Composite client) throws Exception {
-        StudyWrapper study = cevent.getPatient().getStudy();
-        String[] labels = study.getStudyEventAttrLabels();
-        if (labels == null)
-            return;
+        // FIXME
+        // StudyWrapper study = new StudyWrapper(SessionManager.getAppService(),
+        // cevent.getPatient().getStudy());
+        // String[] labels = study.getStudyEventAttrLabels();
+        // if (labels == null)
+        // return;
 
         pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
 
-        for (String label : labels) {
-            FormPvCustomInfo combinedPvInfo = new FormPvCustomInfo();
-            combinedPvInfo.setLabel(label);
-            combinedPvInfo.setType(study.getStudyEventAttrType(label));
-
-            int style = SWT.NONE;
-            if (combinedPvInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE) {
-                style |= SWT.WRAP;
-            }
-
-            String value = cevent.getEventAttrValue(label);
-            if (combinedPvInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE
-                && (value != null)) {
-                combinedPvInfo.setValue(value.replace(';', '\n'));
-            } else {
-                combinedPvInfo.setValue(value);
-            }
-
-            combinedPvInfo.widget = createReadOnlyLabelledField(client, style,
-                label, combinedPvInfo.getValue());
-            GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-            combinedPvInfo.widget.setLayoutData(gd);
-
-            pvCustomInfoList.add(combinedPvInfo);
-        }
+        // for (String label : labels) {
+        // FormPvCustomInfo combinedPvInfo = new FormPvCustomInfo();
+        // combinedPvInfo.setLabel(label);
+        // combinedPvInfo.setType(study.getStudyEventAttrType(label));
+        //
+        // int style = SWT.NONE;
+        // if (combinedPvInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE) {
+        // style |= SWT.WRAP;
+        // }
+        //
+        // // FIXME
+        // String value = new CollectionEventWrapper(
+        // SessionManager.getAppService(), cevent)
+        // .getEventAttrValue(label);
+        // if (combinedPvInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE
+        // && (value != null)) {
+        // combinedPvInfo.setValue(value.replace(';', '\n'));
+        // } else {
+        // combinedPvInfo.setValue(value);
+        // }
+        //
+        // combinedPvInfo.widget = createReadOnlyLabelledField(client, style,
+        // label, combinedPvInfo.getValue());
+        // GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+        // combinedPvInfo.widget.setLayoutData(gd);
+        //
+        // pvCustomInfoList.add(combinedPvInfo);
+        // }
     }
 
     private void setCollectionEventValues() {
@@ -144,37 +147,45 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private void createSourceSpecimensSection() {
         Composite client = createSectionWithClient(Messages.CollectionEventViewForm_sourcespecimens_title);
-        sourceSpecimenTable = new SpecimenInfoTable(client,
-            cevent.getOriginalSpecimenCollection(true),
-            ColumnsShown.SOURCE_SPECIMENS, 10);
-        sourceSpecimenTable.adaptToToolkit(toolkit, true);
-        sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
-        sourceSpecimenTable.createDefaultEditItem();
+        // FIXME
+        // sourceSpecimenTable = new SpecimenInfoTable(client,
+        // new CollectionEventWrapper(SessionManager.getAppService(), cevent)
+        // .getOriginalSpecimenCollection(true),
+        // ColumnsShown.SOURCE_SPECIMENS, 10);
+        // sourceSpecimenTable.adaptToToolkit(toolkit, true);
+        // sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
+        // sourceSpecimenTable.createDefaultEditItem();
     }
 
     private void createAliquotedSpecimensSection() {
         // FIXME should we show that to clinics ?
         Composite client = createSectionWithClient(Messages.CollectionEventViewForm_aliquotedspecimens_title);
-        aliquotedSpcTable = new SpecimenInfoTable(client,
-            cevent.getAliquotedSpecimenCollection(true), ColumnsShown.ALIQUOTS,
-            10);
-        aliquotedSpcTable.adaptToToolkit(toolkit, true);
-        aliquotedSpcTable.addClickListener(collectionDoubleClickListener);
-        aliquotedSpcTable.createDefaultEditItem();
+        // FIXME
+        // aliquotedSpcTable = new SpecimenInfoTable(client,
+        // new CollectionEventWrapper(SessionManager.getAppService(), cevent)
+        // .getAliquotedSpecimenCollection(true), ColumnsShown.ALIQUOTS,
+        // 10);
+        // aliquotedSpcTable.adaptToToolkit(toolkit, true);
+        // aliquotedSpcTable.addClickListener(collectionDoubleClickListener);
+        // aliquotedSpcTable.createDefaultEditItem();
     }
 
     @Override
     public void reload() throws Exception {
-        cevent.reload();
+        // FIXME
+        // cevent.reload();
         setPartName(NLS.bind(Messages.CollectionEventViewForm_title,
             cevent.getVisitNumber()));
         form.setText(NLS.bind(Messages.CollectionEventViewForm_main_title,
             +cevent.getVisitNumber()));
         setCollectionEventValues();
-        sourceSpecimenTable.setCollection(cevent
-            .getOriginalSpecimenCollection(true));
-        aliquotedSpcTable.setCollection(cevent
-            .getAliquotedSpecimenCollection(true));
+        // FIXME
+        // sourceSpecimenTable.setCollection(new CollectionEventWrapper(
+        // SessionManager.getAppService(), cevent)
+        // .getOriginalSpecimenCollection(true));
+        // aliquotedSpcTable.setCollection(new CollectionEventWrapper(
+        // SessionManager.getAppService(), cevent)
+        // .getAliquotedSpecimenCollection(true));
     }
 
 }

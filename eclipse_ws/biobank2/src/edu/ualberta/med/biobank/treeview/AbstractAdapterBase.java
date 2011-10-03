@@ -22,6 +22,10 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.model.IBiobankModel;
+import edu.ualberta.med.biobank.treeview.util.DeltaEvent;
+import edu.ualberta.med.biobank.treeview.util.IDeltaListener;
+import edu.ualberta.med.biobank.treeview.util.NullDeltaListener;
 
 /**
  * Base class for all "Session" tree view nodes. Generally, most of the nodes in
@@ -42,7 +46,9 @@ public abstract class AbstractAdapterBase {
 
     protected List<AbstractAdapterBase> children;
 
-    // FIXME delta listener ???
+    // used when add or remove children. Initializwd to a listener that does
+    // nothing. See NodeContentProvider for an implementation
+    private IDeltaListener deltaListener = NullDeltaListener.getSoleInstance();
 
     /**
      * if true, edit button and actions will be visible
@@ -127,12 +133,34 @@ public abstract class AbstractAdapterBase {
         return children;
     }
 
+    public AbstractAdapterBase getChild(Object object, boolean reloadChildren) {
+        if (reloadChildren) {
+            loadChildren(false);
+        }
+        if (children.size() == 0)
+            return null;
+
+        Class<?> objectClass = object.getClass();
+        Integer objectId = null;
+        if (object instanceof ModelWrapper) {
+            objectId = ((ModelWrapper<?>) object).getId();
+        } else if (object instanceof IBiobankModel) {
+            objectId = ((IBiobankModel) object).getId();
+        }
+        if (objectId != null)
+            for (AbstractAdapterBase child : children) {
+                Object childModelObject = child.getModelObject();
+                if ((childModelObject != null)
+                    && childModelObject.getClass().equals(objectClass)
+                    && child.getId() != null && child.getId().equals(objectId))
+                    return child;
+            }
+        return null;
+    }
+
     public AbstractAdapterBase getChild(Object object) {
         return getChild(object, false);
     }
-
-    public abstract AbstractAdapterBase getChild(Object object,
-        boolean reloadChildren);
 
     public AbstractAdapterBase getChild(int id) {
         return getChild(id, false);
@@ -162,6 +190,7 @@ public abstract class AbstractAdapterBase {
 
         child.setParent(this);
         children.add(child);
+        child.addListener(deltaListener);
     }
 
     public void insertAfter(AbstractAdapterBase existingNode,
@@ -171,6 +200,7 @@ public abstract class AbstractAdapterBase {
             "existing node not found: " + existingNode.getLabel()); //$NON-NLS-1$
         newNode.setParent(this);
         children.add(pos + 1, newNode);
+        newNode.addListener(deltaListener);
     }
 
     public void removeChild(AbstractAdapterBase item) {
@@ -437,6 +467,24 @@ public abstract class AbstractAdapterBase {
 
     protected String getConfirmDeleteMessage() {
         return null;
+    }
+
+    public void addListener(IDeltaListener listener) {
+        this.deltaListener = listener;
+    }
+
+    public void removeListener(IDeltaListener listener) {
+        if (this.deltaListener.equals(listener)) {
+            this.deltaListener = NullDeltaListener.getSoleInstance();
+        }
+    }
+
+    protected void fireAdd(Object added) {
+        deltaListener.add(new DeltaEvent(added));
+    }
+
+    protected void fireRemove(Object removed) {
+        deltaListener.remove(new DeltaEvent(removed));
     }
 
 }

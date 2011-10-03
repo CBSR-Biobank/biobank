@@ -36,7 +36,7 @@ import edu.ualberta.med.biobank.forms.utils.TableGroup;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
@@ -267,7 +267,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                 public void widgetSelected(SelectionEvent e) {
                     DispatchSpecimenWrapper selection = getSelectedSpecimen();
                     if (selection != null) {
-                        AdapterBase adapter = AdapterFactory
+                        AbstractAdapterBase adapter = AdapterFactory
                             .getAdapter(selection.getSpecimen());
                         adapter.openEntryForm();
                     }

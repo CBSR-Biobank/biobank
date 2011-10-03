@@ -72,4 +72,9 @@ public class NewRootNode extends AbstractNewAdapterBase {
         return null;
     }
 
+    @Override
+    protected String getLabelInternal() {
+        return null;
+    }
+
 }

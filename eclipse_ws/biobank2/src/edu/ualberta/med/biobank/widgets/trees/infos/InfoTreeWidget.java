@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
@@ -315,7 +315,8 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
                 ModelWrapper<?> selection = (ModelWrapper<?>) InfoTreeWidget.this
                     .getSelection();
                 if (selection != null) {
-                    AdapterBase adapter = AdapterFactory.getAdapter(selection);
+                    AbstractAdapterBase adapter = AdapterFactory
+                        .getAdapter(selection);
                     adapter.openEntryForm();
                 }
             }

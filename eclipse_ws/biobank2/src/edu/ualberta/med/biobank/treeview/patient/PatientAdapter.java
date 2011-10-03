@@ -31,9 +31,8 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     private static BgcLogger logger = BgcLogger.getLogger(PatientAdapter.class
         .getName());
 
-    public PatientAdapter(AbstractAdapterBase parent, Patient patient,
-        String label) {
-        super(parent, patient, label);
+    public PatientAdapter(AbstractAdapterBase parent, Patient patient) {
+        super(parent, patient);
         if (patient != null) {
             boolean hasChildren = false;
             try {
@@ -53,12 +52,12 @@ public class PatientAdapter extends AbstractNewAdapterBase {
         return (Patient) super.getModelObject();
     }
 
-    // @Override
-    // protected String getLabelInternal() {
-    // PatientWrapper patientWrapper = getPatientWrapper();
-    //        Assert.isNotNull(patientWrapper, "patient is null"); //$NON-NLS-1$
-    // return patientWrapper.getPnumber();
-    // }
+    @Override
+    protected String getLabelInternal() {
+        Patient patientWrapper = getModelObject();
+        Assert.isNotNull(patientWrapper, "patient is null"); //$NON-NLS-1$
+        return patientWrapper.getPnumber();
+    }
 
     @Override
     public String getTooltipText() {
@@ -96,7 +95,7 @@ public class PatientAdapter extends AbstractNewAdapterBase {
                     CollectionEvent cevent = new CollectionEvent();
                     cevent.setPatient(getModelObject());
                     CollectionEventAdapter ceventAdapter = new CollectionEventAdapter(
-                        PatientAdapter.this, cevent, null);
+                        PatientAdapter.this, cevent);
                     ceventAdapter.openEntryForm();
                 }
             });
@@ -110,13 +109,13 @@ public class PatientAdapter extends AbstractNewAdapterBase {
 
     @Override
     protected CollectionEventAdapter createChildNode() {
-        return new CollectionEventAdapter(this, null, null);
+        return new CollectionEventAdapter(this, null);
     }
 
     @Override
     protected CollectionEventAdapter createChildNode(Object child) {
         Assert.isTrue(child instanceof CollectionEvent);
-        return new CollectionEventAdapter(this, (CollectionEvent) child, null);
+        return new CollectionEventAdapter(this, (CollectionEvent) child);
     }
 
     @Override

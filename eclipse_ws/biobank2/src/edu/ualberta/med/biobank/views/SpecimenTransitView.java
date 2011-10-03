@@ -265,9 +265,9 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     }
 
     public static AbstractAdapterBase addToNode(AdapterBase parentNode,
-        ModelWrapper<?> wrapper) {
-        if (currentInstance != null && wrapper instanceof OriginInfoWrapper) {
-            OriginInfoWrapper originInfo = (OriginInfoWrapper) wrapper;
+        Object obj) {
+        if (currentInstance != null && obj instanceof OriginInfoWrapper) {
+            OriginInfoWrapper originInfo = (OriginInfoWrapper) obj;
             String text = ""; //$NON-NLS-1$
             AdapterBase topNode = parentNode;
             if (parentNode.equals(currentInstance.searchedNode)
@@ -329,12 +329,11 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 }
                 return shipmentAdapter;
             }
-        } else if (currentInstance != null
-            && wrapper instanceof DispatchWrapper) {
-            List<AbstractAdapterBase> res = parentNode.search(wrapper);
+        } else if (currentInstance != null && obj instanceof DispatchWrapper) {
+            List<AbstractAdapterBase> res = parentNode.search(obj);
             if (res.size() == 0) {
                 DispatchAdapter dispatch = new DispatchAdapter(parentNode,
-                    (DispatchWrapper) wrapper);
+                    (DispatchWrapper) obj);
                 parentNode.addChild(dispatch);
             }
         }

@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
 /**
@@ -283,7 +283,8 @@ public abstract class InfoTableWidget extends InfoTableBgrLoader {
             ModelWrapper<?> selection = (ModelWrapper<?>) InfoTableWidget.this
                 .getSelection();
             if (selection != null) {
-                AdapterBase adapter = AdapterFactory.getAdapter(selection);
+                AbstractAdapterBase adapter = AdapterFactory
+                    .getAdapter(selection);
                 adapter.openEntryForm();
             }
             return;

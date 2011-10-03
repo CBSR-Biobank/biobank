@@ -81,7 +81,8 @@ public class SessionAdapter extends AdapterBase {
                     throw new RuntimeException(e);
                 }
                 if (clonedCenter != null) {
-                    AdapterBase child = AdapterFactory.getAdapter(clonedCenter);
+                    AbstractAdapterBase child = AdapterFactory
+                        .getAdapter(clonedCenter);
                     addChild(child);
                     child.performExpand();
                 }

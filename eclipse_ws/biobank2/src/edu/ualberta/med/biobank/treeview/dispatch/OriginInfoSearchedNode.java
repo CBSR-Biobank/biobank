@@ -5,7 +5,6 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
@@ -35,7 +34,7 @@ public class OriginInfoSearchedNode extends AbstractSearchedNode {
     }
 
     @Override
-    protected boolean isParentTo(ModelWrapper<?> parent, ModelWrapper<?> child) {
+    protected boolean isParentTo(Object parent, Object child) {
         if (child instanceof DispatchWrapper) {
             return parent.equals(((DispatchWrapper) child).getSenderCenter());
         }
@@ -51,8 +50,8 @@ public class OriginInfoSearchedNode extends AbstractSearchedNode {
     }
 
     @Override
-    protected void addNode(ModelWrapper<?> wrapper) {
-        SpecimenTransitView.addToNode(this, wrapper);
+    protected void addNode(Object obj) {
+        SpecimenTransitView.addToNode(this, obj);
     }
 
     @Override

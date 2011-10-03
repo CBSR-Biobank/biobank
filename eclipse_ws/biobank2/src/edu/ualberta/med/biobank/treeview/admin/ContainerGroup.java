@@ -73,7 +73,7 @@ public class ContainerGroup extends AdapterBase {
             if (container.getContainerType() != null) {
                 if (Boolean.TRUE.equals(container.getContainerType()
                     .getTopLevel())) {
-                    AdapterBase child = getChild(searchedObject, true);
+                    AbstractAdapterBase child = getChild(searchedObject, true);
                     if (child != null)
                         res.add(child);
                 } else {

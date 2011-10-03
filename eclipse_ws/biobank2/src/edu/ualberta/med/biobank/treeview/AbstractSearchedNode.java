@@ -25,7 +25,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractSearchedNode.class.getName());
 
-    protected List<ModelWrapper<?>> searchedObjects = new ArrayList<ModelWrapper<?>>();
+    protected ArrayList<Object> searchedObjects = new ArrayList<Object>();
 
     private boolean keepDirectLeafChild;
 
@@ -52,40 +52,49 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         List<ModelWrapper<?>> alreadyHasListener = new ArrayList<ModelWrapper<?>>();
         try {
             for (AbstractAdapterBase child : getChildren()) {
-                ModelWrapper<?> childWrapper = ((AdapterBase) child)
-                    .getModelObject();
-                if (childWrapper != null) {
-                    childWrapper.reload();
+                if (child instanceof AdapterBase) {
+                    ModelWrapper<?> childWrapper = ((AdapterBase) child)
+                        .getModelObject();
+                    if (childWrapper != null) {
+                        childWrapper.reload();
+                    }
                 }
                 List<AbstractAdapterBase> subChildren = new ArrayList<AbstractAdapterBase>(
                     child.getChildren());
                 List<AbstractAdapterBase> toRemove = new ArrayList<AbstractAdapterBase>();
                 for (AbstractAdapterBase subChild : subChildren) {
-                    ModelWrapper<?> subChildWrapper = ((AdapterBase) subChild)
-                        .getModelObject();
-                    subChildWrapper.reload();
-                    if (!searchedObjects.contains(subChildWrapper)) {
+                    Object subChildObj = subChild.getModelObject();
+                    if (subChildObj instanceof ModelWrapper) {
+                        ((ModelWrapper<?>) subChildObj).reload();
+                    }
+                    if (!searchedObjects.contains(subChildObj)) {
                         toRemove.add(subChild);
                     } else {
                         subChild.rebuild();
-                        alreadyHasListener.add(subChildWrapper);
+                        if (subChildObj instanceof ModelWrapper) {
+                            alreadyHasListener
+                                .add((ModelWrapper<?>) subChildObj);
+                        }
                     }
                 }
                 for (AbstractAdapterBase subChild : toRemove)
                     child.removeChild(subChild);
             }
             // add searched objects is not yet there
-            for (final ModelWrapper<?> wrapper : searchedObjects) {
-                if (!alreadyHasListener.contains(wrapper)) {
-                    wrapper.addWrapperListener(new WrapperListenerAdapter() {
-                        @Override
-                        public void deleted(WrapperEvent event) {
-                            searchedObjects.remove(wrapper);
-                            performExpand();
-                        }
-                    });
+            for (final Object o : searchedObjects) {
+                if (o instanceof ModelWrapper) {
+                    ModelWrapper<?> w = (ModelWrapper<?>) o;
+                    if (!alreadyHasListener.contains(w)) {
+                        w.addWrapperListener(new WrapperListenerAdapter() {
+                            @Override
+                            public void deleted(WrapperEvent event) {
+                                searchedObjects.remove(o);
+                                performExpand();
+                            }
+                        });
+                    }
                 }
-                addNode(wrapper);
+                addNode(o);
             }
 
             if (!keepDirectLeafChild) {
@@ -106,7 +115,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         }
     }
 
-    protected abstract void addNode(ModelWrapper<?> wrapper);
+    protected abstract void addNode(Object obj);
 
     @Override
     protected void executeDoubleClick() {
@@ -144,12 +153,11 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         return null;
     }
 
-    public void addSearchObject(ModelWrapper<?> searchedObject) {
+    public void addSearchObject(Object searchedObject) {
         searchedObjects.add(searchedObject);
     }
 
-    protected abstract boolean isParentTo(ModelWrapper<?> parent,
-        ModelWrapper<?> child);
+    protected abstract boolean isParentTo(Object parent, Object child);
 
     @Override
     public List<AbstractAdapterBase> search(Object searchedObject) {
@@ -161,7 +169,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         removeAll();
     }
 
-    public void removeObjects(List<? extends ModelWrapper<?>> children) {
+    public void removeObjects(List<?> children) {
         searchedObjects.removeAll(children);
     }
 }

@@ -24,7 +24,7 @@ public class CollectionEventAddHandler extends AbstractHandler {
             CollectionEvent ce = new CollectionEvent();
             ce.setPatient(patientAdapter.getModelObject());
             CollectionEventAdapter adapter = new CollectionEventAdapter(
-                patientAdapter, ce, "test");
+                patientAdapter, ce);
             adapter.openEntryForm();
         } catch (Exception exp) {
             logger.error("Error while opening the collection event entry form", //$NON-NLS-1$

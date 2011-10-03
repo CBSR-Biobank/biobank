@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.forms.PeListViewForm;
 import edu.ualberta.med.biobank.forms.SpecimenListViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
 public enum SearchType {
@@ -181,7 +181,7 @@ public enum SearchType {
     }
 
     protected void openResult(ModelWrapper<?> wrapper) {
-        AdapterBase adapter = AdapterFactory.getAdapter(wrapper);
+        AbstractAdapterBase adapter = AdapterFactory.getAdapter(wrapper);
         if (adapter != null) {
             adapter.performDoubleClick();
         }

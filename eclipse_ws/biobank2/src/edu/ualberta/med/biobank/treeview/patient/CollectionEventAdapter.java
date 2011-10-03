@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.treeview.patient;
 
 import java.util.Collection;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Menu;
@@ -10,35 +11,38 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
-    public CollectionEventAdapter(AbstractNewAdapterBase parent,
-        CollectionEvent collectionEvent, String label) {
-        super(parent, collectionEvent, label);
+    public CollectionEventAdapter(AbstractAdapterBase parent,
+        CollectionEvent collectionEvent) {
+        super(parent, collectionEvent);
         setEditable(parent instanceof PatientAdapter || parent == null);
     }
 
-    // @Override
-    // protected String getLabelInternal() {
-    // CollectionEventWrapper cevent = (CollectionEventWrapper)
-    // getModelObject();
-    //        Assert.isNotNull(cevent, "collection event is null"); //$NON-NLS-1$
-    // long count = -1;
-    // try {
-    // count = cevent.getSourceSpecimensCount(false);
-    // } catch (Exception e) {
-    //            logger.error("Problem counting specimens", e); //$NON-NLS-1$
-    // }
-    //        return new StringBuilder("#") //$NON-NLS-1$ 
-    //            .append(cevent.getVisitNumber()).append(" - ") //$NON-NLS-1$ 
-    // .append(
-    // DateFormatter.formatAsDateTime(cevent
-    //                    .getMinSourceSpecimenDate())).append(" [").append(count) //$NON-NLS-1$ 
-    //            .append("]").toString(); //$NON-NLS-1$ 
-    // }
+    @Override
+    protected String getLabelInternal() {
+        CollectionEvent cevent = getModelObject();
+        Assert.isNotNull(cevent, "collection event is null"); //$NON-NLS-1$
+        long count = -1;
+        // FIXME action ?
+        // try {
+        // count = cevent.getSourceSpecimensCount(false);
+        // } catch (Exception e) {
+        //            logger.error("Problem counting specimens", e); //$NON-NLS-1$
+        // }
+        return new StringBuilder("#") //$NON-NLS-1$ 
+            .append(cevent.getVisitNumber()).append(" - ")//$NON-NLS-1$
+            // FIXME
+            // .append(
+            // DateFormatter.formatAsDateTime(cevent
+            // .getMinSourceSpecimenDate()))
+            .append(" [").append(count) //$NON-NLS-1$ 
+            .append("]").toString(); //$NON-NLS-1$ 
+    }
 
     @Override
     public CollectionEvent getModelObject() {

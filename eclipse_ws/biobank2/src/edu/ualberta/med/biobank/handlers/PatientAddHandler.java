@@ -19,7 +19,7 @@ public class PatientAddHandler extends AbstractHandler {
     public Object execute(ExecutionEvent event) throws ExecutionException {
         try {
             Patient patient = new Patient();
-            PatientAdapter adapter = new PatientAdapter(null, patient, null);
+            PatientAdapter adapter = new PatientAdapter(null, patient);
             adapter.openEntryForm();
         } catch (Exception exp) {
             logger.error(Messages.PatientAddHandler_patient_open_error, exp);

@@ -143,7 +143,7 @@ public class PatientEntryForm extends BiobankEntryForm {
             @Override
             public void run() {
                 CollectionView.getCurrent().showSearchedObjectsInTree(
-                    Arrays.asList(patient), true);
+                    Arrays.asList(patient.getWrappedObject()), true);
             }
         });
     }
