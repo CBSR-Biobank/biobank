@@ -18,6 +18,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
@@ -65,16 +66,20 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
         GridData cgd = new GridData(SWT.FILL, SWT.FILL, true, true);
         contents.setLayoutData(cgd);
 
-        HashSet<ClinicWrapper> clinics = new HashSet<ClinicWrapper>();
-        for (ContactWrapper contact : contacts)
-            clinics.add(contact.getClinic());
-
         LabelProvider labelProvider = new LabelProvider() {
             @Override
             public String getText(Object o) {
                 return ((ClinicWrapper) o).getNameShort();
             }
         };
+
+        List<ContactWrapper> allContacts = ContactWrapper
+            .getAllContacts(SessionManager.getAppService());
+        allContacts.removeAll(contacts);
+
+        HashSet<ClinicWrapper> clinics = new HashSet<ClinicWrapper>();
+        for (ContactWrapper contact : allContacts)
+            clinics.add(contact.getClinic());
 
         clinicCombo = widgetCreator.createComboViewer(contents,
             Messages.SelectClinicContactDialog_clinic_label,

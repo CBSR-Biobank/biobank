@@ -1,42 +1,18 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import org.apache.commons.lang.StringUtils;
+import java.util.List;
+
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.action.site.SiteViewAction.StudyInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class NewStudyInfoTable extends AbstractInfoTableWidget {
-
-    protected static class RowData extends RowItem {
-        String name;
-        String nameShort;
-        String status;
-        Long patientCount;
-        Long ceventCount;
-
-        public RowData(Object[] props) {
-            name = (String) props[0];
-            nameShort = (String) props[1];
-            status = (String) props[2];
-            patientCount = (Long) props[3];
-            ceventCount = (Long) props[4];
-        }
-
-        @Override
-        public String toString() {
-            return StringUtils.join(new String[] { name, nameShort, status,
-                (patientCount != null) ? patientCount.toString() : "", //$NON-NLS-1$
-                (ceventCount != null) ? ceventCount.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-    }
-
     private static final String[] HEADINGS = new String[] {
         Messages.StudyInfoTable_name_label,
         Messages.StudyInfoTable_nameshort_label,
@@ -44,13 +20,9 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
         Messages.StudyInfoTable_patients_label,
         Messages.StudyInfoTable_visits_label };
 
-    private SiteWrapper site;
-
-    public NewStudyInfoTable(Composite parent, SiteWrapper site)
-        throws ApplicationException {
+    public NewStudyInfoTable(Composite parent, List<StudyInfo> studies) {
         super(parent, HEADINGS, new int[] { 100, 100, 100, 100, 100 }, 10);
-        this.site = site;
-        getTableViewer().setInput(SiteQuery.getSiteStudyQuickInfo(site));
+        getTableViewer().setInput(studies);
     }
 
     @Override
@@ -58,18 +30,20 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                RowData info = new RowData((Object[]) element);
+                StudyInfo info = (StudyInfo) element;
+
                 switch (columnIndex) {
                 case 0:
-                    return info.name;
+                    return info.study.getName();
                 case 1:
-                    return info.nameShort;
+                    return info.study.getNameShort();
                 case 2:
-                    return (info.status != null) ? info.status : ""; //$NON-NLS-1$
+                    return (info.study.getActivityStatus() != null) ? info.study
+                        .getActivityStatus().getName() : ""; //$NON-NLS-1$
                 case 3:
                     return NumberFormatter.format(info.patientCount);
                 case 4:
-                    return NumberFormatter.format(info.ceventCount);
+                    return NumberFormatter.format(info.collectionEventCount);
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -84,24 +58,27 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
             @Override
             public int compare(Viewer viewer, Object e1, Object e2) {
                 int rc = 0;
-                RowData row1 = new RowData((Object[]) e1);
-                RowData row2 = new RowData((Object[]) e2);
+                StudyInfo row1 = (StudyInfo) e1;
+                StudyInfo row2 = (StudyInfo) e2;
 
                 switch (propertyIndex) {
                 case 0:
-                    rc = row1.name.compareTo(row2.name);
+                    rc = row1.study.getName().compareTo(row2.study.getName());
                     break;
                 case 1:
-                    rc = row1.nameShort.compareTo(row2.nameShort);
+                    rc = row1.study.getNameShort().compareTo(
+                        row2.study.getNameShort());
                     break;
                 case 2:
-                    rc = row1.status.compareTo(row2.status);
+                    rc = row1.study.getActivityStatus().getName()
+                        .compareTo(row2.study.getActivityStatus().getName());
                     break;
                 case 3:
                     rc = row1.patientCount.compareTo(row2.patientCount);
                     break;
                 case 4:
-                    rc = row1.ceventCount.compareTo(row2.ceventCount);
+                    rc = row1.collectionEventCount
+                        .compareTo(row2.collectionEventCount);
                     break;
                 }
                 // If descending order, flip the direction
@@ -141,7 +118,9 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
 
     @Override
     public void reload() throws ApplicationException {
-        getTableViewer().setInput(SiteQuery.getSiteStudyQuickInfo(site));
     }
 
+    public void setCollection(List<?> object) {
+        getTableViewer().setInput(object);
+    }
 }

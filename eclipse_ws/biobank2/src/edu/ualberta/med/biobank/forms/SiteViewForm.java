@@ -10,24 +10,22 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.site.SiteViewAction;
+import edu.ualberta.med.biobank.common.action.site.SiteViewAction.SiteInfo;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewStudyInfoTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteViewForm"; //$NON-NLS-1$
 
     private SiteAdapter siteAdapter;
-
-    private SiteWrapper site;
 
     private NewStudyInfoTable studiesTable;
     private ContainerTypeInfoTable containerTypesTable;
@@ -53,21 +51,25 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private BgcBaseText commentLabel;
 
+    private SiteInfo siteInfo;
+
+    private SiteWrapper site;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof SiteAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        siteAdapter = (SiteAdapter) adapter;
-        site = (SiteWrapper) getModelObject();
-        retrieveSite();
-        setPartName(NLS.bind(Messages.SiteViewForm_title, site.getNameShort()));
+        updateSiteInfo();
+        setPartName(NLS.bind(Messages.SiteViewForm_title,
+            siteInfo.site.getNameShort()));
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind(Messages.SiteViewForm_title, site.getName()));
+        form.setText(NLS.bind(Messages.SiteViewForm_title,
+            siteInfo.site.getName()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -108,24 +110,23 @@ public class SiteViewForm extends AddressViewFormCommon {
         setSiteSectionValues();
     }
 
-    private void setSiteSectionValues() throws Exception {
-        setTextValue(nameLabel, site.getName());
-        setTextValue(nameShortLabel, site.getNameShort());
-        setTextValue(studyCountLabel, site.getStudyCollection().size());
-        setTextValue(containerTypeCountLabel, site.getContainerTypeCollection()
-            .size());
-        setTextValue(topContainerCountLabel, site.getTopContainerCollection()
-            .size());
-        setTextValue(patientCountLabel, SiteQuery.getPatientCount(site));
-        setTextValue(patientVisitCountLabel, site.getCollectionEventCount());
-        setTextValue(specimenCountLabel, site.getAliquotedSpecimenCount());
-        setTextValue(activityStatusLabel, site.getActivityStatus().getName());
-        setTextValue(commentLabel, site.getComment());
+    private void setSiteSectionValues() {
+        setTextValue(nameLabel, siteInfo.site.getName());
+        setTextValue(nameShortLabel, siteInfo.site.getNameShort());
+        setTextValue(studyCountLabel, siteInfo.studies.size());
+        setTextValue(containerTypeCountLabel, siteInfo.containerTypes.size());
+        setTextValue(topContainerCountLabel, siteInfo.topContainers.size());
+        setTextValue(patientCountLabel, siteInfo.patientCount);
+        setTextValue(patientVisitCountLabel, siteInfo.collectionEventCount);
+        setTextValue(specimenCountLabel, siteInfo.aliquotedSpecimenCount);
+        setTextValue(activityStatusLabel, siteInfo.site.getActivityStatus()
+            .getName());
+        setTextValue(commentLabel, siteInfo.site.getComment());
     }
 
-    private void createStudySection() throws ApplicationException {
+    private void createStudySection() {
         Section section = createSection(Messages.SiteViewForm_studies_title);
-        studiesTable = new NewStudyInfoTable(section, site);
+        studiesTable = new NewStudyInfoTable(section, siteInfo.studies);
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addClickListener(collectionDoubleClickListener);
 
@@ -146,14 +147,15 @@ public class SiteViewForm extends AddressViewFormCommon {
                 }
             }, ContainerTypeWrapper.class);
 
-        containerTypesTable = new ContainerTypeInfoTable(section, siteAdapter);
+        containerTypesTable = new ContainerTypeInfoTable(section, siteAdapter,
+            siteInfo.containerTypes);
         containerTypesTable.adaptToToolkit(toolkit, true);
 
         containerTypesTable.addClickListener(collectionDoubleClickListener);
         section.setClient(containerTypesTable);
     }
 
-    private void createContainerSection() throws Exception {
+    private void createContainerSection() {
         Section section = createSection(Messages.SiteViewForm_topContainers_title);
         addSectionToolbar(section, Messages.SiteViewForm_topContainers_add,
             new SelectionAdapter() {
@@ -164,7 +166,8 @@ public class SiteViewForm extends AddressViewFormCommon {
                 }
             }, ContainerWrapper.class);
 
-        topContainersTable = new ContainerInfoTable(section, siteAdapter);
+        topContainersTable = new ContainerInfoTable(section, siteAdapter,
+            siteInfo.topContainers);
         topContainersTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(topContainersTable);
 
@@ -174,23 +177,25 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     @Override
     public void reload() throws Exception {
-        retrieveSite();
-        setPartName(NLS.bind(Messages.SiteViewForm_title, site.getNameShort()));
-        form.setText(NLS.bind(Messages.SiteViewForm_title, site.getName()));
+        updateSiteInfo();
+
+        setPartName(NLS.bind(Messages.SiteViewForm_title,
+            siteInfo.site.getNameShort()));
+        form.setText(NLS.bind(Messages.SiteViewForm_title,
+            siteInfo.site.getName()));
         setSiteSectionValues();
         setAddressValues(site);
-        studiesTable.reload();
-        containerTypesTable
-            .setCollection(site.getContainerTypeCollection(true));
-        topContainersTable.setCollection(site.getTopContainerCollection());
+
+        studiesTable.setCollection(siteInfo.studies);
+        containerTypesTable.setCollection(siteInfo.containerTypes);
+        topContainersTable.setCollection(siteInfo.topContainers);
     }
 
-    private void retrieveSite() {
-        try {
-            site.reload();
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.SiteViewForm_reload_error_msg, e);
-        }
-    }
+    private void updateSiteInfo() throws Exception {
+        siteAdapter = (SiteAdapter) adapter;
+        site = (SiteWrapper) getModelObject();
 
+        siteInfo = SessionManager.getAppService().doAction(
+            new SiteViewAction(site.getWrappedObject()));
+    }
 }

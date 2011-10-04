@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -9,10 +11,10 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 
+import edu.ualberta.med.biobank.common.action.site.SiteViewAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
@@ -48,9 +50,9 @@ public class ContainerTypeInfoTable extends InfoTableWidget {
 
     private SiteAdapter siteAdapter;
 
-    public ContainerTypeInfoTable(Composite parent, SiteAdapter site) {
-        super(parent, ((SiteWrapper) site.getModelObject())
-            .getContainerTypeCollection(), HEADINGS, 10,
+    public ContainerTypeInfoTable(Composite parent, SiteAdapter site,
+        List<ContainerTypeInfo> containerTypeInfo) {
+        super(parent, containerTypeInfo, HEADINGS, 10,
             ContainerTypeWrapper.class);
         siteAdapter = site;
     }
@@ -90,7 +92,11 @@ public class ContainerTypeInfoTable extends InfoTableWidget {
     @Override
     public Object getCollectionModelObject(Object type) throws Exception {
         TableRowData info = new TableRowData();
-        info.containerType = (ContainerTypeWrapper) type;
+
+        ContainerTypeInfo containerTypeInfo = (ContainerTypeInfo) type;
+
+        info.containerType = new ContainerTypeWrapper(
+            siteAdapter.getAppService(), containerTypeInfo.containerType);
         Integer rowCapacity = info.containerType.getRowCapacity();
         Integer colCapacity = info.containerType.getColCapacity();
 
@@ -100,7 +106,7 @@ public class ContainerTypeInfoTable extends InfoTableWidget {
         if ((rowCapacity != null) && (colCapacity != null)) {
             info.capacity = rowCapacity * colCapacity;
         }
-        info.inUseCount = info.containerType.getContainersCount();
+        info.inUseCount = containerTypeInfo.containerCount;
         info.temperature = info.containerType.getDefaultTemperature();
         return info;
     }
