@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.presenter;
 
 
+import edu.ualberta.med.biobank.event.HasValue;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.presenter.SiteEditPresenter.HasValue;
 
 public class AddressEditPresenter {
 	private final Display display;
@@ -12,7 +12,9 @@ public class AddressEditPresenter {
 		this.display = display;
 	}
 	
-	public void setAddress(Address address) {
+	public void editAddress(Address address) {
+		this.address = address;
+		
 		display.getStreet1().setValue(address.getStreet1());
 		display.getStreet2().setValue(address.getStreet2());
 		display.getCity().setValue(address.getCity());
@@ -23,10 +25,7 @@ public class AddressEditPresenter {
 		display.getCountry().setValue(address.getCountry());
 	}
 	
-	public static void main(String[] args) {
-	}
-	
-	public interface Display {		
+	public interface Display {
 		public HasValue<String> getStreet1();
 		public HasValue<String> getStreet2();
 		public HasValue<String> getCity();

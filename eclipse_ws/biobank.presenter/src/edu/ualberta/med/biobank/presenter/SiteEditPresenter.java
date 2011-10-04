@@ -5,7 +5,16 @@ import java.util.Collection;
 
 import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction;
 import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction.SiteInfo;
+import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.site.UpdateSiteAction;
+import edu.ualberta.med.biobank.event.ClickEvent;
+import edu.ualberta.med.biobank.event.ClickHandler;
+import edu.ualberta.med.biobank.event.HandlerRegistration;
+import edu.ualberta.med.biobank.event.HasClickHandlers;
+import edu.ualberta.med.biobank.event.HasValue;
+import edu.ualberta.med.biobank.event.ValueChangeEvent;
+import edu.ualberta.med.biobank.event.ValueChangeHandler;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
@@ -30,28 +39,31 @@ public class SiteEditPresenter {
 			public void onClick(ClickEvent event) {
 				doSave();
 			}});
+		
+		// TODO: listen to Display properties for validation purposes.
 	}
 	
 	private void init() {
-		GetSiteInfoAction action = new GetSiteInfoAction((Integer) null);
+		GetSiteInfoAction action = new GetSiteInfoAction(siteId);
+		SiteInfo siteInfo = service.doAction(action);
 		
-		service.doAction(action);
-		
-		SiteInfo siteInfo = null;
-		
+		// TODO: seems error-prone :-(
 		display.getName().setValue(siteInfo.site.getName());
-//		siteInfo.site.get
+		display.getNameShort().setValue(siteInfo.site.getNameShort());
+		display.getComment().setValue(siteInfo.site.getComment());
+		display.getActivityStatus().setValue(siteInfo.site.getActivityStatus());
+		display.getStudies().setValue(siteInfo.studies);
 		
-		addressEditPresenter.setAddress(siteInfo.site.getAddress());
+		addressEditPresenter.editAddress(siteInfo.site.getAddress());
 	}
 	
-	public void doSave() {		
+	public void doSave() {
 		UpdateSiteAction updateSite = new UpdateSiteAction(siteId);
 		updateSite.setName(display.getName().getValue());
 		updateSite.setNameShort(display.getNameShort().getValue());
 		updateSite.setComment(display.getComment().getValue());
 //		updateSite.setAddress(display.getAddressEditDisplay().g)
-		updateSite.setStudyIds(display.getStudyIds().getValue());
+//		updateSite.setStudyIds(display.getStudyIds().getValue());
 	}
 	
 	public interface Display {
@@ -59,58 +71,14 @@ public class SiteEditPresenter {
 		public HasClickHandlers getReloadButton();
 		public HasClickHandlers getCloseButton();
 		
+		public void setGeneralErrors(Collection<Object> errors); // ??
+		
 		public AddressEditPresenter.Display getAddressEditDisplay();
 		
 		public HasValue<String> getName();
 		public HasValue<String> getNameShort();
-		public HasValue<String> getActivityStatus();
 		public HasValue<String> getComment();
-		public HasValue<Collection<Integer>> getStudyIds();
+		public HasValue<ActivityStatus> getActivityStatus();
+		public HasValue<Collection<StudyInfo>> getStudies();
 	}
-	
-	public interface HasClickHandlers {
-		public void addClickHandler(ClickHandler clickHandler);
-	}
-	
-	public interface ClickHandler {
-		public void onClick(ClickEvent event);
-	}
-	
-	public interface ClickEvent {
-		
-	}
-	
-	public interface HasValue<T> {
-		public T getValue();
-		
-		public void setValue(T value);
-	}
-	
-	public interface HasChangeHandler<T> {
-	}
-
-	public interface ValidatableValue<T> extends HasChangeHandler<T>, HasValue<T> {
-	}
-	
-	public class TextWrapper implements HasValue<String> {
-		private final TextField text;
-		
-		public TextWrapper(TextField text) {
-			this.text = text;
-		}
-		
-		@Override
-		public String getValue() {
-			return text.getText();
-		}
-
-		@Override
-		public void setValue(String value) {
-			text.setText(value);
-		}
-		
-	}
-	
-	// 1. listen to HasValue changes, validate as necessary
-	// 2. 
 }
