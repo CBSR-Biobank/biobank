@@ -10,6 +10,10 @@
   !define VERSION_STR "2.0.1.a" 
   !define EXPORTED_PRODUCT_NAME "${PRODUCT_NAME}_v${VERSION_STR}_win32"
 
+; if JAVA is to be installed the createInstaller.pl perl script
+; will uncomment this line
+;!define INSTALL_JAVA
+
 ; Definitions for Java 6.0
 !define JRE_VERSION "6.0"
 !define JRE_URL "http://javadl.sun.com/webapps/download/AutoDL?BundleId=42742&/jre-6u22-windows-i586-p.exe"
@@ -198,8 +202,9 @@ NOT_PREV_INSTALLED:
   Exec '"xcopy.exe" "C:\Program Files\${PRODUCT_NAME}\${PRODUCT_NAME}_v1.2.0_win32\workspace" "$PROFILE\${PRODUCT_NAME}\" /S /Y /E'
 
 INSTALL_BIOBANK_CORE:
+!ifdef INSTALL_JAVA  
   Call GetJRE
-  
+!endif  
   ; copy over the exported biobank directory
   SetOutPath $INSTDIR\${EXPORTED_PRODUCT_NAME}
   File /r ..\${EXPORTED_PRODUCT_NAME}\*

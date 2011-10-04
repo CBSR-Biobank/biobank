@@ -53,7 +53,7 @@ $DLL_DIR = "";
 $NSIS_DIR = "";
 
 
-if($#ARGV == 1){
+if ($#ARGV == 1){
         $EXPORT_DIR = $ARGV[0];
         $EXPORT_DIR =~ s/\/$//;
 
@@ -65,6 +65,13 @@ else{
         exit 0;
 }
 print "\n";
+
+#is there a bundled jre?
+$HAS_BUNDLED_JRE = 0;
+if (-d "$EXPORT_DIR/jre") {
+    print "Has bundled jre\n";
+	$HAS_BUNDLED_JRE = 1;
+}
 
 #make temp directory
 if(-d "tmp" ){
@@ -108,22 +115,33 @@ while($line = <FH>){
                 $line =~ s/".*?"/"$VERSION"/;
                 print "Modified nsis script line: $line";
         }
+		if (($line =~ m/define INSTALL_JAVA/ ) && ($HAS_BUNDLED_JRE == 0)) {
+                $line = "!define INSTALL_JAVA";
+                print "Defining symbol INSTALL_JAVA\n";
+		}
         print FHA $line;
 }
 close(FHA);
 close(FH);
 -e "tmp/nsis/BiobankTMP.nsi" or die "could not create customized nsis script";
 
+
 print "Compiling nsis script...\n";
 `\"$NSIS_PROGRAM\" tmp/nsis/BiobankTMP.nsi`;
 -e "tmp/BioBankInstaller-${VERSION}.exe" or die "nsis could not create installer";
 
+if ($HAS_BUNDLED_JRE == 1) {
+	$INSTALLER_NAME = "BioBankInstaller-${VERSION}_with_jre.exe";
+} else {
+	$INSTALLER_NAME = "BioBankInstaller-${VERSION}.exe";
+}
+
 print "Moving installer...\n";
-`mv tmp/BioBankInstaller-${VERSION}.exe .`;
--e "BioBankInstaller-${VERSION}.exe" or die "could not move installer";
+`mv tmp/BioBankInstaller-${VERSION}.exe ${INSTALLER_NAME}`;
+-e "${INSTALLER_NAME}" or die "could not move installer";
 
 print "Cleaning up....\n";
 `rm -rf tmp`;
 !(-d "tmp") or die "temp directory could not be removed";
 
-print "Successfully created: BioBankInstaller-${VERSION}.exe\n";
+print "Successfully created: ${INSTALLER_NAME}\n";
