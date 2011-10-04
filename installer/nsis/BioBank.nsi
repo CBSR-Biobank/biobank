@@ -202,9 +202,10 @@ NOT_PREV_INSTALLED:
   Exec '"xcopy.exe" "C:\Program Files\${PRODUCT_NAME}\${PRODUCT_NAME}_v1.2.0_win32\workspace" "$PROFILE\${PRODUCT_NAME}\" /S /Y /E'
 
 INSTALL_BIOBANK_CORE:
-!ifdef INSTALL_JAVA  
-  Call GetJRE
-!endif  
+!ifdef INSTALL_JAVA
+	Call GetJRE
+!endif
+
   ; copy over the exported biobank directory
   SetOutPath $INSTDIR\${EXPORTED_PRODUCT_NAME}
   File /r ..\${EXPORTED_PRODUCT_NAME}\*
