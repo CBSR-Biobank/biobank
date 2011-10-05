@@ -51,7 +51,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
         boolean loadChildrenInBackground) {
         super(parent, object == null ? null : object.getClass(),
-            object == null ? -1 : object.getId(), null, null, false);
+            object == null ? null : object.getId(), null, null, false);
         this.modelObject = object;
         this.loadChildrenInBackground = loadChildrenInBackground;
     }
@@ -60,7 +60,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
         this(parent, object, true);
     }
 
-    public AdapterBase(AdapterBase parent, int id, String label,
+    public AdapterBase(AdapterBase parent, Integer id, String label,
         boolean hasChildren, boolean loadChildrenInBackground) {
         super(parent, null, id, label, null, hasChildren);
         this.loadChildrenInBackground = loadChildrenInBackground;

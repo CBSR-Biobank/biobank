@@ -103,13 +103,12 @@ public class CollectionView extends AbstractAdministrationView {
     }
 
     public void showSearchedObjectsInTree(PatientInfo pinfo, boolean doubleClick) {
-        List<AbstractAdapterBase> nodeRes = rootNode.search(pinfo.getClass(),
+        List<AbstractAdapterBase> nodeRes = rootNode.search(Patient.class,
             pinfo.patient.getId());
         if (nodeRes.size() == 0) {
             searchedNode.addSearchObject(pinfo, pinfo.patient.getId());
             searchedNode.performExpand();
-            nodeRes = searchedNode.search(pinfo.getClass(),
-                pinfo.patient.getId());
+            nodeRes = searchedNode.search(Patient.class, pinfo.patient.getId());
         }
         if (nodeRes.size() > 0) {
             if (doubleClick) {

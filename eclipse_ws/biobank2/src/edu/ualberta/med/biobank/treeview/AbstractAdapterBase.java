@@ -56,7 +56,7 @@ public abstract class AbstractAdapterBase {
     private boolean editable = true;
 
     public AbstractAdapterBase(AbstractAdapterBase parent, Class<?> clazz,
-        int id, String label, String tooltip, boolean hasChildren) {
+        Integer id, String label, String tooltip, boolean hasChildren) {
         this.parent = parent;
         children = new ArrayList<AbstractAdapterBase>();
         this.objectClazz = clazz;

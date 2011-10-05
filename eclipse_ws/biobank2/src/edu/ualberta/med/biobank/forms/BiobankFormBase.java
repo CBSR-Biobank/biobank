@@ -61,7 +61,8 @@ public abstract class BiobankFormBase extends BgcFormBase {
             SessionManager.setSelectedNode(adapter);
             // if selection fails, then the adapter needs to be matched at the
             // id level
-            if (SessionManager.getSelectedNode() == null) {
+            if (SessionManager.getSelectedNode() == null
+                && adapter.getClass() != null) {
                 AbstractAdapterBase node = SessionManager.searchFirstNode(
                     adapter.getObjectClazz(), adapter.getId());
                 SessionManager.setSelectedNode(node);

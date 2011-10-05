@@ -11,7 +11,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.cevent.CollectionEventViewAction;
+import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction;
 import edu.ualberta.med.biobank.common.action.cevent.CollectionEventWithSpecimensInfo;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
@@ -62,7 +62,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private void updateCEventInfo() throws Exception {
         ceventInfo = SessionManager.getAppService().doAction(
-            new CollectionEventViewAction(adapter.getId()));
+            new GetCollectionEventInfoAction(adapter.getId()));
     }
 
     @Override

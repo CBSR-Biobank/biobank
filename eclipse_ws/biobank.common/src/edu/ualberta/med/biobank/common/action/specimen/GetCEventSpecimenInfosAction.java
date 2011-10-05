@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.cevent;
+package edu.ualberta.med.biobank.common.action.specimen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +8,6 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionException;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
@@ -17,23 +16,13 @@ import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
-public class CollectionEventViewAction implements
-    Action<CollectionEventWithSpecimensInfo> {
+public class GetCEventSpecimenInfosAction implements Action<List<SpecimenInfo>> {
     private static final long serialVersionUID = 1L;
+
     // @formatter:off
-    @SuppressWarnings("nls")
-    private static final String CEVENT_INFO_QRY = 
-        "select cevent"
-        + " from " + CollectionEvent.class.getName() + " as cevent"
-        + " inner join fetch cevent." + CollectionEventPeer.PATIENT.getName() + " patient"
-        + " inner join fetch cevent." + CollectionEventPeer.ACTIVITY_STATUS.getName() + " status"
-        + " inner join fetch patient." + PatientPeer.STUDY.getName() + " study"
-        + " where cevent." + CollectionEventPeer.ID.getName() + "=?"
-        + " GROUP BY cevent";
     @SuppressWarnings("nls")
     private static final String COMMON_SPEC_QRY = 
         "select spec, parent." + ContainerPeer.LABEL.getName() 
@@ -66,46 +55,27 @@ public class CollectionEventViewAction implements
         + " and spec." + SpecimenPeer.PARENT_SPECIMEN.getName() + " is not null";
     // @formatter:on
 
-    private final Integer ceventId;
+    private Integer ceventId;
+    private boolean aliquotedSpecimens = false;
 
-    public CollectionEventViewAction(Integer ceventId) {
-        this.ceventId = ceventId;
+    public GetCEventSpecimenInfosAction(Integer cevenId,
+        boolean aliquotedSpecimens) {
+        this.ceventId = cevenId;
+        this.aliquotedSpecimens = aliquotedSpecimens;
     }
 
     @Override
     public boolean isAllowed(User user, Session session) {
-        return true; // TODO: restrict access
+        return true;
     }
 
     @Override
-    public CollectionEventWithSpecimensInfo doAction(Session session)
-        throws ActionException {
-        CollectionEventWithSpecimensInfo ceventInfo = new CollectionEventWithSpecimensInfo();
+    public List<SpecimenInfo> doAction(Session session) throws ActionException {
+        List<SpecimenInfo> specs = new ArrayList<SpecimenInfo>();
 
-        Query query = session.createQuery(CEVENT_INFO_QRY);
-        query.setParameter(0, ceventId);
-
-        @SuppressWarnings("unchecked")
-        List<CollectionEvent> rows = query.list();
-        if (rows.size() == 1) {
-            ceventInfo.cevent = rows.get(0);
-            ceventInfo.sourceSpecimenInfos = getSourceSpecimens(session);
-            ceventInfo.sourceSpecimenCount = (long) ceventInfo.sourceSpecimenInfos
-                .size();
-            ceventInfo.aliquotedSpecimenInfos = getAliquotedSpecimens(session);
-            ceventInfo.aliquotedSpecimenCount = (long) ceventInfo.aliquotedSpecimenInfos
-                .size();
-        } else {
-            // TODO: throw exception?
-        }
-
-        return ceventInfo;
-    }
-
-    private List<SpecimenInfo> getSourceSpecimens(Session session) {
-        List<SpecimenInfo> sourceSpecs = new ArrayList<SpecimenInfo>();
-
-        Query query = session.createQuery(SOURCE_SPEC_QRY);
+        Query query = session
+            .createQuery(aliquotedSpecimens ? ALIQUOTED_SPEC_QRY
+                : SOURCE_SPEC_QRY);
         query.setParameter(0, ceventId);
 
         @SuppressWarnings("unchecked")
@@ -116,28 +86,9 @@ public class CollectionEventViewAction implements
             specInfo.parentLabel = (String) row[1];
             specInfo.positionString = (String) row[2];
             specInfo.topContainerTypeNameShort = (String) row[3];
-            sourceSpecs.add(specInfo);
+            specs.add(specInfo);
         }
 
-        return sourceSpecs;
-    }
-
-    private List<SpecimenInfo> getAliquotedSpecimens(Session session) {
-        List<SpecimenInfo> aliquotedSpecs = new ArrayList<SpecimenInfo>();
-
-        Query query = session.createQuery(ALIQUOTED_SPEC_QRY);
-        query.setParameter(0, ceventId);
-
-        @SuppressWarnings("unchecked")
-        List<Object[]> rows = query.list();
-        for (Object[] row : rows) {
-            SpecimenInfo specInfo = new SpecimenInfo();
-            specInfo.specimen = (Specimen) row[0];
-            specInfo.parentLabel = (String) row[1];
-            specInfo.positionString = (String) row[2];
-            specInfo.topContainerTypeNameShort = (String) row[3];
-            aliquotedSpecs.add(specInfo);
-        }
-        return aliquotedSpecs;
+        return specs;
     }
 }

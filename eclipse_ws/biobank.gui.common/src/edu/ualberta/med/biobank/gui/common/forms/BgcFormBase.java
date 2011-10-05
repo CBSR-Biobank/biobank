@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -313,7 +313,12 @@ public abstract class BgcFormBase extends EditorPart implements
         if (bean == null)
             return null;
         Assert.isNotNull(propertyName);
-        return BeansObservables.observeValue(bean, propertyName);
+        // FIXME temporary use pojo to be able to make some tests in new forms
+        // behaviour. Should not need this anymore when will use presenter.
+        // Might eventually need to set back to Beansobservable if still needed
+        // in some specific situations
+        // return BeansObservables.observeValue(bean, propertyName);
+        return PojoObservables.observeValue(bean, propertyName);
     }
 
     public Control createBoundWidget(Composite composite,

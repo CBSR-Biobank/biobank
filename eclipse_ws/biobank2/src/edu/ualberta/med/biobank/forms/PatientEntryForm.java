@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -10,17 +11,23 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.patient.GetPatientInfoAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
+import edu.ualberta.med.biobank.views.CollectionView;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class PatientEntryForm extends BiobankEntryForm {
@@ -33,8 +40,6 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     public static final String MSG_PATIENT_OK = Messages.PatientEntryForm_edition_msg;
 
-    private PatientWrapper patient;
-
     private ComboViewer studiesViewer;
 
     private Label createdAtLabel;
@@ -44,23 +49,53 @@ public class PatientEntryForm extends BiobankEntryForm {
     private NonEmptyStringValidator pnumberNonEmptyValidator = new NonEmptyStringValidator(
         Messages.PatientEntryForm_patientNumber_validation_msg);
 
+    private PatientInfo pInfo;
+
+    private Patient patientCopy;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof PatientAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        patient = (PatientWrapper) getModelObject();
+        patientCopy = new Patient();
+        if (adapter.getId() != null) {
+            pInfo = SessionManager.getAppService().doAction(
+                new GetPatientInfoAction(adapter.getId()));
+            copyPatient();
+        }
 
-        SessionManager.logEdit(patient);
+        // FIXME log !
+        // SessionManager.logEdit(patient);
         String tabName;
-        if (patient.isNew()) {
+        if (pInfo == null) {
             tabName = Messages.PatientEntryForm_new_title;
         } else {
             tabName = NLS.bind(Messages.PatientEntryForm_edit_title,
-                patient.getPnumber());
+                pInfo.patient.getPnumber());
         }
         setPartName(tabName);
+    }
+
+    protected void copyPatient() {
+        if (pInfo == null) {
+            patientCopy.setCreatedAt(null);
+            patientCopy.setPnumber(null);
+            patientCopy.setStudy(null);
+            patientCopy
+                .setCollectionEventCollection(new ArrayList<CollectionEvent>());
+        } else {
+            patientCopy.setId(pInfo.patient.getId());
+            patientCopy.setCreatedAt(pInfo.patient.getCreatedAt());
+            patientCopy.setPnumber(pInfo.patient.getPnumber());
+            patientCopy.setStudy(pInfo.patient.getStudy());
+            List<CollectionEvent> cevents = new ArrayList<CollectionEvent>();
+            if (pInfo.patient.getCollectionEventCollection() != null) {
+                cevents.addAll(pInfo.patient.getCollectionEventCollection());
+            }
+            patientCopy.setCollectionEventCollection(cevents);
+        }
     }
 
     @Override
@@ -71,7 +106,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         createPatientSection();
 
-        if (patient.isNew()) {
+        if (pInfo == null) {
             setDirty(true);
         }
     }
@@ -84,16 +119,19 @@ public class PatientEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        // FIXME action !
         List<StudyWrapper> studies = SessionManager.getUser()
             .getCurrentWorkingCenter().getStudyCollection();
         StudyWrapper selectedStudy = null;
-        if (patient.isNew()) {
+        // FIXME set by presenter...
+        if (pInfo == null) {
             if (studies.size() == 1) {
                 selectedStudy = studies.get(0);
-                patient.setStudy(selectedStudy);
+                patientCopy.setStudy(selectedStudy.getWrappedObject());
             }
         } else {
-            selectedStudy = patient.getStudy();
+            selectedStudy = new StudyWrapper(SessionManager.getAppService(),
+                patientCopy.getStudy());
         }
 
         studiesViewer = createComboViewer(client,
@@ -103,13 +141,14 @@ public class PatientEntryForm extends BiobankEntryForm {
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    patient.setStudy((StudyWrapper) selectedObject);
+                    patientCopy.setStudy(((StudyWrapper) selectedObject)
+                        .getWrappedObject());
                 }
             });
         setFirstControl(studiesViewer.getControl());
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.PatientEntryForm_field_pNumber_label, null, patient,
+            Messages.PatientEntryForm_field_pNumber_label, null, patientCopy,
             PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
 
         createdAtLabel = widgetCreator.createLabel(client,
@@ -119,14 +158,15 @@ public class PatientEntryForm extends BiobankEntryForm {
         createdAtValidator = new NotNullValidator(
             Messages.PatientEntryForm_created_validation_msg);
 
-        createDateTimeWidget(client, createdAtLabel, patient.getCreatedAt(),
-            patient, PatientPeer.CREATED_AT.getName(), createdAtValidator,
-            SWT.DATE | SWT.TIME, CREATED_AT_BINDING);
+        createDateTimeWidget(client, createdAtLabel,
+            patientCopy.getCreatedAt(), patientCopy,
+            PatientPeer.CREATED_AT.getName(), createdAtValidator, SWT.DATE
+                | SWT.TIME, CREATED_AT_BINDING);
     }
 
     @Override
     protected String getOkMessage() {
-        if (patient.isNew()) {
+        if (pInfo == null) {
             return MSG_NEW_PATIENT_OK;
         }
         return MSG_PATIENT_OK;
@@ -134,16 +174,23 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        patient.persist();
+        final Patient patient = SessionManager.getAppService()
+            .doAction(
+                new PatientSaveAction(patientCopy.getId(), patientCopy
+                    .getStudy().getId(), patientCopy.getPnumber(), patientCopy
+                    .getCreatedAt()));
+        adapter.setId(patient.getId());
+
         SessionManager.updateAllSimilarNodes(adapter, true);
-        // FIXME done by presenter...
-        // Display.getDefault().syncExec(new Runnable() {
-        // @Override
-        // public void run() {
-        // CollectionView.getCurrent().showSearchedObjectsInTree(
-        // Arrays.asList(patient.getWrappedObject()), true);
-        // }
-        // });
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                PatientInfo pinfo = new PatientInfo();
+                pinfo.patient = patient;
+                CollectionView.getCurrent().showSearchedObjectsInTree(pinfo,
+                    true);
+            }
+        });
     }
 
     @Override
@@ -153,8 +200,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void onReset() throws Exception {
-        patient.reset();
-
-        GuiUtil.reset(studiesViewer, patient.getStudy());
+        copyPatient();
+        GuiUtil.reset(studiesViewer, patientCopy.getStudy());
     }
 }

@@ -29,14 +29,17 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     private PatientInfo pinfo;
 
     public PatientAdapter(AbstractAdapterBase parent, PatientInfo pinfo) {
-        super(parent, pinfo.getClass(), pinfo.patient.getId(), null, null,
-            pinfo.cevents.size() > 0);
+        super(parent, Patient.class, pinfo == null ? null : pinfo.patient
+            .getId(), null, null,
+            (pinfo == null || pinfo.cevents == null) ? false : pinfo.cevents
+                .size() > 0);
         this.pinfo = pinfo;
     }
 
     @Override
     protected String getLabelInternal() {
-        Assert.isNotNull(pinfo, "patient is null"); //$NON-NLS-1$
+        if (pinfo == null)
+            return "no patient - should not see this"; //$NON-NLS-1$
         return pinfo.patient.getPnumber();
     }
 
@@ -106,8 +109,10 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     @Override
     protected List<Integer> getChildrenObjectIds() throws Exception {
         List<Integer> ids = new ArrayList<Integer>();
-        for (CollectionEventInfo cevent : pinfo.cevents) {
-            ids.add(cevent.cevent.getId());
+        if (pinfo.cevents != null) {
+            for (CollectionEventInfo cevent : pinfo.cevents) {
+                ids.add(cevent.cevent.getId());
+            }
         }
         return ids;
     }
