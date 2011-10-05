@@ -44,8 +44,7 @@ public class AliquotedSpecimenInfoTable extends InfoTableWidget {
     }
 
     @Override
-    public TableRowData getCollectionModelObject(Object obj)
-        throws Exception {
+    public TableRowData getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
         info.sampleStorage = (AliquotedSpecimenWrapper) obj;
         SpecimenTypeWrapper type = info.sampleStorage.getSpecimenType();

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -11,7 +10,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -23,7 +21,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
-import edu.ualberta.med.biobank.views.CollectionView;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class PatientEntryForm extends BiobankEntryForm {
@@ -139,13 +136,14 @@ public class PatientEntryForm extends BiobankEntryForm {
     protected void saveForm() throws Exception {
         patient.persist();
         SessionManager.updateAllSimilarNodes(adapter, true);
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                CollectionView.getCurrent().showSearchedObjectsInTree(
-                    Arrays.asList(patient.getWrappedObject()), true);
-            }
-        });
+        // FIXME done by presenter...
+        // Display.getDefault().syncExec(new Runnable() {
+        // @Override
+        // public void run() {
+        // CollectionView.getCurrent().showSearchedObjectsInTree(
+        // Arrays.asList(patient.getWrappedObject()), true);
+        // }
+        // });
     }
 
     @Override

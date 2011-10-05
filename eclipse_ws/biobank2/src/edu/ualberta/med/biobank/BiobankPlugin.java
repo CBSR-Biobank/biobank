@@ -20,11 +20,11 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.DateNode;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
@@ -254,9 +254,10 @@ public class BiobankPlugin extends AbstractUIPlugin {
         String imageKey = null;
         if (object == null)
             return null;
-        if (object instanceof AdapterBase) {
+        if (object instanceof AbstractAdapterBase) {
             Class<?> objectClass = object.getClass();
-            while (imageKey == null && !objectClass.equals(AdapterBase.class)) {
+            while (imageKey == null
+                && !objectClass.equals(AbstractAdapterBase.class)) {
                 imageKey = classToImageKey.get(objectClass.getName());
                 objectClass = objectClass.getSuperclass();
             }

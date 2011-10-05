@@ -11,7 +11,6 @@ import org.springframework.remoting.RemoteAccessException;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.model.IBiobankModel;
 
 /**
  * Base class for all "Session" tree view nodes. Generally, most of the nodes in
@@ -22,26 +21,18 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractNewAdapterBase.class.getName());
 
-    public AbstractNewAdapterBase(AbstractAdapterBase parent,
-        IBiobankModel model, String label) {
+    public AbstractNewAdapterBase(AbstractAdapterBase parent, Object model,
+        String label) {
         super(parent, model, label);
     }
 
-    public AbstractNewAdapterBase(AbstractAdapterBase parent,
-        IBiobankModel model) {
+    public AbstractNewAdapterBase(AbstractAdapterBase parent, Object model) {
         this(parent, model, null);
     }
 
     public AbstractNewAdapterBase(AbstractAdapterBase parent, int id,
         String label, boolean hasChildren) {
         super(parent, id, label, hasChildren);
-    }
-
-    @Override
-    public Integer getId() {
-        if (getModelObject() != null)
-            return getModelObject().getId();
-        return super.getId();
     }
 
     @Override
@@ -53,11 +44,6 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
     }
 
     protected abstract String getLabelInternal();
-
-    @Override
-    public IBiobankModel getModelObject() {
-        return (IBiobankModel) super.getModelObject();
-    }
 
     @Override
     public void performExpand() {

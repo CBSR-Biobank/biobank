@@ -83,7 +83,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         ceventAdapter = (CollectionEventAdapter) adapter;
-        cevent = ceventAdapter.getModelObject();
+        // load cevent infos for entry form
+        // cevent = ceventAdapter.getModelObject();
         patient = cevent.getPatient();
 
         // SessionManager.logEdit(cevent);
@@ -285,8 +286,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     protected void doBeforeSave() throws Exception {
         PatientAdapter patientAdapter = (PatientAdapter) ceventAdapter
             .getParent();
-        if (patientAdapter != null)
-            cevent.setPatient(patientAdapter.getModelObject());
+        // FIXME this should be done before the entry form is opened.
+        // if (patientAdapter != null)
+        // cevent.setPatient(patientAdapter.getModelObject());
 
         // ACTIOn ? Presenter?
         // cevent.addToOriginalSpecimenCollection(specimensTable

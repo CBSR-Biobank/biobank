@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.model.User;
 public class SiteViewAction implements Action<SiteInfo> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
+    @SuppressWarnings("nls")
     private static final String SITE_INFO_HQL = "SELECT site, COUNT(DISTINCT patients), COUNT(DISTINCT collectionEvents), COUNT(DISTINCT aliquotedSpecimens)"
         + " FROM " + Site.class.getName() + " site"
         + " INNER JOIN FETCH site.address address"
@@ -31,18 +32,21 @@ public class SiteViewAction implements Action<SiteInfo> {
         + " WHERE site.id = ?"
         + " AND aliquotedSpecimens.parentSpecimen IS NULL" // count only aliquoted Specimen-s
         + " GROUP BY site";
+    @SuppressWarnings("nls")
     private static final String TOP_CONTAINER_HQL = "SELECT container"
         + " FROM " + Container.class.getName() + " container"
         + " INNER JOIN FETCH container.containerType containerType"
         + " INNER JOIN FETCH container.activityStatus activityStatus"
         + " WHERE container.site.id = ?"
         + " AND containerType.topLevel IS TRUE"; // only select top-level Container-s
+    @SuppressWarnings("nls")
     private static final String CONTAINER_TYPE_INFO_HQL = "SELECT containerType, (SELECT COUNT(*) FROM " + Container.class.getName() + " c WHERE c.containerType = containerType)"
         + " FROM " + ContainerType.class.getName() + " containerType"
         + " INNER JOIN FETCH containerType.activityStatus AS activityStatus"
         + " INNER JOIN FETCH containerType.capacity capacity"
         + " WHERE containerType.site.id = ?"
         + " ORDER BY containerType.nameShort";
+    @SuppressWarnings("nls")
     private static final String STUDY_INFO_HQL = "SELECT studies, COUNT(DISTINCT patients), COUNT(DISTINCT collectionEvents)"
         + " FROM " + Site.class.getName() + " site"
         + " INNER JOIN site.studyCollection AS studies"

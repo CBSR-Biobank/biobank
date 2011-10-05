@@ -35,7 +35,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
@@ -122,8 +121,8 @@ public abstract class BiobankFormBase extends BgcFormBase {
         if (selection instanceof StructuredSelection) {
             Object element = ((StructuredSelection) selection)
                 .getFirstElement();
-            if (element instanceof AdapterBase) {
-                ((AdapterBase) element).performDoubleClick();
+            if (element instanceof AbstractAdapterBase) {
+                ((AbstractAdapterBase) element).performDoubleClick();
             } else if (element instanceof ModelWrapper<?>) {
                 SessionManager.openViewForm((ModelWrapper<?>) element);
             }

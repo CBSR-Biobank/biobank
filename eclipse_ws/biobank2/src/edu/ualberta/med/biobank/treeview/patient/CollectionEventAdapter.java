@@ -8,9 +8,10 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.action.cevent.CollectionEventInfo;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
-import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -18,59 +19,53 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
     public CollectionEventAdapter(AbstractAdapterBase parent,
-        CollectionEvent collectionEvent) {
-        super(parent, collectionEvent);
+        CollectionEventInfo ceventInfo) {
+        super(parent, ceventInfo);
         setEditable(parent instanceof PatientAdapter || parent == null);
     }
 
     @Override
     protected String getLabelInternal() {
-        CollectionEvent cevent = getModelObject();
-        Assert.isNotNull(cevent, "collection event is null"); //$NON-NLS-1$
-        long count = -1;
-        // FIXME action ?
-        // try {
-        // count = cevent.getSourceSpecimensCount(false);
-        // } catch (Exception e) {
-        //            logger.error("Problem counting specimens", e); //$NON-NLS-1$
-        // }
+        CollectionEventInfo ceventInfo = getModelObject();
+        Assert.isNotNull(ceventInfo, "collection event is null"); //$NON-NLS-1$
         return new StringBuilder("#") //$NON-NLS-1$ 
-            .append(cevent.getVisitNumber()).append(" - ")//$NON-NLS-1$
-            // FIXME
-            // .append(
-            // DateFormatter.formatAsDateTime(cevent
-            // .getMinSourceSpecimenDate()))
-            .append(" [").append(count) //$NON-NLS-1$ 
+            .append(ceventInfo.cevent.getVisitNumber())
+            .append(" - ")//$NON-NLS-1$
+            .append(
+                DateFormatter
+                    .formatAsDateTime(ceventInfo.minSourceSpecimenDate))
+            .append(" [").append(ceventInfo.sourceSpecimenCount) //$NON-NLS-1$ 
             .append("]").toString(); //$NON-NLS-1$ 
     }
 
     @Override
-    public CollectionEvent getModelObject() {
-        return (CollectionEvent) super.getModelObject();
+    public CollectionEventInfo getModelObject() {
+        return (CollectionEventInfo) super.getModelObject();
     }
 
     @Override
     public String getTooltipText() {
         String tabName = null;
-        CollectionEvent cEvent = getModelObject();
-        if (cEvent != null)
-            // FIXME
-            // if (cEvent.isNew()) {
-            // tabName = Messages.CollectionEventEntryForm_title_new;
-            // try {
-            // cEvent
-            // .setActivityStatus(ActivityStatusWrapper
-            // .getActiveActivityStatus(SessionManager
-            // .getAppService()));
-            // } catch (Exception e) {
-            // BgcPlugin.openAsyncError(
-            // Messages.CollectionEventAdapter_error_title,
-            // Messages.CollectionEventAdapter_create_error_msg);
-            // }
-            // } else {
-            tabName = NLS.bind(Messages.CollectionEventEntryForm_title_edit,
-                cEvent.getVisitNumber());
-        // }
+        CollectionEventInfo ceventInfo = getModelObject();
+        if (ceventInfo != null)
+            if (ceventInfo.cevent.getId() == null) {
+                tabName = Messages.CollectionEventEntryForm_title_new;
+                // FIXME this should not be done in a getter!
+                // try {
+                // cEvent
+                // .setActivityStatus(ActivityStatusWrapper
+                // .getActiveActivityStatus(SessionManager
+                // .getAppService()));
+                // } catch (Exception e) {
+                // BgcPlugin.openAsyncError(
+                // Messages.CollectionEventAdapter_error_title,
+                // Messages.CollectionEventAdapter_create_error_msg);
+                // }
+            } else {
+                tabName = NLS.bind(
+                    Messages.CollectionEventEntryForm_title_edit,
+                    ceventInfo.cevent.getVisitNumber());
+            }
         return tabName;
     }
 

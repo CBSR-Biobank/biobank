@@ -10,17 +10,18 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.cevent.CollectionEventViewAction;
+import edu.ualberta.med.biobank.common.action.cevent.CollectionEventWithSpecimensInfo;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
-import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
 
 public class CollectionEventViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventViewForm"; //$NON-NLS-1$
-
-    private CollectionEvent cevent;
 
     private BgcBaseText studyLabel;
 
@@ -32,11 +33,13 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private BgcBaseText commentLabel;
 
-    private SpecimenInfoTable sourceSpecimenTable;
+    private NewSpecimenInfoTable sourceSpecimenTable;
 
     private BgcBaseText activityStatusLabel;
 
-    private SpecimenInfoTable aliquotedSpcTable;
+    private NewSpecimenInfoTable aliquotedSpcTable;
+
+    private CollectionEventWithSpecimensInfo ceventInfo;
 
     private static class FormPvCustomInfo extends PvAttrCustom {
         BgcBaseText widget;
@@ -48,19 +51,25 @@ public class CollectionEventViewForm extends BiobankViewForm {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
-        cevent = ((CollectionEventAdapter) adapter).getModelObject();
-        // FIXME
+        updateCEventInfo();
+        // FIXME log ?
         // SessionManager.logLookup(new CollectionEventWrapper(SessionManager
         // .getAppService(), cevent));
 
         setPartName(NLS.bind(Messages.CollectionEventViewForm_title,
-            cevent.getVisitNumber()));
+            ceventInfo.cevent.getVisitNumber()));
+    }
+
+    private void updateCEventInfo() throws Exception {
+        ceventInfo = SessionManager.getAppService().doAction(
+            new CollectionEventViewAction(((CollectionEventAdapter) adapter)
+                .getModelObject().cevent.getId()));
     }
 
     @Override
     protected void createFormContent() throws Exception {
         form.setText(NLS.bind(Messages.CollectionEventViewForm_main_title,
-            +cevent.getVisitNumber()));
+            +ceventInfo.cevent.getVisitNumber()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();
@@ -134,11 +143,13 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void setCollectionEventValues() {
-        setTextValue(studyLabel, cevent.getPatient().getStudy().getName());
-        setTextValue(patientLabel, cevent.getPatient().getPnumber());
-        setTextValue(visitNumberLabel, cevent.getVisitNumber());
-        setTextValue(activityStatusLabel, cevent.getActivityStatus().getName());
-        setTextValue(commentLabel, cevent.getComment());
+        setTextValue(studyLabel, ceventInfo.cevent.getPatient().getStudy()
+            .getName());
+        setTextValue(patientLabel, ceventInfo.cevent.getPatient().getPnumber());
+        setTextValue(visitNumberLabel, ceventInfo.cevent.getVisitNumber());
+        setTextValue(activityStatusLabel, ceventInfo.cevent.getActivityStatus()
+            .getName());
+        setTextValue(commentLabel, ceventInfo.cevent.getComment());
         // assign PvInfo
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
             setTextValue(combinedPvInfo.widget, combinedPvInfo.getValue());
@@ -147,37 +158,32 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private void createSourceSpecimensSection() {
         Composite client = createSectionWithClient(Messages.CollectionEventViewForm_sourcespecimens_title);
-        // FIXME
-        // sourceSpecimenTable = new SpecimenInfoTable(client,
-        // new CollectionEventWrapper(SessionManager.getAppService(), cevent)
-        // .getOriginalSpecimenCollection(true),
-        // ColumnsShown.SOURCE_SPECIMENS, 10);
-        // sourceSpecimenTable.adaptToToolkit(toolkit, true);
-        // sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
-        // sourceSpecimenTable.createDefaultEditItem();
+        sourceSpecimenTable = new NewSpecimenInfoTable(client,
+            ceventInfo.sourceSpecimenInfos,
+            ColumnsShown.CEVENT_SOURCE_SPECIMENS, 10);
+        sourceSpecimenTable.adaptToToolkit(toolkit, true);
+        sourceSpecimenTable.addClickListener(collectionDoubleClickListener);
+        sourceSpecimenTable.createDefaultEditItem();
     }
 
     private void createAliquotedSpecimensSection() {
         // FIXME should we show that to clinics ?
         Composite client = createSectionWithClient(Messages.CollectionEventViewForm_aliquotedspecimens_title);
-        // FIXME
-        // aliquotedSpcTable = new SpecimenInfoTable(client,
-        // new CollectionEventWrapper(SessionManager.getAppService(), cevent)
-        // .getAliquotedSpecimenCollection(true), ColumnsShown.ALIQUOTS,
-        // 10);
-        // aliquotedSpcTable.adaptToToolkit(toolkit, true);
-        // aliquotedSpcTable.addClickListener(collectionDoubleClickListener);
-        // aliquotedSpcTable.createDefaultEditItem();
+        aliquotedSpcTable = new NewSpecimenInfoTable(client,
+            ceventInfo.aliquotedSpecimenInfos,
+            ColumnsShown.CEVENT_ALIQUOTED_SPECIMENS, 10);
+        aliquotedSpcTable.adaptToToolkit(toolkit, true);
+        aliquotedSpcTable.addClickListener(collectionDoubleClickListener);
+        aliquotedSpcTable.createDefaultEditItem();
     }
 
     @Override
     public void reload() throws Exception {
-        // FIXME
-        // cevent.reload();
+        updateCEventInfo();
         setPartName(NLS.bind(Messages.CollectionEventViewForm_title,
-            cevent.getVisitNumber()));
+            ceventInfo.cevent.getVisitNumber()));
         form.setText(NLS.bind(Messages.CollectionEventViewForm_main_title,
-            +cevent.getVisitNumber()));
+            +ceventInfo.cevent.getVisitNumber()));
         setCollectionEventValues();
         // FIXME
         // sourceSpecimenTable.setCollection(new CollectionEventWrapper(

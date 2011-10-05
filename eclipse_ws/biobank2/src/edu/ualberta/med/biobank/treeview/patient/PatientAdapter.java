@@ -13,59 +13,43 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.cevent.CollectionEventInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientInfo;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.IBiobankModel;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 
 public class PatientAdapter extends AbstractNewAdapterBase {
 
-    private static BgcLogger logger = BgcLogger.getLogger(PatientAdapter.class
-        .getName());
-
-    public PatientAdapter(AbstractAdapterBase parent, Patient patient) {
-        super(parent, patient);
-        if (patient != null) {
-            boolean hasChildren = false;
-            try {
-                // FIXME adapter data should be retrieve from an action
-                hasChildren = new PatientWrapper(
-                    SessionManager.getAppService(), patient)
-                    .getCollectionEventCount(true) > 0;
-            } catch (Exception e) {
-                logger.error("error counting events in patient", e); //$NON-NLS-1$
-            }
-            setHasChildren(hasChildren);
+    public PatientAdapter(AbstractAdapterBase parent, PatientInfo pinfo) {
+        super(parent, pinfo);
+        if (pinfo != null) {
+            setId(pinfo.patient.getId());
+            setHasChildren(pinfo.cevents.size() > 0);
         }
     }
 
     @Override
-    public Patient getModelObject() {
-        return (Patient) super.getModelObject();
+    public PatientInfo getModelObject() {
+        return (PatientInfo) super.getModelObject();
     }
 
     @Override
     protected String getLabelInternal() {
-        Patient patientWrapper = getModelObject();
-        Assert.isNotNull(patientWrapper, "patient is null"); //$NON-NLS-1$
-        return patientWrapper.getPnumber();
+        PatientInfo pinfo = getModelObject();
+        Assert.isNotNull(pinfo, "patient is null"); //$NON-NLS-1$
+        return pinfo.patient.getPnumber();
     }
 
     @Override
     public String getTooltipText() {
-        // FIXME should also be part of data retrieve when retrieve tree data
-        // via action ?
-        Patient patient = getModelObject();
-        if (patient != null) {
-            Study study = patient.getStudy();
+        PatientInfo pinfo = getModelObject();
+        if (pinfo != null) {
+            Study study = pinfo.patient.getStudy();
             if (study != null)
                 return study.getName()
                     + " - " + getTooltipText(Messages.PatientAdapter_patient_label); //$NON-NLS-1$
@@ -93,9 +77,9 @@ public class PatientAdapter extends AbstractNewAdapterBase {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     CollectionEvent cevent = new CollectionEvent();
-                    cevent.setPatient(getModelObject());
+                    cevent.setPatient(getModelObject().patient);
                     CollectionEventAdapter ceventAdapter = new CollectionEventAdapter(
-                        PatientAdapter.this, cevent);
+                        PatientAdapter.this, null);
                     ceventAdapter.openEntryForm();
                 }
             });
@@ -104,7 +88,7 @@ public class PatientAdapter extends AbstractNewAdapterBase {
 
     @Override
     public List<AbstractAdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, ProcessingEventWrapper.class);
+        return findChildFromClass(searchedObject, CollectionEventInfo.class);
     }
 
     @Override
@@ -114,14 +98,14 @@ public class PatientAdapter extends AbstractNewAdapterBase {
 
     @Override
     protected CollectionEventAdapter createChildNode(Object child) {
-        Assert.isTrue(child instanceof CollectionEvent);
-        return new CollectionEventAdapter(this, (CollectionEvent) child);
+        Assert.isTrue(child instanceof CollectionEventInfo);
+        return new CollectionEventAdapter(this, (CollectionEventInfo) child);
     }
 
     @Override
-    protected Collection<? extends IBiobankModel> getChildrenObjects()
+    protected Collection<CollectionEventInfo> getChildrenObjects()
         throws Exception {
-        return getModelObject().getCollectionEventCollection();
+        return getModelObject().cevents;
     }
 
     @Override

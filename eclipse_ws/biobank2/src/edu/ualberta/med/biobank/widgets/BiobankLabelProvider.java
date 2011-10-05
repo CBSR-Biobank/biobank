@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 
 /**
@@ -135,8 +135,8 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return dsa.getSpecimen().getPositionString(true, true);
             if (columnIndex == 3)
                 return dsa.getClaimedBy();
-        } else if (element instanceof AdapterBase)
-            return ((AdapterBase) element).getLabel();
+        } else if (element instanceof AbstractAdapterBase)
+            return ((AbstractAdapterBase) element).getLabel();
         else {
             Assert.isTrue(false, "invalid object type: " + element.getClass()); //$NON-NLS-1$
         }
@@ -175,8 +175,8 @@ public class BiobankLabelProvider extends LabelProvider implements
             return ((SiteWrapper) element).getName();
         } else if (element instanceof ActivityStatusWrapper) {
             return ((ActivityStatusWrapper) element).getName();
-        } else if (element instanceof AdapterBase) {
-            return ((AdapterBase) element).getLabel();
+        } else if (element instanceof AbstractAdapterBase) {
+            return ((AbstractAdapterBase) element).getLabel();
         }
         return element.toString();
     }
