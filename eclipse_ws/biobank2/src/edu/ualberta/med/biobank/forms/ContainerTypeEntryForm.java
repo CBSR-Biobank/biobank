@@ -127,8 +127,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        adapter.setParent(((SiteAdapter) SessionManager
-            .searchFirstNode(containerType.getSite()))
+        adapter.setParent(((SiteAdapter) SessionManager.searchFirstNode(
+            SiteWrapper.class, containerType.getSite().getId()))
             .getContainerTypesGroupNode());
 
         availSubContainerTypes = new ArrayList<ContainerTypeWrapper>();

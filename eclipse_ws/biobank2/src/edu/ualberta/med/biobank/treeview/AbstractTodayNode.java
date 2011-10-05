@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -36,7 +35,7 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     }
 
     @Override
-    protected Collection<E> getWrapperChildren() throws Exception {
+    protected List<E> getWrapperChildren() throws Exception {
         return null;
     }
 
@@ -51,7 +50,7 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
@@ -115,8 +114,9 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     protected abstract void addChild(E child);
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return searchChildren(searchedClass, objectId);
     }
 
     public List<E> getCurrentTodayElements() {

@@ -16,7 +16,9 @@ public class ClinicWithShipmentAdapter extends ClinicAdapter {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, OriginInfoWrapper.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId,
+            OriginInfoWrapper.class);
     }
 }

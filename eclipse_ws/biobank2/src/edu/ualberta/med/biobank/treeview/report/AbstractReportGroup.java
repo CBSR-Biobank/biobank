@@ -40,7 +40,7 @@ public abstract class AbstractReportGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
@@ -67,8 +67,9 @@ public abstract class AbstractReportGroup extends AdapterBase {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return searchChildren(searchedClass, objectId);
     }
 
     protected abstract Collection<ReportWrapper> getReports();
@@ -100,7 +101,7 @@ public abstract class AbstractReportGroup extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }

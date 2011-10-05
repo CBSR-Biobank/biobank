@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -25,6 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
 import edu.ualberta.med.biobank.views.CollectionView;
@@ -65,7 +65,8 @@ public class PatientMergeForm extends BiobankEntryForm {
 
         patient1 = (PatientWrapper) getModelObject();
 
-        String tabName = NLS.bind(Messages.PatientMergeForm_title, patient1.getPnumber());
+        String tabName = NLS.bind(Messages.PatientMergeForm_title,
+            patient1.getPnumber());
         setPartName(tabName);
         patientNotNullValue = new WritableValue(Boolean.FALSE, Boolean.class);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
@@ -74,14 +75,16 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind(Messages.PatientMergeForm_form_title, patient1.getPnumber()));
+        form.setText(NLS.bind(Messages.PatientMergeForm_form_title,
+            patient1.getPnumber()));
         page.setLayout(new GridLayout(1, false));
         form.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_PATIENT));
 
-        toolkit.createLabel(page, NLS.bind(
-            Messages.PatientMergeForm_description,
-            patient1.getPnumber()), SWT.LEFT);
+        toolkit.createLabel(
+            page,
+            NLS.bind(Messages.PatientMergeForm_description,
+                patient1.getPnumber()), SWT.LEFT);
 
         createPatientSection();
     }
@@ -230,7 +233,7 @@ public class PatientMergeForm extends BiobankEntryForm {
             public void run() {
                 PatientSearchedNode searcher = (PatientSearchedNode) CollectionView
                     .getCurrent().getSearchedNode();
-                searcher.removeObjects(Arrays.asList(patient2));
+                searcher.removeObject(Patient.class, patient2.getId());
                 searcher.performExpand();
                 closeEntryOpenView(false, true);
             }
@@ -241,12 +244,10 @@ public class PatientMergeForm extends BiobankEntryForm {
     protected void doBeforeSave() throws Exception {
         canMerge = false;
         if (patient2 != null) {
-            if (BgcPlugin
-                .openConfirm(
-                    Messages.PatientMergeForm_confirm_dialog_title,
-                    NLS.bind(
-                        Messages.PatientMergeForm_confirm_dialog_msg,
-                        patient2.getPnumber(), patient1.getPnumber()))) {
+            if (BgcPlugin.openConfirm(
+                Messages.PatientMergeForm_confirm_dialog_title,
+                NLS.bind(Messages.PatientMergeForm_confirm_dialog_msg,
+                    patient2.getPnumber(), patient1.getPnumber()))) {
                 canMerge = true;
             }
         }

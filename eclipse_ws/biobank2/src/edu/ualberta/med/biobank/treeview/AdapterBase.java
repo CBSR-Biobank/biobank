@@ -43,12 +43,26 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     private Semaphore loadChildrenSemaphore;
 
+    private Object modelObject;
+
     // FIXME can we merge this list of listeners with the DeltaListener ?
     private List<AdapterChangedListener> listeners;
 
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
         boolean loadChildrenInBackground) {
-        super(parent, object, null);
+        super(parent, object == null ? null : object.getClass(),
+            object == null ? -1 : object.getId(), null, null, false);
+        this.modelObject = object;
+        this.loadChildrenInBackground = loadChildrenInBackground;
+    }
+
+    public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
+        this(parent, object, true);
+    }
+
+    public AdapterBase(AdapterBase parent, int id, String label,
+        boolean hasChildren, boolean loadChildrenInBackground) {
+        super(parent, null, id, label, null, hasChildren);
         this.loadChildrenInBackground = loadChildrenInBackground;
     }
 
@@ -58,19 +72,8 @@ public abstract class AdapterBase extends AbstractAdapterBase {
         listeners = new ArrayList<AdapterChangedListener>();
     }
 
-    public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
-        this(parent, object, true);
-    }
-
-    public AdapterBase(AdapterBase parent, int id, String name,
-        boolean hasChildren, boolean loadChildrenInBackground) {
-        super(parent, id, name, hasChildren);
-        this.loadChildrenInBackground = loadChildrenInBackground;
-    }
-
-    @Override
     public ModelWrapper<?> getModelObject() {
-        return (ModelWrapper<?>) super.getModelObject();
+        return (ModelWrapper<?>) modelObject;
     }
 
     public ModelWrapper<?> getModelObjectClone() throws Exception {
@@ -96,7 +99,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
      * @return the name for the node.
      */
     @Override
-    public String getLabel() {
+    public final String getLabel() {
         if (getModelObject() != null) {
             return getLabelInternal();
         } else if (parent != null
@@ -120,19 +123,11 @@ public abstract class AdapterBase extends AbstractAdapterBase {
         return (AdapterBase) parent;
     }
 
-    @Override
-    public AbstractAdapterBase getChild(Object object) {
-        return getChild(object, false);
-    }
-
-    @Override
-    public AdapterBase getChild(int id) {
-        return (AdapterBase) super.getChild(id);
-    }
-
-    @Override
-    public AdapterBase getChild(int id, boolean reloadChildren) {
-        return (AdapterBase) super.getChild(id, reloadChildren);
+    /*
+     * Used when updating tree nodes from a background thread.
+     */
+    protected void setModelObject(Object modelObject) {
+        this.modelObject = modelObject;
     }
 
     @Override
@@ -207,7 +202,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
             Collection<? extends ModelWrapper<?>> children = getWrapperChildren();
             if (children != null) {
                 for (ModelWrapper<?> child : children) {
-                    AbstractAdapterBase node = getChild(child);
+                    AbstractAdapterBase node = getChild(child.getId());
                     if (node == null) {
                         node = createChildNode(child);
                         addChild(node);
@@ -261,7 +256,8 @@ public abstract class AdapterBase extends AbstractAdapterBase {
                                 // first see if this object is among the
                                 // children, if not then it is being loaded
                                 // for the first time
-                                AbstractAdapterBase node = getChild(child);
+                                AbstractAdapterBase node = getChild(child
+                                    .getId());
                                 if (node == null) {
                                     Assert.isTrue(newNodes.size() > 0);
                                     node = newNodes.get(0);
@@ -318,11 +314,11 @@ public abstract class AdapterBase extends AbstractAdapterBase {
      * 
      * @throws Exception
      */
-    protected abstract Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected abstract List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception;
 
     @Override
-    protected Collection<?> getChildrenObjects() throws Exception {
+    protected List<?> getChildrenObjects() throws Exception {
         return getWrapperChildren();
     }
 
@@ -371,8 +367,9 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        if (getModelObject() != null && getModelObject().equals(searchedObject))
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        if (getObjectClazz() != null && getObjectClazz().equals(searchedClass))
             return Arrays.asList(new AbstractAdapterBase[] { this });
         return new ArrayList<AbstractAdapterBase>();
     }
@@ -458,20 +455,19 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     }
 
     protected List<AbstractAdapterBase> searchChildContainers(
-        Object searchedObject, ContainerAdapter container,
+        Class<?> searchedClass, Integer objectId, ContainerAdapter container,
         final List<ContainerWrapper> parents) {
         List<AbstractAdapterBase> res = new ArrayList<AbstractAdapterBase>();
         if (parents.contains(container.getModelObject())) {
-            AbstractAdapterBase child = container
-                .getChild(searchedObject, true);
+            AbstractAdapterBase child = container.getChild(objectId, true);
             if (child == null) {
                 for (AbstractAdapterBase childContainer : container
                     .getChildren()) {
                     if (childContainer instanceof ContainerAdapter) {
-                        res = searchChildContainers(searchedObject,
+                        res = searchChildContainers(searchedClass, objectId,
                             (ContainerAdapter) childContainer, parents);
                     } else {
-                        res = childContainer.search(searchedObject);
+                        res = childContainer.search(searchedClass, objectId);
                     }
                     if (res.size() > 0)
                         break;

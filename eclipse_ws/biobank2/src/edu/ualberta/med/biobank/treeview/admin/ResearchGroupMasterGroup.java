@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -37,7 +37,7 @@ public class ResearchGroupMasterGroup extends AbstractResearchGroupGroup {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return ResearchGroupWrapper.getAllResearchGroups(SessionManager
             .getAppService());

@@ -57,7 +57,8 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
         researchGroupAdapter = (ResearchGroupAdapter) adapter;
-        researchGroup = (ResearchGroupWrapper) adapter.getModelObject();
+        researchGroup = (ResearchGroupWrapper) researchGroupAdapter
+            .getModelObject();
 
         String tabName;
         if (researchGroup.isNew()) {

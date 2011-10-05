@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -66,7 +65,7 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         ContainerWrapper container = getContainer();
         if (container != null) {
             SiteWrapper site = container.getSite();
@@ -152,7 +151,8 @@ public class ContainerAdapter extends AdapterBase {
                     }
                 });
                 ContainerAdapter newContainerAdapter = (ContainerAdapter) SessionManager
-                    .searchFirstNode(newContainer);
+                    .searchFirstNode(ContainerWrapper.class,
+                        newContainer.getId());
                 if (newContainerAdapter != null) {
                     getContainer().reload();
                     newContainerAdapter.performDoubleClick();
@@ -188,7 +188,8 @@ public class ContainerAdapter extends AdapterBase {
                     ContainerWrapper newParentContainer = getContainer()
                         .getParentContainer();
                     ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
-                        .searchFirstNode(newParentContainer);
+                        .searchFirstNode(ContainerWrapper.class,
+                            newParentContainer.getId());
                     if (parentAdapter != null) {
                         parentAdapter.getContainer().reload();
                         parentAdapter.removeAll();
@@ -273,17 +274,22 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
         List<AbstractAdapterBase> res = new ArrayList<AbstractAdapterBase>();
-        if (searchedObject instanceof ContainerWrapper) {
-            ContainerWrapper containerWrapper = (ContainerWrapper) searchedObject;
-            List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
-            ContainerWrapper currentContainer = containerWrapper;
-            while (currentContainer.hasParentContainer()) {
-                currentContainer = currentContainer.getParentContainer();
-                parents.add(currentContainer);
-            }
-            res = searchChildContainers(searchedObject, this, parents);
+        if (ContainerWrapper.class.isAssignableFrom(searchedClass)) {
+            // FIXME !!
+            // ContainerWrapper containerWrapper = (ContainerWrapper)
+            // searchedObject;
+            // List<ContainerWrapper> parents = new
+            // ArrayList<ContainerWrapper>();
+            // ContainerWrapper currentContainer = containerWrapper;
+            // while (currentContainer.hasParentContainer()) {
+            // currentContainer = currentContainer.getParentContainer();
+            // parents.add(currentContainer);
+            // }
+            // res = searchChildContainers(searchedObject, objectId, this,
+            // parents);
         }
         return res;
     }
@@ -300,11 +306,12 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         Assert.isNotNull(getContainer(), "site null"); //$NON-NLS-1$
         getContainer().reload();
-        return getContainer().getChildren().values();
+        return new ArrayList<ModelWrapper<?>>(getContainer().getChildren()
+            .values());
     }
 
     @Override

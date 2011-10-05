@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.processing;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -50,7 +50,7 @@ public class ProcessingEventAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         ProcessingEventWrapper pevent = (ProcessingEventWrapper) getModelObject();
         if (pevent == null)
             return Messages.ProvessingEventAdapter_tooltiptext;
@@ -86,7 +86,7 @@ public class ProcessingEventAdapter extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }

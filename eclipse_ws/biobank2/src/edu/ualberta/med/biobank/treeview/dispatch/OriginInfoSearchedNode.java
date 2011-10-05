@@ -42,11 +42,12 @@ public class OriginInfoSearchedNode extends AbstractSearchedNode {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        if (searchedObject instanceof Integer)
-            return findChildFromClass(searchedObject, Integer.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        if (Integer.class.isAssignableFrom(searchedClass))
+            return findChildFromClass(searchedClass, objectId, Integer.class);
         else
-            return searchChildren(searchedObject);
+            return searchChildren(searchedClass, objectId);
     }
 
     @Override

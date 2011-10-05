@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -30,7 +30,7 @@ public class SpecimenAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return getTooltipText(Messages.SpecimenAdapter_specimen_label);
     }
 
@@ -50,7 +50,7 @@ public class SpecimenAdapter extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }

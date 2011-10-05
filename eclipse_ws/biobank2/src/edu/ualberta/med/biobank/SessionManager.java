@@ -188,7 +188,8 @@ public class SessionManager {
     }
 
     public static void openViewForm(ModelWrapper<?> wrapper) {
-        AbstractAdapterBase adapter = searchFirstNode(wrapper);
+        AbstractAdapterBase adapter = searchFirstNode(wrapper.getClass(),
+            wrapper.getId());
         if (adapter != null) {
             adapter.performDoubleClick();
             return;
@@ -207,16 +208,18 @@ public class SessionManager {
         return sm.possibleViewMap.get(sm.currentAdministrationViewId);
     }
 
-    public static List<AbstractAdapterBase> searchNodes(Object o) {
+    public static List<AbstractAdapterBase> searchNodes(Class<?> searchedClass,
+        Integer objectId) {
         AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null) {
-            return view.searchNode(o);
+            return view.searchNode(searchedClass, objectId);
         }
         return new ArrayList<AbstractAdapterBase>();
     }
 
-    public static AbstractAdapterBase searchFirstNode(Object o) {
-        List<AbstractAdapterBase> nodes = searchNodes(o);
+    public static AbstractAdapterBase searchFirstNode(Class<?> searchedClass,
+        Integer objectId) {
+        List<AbstractAdapterBase> nodes = searchNodes(searchedClass, objectId);
         if (nodes.size() > 0) {
             return nodes.get(0);
         }
@@ -336,8 +339,8 @@ public class SessionManager {
                     AbstractAdapterBase parent = adapter.getParent();
                     if (parent != null)
                         parent.addChild(adapter);
-                    List<AbstractAdapterBase> res = searchNodes(adapter
-                        .getModelObject());
+                    List<AbstractAdapterBase> res = searchNodes(
+                        adapter.getObjectClazz(), adapter.getId());
                     final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
                     if (view != null) {
                         for (AbstractAdapterBase ab : res) {

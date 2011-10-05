@@ -125,7 +125,7 @@ public class Messages extends NLS {
 
     public static String SpecimenInfoTable_position_label;
 
-    public static String SpecimenInfoTable_quantity_label;
+    public static String SpecimenInfoTable_quantity_ml_label;
 
     public static String SpecimenInfoTable_status_label;
 
@@ -292,6 +292,10 @@ public class Messages extends NLS {
     public static String MembershipInfoTable_role_label;
 
     public static String MembershipInfoTable_study_label;
+
+    public static String NewSpecimenInfoTable_quantity_label;
+
+    public static String NewSpecimenInfoTable_source_worksheet_label;
 
     public static String PeListInfoTable_aliquoteds_label;
 

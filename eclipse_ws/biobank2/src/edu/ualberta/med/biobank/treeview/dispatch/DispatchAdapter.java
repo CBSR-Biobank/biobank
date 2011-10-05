@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.treeview.dispatch;
 
-import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.runtime.Assert;
@@ -75,7 +75,7 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return getTooltipText(Messages.DispatchAdapter_dispatch_label);
     }
 
@@ -224,7 +224,7 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }

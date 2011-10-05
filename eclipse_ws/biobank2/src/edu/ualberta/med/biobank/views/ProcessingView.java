@@ -208,7 +208,8 @@ public class ProcessingView extends AbstractAdministrationView {
         List<? extends ModelWrapper<?>> searchedObjects) {
         processingNode.removeAll();
         for (ModelWrapper<?> searchedObject : searchedObjects) {
-            List<AbstractAdapterBase> nodeRes = rootNode.search(searchedObject);
+            List<AbstractAdapterBase> nodeRes = rootNode.search(
+                searchedObject.getClass(), searchedObject.getId());
             if (nodeRes.size() == 0) {
                 ProcessingEventAdapter newChild = new ProcessingEventAdapter(
                     processingNode, (ProcessingEventWrapper) searchedObject);
@@ -218,8 +219,9 @@ public class ProcessingView extends AbstractAdministrationView {
         }
         processingNode.performExpand();
         if (searchedObjects.size() == 1) {
-            List<AbstractAdapterBase> nodeRes = rootNode.search(searchedObjects
-                .get(0));
+            ModelWrapper<?> modelWrapper = searchedObjects.get(0);
+            List<AbstractAdapterBase> nodeRes = rootNode.search(
+                modelWrapper.getClass(), modelWrapper.getId());
             nodeRes.get(0).performDoubleClick();
         } else
             BgcPlugin.openMessage(Messages.ProcessingView_pevent_info_title,

@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.report;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osgi.util.NLS;
@@ -37,7 +37,7 @@ public class ReportAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return getTooltipText(Messages.ReportAdapter_report_label);
     }
 
@@ -99,7 +99,7 @@ public class ReportAdapter extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }

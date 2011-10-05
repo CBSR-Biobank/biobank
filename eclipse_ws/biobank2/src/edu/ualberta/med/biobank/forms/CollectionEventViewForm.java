@@ -62,8 +62,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private void updateCEventInfo() throws Exception {
         ceventInfo = SessionManager.getAppService().doAction(
-            new CollectionEventViewAction(((CollectionEventAdapter) adapter)
-                .getModelObject().cevent.getId()));
+            new CollectionEventViewAction(adapter.getId()));
     }
 
     @Override

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -24,8 +23,9 @@ public class DateNode extends AdapterBase {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, ClinicWrapper.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId, ClinicWrapper.class);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class DateNode extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
@@ -59,7 +59,7 @@ public class DateNode extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }

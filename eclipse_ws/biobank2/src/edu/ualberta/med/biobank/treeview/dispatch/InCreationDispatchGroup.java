@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.dispatch;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -21,11 +21,12 @@ public class InCreationDispatchGroup extends AbstractDispatchGroup {
 
     public InCreationDispatchGroup(AdapterBase parent, int id,
         CenterWrapper<?> center) {
-        super(parent, id, Messages.InCreationDispatchGroup_creation_node_label, center);
+        super(parent, id, Messages.InCreationDispatchGroup_creation_node_label,
+            center);
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return SiteWrapper.getInCreationDispatchCollection(center);
     }

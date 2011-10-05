@@ -49,6 +49,7 @@ public abstract class AbstractViewWithTree<T> extends ViewPart {
         });
     }
 
-    public abstract List<AbstractAdapterBase> searchNode(Object o);
+    public abstract List<AbstractAdapterBase> searchNode(
+        Class<?> searchedClass, Integer objectId);
 
 }

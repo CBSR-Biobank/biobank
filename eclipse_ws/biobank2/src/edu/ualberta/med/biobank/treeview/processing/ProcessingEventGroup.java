@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.treeview.processing;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -58,13 +57,14 @@ public class ProcessingEventGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, ClinicWrapper.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId, ClinicWrapper.class);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class ProcessingEventGroup extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         List<AbstractAdapterBase> children = getChildren();
         List<ModelWrapper<?>> wrappers = new ArrayList<ModelWrapper<?>>();

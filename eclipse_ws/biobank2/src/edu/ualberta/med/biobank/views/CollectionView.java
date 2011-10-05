@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
@@ -102,11 +103,13 @@ public class CollectionView extends AbstractAdministrationView {
     }
 
     public void showSearchedObjectsInTree(PatientInfo pinfo, boolean doubleClick) {
-        List<AbstractAdapterBase> nodeRes = rootNode.search(pinfo);
+        List<AbstractAdapterBase> nodeRes = rootNode.search(pinfo.getClass(),
+            pinfo.patient.getId());
         if (nodeRes.size() == 0) {
-            searchedNode.addSearchObject(pinfo);
+            searchedNode.addSearchObject(pinfo, pinfo.patient.getId());
             searchedNode.performExpand();
-            nodeRes = searchedNode.search(pinfo);
+            nodeRes = searchedNode.search(pinfo.getClass(),
+                pinfo.patient.getId());
         }
         if (nodeRes.size() > 0) {
             if (doubleClick) {
@@ -119,8 +122,8 @@ public class CollectionView extends AbstractAdministrationView {
         Object obj) {
         if (obj instanceof PatientInfo) {
             PatientInfo pinfo = (PatientInfo) obj;
-            List<AbstractAdapterBase> res = parentNode.search(pinfo.patient
-                .getStudy());
+            List<AbstractAdapterBase> res = parentNode.search(Study.class,
+                pinfo.patient.getStudy().getId());
             StudyWithPatientAdapter studyAdapter = null;
             if (res.size() > 0)
                 studyAdapter = (StudyWithPatientAdapter) res.get(0);
@@ -132,8 +135,8 @@ public class CollectionView extends AbstractAdministrationView {
                 studyAdapter.setLoadChildrenInBackground(false);
                 parentNode.addChild(studyAdapter);
             }
-            List<AbstractAdapterBase> patientAdapterList = studyAdapter
-                .search(pinfo);
+            List<AbstractAdapterBase> patientAdapterList = studyAdapter.search(
+                Patient.class, pinfo.patient.getId());
             PatientAdapter patientAdapter = null;
             if (patientAdapterList.size() > 0)
                 patientAdapter = (PatientAdapter) patientAdapterList.get(0);

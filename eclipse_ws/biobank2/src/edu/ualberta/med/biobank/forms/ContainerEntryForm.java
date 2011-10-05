@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -86,10 +87,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
         }
 
         if (adapter.getParent() == null)
-            adapter
-                .setParent(((SiteAdapter) SessionManager
-                    .searchFirstNode(container.getSite()))
-                    .getContainersGroupNode());
+            adapter.setParent(((SiteAdapter) SessionManager.searchFirstNode(
+                Site.class, container.getSite().getId()))
+                .getContainersGroupNode());
 
         setPartName(tabName);
     }

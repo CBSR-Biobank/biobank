@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.patient;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -19,35 +19,29 @@ import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 
 public class PatientAdapter extends AbstractNewAdapterBase {
 
-    public PatientAdapter(AbstractAdapterBase parent, PatientInfo pinfo) {
-        super(parent, pinfo);
-        if (pinfo != null) {
-            setId(pinfo.patient.getId());
-            setHasChildren(pinfo.cevents.size() > 0);
-        }
-    }
+    private PatientInfo pinfo;
 
-    @Override
-    public PatientInfo getModelObject() {
-        return (PatientInfo) super.getModelObject();
+    public PatientAdapter(AbstractAdapterBase parent, PatientInfo pinfo) {
+        super(parent, pinfo.getClass(), pinfo.patient.getId(), null, null,
+            pinfo.cevents.size() > 0);
+        this.pinfo = pinfo;
     }
 
     @Override
     protected String getLabelInternal() {
-        PatientInfo pinfo = getModelObject();
         Assert.isNotNull(pinfo, "patient is null"); //$NON-NLS-1$
         return pinfo.patient.getPnumber();
     }
 
     @Override
-    public String getTooltipText() {
-        PatientInfo pinfo = getModelObject();
+    public String getTooltipTextInternal() {
         if (pinfo != null) {
             Study study = pinfo.patient.getStudy();
             if (study != null)
@@ -77,7 +71,7 @@ public class PatientAdapter extends AbstractNewAdapterBase {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     CollectionEvent cevent = new CollectionEvent();
-                    cevent.setPatient(getModelObject().patient);
+                    cevent.setPatient(pinfo.patient);
                     CollectionEventAdapter ceventAdapter = new CollectionEventAdapter(
                         PatientAdapter.this, null);
                     ceventAdapter.openEntryForm();
@@ -87,8 +81,10 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, CollectionEventInfo.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId,
+            CollectionEventInfo.class);
     }
 
     @Override
@@ -103,9 +99,17 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     }
 
     @Override
-    protected Collection<CollectionEventInfo> getChildrenObjects()
-        throws Exception {
-        return getModelObject().cevents;
+    protected List<CollectionEventInfo> getChildrenObjects() throws Exception {
+        return pinfo.cevents;
+    }
+
+    @Override
+    protected List<Integer> getChildrenObjectIds() throws Exception {
+        List<Integer> ids = new ArrayList<Integer>();
+        for (CollectionEventInfo cevent : pinfo.cevents) {
+            ids.add(cevent.cevent.getId());
+        }
+        return ids;
     }
 
     @Override
@@ -131,6 +135,11 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     @Override
     public boolean isDeletable() {
         return internalIsDeletable();
+    }
+
+    // FIXME do we want to do this ?
+    public Patient getPatient() {
+        return pinfo.patient;
     }
 
 }

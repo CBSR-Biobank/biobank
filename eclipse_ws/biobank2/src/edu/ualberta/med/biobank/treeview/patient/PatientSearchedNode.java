@@ -2,14 +2,10 @@ package edu.ualberta.med.biobank.treeview.patient;
 
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
-
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.views.CollectionView;
 
 public class PatientSearchedNode extends AbstractSearchedNode {
@@ -20,13 +16,12 @@ public class PatientSearchedNode extends AbstractSearchedNode {
 
     @Override
     protected AdapterBase createChildNode(Object child) {
-        Assert.isTrue(child instanceof SiteWrapper);
-        return new SiteAdapter(this, (SiteWrapper) child);
+        return null;
     }
 
     @Override
     protected AdapterBase createChildNode() {
-        return new SiteAdapter(this, null);
+        return null;
     }
 
     @Override
@@ -35,8 +30,9 @@ public class PatientSearchedNode extends AbstractSearchedNode {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, StudyWrapper.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId, Study.class);
     }
 
     @Override

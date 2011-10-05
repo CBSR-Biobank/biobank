@@ -39,7 +39,7 @@ public abstract class AbstractDispatchGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
@@ -69,8 +69,9 @@ public abstract class AbstractDispatchGroup extends AdapterBase {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return searchChildren(searchedClass, objectId);
     }
 
     @Override

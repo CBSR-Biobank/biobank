@@ -31,7 +31,7 @@ public class SpecimenInfoTable extends InfoTableWidget {
             Messages.SpecimenInfoTable_current_center_label,
             Messages.SpecimenInfoTable_position_label,
             Messages.SpecimenInfoTable_created_label,
-            Messages.SpecimenInfoTable_quantity_label,
+            Messages.SpecimenInfoTable_quantity_ml_label,
             Messages.SpecimenInfoTable_status_label,
             Messages.SpecimenInfoTable_comments_label }) {
             @Override
@@ -79,7 +79,7 @@ public class SpecimenInfoTable extends InfoTableWidget {
             Messages.SpecimenInfoTable_type_label,
             Messages.SpecimenInfoTable_position_label,
             Messages.SpecimenInfoTable_time_drawn_label,
-            Messages.SpecimenInfoTable_quantity_label,
+            Messages.SpecimenInfoTable_quantity_ml_label,
             Messages.SpecimenInfoTable_status_label,
             Messages.SpecimenInfoTable_study_label,
             Messages.SpecimenInfoTable_pnumber_label,

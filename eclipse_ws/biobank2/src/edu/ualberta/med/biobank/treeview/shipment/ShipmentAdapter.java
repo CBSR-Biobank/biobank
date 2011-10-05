@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.shipment;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -46,7 +45,7 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         OriginInfoWrapper originInfo = (OriginInfoWrapper) getModelObject();
         if (originInfo != null) {
             CenterWrapper<?> center = originInfo.getCenter();
@@ -70,8 +69,10 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, ProcessingEventWrapper.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId,
+            ProcessingEventWrapper.class);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }

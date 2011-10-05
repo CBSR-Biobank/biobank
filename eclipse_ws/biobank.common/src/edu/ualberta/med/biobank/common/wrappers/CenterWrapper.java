@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -296,27 +295,27 @@ public abstract class CenterWrapper<E extends Center> extends
         return shipCollection;
     }
 
-    public static Collection<? extends ModelWrapper<?>> getInTransitReceiveDispatchCollection(
+    public static List<? extends ModelWrapper<?>> getInTransitReceiveDispatchCollection(
         CenterWrapper<?> center) {
         return center.getInTransitReceiveDispatchCollection();
     }
 
-    public static Collection<? extends ModelWrapper<?>> getReceivingNoErrorsDispatchCollection(
+    public static List<? extends ModelWrapper<?>> getReceivingNoErrorsDispatchCollection(
         CenterWrapper<?> center) {
         return center.getReceivingNoErrorsDispatchCollection();
     }
 
-    public static Collection<? extends ModelWrapper<?>> getInCreationDispatchCollection(
+    public static List<? extends ModelWrapper<?>> getInCreationDispatchCollection(
         CenterWrapper<?> center) {
         return center.getInCreationDispatchCollection();
     }
 
-    public static Collection<? extends ModelWrapper<?>> getReceivingWithErrorsDispatchCollection(
+    public static List<? extends ModelWrapper<?>> getReceivingWithErrorsDispatchCollection(
         CenterWrapper<?> center) {
         return center.getReceivingWithErrorsDispatchCollection();
     }
 
-    public static Collection<? extends ModelWrapper<?>> getInTransitSentDispatchCollection(
+    public static List<? extends ModelWrapper<?>> getInTransitSentDispatchCollection(
         CenterWrapper<?> center) {
         return center.getInTransitSentDispatchCollection();
     }
@@ -436,7 +435,7 @@ public abstract class CenterWrapper<E extends Center> extends
         + RequestSpecimenState.AVAILABLE_STATE.getId() + " or ra.state = "
         + RequestSpecimenState.PULLED_STATE.getId();
 
-    public static Collection<? extends ModelWrapper<?>> getRequestCollection(
+    public static List<? extends ModelWrapper<?>> getRequestCollection(
         WritableApplicationService appService, CenterWrapper<?> center)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(PENDING_REQUEST_STRING,

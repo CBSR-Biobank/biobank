@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.dispatch;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -49,7 +48,7 @@ public class IncomingNode extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
@@ -69,7 +68,7 @@ public class IncomingNode extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }
@@ -97,8 +96,9 @@ public class IncomingNode extends AdapterBase {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return searchChildren(searchedClass, objectId);
     }
 
 }

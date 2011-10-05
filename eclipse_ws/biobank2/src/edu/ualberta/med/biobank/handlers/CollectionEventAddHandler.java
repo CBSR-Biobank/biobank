@@ -23,7 +23,7 @@ public class CollectionEventAddHandler extends AbstractHandler {
         try {
             PatientAdapter patientAdapter = CollectionView.getCurrentPatient();
             CollectionEvent ce = new CollectionEvent();
-            ce.setPatient(patientAdapter.getModelObject().patient);
+            ce.setPatient(patientAdapter.getPatient());
             CollectionEventInfo ceventInfo = new CollectionEventInfo();
             ceventInfo.cevent = ce;
             CollectionEventAdapter adapter = new CollectionEventAdapter(

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -57,13 +56,14 @@ public class SiteGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, SiteWrapper.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId, SiteWrapper.class);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class SiteGroup extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         if (SessionManager.isSuperAdminMode()) {
             return SiteQuery.getSites(SessionManager.getAppService());

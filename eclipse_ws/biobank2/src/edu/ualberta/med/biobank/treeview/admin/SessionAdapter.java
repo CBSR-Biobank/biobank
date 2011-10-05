@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -111,7 +110,7 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         if (appService != null) {
             return Messages.SessionAdapter_current_session_label
                 + appService.getServerVersion();
@@ -120,27 +119,27 @@ public class SessionAdapter extends AdapterBase {
     }
 
     private SiteGroup getSitesGroupNode() {
-        AdapterBase adapter = getChild(SITES_NODE_ID);
+        SiteGroup adapter = (SiteGroup) getChild(SITES_NODE_ID);
         Assert.isNotNull(adapter);
-        return (SiteGroup) adapter;
+        return adapter;
     }
 
     private StudyMasterGroup getStudiesGroupNode() {
-        AdapterBase adapter = getChild(STUDIES_NODE_ID);
+        StudyMasterGroup adapter = (StudyMasterGroup) getChild(STUDIES_NODE_ID);
         Assert.isNotNull(adapter);
-        return (StudyMasterGroup) adapter;
+        return adapter;
     }
 
     private ClinicMasterGroup getClinicGroupNode() {
-        AdapterBase adapter = getChild(CLINICS_BASE_NODE_ID);
+        ClinicMasterGroup adapter = (ClinicMasterGroup) getChild(CLINICS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
-        return (ClinicMasterGroup) adapter;
+        return adapter;
     }
 
     private ResearchGroupMasterGroup getResearchGroupGroupNode() {
-        AdapterBase adapter = getChild(RESEARCH_GROUPS_BASE_NODE_ID);
+        ResearchGroupMasterGroup adapter = (ResearchGroupMasterGroup) getChild(RESEARCH_GROUPS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
-        return (ResearchGroupMasterGroup) adapter;
+        return adapter;
     }
 
     @Override
@@ -171,8 +170,9 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return searchChildren(searchedClass, objectId);
     }
 
     @Override
@@ -186,7 +186,7 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren() {
+    protected List<? extends ModelWrapper<?>> getWrapperChildren() {
         return null;
     }
 

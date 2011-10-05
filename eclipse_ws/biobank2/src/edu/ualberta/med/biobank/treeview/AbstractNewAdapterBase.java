@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.treeview;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Display;
@@ -21,23 +20,14 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractNewAdapterBase.class.getName());
 
-    public AbstractNewAdapterBase(AbstractAdapterBase parent, Object model,
-        String label) {
-        super(parent, model, label);
-    }
-
-    public AbstractNewAdapterBase(AbstractAdapterBase parent, Object model) {
-        this(parent, model, null);
-    }
-
-    public AbstractNewAdapterBase(AbstractAdapterBase parent, int id,
-        String label, boolean hasChildren) {
-        super(parent, id, label, hasChildren);
+    public AbstractNewAdapterBase(AbstractAdapterBase parent, Class<?> clazz,
+        Integer id, String label, String tooltip, boolean hasChildren) {
+        super(parent, clazz, id, label, tooltip, hasChildren);
     }
 
     @Override
     public String getLabel() {
-        if (super.getLabel() == null && getModelObject() != null) {
+        if (super.getLabel() == null) {
             return getLabelInternal();
         }
         return super.getLabel();
@@ -71,12 +61,18 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
     @Override
     public void loadChildren(boolean updateNode) {
         try {
-            Collection<?> children = getChildrenObjects();
-            if (children != null) {
-                for (Object child : children) {
-                    AbstractAdapterBase node = getChild(child);
+            // FIXME not very nice. Should all info class implements
+            // IBiobankModel interface to define the getId method?
+            List<?> children = getChildrenObjects();
+            List<Integer> childrenIds = getChildrenObjectIds();
+            if (children != null && childrenIds != null) {
+                if (children.size() != childrenIds.size())
+                    throw new Exception("problem in arrays size"); //$NON-NLS-1$
+                for (int i = 0; i < children.size(); i++) {
+                    Integer childId = childrenIds.get(i);
+                    AbstractAdapterBase node = getChild(childId);
                     if (node == null) {
-                        node = createChildNode(child);
+                        node = createChildNode(children.get(i));
                         addChild(node);
                     }
                     if (updateNode) {
@@ -89,9 +85,10 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
             BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
             String text = getClass().getName();
-            if (getModelObject() != null) {
-                text = getModelObject().toString();
+            if (getObjectClazz() != null) {
+                text = getObjectClazz().toString();
             }
+            text += " id=" + getId(); //$NON-NLS-1$
             logger.error("Error while loading children of node " + text, e); //$NON-NLS-1$
         }
     }
@@ -102,10 +99,13 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        if (getModelObject() != null && getModelObject().equals(searchedObject))
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        if (getObjectClazz() != null && getObjectClazz().equals(searchedClass))
             return Arrays.asList(new AbstractAdapterBase[] { this });
         return new ArrayList<AbstractAdapterBase>();
     }
+
+    protected abstract List<Integer> getChildrenObjectIds() throws Exception;
 
 }

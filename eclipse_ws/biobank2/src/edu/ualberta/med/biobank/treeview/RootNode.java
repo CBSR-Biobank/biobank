@@ -4,7 +4,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -38,7 +37,7 @@ public class RootNode extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
@@ -49,8 +48,9 @@ public class RootNode extends AdapterBase {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return searchChildren(searchedClass, objectId);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class RootNode extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }

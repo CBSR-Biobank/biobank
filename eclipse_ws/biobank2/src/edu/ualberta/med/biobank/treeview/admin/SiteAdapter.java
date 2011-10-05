@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -36,16 +35,17 @@ public class SiteAdapter extends AdapterBase {
     }
 
     public ContainerTypeGroup getContainerTypesGroupNode() {
-        AdapterBase adapter = getChild(nodeIdOffset
+        ContainerTypeGroup adapter = (ContainerTypeGroup) getChild(nodeIdOffset
             + CONTAINER_TYPES_BASE_NODE_ID);
         Assert.isNotNull(adapter);
-        return (ContainerTypeGroup) adapter;
+        return adapter;
     }
 
     public ContainerGroup getContainersGroupNode() {
-        AdapterBase adapter = getChild(nodeIdOffset + CONTAINERS_BASE_NODE_ID);
+        ContainerGroup adapter = (ContainerGroup) getChild(nodeIdOffset
+            + CONTAINERS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
-        return (ContainerGroup) adapter;
+        return adapter;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return getTooltipText(Messages.SiteAdapter_tooltip_label);
     }
 
@@ -80,10 +80,11 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        if (searchedObject instanceof SiteWrapper)
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        if (SiteWrapper.class.isAssignableFrom(searchedClass))
             return Arrays.asList((AbstractAdapterBase) this);
-        return searchChildren(searchedObject);
+        return searchChildren(searchedClass, objectId);
     }
 
     @Override
@@ -97,7 +98,7 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren() {
+    protected List<? extends ModelWrapper<?>> getWrapperChildren() {
         return null;
     }
 

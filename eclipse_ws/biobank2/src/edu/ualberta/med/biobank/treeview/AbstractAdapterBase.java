@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -19,10 +17,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.model.IBiobankModel;
 import edu.ualberta.med.biobank.treeview.util.DeltaEvent;
 import edu.ualberta.med.biobank.treeview.util.IDeltaListener;
 import edu.ualberta.med.biobank.treeview.util.NullDeltaListener;
@@ -36,9 +32,13 @@ public abstract class AbstractAdapterBase {
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractAdapterBase.class.getName());
 
+    private Class<?> objectClazz;
+
     private Integer id;
 
     private String label;
+
+    private String tooltip;
 
     protected AbstractAdapterBase parent;
 
@@ -46,7 +46,7 @@ public abstract class AbstractAdapterBase {
 
     protected List<AbstractAdapterBase> children;
 
-    // used when add or remove children. Initializwd to a listener that does
+    // used when add or remove children. Initialised to a listener that does
     // nothing. See NodeContentProvider for an implementation
     private IDeltaListener deltaListener = NullDeltaListener.getSoleInstance();
 
@@ -55,22 +55,16 @@ public abstract class AbstractAdapterBase {
      */
     private boolean editable = true;
 
-    private Object modelObject;
-
-    public AbstractAdapterBase(AbstractAdapterBase parent, int id,
-        String label, boolean hasChildren) {
+    public AbstractAdapterBase(AbstractAdapterBase parent, Class<?> clazz,
+        int id, String label, String tooltip, boolean hasChildren) {
         this.parent = parent;
         children = new ArrayList<AbstractAdapterBase>();
-        setId(id);
-        setLabel(label);
-        setHasChildren(hasChildren);
+        this.objectClazz = clazz;
+        this.id = id;
+        this.label = label;
+        this.tooltip = tooltip;
+        this.hasChildren = hasChildren;
         init();
-    }
-
-    public AbstractAdapterBase(AbstractAdapterBase parent, Object modelObject,
-        String label) {
-        this(parent, -1, label, false);
-        this.modelObject = modelObject;
     }
 
     protected void init() {
@@ -93,17 +87,6 @@ public abstract class AbstractAdapterBase {
         return id;
     }
 
-    public Object getModelObject() {
-        return modelObject;
-    }
-
-    /*
-     * Used when updating tree nodes from a background thread.
-     */
-    protected void setModelObject(Object modelObject) {
-        this.modelObject = modelObject;
-    }
-
     public void setLabel(String label) {
         this.label = label;
     }
@@ -118,7 +101,13 @@ public abstract class AbstractAdapterBase {
     /**
      * The string to display in the tooltip for the form.
      */
-    public abstract String getTooltipText();
+    public final String getTooltipText() {
+        if (tooltip == null)
+            return getTooltipTextInternal();
+        return tooltip;
+    }
+
+    public abstract String getTooltipTextInternal();
 
     protected String getTooltipText(String string) {
         String label = getLabel();
@@ -129,37 +118,12 @@ public abstract class AbstractAdapterBase {
         return new StringBuilder(string).append(" ").append(label).toString(); //$NON-NLS-1$
     }
 
+    public Class<?> getObjectClazz() {
+        return objectClazz;
+    }
+
     public List<AbstractAdapterBase> getChildren() {
         return children;
-    }
-
-    public AbstractAdapterBase getChild(Object object, boolean reloadChildren) {
-        if (reloadChildren) {
-            loadChildren(false);
-        }
-        if (children.size() == 0)
-            return null;
-
-        Class<?> objectClass = object.getClass();
-        Integer objectId = null;
-        if (object instanceof ModelWrapper) {
-            objectId = ((ModelWrapper<?>) object).getId();
-        } else if (object instanceof IBiobankModel) {
-            objectId = ((IBiobankModel) object).getId();
-        }
-        if (objectId != null)
-            for (AbstractAdapterBase child : children) {
-                Object childModelObject = child.getModelObject();
-                if ((childModelObject != null)
-                    && childModelObject.getClass().equals(objectClass)
-                    && child.getId() != null && child.getId().equals(objectId))
-                    return child;
-            }
-        return null;
-    }
-
-    public AbstractAdapterBase getChild(Object object) {
-        return getChild(object, false);
     }
 
     public AbstractAdapterBase getChild(int id) {
@@ -336,7 +300,7 @@ public abstract class AbstractAdapterBase {
      * 
      * @throws Exception
      */
-    protected abstract Collection<?> getChildrenObjects() throws Exception;
+    protected abstract List<?> getChildrenObjects() throws Exception;
 
     protected abstract int getChildrenCount() throws Exception;
 
@@ -400,15 +364,18 @@ public abstract class AbstractAdapterBase {
 
     public abstract String getEntryFormId();
 
-    public abstract List<AbstractAdapterBase> search(Object searchedObject);
+    public abstract List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId);
 
-    protected List<AbstractAdapterBase> searchChildren(Object searchedObject) {
+    protected List<AbstractAdapterBase> searchChildren(Class<?> searchedClass,
+        Integer objectId) {
         // FIXME children are loading in background most of the time:
         // they are not loaded then the objects are not found
         loadChildren(false);
         List<AbstractAdapterBase> result = new ArrayList<AbstractAdapterBase>();
         for (AbstractAdapterBase child : getChildren()) {
-            List<AbstractAdapterBase> tmpRes = child.search(searchedObject);
+            List<AbstractAdapterBase> tmpRes = child.search(searchedClass,
+                objectId);
             if (tmpRes.size() > 0)
                 result.addAll(tmpRes);
         }
@@ -416,27 +383,24 @@ public abstract class AbstractAdapterBase {
     }
 
     protected List<AbstractAdapterBase> findChildFromClass(
-        Object searchedObject, Class<?>... clazzList) {
-        if (searchedObject != null) {
-            for (Class<?> clazz : clazzList) {
-                if (clazz.isAssignableFrom(searchedObject.getClass())) {
-                    List<AbstractAdapterBase> res = new ArrayList<AbstractAdapterBase>();
-                    AbstractAdapterBase child = null;
-                    if (ModelWrapper.class.isAssignableFrom(clazz))
-                        child = getChild(searchedObject, true);
-                    else if (Date.class.isAssignableFrom(clazz))
-                        child = getChild((int) ((Date) searchedObject)
-                            .getTime());
-                    else if (Integer.class.isAssignableFrom(clazz))
-                        child = getChild(((Integer) searchedObject).intValue());
-                    if (child != null) {
-                        res.add(child);
-                    }
-                    return res;
+        Class<?> searchedClass, Integer objectId, Class<?>... clazzList) {
+        for (Class<?> clazz : clazzList) {
+            if (clazz.isAssignableFrom(searchedClass)) {
+                List<AbstractAdapterBase> res = new ArrayList<AbstractAdapterBase>();
+                AbstractAdapterBase child = null;
+                // if (Date.class.isAssignableFrom(clazz))
+                // child = getChild((int) ((Date) searchedObject).getTime());
+                // else if (Integer.class.isAssignableFrom(clazz))
+                // child = getChild(((Integer) searchedObject).intValue());
+                // else
+                child = getChild(objectId, true);
+                if (child != null) {
+                    res.add(child);
                 }
+                return res;
             }
         }
-        return searchChildren(searchedObject);
+        return searchChildren(searchedClass, objectId);
     }
 
     public void rebuild() {

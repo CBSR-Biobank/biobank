@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -26,6 +25,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         .getLogger(AbstractSearchedNode.class.getName());
 
     protected ArrayList<Object> searchedObjects = new ArrayList<Object>();
+    protected ArrayList<Integer> searchedObjectIds = new ArrayList<Integer>();
 
     private boolean keepDirectLeafChild;
 
@@ -63,17 +63,22 @@ public abstract class AbstractSearchedNode extends AdapterBase {
                     child.getChildren());
                 List<AbstractAdapterBase> toRemove = new ArrayList<AbstractAdapterBase>();
                 for (AbstractAdapterBase subChild : subChildren) {
-                    Object subChildObj = subChild.getModelObject();
-                    if (subChildObj instanceof ModelWrapper) {
-                        ((ModelWrapper<?>) subChildObj).reload();
+                    ModelWrapper<?> wrapper = null;
+                    if (subChild instanceof AdapterBase) {
+                        Object subChildObj = ((AdapterBase) subChild)
+                            .getModelObject();
+                        if (subChildObj instanceof ModelWrapper) {
+                            wrapper = (ModelWrapper<?>) subChildObj;
+                            wrapper.reload();
+                        }
                     }
-                    if (!searchedObjects.contains(subChildObj)) {
+                    Integer subChildId = subChild.getId();
+                    if (!searchedObjectIds.contains(subChildId)) {
                         toRemove.add(subChild);
                     } else {
-                        subChild.rebuild();
-                        if (subChildObj instanceof ModelWrapper) {
-                            alreadyHasListener
-                                .add((ModelWrapper<?>) subChildObj);
+                        // subChild.rebuild();
+                        if (wrapper != null) {
+                            alreadyHasListener.add(wrapper);
                         }
                     }
                 }
@@ -123,7 +128,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
     }
@@ -139,7 +144,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
@@ -153,23 +158,27 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         return null;
     }
 
-    public void addSearchObject(Object searchedObject) {
+    public void addSearchObject(Object searchedObject, Integer id) {
         searchedObjects.add(searchedObject);
+        searchedObjectIds.add(id);
     }
 
     protected abstract boolean isParentTo(Object parent, Object child);
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return searchChildren(searchedClass, objectId);
     }
 
     public void clear() {
         searchedObjects.clear();
+        searchedObjectIds.clear();
         removeAll();
     }
 
-    public void removeObjects(List<?> children) {
-        searchedObjects.removeAll(children);
+    public void removeObject(Object child, Integer childId) {
+        searchedObjects.remove(child);
+        searchedObjectIds.remove(childId);
     }
 }

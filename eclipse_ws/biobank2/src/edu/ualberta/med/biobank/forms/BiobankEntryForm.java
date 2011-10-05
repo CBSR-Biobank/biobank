@@ -120,7 +120,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     public void formClosed() throws Exception {
         // TODO: is this necessary if making copies?
         if (adapter instanceof AdapterBase)
-            if ((adapter != null) && (adapter.getModelObject() != null)) {
+            if ((adapter != null)
+                && (((AdapterBase) adapter).getModelObject() != null)) {
                 ((AdapterBase) adapter).getModelObject().reload();
             }
         SessionManager.updateAdapterTreeNode(adapter);
@@ -206,8 +207,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     }
 
     protected void checkEditAccess() {
-        if (adapter != null && adapter.getModelObject() != null
-            && !SessionManager.canUpdate(adapter.getModelObject().getClass())) {
+        if (adapter != null && adapter.getObjectClazz() != null
+            && !SessionManager.canUpdate(adapter.getObjectClazz())) {
             BgcPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 Messages.BiobankEntryForm_access_denied_error_msg);
@@ -456,7 +457,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     @Override
     public void cancel() {
         try {
-            boolean openView = adapter.getModelObject() != null;
+            boolean openView = adapter.getObjectClazz() != null;
             if (adapter instanceof AdapterBase)
                 openView &= !((AdapterBase) adapter).getModelObject().isNew();
             closeEntryOpenView(true, openView);

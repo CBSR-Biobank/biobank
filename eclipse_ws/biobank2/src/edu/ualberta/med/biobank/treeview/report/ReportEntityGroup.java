@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.treeview.report;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -46,7 +45,7 @@ public class ReportEntityGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
@@ -81,8 +80,9 @@ public class ReportEntityGroup extends AdapterBase {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return searchChildren(searchedClass, objectId);
     }
 
     @Override
@@ -102,9 +102,9 @@ public class ReportEntityGroup extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        Collection<ReportWrapper> reports = new ArrayList<ReportWrapper>();
+        List<ReportWrapper> reports = new ArrayList<ReportWrapper>();
         for (ReportWrapper report : parent.getReports()) {
             if (entity.getId().equals(report.getEntity().getId())) {
                 reports.add(report);

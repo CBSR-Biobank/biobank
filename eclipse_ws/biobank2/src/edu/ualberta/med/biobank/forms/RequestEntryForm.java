@@ -286,7 +286,8 @@ public class RequestEntryForm extends BiobankViewForm {
         Assert.isTrue((adapter instanceof RequestAdapter),
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
-        this.request = (RequestWrapper) adapter.getModelObject();
+        this.request = (RequestWrapper) ((RequestAdapter) adapter)
+            .getModelObject();
         setPartName(Messages.RequestEntryForm_title
             + request.getId().toString());
     }

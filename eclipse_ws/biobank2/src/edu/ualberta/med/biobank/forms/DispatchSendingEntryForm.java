@@ -328,7 +328,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     @Override
     protected void checkEditAccess() {
         if (adapter != null
-            && adapter.getModelObject() != null
+            && adapter.getObjectClazz() != null
             && !SessionManager
                 .isAllowed(SessionSecurityHelper.DISPATCH_SEND_KEY_DESC)) {
             BgcPlugin.openAccessDeniedErrorMessage();

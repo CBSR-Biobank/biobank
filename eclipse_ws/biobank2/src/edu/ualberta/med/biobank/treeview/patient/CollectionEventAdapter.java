@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.patient;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -18,15 +18,18 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
+    public CollectionEventInfo ceventInfo;
+
     public CollectionEventAdapter(AbstractAdapterBase parent,
         CollectionEventInfo ceventInfo) {
-        super(parent, ceventInfo);
+        super(parent, ceventInfo.getClass(), ceventInfo.cevent.getId(), null,
+            null, false);
+        this.ceventInfo = ceventInfo;
         setEditable(parent instanceof PatientAdapter || parent == null);
     }
 
     @Override
     protected String getLabelInternal() {
-        CollectionEventInfo ceventInfo = getModelObject();
         Assert.isNotNull(ceventInfo, "collection event is null"); //$NON-NLS-1$
         return new StringBuilder("#") //$NON-NLS-1$ 
             .append(ceventInfo.cevent.getVisitNumber())
@@ -39,14 +42,8 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     }
 
     @Override
-    public CollectionEventInfo getModelObject() {
-        return (CollectionEventInfo) super.getModelObject();
-    }
-
-    @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         String tabName = null;
-        CollectionEventInfo ceventInfo = getModelObject();
         if (ceventInfo != null)
             if (ceventInfo.cevent.getId() == null) {
                 tabName = Messages.CollectionEventEntryForm_title_new;
@@ -92,7 +89,7 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     }
 
     @Override
-    protected Collection<?> getChildrenObjects() throws Exception {
+    protected List<?> getChildrenObjects() throws Exception {
         return null;
     }
 
@@ -114,6 +111,11 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     @Override
     public boolean isDeletable() {
         return internalIsDeletable();
+    }
+
+    @Override
+    protected List<Integer> getChildrenObjectIds() throws Exception {
+        return null;
     }
 
 }

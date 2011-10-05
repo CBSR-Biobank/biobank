@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -54,13 +53,15 @@ public class ContainerTypeGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, ContainerTypeWrapper.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId,
+            ContainerTypeWrapper.class);
     }
 
     @Override
@@ -75,7 +76,7 @@ public class ContainerTypeGroup extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         SiteWrapper currentSite = (SiteWrapper) ((SiteAdapter) getParent())
             .getModelObject();

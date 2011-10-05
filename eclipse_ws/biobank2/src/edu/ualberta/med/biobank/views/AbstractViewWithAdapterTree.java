@@ -68,8 +68,9 @@ public abstract class AbstractViewWithAdapterTree extends
     }
 
     @Override
-    public List<AbstractAdapterBase> searchNode(Object o) {
-        return rootNode.search(o);
+    public List<AbstractAdapterBase> searchNode(Class<?> searchedClass,
+        Integer objectId) {
+        return rootNode.search(searchedClass, objectId);
     }
 
     public abstract void reload();
