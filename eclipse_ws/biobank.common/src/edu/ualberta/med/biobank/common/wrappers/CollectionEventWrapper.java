@@ -519,9 +519,10 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     public Date getMinSourceSpecimenDate() {
-        Date min = new Date();
+        Date min = null;
         for (SpecimenWrapper spec : getOriginalSpecimenCollection(false))
-            min = min.before(spec.getCreatedAt()) ? min : spec.getCreatedAt();
+            min = (min != null && min.before(spec.getCreatedAt())) ? min : spec
+                .getCreatedAt();
         return min;
     }
 }

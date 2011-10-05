@@ -41,10 +41,13 @@ public class CollectionEventAdapter extends AdapterBase {
             logger.error("Problem counting specimens", e); //$NON-NLS-1$
         }
         return new StringBuilder("#") //$NON-NLS-1$ 
-            .append(cevent.getVisitNumber()).append(" - ") //$NON-NLS-1$ 
+            .append(cevent.getVisitNumber())
+            .append(" - ") //$NON-NLS-1$ 
             .append(
-                DateFormatter.formatAsDateTime(cevent
-                    .getMinSourceSpecimenDate())).append(" [").append(count) //$NON-NLS-1$ 
+                cevent.getMinSourceSpecimenDate() == null ? "No Specimens" //$NON-NLS-1$
+                    : DateFormatter.formatAsDateTime(cevent
+                        .getMinSourceSpecimenDate()))
+            .append(" [").append(count) //$NON-NLS-1$ 
             .append("]").toString(); //$NON-NLS-1$ 
     }
 
