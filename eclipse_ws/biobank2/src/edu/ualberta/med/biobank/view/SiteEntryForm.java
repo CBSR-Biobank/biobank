@@ -8,12 +8,20 @@ import edu.ualberta.med.biobank.event.HasValue;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.presenter.AddressEditPresenter.Display;
 import edu.ualberta.med.biobank.presenter.SiteEditPresenter;
+import edu.ualberta.med.biobank.view.item.ButtonItem;
+import edu.ualberta.med.biobank.view.item.ComboItem;
+import edu.ualberta.med.biobank.view.item.TextItem;
 
 public class SiteEntryForm implements SiteEditPresenter.Display {
+    private ButtonItem saveButton;
+    private TextItem name;
+    private TextItem nameShort;
+    private TextItem comment;
+    private ComboItem<ActivityStatus> activityStatus;
+
     @Override
     public HasClickHandlers getSaveButton() {
-        // TODO Auto-generated method stub
-        return null;
+        return saveButton;
     }
 
     @Override
@@ -42,31 +50,26 @@ public class SiteEntryForm implements SiteEditPresenter.Display {
 
     @Override
     public HasValue<String> getName() {
-        // TODO Auto-generated method stub
-        return null;
+        return name;
     }
 
     @Override
     public HasValue<String> getNameShort() {
-        // TODO Auto-generated method stub
-        return null;
+        return nameShort;
     }
 
     @Override
     public HasValue<String> getComment() {
-        // TODO Auto-generated method stub
-        return null;
+        return comment;
     }
 
     @Override
     public HasValue<ActivityStatus> getActivityStatus() {
-        // TODO Auto-generated method stub
-        return null;
+        return activityStatus;
     }
 
     @Override
     public HasValue<Collection<StudyInfo>> getStudies() {
-        // TODO Auto-generated method stub
         return null;
     }
 

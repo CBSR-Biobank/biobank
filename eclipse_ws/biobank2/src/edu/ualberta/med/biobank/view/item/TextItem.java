@@ -1,22 +1,23 @@
-package edu.ualberta.med.biobank.view.component;
+package edu.ualberta.med.biobank.view.item;
 
-import java.awt.TextField;
-import java.awt.event.TextEvent;
-import java.awt.event.TextListener;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.event.HandlerRegistration;
 import edu.ualberta.med.biobank.event.HasValue;
 import edu.ualberta.med.biobank.event.ValueChangeEvent;
 import edu.ualberta.med.biobank.event.ValueChangeHandler;
 
-public class TextWrapper implements HasValue<String> {
-    private final TextField text;
+public class TextItem implements HasValue<String> {
+    private final Text text;
     private final List<ValueChangeHandler<String>> valueChangeHandlers = new ArrayList<ValueChangeHandler<String>>();
-    private final TextListener textListener = new TextListener() {
+    private final ModifyListener modifyListener = new ModifyListener() {
         @Override
-        public void textValueChanged(TextEvent event) {
+        public void modifyText(ModifyEvent e) {
             if (fireEvents) {
                 // TODO: send actual event object
                 notifyValueChangeHandlers(null);
@@ -25,10 +26,10 @@ public class TextWrapper implements HasValue<String> {
     };
     private boolean fireEvents = true;
 
-    public TextWrapper(TextField text) {
+    public TextItem(Text text) {
         this.text = text;
 
-        text.addTextListener(textListener);
+        text.addModifyListener(modifyListener);
     }
 
     @Override
@@ -62,18 +63,18 @@ public class TextWrapper implements HasValue<String> {
     }
 
     private static class HandlerRegistrationImpl implements HandlerRegistration {
-        private final TextWrapper textWrapper;
+        private final TextItem textItem;
         private final ValueChangeHandler<String> handler;
 
-        public HandlerRegistrationImpl(TextWrapper textWrapper,
+        public HandlerRegistrationImpl(TextItem textItem,
             ValueChangeHandler<String> handler) {
-            this.textWrapper = textWrapper;
+            this.textItem = textItem;
             this.handler = handler;
         }
 
         @Override
         public void removeHandler() {
-            textWrapper.valueChangeHandlers.remove(handler);
+            textItem.valueChangeHandlers.remove(handler);
         }
     }
 }

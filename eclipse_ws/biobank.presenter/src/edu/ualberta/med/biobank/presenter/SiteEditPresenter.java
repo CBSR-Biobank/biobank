@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.presenter;
 
-import java.awt.TextField;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction;
@@ -9,13 +9,13 @@ import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyI
 import edu.ualberta.med.biobank.common.action.site.UpdateSiteAction;
 import edu.ualberta.med.biobank.event.ClickEvent;
 import edu.ualberta.med.biobank.event.ClickHandler;
-import edu.ualberta.med.biobank.event.HandlerRegistration;
 import edu.ualberta.med.biobank.event.HasClickHandlers;
 import edu.ualberta.med.biobank.event.HasValue;
 import edu.ualberta.med.biobank.event.ValueChangeEvent;
 import edu.ualberta.med.biobank.event.ValueChangeHandler;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
 public class SiteEditPresenter {
@@ -24,9 +24,9 @@ public class SiteEditPresenter {
 	private final Integer siteId;
 	private BiobankApplicationService service; // TODO: get from somewhere.
 	
-	public SiteEditPresenter(Display display, Integer siteId) {
+	public SiteEditPresenter(Display display, Site site) {
 		this.display = display;
-		this.siteId = siteId;
+		this.siteId = site != null ? site.getId() : null;
 		this.addressEditPresenter = new AddressEditPresenter(display.getAddressEditDisplay());
 		
 		bindDisplay();
@@ -41,11 +41,24 @@ public class SiteEditPresenter {
 			}});
 		
 		// TODO: listen to Display properties for validation purposes.
+		display.getName().addValueChangeHandler(new ValueChangeHandler<String>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<String> event) {
+//				display.getName().set
+			}});
 	}
 	
 	private void init() {
-		GetSiteInfoAction action = new GetSiteInfoAction(siteId);
-		SiteInfo siteInfo = service.doAction(action);
+		SiteInfo siteInfo = null;
+		if (siteId != null) {
+			GetSiteInfoAction action = new GetSiteInfoAction(siteId);
+			siteInfo = service.doAction(action);
+		} else {
+			siteInfo = new SiteInfo();
+			siteInfo.site = new Site();
+			siteInfo.site.setAddress(new Address());
+			siteInfo.studies = new ArrayList<StudyInfo>();
+		}
 		
 		// TODO: seems error-prone :-(
 		display.getName().setValue(siteInfo.site.getName());

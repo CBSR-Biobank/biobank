@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.view.component;
+package edu.ualberta.med.biobank.view.item;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,8 @@ import edu.ualberta.med.biobank.event.ClickEvent;
 import edu.ualberta.med.biobank.event.ClickHandler;
 import edu.ualberta.med.biobank.event.HasClickHandlers;
 
-public class ButtonWrapper implements HasClickHandlers {
+public class ButtonItem implements HasClickHandlers {
+    private final Button button;
     private final List<ClickHandler> clickHandlers = new ArrayList<ClickHandler>();
     private final Listener listener = new Listener() {
         @Override
@@ -26,8 +27,14 @@ public class ButtonWrapper implements HasClickHandlers {
         }
     };
 
-    public ButtonWrapper(Button button) {
+    public ButtonItem(Button button) {
+        this.button = button;
+
         button.addListener(SWT.Selection, listener);
+    }
+
+    public Button getButton() {
+        return button;
     }
 
     @Override
