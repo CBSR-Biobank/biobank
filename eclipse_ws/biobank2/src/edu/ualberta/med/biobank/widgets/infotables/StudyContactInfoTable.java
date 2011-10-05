@@ -27,14 +27,13 @@ public class StudyContactInfoTable extends InfoTableWidget {
         Long patientCount;
         Long ceventCount;
         String contactNames;
-        String contactTitles;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { clinicNameShort,
                 (patientCount != null) ? patientCount.toString() : "", //$NON-NLS-1$
                 (ceventCount != null) ? ceventCount.toString() : "", //$NON-NLS-1$
-                contactNames, contactTitles }, "\t"); //$NON-NLS-1$
+                contactNames }, "\t"); //$NON-NLS-1$
 
         }
     }
@@ -43,8 +42,7 @@ public class StudyContactInfoTable extends InfoTableWidget {
         Messages.StudyContactInfoTable_clinic_label,
         Messages.StudyContactInfoTable_patient_count_label,
         Messages.StudyContactInfoTable_cEvent_count_label,
-        Messages.StudyContactInfoTable_contact_name_label,
-        Messages.StudyContactInfoTable_contact_title_label };
+        Messages.StudyContactInfoTable_contact_name_label };
 
     private StudyWrapper study;
 
@@ -58,13 +56,10 @@ public class StudyContactInfoTable extends InfoTableWidget {
     private class ClinicContacts {
         public ClinicWrapper clinic;
         public String contacts;
-        public String titles;
 
-        public ClinicContacts(ClinicWrapper clinic, String contacts,
-            String titles) {
+        public ClinicContacts(ClinicWrapper clinic, String contacts) {
             this.clinic = clinic;
             this.contacts = contacts;
-            this.titles = titles;
         }
     }
 
@@ -75,15 +70,18 @@ public class StudyContactInfoTable extends InfoTableWidget {
             ClinicWrapper clinic = contact.getClinic();
             if (tableData.containsKey(clinic)) {
                 ClinicContacts prevEntry = tableData.get(clinic);
-                ClinicContacts newEntry = new ClinicContacts(clinic,
-                    prevEntry.contacts + ";" + contact.getName(), //$NON-NLS-1$
-                    prevEntry.titles + ";" + contact.getTitle()); //$NON-NLS-1$
+                ClinicContacts newEntry = new ClinicContacts(
+                    clinic,
+                    prevEntry.contacts + ";" //$NON-NLS-1$
+                        + (contact.getName() == null ? "" : contact.getName()) //$NON-NLS-1$
+                        + (contact.getTitle() == null ? "" : "(" + contact.getTitle() + ")")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 tableData.put(clinic, newEntry);
             } else
-                tableData.put(
-                    clinic,
-                    new ClinicContacts(clinic, contact.getName(), contact
-                        .getTitle()));
+                tableData.put(clinic,
+                    new ClinicContacts(clinic, (contact.getName() == null ? "" //$NON-NLS-1$
+                        : contact.getName())
+                        + (contact.getTitle() == null ? "" : "(" //$NON-NLS-1$ //$NON-NLS-2$
+                            + contact.getTitle() + ")"))); //$NON-NLS-1$
         }
         return tableData.values();
     }
@@ -119,8 +117,6 @@ public class StudyContactInfoTable extends InfoTableWidget {
                     return NumberFormatter.format(item.ceventCount);
                 case 3:
                     return item.contactNames;
-                case 4:
-                    return item.contactTitles;
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -137,7 +133,6 @@ public class StudyContactInfoTable extends InfoTableWidget {
         info.patientCount = info.clinic.getPatientCountForStudy(study);
         info.ceventCount = info.clinic.getCollectionEventCountForStudy(study);
         info.contactNames = cc.contacts;
-        info.contactTitles = cc.titles;
         return info;
     }
 
