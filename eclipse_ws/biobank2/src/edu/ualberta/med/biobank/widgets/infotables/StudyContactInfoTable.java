@@ -49,8 +49,7 @@ public class StudyContactInfoTable extends InfoTableWidget {
     public StudyContactInfoTable(Composite parent, StudyWrapper study) {
         super(parent, null, HEADINGS, 10, ContactWrapper.class);
         this.study = study;
-        this.setCollection(new ArrayList<ClinicContacts>(processClinics(study
-            .getContactCollection(true))));
+        setCollectionByStudy(study);
     }
 
     private class ClinicContacts {
@@ -61,6 +60,11 @@ public class StudyContactInfoTable extends InfoTableWidget {
             this.clinic = clinic;
             this.contacts = contacts;
         }
+    }
+
+    public void setCollectionByStudy(StudyWrapper study) {
+        super.setCollection(new ArrayList<ClinicContacts>(processClinics(study
+            .getContactCollection(true))));
     }
 
     private Collection<ClinicContacts> processClinics(
