@@ -42,7 +42,7 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
     }
 
     public void addClinic() {
-        ClinicWrapper clinic = new ClinicWrapper(getAppService());
+        ClinicWrapper clinic = new ClinicWrapper(SessionManager.getAppService());
         ClinicAdapter adapter = new ClinicAdapter(this, clinic);
         adapter.openEntryForm();
     }

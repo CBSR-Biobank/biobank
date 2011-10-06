@@ -82,8 +82,8 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         typeName = getWidgetCreator().createComboViewer(contents,
-            Messages.StudySourceSpecimenDialog_field_type_label, allSpecimenTypes,
-            internalSourceSpecimen.getSpecimenType(),
+            Messages.StudySourceSpecimenDialog_field_type_label,
+            allSpecimenTypes, internalSourceSpecimen.getSpecimenType(),
             Messages.StudySourceSpecimenDialog_field_type_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
@@ -94,7 +94,8 @@ public class StudySourceSpecimenDialog extends PagedDialog {
             }, new BiobankLabelProvider());
 
         volume = (Button) createBoundWidgetWithLabel(contents, Button.class,
-            SWT.BORDER, Messages.StudySourceSpecimenDialog_field_originalVolume_label,
+            SWT.BORDER,
+            Messages.StudySourceSpecimenDialog_field_originalVolume_label,
             new String[0], internalSourceSpecimen,
             SourceSpecimenPeer.NEED_ORIGINAL_VOLUME.getName(), null);
 
@@ -116,14 +117,15 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         try {
             internalSourceSpecimen.reset();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.StudySourceSpecimenDialog_error_title, e);
+            BgcPlugin.openAsyncError(
+                Messages.StudySourceSpecimenDialog_error_title, e);
         }
         typeName.getCombo().deselectAll();
         volume.setSelection(false);
     }
 
     @Override
-    protected void copy(ModelWrapper<?> newModelObject) {
+    protected void copy(Object newModelObject) {
         ((SourceSpecimenWrapper) newModelObject)
             .setSpecimenType((internalSourceSpecimen).getSpecimenType());
         ((SourceSpecimenWrapper) newModelObject)

@@ -13,7 +13,6 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -95,7 +94,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
             // only add to the collection when adding and not editing
             newListener = new NewListener() {
                 @Override
-                public void newAdded(ModelWrapper<?> spec) {
+                public void newAdded(Object spec) {
                     ((SourceSpecimenWrapper) spec).setStudy(study);
                     availableSpecimenTypes.remove(sourceSpecimen
                         .getSpecimenType());

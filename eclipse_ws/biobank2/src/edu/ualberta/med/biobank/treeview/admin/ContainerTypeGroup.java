@@ -99,7 +99,7 @@ public class ContainerTypeGroup extends AdapterBase {
     public void addContainerType(SiteAdapter siteAdapter,
         boolean hasPreviousForm) {
         ContainerTypeWrapper ct = new ContainerTypeWrapper(
-            siteAdapter.getAppService());
+            SessionManager.getAppService());
         ct.setSite((SiteWrapper) siteAdapter.getModelObject());
         ContainerTypeAdapter adapter = new ContainerTypeAdapter(
             siteAdapter.getContainerTypesGroupNode(), ct);

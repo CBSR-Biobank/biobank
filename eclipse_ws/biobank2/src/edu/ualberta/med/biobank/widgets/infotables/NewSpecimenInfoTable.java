@@ -12,6 +12,8 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.OriginInfo;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 
 public class NewSpecimenInfoTable extends InfoTableWidget {
@@ -149,10 +151,11 @@ public class NewSpecimenInfoTable extends InfoTableWidget {
                 case 5:
                     return row.specimen.getActivityStatus().getName();
                 case 6:
-                    return row.specimen.getProcessingEvent().getWorksheet();
+                    ProcessingEvent pe = row.specimen.getProcessingEvent();
+                    return pe == null ? "" : pe.getWorksheet(); //$NON-NLS-1$
                 case 7:
-                    return row.specimen.getOriginInfo().getCenter()
-                        .getNameShort();
+                    OriginInfo oi = row.specimen.getOriginInfo();
+                    return oi == null ? "" : oi.getCenter().getNameShort(); //$NON-NLS-1$
                 case 8:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 9:

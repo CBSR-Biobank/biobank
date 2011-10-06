@@ -8,13 +8,16 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.cevent.CollectionEventInfo;
+import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
@@ -122,6 +125,13 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
         this.ceventInfo = ceventInfo;
         if (ceventInfo != null)
             setId(ceventInfo.cevent.id);
+    }
+
+    public void setCollectionEventId(Integer id) throws ApplicationException {
+        // TODO Auto-generated method stub
+        // FIXME set id and set retrieve new CollectionEventInfo
+        setCollectionEventInfo(SessionManager.getAppService().doAction(
+            new GetCollectionEventInfoAction(id)));
     }
 
 }

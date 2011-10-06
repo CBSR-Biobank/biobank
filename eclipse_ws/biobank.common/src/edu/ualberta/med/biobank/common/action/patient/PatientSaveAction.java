@@ -6,8 +6,8 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionException;
-import edu.ualberta.med.biobank.common.action.study.GetStudyInfoAction;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
 public class PatientSaveAction implements Action<Patient> {
@@ -46,8 +46,7 @@ public class PatientSaveAction implements Action<Patient> {
         }
         patientToSave.setPnumber(pnumber);
         patientToSave.setCreatedAt(createdAt);
-        patientToSave.setStudy(new GetStudyInfoAction(studyId)
-            .doAction(session));
+        patientToSave.setStudy((Study) session.load(Study.class, studyId));
 
         session.saveOrUpdate(patientToSave);
 

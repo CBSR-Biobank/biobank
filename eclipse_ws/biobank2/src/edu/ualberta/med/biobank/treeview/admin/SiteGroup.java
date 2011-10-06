@@ -97,7 +97,7 @@ public class SiteGroup extends AdapterBase {
     }
 
     public void addSite() {
-        SiteWrapper site = new SiteWrapper(getAppService());
+        SiteWrapper site = new SiteWrapper(SessionManager.getAppService());
         SiteAdapter adapter = new SiteAdapter(this, site);
         adapter.openEntryForm();
     }

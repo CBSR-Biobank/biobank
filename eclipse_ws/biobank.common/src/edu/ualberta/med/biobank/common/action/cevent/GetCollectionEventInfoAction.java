@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.User;
 
 public class GetCollectionEventInfoAction implements
-    Action<CollectionEventWithSpecimensInfo> {
+    Action<CollectionEventWithFullInfo> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
@@ -40,9 +40,9 @@ public class GetCollectionEventInfoAction implements
     }
 
     @Override
-    public CollectionEventWithSpecimensInfo doAction(Session session)
+    public CollectionEventWithFullInfo doAction(Session session)
         throws ActionException {
-        CollectionEventWithSpecimensInfo ceventInfo = new CollectionEventWithSpecimensInfo();
+        CollectionEventWithFullInfo ceventInfo = new CollectionEventWithFullInfo();
 
         Query query = session.createQuery(CEVENT_INFO_QRY);
         query.setParameter(0, ceventId);
@@ -59,6 +59,8 @@ public class GetCollectionEventInfoAction implements
                 ceventId, true).doAction(session);
             ceventInfo.aliquotedSpecimenCount = (long) ceventInfo.aliquotedSpecimenInfos
                 .size();
+            ceventInfo.eventAttrs = new GetEventAttrInfoAction(ceventId)
+                .doAction(session);
         } else {
             // TODO: throw exception?
         }

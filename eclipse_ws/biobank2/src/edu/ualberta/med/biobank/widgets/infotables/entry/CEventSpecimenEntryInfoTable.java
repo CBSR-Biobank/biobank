@@ -13,10 +13,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenTypeInfo;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.CEventSourceSpecimenDialog;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
@@ -24,40 +22,47 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.Specimen;
 
-public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
+public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
 
     protected IObservableValue specimensAdded = new WritableValue(
         Boolean.FALSE, Boolean.class);
 
     public CEventSpecimenEntryInfoTable(Composite parent,
-        List<SpecimenWrapper> specs, ColumnsShown columnsShowns) {
+        List<SpecimenInfo> specs, ColumnsShown columnsShowns) {
         super(parent, specs, columnsShowns);
     }
 
     @Override
-    public void reload(List<SpecimenWrapper> specimens) {
+    public void reload(List<SpecimenInfo> specimens) {
         super.reload(specimens);
         specimensAdded.setValue(currentSpecimens.size() > 0);
     }
 
-    public void addOrEditSpecimen(boolean add, SpecimenWrapper specimen,
-        List<SourceSpecimenWrapper> studySourceTypes,
-        List<SpecimenTypeWrapper> allSpecimenTypes,
-        final CollectionEventWrapper cEvent, final Date defaultTimeDrawn) {
+    public void addOrEditSpecimen(boolean add, Specimen specimen,
+        List<SourceSpecimen> studySourceTypes,
+        List<SpecimenTypeInfo> allSpecimenTypes, final CollectionEvent cEvent,
+        final Date defaultTimeDrawn) {
         NewListener newListener = null;
-        List<SpecimenWrapper> excludeList = new ArrayList<SpecimenWrapper>(
-            currentSpecimens);
+        List<Specimen> excludeList = new ArrayList<Specimen>();
+        for (SpecimenInfo sp : currentSpecimens) {
+            excludeList.add(sp.specimen);
+        }
         if (add) {
             newListener = new NewListener() {
                 @Override
-                public void newAdded(ModelWrapper<?> mw) {
-                    SpecimenWrapper spec = (SpecimenWrapper) mw;
+                public void newAdded(Object mw) {
+                    Specimen spec = (Specimen) mw;
                     spec.setCollectionEvent(cEvent);
                     spec.setOriginalCollectionEvent(cEvent);
                     spec.setCurrentCenter(SessionManager.getUser()
-                        .getCurrentWorkingCenter());
-                    currentSpecimens.add(spec);
+                        .getCurrentWorkingCenter().getWrappedObject());
+                    SpecimenInfo info = new SpecimenInfo();
+                    info.specimen = spec;
+                    currentSpecimens.add(info);
                     addedorModifiedSpecimens.add(spec);
                     specimensAdded.setValue(true);
                     reloadCollection(currentSpecimens);
@@ -79,9 +84,8 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
         }
     }
 
-    public void addEditSupport(
-        final List<SourceSpecimenWrapper> studySourceTypes,
-        final List<SpecimenTypeWrapper> allSpecimenTypes) {
+    public void addEditSupport(final List<SourceSpecimen> studySourceTypes,
+        final List<SpecimenTypeInfo> allSpecimenTypes) {
         if (SessionManager.canCreate(SpecimenWrapper.class)) {
             addAddItemListener(new IInfoTableAddItemListener() {
                 @Override
@@ -95,7 +99,7 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
                 public void editItem(InfoTableEvent event) {
-                    SpecimenWrapper sw = getSelection();
+                    Specimen sw = getSelection();
                     if (sw != null)
                         addOrEditSpecimen(false, sw, studySourceTypes,
                             allSpecimenTypes, null, null);
@@ -106,7 +110,7 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
             addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
                 public void deleteItem(InfoTableEvent event) {
-                    SpecimenWrapper sw = getSelection();
+                    Specimen sw = getSelection();
                     if (sw != null) {
                         if (!MessageDialog
                             .openConfirm(
@@ -118,8 +122,9 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
                                     sw.getInventoryId()))) {
                             return;
                         }
-
-                        currentSpecimens.remove(sw);
+                        SpecimenInfo info = new SpecimenInfo();
+                        info.specimen = sw;
+                        currentSpecimens.remove(info);
                         setCollection(currentSpecimens);
                         if (currentSpecimens.size() == 0) {
                             specimensAdded.setValue(false);
@@ -132,5 +137,4 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
             });
         }
     }
-
 }

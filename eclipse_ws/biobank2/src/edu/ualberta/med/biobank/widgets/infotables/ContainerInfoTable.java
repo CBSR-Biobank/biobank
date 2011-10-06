@@ -11,6 +11,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -90,7 +91,7 @@ public class ContainerInfoTable extends InfoTableWidget {
 
         Container container = (Container) obj;
 
-        info.container = new ContainerWrapper(siteAdapter.getAppService(),
+        info.container = new ContainerWrapper(SessionManager.getAppService(),
             container);
         info.label = info.container.getLabel();
         ContainerTypeWrapper type = info.container.getContainerType();

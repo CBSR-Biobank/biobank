@@ -45,7 +45,7 @@ public class ResearchGroupMasterGroup extends AbstractResearchGroupGroup {
 
     public void addResearchGroup() {
         ResearchGroupWrapper researchGroup = new ResearchGroupWrapper(
-            getAppService());
+            SessionManager.getAppService());
         ResearchGroupAdapter adapter = new ResearchGroupAdapter(this,
             researchGroup);
         adapter.openEntryForm();

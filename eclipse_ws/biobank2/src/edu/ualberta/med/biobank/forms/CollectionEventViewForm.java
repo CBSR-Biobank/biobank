@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.osgi.util.NLS;
@@ -11,8 +13,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.cevent.CollectionEventWithFullInfo;
+import edu.ualberta.med.biobank.common.action.cevent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction;
-import edu.ualberta.med.biobank.common.action.cevent.CollectionEventWithSpecimensInfo;
+import edu.ualberta.med.biobank.common.action.study.GetStudyEventAttrInfoAction;
+import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
+import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
@@ -39,7 +45,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private NewSpecimenInfoTable aliquotedSpcTable;
 
-    private CollectionEventWithSpecimensInfo ceventInfo;
+    private CollectionEventWithFullInfo ceventInfo;
 
     private static class FormPvCustomInfo extends PvAttrCustom {
         BgcBaseText widget;
@@ -102,43 +108,40 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void createPvDataSection(Composite client) throws Exception {
-        // FIXME
-        // StudyWrapper study = new StudyWrapper(SessionManager.getAppService(),
-        // cevent.getPatient().getStudy());
-        // String[] labels = study.getStudyEventAttrLabels();
-        // if (labels == null)
-        // return;
+        Map<String, StudyEventAttrInfo> studyAttrInfos = SessionManager
+            .getAppService().doAction(
+                new GetStudyEventAttrInfoAction(ceventInfo.cevent.getPatient()
+                    .getStudy().getId()));
 
         pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
 
-        // for (String label : labels) {
-        // FormPvCustomInfo combinedPvInfo = new FormPvCustomInfo();
-        // combinedPvInfo.setLabel(label);
-        // combinedPvInfo.setType(study.getStudyEventAttrType(label));
-        //
-        // int style = SWT.NONE;
-        // if (combinedPvInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE) {
-        // style |= SWT.WRAP;
-        // }
-        //
-        // // FIXME
-        // String value = new CollectionEventWrapper(
-        // SessionManager.getAppService(), cevent)
-        // .getEventAttrValue(label);
-        // if (combinedPvInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE
-        // && (value != null)) {
-        // combinedPvInfo.setValue(value.replace(';', '\n'));
-        // } else {
-        // combinedPvInfo.setValue(value);
-        // }
-        //
-        // combinedPvInfo.widget = createReadOnlyLabelledField(client, style,
-        // label, combinedPvInfo.getValue());
-        // GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        // combinedPvInfo.widget.setLayoutData(gd);
-        //
-        // pvCustomInfoList.add(combinedPvInfo);
-        // }
+        for (Entry<String, StudyEventAttrInfo> entry : studyAttrInfos
+            .entrySet()) {
+            FormPvCustomInfo combinedPvInfo = new FormPvCustomInfo();
+            combinedPvInfo.setLabel(entry.getValue().attr.getLabel());
+            combinedPvInfo.setType(entry.getValue().type);
+
+            int style = SWT.NONE;
+            if (combinedPvInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE) {
+                style |= SWT.WRAP;
+            }
+
+            EventAttrInfo eventAttr = ceventInfo.eventAttrs.get(entry.getKey());
+            String value = eventAttr == null ? null : eventAttr.attr.getValue();
+            if (combinedPvInfo.getType() == EventAttrTypeEnum.SELECT_MULTIPLE
+                && (value != null)) {
+                combinedPvInfo.setValue(value.replace(';', '\n'));
+            } else {
+                combinedPvInfo.setValue(value);
+            }
+
+            combinedPvInfo.widget = createReadOnlyLabelledField(client, style,
+                entry.getKey(), combinedPvInfo.getValue());
+            GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+            combinedPvInfo.widget.setLayoutData(gd);
+
+            pvCustomInfoList.add(combinedPvInfo);
+        }
     }
 
     private void setCollectionEventValues() {
@@ -184,13 +187,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
         form.setText(NLS.bind(Messages.CollectionEventViewForm_main_title,
             +ceventInfo.cevent.getVisitNumber()));
         setCollectionEventValues();
-        // FIXME
-        // sourceSpecimenTable.setCollection(new CollectionEventWrapper(
-        // SessionManager.getAppService(), cevent)
-        // .getOriginalSpecimenCollection(true));
-        // aliquotedSpcTable.setCollection(new CollectionEventWrapper(
-        // SessionManager.getAppService(), cevent)
-        // .getAliquotedSpecimenCollection(true));
+        sourceSpecimenTable.setCollection(ceventInfo.sourceSpecimenInfos);
+        aliquotedSpcTable.setCollection(ceventInfo.aliquotedSpecimenInfos);
     }
 
 }
