@@ -126,11 +126,11 @@ public abstract class AbstractAdapterBase {
         return children;
     }
 
-    public AbstractAdapterBase getChild(int id) {
+    public AbstractAdapterBase getChild(Integer id) {
         return getChild(id, false);
     }
 
-    public AbstractAdapterBase getChild(int id, boolean reloadChildren) {
+    public AbstractAdapterBase getChild(Integer id, boolean reloadChildren) {
         if (reloadChildren) {
             loadChildren(false);
         }

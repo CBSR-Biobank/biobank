@@ -75,8 +75,10 @@ public class PatientAdapter extends AbstractNewAdapterBase {
                 public void widgetSelected(SelectionEvent event) {
                     CollectionEvent cevent = new CollectionEvent();
                     cevent.setPatient(pinfo.patient);
+                    CollectionEventInfo ceventInfo = new CollectionEventInfo();
+                    ceventInfo.cevent = cevent;
                     CollectionEventAdapter ceventAdapter = new CollectionEventAdapter(
-                        PatientAdapter.this, null);
+                        PatientAdapter.this, ceventInfo);
                     ceventAdapter.openEntryForm();
                 }
             });

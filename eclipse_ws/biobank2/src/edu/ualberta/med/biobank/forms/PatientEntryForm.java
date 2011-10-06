@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -23,7 +22,6 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
@@ -83,18 +81,11 @@ public class PatientEntryForm extends BiobankEntryForm {
             patientCopy.setCreatedAt(null);
             patientCopy.setPnumber(null);
             patientCopy.setStudy(null);
-            patientCopy
-                .setCollectionEventCollection(new ArrayList<CollectionEvent>());
         } else {
             patientCopy.setId(pInfo.patient.getId());
             patientCopy.setCreatedAt(pInfo.patient.getCreatedAt());
             patientCopy.setPnumber(pInfo.patient.getPnumber());
             patientCopy.setStudy(pInfo.patient.getStudy());
-            List<CollectionEvent> cevents = new ArrayList<CollectionEvent>();
-            if (pInfo.patient.getCollectionEventCollection() != null) {
-                cevents.addAll(pInfo.patient.getCollectionEventCollection());
-            }
-            patientCopy.setCollectionEventCollection(cevents);
         }
     }
 
@@ -179,6 +170,7 @@ public class PatientEntryForm extends BiobankEntryForm {
                 new PatientSaveAction(patientCopy.getId(), patientCopy
                     .getStudy().getId(), patientCopy.getPnumber(), patientCopy
                     .getCreatedAt()));
+        // FIXME better than that?
         adapter.setId(patient.getId());
 
         SessionManager.updateAllSimilarNodes(adapter, true);

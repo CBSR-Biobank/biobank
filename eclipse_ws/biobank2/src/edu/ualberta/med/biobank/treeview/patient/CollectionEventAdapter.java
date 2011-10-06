@@ -22,8 +22,8 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
     public CollectionEventAdapter(AbstractAdapterBase parent,
         CollectionEventInfo ceventInfo) {
-        super(parent, ceventInfo.getClass(), ceventInfo.cevent.getId(), null,
-            null, false);
+        super(parent, CollectionEventInfo.class, ceventInfo == null ? null
+            : ceventInfo.cevent.getId(), null, null, false);
         this.ceventInfo = ceventInfo;
         setEditable(parent instanceof PatientAdapter || parent == null);
     }
@@ -116,6 +116,12 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     @Override
     protected List<Integer> getChildrenObjectIds() throws Exception {
         return null;
+    }
+
+    public void setCollectionEventInfo(CollectionEventInfo ceventInfo) {
+        this.ceventInfo = ceventInfo;
+        if (ceventInfo != null)
+            setId(ceventInfo.cevent.id);
     }
 
 }
