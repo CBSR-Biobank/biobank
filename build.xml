@@ -26,6 +26,7 @@
   <property name="cacore.sdk.filename" value="caCORE_SDK_411.tar.gz" />
   <property name="eclipse.workspace.dir" location="eclipse_ws" />
   <property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
+  <property name="eclipse.proj.dir.mvp" location="eclipse_ws/biobank.mvp" />
   <property name="eclipse.proj.dir.gui.common"
             location="eclipse_ws/biobank.gui.common" />
   <property name="eclipse.proj.dir.common"
@@ -50,6 +51,8 @@
   <property name="lib-sources.dir" value="lib-sources" />
   <property name="biobank.gui.common.jar.files"
             value="commons-beanutils-1.8.0.jar,commons-io-1.4.jar,commons-digester-1.7.jar,commons-javaflow-20060411.jar,iText-2.1.7.jar,jasperreports-4.0.1.jar,jdt-compiler-3.1.1.jar,DynamicJasper-3.0.14.jar" />
+  <property name="biobank.mvp.jar.files"
+            value="gwt-user.jar" />
   <property name="biobank.jar.files"
             value="gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
   <property name="biobank.common.jar.files"
@@ -302,6 +305,11 @@
                       files="${biobank.gui.commmon.jar.files}" />
     </dependset>
     <dependset>
+      <srcfilelist dir="${req.jars.dir}" files="${biobank.mvp.jar.files}" />
+      <targetfilelist dir="${eclipse.proj.dir.mvp}/lib"
+                      files="${biobank.mvp.jar.files}" />
+    </dependset>
+    <dependset>
       <srcfilelist dir="${req.jars.dir}" files="${biobank.jar.files}" />
       <targetfilelist dir="${eclipse.proj.dir}/lib"
                       files="${biobank.jar.files}" />
@@ -354,6 +362,9 @@
     </copy>
     <copy todir="${eclipse.proj.dir.gui.common}/lib" overwrite="true">
       <filelist dir="${cacore.sdk.dir}/system/lib" files="commons-collections-3.2.jar,commons-logging-1.1.jar" />
+    </copy>
+    <copy todir="${eclipse.proj.dir.mvp}/lib" overwrite="true">
+      <filelist dir="${req.jars.dir}" files="${biobank.mvp.jar.files}" />
     </copy>
     <copy todir="${eclipse.proj.dir}/lib" overwrite="true">
       <filelist dir="${req.jars.dir}" files="${biobank.jar.files}" />
