@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetSiteStudyInfoAction implements Action<List<StudyInfo>> {
+public class GetSiteStudyInfoAction implements Action<ArrayList<StudyInfo>> {
     public static class StudyInfo implements Serializable, NotAProxy {
         private static final long serialVersionUID = 1L;
 
@@ -73,8 +73,9 @@ public class GetSiteStudyInfoAction implements Action<List<StudyInfo>> {
     }
 
     @Override
-    public List<StudyInfo> run(User user, Session session) throws ActionException {
-        List<StudyInfo> studies = new ArrayList<StudyInfo>();
+    public ArrayList<StudyInfo> run(User user, Session session)
+        throws ActionException {
+        ArrayList<StudyInfo> studies = new ArrayList<StudyInfo>();
 
         Query query = session.createQuery(STUDY_INFO_HQL);
         query.setParameter(0, siteId);

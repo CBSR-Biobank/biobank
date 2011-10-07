@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetSiteTopContainersAction implements Action<List<Container>> {
+public class GetSiteTopContainersAction implements Action<ArrayList<Container>> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     private static final String SELECT_TOP_CONTAINERS_HQL = "SELECT container"
@@ -40,8 +40,9 @@ public class GetSiteTopContainersAction implements Action<List<Container>> {
     }
 
     @Override
-    public List<Container> run(User user, Session session) throws ActionException {
-        List<Container> topContainers = new ArrayList<Container>();
+    public ArrayList<Container> run(User user, Session session)
+        throws ActionException {
+        ArrayList<Container> topContainers = new ArrayList<Container>();
 
         Query query = session.createQuery(SELECT_TOP_CONTAINERS_HQL);
         query.setParameter(0, siteId);

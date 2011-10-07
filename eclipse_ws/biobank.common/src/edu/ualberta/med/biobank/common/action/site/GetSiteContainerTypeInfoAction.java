@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
 
 public class GetSiteContainerTypeInfoAction implements
-    Action<List<ContainerTypeInfo>> {
+    Action<ArrayList<ContainerTypeInfo>> {
     public static class ContainerTypeInfo implements Serializable, NotAProxy {
         private static final long serialVersionUID = 1L;
 
@@ -67,8 +67,9 @@ public class GetSiteContainerTypeInfoAction implements
     }
 
     @Override
-    public List<ContainerTypeInfo> run(User user, Session session) throws ActionException {
-        List<ContainerTypeInfo> containerTypes = new ArrayList<ContainerTypeInfo>();
+    public ArrayList<ContainerTypeInfo> run(User user, Session session)
+        throws ActionException {
+        ArrayList<ContainerTypeInfo> containerTypes = new ArrayList<ContainerTypeInfo>();
 
         Query query = session.createQuery(SELECT_CONTAINER_TYPE_INFO_HQL);
         query.setParameter(0, siteId);

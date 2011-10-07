@@ -8,18 +8,28 @@ import java.util.Set;
 import org.hibernate.Session;
 
 public class SessionUtil {
-    public static <E> E load(Session session, Class<E> klazz, Serializable id) {
+    private final Session session;
+
+    public SessionUtil(Session session) {
+        this.session = session;
+    }
+
+    public <E> E get(Class<E> klazz, Serializable id) {
         @SuppressWarnings("unchecked")
-        E result = (E) session.load(klazz, id);
+        E result = (E) session.get(klazz, id);
         return result;
     }
 
-    public static <E> Map<Serializable, E> load(Session session,
-        Class<E> klazz, Set<Serializable> ids) {
-        Map<Serializable, E> results = new HashMap<Serializable, E>();
+    public <E> E get(Class<E> klazz, Serializable id, E defaultValue) {
+        E result = get(klazz, id);
+        return result != null ? result : defaultValue;
+    }
 
-        for (Serializable id : ids) {
-            E result = load(session, klazz, id);
+    public <K extends Serializable, V> Map<K, V> get(Class<V> klazz, Set<K> ids) {
+        Map<K, V> results = new HashMap<K, V>();
+
+        for (K id : ids) {
+            V result = get(klazz, id);
             results.put(id, result);
         }
 

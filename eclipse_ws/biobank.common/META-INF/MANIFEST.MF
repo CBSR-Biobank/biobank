@@ -64,6 +64,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.common.permission,
  edu.ualberta.med.biobank.common.reports,
  edu.ualberta.med.biobank.common.reports.filters,
+ edu.ualberta.med.biobank.common.rpc,
  edu.ualberta.med.biobank.common.scanprocess,
  edu.ualberta.med.biobank.common.scanprocess.data,
  edu.ualberta.med.biobank.common.scanprocess.result,
