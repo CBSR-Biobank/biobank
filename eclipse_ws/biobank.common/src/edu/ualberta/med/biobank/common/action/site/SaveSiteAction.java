@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.site;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -37,56 +36,28 @@ public class SaveSiteAction implements Action<Integer> {
         this.siteId = siteId;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getNameShort() {
-        return nameShort;
     }
 
     public void setNameShort(String nameShort) {
         this.nameShort = nameShort;
     }
 
-    public String getComment() {
-        return comment;
-    }
-
     public void setComment(String comment) {
         this.comment = comment;
-    }
-
-    public Address getAddress() {
-        return address;
     }
 
     public void setAddress(Address address) {
         this.address = address;
     }
 
-    public ActivityStatus getActivityStatus() {
-        return activityStatus;
-    }
-
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }
 
-    public Collection<Integer> getStudyIds() {
-        return studyIds;
-    }
-
     public void setStudyIds(Set<Integer> studyIds) {
         this.studyIds = studyIds;
-    }
-
-    public Integer getSiteId() {
-        return siteId;
     }
 
     @Override
@@ -99,6 +70,8 @@ public class SaveSiteAction implements Action<Integer> {
     public Integer run(User user, Session session) throws ActionException {
         SessionUtil sessionUtil = new SessionUtil(session);
         Site site = sessionUtil.get(Site.class, siteId, new Site());
+
+        // TODO: check permission?
 
         // TODO: error checks
         // TODO: version check?
@@ -116,6 +89,12 @@ public class SaveSiteAction implements Action<Integer> {
         // TODO: check that the user has access to at least the studies they are
         // removing or adding?
         Map<Integer, Study> studies = sessionUtil.get(Study.class, studyIds);
+
+        // TODO: write a Diff class?
+        // Diff<Collection<Study>> diff = Diff.from(site.getStudyCollection(),
+        // studies.values());
+        // diff.getRemoved()
+        // diff.getAdded()
         site.setStudyCollection(new HashSet<Study>(studies.values()));
 
         session.saveOrUpdate(site);
@@ -125,6 +104,6 @@ public class SaveSiteAction implements Action<Integer> {
         // if this was an insert, try using a callback that sets the response
         // value instead?
 
-        return null;
+        return site.getId();
     }
 }

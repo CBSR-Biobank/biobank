@@ -2,8 +2,11 @@ package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import com.google.gwt.user.client.ui.HasValue;
 
+import edu.ualberta.med.biobank.common.action.ActionCallback;
+import edu.ualberta.med.biobank.common.action.collectionEvent.SaveCollectionEventAction;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.mvp.event.AlertEvent;
 import edu.ualberta.med.biobank.mvp.presenter.SaveablePresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.CollectionEventEditPresenter.Display;
 import edu.ualberta.med.biobank.mvp.view.SaveableView;
@@ -18,14 +21,29 @@ public abstract class CollectionEventEditPresenter extends
 
     @Override
     protected void doSave() {
-        // TODO Auto-generated method stub
+        SaveCollectionEventAction save = new SaveCollectionEventAction();
+        // TODO: populate save action with appropriate data
 
+        dispatcher.exec(save, new ActionCallback<Integer>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                // TODO: replace with a better message.
+                eventBus.fireEvent(new AlertEvent("FAIL!"));
+            }
+
+            @Override
+            public void onSuccess(Integer result) {
+
+            }
+        });
     }
 
     @Override
     public void doInit() {
+        CollectionEvent collectionEvent = getCollectionEvent();
 
-        // display.setPatient();
+        display.setPatient(collectionEvent.getPatient());
+        display.getVisitNumber().setValue(collectionEvent.getVisitNumber());
     }
 
     @Override
@@ -53,7 +71,11 @@ public abstract class CollectionEventEditPresenter extends
         @Override
         protected CollectionEvent getCollectionEvent() {
             CollectionEvent tmp = new CollectionEvent();
+            tmp.setVisitNumber(null); // action to get next visit number
             tmp.setPatient(null); // action to get patient;
+
+            // TODO: work on action batch query?
+
             return tmp;
         }
     }

@@ -149,6 +149,8 @@ public class SiteEditPresenter {
 
         HasValue<String> getCountry();
 
+        // TODO: where to the options for ActivityStatus come from? See what GWT
+        // does for combo boxes...?
         HasValue<ActivityStatus> getActivityStatus();
 
         HasValue<Collection<StudyInfo>> getStudies();
