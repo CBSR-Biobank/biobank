@@ -24,7 +24,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ClinicWrapper extends ClinicBaseWrapper {
-    private static final String STUDY_COLLECTION_CACHE_KEY = "studyCollection";
+    private static final String STUDY_COLLECTION_CACHE_KEY = "studyCollection"; //$NON-NLS-1$
 
     public ClinicWrapper(WritableApplicationService appService) {
         super(appService);
@@ -49,6 +49,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         return null;
     }
 
+    @SuppressWarnings("nls")
     private static final String STUDY_COLLECTION_QUERY = "select distinct studies from "
         + Contact.class.getName()
         + " as contacts inner join contacts."
@@ -91,6 +92,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         return 0;
     }
 
+    @SuppressWarnings("nls")
     public static final String PATIENT_COUNT_QRY = "select count(distinct patients) from "
         + Clinic.class.getName()
         + " as clinic join clinic."
@@ -113,6 +115,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         return getCountResult(appService, criteria);
     }
 
+    @SuppressWarnings("nls")
     public static final String PATIENT_COUNT_FOR_STUDY_QRY = "select count(distinct patients) from "
         + Clinic.class.getName()
         + " as clinic join clinic."
@@ -135,6 +138,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         return getCountResult(appService, c);
     }
 
+    @SuppressWarnings("nls")
     private static final String ALL_CLINICS_QRY = "from "
         + Clinic.class.getName();
 
@@ -148,6 +152,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         return wrappers;
     }
 
+    @SuppressWarnings("nls")
     private static final String CLINIC_COUNT_QRY = "select count (*) from "
         + Clinic.class.getName();
 
@@ -156,6 +161,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         return getCountResult(appService, new HQLCriteria(CLINIC_COUNT_QRY));
     }
 
+    @SuppressWarnings("nls")
     public static final String COLLECTION_EVENT_COUNT_QRY = "select count(cevent) from "
         + Clinic.class.getName()
         + " as clinic join clinic."
@@ -175,6 +181,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         return getCountResult(appService, criteria);
     }
 
+    @SuppressWarnings("nls")
     private static final String COLLECTION_EVENT_COUNT_FOR_STUDY_QRY = "select count(distinct cEvent) from "
         + Clinic.class.getName()
         + " as clinic join clinic."

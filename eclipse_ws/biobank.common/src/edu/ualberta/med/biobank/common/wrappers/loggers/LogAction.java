@@ -63,12 +63,12 @@ public class LogAction<E> extends LoadModelAction<E> {
 
         if (Type.PERSIST.equals(type)) {
             if (getIdProperty().get(getModel()) == null) {
-                action = "insert";
+                action = "insert"; //$NON-NLS-1$
             } else {
-                action = "update";
+                action = "update"; //$NON-NLS-1$
             }
         } else if (Type.DELETE.equals(type)) {
-            action = "delete";
+            action = "delete"; //$NON-NLS-1$
         }
 
         return action;

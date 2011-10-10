@@ -5,7 +5,7 @@ import java.util.Collection;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 
 class Format {
-    private static final String DELIMITER = ", ";
+    private static final String DELIMITER = ", "; //$NON-NLS-1$
 
     static String modelClass(Class<?> modelClass) {
         // TODO: some formatting? language translation lookup?
@@ -19,7 +19,7 @@ class Format {
         int i = 0;
         for (Property<?, ? super E> property : properties) {
             Object pValue = property.get(model);
-            sb.append(pValue == null ? "null" : pValue.toString());
+            sb.append(pValue == null ? "null" : pValue.toString()); //$NON-NLS-1$
             i++;
             if (i < n) {
                 sb.append(DELIMITER);

@@ -34,7 +34,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 @SuppressWarnings("unused")
 public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     private static final CollectionEventLogProvider LOG_PROVIDER = new CollectionEventLogProvider();
-    private static final String HAS_SPECIMENS_MSG = "Specimens are still linked to this Collection Event. Delete them before attempting to remove this Collection Event";
+    private static final String HAS_SPECIMENS_MSG = Messages
+        .getString("CollectionEventWrapper.has_specimen_delete_msg"); //$NON-NLS-1$
     private static final Collection<Property<?, ? super CollectionEvent>> UNIQUE_VISIT_NUMBER_PROPS;
     static {
         Collection<Property<?, ? super CollectionEvent>> tmp = new ArrayList<Property<?, ? super CollectionEvent>>();
@@ -58,8 +59,16 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     private void removeFromSpecimenCollections(
         List<? extends SpecimenBaseWrapper> specimenCollection) {
-        super.removeFromAllSpecimenCollection(specimenCollection);
-        super.removeFromOriginalSpecimenCollection(specimenCollection);
+        // super.removeFromAllSpecimenCollection(specimenCollection); is not
+        // called because it will set the collectionEvent of specimens to null
+        // Since hibernate will check that it is not null, it is a problem.
+        // Specimens are deleted after that, so that's ok to keep the cevent
+        // reference
+        removeFromWrapperCollection(
+            CollectionEventPeer.ALL_SPECIMEN_COLLECTION, specimenCollection);
+        removeFromWrapperCollection(
+            CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION,
+            specimenCollection);
     }
 
     private void removeFromSpecimenCollectionsWithCheck(
@@ -107,12 +116,13 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return LOG_PROVIDER;
     }
 
-    private static final String COLLECTION_EVENTS_BY_WAYBILL_QRY = "from "
-        + CollectionEvent.class.getName() + " ce join ce."
+    private static final String COLLECTION_EVENTS_BY_WAYBILL_QRY = "from " //$NON-NLS-1$
+        + CollectionEvent.class.getName()
+        + " ce join ce." //$NON-NLS-1$
         + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION
-        + " as spcs join spcs." + SpecimenPeer.ORIGIN_INFO.getName()
-        + " as oi join oi." + OriginInfoPeer.SHIPMENT_INFO.getName()
-        + " as shipinfo where shipinfo." + ShipmentInfoPeer.WAYBILL + "=?";
+        + " as spcs join spcs." + SpecimenPeer.ORIGIN_INFO.getName() //$NON-NLS-1$
+        + " as oi join oi." + OriginInfoPeer.SHIPMENT_INFO.getName() //$NON-NLS-1$
+        + " as shipinfo where shipinfo." + ShipmentInfoPeer.WAYBILL + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
     // TODO: make sure that these count methods are actually correct if the
     // memory contents have been altered...
@@ -130,15 +140,15 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             CollectionEventWrapper.class);
     }
 
-    private static final String COLLECTION_EVENTS_BY_DATE_RECEIVED_QRY = "from "
+    private static final String COLLECTION_EVENTS_BY_DATE_RECEIVED_QRY = "from " //$NON-NLS-1$
         + CollectionEvent.class.getName()
-        + " ce join ce."
+        + " ce join ce." //$NON-NLS-1$
         + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION
-        + " as spcs join spcs."
+        + " as spcs join spcs." //$NON-NLS-1$
         + SpecimenPeer.ORIGIN_INFO.getName()
-        + " as oi join oi."
+        + " as oi join oi." //$NON-NLS-1$
         + OriginInfoPeer.SHIPMENT_INFO.getName()
-        + " as shipinfo where shipinfo." + ShipmentInfoPeer.RECEIVED_AT + "=?";
+        + " as shipinfo where shipinfo." + ShipmentInfoPeer.RECEIVED_AT + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
     public static List<CollectionEventWrapper> getCollectionEvents(
         WritableApplicationService appService, Date dateReceived)
@@ -165,13 +175,12 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             fast);
     }
 
-    private static final String ALIQUOTED_SPECIMEN_COUNT_QRY = "select count(spc) from "
+    private static final String ALIQUOTED_SPECIMEN_COUNT_QRY = "select count(spc) from " //$NON-NLS-1$
         + Specimen.class.getName()
-        + " as spc where spc."
+        + " as spc where spc." //$NON-NLS-1$
         + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-            CollectionEventPeer.ID)
-        + "=? and spc."
-        + SpecimenPeer.PARENT_SPECIMEN.getName() + " is not null";
+            CollectionEventPeer.ID) + "=? and spc." //$NON-NLS-1$
+        + SpecimenPeer.PARENT_SPECIMEN.getName() + " is not null"; //$NON-NLS-1$
 
     public long getAliquotedSpecimensCount(boolean fast)
         throws BiobankException, ApplicationException {
@@ -198,17 +207,17 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return aliquotedSpecimens;
     }
 
-    private static String SOURCE_SPEC_IN_PROCESS_NOT_FLAGGED_QRY = "select spec from "
+    private static String SOURCE_SPEC_IN_PROCESS_NOT_FLAGGED_QRY = "select spec from " //$NON-NLS-1$
         + Specimen.class.getName()
-        + " as spec where spec."
+        + " as spec where spec." //$NON-NLS-1$
         + Property.concatNames(SpecimenPeer.ORIGINAL_COLLECTION_EVENT,
             CollectionEventPeer.ID)
-        + " = ? and spec."
+        + " = ? and spec." //$NON-NLS-1$
         + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
             ProcessingEventPeer.ID)
-        + " = ? and spec."
+        + " = ? and spec." //$NON-NLS-1$
         + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
-            ActivityStatusPeer.NAME) + " != 'Flagged'";
+            ActivityStatusPeer.NAME) + " != 'Flagged'"; //$NON-NLS-1$
 
     /**
      * source specimen that are in a process event
@@ -278,8 +287,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             StudyEventAttrWrapper studyEventAttr = studyEventAttrMap.get(label);
             // make sure "label" is a valid study pv attr
             if (studyEventAttr == null) {
-                throw new Exception("StudyEventAttr with label \"" + label
-                    + "\" is invalid");
+                throw new Exception("StudyEventAttr with label \"" + label //$NON-NLS-1$
+                    + "\" is invalid"); //$NON-NLS-1$
             }
             // not assigned yet so return null
             return null;
@@ -297,8 +306,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             studyEventAttr = studyEventAttrMap.get(label);
             // make sure "label" is a valid study pv attr
             if (studyEventAttr == null) {
-                throw new Exception("StudyEventAttr withr label \"" + label
-                    + "\" does not exist");
+                throw new Exception("StudyEventAttr withr label \"" + label //$NON-NLS-1$
+                    + "\" does not exist"); //$NON-NLS-1$
             }
         }
         return studyEventAttr.getEventAttrType().getName();
@@ -314,15 +323,15 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             studyEventAttr = studyEventAttrMap.get(label);
             // make sure "label" is a valid study pv attr
             if (studyEventAttr == null) {
-                throw new Exception("EventAttr for label \"" + label
-                    + "\" does not exist");
+                throw new Exception("EventAttr for label \"" + label //$NON-NLS-1$
+                    + "\" does not exist"); //$NON-NLS-1$
             }
         }
         String permissible = studyEventAttr.getPermissible();
         if (permissible == null) {
             return null;
         }
-        return permissible.split(";");
+        return permissible.split(";"); //$NON-NLS-1$
     }
 
     /**
@@ -351,14 +360,14 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         } else {
             studyEventAttr = studyEventAttrMap.get(label);
             if (studyEventAttr == null) {
-                throw new Exception("no StudyEventAttr found for label \""
-                    + label + "\"");
+                throw new Exception("no StudyEventAttr found for label \"" //$NON-NLS-1$
+                    + label + "\""); //$NON-NLS-1$
             }
         }
 
         if (!studyEventAttr.getActivityStatus().isActive()) {
-            throw new Exception("attribute for label \"" + label
-                + "\" is locked, changes not premitted");
+            throw new Exception("attribute for label \"" + label //$NON-NLS-1$
+                + "\" is locked, changes not premitted"); //$NON-NLS-1$
         }
 
         if (value != null) {
@@ -373,21 +382,21 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
                     String permissible = studyEventAttr.getPermissible();
                     if (permissible != null) {
                         permissibleSplit = Arrays
-                            .asList(permissible.split(";"));
+                            .asList(permissible.split(";")); //$NON-NLS-1$
                     }
                 }
 
                 if (EventAttrTypeEnum.SELECT_SINGLE.isSameType(type)) {
                     if (!permissibleSplit.contains(value)) {
-                        throw new Exception("value " + value
-                            + "is invalid for label \"" + label + "\"");
+                        throw new Exception("value " + value //$NON-NLS-1$
+                            + "is invalid for label \"" + label + "\""); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 } else if (EventAttrTypeEnum.SELECT_MULTIPLE.isSameType(type)) {
-                    for (String singleVal : value.split(";")) {
+                    for (String singleVal : value.split(";")) { //$NON-NLS-1$
                         if (!permissibleSplit.contains(singleVal)) {
-                            throw new Exception("value " + singleVal + " ("
-                                + value + ") is invalid for label \"" + label
-                                + "\"");
+                            throw new Exception("value " + singleVal + " (" //$NON-NLS-1$ //$NON-NLS-2$
+                                + value + ") is invalid for label \"" + label //$NON-NLS-1$
+                                + "\""); //$NON-NLS-1$
                         }
                     }
                 } else if (EventAttrTypeEnum.NUMBER.isSameType(type)) {
@@ -397,7 +406,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
                 } else if (EventAttrTypeEnum.TEXT.isSameType(type)) {
                     // do nothing
                 } else {
-                    throw new Exception("type \"" + type + "\" not tested");
+                    throw new Exception("type \"" + type + "\" not tested"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             }
         }
@@ -439,8 +448,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     public static Integer getNextVisitNumber(
         WritableApplicationService appService, CollectionEventWrapper cevent)
         throws Exception {
-        HQLCriteria c = new HQLCriteria("select max(ce.visitNumber) from "
-            + CollectionEvent.class.getName() + " ce where ce.patient.id=?",
+        HQLCriteria c = new HQLCriteria("select max(ce.visitNumber) from " //$NON-NLS-1$
+            + CollectionEvent.class.getName() + " ce where ce.patient.id=?", //$NON-NLS-1$
             Arrays.asList(cevent.getPatient().getId()));
         List<Object> result = appService.query(c);
         if (result == null || result.size() == 0 || result.get(0) == null)
@@ -455,8 +464,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
         tasks.add(check().unique(UNIQUE_VISIT_NUMBER_PROPS));
 
-        tasks.persistRemoved(this, CollectionEventPeer.ALL_SPECIMEN_COLLECTION);
-        tasks.persistRemoved(this,
+        tasks.deleteRemoved(this, CollectionEventPeer.ALL_SPECIMEN_COLLECTION);
+        tasks.deleteRemoved(this,
             CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION);
 
         super.addPersistTasks(tasks);
@@ -510,9 +519,10 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     public Date getMinSourceSpecimenDate() {
-        Date min = new Date();
+        Date min = null;
         for (SpecimenWrapper spec : getOriginalSpecimenCollection(false))
-            min = min.before(spec.getCreatedAt()) ? min : spec.getCreatedAt();
+            min = (min != null && min.before(spec.getCreatedAt())) ? min : spec
+                .getCreatedAt();
         return min;
     }
 }

@@ -167,7 +167,10 @@ public abstract class UserInfoTable extends InfoTableWidget {
             String message;
 
             if (SessionManager.getUser().equals(user)) {
-                message = Messages.UserInfoTable_confirm_delete_suicide_msg;
+                BgcPlugin.openAsyncError(
+                    Messages.UserInfoTable_delete_error_msg,
+                    Messages.UserInfoTable_confirm_delete_suicide_msg);
+                return false;
             } else {
                 message = MessageFormat.format(
                     Messages.UserInfoTable_confirm_delete_msg,

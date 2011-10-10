@@ -15,14 +15,15 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
 
 public class ClinicPreDeleteChecks extends UncachedAction<Clinic> {
     private static final long serialVersionUID = 1L;
-    private static final String HAS_STUDIES_MSG = "Unable to delete clinic {0}. No more study reference should exist.";
+    private static final String HAS_STUDIES_MSG = Messages
+        .getString("ClinicPreDeleteChecks.delete.clinic.error.msg"); //$NON-NLS-1$
 
     // @formatter:off
     private static final String COUNT_STUDIES_HQL =
-        "SELECT COUNT(DISTINCT studies)" +
-        " FROM " + Contact.class.getName() + " AS contacts" +
-        " INNER JOIN contacts." + ContactPeer.STUDY_COLLECTION.getName() + " AS studies" +
-        " WHERE contacts." + ContactPeer.CLINIC.getName() + " = ?";
+        "SELECT COUNT(DISTINCT studies)" + //$NON-NLS-1$
+        " FROM " + Contact.class.getName() + " AS contacts" + //$NON-NLS-1$ //$NON-NLS-2$
+        " INNER JOIN contacts." + ContactPeer.STUDY_COLLECTION.getName() + " AS studies" + //$NON-NLS-1$ //$NON-NLS-2$
+        " WHERE contacts." + ContactPeer.CLINIC.getName() + " = ?"; //$NON-NLS-1$ //$NON-NLS-2$
     // @formatter:on
 
     public ClinicPreDeleteChecks(ModelWrapper<Clinic> wrapper) {
@@ -30,7 +31,8 @@ public class ClinicPreDeleteChecks extends UncachedAction<Clinic> {
     }
 
     @Override
-    public void doUncachedAction(Session session) throws BiobankSessionException {
+    public void doUncachedAction(Session session)
+        throws BiobankSessionException {
         checkHasStudies(session);
     }
 

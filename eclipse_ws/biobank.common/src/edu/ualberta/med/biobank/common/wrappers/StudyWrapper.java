@@ -91,8 +91,8 @@ public class StudyWrapper extends StudyBaseWrapper {
         getStudyEventAttrMap();
         StudyEventAttrWrapper studyEventAttr = studyEventAttrMap.get(label);
         if (studyEventAttr == null) {
-            throw new Exception("StudyEventAttr with label \"" + label
-                + "\" is invalid");
+            throw new Exception("StudyEventAttr with label \"" + label //$NON-NLS-1$
+                + "\" is invalid"); //$NON-NLS-1$
         }
         return studyEventAttr;
     }
@@ -115,7 +115,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         String joinedPossibleValues = getStudyEventAttr(label).getPermissible();
         if (joinedPossibleValues == null)
             return null;
-        return joinedPossibleValues.split(";");
+        return joinedPossibleValues.split(";"); //$NON-NLS-1$
     }
 
     /**
@@ -149,8 +149,8 @@ public class StudyWrapper extends StudyBaseWrapper {
         EventAttrTypeWrapper EventAttrType = EventAttrTypeMap.get(type
             .getName());
         if (EventAttrType == null) {
-            throw new Exception("the pv attribute type \"" + type
-                + "\" does not exist");
+            throw new Exception("the pv attribute type \"" + type //$NON-NLS-1$
+                + "\" does not exist"); //$NON-NLS-1$
         }
 
         StudyEventAttrWrapper studyEventAttr = getStudyEventAttrMap()
@@ -227,8 +227,8 @@ public class StudyWrapper extends StudyBaseWrapper {
         getStudyEventAttrMap();
         StudyEventAttrWrapper studyEventAttr = getStudyEventAttr(label);
         if (studyEventAttr.isUsedByCollectionEvents()) {
-            throw new BiobankCheckException("StudyEventAttr with label \""
-                + label + "\" is in use by patient visits");
+            throw new BiobankCheckException("StudyEventAttr with label \"" //$NON-NLS-1$
+                + label + "\" is in use by patient visits"); //$NON-NLS-1$
         }
         studyEventAttrMap.remove(label);
         updateStudyEventAttrCollection();
@@ -245,6 +245,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         return Arrays.asList(clinicWrappers.toArray(new ClinicWrapper[] {}));
     }
 
+    @SuppressWarnings("nls")
     private static final String PATIENT_QRY = "select patients from "
         + Study.class.getName() + " as study inner join study."
         + StudyPeer.PATIENT_COLLECTION.getName()
@@ -293,6 +294,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         return 0;
     }
 
+    @SuppressWarnings("nls")
     public static final String IS_LINKED_TO_CLINIC_QRY = "select count(clinics) from "
         + Contact.class.getName()
         + " as contacts join contacts."
@@ -317,6 +319,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         studyEventAttrMap = null;
     }
 
+    @SuppressWarnings("nls")
     public static final String ALL_STUDIES_QRY = "from "
         + Study.class.getName();
 
@@ -327,6 +330,7 @@ public class StudyWrapper extends StudyBaseWrapper {
             appService.query(c), StudyWrapper.class);
     }
 
+    @SuppressWarnings("nls")
     public static final String COUNT_QRY = "select count (*) from "
         + Study.class.getName();
 
@@ -340,6 +344,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         return getName();
     }
 
+    @SuppressWarnings("nls")
     private static final String COLLECTION_EVENT_COUNT_QRY = "select count(distinct ce) from "
         + CollectionEvent.class.getName()
         + " as ce where ce."
@@ -396,6 +401,7 @@ public class StudyWrapper extends StudyBaseWrapper {
     // Patient.class, PatientWrapper.class, sort);
     // }
 
+    @SuppressWarnings("nls")
     private static final String ACTIVE_ALIQUOTED_SPECIMENS_TYPE_QRY = "select aspec."
         + AliquotedSpecimenPeer.SPECIMEN_TYPE.getName()
         + " from "

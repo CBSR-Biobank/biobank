@@ -510,8 +510,7 @@
       <transaction src="${data.sql.dir}/shippingMethod.sql" />
       <transaction src="${data.sql.dir}/patientLabels.sql" />
       <transaction src="${data.sql.dir}/advancedReportsData.sql" />
-      <transaction src="${data.sql.dir}/privileges.sql" />
-      <transaction src="${data.sql.dir}/rights.sql" />
+      <transaction src="${data.sql.dir}/permissions.sql" />
       <transaction src="${data.sql.dir}/groups.sql" />
       <transaction src="${secu-log.dir}/schemaSecurity.sql" />
       <transaction>commit;</transaction>
@@ -601,7 +600,7 @@
     <java classname="edu.ualberta.med.biobank.tools.modelextender.ModelExtender"
           failonerror="true"
           fork="true">
-      <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
+      <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/src/log4j.properties" />
       <arg value="${model.proj.dir}/biobank.uml" />
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer" />
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/wrappers" />
@@ -671,7 +670,7 @@
     <java classname="edu.ualberta.med.biobank.tools.validator.ValidatorGeneration"
           failonerror="true"
           fork="true">
-      <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
+      <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/src/log4j.properties" />
       <arg value="${model.proj.dir}/biobank.uml" />
       <arg value="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
       <classpath>
@@ -741,7 +740,7 @@
     <java classname="edu.ualberta.med.biobank.tools.hbmpostproc.HbmPostProcess"
           failonerror="true"
           fork="true">
-      <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
+      <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/src/log4j.properties" />
       <arg value="${model.proj.dir}/biobank.uml" />
       <arg value="${cacore.sdk.dir}/output/biobank/src/edu/ualberta/med/biobank/model" />
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/VarCharLengths.java.template" />
@@ -786,6 +785,10 @@
     <delete>
       <fileset dir="${cacore.sdk.dir}/${build.classes.dir}"/>
     </delete>
+  	<!-- copy the interface that all model object should implements now (thanks to the hbmpostprocess) -->
+  	<copy todir="${cacore.sdk.dir}/${output.src.dir}/edu/ualberta/med/biobank/model" 
+  		file="${eclipse.proj.dir.tools}/src/edu/ualberta/med/biobank/model/IBiobankModel.java"
+  	    overwrite="true"/>
 
     <javac srcdir="${cacore.sdk.dir}/${output.src.dir}" destdir="${cacore.sdk.dir}/${build.classes.dir}"
       debug="true" includeantruntime="false" >

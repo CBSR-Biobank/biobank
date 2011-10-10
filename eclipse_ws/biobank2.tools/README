@@ -1,0 +1,3 @@
+Log4j Configuration
+  - log4j.properties should be in src folder.
+  - Use "-Dlog4j.debug" in VM arguments to display log4j debug output.

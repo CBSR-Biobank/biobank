@@ -29,8 +29,8 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePr
  */
 public class UniquePreCheck<E> extends UncachedAction<E> {
     private static final long serialVersionUID = 1L;
-    private static final String HQL = "SELECT COUNT(*) FROM {0} o WHERE ({1}) = ({2}) {3}";
-    private static final String EXCEPTION_STRING = "There already exists a {0} with property value(s) ({1}) for ({2}), respectively. These field(s) must be unique.";
+    private static final String HQL = "SELECT COUNT(*) FROM {0} o WHERE ({1}) = ({2}) {3}"; //$NON-NLS-1$
+    private static final String EXCEPTION_STRING = "There already exists a {0} with property value(s) ({1}) for ({2}), respectively. These field(s) must be unique."; //$NON-NLS-1$
 
     protected final Collection<Property<?, ? super E>> properties;
 
@@ -69,7 +69,7 @@ public class UniquePreCheck<E> extends UncachedAction<E> {
 
     private Query getQuery(Session session) {
         String modelName = getModelClass().getName();
-        String propertyNames = StringUtil.join(getPropertyNames(), ", ");
+        String propertyNames = StringUtil.join(getPropertyNames(), ", "); //$NON-NLS-1$
         String valueBindings = getValueBindings();
         String notSelfCondition = getNotSelfCondition();
 
@@ -86,9 +86,9 @@ public class UniquePreCheck<E> extends UncachedAction<E> {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 1, n = properties.size(); i <= n; i++) {
-            sb.append("?");
+            sb.append("?"); //$NON-NLS-1$
             if (i < n) {
-                sb.append(",");
+                sb.append(","); //$NON-NLS-1$
             }
         }
 
@@ -103,12 +103,12 @@ public class UniquePreCheck<E> extends UncachedAction<E> {
     }
 
     private String getNotSelfCondition() {
-        String idCheck = "";
+        String idCheck = ""; //$NON-NLS-1$
 
         Integer id = getModelId();
         if (id != null) {
             String idName = getIdProperty().getName();
-            idCheck = " AND " + idName + " <> " + id;
+            idCheck = " AND " + idName + " <> " + id; //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         return idCheck;

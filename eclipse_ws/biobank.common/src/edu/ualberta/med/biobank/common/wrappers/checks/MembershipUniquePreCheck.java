@@ -31,9 +31,10 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePr
  */
 public class MembershipUniquePreCheck extends UncachedAction<Membership> {
     private static final long serialVersionUID = 1L;
-    private static final String HQL_START = "SELECT COUNT(*) FROM "
-        + Membership.class.getName() + " WHERE";
-    private static final String EXCEPTION_STRING = "There already exists a membership with property value(s) ({1}) for ({2}), respectively. These field(s) must be unique.";
+    private static final String HQL_START = "SELECT COUNT(*) FROM " //$NON-NLS-1$
+        + Membership.class.getName() + " WHERE"; //$NON-NLS-1$
+    private static final String EXCEPTION_STRING = Messages
+        .getString("MembershipUniquePreCheck.exception.string"); //$NON-NLS-1$
 
     /**
      * 
@@ -75,9 +76,9 @@ public class MembershipUniquePreCheck extends UncachedAction<Membership> {
         StringBuffer hql = new StringBuffer(HQL_START);
         appendValueTest(hql, session,
             MembershipPeer.PRINCIPAL.to(PrincipalPeer.ID));
-        hql.append(" and ");
+        hql.append(" and "); //$NON-NLS-1$
         appendValueTest(hql, session, MembershipPeer.CENTER.to(CenterPeer.ID));
-        hql.append(" and ");
+        hql.append(" and "); //$NON-NLS-1$
         appendValueTest(hql, session, MembershipPeer.STUDY.to(StudyPeer.ID));
 
         hql.append(getNotSelfCondition());
@@ -88,12 +89,12 @@ public class MembershipUniquePreCheck extends UncachedAction<Membership> {
     }
 
     private String getNotSelfCondition() {
-        String idCheck = "";
+        String idCheck = ""; //$NON-NLS-1$
 
         Integer id = getModelId();
         if (id != null) {
             String idName = getIdProperty().getName();
-            idCheck = " AND " + idName + " <> " + id;
+            idCheck = " AND " + idName + " <> " + id; //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         return idCheck;
@@ -104,11 +105,11 @@ public class MembershipUniquePreCheck extends UncachedAction<Membership> {
         Membership model = getModel();
         GetterInterceptor lazyLoad = new LazyLoaderInterceptor(session, 1);
         Object value = property.get(model, lazyLoad);
-        sb.append(" ").append(property.getName());
+        sb.append(" ").append(property.getName()); //$NON-NLS-1$
         if (value == null)
-            sb.append(" is null");
+            sb.append(" is null"); //$NON-NLS-1$
         else
-            sb.append(" = '").append(value).append("'");
+            sb.append(" = '").append(value).append("'"); //$NON-NLS-1$ //$NON-NLS-2$
 
     }
 }

@@ -33,11 +33,11 @@ public class GlobalEventAttrWrapper extends GlobalEventAttrBaseWrapper {
 
     @Override
     public String toString() {
-        return "" + getId() + ":" + getLabel() + ":"
+        return "" + getId() + ":" + getLabel() + ":" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             + getEventAttrType().getName();
     }
 
-    public static final String ALL_GLOBAL_EVENT_ATTRS_QRY = "from "
+    public static final String ALL_GLOBAL_EVENT_ATTRS_QRY = "from " //$NON-NLS-1$
         + GlobalEventAttr.class.getName();
 
     public static List<GlobalEventAttrWrapper> getAllGlobalEventAttrs(

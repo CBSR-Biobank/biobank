@@ -63,7 +63,7 @@ public class DeleteModelWrapperQueryTask<E> implements
      */
     private static class DeleteAction<E> extends WrapperAction<E> {
         private static final long serialVersionUID = 1L;
-        private static final String HQL = "DELETE FROM {0} WHERE {1} = ?";
+        private static final String HQL = "DELETE FROM {0} WHERE {1} = ?"; //$NON-NLS-1$
 
         public DeleteAction(ModelWrapper<E> wrapper) {
             super(wrapper);
@@ -82,7 +82,14 @@ public class DeleteModelWrapperQueryTask<E> implements
             // https://forum.hibernate.org/viewtopic.php?f=1&t=944722)
             try {
                 Serializable id = getIdProperty().get(model);
-                session.delete(session.load(getModelClass(), id));
+
+                @SuppressWarnings("unchecked")
+                E loadedModel = (E) session.load(getModelClass(), id);
+                session.delete(loadedModel);
+
+                // Remove the loaded model from the Session so that it is not
+                // automagically saved (when the session is closed or flush() is
+                // called).
                 // TODO: version check and throw a StaleStateException?
             } catch (PropertyValueException e) {
                 // TODO: determine why the HQL delete is still necessary, test

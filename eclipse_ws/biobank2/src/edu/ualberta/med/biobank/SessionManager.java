@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -364,32 +365,40 @@ public class SessionManager {
         return getUser().isInSuperAdminMode();
     }
 
-    public static void updateViewsVisibility(IWorkbenchPage page, boolean login) {
-        try {
-            SessionManager sm = getInstance();
-            if (sm.isConnected()) {
-                String perspectiveId = page.getPerspective().getId();
-                Boolean done = sm.perspectivesUpdateDone.get(perspectiveId);
-                if (done == null || !done) {
-                    PerspectiveSecurity.updateVisibility(getUser(), page);
-                    sm.perspectivesUpdateDone.put(perspectiveId, true);
+    public static void updateViewsVisibility(final IWorkbenchPage page,
+        final boolean login) {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    SessionManager sm = getInstance();
+                    if (sm.isConnected()) {
+                        String perspectiveId = page.getPerspective().getId();
+                        Boolean done = sm.perspectivesUpdateDone
+                            .get(perspectiveId);
+                        if (done == null || !done) {
+                            PerspectiveSecurity.updateVisibility(getUser(),
+                                page);
+                            sm.perspectivesUpdateDone.put(perspectiveId, true);
+                        }
+                    }
+                } catch (PartInitException e) {
+                    BgcPlugin.openAsyncError(
+                        Messages.SessionManager_actions_error_title, e);
                 }
+                // don't want to switch if was activated by an handler after
+                // login
+                // (display is weird otherwise)
+                if (login && page.getViewReferences().length == 0)
+                    try {
+                        page.getWorkbenchWindow()
+                            .getWorkbench()
+                            .showPerspective(MainPerspective.ID,
+                                page.getWorkbenchWindow());
+                    } catch (WorkbenchException e) {
+                        logger.error("Error opening main perspective", e); //$NON-NLS-1$
+                    }
             }
-        } catch (PartInitException e) {
-            BgcPlugin.openAsyncError(
-                Messages.SessionManager_actions_error_title, e);
-        }
-        // don't want to switch if was activated by an handler after login
-        // (display is weird otherwise)
-        if (login && page.getViewReferences().length == 0)
-            try {
-                page.getWorkbenchWindow()
-                    .getWorkbench()
-                    .showPerspective(MainPerspective.ID,
-                        page.getWorkbenchWindow());
-            } catch (WorkbenchException e) {
-                logger.error("Error opening main perspective", e); //$NON-NLS-1$
-            }
-
+        });
     }
 }

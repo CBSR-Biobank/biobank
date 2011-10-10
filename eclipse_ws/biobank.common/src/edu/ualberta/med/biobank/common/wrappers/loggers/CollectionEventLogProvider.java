@@ -16,8 +16,8 @@ public class CollectionEventLogProvider implements
 
         log.setPatientNumber(collectionEvent.getPatient().getPnumber());
 
-        String details = "visit: " + collectionEvent.getVisitNumber()
-            + ", specimens: " + getOriginalSpecimensCount(collectionEvent);
+        String details = "visit: " + collectionEvent.getVisitNumber() //$NON-NLS-1$
+            + ", specimens: " + getOriginalSpecimensCount(collectionEvent); //$NON-NLS-1$
         log.setDetails(details);
 
         return log;

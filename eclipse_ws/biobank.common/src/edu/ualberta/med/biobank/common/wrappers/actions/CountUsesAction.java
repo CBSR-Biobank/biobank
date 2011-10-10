@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
  */
 public class CountUsesAction<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
-    private static final String COUNT_HQL = "SELECT count(m) FROM {0} m WHERE m.{1} = ?";
+    private static final String COUNT_HQL = "SELECT count(m) FROM {0} m WHERE m.{1} = ?"; //$NON-NLS-1$
 
     private final Property<? super E, ?> property;
     private final Class<?> propertyClass;

@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
  */
 public class IfAction<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
-    private static final String HQL = "SELECT COUNT(*) FROM {0} m {1} WHERE m = ? {2}";
+    private static final String HQL = "SELECT COUNT(*) FROM {0} m {1} WHERE m = ? {2}"; //$NON-NLS-1$
 
     private final Property<?, ? super E> property;
     private final Is is;
@@ -32,8 +32,8 @@ public class IfAction<E> extends WrapperAction<E> {
 
     public enum Is {
         // @formatter:off
-        NULL("IS NULL"),
-        NOT_NULL("IS NOT NULL");
+        NULL("IS NULL"), //$NON-NLS-1$
+        NOT_NULL("IS NOT NULL"); //$NON-NLS-1$
         // @formatter:on;
 
         public final String hqlString;
@@ -52,8 +52,8 @@ public class IfAction<E> extends WrapperAction<E> {
      * @param is (e.g. should the {@link Property} be null or not null)
      * @param action what to do if the condition is true
      */
-    public IfAction(ModelWrapper<E> wrapper,
-        Property<?, ? super E> property, Is is, BiobankSessionAction action) {
+    public IfAction(ModelWrapper<E> wrapper, Property<?, ? super E> property,
+        Is is, BiobankSessionAction action) {
         super(wrapper);
         this.property = property;
         this.is = is;
@@ -67,21 +67,21 @@ public class IfAction<E> extends WrapperAction<E> {
 
         // use left joins in case the property is allowed to be null.
         List<String> names = property.getNames();
-        String joinPoint = "m";
+        String joinPoint = "m"; //$NON-NLS-1$
         for (int i = 0, n = names.size() - 1; i < n; i++) {
-            joins.append(" LEFT JOIN ");
+            joins.append(" LEFT JOIN "); //$NON-NLS-1$
             joins.append(joinPoint);
-            joins.append(".");
+            joins.append("."); //$NON-NLS-1$
             joins.append(names.get(i));
-            joins.append(" p");
+            joins.append(" p"); //$NON-NLS-1$
             joins.append(i);
 
-            conditions.append(" AND p");
+            conditions.append(" AND p"); //$NON-NLS-1$
             conditions.append(i);
-            conditions.append(" ");
+            conditions.append(" "); //$NON-NLS-1$
             conditions.append(is.hqlString);
 
-            joinPoint = "p" + Integer.toString(i);
+            joinPoint = "p" + Integer.toString(i); //$NON-NLS-1$
         }
 
         String hql = MessageFormat.format(HQL, getModelClass().getName(),

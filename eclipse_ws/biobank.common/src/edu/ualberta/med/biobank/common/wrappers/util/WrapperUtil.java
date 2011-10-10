@@ -39,19 +39,19 @@ public class WrapperUtil {
         Class<? extends ModelWrapper<E>> wrapperClass = null;
 
         String packageName = ModelWrapper.class.getPackage().getName();
-        String internalPackageName = packageName + ".internal";
-        String classSimpleName = modelClass.getSimpleName() + "Wrapper";
+        String internalPackageName = packageName + ".internal"; //$NON-NLS-1$
+        String classSimpleName = modelClass.getSimpleName() + "Wrapper"; //$NON-NLS-1$
 
         try {
             @SuppressWarnings("unchecked")
             Class<? extends ModelWrapper<E>> tmp = (Class<? extends ModelWrapper<E>>) Class
-                .forName(packageName + "." + classSimpleName);
+                .forName(packageName + "." + classSimpleName); //$NON-NLS-1$
             wrapperClass = tmp;
         } catch (ClassNotFoundException e) {
             try {
                 @SuppressWarnings("unchecked")
                 Class<? extends ModelWrapper<E>> tmp = (Class<? extends ModelWrapper<E>>) Class
-                    .forName(internalPackageName + "." + classSimpleName);
+                    .forName(internalPackageName + "." + classSimpleName); //$NON-NLS-1$
                 wrapperClass = tmp;
             } catch (ClassNotFoundException e1) {
             }
@@ -124,7 +124,7 @@ public class WrapperUtil {
 
         Class<?> nakedKlazz = nakedObject.getClass();
         String wrapperClassName = ModelWrapper.class.getPackage().getName()
-            + "." + nakedObject.getClass().getSimpleName() + "Wrapper";
+            + "." + nakedObject.getClass().getSimpleName() + "Wrapper"; //$NON-NLS-1$//$NON-NLS-2$
 
         try {
             Class<?> wrapperKlazz = Class.forName(wrapperClassName);
@@ -137,8 +137,8 @@ public class WrapperUtil {
 
             return (ModelWrapper<?>) constructor.newInstance(args);
         } catch (Exception e) {
-            throw new Exception("cannot find or create expected Wrapper ("
-                + wrapperClassName + ") for " + nakedKlazz.getName(), e);
+            throw new Exception("cannot find or create expected Wrapper (" //$NON-NLS-1$
+                + wrapperClassName + ") for " + nakedKlazz.getName(), e); //$NON-NLS-1$
         }
     }
 

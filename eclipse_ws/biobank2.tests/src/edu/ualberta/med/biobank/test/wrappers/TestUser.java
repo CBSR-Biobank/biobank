@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.BbGroupWrapper;
-import edu.ualberta.med.biobank.common.wrappers.BbRightWrapper;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RoleWrapper;
@@ -194,10 +193,8 @@ public class TestUser extends TestDatabase {
         UserWrapper user = UserHelper.addUser(name, null, true);
 
         PermissionWrapper perm = new PermissionWrapper(appService);
-        BbRightWrapper right = BbRightWrapper.getAllRights(appService).get(0);
-        perm.setRight(right);
-        perm.addToPrivilegeCollection(right
-            .getAvailablePrivilegeCollection(false));
+        perm.setClassName(name);
+        perm.persist();
 
         MembershipWrapper ms = MembershipHelper.newMembership(user, null, null);
         ms.addToPermissionCollection(Arrays.asList(perm));
@@ -207,12 +204,6 @@ public class TestUser extends TestDatabase {
         Assert.assertEquals(1, user.getMembershipCollection(false).size());
         ms = user.getMembershipCollection(false).get(0);
         Assert.assertEquals(1, ms.getPermissionCollection(false).size());
-        perm = ms.getPermissionCollection(false).get(0);
-        Assert.assertEquals(
-            right.getAvailablePrivilegeCollection(false).size(), perm
-                .getPrivilegeCollection(false).size());
-        Assert.assertTrue(right.getAvailablePrivilegeCollection(false)
-            .containsAll(perm.getPrivilegeCollection(false)));
     }
 
     @Test
@@ -228,7 +219,7 @@ public class TestUser extends TestDatabase {
         // search the user again otherwise the appService will still try with
         // testuser
         user = UserWrapper.getUser(newUserAppService, name);
-        user.modifyPassword(password, newPwd);
+        user.modifyPassword(password, newPwd, null);
 
         // check user can't connect with old password
         try {

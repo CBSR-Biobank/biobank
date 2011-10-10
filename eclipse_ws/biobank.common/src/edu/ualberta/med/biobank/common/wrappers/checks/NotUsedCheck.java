@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsed
  */
 public class NotUsedCheck<E> extends UncachedAction<E> {
     private static final long serialVersionUID = 1L;
-    private static final String EXCEPTION_MESSAGE = "{0} {1} is still in use by {2}.";
+    private static final String EXCEPTION_MESSAGE = Messages.getString("NotUsedCheck.msg"); //$NON-NLS-1$
 
     private final CountUsesAction<E> countAction;
     private final String modelString;

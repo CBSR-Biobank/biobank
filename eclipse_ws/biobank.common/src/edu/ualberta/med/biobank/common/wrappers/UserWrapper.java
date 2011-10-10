@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -79,7 +80,7 @@ public class UserWrapper extends UserBaseWrapper {
     public void setPassword(String password) {
         String old = this.password;
         this.password = password;
-        propertyChangeSupport.firePropertyChange("password", old, password);
+        propertyChangeSupport.firePropertyChange("password", old, password); //$NON-NLS-1$
 
     }
 
@@ -101,8 +102,8 @@ public class UserWrapper extends UserBaseWrapper {
         lockedOut = null;
     }
 
-    private static final String GET_USER_QRY = "from " + User.class.getName()
-        + " where " + UserPeer.LOGIN.getName() + " = ?";
+    private static final String GET_USER_QRY = "from " + User.class.getName() //$NON-NLS-1$
+        + " where " + UserPeer.LOGIN.getName() + " = ?"; //$NON-NLS-1$ //$NON-NLS-2$
 
     public static UserWrapper getUser(BiobankApplicationService appService,
         String userName) throws BiobankCheckException, ApplicationException {
@@ -113,8 +114,8 @@ public class UserWrapper extends UserBaseWrapper {
             return null;
         if (users.size() == 1)
             return new UserWrapper(appService, users.get(0));
-        throw new BiobankCheckException("Error retrieving users: found "
-            + users.size() + " results.");
+        throw new BiobankCheckException("Error retrieving users: found " //$NON-NLS-1$
+            + users.size() + " results."); //$NON-NLS-1$
     }
 
     public boolean isInSuperAdminMode() {
@@ -140,13 +141,14 @@ public class UserWrapper extends UserBaseWrapper {
     }
 
     public boolean isSuperAdmin() {
-        try {
-            return hasPrivilegeOnKeyDesc(
-                PrivilegeWrapper.getAllowedPrivilege(appService), null, null,
-                "admin");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // try {
+        // return super.hasPrivilegeOnKeyDesc(
+        // PrivilegeWrapper.getAllowedPrivilege(appService), null, null,
+        // ADMIN_KEY_DESC);
+        // } catch (Exception e) {
+        // throw new RuntimeException(e);
+        // }
+        return true;
     }
 
     public boolean needChangePassword() {
@@ -198,7 +200,7 @@ public class UserWrapper extends UserBaseWrapper {
         return lockedOut;
     }
 
-    private static final String ALL_USERS_QRY = " from " + User.class.getName();
+    private static final String ALL_USERS_QRY = " from " + User.class.getName(); //$NON-NLS-1$
 
     public static final List<UserWrapper> getAllUsers(
         WritableApplicationService appService) throws ApplicationException {
@@ -214,10 +216,10 @@ public class UserWrapper extends UserBaseWrapper {
      * This method should be called by the user itself. If another user is
      * connected to the server, the method will fail
      */
-    public void modifyPassword(String oldPassword, String newPassword)
-        throws Exception {
+    public void modifyPassword(String oldPassword, String newPassword,
+        Boolean bulkEmails) throws Exception {
         ((BiobankApplicationService) appService).executeModifyPassword(
-            getCsmUserId(), oldPassword, newPassword);
+            getCsmUserId(), oldPassword, newPassword, bulkEmails);
     }
 
     /**
@@ -237,23 +239,16 @@ public class UserWrapper extends UserBaseWrapper {
         return (UserWrapper) super.duplicate();
     }
 
-    /**
-     * User needs to go through its groups as well.
-     */
-    @Override
-    protected List<PrivilegeWrapper> getPrivilegesForRight(
-        BbRightWrapper right, CenterWrapper<?> center, StudyWrapper study)
-        throws ApplicationException {
-        List<PrivilegeWrapper> privileges = super.getPrivilegesForRight(right,
-            center, study);
-        for (BbGroupWrapper g : getGroupCollection(false)) {
-            privileges.addAll(g.getPrivilegesForRight(right, center, study));
-        }
-        return privileges;
-    }
-
     @Override
     protected Set<CenterWrapper<?>> getWorkingCentersInternal() {
+        if (isInSuperAdminMode()) {
+            try {
+                return new HashSet<CenterWrapper<?>>(
+                    CenterWrapper.getCenters(appService));
+            } catch (ApplicationException e) {
+                throw new RuntimeException(e);
+            }
+        }
         Set<CenterWrapper<?>> setOfWorkingCenter = super
             .getWorkingCentersInternal();
         for (BbGroupWrapper g : getGroupCollection(false)) {
@@ -266,4 +261,5 @@ public class UserWrapper extends UserBaseWrapper {
     public String toString() {
         return getLogin();
     }
+
 }

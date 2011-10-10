@@ -7,10 +7,10 @@ import org.hibernate.Query;
 
 public class HibernateUtil {
     public static Long getCountFromResult(List<?> results) {
-        Long count = new Long(0);
+        Long count = 0L;
         if (results != null && results.size() == 1
             && (results.get(0) instanceof Number)) {
-            count = new Long(((Number) results.get(0)).longValue());
+            count = Long.valueOf(((Number) results.get(0)).longValue());
         }
         return count;
     }

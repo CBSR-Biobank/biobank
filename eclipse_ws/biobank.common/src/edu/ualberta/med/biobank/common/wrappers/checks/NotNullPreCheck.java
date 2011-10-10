@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropert
  */
 public class NotNullPreCheck<E> extends UncachedAction<E> {
     private static final long serialVersionUID = 1L;
-    private static final String EXCEPTION_STRING = "The {0} of {1} {2} must be defined (cannot be null).";
+    private static final String EXCEPTION_STRING = Messages.getString("NotNullPreCheck.exception.string"); //$NON-NLS-1$
 
     private final Property<?, ? super E> property;
     private final String modelString;

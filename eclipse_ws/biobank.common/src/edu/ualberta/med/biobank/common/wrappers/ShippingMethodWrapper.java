@@ -18,8 +18,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
 
-    public static final String DROP_OFF_NAME = "Drop-off";
-    public static final String PICK_UP_NAME = "Pick-up";
+    public static final String DROP_OFF_NAME = "Drop-off"; //$NON-NLS-1$
+    public static final String PICK_UP_NAME = "Pick-up"; //$NON-NLS-1$
 
     public ShippingMethodWrapper(WritableApplicationService appService) {
         super(appService);
@@ -63,9 +63,9 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
         return getName();
     }
 
-    private static final String IS_USED_HQL = "select count(si) from "
-        + ShipmentInfo.class.getName() + " as si where si."
-        + ShipmentInfoPeer.SHIPPING_METHOD.getName() + "=?";
+    private static final String IS_USED_HQL = "select count(si) from " //$NON-NLS-1$
+        + ShipmentInfo.class.getName() + " as si where si." //$NON-NLS-1$
+        + ShipmentInfoPeer.SHIPPING_METHOD.getName() + "=?"; //$NON-NLS-1$
 
     public boolean isUsed() throws ApplicationException, BiobankException {
         if (isNew())

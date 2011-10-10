@@ -15,12 +15,12 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
 public class ContainerPersistChecks extends LoadModelAction<Container> {
     private static final long serialVersionUID = 1L;
 
-    private static final String POSITION_NOT_ALLOWED_MSG = "Container {0} is a top-level container and is not allowed to have a parent or position.";
-    private static final String MISSING_PARENT_MSG = "Container {0} does not have a parent container.";
-    private static final String BAD_CONTAINER_TYPE_MSG = "Container {0} does not allow inserts of container type {1}.";
-    private static final String MISSING_POSITION_MSG = "Child container {0} must have a position.";
-    private static final String WRONG_PARENT_SITE_MSG = "Container {0} has a different site than its parent container. The sites must be the same.";
-    private static final String WRONG_CONTAINER_TYPE_SITE_MSG = "Container {0} has a different site than its container type's site. The sites be the same.";
+    private static final String POSITION_NOT_ALLOWED_MSG = Messages.getString("ContainerPersistChecks.position.not.allowed.msg"); //$NON-NLS-1$
+    private static final String MISSING_PARENT_MSG = Messages.getString("ContainerPersistChecks.missing.parent.msg"); //$NON-NLS-1$
+    private static final String BAD_CONTAINER_TYPE_MSG = Messages.getString("ContainerPersistChecks.bad.container.type.msg"); //$NON-NLS-1$
+    private static final String MISSING_POSITION_MSG = Messages.getString("ContainerPersistChecks.missing.position.msg"); //$NON-NLS-1$
+    private static final String WRONG_PARENT_SITE_MSG = Messages.getString("ContainerPersistChecks.wrong.parent.site.msg"); //$NON-NLS-1$
+    private static final String WRONG_CONTAINER_TYPE_SITE_MSG = Messages.getString("ContainerPersistChecks.wrong.container.type.site.msg"); //$NON-NLS-1$
 
     public ContainerPersistChecks(ModelWrapper<Container> wrapper) {
         super(wrapper);

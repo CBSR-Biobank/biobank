@@ -29,8 +29,8 @@ public class AliquotedSpecimenWrapper extends AliquotedSpecimenBaseWrapper {
 
     @Override
     public String toString() {
-        return new StringBuilder(getSpecimenType().getName()).append("/")
-            .append(getQuantity()).append("/").append(getActivityStatus())
+        return new StringBuilder(getSpecimenType().getName()).append("/") //$NON-NLS-1$
+            .append(getQuantity()).append("/").append(getActivityStatus()) //$NON-NLS-1$
             .toString();
     }
 }

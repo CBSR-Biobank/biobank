@@ -30,25 +30,25 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
 public class ContainerTypePostPersistChecks extends LoadModelAction<ContainerType> {
     private static final long serialVersionUID = 1L;
 
-    private static final String CANNOT_REMOVE_CHILD_CONTAINER_TYPE_MSG = "Unable to remove child type. This parent/child relationship exists in database. Remove all instances before attempting to delete a child type.";
-    private static final String CANNOT_REMOVE_SPECIMEN_TYPE_MSG = "Unable to remove specimen type. This parent/child relationship exists in database. Remove all instances before attempting to delete a sample type.";
-    private static final String INSUFFICIENT_LABELING_SCHEME_MSG = "Labeling scheme cannot label {0} rows and {1} columns.";
+    private static final String CANNOT_REMOVE_CHILD_CONTAINER_TYPE_MSG = Messages.getString("ContainerTypePostPersistChecks.cannot.remove.child.container.type.msg"); //$NON-NLS-1$
+    private static final String CANNOT_REMOVE_SPECIMEN_TYPE_MSG = Messages.getString("ContainerTypePostPersistChecks.cannot.remove.specimen.type.msg"); //$NON-NLS-1$
+    private static final String INSUFFICIENT_LABELING_SCHEME_MSG = Messages.getString("ContainerTypePostPersistChecks.insufficient.labeling.scheme.msg"); //$NON-NLS-1$
 
     // @formatter:off
     private static final String COUNT_COUNTAINERS_WITH_CONTAINER_TYPE =
-        "SELECT COUNT(cp)" +
-        " FROM " + ContainerPosition.class.getName() + " AS cp" +
-        " INNER JOIN cp." + ContainerPositionPeer.PARENT_CONTAINER.getName() + " AS cparent" +
-        " WHERE cparent." + ContainerPeer.CONTAINER_TYPE.to(ContainerTypePeer.ID).getName() + " = ?" +
-        "   AND cp." + ContainerPositionPeer.CONTAINER.to(ContainerPeer.CONTAINER_TYPE.to(ContainerTypePeer.ID)).getName() +
-        "       IN ({0})";
+        "SELECT COUNT(cp)" + //$NON-NLS-1$
+        " FROM " + ContainerPosition.class.getName() + " AS cp" + //$NON-NLS-1$ //$NON-NLS-2$
+        " INNER JOIN cp." + ContainerPositionPeer.PARENT_CONTAINER.getName() + " AS cparent" + //$NON-NLS-1$ //$NON-NLS-2$
+        " WHERE cparent." + ContainerPeer.CONTAINER_TYPE.to(ContainerTypePeer.ID).getName() + " = ?" + //$NON-NLS-1$ //$NON-NLS-2$
+        "   AND cp." + ContainerPositionPeer.CONTAINER.to(ContainerPeer.CONTAINER_TYPE.to(ContainerTypePeer.ID)).getName() + //$NON-NLS-1$
+        "       IN ({0})"; //$NON-NLS-1$
     private static final String COUNT_SPECIMENS_WITH_CONTAINER_TYPE =
-        "SELECT COUNT(ap) " +
-        " FROM " + SpecimenPosition.class.getName() + " AS ap" +
-        " INNER JOIN ap." + SpecimenPositionPeer.CONTAINER.getName() + " AS aparent" +
-        " WHERE aparent." + ContainerPeer.CONTAINER_TYPE.to(ContainerTypePeer.ID).getName() + " = ?" +
-        "   AND ap." + SpecimenPositionPeer.SPECIMEN.to(SpecimenPeer.SPECIMEN_TYPE.to(SpecimenTypePeer.ID)).getName() +
-        "     IN ({0})";
+        "SELECT COUNT(ap) " + //$NON-NLS-1$
+        " FROM " + SpecimenPosition.class.getName() + " AS ap" + //$NON-NLS-1$ //$NON-NLS-2$
+        " INNER JOIN ap." + SpecimenPositionPeer.CONTAINER.getName() + " AS aparent" + //$NON-NLS-1$ //$NON-NLS-2$
+        " WHERE aparent." + ContainerPeer.CONTAINER_TYPE.to(ContainerTypePeer.ID).getName() + " = ?" + //$NON-NLS-1$ //$NON-NLS-2$
+        "   AND ap." + SpecimenPositionPeer.SPECIMEN.to(SpecimenPeer.SPECIMEN_TYPE.to(SpecimenTypePeer.ID)).getName() + //$NON-NLS-1$
+        "     IN ({0})"; //$NON-NLS-1$
     // @formatter:on
 
     private final Collection<ContainerType> removedChildContainerTypes;
@@ -134,7 +134,7 @@ public class ContainerTypePostPersistChecks extends LoadModelAction<ContainerTyp
             }
         }
 
-        String idsList = StringUtil.join(ids, ", ");
+        String idsList = StringUtil.join(ids, ", "); //$NON-NLS-1$
         String hql = MessageFormat.format(
             COUNT_COUNTAINERS_WITH_CONTAINER_TYPE, idsList);
 
@@ -162,7 +162,7 @@ public class ContainerTypePostPersistChecks extends LoadModelAction<ContainerTyp
             }
         }
 
-        String idsList = StringUtil.join(ids, ", ");
+        String idsList = StringUtil.join(ids, ", "); //$NON-NLS-1$
         String hql = MessageFormat.format(COUNT_SPECIMENS_WITH_CONTAINER_TYPE,
             idsList);
 

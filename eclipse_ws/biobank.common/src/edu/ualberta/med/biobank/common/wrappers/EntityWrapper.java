@@ -98,7 +98,7 @@ public class EntityWrapper extends EntityBaseWrapper {
         return filters;
     }
 
-    private static final String GET_ENTTITIES_QRY = "from "
+    private static final String GET_ENTTITIES_QRY = "from " //$NON-NLS-1$
         + Entity.class.getName();
 
     public static Collection<Entity> getEntities(

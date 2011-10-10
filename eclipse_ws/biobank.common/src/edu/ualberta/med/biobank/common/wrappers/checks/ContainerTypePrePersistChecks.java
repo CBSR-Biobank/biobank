@@ -13,9 +13,9 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
 
 public class ContainerTypePrePersistChecks extends LoadModelAction<ContainerType> {
     private static final long serialVersionUID = 1L;
-    private static final String CANNOT_CHANGE_CAPACITY_MSG = "Unable to alter dimensions. A container of this type exists in storage. Remove all instances before attempting to modify this container type.";
-    private static final String CANNOT_CHANGE_TOP_LEVEL_MSG = "Unable to change the \"Top Level\" property. A container requiring this property exists in storage. Remove all instances before attempting to modify this container type.";
-    private static final String CANNOT_CHANGE_LABELING_SCHEME_MSG = "Unable to change the \"Child Labeling scheme\" property. A container requiring this property exists in storage. Remove all instances before attempting to modify this container type.";
+    private static final String CANNOT_CHANGE_CAPACITY_MSG = Messages.getString("ContainerTypePrePersistChecks.cannot.change.capacity.msg"); //$NON-NLS-1$
+    private static final String CANNOT_CHANGE_TOP_LEVEL_MSG = Messages.getString("ContainerTypePrePersistChecks.cannot.change.top.level.msg"); //$NON-NLS-1$
+    private static final String CANNOT_CHANGE_LABELING_SCHEME_MSG = Messages.getString("ContainerTypePrePersistChecks.cannot.change.labeling.scheme.msg"); //$NON-NLS-1$
 
     private final CountUsesAction<ContainerType> countContainers;
 

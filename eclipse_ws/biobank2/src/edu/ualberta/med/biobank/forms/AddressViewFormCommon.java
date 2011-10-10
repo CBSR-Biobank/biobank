@@ -21,8 +21,8 @@ public abstract class AddressViewFormCommon extends BiobankViewForm {
         FieldInfo field;
         for (String widgetName : AddressEntryFormCommon.ADDRESS_FIELDS.keySet()) {
             field = AddressEntryFormCommon.ADDRESS_FIELDS.get(widgetName);
-            addWidget(widgetName, createReadOnlyLabelledField(parent, SWT.NONE,
-                field.label));
+            addWidget(widgetName,
+                createReadOnlyLabelledField(parent, SWT.NONE, field.label));
         }
         setAddressValues(wrapperObject);
     }

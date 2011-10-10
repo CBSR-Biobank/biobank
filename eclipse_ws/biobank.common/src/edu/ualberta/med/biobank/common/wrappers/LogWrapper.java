@@ -17,6 +17,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+@SuppressWarnings("nls")
 public class LogWrapper extends LogBaseWrapper {
 
     public LogWrapper(WritableApplicationService appService) {
@@ -124,7 +125,8 @@ public class LogWrapper extends LogBaseWrapper {
 
     public static final String POSSIBLE_CENTERS_QRY = "select distinct("
         + LogPeer.CENTER.getName() + ") from " + Log.class.getName()
-        + " where " + LogPeer.CENTER.getName() + "!=''";
+        + " where " + LogPeer.CENTER.getName() + "!=''  ORDER BY "
+        + LogPeer.CENTER.getName();
 
     public static List<String> getPossibleCenters(
         WritableApplicationService appService) throws ApplicationException {
@@ -132,7 +134,8 @@ public class LogWrapper extends LogBaseWrapper {
     }
 
     public static final String POSSIBLE_USER_NAMES_QRY = "select distinct("
-        + LogPeer.USERNAME.getName() + ") from " + Log.class.getName();
+        + LogPeer.USERNAME.getName() + ") from " + Log.class.getName()
+        + " ORDER BY " + LogPeer.USERNAME.getName();
 
     public static List<String> getPossibleUsernames(
         WritableApplicationService appService) throws ApplicationException {
@@ -140,7 +143,8 @@ public class LogWrapper extends LogBaseWrapper {
     }
 
     public static final String POSSIBLE_ACTIONS_QRY = "select distinct("
-        + LogPeer.ACTION.getName() + ") from " + Log.class.getName();
+        + LogPeer.ACTION.getName() + ") from " + Log.class.getName()
+        + " ORDER BY " + LogPeer.ACTION.getName();
 
     public static List<String> getPossibleActions(
         WritableApplicationService appService) throws ApplicationException {
@@ -149,7 +153,7 @@ public class LogWrapper extends LogBaseWrapper {
 
     public static final String POSSIBLE_TYPES_QRY = "select distinct("
         + LogPeer.TYPE.getName() + ") from " + Log.class.getName()
-        + " where type !=''";
+        + " where type !='' ORDER BY " + LogPeer.TYPE.getName();
 
     public static List<String> getPossibleTypes(
         WritableApplicationService appService) throws ApplicationException {

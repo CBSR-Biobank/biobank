@@ -1,5 +1,15 @@
 <?xml encoding="UTF-8"?>
 
+<!ELEMENT ol (li)+>
+<!ELEMENT ul (li)+>
+<!ELEMENT li (#PCDATA|b|i|ref|sub|sup|p)*>
+<!ELEMENT p EMPTY>
+<!ELEMENT b (#PCDATA|i)*>
+<!ELEMENT i (#PCDATA|b)*>
+<!ELEMENT sub (#PCDATA)>
+<!ELEMENT sup (#PCDATA)>
+<!ELEMENT ref (#PCDATA)>
+
 <!ELEMENT test_suite (test_section)+>
 <!ATTLIST test_suite
   xmlns CDATA #FIXED ''
@@ -19,21 +29,21 @@
   xmlns CDATA #FIXED ''
   id CDATA #REQUIRED
   name CDATA #REQUIRED
-  variety NMTOKEN #REQUIRED>
+  variety (positive | negative) "positive">
 
-<!ELEMENT description (#PCDATA)>
+<!ELEMENT description (#PCDATA|p|b|i|ref|ol|ul|sub|sup)*>
 <!ATTLIST description
   xmlns CDATA #FIXED ''>
 
-<!ELEMENT precondition (#PCDATA)>
+<!ELEMENT precondition (#PCDATA|p|b|i|ref|ol|ul|sub|sup)*>
 <!ATTLIST precondition
   xmlns CDATA #FIXED ''>
 
-<!ELEMENT expected_result (#PCDATA)>
+<!ELEMENT expected_result (#PCDATA|p|b|i|ref|ol|ul|sub|sup)*>
 <!ATTLIST expected_result
   xmlns CDATA #FIXED ''>
 
-<!ELEMENT note (#PCDATA)>
+<!ELEMENT note (#PCDATA|p|b|i|ref|ol|ul|sub|sup)*>
 <!ATTLIST note
   xmlns CDATA #FIXED ''>
 
@@ -45,6 +55,6 @@
 <!ATTLIST steps
   xmlns CDATA #FIXED ''>
 
-<!ELEMENT step (#PCDATA)>
+<!ELEMENT step (#PCDATA|p|b|i|ref|ol|ul|sub|sup)*>
 <!ATTLIST step
   xmlns CDATA #FIXED ''>

@@ -27,8 +27,8 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSess
  */
 public class PropertyCountAction<E> extends WrapperAction<E> {
     private static final long serialVersionUID = 1L;
-    private static final String PROPERTIES_EMPTY_ERRMSG = "No properties were given to count. At least one property is required.";
-    private static final String HQL = "SELECT COUNT(*) FROM {0} o WHERE ({1}) = (SELECT {2} FROM {0} o2 WHERE o2 = ?)";
+    private static final String PROPERTIES_EMPTY_ERRMSG = "No properties were given to count. At least one property is required."; //$NON-NLS-1$
+    private static final String HQL = "SELECT COUNT(*) FROM {0} o WHERE ({1}) = (SELECT {2} FROM {0} o2 WHERE o2 = ?)"; //$NON-NLS-1$
 
     private final Collection<Property<?, ? super E>> properties;
 
@@ -53,10 +53,10 @@ public class PropertyCountAction<E> extends WrapperAction<E> {
         String modelClassName = getModelClass().getName();
 
         List<String> propertyNames = getPropertyNames(properties);
-        String hqlProperties = StringUtil.join(propertyNames, ", ");
+        String hqlProperties = StringUtil.join(propertyNames, ", "); //$NON-NLS-1$
 
-        List<String> subPropertyNames = getPropertyNames("o2.", properties);
-        String subHqlProperties = StringUtil.join(subPropertyNames, ", ");
+        List<String> subPropertyNames = getPropertyNames("o2.", properties); //$NON-NLS-1$
+        String subHqlProperties = StringUtil.join(subPropertyNames, ", "); //$NON-NLS-1$
 
         String hql = MessageFormat.format(HQL, modelClassName, hqlProperties,
             subHqlProperties);
@@ -70,7 +70,7 @@ public class PropertyCountAction<E> extends WrapperAction<E> {
 
     private List<String> getPropertyNames(
         Collection<Property<?, ? super E>> properties) {
-        return getPropertyNames("", properties);
+        return getPropertyNames("", properties); //$NON-NLS-1$
     }
 
     private List<String> getPropertyNames(String prefix,

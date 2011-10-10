@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 class HQLAccessor {
-    private static final String GET_COLLECTION_HQL = "SELECT e FROM {0} e WHERE e.{1} = ?";
+    private static final String GET_COLLECTION_HQL = "SELECT e FROM {0} e WHERE e.{1} = ?"; //$NON-NLS-1$
 
     /**
      * Get a {@link List} of {@link ModelWrapper}-s that wrap a collection of

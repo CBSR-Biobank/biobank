@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
@@ -217,6 +218,10 @@ public abstract class BiobankFormBase extends BgcFormBase {
                 ex);
             cancelSave(monitor);
         } else if (ex instanceof BiobankServerException) {
+            BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
+                ex);
+            cancelSave(monitor);
+        } else if (ex instanceof BiobankSessionException) {
             BgcPlugin.openAsyncError(Messages.BiobankFormBase_save_error_title,
                 ex);
             cancelSave(monitor);

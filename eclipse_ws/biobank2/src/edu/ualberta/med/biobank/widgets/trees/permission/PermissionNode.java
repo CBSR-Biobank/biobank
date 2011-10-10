@@ -1,25 +1,57 @@
 package edu.ualberta.med.biobank.widgets.trees.permission;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
-import edu.ualberta.med.biobank.common.wrappers.PrivilegeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PermissionWrapper;
 
-public interface PermissionNode {
+public class PermissionNode implements IPermissionCheckTreeNode {
 
-    public PermissionNode getParent();
+    private PermissionWrapper permission;
+    private IPermissionCheckTreeNode parent;
 
-    public Collection<? extends PermissionNode> getChildren();
+    public PermissionNode(IPermissionCheckTreeNode parent,
+        PermissionWrapper permission) {
+        this.parent = parent;
+        this.permission = permission;
+    }
 
-    public String getText();
+    @Override
+    public IPermissionCheckTreeNode getParent() {
+        return parent;
+    }
 
-    public void setChecked(boolean checked);
+    public PermissionWrapper getPermission() {
+        return permission;
+    }
 
-    public void setChecked(boolean checked,
-        List<PrivilegeWrapper> defaultPrivilegeSelection);
+    @Override
+    public String getText() {
+        return permission.getClassName();
+    }
 
-    public boolean isChecked();
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof PermissionNode) {
+            PermissionNode r = (PermissionNode) o;
+            return getPermission().equals(r.getPermission());
+        }
+        return false;
+    }
 
-    public boolean isGrayed();
+    public void setPermission(PermissionWrapper p) {
+        this.permission = p;
+    }
+
+    @Override
+    public String toString() {
+        return "Permission=" //$NON-NLS-1$
+            + permission.toString();
+    }
+
+    @Override
+    public Collection<? extends IPermissionCheckTreeNode> getChildren() {
+        return Collections.emptyList();
+    }
 
 }

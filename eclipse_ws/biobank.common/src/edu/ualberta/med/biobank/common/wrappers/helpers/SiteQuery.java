@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
@@ -18,10 +19,10 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -31,10 +32,12 @@ public class SiteQuery {
 
     // due to bug in Hibernate when using elements in query must also use a left
     // join
+    @SuppressWarnings("nls")
     private static final String STUDIES_NON_ASSOC_BASE_QRY = "select s from "
         + Study.class.getName() + " s left join s."
         + StudyPeer.SITE_COLLECTION.getName() + " where ";
 
+    @SuppressWarnings("nls")
     public static List<StudyWrapper> getStudiesNotAssoc(SiteWrapper site)
         throws ApplicationException {
         List<StudyWrapper> studyWrappers = new ArrayList<StudyWrapper>();
@@ -49,6 +52,7 @@ public class SiteQuery {
         return studyWrappers;
     }
 
+    @SuppressWarnings("nls")
     private static final String SITES_QRY = "from " + Site.class.getName();
 
     /**
@@ -61,7 +65,7 @@ public class SiteQuery {
         List<Object> qryParms = new ArrayList<Object>();
 
         if (id != null) {
-            qry.append(" where id = ?");
+            qry.append(" where id = ?"); //$NON-NLS-1$
             qryParms.add(id);
         }
 
@@ -74,6 +78,7 @@ public class SiteQuery {
         return wrappers;
     }
 
+    @SuppressWarnings("nls")
     private static final String TOP_CONTAINERS_QRY = "from "
         + Container.class.getName()
         + " where "
@@ -102,6 +107,7 @@ public class SiteQuery {
         return getSites(appService, null);
     }
 
+    @SuppressWarnings("nls")
     private static final String WORKING_CLINIC_COLLECTION_SIZE = "select distinct contact."
         + ContactPeer.CLINIC.getName()
         + " from "
@@ -128,16 +134,16 @@ public class SiteQuery {
         return clinics.size();
     }
 
+    @SuppressWarnings("nls")
     private static final String PATIENT_COUNT_QRY = "select count(distinct cevent."
         + CollectionEventPeer.PATIENT.getName()
         + ") from "
-        + Center.class.getName()
-        + " as center join center."
-        + SitePeer.SPECIMEN_COLLECTION.getName()
+        + Specimen.class.getName()
         + " as spcs join spcs."
         + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cevent where center."
-        + SitePeer.ID.getName() + "=?";
+        + " as cevent where spcs."
+        + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
+        + "=?";
 
     public static Long getPatientCount(SiteWrapper site) throws Exception {
         HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
@@ -145,15 +151,14 @@ public class SiteQuery {
         return ModelWrapper.getCountResult(site.getAppService(), criteria);
     }
 
+    @SuppressWarnings("nls")
     public static final String PATIENT_COUNT_FOR_STUDY_QRY = "select count(distinct patient) from "
-        + Site.class.getName()
-        + " as site join site."
-        + SitePeer.SPECIMEN_COLLECTION.getName()
+        + Specimen.class.getName()
         + " as specimens join specimens."
         + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
             CollectionEventPeer.PATIENT)
-        + " as patient where site."
-        + SitePeer.ID.getName()
+        + " as patient where specimens."
+        + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
         + "=? and patient."
         + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID) + "=?";
 
@@ -164,6 +169,7 @@ public class SiteQuery {
         return ModelWrapper.getCountResult(site.getAppService(), c);
     }
 
+    @SuppressWarnings("nls")
     private static final String SITE_STUDY_QUICK_INFO_QRY = "select studies.name,studies.nameShort,astatus.name,"
         + " count(distinct patients), count(distinct collectionEvents)"
         + " from edu.ualberta.med.biobank.model.Site site"

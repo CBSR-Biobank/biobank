@@ -21,7 +21,7 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
 
         if (row == null || col == null) {
             throw new IllegalArgumentException(
-                "Neither the row nor column of a position can be null");
+                "Neither the row nor column of a position can be null"); //$NON-NLS-1$
         }
     }
 

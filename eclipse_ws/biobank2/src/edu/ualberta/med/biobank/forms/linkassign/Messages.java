@@ -32,7 +32,11 @@ public class Messages extends NLS {
 
     public static String AbstractPalletSpecimenAdminForm_activitylog_scanTubeAlone;
 
+    public static String AbstractPalletSpecimenAdminForm_barcodes_tooltip_msg;
+
     public static String AbstractPalletSpecimenAdminForm_canLaunchScanValidationMsg;
+
+    public static String AbstractPalletSpecimenAdminForm_nobarcodes_msg;
 
     public static String AbstractPalletSpecimenAdminForm_plateToScan_label;
 

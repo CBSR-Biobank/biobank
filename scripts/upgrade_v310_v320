@@ -59,3 +59,6 @@ mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD create biobank
 gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
 echo "upgrading database..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v310_v320.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/permissions.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/groups.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v310_v320_security_transfer.sql
