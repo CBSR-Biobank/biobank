@@ -29,7 +29,7 @@ public class SaveSiteAction implements Action<Integer> {
     private String nameShort;
     private String comment;
     private Address address;
-    private ActivityStatus activityStatus;
+    private Integer aStatusId;
     private Set<Integer> studyIds;
 
     public SaveSiteAction(Integer siteId) {
@@ -52,8 +52,8 @@ public class SaveSiteAction implements Action<Integer> {
         this.address = address;
     }
 
-    public void setActivityStatus(ActivityStatus activityStatus) {
-        this.activityStatus = activityStatus;
+    public void setActivityStatusId(Integer activityStatusId) {
+        this.aStatusId = activityStatusId;
     }
 
     public void setStudyIds(Set<Integer> studyIds) {
@@ -81,7 +81,10 @@ public class SaveSiteAction implements Action<Integer> {
         site.setName(name);
         site.setNameShort(nameShort);
         site.setComment(comment);
-        site.setActivityStatus(activityStatus);
+
+        ActivityStatus aStatus = sessionUtil.get(ActivityStatus.class,
+            aStatusId);
+        site.setActivityStatus(aStatus);
 
         // TODO: remember to check the address
         site.setAddress(address);
