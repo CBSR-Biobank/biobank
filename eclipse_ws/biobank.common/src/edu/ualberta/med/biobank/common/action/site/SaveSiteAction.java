@@ -71,7 +71,7 @@ public class SaveSiteAction implements Action<Integer> {
         SessionUtil sessionUtil = new SessionUtil(session);
         Site site = sessionUtil.get(Site.class, siteId, new Site());
 
-        // TODO: check permission?
+        // TODO: check permission? (can edit site?)
 
         // TODO: error checks
         // TODO: version check?

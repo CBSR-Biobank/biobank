@@ -14,7 +14,6 @@ Export-Package: com.google.gwt.event.dom.client,
  com.google.gwt.event.shared,
  com.google.gwt.user.client.ui,
  com.google.gwt.user.client.ui.impl,
- edu.ualberta.med.biobank.event,
+ edu.ualberta.med.biobank.mvp.event,
  edu.ualberta.med.biobank.mvp.presenter,
- edu.ualberta.med.biobank.mvp.presenter.form,
- edu.ualberta.med.biobank.presenter
+ edu.ualberta.med.biobank.mvp.presenter.impl

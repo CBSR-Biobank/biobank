@@ -32,6 +32,7 @@ import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 import gov.nih.nci.system.util.ClassCache;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -289,7 +290,8 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public <T> T doAction(Action<T> action) throws ApplicationException {
+    public <T extends Serializable> T doAction(Action<T> action)
+        throws ApplicationException {
         Request request = new Request(action);
         request.setDomainObjectName(Site.class.getName());
 

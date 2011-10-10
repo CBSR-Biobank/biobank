@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.mvp.event.form;
+package edu.ualberta.med.biobank.mvp.event.presenter;
 
 import com.google.gwt.event.shared.GwtEvent;
 

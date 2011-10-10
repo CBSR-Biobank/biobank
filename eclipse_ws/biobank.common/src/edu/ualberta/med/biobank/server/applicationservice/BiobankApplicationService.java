@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -76,7 +77,8 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public boolean isUserLockedOut(Long csmUserId) throws ApplicationException;
 
-    public <T> T doAction(Action<T> action);
+    public <T extends Serializable> T doAction(Action<T> action)
+        throws ApplicationException;
 
     public boolean isAllowed(Permission permission) throws ApplicationException;
 }

@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.mvp.view.SaveableView;
 public abstract class BaseEditPresenter<D extends SaveableView> extends
     BaseViewPresenter<D> implements SaveablePresenter<D> {
 
+    @Override
     public void save() {
         doSave();
     }

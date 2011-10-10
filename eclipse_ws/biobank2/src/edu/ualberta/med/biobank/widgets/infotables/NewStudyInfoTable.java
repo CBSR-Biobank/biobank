@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
@@ -34,16 +34,17 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
 
                 switch (columnIndex) {
                 case 0:
-                    return info.study.getName();
+                    return info.getStudy().getName();
                 case 1:
-                    return info.study.getNameShort();
+                    return info.getStudy().getNameShort();
                 case 2:
-                    return (info.study.getActivityStatus() != null) ? info.study
-                        .getActivityStatus().getName() : ""; //$NON-NLS-1$
+                    return (info.getStudy().getActivityStatus() != null) ? info
+                        .getStudy().getActivityStatus().getName() : ""; //$NON-NLS-1$
                 case 3:
-                    return NumberFormatter.format(info.patientCount);
+                    return NumberFormatter.format(info.getPatientCount());
                 case 4:
-                    return NumberFormatter.format(info.collectionEventCount);
+                    return NumberFormatter.format(info
+                        .getCollectionEventCount());
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -63,22 +64,28 @@ public class NewStudyInfoTable extends AbstractInfoTableWidget {
 
                 switch (propertyIndex) {
                 case 0:
-                    rc = row1.study.getName().compareTo(row2.study.getName());
+                    rc = row1.getStudy().getName()
+                        .compareTo(row2.getStudy().getName());
                     break;
                 case 1:
-                    rc = row1.study.getNameShort().compareTo(
-                        row2.study.getNameShort());
+                    rc = row1.getStudy().getNameShort()
+                        .compareTo(row2.getStudy().getNameShort());
                     break;
                 case 2:
-                    rc = row1.study.getActivityStatus().getName()
-                        .compareTo(row2.study.getActivityStatus().getName());
+                    rc = row1
+                        .getStudy()
+                        .getActivityStatus()
+                        .getName()
+                        .compareTo(
+                            row2.getStudy().getActivityStatus().getName());
                     break;
                 case 3:
-                    rc = row1.patientCount.compareTo(row2.patientCount);
+                    rc = row1.getPatientCount().compareTo(
+                        row2.getPatientCount());
                     break;
                 case 4:
-                    rc = row1.collectionEventCount
-                        .compareTo(row2.collectionEventCount);
+                    rc = row1.getCollectionEventCount().compareTo(
+                        row2.getCollectionEventCount());
                     break;
                 }
                 // If descending order, flip the direction
