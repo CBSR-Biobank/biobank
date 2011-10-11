@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.mvp.view.item;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -21,6 +21,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 
 import edu.ualberta.med.biobank.mvp.event.SimpleValueChangeEvent;
 import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValue;
+import edu.ualberta.med.biobank.mvp.util.Converter;
 
 public class ComboItem<T> implements HasSelectedValue<T> {
     private static final Listener KILL_MOUSE_WHEEL_LISTENER = new Listener() {
@@ -41,19 +42,12 @@ public class ComboItem<T> implements HasSelectedValue<T> {
         }
     };
     private boolean fireEvents;
+    private Converter<T, String> optionLabeler;
 
-    public ComboItem(ComboViewer comboViewer,
-        final OptionLabelProvider<T> optionLabelProvider) {
+    public ComboItem(ComboViewer comboViewer) {
         this.comboViewer = comboViewer;
 
-        comboViewer.setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(Object element) {
-                @SuppressWarnings("unchecked")
-                T option = (T) element;
-                return optionLabelProvider.getLabel(option);
-            }
-        });
+        comboViewer.setLabelProvider(new CustomLabelProvider());
         comboViewer.addSelectionChangedListener(selectionChangedListener);
         disableMouseWheel();
     }
@@ -96,16 +90,25 @@ public class ComboItem<T> implements HasSelectedValue<T> {
     }
 
     @Override
-    public void setOptions(Collection<T> options) {
+    public void setOptions(List<T> options) {
         comboViewer.setInput(options);
     }
 
-    public interface OptionLabelProvider<T> {
-        String getLabel(T option);
+    @Override
+    public void setOptionLabeler(Converter<T, String> labeler) {
+        this.optionLabeler = labeler;
     }
 
     private void disableMouseWheel() {
         CCombo combo = comboViewer.getCCombo();
         combo.addListener(SWT.MouseWheel, KILL_MOUSE_WHEEL_LISTENER);
+    }
+
+    private class CustomLabelProvider extends LabelProvider {
+        @SuppressWarnings("unchecked")
+        @Override
+        public String getText(Object element) {
+            return optionLabeler.convert((T) element);
+        }
     }
 }
