@@ -28,6 +28,8 @@ public class SiteEditPresenter {
     private EventBus eventBus;
     private final Integer siteId;
     private Dispatcher dispatcher;
+    private final SelectActivityStatusPresenter selectActivityStatusPresenter =
+        new SelectActivityStatusPresenter();
 
     // data should go in constructor
     // display/ eventbus should be injected elsewhere
@@ -39,6 +41,8 @@ public class SiteEditPresenter {
     }
 
     private void bindDisplay() {
+        selectActivityStatusPresenter.bind(display, eventBus);
+
         display.getSave().addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
@@ -119,7 +123,7 @@ public class SiteEditPresenter {
         });
     }
 
-    public interface Display {
+    public interface Display extends SelectActivityStatusPresenter.Display {
         HasClickHandlers getSave();
 
         // TODO: have general validation errors
