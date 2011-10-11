@@ -8,6 +8,7 @@ import com.google.gwt.user.client.ui.HasValue;
 import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEditPresenter;
+import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValue;
 import edu.ualberta.med.biobank.mvp.view.item.ButtonItem;
 import edu.ualberta.med.biobank.mvp.view.item.ComboItem;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
@@ -53,7 +54,7 @@ public class SiteEntryForm implements SiteEditPresenter.Display {
     }
 
     @Override
-    public HasValue<ActivityStatus> getActivityStatus() {
+    public HasSelectedValue<ActivityStatus> getActivityStatus() {
         return activityStatus;
     }
 

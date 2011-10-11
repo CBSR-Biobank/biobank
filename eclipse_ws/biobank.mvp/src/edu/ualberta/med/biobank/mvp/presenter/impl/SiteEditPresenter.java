@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.mvp.event.model.SiteSavedEvent;
+import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValue;
 
 public class SiteEditPresenter {
     private Display display;
@@ -151,7 +152,7 @@ public class SiteEditPresenter {
 
         // TODO: where to the options for ActivityStatus come from? See what GWT
         // does for combo boxes...?
-        HasValue<ActivityStatus> getActivityStatus();
+        HasSelectedValue<ActivityStatus> getActivityStatus();
 
         HasValue<Collection<StudyInfo>> getStudies();
     }

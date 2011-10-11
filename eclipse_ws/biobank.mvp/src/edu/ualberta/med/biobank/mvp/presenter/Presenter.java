@@ -5,6 +5,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.mvp.view.View;
 
+// TODO: give Presenter-s a "Context" that they can use to bind a display, get the eventBus, whatever. Put it in the constructor? Because need to pass to inner presenters.
 public interface Presenter<D extends View> {
     public void setDispatcher(Dispatcher dispatcher);
 
