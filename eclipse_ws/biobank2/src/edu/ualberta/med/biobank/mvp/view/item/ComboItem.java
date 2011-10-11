@@ -95,7 +95,7 @@ public class ComboItem<T> implements HasSelectedValue<T> {
     }
 
     @Override
-    public void setOptionLabeler(Converter<T, String> labeler) {
+    public void setOptionLabeller(Converter<T, String> labeler) {
         this.optionLabeler = labeler;
     }
 

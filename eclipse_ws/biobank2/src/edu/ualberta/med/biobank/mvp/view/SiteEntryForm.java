@@ -14,7 +14,9 @@ import edu.ualberta.med.biobank.mvp.view.item.ComboItem;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
 
 public class SiteEntryForm implements SiteEditPresenter.Display {
-    private ButtonItem saveButton;
+    private ButtonItem save;
+    private ButtonItem reload;
+    private ButtonItem close;
     private TextItem name;
     private TextItem nameShort;
     private TextItem comment;
@@ -30,7 +32,7 @@ public class SiteEntryForm implements SiteEditPresenter.Display {
 
     @Override
     public HasClickHandlers getSave() {
-        return saveButton;
+        return save;
     }
 
     @Override
@@ -101,6 +103,21 @@ public class SiteEntryForm implements SiteEditPresenter.Display {
     @Override
     public HasValue<String> getCountry() {
         return country;
+    }
+
+    @Override
+    public void close() {
+        // TODO: something?
+    }
+
+    @Override
+    public HasClickHandlers getClose() {
+        return close;
+    }
+
+    @Override
+    public HasClickHandlers getReload() {
+        return reload;
     }
 
 }
