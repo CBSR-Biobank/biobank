@@ -18,4 +18,5 @@ Export-Package: com.google.gwt.event.dom.client,
  edu.ualberta.med.biobank.mvp.presenter,
  edu.ualberta.med.biobank.mvp.presenter.impl,
  edu.ualberta.med.biobank.mvp.user.ui,
- edu.ualberta.med.biobank.mvp.util
+ edu.ualberta.med.biobank.mvp.util,
+ edu.ualberta.med.biobank.mvp.view

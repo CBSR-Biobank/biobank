@@ -1,56 +1,55 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Collection;
-
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.user.client.ui.HasValue;
-
-import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEditPresenter;
-import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValue;
-import edu.ualberta.med.biobank.mvp.view.item.ButtonItem;
-import edu.ualberta.med.biobank.mvp.view.item.ComboItem;
-import edu.ualberta.med.biobank.mvp.view.item.TextItem;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
+import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class SiteEntryForm extends BiobankEntryForm implements
-    SiteEditPresenter.Display {
+public class OldSiteEntryForm extends AddressEntryFormCommon {
+
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteEntryForm"; //$NON-NLS-1$
 
     private static final String MSG_NEW_SITE_OK = Messages.SiteEntryForm_creation_msg;
     private static final String MSG_SITE_OK = Messages.SiteEntryForm_edition_msg;
 
-    private ButtonItem save;
-    private ButtonItem reload;
-    private ButtonItem close;
-    private TextItem name;
-    private TextItem nameShort;
-    private TextItem comment;
-    private TextItem street1;
-    private TextItem street2;
-    private TextItem city;
-    private TextItem province;
-    private TextItem postalCode;
-    private TextItem phoneNumber;
-    private TextItem faxNumber;
-    private TextItem country;
-    private ComboItem<ActivityStatus> activityStatus;
+    private SiteAdapter siteAdapter;
+
+    private SiteWrapper site;
+
+    protected Combo session;
+
+    private ComboViewer activityStatusComboViewer;
+
+    private StudyAddInfoTable studiesTable;
+
+    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
 
     @Override
     public void init() throws Exception {
@@ -126,39 +125,39 @@ public class SiteEntryForm extends BiobankEntryForm implements
 
     private void createStudySection() {
         Section section = createSection(Messages.SiteEntryForm_studies_title);
-        // boolean superAdmin = SessionManager.getUser().isSuperAdmin();
-        // if (superAdmin) {
-        // addSectionToolbar(section, Messages.SiteEntryForm_studies_add,
-        // new SelectionAdapter() {
-        // @Override
-        // public void widgetSelected(SelectionEvent e) {
-        // studiesTable.createStudyDlg();
-        // }
-        // }, ContactWrapper.class);
-        // }
-        // studiesTable = new StudyAddInfoTable(section, site, superAdmin);
-        // studiesTable.adaptToToolkit(toolkit, true);
-        // studiesTable.addClickListener(collectionDoubleClickListener);
-        // // TODO: the new style info table needs to support editing of items
-        // // via the context menu
-        // // studiesTable.createDefaultEditItem();
-        // studiesTable.addSelectionChangedListener(listener);
-        // section.setClient(studiesTable);
+        boolean superAdmin = SessionManager.getUser().isSuperAdmin();
+        if (superAdmin) {
+            addSectionToolbar(section, Messages.SiteEntryForm_studies_add,
+                new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        studiesTable.createStudyDlg();
+                    }
+                }, ContactWrapper.class);
+        }
+        studiesTable = new StudyAddInfoTable(section, site, superAdmin);
+        studiesTable.adaptToToolkit(toolkit, true);
+        studiesTable.addClickListener(collectionDoubleClickListener);
+        // TODO: the new style info table needs to support editing of items
+        // via the context menu
+        // studiesTable.createDefaultEditItem();
+        studiesTable.addSelectionChangedListener(listener);
+        section.setClient(studiesTable);
     }
 
     @Override
     protected String getOkMessage() {
-        // if (site.getId() == null) {
-        // return MSG_NEW_SITE_OK;
-        // }
+        if (site.getId() == null) {
+            return MSG_NEW_SITE_OK;
+        }
         return MSG_SITE_OK;
     }
 
     @Override
     protected void saveForm() throws Exception {
-        // site.persist();
-        // siteAdapter.getParent().performExpand();
-        // SessionManager.getUser().updateCurrentCenter(site);
+        site.persist();
+        siteAdapter.getParent().performExpand();
+        SessionManager.getUser().updateCurrentCenter(site);
     }
 
     @Override
@@ -168,96 +167,15 @@ public class SiteEntryForm extends BiobankEntryForm implements
 
     @Override
     protected void onReset() throws Exception {
-    }
+        site.reset();
 
-    @Override
-    public void close() {
-    }
+        if (site.isNew()) {
+            site.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
+        }
 
-    @Override
-    public HasClickHandlers getClose() {
-        return close;
-    }
+        GuiUtil.reset(activityStatusComboViewer, site.getActivityStatus());
 
-    @Override
-    public HasClickHandlers getReload() {
-        return reload;
-    }
-
-    @Override
-    public HasClickHandlers getSave() {
-        return save;
-    }
-
-    @Override
-    public HasSelectedValue<ActivityStatus> getActivityStatus() {
-        return activityStatus;
-    }
-
-    @Override
-    public HasValue<String> getStreet1() {
-        return street1;
-    }
-
-    @Override
-    public HasValue<String> getStreet2() {
-        return street2;
-    }
-
-    @Override
-    public HasValue<String> getCity() {
-        return city;
-    }
-
-    @Override
-    public HasValue<String> getProvince() {
-        return province;
-    }
-
-    @Override
-    public HasValue<String> getPostalCode() {
-        return postalCode;
-    }
-
-    @Override
-    public HasValue<String> getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    @Override
-    public HasValue<String> getFaxNumber() {
-        return faxNumber;
-    }
-
-    @Override
-    public HasValue<String> getCountry() {
-        return country;
-    }
-
-    @Override
-    public void setGeneralErrors(Collection<Object> errors) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public HasValue<String> getName() {
-        return name;
-    }
-
-    @Override
-    public HasValue<String> getNameShort() {
-        return nameShort;
-    }
-
-    @Override
-    public HasValue<String> getComment() {
-        return comment;
-    }
-
-    @Override
-    public HasValue<Collection<StudyInfo>> getStudies() {
-        // TODO Auto-generated method stub
-        return null;
+        studiesTable.reload();
     }
 }
