@@ -6,10 +6,11 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.mvp.presenter.Presenter;
 import edu.ualberta.med.biobank.mvp.presenter.ReloadablePresenter;
+import edu.ualberta.med.biobank.mvp.view.CloseableView;
 import edu.ualberta.med.biobank.mvp.view.ReloadableView;
 
-public abstract class BaseViewPresenter<D extends ReloadableView> extends
-    BasePresenter<D> implements ReloadablePresenter<D> {
+public abstract class BaseViewPresenter<D extends ReloadableView & CloseableView>
+    extends BaseCloseablePresenter<D> implements ReloadablePresenter<D> {
 
     @Override
     public void bind(D display, EventBus eventBus) {

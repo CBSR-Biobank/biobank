@@ -9,11 +9,14 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.mvp.event.AlertEvent;
 import edu.ualberta.med.biobank.mvp.presenter.SaveablePresenter;
 import edu.ualberta.med.biobank.mvp.presenter.impl.CollectionEventEditPresenter.Display;
+import edu.ualberta.med.biobank.mvp.view.CloseableView;
+import edu.ualberta.med.biobank.mvp.view.ReloadableView;
 import edu.ualberta.med.biobank.mvp.view.SaveableView;
 
 public abstract class CollectionEventEditPresenter extends
     BaseEditPresenter<Display> implements SaveablePresenter<Display> {
-    public interface Display extends SaveableView {
+    public interface Display extends CloseableView, ReloadableView,
+        SaveableView {
         void setPatient(Patient patient);
 
         HasValue<Integer> getVisitNumber();

@@ -3,8 +3,6 @@ package edu.ualberta.med.biobank.mvp.presenter.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
@@ -31,9 +29,6 @@ public abstract class BasePresenter<D extends View> implements Presenter<D> {
         this.eventBus = eventBus;
 
         if (!bound) {
-            registerHandler(display.getClose().addClickHandler(
-                new CloseClickHandler()));
-
             onBind();
             bound = true;
         }
@@ -101,11 +96,4 @@ public abstract class BasePresenter<D extends View> implements Presenter<D> {
      * will have already been removed at this point.
      */
     protected abstract void onUnbind();
-
-    private class CloseClickHandler implements ClickHandler {
-        @Override
-        public void onClick(ClickEvent event) {
-            display.close();
-        }
-    }
 }
