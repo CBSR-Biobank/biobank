@@ -113,37 +113,6 @@ public class CollectionView extends AbstractAdministrationView {
         }
     }
 
-    // public static AbstractAdapterBase addToNode(AdapterBase parentNode,
-    // Object obj) {
-    // if (obj instanceof PatientInfo) {
-    // PatientInfo pinfo = (PatientInfo) obj;
-    // List<AbstractAdapterBase> res = parentNode.search(Study.class,
-    // pinfo.patient.getStudy().getId());
-    // StudyWithPatientAdapter studyAdapter = null;
-    // if (res.size() > 0)
-    // studyAdapter = (StudyWithPatientAdapter) res.get(0);
-    // if (studyAdapter == null) {
-    // studyAdapter = new StudyWithPatientAdapter(parentNode,
-    // new StudyWrapper(SessionManager.getAppService(),
-    // pinfo.patient.getStudy()));
-    // studyAdapter.setEditable(false);
-    // studyAdapter.setLoadChildrenInBackground(false);
-    // parentNode.addChild(studyAdapter);
-    // }
-    // List<AbstractAdapterBase> patientAdapterList = studyAdapter.search(
-    // Patient.class, pinfo.patient.getId());
-    // PatientAdapter patientAdapter = null;
-    // if (patientAdapterList.size() > 0)
-    // patientAdapter = (PatientAdapter) patientAdapterList.get(0);
-    // else {
-    // patientAdapter = new PatientAdapter(studyAdapter, pinfo);
-    // studyAdapter.addChild(patientAdapter);
-    // }
-    // return patientAdapter;
-    // }
-    // return null;
-    // }
-
     @Override
     protected void internalSearch() {
         String text = treeText.getText();

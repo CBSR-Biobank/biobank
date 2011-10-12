@@ -64,7 +64,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                     }
                 }
             };
-            // FIXME
+            // FIXME changedlistener also in AbstractAdapterBase?
             if (adapter instanceof AdapterBase)
                 ((AdapterBase) adapter)
                     .addChangedListener(adapterChangedListener);
@@ -75,7 +75,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     public void dispose() {
         if (adapter != null) {
             Assert.isNotNull(adapterChangedListener);
-            // FIXME
+            // FIXME changed listener also in AbstractAdapterBase?
             if (adapter instanceof AdapterBase)
                 ((AdapterBase) adapter)
                     .removeChangedListener(adapterChangedListener);

@@ -19,25 +19,13 @@ public class SearchPatientAction implements Action<SearchedPatientInfo> {
     private static final long serialVersionUID = 1L;
 
     // @formatter:off
-//    @SuppressWarnings("nls")
-//    private static final String PATIENT_INFO_QRY = 
-//        "from " + Patient.class.getName() + " as p" 
-//        + " INNER JOIN FETCH p.study"
-//        + " where " + PatientPeer.PNUMBER.getName() + "=?";
-//    @SuppressWarnings("nls")
-//    private static final String CEVENT_INFO_QRY = 
-//        "select cevent, COUNT(DISTINCT sourcesSpecs), min(sourcesSpecs." + SpecimenPeer.CREATED_AT.getName() + ")"
-//        + " from " + CollectionEvent.class.getName() + " as cevent"
-//        + " left join cevent." + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName() + " as sourcesSpecs"
-//        + " where cevent." + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID) + "=?"
-//        + " GROUP BY cevent";
     @SuppressWarnings("nls")
     private static final String PATIENT_INFO_QRY = 
         " select p, study, count(cevents)"
         + " from " + Patient.class.getName() + " as p" 
-        + " INNER JOIN p." + PatientPeer.STUDY.getName() + " as study"
-        + " join p." + PatientPeer.COLLECTION_EVENT_COLLECTION.getName() + " as cevents"
-        + " where " + PatientPeer.PNUMBER.getName() + "=?";
+        + " LEFT JOIN p." + PatientPeer.STUDY.getName() + " as study"
+        + " LEFT JOIN p." + PatientPeer.COLLECTION_EVENT_COLLECTION.getName() + " as cevents"
+        + " where " + PatientPeer.PNUMBER.getName() + "=? GROUP BY p";
     // @formatter:on
 
     private String pnumber;

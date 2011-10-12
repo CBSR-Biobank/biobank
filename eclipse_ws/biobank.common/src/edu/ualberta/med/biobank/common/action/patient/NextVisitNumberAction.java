@@ -15,7 +15,7 @@ public class NextVisitNumberAction implements Action<Integer> {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
-    private static final String NEXT_NUMBER_QRY = "select max(ce.visitNumber) from "
+    private static final String NEXT_NUMBER_QRY = "select coalesce(max(ce.visitNumber),0) from "
         + CollectionEvent.class.getName() + " ce where ce.patient.id=?";
 
     private Integer patientId;

@@ -36,9 +36,11 @@ public class PatientAdapter extends AbstractNewAdapterBase {
             .getId(), null, null,
             (pinfo == null || pinfo.ceventsCount == null) ? false
                 : pinfo.ceventsCount > 0);
-        this.patient = pinfo.patient;
-        this.study = pinfo.study;
-        this.ceventsCount = pinfo.ceventsCount;
+        if (pinfo != null) {
+            this.patient = pinfo.patient;
+            this.study = pinfo.study;
+            this.ceventsCount = pinfo.ceventsCount;
+        }
     }
 
     @Override
@@ -75,16 +77,12 @@ public class PatientAdapter extends AbstractNewAdapterBase {
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    // FIXME
-                    // CollectionEvent cevent = new CollectionEvent();
-                    // cevent.setPatient(pinfo.patient);
-                    // CollectionEventInfo ceventInfo = new
-                    // CollectionEventInfo();
-                    // ceventInfo.cevent = cevent;
-                    // CollectionEventAdapter ceventAdapter = new
-                    // CollectionEventAdapter(
-                    // PatientAdapter.this, ceventInfo);
-                    // ceventAdapter.openEntryForm();
+                    SimpleCEventInfo cevent = new SimpleCEventInfo();
+                    cevent.cevent = new CollectionEvent();
+                    cevent.cevent.setPatient(patient);
+                    CollectionEventAdapter ceventAdapter = new CollectionEventAdapter(
+                        PatientAdapter.this, cevent);
+                    ceventAdapter.openEntryForm();
                 }
             });
         }
