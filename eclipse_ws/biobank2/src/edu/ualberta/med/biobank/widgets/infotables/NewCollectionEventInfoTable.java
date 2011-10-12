@@ -71,7 +71,20 @@ public class NewCollectionEventInfoTable extends InfoTableWidget {
 
     @Override
     protected BiobankTableSorter getComparator() {
-        return null;
-    }
+        return new BiobankTableSorter() {
+            private static final long serialVersionUID = 1L;
 
+            @Override
+            public int compare(Object o1, Object o2) {
+                if (o1 instanceof PatientCEventInfo
+                    && o2 instanceof PatientCEventInfo) {
+                    PatientCEventInfo p1 = (PatientCEventInfo) o1;
+                    PatientCEventInfo p2 = (PatientCEventInfo) o2;
+                    return p1.cevent.visitNumber
+                        .compareTo(p2.cevent.visitNumber);
+                }
+                return super.compare(01, o2);
+            }
+        };
+    }
 }
