@@ -737,14 +737,9 @@
                <reference
                      definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
-               <or>
-                  <reference
-                        definitionId="biobank.isSuperAdminMode">
-                  </reference>
-                   <reference
-                        definitionId="biobank.hasUserManagementRights">
-                  </reference>
-               </or>
+               <reference
+                     definitionId="biobank.mainPerspectiveSelected">
+               </reference>
             </and>
          </activeWhen>
          <enabledWhen>
@@ -1010,14 +1005,14 @@
                       style="push">
                    <visibleWhen
                          checkEnabled="false">
-                         <or>
+                      <or>
                          <reference
                                definitionId="biobank.isSuperAdminMode">
                          </reference>
-                           <reference
-                        definitionId="biobank.hasUserManagementRights">
-                  </reference>
-               </or>
+                         <reference
+                               definitionId="biobank.hasUserManagementRights">
+                         </reference>
+                      </or>
                    </visibleWhen>
                 </command>
                 <command

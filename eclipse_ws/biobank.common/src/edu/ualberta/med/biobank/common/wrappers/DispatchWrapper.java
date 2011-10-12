@@ -189,9 +189,11 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                     hasNewSpecimens = true;
                 }
             } else
-                throw new BiobankCheckException(MessageFormat.format(
-                    Messages.getString("DispatchWrapper.specimen.add.sender.error.msg"), //$NON-NLS-1$
-                    specimen.getInventoryId()));
+                throw new BiobankCheckException(
+                    MessageFormat.format(
+                        Messages
+                            .getString("DispatchWrapper.specimen.add.sender.error.msg"), //$NON-NLS-1$
+                        specimen.getInventoryId()));
         }
         addToDispatchSpecimenCollection(newDispatchSpecimens);
         resetMap();
@@ -343,14 +345,18 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     private static final String FAST_DISPATCH_SPECIMEN_QRY = "select ra from " //$NON-NLS-1$
-        + DispatchSpecimen.class.getName() + " ra inner join fetch ra." //$NON-NLS-1$
+        + DispatchSpecimen.class.getName()
+        + " ra inner join fetch ra." //$NON-NLS-1$
         + DispatchSpecimenPeer.SPECIMEN.getName()
         + " as spec inner join fetch spec." //$NON-NLS-1$
-        + SpecimenPeer.SPECIMEN_TYPE.getName() + " inner join fetch spec." //$NON-NLS-1$
+        + SpecimenPeer.SPECIMEN_TYPE.getName()
+        + " inner join fetch spec." //$NON-NLS-1$
         + SpecimenPeer.COLLECTION_EVENT.getName()
         + " as cevent inner join fetch cevent." //$NON-NLS-1$
-        + CollectionEventPeer.PATIENT.getName() + " inner join fetch spec." //$NON-NLS-1$
-        + SpecimenPeer.ACTIVITY_STATUS.getName() + " where ra." //$NON-NLS-1$
+        + CollectionEventPeer.PATIENT.getName()
+        + " inner join fetch spec." //$NON-NLS-1$
+        + SpecimenPeer.ACTIVITY_STATUS.getName()
+        + " where ra." //$NON-NLS-1$
         + Property.concatNames(DispatchSpecimenPeer.DISPATCH, DispatchPeer.ID)
         + " = ?"; //$NON-NLS-1$
 
@@ -525,7 +531,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             Collection<DispatchSpecimenWrapper> dispatchSpecimens = getDispatchSpecimenCollection(false);
             for (DispatchSpecimenWrapper dispatchSpecimen : dispatchSpecimens) {
                 SpecimenWrapper specimen = dispatchSpecimen.getSpecimen();
-                specimen.setParent(null, null);
+                specimen.setSpecimenPosition(null);
                 specimen.addPersistTasks(tasks);
             }
         }

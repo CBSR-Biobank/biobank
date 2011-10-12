@@ -1,6 +1,5 @@
-package edu.ualberta.med.biobank.common.wrappers.internal;
+package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.AddressBaseWrapper;
 import edu.ualberta.med.biobank.model.Address;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;

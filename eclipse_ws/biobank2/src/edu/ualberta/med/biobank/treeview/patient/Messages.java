@@ -13,6 +13,8 @@ public class Messages extends NLS {
 
     public static String CollectionEventAdapter_error_title;
 
+    public static String CollectionEventAdapter_nospecimens_label;
+
     public static String CollectionEventEntryForm_title_new;
     public static String CollectionEventEntryForm_title_edit;
 

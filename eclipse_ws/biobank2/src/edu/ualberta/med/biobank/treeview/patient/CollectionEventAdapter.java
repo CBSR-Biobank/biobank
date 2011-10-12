@@ -36,8 +36,9 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
             .append(ceventInfo.cevent.getVisitNumber())
             .append(" - ")//$NON-NLS-1$
             .append(
-                DateFormatter
-                    .formatAsDateTime(ceventInfo.minSourceSpecimenDate))
+                ceventInfo.minSourceSpecimenDate == null ? Messages.CollectionEventAdapter_nospecimens_label
+                    : DateFormatter
+                        .formatAsDateTime(ceventInfo.minSourceSpecimenDate))
             .append(" [").append(ceventInfo.sourceSpecimenCount) //$NON-NLS-1$ 
             .append("]").toString(); //$NON-NLS-1$ 
     }

@@ -82,7 +82,14 @@ public class DeleteModelWrapperQueryTask<E> implements
             // https://forum.hibernate.org/viewtopic.php?f=1&t=944722)
             try {
                 Serializable id = getIdProperty().get(model);
-                session.delete(session.load(getModelClass(), id));
+
+                @SuppressWarnings("unchecked")
+                E loadedModel = (E) session.load(getModelClass(), id);
+                session.delete(loadedModel);
+
+                // Remove the loaded model from the Session so that it is not
+                // automagically saved (when the session is closed or flush() is
+                // called).
                 // TODO: version check and throw a StaleStateException?
             } catch (PropertyValueException e) {
                 // TODO: determine why the HQL delete is still necessary, test

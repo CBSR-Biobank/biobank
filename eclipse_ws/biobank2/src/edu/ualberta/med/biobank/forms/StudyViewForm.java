@@ -223,6 +223,6 @@ public class StudyViewForm extends BiobankViewForm {
             .getAliquotedSpecimenCollection(true));
         sourceSpecimenTable.setCollection(study
             .getSourceSpecimenCollection(true));
-        contactsTable.setCollection(study.getContactCollection(true));
+        contactsTable.setCollectionByStudy(study);
     }
 }

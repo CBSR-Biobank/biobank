@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenTypeInfo;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.CEventSourceSpecimenDialog;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
-import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
@@ -86,15 +85,6 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
 
     public void addEditSupport(final List<SourceSpecimen> studySourceTypes,
         final List<SpecimenTypeInfo> allSpecimenTypes) {
-        if (SessionManager.canCreate(SpecimenWrapper.class)) {
-            addAddItemListener(new IInfoTableAddItemListener() {
-                @Override
-                public void addItem(InfoTableEvent event) {
-                    addOrEditSpecimen(true, null, studySourceTypes,
-                        allSpecimenTypes, null, null);
-                }
-            });
-        }
         if (SessionManager.canUpdate(SpecimenWrapper.class)) {
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
