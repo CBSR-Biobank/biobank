@@ -69,7 +69,7 @@ public class ContainerGroup extends AdapterBase {
         Integer objectId) {
         List<AbstractAdapterBase> res = new ArrayList<AbstractAdapterBase>();
         if (ContainerWrapper.class.isAssignableFrom(searchedClass)) {
-            // FIXME !!
+            // FIXME search might need to be different now
             // ContainerWrapper container = (ContainerWrapper) searchedObject;
             // if (container.getContainerType() != null) {
             // if (Boolean.TRUE.equals(container.getContainerType()

@@ -40,7 +40,7 @@ public class PatientViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         updatePatientInfo();
-        // FIXME log ?
+        // FIXME log edit action?
         // SessionManager.logLookup(patientInfo.patient);
         setPartName(NLS.bind(Messages.PatientViewForm_title,
             patientInfo.patient.getPnumber()));

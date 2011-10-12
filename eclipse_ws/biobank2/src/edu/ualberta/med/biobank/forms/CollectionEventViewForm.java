@@ -58,7 +58,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         updateCEventInfo();
-        // FIXME log ?
+        // FIXME log edit action?
         // SessionManager.logLookup(new CollectionEventWrapper(SessionManager
         // .getAppService(), cevent));
 

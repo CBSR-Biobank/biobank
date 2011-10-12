@@ -46,9 +46,9 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
         List<SpecimenTypeInfo> allSpecimenTypes, final CollectionEvent cEvent,
         final Date defaultTimeDrawn) {
         NewListener newListener = null;
-        List<Specimen> excludeList = new ArrayList<Specimen>();
+        List<String> inventoryIdExcludeList = new ArrayList<String>();
         for (SpecimenInfo sp : currentSpecimens) {
-            excludeList.add(sp.specimen);
+            inventoryIdExcludeList.add(sp.specimen.getInventoryId());
         }
         if (add) {
             newListener = new NewListener() {
@@ -69,12 +69,12 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                 }
             };
         } else {
-            excludeList.remove(specimen);
+            inventoryIdExcludeList.remove(specimen.getInventoryId());
         }
         CEventSourceSpecimenDialog dlg = new CEventSourceSpecimenDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            specimen, studySourceTypes, allSpecimenTypes, excludeList,
-            newListener, defaultTimeDrawn);
+            specimen, studySourceTypes, allSpecimenTypes,
+            inventoryIdExcludeList, newListener, defaultTimeDrawn);
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
             addedorModifiedSpecimens.add(specimen);

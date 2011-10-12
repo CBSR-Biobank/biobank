@@ -278,7 +278,7 @@ public class ContainerAdapter extends AdapterBase {
         Integer objectId) {
         List<AbstractAdapterBase> res = new ArrayList<AbstractAdapterBase>();
         if (ContainerWrapper.class.isAssignableFrom(searchedClass)) {
-            // FIXME !!
+            // FIXME search might need to be different now
             // ContainerWrapper containerWrapper = (ContainerWrapper)
             // searchedObject;
             // List<ContainerWrapper> parents = new

@@ -294,7 +294,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget {
         return r.toString();
     }
 
-    // FIXME ?
+    // FIXME do we need this method?
     // public void setSelection(SpecimenWrapper selectedSample) {
     // if (selectedSample == null)
     // return;

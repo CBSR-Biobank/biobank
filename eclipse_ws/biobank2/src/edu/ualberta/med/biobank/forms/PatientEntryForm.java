@@ -17,14 +17,17 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.GetPatientInfoAction;
 import edu.ualberta.med.biobank.common.action.patient.GetPatientInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
+import edu.ualberta.med.biobank.common.action.study.GetStudyListForSiteAction;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
+import edu.ualberta.med.biobank.views.CollectionView;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class PatientEntryForm extends BiobankEntryForm {
@@ -63,7 +66,7 @@ public class PatientEntryForm extends BiobankEntryForm {
             copyPatient();
         }
 
-        // FIXME log !
+        // FIXME log edit action?
         // SessionManager.logEdit(patient);
         String tabName;
         if (pInfo == null) {
@@ -101,7 +104,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         }
     }
 
-    private void createPatientSection() {
+    private void createPatientSection() throws Exception {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -109,19 +112,17 @@ public class PatientEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        // FIXME action !
-        List<StudyWrapper> studies = SessionManager.getUser()
-            .getCurrentWorkingCenter().getStudyCollection();
-        StudyWrapper selectedStudy = null;
-        // FIXME set by presenter...
+        List<Study> studies = SessionManager.getAppService().doAction(
+            new GetStudyListForSiteAction(SessionManager.getUser()
+                .getCurrentWorkingSite().getId()));
+        Study selectedStudy = null;
         if (pInfo == null) {
             if (studies.size() == 1) {
                 selectedStudy = studies.get(0);
-                patientCopy.setStudy(selectedStudy.getWrappedObject());
+                patientCopy.setStudy(selectedStudy);
             }
         } else {
-            selectedStudy = new StudyWrapper(SessionManager.getAppService(),
-                patientCopy.getStudy());
+            selectedStudy = patientCopy.getStudy();
         }
 
         studiesViewer = createComboViewer(client,
@@ -131,10 +132,15 @@ public class PatientEntryForm extends BiobankEntryForm {
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    patientCopy.setStudy(((StudyWrapper) selectedObject)
-                        .getWrappedObject());
+                    patientCopy.setStudy((Study) selectedObject);
                 }
             });
+        studiesViewer.setLabelProvider(new BiobankLabelProvider() {
+            @Override
+            public String getText(Object element) {
+                return ((Study) element).getNameShort();
+            }
+        });
         setFirstControl(studiesViewer.getControl());
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
@@ -169,7 +175,6 @@ public class PatientEntryForm extends BiobankEntryForm {
                 new PatientSaveAction(patientCopy.getId(), patientCopy
                     .getStudy().getId(), patientCopy.getPnumber(), patientCopy
                     .getCreatedAt()));
-        // FIXME better than that?
         adapter.setId(patient.getId());
 
         SessionManager.updateAllSimilarNodes(adapter, true);
@@ -178,8 +183,9 @@ public class PatientEntryForm extends BiobankEntryForm {
             public void run() {
                 PatientInfo pinfo = new PatientInfo();
                 pinfo.patient = patient;
-                // CollectionView.getCurrent().showSearchedObjectsInTree(pinfo,
-                // true);
+                // FIXME how to display new patient?
+                CollectionView.getCurrent().showSearchedObjectsInTree(patient,
+                    true);
             }
         });
     }

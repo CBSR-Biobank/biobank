@@ -8,62 +8,63 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.others.CheckNoDuplicateAction;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.model.Specimen;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class InventoryIdValidator extends AbstractValidator {
 
     private boolean duplicate;
-    private List<Specimen> excludeList;
+    private List<String> inventoryIdExcludeList;
 
     /**
      * Edited specimen. Null if new specimen.
      */
     private Specimen editedSpecimen;
 
-    public InventoryIdValidator(List<Specimen> excludeList, String message,
-        Specimen editedSpecimen) {
+    public InventoryIdValidator(List<String> inventoryIdExcludeList,
+        String message, Specimen editedSpecimen) {
         super(message);
-        this.excludeList = excludeList;
+        this.inventoryIdExcludeList = inventoryIdExcludeList;
         this.editedSpecimen = editedSpecimen;
     }
 
     @Override
-    public IStatus validate(Object value) {
-        if ((value != null) && !(value instanceof String)) {
+    public IStatus validate(final Object testedValue) {
+        if ((testedValue != null) && !(testedValue instanceof String)) {
             throw new RuntimeException(
                 Messages.InventoryIdValidator_nonstring_error_msg);
         }
 
-        if (value == null || (((String) value).length() == 0)) {
+        if (testedValue == null || (((String) testedValue).length() == 0)) {
             showDecoration();
             return ValidationStatus.error(errorMessage);
         }
-
-        final Specimen spc = new Specimen();
-        spc.setInventoryId((String) value);
-        if (editedSpecimen != null)
-            // need to do that to know the object in database is not the same we
-            // are editing
-            spc.setId(editedSpecimen.getId());
-
+        final String testedInventoryId = (String) testedValue;
         duplicate = false;
 
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
-                // FIXME
-                // try {
-                // spc.checkInventoryIdUnique();
-                // if (excludeList.contains(spc)) {
-                // duplicate = true;
-                // }
-                // } catch (DuplicateEntryException e) {
-                // duplicate = true;
-                // } catch (Exception e) {
-                // BgcPlugin.openAsyncError(
-                // Messages.InventoryIdValidator_checking_error_msg, e);
-                // }
+                try {
+                    Boolean unique = SessionManager.getAppService().doAction(
+                        new CheckNoDuplicateAction(Specimen.class,
+                            editedSpecimen == null ? null : editedSpecimen
+                                .getId(), SpecimenPeer.INVENTORY_ID.getName(),
+                            testedInventoryId));
+                    duplicate = !unique;
+                    if (unique)
+                        if (inventoryIdExcludeList.contains(testedInventoryId)) {
+                            duplicate = true;
+                        }
+                } catch (ApplicationException e) {
+                    BgcPlugin.openAsyncError(
+                        Messages.InventoryIdValidator_checking_error_msg, e);
+                }
             }
         });
 

@@ -109,7 +109,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 new GetCollectionEventInfoAction(adapter.getId()));
         }
         copyCEvent();
-        // FIXME log ?
+        // FIXME log edit action?
         // SessionManager.logEdit(cevent);
         String tabName;
         if (adapter.getId() == null) {
@@ -138,7 +138,6 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             ceventCopy.setVisitNumber(ceventInfo.cevent.getVisitNumber());
             ceventCopy.setActivityStatus(ceventInfo.cevent.getActivityStatus());
             ceventCopy.setComment(ceventInfo.cevent.getComment());
-            // FIXME different info for existing event?
             sourceSpecimens = new ArrayList<SpecimenInfo>(
                 ceventInfo.sourceSpecimenInfos);
         }
@@ -406,12 +405,12 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         GuiUtil
             .reset(activityStatusComboViewer, ceventCopy.getActivityStatus());
         specimensTable.reload(sourceSpecimens);
-        // FIXME
+        // FIXME reset will be done with the presenter
         // resetPvCustomInfo();
     }
 
     private void resetPvCustomInfo() throws Exception {
-        // FIXME
+        // FIXME reset will be done with the presenter
         // StudyWrapper study = cevent.getPatient().getStudy();
         // String[] labels = study.getStudyEventAttrLabels();
         // if (labels == null)

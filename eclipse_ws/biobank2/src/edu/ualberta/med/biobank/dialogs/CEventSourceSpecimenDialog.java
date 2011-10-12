@@ -65,15 +65,16 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
     private Specimen internalSpecimen;
 
-    private List<Specimen> excludeList;
+    private List<String> inventoryIdExcludeList;
 
     public CEventSourceSpecimenDialog(Shell parent, Specimen spec,
         List<SourceSpecimen> studySourceSpecimen,
-        List<SpecimenTypeInfo> allSpecimenTypes, List<Specimen> excludeList,
-        NewListener listener, Date defaultTimeDrawn) {
+        List<SpecimenTypeInfo> allSpecimenTypes,
+        List<String> inventoryIdExcludeList, NewListener listener,
+        Date defaultTimeDrawn) {
         super(parent, listener, spec == null);
         this.defaultTimeDrawn = defaultTimeDrawn;
-        this.excludeList = excludeList;
+        this.inventoryIdExcludeList = inventoryIdExcludeList;
         try {
             allActivityStatuses = SessionManager.getAppService().doAction(
                 new GetActivityStatusesAction());
@@ -143,7 +144,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             internalSpecimen,
             SpecimenPeer.INVENTORY_ID.getName(),
             new InventoryIdValidator(
-                excludeList,
+                inventoryIdExcludeList,
                 Messages.CEventSourceSpecimenDialog_field_inventoryID_validator_msg,
                 internalSpecimen));
         GridData gd = (GridData) inventoryIdWidget.getLayoutData();
@@ -314,7 +315,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
     @Override
     protected void resetFields() {
         // then reset fields
-        // FIXME reset ?
+        // FIXME reset ? see presenter ?
         // try {
         // internalSpecimen.reset();
         // } catch (Exception e) {
@@ -342,6 +343,6 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         spec.setCreatedAt(internalSpecimen.getCreatedAt());
         spec.setComment(internalSpecimen.getComment());
         spec.setActivityStatus(internalSpecimen.getActivityStatus());
-        excludeList.add(spec);
+        inventoryIdExcludeList.add(internalSpecimen.getInventoryId());
     }
 }

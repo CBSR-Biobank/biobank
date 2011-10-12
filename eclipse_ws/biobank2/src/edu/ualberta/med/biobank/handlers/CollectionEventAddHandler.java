@@ -5,8 +5,13 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.cevent.GetSimplePatientCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
+import edu.ualberta.med.biobank.views.CollectionView;
 
 public class CollectionEventAddHandler extends AbstractHandler {
 
@@ -15,20 +20,18 @@ public class CollectionEventAddHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        // FIXME
-        // try {
-        // PatientAdapter patientAdapter = CollectionView.getCurrentPatient();
-        // CollectionEvent ce = new CollectionEvent();
-        // ce.setPatient(patientAdapter.getPatient());
-        // CollectionEventInfo ceventInfo = new CollectionEventInfo();
-        // ceventInfo.cevent = ce;
-        // CollectionEventAdapter adapter = new CollectionEventAdapter(
-        // patientAdapter, ceventInfo);
-        // adapter.openEntryForm();
-        // } catch (Exception exp) {
-        //            logger.error("Error while opening the collection event entry form", //$NON-NLS-1$
-        // exp);
-        // }
+        try {
+            PatientAdapter patientAdapter = CollectionView.getCurrentPatient();
+            SimpleCEventInfo cevent = new SimpleCEventInfo();
+            cevent.cevent = new CollectionEvent();
+            cevent.cevent.setPatient(patientAdapter.getPatient());
+            CollectionEventAdapter adapter = new CollectionEventAdapter(
+                patientAdapter, cevent);
+            adapter.openEntryForm();
+        } catch (Exception exp) {
+            logger.error("Error while opening the collection event entry form", //$NON-NLS-1$
+                exp);
+        }
         return null;
     }
 

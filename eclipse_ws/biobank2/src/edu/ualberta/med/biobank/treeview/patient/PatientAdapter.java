@@ -137,4 +137,8 @@ public class PatientAdapter extends AbstractNewAdapterBase {
         return internalIsDeletable();
     }
 
+    public Patient getPatient() {
+        return patient;
+    }
+
 }
