@@ -22,9 +22,9 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractNewAdapterBase.class.getName());
 
-    public AbstractNewAdapterBase(AbstractAdapterBase parent, Class<?> clazz,
-        Integer id, String label, String tooltip, boolean hasChildren) {
-        super(parent, clazz, id, label, tooltip, hasChildren);
+    public AbstractNewAdapterBase(AbstractAdapterBase parent, Integer id,
+        String label, String tooltip, boolean hasChildren) {
+        super(parent, id, label, tooltip, hasChildren);
     }
 
     @Override
@@ -81,9 +81,6 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
             BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
             String text = getClass().getName();
-            if (getObjectClazz() != null) {
-                text = getObjectClazz().toString();
-            }
             text += " id=" + getId(); //$NON-NLS-1$
             logger.error("Error while loading children of node " + text, e); //$NON-NLS-1$
         }
@@ -97,7 +94,7 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
     @Override
     public List<AbstractAdapterBase> search(Class<?> searchedClass,
         Integer objectId) {
-        if (getObjectClazz() != null && getObjectClazz().equals(searchedClass))
+        if (getClass().equals(searchedClass))
             return Arrays.asList(new AbstractAdapterBase[] { this });
         return new ArrayList<AbstractAdapterBase>();
     }

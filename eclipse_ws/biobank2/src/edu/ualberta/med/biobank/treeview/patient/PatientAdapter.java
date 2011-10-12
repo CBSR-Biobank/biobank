@@ -32,8 +32,7 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     private Long ceventsCount;
 
     public PatientAdapter(AbstractAdapterBase parent, SearchedPatientInfo pinfo) {
-        super(parent, Patient.class, pinfo == null ? null : pinfo.patient
-            .getId(), null, null,
+        super(parent, pinfo == null ? null : pinfo.patient.getId(), null, null,
             (pinfo == null || pinfo.ceventsCount == null) ? false
                 : pinfo.ceventsCount > 0);
         if (pinfo != null) {

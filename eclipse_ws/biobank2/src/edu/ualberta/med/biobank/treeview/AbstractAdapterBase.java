@@ -33,8 +33,6 @@ public abstract class AbstractAdapterBase {
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractAdapterBase.class.getName());
 
-    private Class<?> objectClazz;
-
     private Integer id;
 
     private String label;
@@ -56,11 +54,10 @@ public abstract class AbstractAdapterBase {
      */
     private boolean editable = true;
 
-    public AbstractAdapterBase(AbstractAdapterBase parent, Class<?> clazz,
-        Integer id, String label, String tooltip, boolean hasChildren) {
+    public AbstractAdapterBase(AbstractAdapterBase parent, Integer id,
+        String label, String tooltip, boolean hasChildren) {
         this.parent = parent;
         children = new ArrayList<AbstractAdapterBase>();
-        this.objectClazz = clazz;
         this.id = id;
         this.label = label;
         this.tooltip = tooltip;
@@ -117,10 +114,6 @@ public abstract class AbstractAdapterBase {
                 string).toString();
         }
         return new StringBuilder(string).append(" ").append(label).toString(); //$NON-NLS-1$
-    }
-
-    public Class<?> getObjectClazz() {
-        return objectClazz;
     }
 
     public List<AbstractAdapterBase> getChildren() {

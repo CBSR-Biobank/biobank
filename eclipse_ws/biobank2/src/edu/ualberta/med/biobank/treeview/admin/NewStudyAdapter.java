@@ -17,7 +17,7 @@ public class NewStudyAdapter extends AbstractNewAdapterBase {
     private Study study;
 
     public NewStudyAdapter(AbstractAdapterBase parent, Study study) {
-        super(parent, Study.class, study.getId(), null, null, false);
+        super(parent, study.getId(), null, null, false);
         this.study = study;
         setEditable(parent instanceof StudyMasterGroup || parent == null);
     }

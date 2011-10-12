@@ -64,7 +64,7 @@ public abstract class BiobankFormBase extends BgcFormBase {
             if (SessionManager.getSelectedNode() == null
                 && adapter.getClass() != null) {
                 AbstractAdapterBase node = SessionManager.searchFirstNode(
-                    adapter.getObjectClazz(), adapter.getId());
+                    adapter.getClass(), adapter.getId());
                 SessionManager.setSelectedNode(node);
             }
         }

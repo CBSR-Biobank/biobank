@@ -324,11 +324,10 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         }
     }
 
-    // FIXME very ugly
     @Override
     protected void checkEditAccess() {
         if (adapter != null
-            && adapter.getObjectClazz() != null
+            && adapter.getId() != null
             && !SessionManager
                 .isAllowed(SessionSecurityHelper.DISPATCH_SEND_KEY_DESC)) {
             BgcPlugin.openAccessDeniedErrorMessage();

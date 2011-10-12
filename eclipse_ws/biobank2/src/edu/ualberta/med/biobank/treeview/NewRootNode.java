@@ -12,7 +12,7 @@ public class NewRootNode extends AbstractNewAdapterBase {
     private TreeViewer treeViewer;
 
     public NewRootNode() {
-        super(null, null, 1, "root", null, true); //$NON-NLS-1$
+        super(null, 1, "root", null, true); //$NON-NLS-1$
     }
 
     public void setTreeViewer(TreeViewer treeViewer) {

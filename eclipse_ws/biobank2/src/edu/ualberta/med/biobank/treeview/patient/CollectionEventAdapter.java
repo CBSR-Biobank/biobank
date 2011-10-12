@@ -23,8 +23,8 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
     public CollectionEventAdapter(AbstractAdapterBase parent,
         SimpleCEventInfo ceventInfo) {
-        super(parent, SimpleCEventInfo.class, ceventInfo == null ? null
-            : ceventInfo.cevent.getId(), null, null, false);
+        super(parent, ceventInfo == null ? null : ceventInfo.cevent.getId(),
+            null, null, false);
         this.ceventInfo = ceventInfo;
         setEditable(parent instanceof PatientAdapter || parent == null);
     }

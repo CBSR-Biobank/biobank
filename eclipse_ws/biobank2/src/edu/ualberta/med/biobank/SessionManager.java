@@ -340,7 +340,7 @@ public class SessionManager {
                     if (parent != null)
                         parent.addChild(adapter);
                     List<AbstractAdapterBase> res = searchNodes(
-                        adapter.getObjectClazz(), adapter.getId());
+                        adapter.getClass(), adapter.getId());
                     final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
                     if (view != null) {
                         for (AbstractAdapterBase ab : res) {

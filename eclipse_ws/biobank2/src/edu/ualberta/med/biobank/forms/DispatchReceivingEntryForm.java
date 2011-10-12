@@ -27,6 +27,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
 public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
@@ -248,11 +249,10 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         }
     }
 
-    // FIXME very ugly
     @Override
     protected void checkEditAccess() {
         if (adapter != null
-            && adapter.getObjectClazz() != null
+            && ((AdapterBase) adapter).getId() != null
             && !SessionManager
                 .isAllowed(SessionSecurityHelper.DISPATCH_RECEIVE_KEY_DESC)) {
             BgcPlugin.openAccessDeniedErrorMessage();

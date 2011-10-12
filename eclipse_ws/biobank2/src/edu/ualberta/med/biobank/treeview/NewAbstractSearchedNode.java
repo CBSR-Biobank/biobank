@@ -18,8 +18,7 @@ public abstract class NewAbstractSearchedNode extends AbstractNewAdapterBase {
         .getLogger(NewAbstractSearchedNode.class.getName());
 
     public NewAbstractSearchedNode(AdapterBase parent, int id) {
-        super(parent, null, id, Messages.AbstractSearchedNode_searched, null,
-            true);
+        super(parent, id, Messages.AbstractSearchedNode_searched, null, true);
     }
 
     @Override
