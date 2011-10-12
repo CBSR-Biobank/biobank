@@ -101,4 +101,9 @@ public class IncomingNode extends AdapterBase {
         return searchChildren(searchedClass, objectId);
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
+
 }

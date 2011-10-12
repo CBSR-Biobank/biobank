@@ -20,6 +20,8 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
+import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 import edu.ualberta.med.biobank.treeview.util.DeltaEvent;
 import edu.ualberta.med.biobank.treeview.util.IDeltaListener;
 import edu.ualberta.med.biobank.treeview.util.NullDeltaListener;
@@ -28,7 +30,8 @@ import edu.ualberta.med.biobank.treeview.util.NullDeltaListener;
  * Base class for all "Session" tree view nodes. Generally, most of the nodes in
  * the tree are adapters for classes in the ORM model.
  */
-public abstract class AbstractAdapterBase {
+public abstract class AbstractAdapterBase implements
+    Comparable<AbstractAdapterBase> {
 
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractAdapterBase.class.getName());
@@ -49,6 +52,9 @@ public abstract class AbstractAdapterBase {
     // nothing. See NodeContentProvider for an implementation
     private IDeltaListener deltaListener = NullDeltaListener.getSoleInstance();
 
+    // FIXME can we merge this list of listeners with the DeltaListener ?
+    private List<AdapterChangedListener> listeners;
+
     /**
      * if true, edit button and actions will be visible
      */
@@ -62,6 +68,7 @@ public abstract class AbstractAdapterBase {
         this.label = label;
         this.tooltip = tooltip;
         this.hasChildren = hasChildren;
+        listeners = new ArrayList<AdapterChangedListener>();
         init();
     }
 
@@ -443,6 +450,24 @@ public abstract class AbstractAdapterBase {
 
     protected void fireRemove(Object removed) {
         deltaListener.remove(new DeltaEvent(removed));
+    }
+
+    public void addChangedListener(AdapterChangedListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeChangedListener(AdapterChangedListener listener) {
+        listeners.remove(listener);
+    }
+
+    public void notifyListeners(AdapterChangedEvent event) {
+        for (AdapterChangedListener listener : listeners) {
+            listener.changed(event);
+        }
+    }
+
+    public void notifyListeners() {
+        notifyListeners(new AdapterChangedEvent(this));
     }
 
 }

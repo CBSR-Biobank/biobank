@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
 
@@ -52,7 +53,7 @@ public class ProcessingView extends AbstractAdministrationView {
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
 
-        processingNode = new ProcessingEventGroup(rootNode, 2,
+        processingNode = new ProcessingEventGroup((RootNode) rootNode, 2,
             Messages.ProcessingView_pevent_group_label);
         processingNode.setParent(rootNode);
         rootNode.addChild(processingNode);
@@ -238,4 +239,10 @@ public class ProcessingView extends AbstractAdministrationView {
         processingNode.removeAll();
         setSearchFieldsEnablement(false);
     }
+
+    @Override
+    protected void createRootNode() {
+        createOldRootNode();
+    }
+
 }

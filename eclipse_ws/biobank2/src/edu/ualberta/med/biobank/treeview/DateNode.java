@@ -90,4 +90,10 @@ public class DateNode extends AdapterBase {
         return text;
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof DateNode)
+            return date.compareTo(((DateNode) o).date);
+        return 0;
+    }
 }

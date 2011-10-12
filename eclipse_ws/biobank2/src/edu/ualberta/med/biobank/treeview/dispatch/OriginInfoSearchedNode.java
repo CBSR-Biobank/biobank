@@ -60,4 +60,9 @@ public class OriginInfoSearchedNode extends AbstractSearchedNode {
         performExpand();
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
+
 }

@@ -116,4 +116,8 @@ public class ContainerTypeGroup extends AdapterBase {
         return null;
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

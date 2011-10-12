@@ -2518,7 +2518,7 @@
             id="biobank.adapterBasePropertyTester"
             namespace="biobank"
             properties="canDelete,canUpdate"
-            type="edu.ualberta.med.biobank.treeview.AdapterBase">
+            type="edu.ualberta.med.biobank.treeview.AbstractAdapterBase">
       </propertyTester>
    </extension>
    <extension

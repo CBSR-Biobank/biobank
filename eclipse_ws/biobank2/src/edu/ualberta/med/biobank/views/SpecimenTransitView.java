@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.DateNode;
+import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchCenterAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.OriginInfoSearchedNode;
@@ -70,8 +71,8 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     public void createNodes() throws Exception {
         if (SessionManager.getUser().getCurrentWorkingCenter() != null) {
             SessionManager.getUser().getCurrentWorkingCenter().reload();
-            centerNode = new DispatchCenterAdapter(rootNode, SessionManager
-                .getUser().getCurrentWorkingCenter());
+            centerNode = new DispatchCenterAdapter((RootNode) rootNode,
+                SessionManager.getUser().getCurrentWorkingCenter());
             centerNode.setParent(rootNode);
             rootNode.addChild(centerNode);
         }
@@ -362,13 +363,13 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     @Override
     protected AbstractTodayNode<?> createTodayNode() {
-        return new ShipmentTodayNode(rootNode, 1);
+        return new ShipmentTodayNode((RootNode) rootNode, 1);
     }
 
     @Override
     protected AbstractSearchedNode createSearchedNode() {
         if (searchedNode == null)
-            return new OriginInfoSearchedNode(rootNode, 2);
+            return new OriginInfoSearchedNode((RootNode) rootNode, 2);
         else
             return searchedNode;
     }
@@ -415,4 +416,10 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         setSearchFieldsEnablement(false);
         super.clear();
     }
+
+    @Override
+    protected void createRootNode() {
+        createOldRootNode();
+    }
+
 }

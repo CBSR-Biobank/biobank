@@ -85,4 +85,8 @@ public abstract class AbstractDispatchGroup extends AdapterBase {
         return new DispatchAdapter(this, (DispatchWrapper) child);
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

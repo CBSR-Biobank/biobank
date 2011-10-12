@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class SpecimenLinkAdapter extends AdapterBase {
@@ -62,4 +63,8 @@ public class SpecimenLinkAdapter extends AdapterBase {
         return null;
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

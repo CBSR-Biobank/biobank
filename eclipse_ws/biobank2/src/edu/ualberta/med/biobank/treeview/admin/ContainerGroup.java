@@ -168,4 +168,9 @@ public class ContainerGroup extends AdapterBase {
     public String getViewFormId() {
         return null;
     }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

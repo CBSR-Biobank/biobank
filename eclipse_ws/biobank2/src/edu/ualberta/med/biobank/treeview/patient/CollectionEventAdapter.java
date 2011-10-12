@@ -136,4 +136,14 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     // // new GetCollectionEventInfoAction(id)));
     // }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof CollectionEventAdapter) {
+            CollectionEventAdapter ce2 = (CollectionEventAdapter) o;
+            return ceventInfo.cevent.visitNumber
+                .compareTo(ce2.ceventInfo.cevent.visitNumber);
+        }
+        return 0;
+    }
+
 }

@@ -110,4 +110,9 @@ public abstract class AbstractReportGroup extends AdapterBase {
     protected int getWrapperChildCount() throws Exception {
         return 0;
     }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

@@ -24,8 +24,6 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
-import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
-import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**
@@ -47,9 +45,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     private Object modelObject;
 
-    // FIXME can we merge this list of listeners with the DeltaListener ?
-    private List<AdapterChangedListener> listeners;
-
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
         boolean loadChildrenInBackground) {
         super(parent, object == null ? null : object.getId(), null, null, false);
@@ -70,7 +65,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     @Override
     protected void init() {
         loadChildrenSemaphore = new Semaphore(10, true);
-        listeners = new ArrayList<AdapterChangedListener>();
     }
 
     public ModelWrapper<?> getModelObject() {
@@ -445,24 +439,6 @@ public abstract class AdapterBase extends AbstractAdapterBase {
 
     public void setLoadChildrenInBackground(boolean loadChildrenInBackground) {
         this.loadChildrenInBackground = loadChildrenInBackground;
-    }
-
-    public void addChangedListener(AdapterChangedListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeChangedListener(AdapterChangedListener listener) {
-        listeners.remove(listener);
-    }
-
-    public void notifyListeners(AdapterChangedEvent event) {
-        for (AdapterChangedListener listener : listeners) {
-            listener.changed(event);
-        }
-    }
-
-    public void notifyListeners() {
-        notifyListeners(new AdapterChangedEvent(this));
     }
 
     protected List<AbstractAdapterBase> searchChildContainers(

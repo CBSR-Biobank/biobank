@@ -102,9 +102,8 @@ public class CollectionView extends AbstractAdministrationView {
         List<AbstractAdapterBase> nodeRes = rootNode.search(Patient.class,
             patient.getId());
         if (nodeRes.size() == 0) {
-            // searchedNode.addSearchObject(pinfo, pinfo.patient.getId());
-            searchedNode.performExpand();
-            nodeRes = searchedNode.search(Patient.class, patient.getId());
+            // this should not happened if the patient has been added to the
+            // search node
         }
         if (nodeRes.size() > 0) {
             if (doubleClick) {
@@ -158,6 +157,11 @@ public class CollectionView extends AbstractAdministrationView {
     public void clear() {
         searchedNode.clear();
         setSearchFieldsEnablement(false);
+    }
+
+    @Override
+    protected void createRootNode() {
+        createNewRootNode();
     }
 
 }

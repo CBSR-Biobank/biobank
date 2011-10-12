@@ -116,4 +116,12 @@ public class ShipmentAdapter extends AdapterBase {
         getParent().getParent().rebuild();
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof ShipmentAdapter)
+            return getModelObject().compareTo(
+                (ModelWrapper) ((AdapterBase) o).getModelObject());
+        return 0;
+    }
 }

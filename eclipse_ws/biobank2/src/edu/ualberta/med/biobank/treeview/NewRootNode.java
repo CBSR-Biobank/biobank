@@ -75,4 +75,8 @@ public class NewRootNode extends AbstractNewAdapterBase {
         return null;
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

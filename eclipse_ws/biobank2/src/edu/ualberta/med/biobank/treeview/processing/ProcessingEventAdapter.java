@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.forms.ProcessingEventEntryForm;
 import edu.ualberta.med.biobank.forms.ProcessingEventViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ProcessingEventAdapter extends AdapterBase {
@@ -104,6 +105,15 @@ public class ProcessingEventAdapter extends AdapterBase {
     @Override
     public String getEntryFormId() {
         return ProcessingEventEntryForm.ID;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof ProcessingEventAdapter)
+            return getModelObject().compareTo(
+                (ModelWrapper) ((AdapterBase) o).getModelObject());
+        return 0;
     }
 
 }

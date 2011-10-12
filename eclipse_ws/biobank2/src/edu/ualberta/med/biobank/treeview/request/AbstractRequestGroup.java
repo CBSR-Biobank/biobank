@@ -85,4 +85,8 @@ public abstract class AbstractRequestGroup extends AdapterBase {
         return new RequestAdapter(this, (RequestWrapper) child);
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

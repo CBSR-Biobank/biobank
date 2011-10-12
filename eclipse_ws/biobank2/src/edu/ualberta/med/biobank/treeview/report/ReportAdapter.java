@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.forms.ReportEntryForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.AdvancedReportsView;
 
@@ -117,6 +118,15 @@ public class ReportAdapter extends AdapterBase {
     @Override
     public String getEntryFormId() {
         return ReportEntryForm.ID;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof ReportAdapter)
+            return getModelObject().compareTo(
+                (ModelWrapper) ((AdapterBase) o).getModelObject());
+        return 0;
     }
 
 }

@@ -122,4 +122,9 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     public List<E> getCurrentTodayElements() {
         return currentTodayElements;
     }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

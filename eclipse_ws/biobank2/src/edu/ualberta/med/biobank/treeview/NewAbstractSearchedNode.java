@@ -10,15 +10,11 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
-
+// FIXME see code commented below. Need to know what is still needed for the new adapters
 public abstract class NewAbstractSearchedNode extends AbstractNewAdapterBase {
 
-    private static BgcLogger logger = BgcLogger
-        .getLogger(NewAbstractSearchedNode.class.getName());
-
-    public NewAbstractSearchedNode(AdapterBase parent, int id) {
-        super(parent, id, Messages.AbstractSearchedNode_searched, null, true);
+    public NewAbstractSearchedNode(AbstractAdapterBase parent, int id) {
+        super(parent, id, Messages.AbstractSearchedNode_searched, null, false);
     }
 
     @Override

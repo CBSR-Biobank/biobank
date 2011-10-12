@@ -70,4 +70,12 @@ public class SpecimenAdapter extends AdapterBase {
         return SpecimenViewForm.ID;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof SpecimenAdapter)
+            return getModelObject().compareTo(
+                (ModelWrapper) ((AdapterBase) o).getModelObject());
+        return 0;
+    }
 }

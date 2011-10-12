@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.forms.ResearchGroupEntryForm;
 import edu.ualberta.med.biobank.forms.ResearchGroupViewForm;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ResearchGroupAdapter extends AdapterBase {
@@ -80,4 +81,12 @@ public class ResearchGroupAdapter extends AdapterBase {
         return ResearchGroupViewForm.ID;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof ResearchGroupAdapter)
+            return getModelObject().compareTo(
+                (ModelWrapper) ((AdapterBase) o).getModelObject());
+        return 0;
+    }
 }

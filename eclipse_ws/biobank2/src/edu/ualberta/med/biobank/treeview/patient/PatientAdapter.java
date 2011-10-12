@@ -140,4 +140,11 @@ public class PatientAdapter extends AbstractNewAdapterBase {
         return patient;
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof PatientAdapter)
+            return patient.getPnumber().compareTo(
+                ((PatientAdapter) o).patient.getPnumber());
+        return 0;
+    }
 }

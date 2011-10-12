@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcSessionState;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
-import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.widgets.trees.AdapterTreeWidget;
 
 public abstract class AbstractViewWithAdapterTree extends
@@ -22,7 +21,7 @@ public abstract class AbstractViewWithAdapterTree extends
 
     protected AdapterTreeWidget adaptersTree;
 
-    protected RootNode rootNode;
+    protected AbstractAdapterBase rootNode;
 
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractViewWithAdapterTree.class.getName());

@@ -151,16 +151,12 @@ public class AdapterTreeWidget extends Composite {
         treeViewer.getTree().setMenu(menu);
 
         treeViewer.setComparator(new ViewerComparator() {
-            @SuppressWarnings({ "unchecked", "rawtypes" })
             @Override
             public int compare(Viewer viewer, Object e1, Object e2) {
                 if (e1 instanceof AbstractAdapterBase
                     && e2 instanceof AbstractAdapterBase) {
-                    String label1 = ((AbstractAdapterBase) e1).getLabel();
-                    String label2 = ((AbstractAdapterBase) e2).getLabel();
-                    if (label1 != null && label2 != null) {
-                        return ((Comparable) label1).compareTo(label2);
-                    }
+                    return ((AbstractAdapterBase) e1)
+                        .compareTo((AbstractAdapterBase) e2);
                 }
                 return 0;
             }

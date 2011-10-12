@@ -7,7 +7,6 @@ import java.util.Map;
 import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NewAbstractSearchedNode;
 
 public class PatientSearchedNode extends NewAbstractSearchedNode {
@@ -17,7 +16,7 @@ public class PatientSearchedNode extends NewAbstractSearchedNode {
      */
     private Map<Integer, StudyNodeInfo> studyPatientsMap;
 
-    public PatientSearchedNode(AdapterBase parent, int id) {
+    public PatientSearchedNode(AbstractAdapterBase parent, int id) {
         super(parent, id);
         studyPatientsMap = new HashMap<Integer, StudyNodeInfo>();
     }
@@ -71,4 +70,8 @@ public class PatientSearchedNode extends NewAbstractSearchedNode {
         return studyPatientsMap.size();
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

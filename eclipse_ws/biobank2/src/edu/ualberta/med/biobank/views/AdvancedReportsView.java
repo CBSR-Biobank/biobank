@@ -4,6 +4,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
+import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.report.AbstractReportGroup;
 import edu.ualberta.med.biobank.treeview.report.PrivateReportsGroup;
 import edu.ualberta.med.biobank.treeview.report.SharedReportsGroup;
@@ -42,12 +43,13 @@ public class AdvancedReportsView extends AbstractAdministrationView {
 
     private void createNodes() {
         if (SessionManager.getInstance().isConnected()) {
-            AbstractReportGroup adapter = new PrivateReportsGroup(rootNode, 0);
+            AbstractReportGroup adapter = new PrivateReportsGroup(
+                (RootNode) rootNode, 0);
             adapter.setParent(rootNode);
             adapter.setModifiable(true);
             rootNode.addChild(adapter);
 
-            adapter = new SharedReportsGroup(rootNode, 1);
+            adapter = new SharedReportsGroup((RootNode) rootNode, 1);
             adapter.setParent(rootNode);
             rootNode.addChild(adapter);
         }
@@ -67,4 +69,10 @@ public class AdvancedReportsView extends AbstractAdministrationView {
     public String getId() {
         return ID;
     }
+
+    @Override
+    protected void createRootNode() {
+        createOldRootNode();
+    }
+
 }

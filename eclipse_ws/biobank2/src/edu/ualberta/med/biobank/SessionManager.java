@@ -346,8 +346,10 @@ public class SessionManager {
                         for (AbstractAdapterBase ab : res) {
                             if (canReset)
                                 try {
-                                    if (ab != adapter)
-                                        ((AdapterBase) ab).resetObject();
+                                    if (ab != adapter) {
+                                        if (ab instanceof AdapterBase)
+                                            ((AdapterBase) ab).resetObject();
+                                    }
                                 } catch (Exception ex) {
                                     logger.error("Problem reseting object", ex); //$NON-NLS-1$
                                 }

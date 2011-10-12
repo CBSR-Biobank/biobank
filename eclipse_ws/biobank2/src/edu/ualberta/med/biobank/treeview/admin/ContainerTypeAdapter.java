@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerTypeEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerTypeViewForm;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ContainerTypeAdapter extends AdapterBase {
@@ -88,6 +89,15 @@ public class ContainerTypeAdapter extends AdapterBase {
     @Override
     public String getViewFormId() {
         return ContainerTypeViewForm.ID;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof ContainerTypeAdapter)
+            return getModelObject().compareTo(
+                (ModelWrapper) ((AdapterBase) o).getModelObject());
+        return 0;
     }
 
 }

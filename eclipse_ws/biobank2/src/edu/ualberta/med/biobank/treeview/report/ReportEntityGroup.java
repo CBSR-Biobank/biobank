@@ -131,4 +131,9 @@ public class ReportEntityGroup extends AdapterBase {
             reportAdapter.openEntryForm();
         }
     }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

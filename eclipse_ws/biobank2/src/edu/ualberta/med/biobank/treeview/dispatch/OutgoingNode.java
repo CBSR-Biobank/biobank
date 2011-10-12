@@ -106,4 +106,8 @@ public class OutgoingNode extends AdapterBase {
         creationNode.addDispatch();
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

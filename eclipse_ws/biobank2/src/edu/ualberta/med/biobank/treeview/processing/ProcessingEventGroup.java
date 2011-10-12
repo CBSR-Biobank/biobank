@@ -108,4 +108,8 @@ public class ProcessingEventGroup extends AdapterBase {
         return getWrapperChildren().size();
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

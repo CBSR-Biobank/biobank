@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class InCreationDispatchGroup extends AbstractDispatchGroup {
@@ -50,6 +51,11 @@ public class InCreationDispatchGroup extends AbstractDispatchGroup {
             SessionManager.getAppService());
         DispatchAdapter shipNode = new DispatchAdapter(this, shipment);
         shipNode.openEntryForm();
+    }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
     }
 
 }

@@ -20,6 +20,8 @@ public class AdapterBasePropertyTester extends PropertyTester {
     @Override
     public boolean test(Object receiver, String property, Object[] args,
         Object expectedValue) {
+        // plugin.xml already defines that the type should be
+        // AbstractAdpaterBase
         if (receiver instanceof AbstractAdapterBase) {
             AbstractAdapterBase adapter = (AbstractAdapterBase) receiver;
             try {

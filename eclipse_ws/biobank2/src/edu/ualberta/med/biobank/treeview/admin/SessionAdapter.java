@@ -243,4 +243,8 @@ public class SessionAdapter extends AdapterBase {
         }
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

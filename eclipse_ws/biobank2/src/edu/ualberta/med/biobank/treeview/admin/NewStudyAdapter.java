@@ -78,4 +78,12 @@ public class NewStudyAdapter extends AbstractNewAdapterBase {
     protected int getChildrenCount() throws Exception {
         return 0;
     }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof NewStudyAdapter)
+            return study.getNameShort().compareTo(
+                ((NewStudyAdapter) o).study.getNameShort());
+        return 0;
+    }
 }

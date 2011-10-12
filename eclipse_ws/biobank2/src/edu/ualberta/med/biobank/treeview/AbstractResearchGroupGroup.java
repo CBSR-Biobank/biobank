@@ -70,4 +70,8 @@ public abstract class AbstractResearchGroupGroup extends AdapterBase {
         return null;
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

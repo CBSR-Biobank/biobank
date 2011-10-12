@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 
 public class ClinicMasterGroup extends AbstractClinicGroup {
@@ -52,4 +53,8 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
         return (int) ClinicWrapper.getCount(SessionManager.getAppService());
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }
