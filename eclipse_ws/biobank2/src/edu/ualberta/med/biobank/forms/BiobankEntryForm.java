@@ -433,11 +433,15 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().saveEditor(this, false);
             if (!isDirty()) {
-                closeEntryOpenView(true, true);
+                closeEntryOpenView(true, openViewAfterSaving());
             }
         } catch (Exception e) {
             logger.error("Can't save the form", e); //$NON-NLS-1$
         }
+    }
+
+    protected boolean openViewAfterSaving() {
+        return true;
     }
 
     protected void closeEntryOpenView(boolean saveOnClose, boolean openView) {

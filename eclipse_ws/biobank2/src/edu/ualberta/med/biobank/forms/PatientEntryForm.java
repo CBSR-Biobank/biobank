@@ -176,16 +176,20 @@ public class PatientEntryForm extends BiobankEntryForm {
                     .getStudy().getId(), patientCopy.getPnumber(), patientCopy
                     .getCreatedAt()));
         adapter.setId(patient.getId());
+    }
 
+    @Override
+    protected void doAfterSave() throws Exception {
         SessionManager.updateAllSimilarNodes(adapter, true);
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                PatientInfo pinfo = new PatientInfo();
-                pinfo.patient = patient;
-                // FIXME how to display new patient?
-                CollectionView.getCurrent().showSearchedObjectsInTree(patient,
-                    true);
+                // FIXME how to display new patient without explicitly calling
+                // the collection tree view?
+                CollectionView.getCurrent().showSearchedObjectsInTree(
+                    adapter.getId(), patientCopy.getPnumber(), true, true);
+                // the node is not highlighted because the entryform is opening
+                // a viewform with a different adapter
             }
         });
     }
@@ -199,5 +203,11 @@ public class PatientEntryForm extends BiobankEntryForm {
     protected void onReset() throws Exception {
         copyPatient();
         GuiUtil.reset(studiesViewer, patientCopy.getStudy());
+    }
+
+    @Override
+    protected boolean openViewAfterSaving() {
+        // already done by showSearchedObjectsInTree called in doAfterSave
+        return false;
     }
 }

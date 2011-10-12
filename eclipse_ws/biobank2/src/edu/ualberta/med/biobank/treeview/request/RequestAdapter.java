@@ -84,12 +84,10 @@ public class RequestAdapter extends AdapterBase {
         return RequestEntryForm.ID;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public int compareTo(AbstractAdapterBase o) {
         if (o instanceof RequestAdapter)
-            return getModelObject().compareTo(
-                (ModelWrapper) ((AdapterBase) o).getModelObject());
+            return internalCompareTo(o);
         return 0;
     }
 }

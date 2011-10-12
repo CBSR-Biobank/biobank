@@ -171,13 +171,6 @@ public class SessionManager {
         }
     }
 
-    public static void setSelectedNode(final AbstractAdapterBase node) {
-        final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
-        if (view != null && node != null) {
-            view.setSelectedNode(node);
-        }
-    }
-
     public static AbstractAdapterBase getSelectedNode() {
         AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null) {

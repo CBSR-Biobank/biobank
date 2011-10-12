@@ -80,7 +80,7 @@ public class PatientAdapter extends AbstractNewAdapterBase {
                     cevent.cevent = new CollectionEvent();
                     cevent.cevent.setPatient(patient);
                     CollectionEventAdapter ceventAdapter = new CollectionEventAdapter(
-                        PatientAdapter.this, cevent);
+                        null, cevent);
                     ceventAdapter.openEntryForm();
                 }
             });

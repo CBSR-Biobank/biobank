@@ -3,9 +3,14 @@ package edu.ualberta.med.biobank.views;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -103,4 +108,29 @@ public abstract class AbstractViewWithAdapterTree extends
             rootNode.removeAll();
     }
 
+    @Override
+    public void createPartControl(Composite parent) {
+        getSite().setSelectionProvider(getTreeViewer());
+        getSite().getWorkbenchWindow().getSelectionService()
+            .addSelectionListener(new ISelectionListener() {
+                @Override
+                public void selectionChanged(IWorkbenchPart part,
+                    ISelection selection) {
+                    if (part != AbstractViewWithAdapterTree.this
+                        && selection instanceof IStructuredSelection) {
+                        IStructuredSelection strucSel = (IStructuredSelection) selection;
+                        if (!strucSel.isEmpty()) {
+                            if (strucSel.getFirstElement() instanceof AbstractAdapterBase)
+                                // if a form is selected, the corresponding
+                                // adapter is in strucSel
+                                setSelectedNode((AbstractAdapterBase) strucSel
+                                    .getFirstElement());
+                        }
+                    }
+                }
+            });
+        createPartControlInternal(parent);
+    }
+
+    protected abstract void createPartControlInternal(Composite parent);
 }

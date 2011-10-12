@@ -98,12 +98,15 @@ public class CollectionView extends AbstractAdministrationView {
         return Messages.CollectionView_patient_tooltip;
     }
 
-    public void showSearchedObjectsInTree(Patient patient, boolean doubleClick) {
+    public void showSearchedObjectsInTree(Integer patientId, String pnumber,
+        boolean searchIfNotFound, boolean doubleClick) {
         List<AbstractAdapterBase> nodeRes = rootNode.search(Patient.class,
-            patient.getId());
-        if (nodeRes.size() == 0) {
-            // this should not happened if the patient has been added to the
-            // search node
+            patientId);
+        if (nodeRes.size() == 0 && searchIfNotFound) {
+            // this is happening when a new patient is created.
+            internalSearch(pnumber);
+            // searchedNode.performExpand();
+            // nodeRes = searchedNode.search(Patient.class, patient.getId());
         }
         if (nodeRes.size() > 0) {
             if (doubleClick) {
@@ -120,6 +123,10 @@ public class CollectionView extends AbstractAdministrationView {
             return;
         }
 
+        internalSearch(text);
+    }
+
+    protected void internalSearch(String text) {
         try {
             SearchedPatientInfo pinfo = SessionManager.getAppService()
                 .doAction(new SearchPatientAction(text.trim()));
@@ -127,7 +134,8 @@ public class CollectionView extends AbstractAdministrationView {
                 notFound(text);
             } else {
                 searchedNode.addPatient(pinfo);
-                showSearchedObjectsInTree(pinfo.patient, true);
+                showSearchedObjectsInTree(pinfo.patient.getId(),
+                    pinfo.patient.getPnumber(), false, true);
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {

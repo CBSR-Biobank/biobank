@@ -365,7 +365,16 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 SessionManager.getUser().getCurrentWorkingCenter().getId(),
                 cevents, ceventAttrList));
         ((CollectionEventAdapter) adapter).setId(savedCeventId);
+    }
+
+    @Override
+    protected void doAfterSave() throws Exception {
         SessionManager.updateAllSimilarNodes(adapter, true);
+    }
+
+    @Override
+    protected boolean openViewAfterSaving() {
+        return true;
     }
 
     private void savePvInfoValueFromControlType(FormPvCustomInfo pvCustomInfo) {

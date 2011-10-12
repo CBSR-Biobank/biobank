@@ -22,7 +22,7 @@ public abstract class AbstractAdministrationView extends
     private Composite searchComposite;
 
     @Override
-    public void createPartControl(Composite parent) {
+    public void createPartControlInternal(Composite parent) {
         GridLayout gl = new GridLayout(1, false);
         gl.marginWidth = 0;
         gl.marginHeight = 0;

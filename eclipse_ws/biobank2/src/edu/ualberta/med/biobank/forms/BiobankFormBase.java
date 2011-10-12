@@ -57,17 +57,17 @@ public abstract class BiobankFormBase extends BgcFormBase {
 
     @Override
     public void setFocus() {
-        if ((adapter != null) && (adapter.getId() != null)) {
-            SessionManager.setSelectedNode(adapter);
-            // if selection fails, then the adapter needs to be matched at the
-            // id level
-            if (SessionManager.getSelectedNode() == null
-                && adapter.getClass() != null) {
-                AbstractAdapterBase node = SessionManager.searchFirstNode(
-                    adapter.getClass(), adapter.getId());
-                SessionManager.setSelectedNode(node);
-            }
-        }
+        // if ((adapter != null) && (adapter.getId() != null)) {
+        // SessionManager.setSelectedNode(adapter);
+        // // if selection fails, then the adapter needs to be matched at the
+        // // id level
+        // if (SessionManager.getSelectedNode() == null
+        // && adapter.getClass() != null) {
+        // AbstractAdapterBase node = SessionManager.searchFirstNode(
+        // adapter.getClass(), adapter.getId());
+        // SessionManager.setSelectedNode(node);
+        // }
+        // }
     }
 
     @Override
