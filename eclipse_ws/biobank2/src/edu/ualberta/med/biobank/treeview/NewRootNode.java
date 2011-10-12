@@ -1,12 +1,11 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
-
-import edu.ualberta.med.biobank.model.IBiobankModel;
 
 public class NewRootNode extends AbstractNewAdapterBase {
 
@@ -52,13 +51,7 @@ public class NewRootNode extends AbstractNewAdapterBase {
     }
 
     @Override
-    protected List<? extends IBiobankModel> getChildrenObjects()
-        throws Exception {
-        return null;
-    }
-
-    @Override
-    protected List<Integer> getChildrenObjectIds() throws Exception {
+    protected Map<Integer, ?> getChildrenObjects() throws Exception {
         return null;
     }
 

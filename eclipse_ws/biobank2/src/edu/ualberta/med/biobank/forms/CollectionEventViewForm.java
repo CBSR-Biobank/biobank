@@ -13,9 +13,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.cevent.CollectionEventWithFullInfo;
 import edu.ualberta.med.biobank.common.action.cevent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction;
+import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.study.GetStudyEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
@@ -45,7 +45,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private NewSpecimenInfoTable aliquotedSpcTable;
 
-    private CollectionEventWithFullInfo ceventInfo;
+    private CEventInfo ceventInfo;
 
     private static class FormPvCustomInfo extends PvAttrCustom {
         BgcBaseText widget;
@@ -108,14 +108,14 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void createPvDataSection(Composite client) throws Exception {
-        Map<String, StudyEventAttrInfo> studyAttrInfos = SessionManager
+        Map<Integer, StudyEventAttrInfo> studyAttrInfos = SessionManager
             .getAppService().doAction(
                 new GetStudyEventAttrInfoAction(ceventInfo.cevent.getPatient()
                     .getStudy().getId()));
 
         pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
 
-        for (Entry<String, StudyEventAttrInfo> entry : studyAttrInfos
+        for (Entry<Integer, StudyEventAttrInfo> entry : studyAttrInfos
             .entrySet()) {
             FormPvCustomInfo combinedPvInfo = new FormPvCustomInfo();
             combinedPvInfo.setLabel(entry.getValue().attr.getLabel());
@@ -136,7 +136,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
             }
 
             combinedPvInfo.widget = createReadOnlyLabelledField(client, style,
-                entry.getKey(), combinedPvInfo.getValue());
+                entry.getValue().attr.getLabel(), combinedPvInfo.getValue());
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
             combinedPvInfo.widget.setLayoutData(gd);
 

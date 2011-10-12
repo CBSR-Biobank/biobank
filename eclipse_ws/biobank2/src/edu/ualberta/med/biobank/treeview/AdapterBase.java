@@ -3,7 +3,9 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 import org.eclipse.core.runtime.Assert;
@@ -318,8 +320,12 @@ public abstract class AdapterBase extends AbstractAdapterBase {
         throws Exception;
 
     @Override
-    protected List<?> getChildrenObjects() throws Exception {
-        return getWrapperChildren();
+    protected Map<Integer, ?> getChildrenObjects() throws Exception {
+        Map<Integer, Object> map = new HashMap<Integer, Object>();
+        for (ModelWrapper<?> model : getWrapperChildren()) {
+            map.put(model.getId(), model);
+        }
+        return map;
     }
 
     protected abstract int getWrapperChildCount() throws Exception;

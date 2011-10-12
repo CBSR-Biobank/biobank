@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.swt.widgets.Display;
 import org.springframework.remoting.RemoteAccessException;
@@ -61,18 +63,12 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
     @Override
     public void loadChildren(boolean updateNode) {
         try {
-            // FIXME not very nice. Should all info class implements
-            // IBiobankModel interface to define the getId method?
-            List<?> children = getChildrenObjects();
-            List<Integer> childrenIds = getChildrenObjectIds();
-            if (children != null && childrenIds != null) {
-                if (children.size() != childrenIds.size())
-                    throw new Exception("problem in arrays size"); //$NON-NLS-1$
-                for (int i = 0; i < children.size(); i++) {
-                    Integer childId = childrenIds.get(i);
-                    AbstractAdapterBase node = getChild(childId);
+            Map<Integer, ?> children = getChildrenObjects();
+            if (children != null) {
+                for (Entry<Integer, ?> entry : children.entrySet()) {
+                    AbstractAdapterBase node = getChild(entry.getKey());
                     if (node == null) {
-                        node = createChildNode(children.get(i));
+                        node = createChildNode(entry.getValue());
                         addChild(node);
                     }
                     if (updateNode) {
@@ -105,7 +101,5 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
             return Arrays.asList(new AbstractAdapterBase[] { this });
         return new ArrayList<AbstractAdapterBase>();
     }
-
-    protected abstract List<Integer> getChildrenObjectIds() throws Exception;
 
 }

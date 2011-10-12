@@ -9,8 +9,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.patient.PatientInfo;
 import edu.ualberta.med.biobank.common.action.patient.GetPatientInfoAction;
+import edu.ualberta.med.biobank.common.action.patient.GetPatientInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;

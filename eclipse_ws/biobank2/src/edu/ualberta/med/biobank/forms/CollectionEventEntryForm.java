@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.forms;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
@@ -20,20 +22,23 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.cevent.CollectionEventInfo;
 import edu.ualberta.med.biobank.common.action.cevent.CollectionEventSaveAction;
-import edu.ualberta.med.biobank.common.action.cevent.CollectionEventSaveAction.CESpecimenInfo;
-import edu.ualberta.med.biobank.common.action.cevent.CollectionEventWithFullInfo;
+import edu.ualberta.med.biobank.common.action.cevent.CollectionEventSaveAction.SaveCEventAttrInfo;
+import edu.ualberta.med.biobank.common.action.cevent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
+import edu.ualberta.med.biobank.common.action.cevent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction;
+import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction.CEventInfo;
+import edu.ualberta.med.biobank.common.action.patient.NextVisitNumberAction;
 import edu.ualberta.med.biobank.common.action.specimen.GetSpecimenTypeInfosAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenTypeInfo;
+import edu.ualberta.med.biobank.common.action.study.GetStudyEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.GetStudySourceSpecimenInfosAction;
+import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
@@ -83,9 +88,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private DateTimeWidget timeDrawnWidget;
 
-    private CollectionEventInfo ceventInfo;
-
     private List<SpecimenInfo> sourceSpecimens;
+
+    private CEventInfo ceventInfo;
 
     @Override
     public void init() throws Exception {
@@ -95,7 +100,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
         ceventCopy = new CollectionEvent();
         if (adapter.getId() == null) {
-            ceventInfo = ((CollectionEventAdapter) adapter).ceventInfo;
+            ceventInfo = new CEventInfo();
+            ceventInfo.cevent = new CollectionEvent();
+            ceventInfo.cevent.setPatient(((CollectionEventAdapter) adapter)
+                .getPatient());
         } else {
             ceventInfo = SessionManager.getAppService().doAction(
                 new GetCollectionEventInfoAction(adapter.getId()));
@@ -118,12 +126,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         // only value created when is a new cevent.
         ceventCopy.setPatient(ceventInfo.cevent.getPatient());
         if (adapter.getId() == null) {
-            // FIXME action for next visit number ! + how to give the patient id
-            // info either than that ?
-            ceventCopy.setVisitNumber(PatientWrapper.getNextVisitNumber(
-                SessionManager.getAppService(),
-                new PatientWrapper(SessionManager.getAppService(),
-                    ceventInfo.cevent.getPatient())));
+            ceventCopy.setVisitNumber(SessionManager.getAppService().doAction(
+                new NextVisitNumberAction(ceventInfo.cevent.getPatient()
+                    .getId())));
             ceventCopy.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(SessionManager.getAppService())
                 .getWrappedObject());
@@ -133,8 +138,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             ceventCopy.setVisitNumber(ceventInfo.cevent.getVisitNumber());
             ceventCopy.setActivityStatus(ceventInfo.cevent.getActivityStatus());
             ceventCopy.setComment(ceventInfo.cevent.getComment());
+            // FIXME different info for existing event?
             sourceSpecimens = new ArrayList<SpecimenInfo>(
-                ((CollectionEventWithFullInfo) ceventInfo).sourceSpecimenInfos);
+                ceventInfo.sourceSpecimenInfos);
         }
 
     }
@@ -205,7 +211,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             new Date());
         toolkit.adapt(timeDrawnWidget);
 
-        createPvDataSection(client);
+        createEventAttrSection(client);
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             Messages.label_comments, null, ceventCopy,
@@ -246,26 +252,30 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         section.setClient(specimensTable);
     }
 
-    private void createPvDataSection(Composite client) throws Exception {
-        // StudyWrapper study = new StudyWrapper(SessionManager.getAppService(),
-        // cevent.getPatient().getStudy());
-        // String[] labels = study.getStudyEventAttrLabels();
-        // if (labels == null)
-        // return;
+    private void createEventAttrSection(Composite client) throws Exception {
+        Map<Integer, StudyEventAttrInfo> studyAttrInfos = SessionManager
+            .getAppService().doAction(
+                new GetStudyEventAttrInfoAction(ceventInfo.cevent.getPatient()
+                    .getStudy().getId()));
 
         pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
 
-        // FIXME
-        // for (String label : labels) {
-        // FormPvCustomInfo pvCustomInfo = new FormPvCustomInfo();
-        // pvCustomInfo.setLabel(label);
-        // pvCustomInfo.setType(study.getStudyEventAttrType(label));
-        // pvCustomInfo.setAllowedValues(study
-        // .getStudyEventAttrPermissible(label));
-        // pvCustomInfo.setValue(cevent.getEventAttrValue(label));
-        // pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
-        // pvCustomInfoList.add(pvCustomInfo);
-        // }
+        for (Entry<Integer, StudyEventAttrInfo> entry : studyAttrInfos
+            .entrySet()) {
+            FormPvCustomInfo pvCustomInfo = new FormPvCustomInfo();
+            pvCustomInfo.setStudyEventAttrId(entry.getValue().attr.getId());
+            pvCustomInfo.setLabel(entry.getValue().attr.getLabel());
+            pvCustomInfo.setType(entry.getValue().type);
+            pvCustomInfo.setAllowedValues(entry.getValue()
+                .getStudyEventAttrPermissible());
+            // FIXME ugly
+            EventAttrInfo eventAttrInfo = adapter.getId() == null ? null
+                : ceventInfo.eventAttrs.get(entry.getKey());
+            pvCustomInfo.setValue(eventAttrInfo == null ? "" //$NON-NLS-1$
+                : eventAttrInfo.attr.getValue());
+            pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
+            pvCustomInfoList.add(pvCustomInfo);
+        }
     }
 
     private Control getControlForLabel(Composite client,
@@ -316,28 +326,18 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void doBeforeSave() throws Exception {
-        // PatientAdapter patientAdapter = (PatientAdapter) ceventAdapter
-        // .getParent();
-        // FIXME this should be done before the entry form is opened.
-        // if (patientAdapter != null)
-        // cevent.setPatient(patientAdapter.getModelObject());
-
-        // ACTIOn ? Presenter?
-        // cevent.addToOriginalSpecimenCollection(specimensTable
-        // .getAddedOrModifiedSpecimens());
-        // cevent.removeFromOriginalSpecimenCollection(specimensTable
-        // .getRemovedSpecimens());
-        savePvCustomInfo();
+        for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
+            // set the value from the widget
+            savePvInfoValueFromControlType(combinedPvInfo);
+        }
     }
 
     @Override
     protected void saveForm() throws Exception {
-        // FIXME need to use batchquery for OriginInfo + Collection Event
-
-        List<CESpecimenInfo> cevents = new ArrayList<CollectionEventSaveAction.CESpecimenInfo>();
+        List<SaveCEventSpecimenInfo> cevents = new ArrayList<CollectionEventSaveAction.SaveCEventSpecimenInfo>();
         for (Object o : specimensTable.getCollection()) {
             SpecimenInfo specInfo = (SpecimenInfo) o;
-            CESpecimenInfo ceSpecInfo = new CESpecimenInfo();
+            SaveCEventSpecimenInfo ceSpecInfo = new SaveCEventSpecimenInfo();
             ceSpecInfo.comment = specInfo.specimen.getComment();
             ceSpecInfo.id = specInfo.specimen.getId();
             ceSpecInfo.inventoryId = specInfo.specimen.getInventoryId();
@@ -349,27 +349,26 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             cevents.add(ceSpecInfo);
         }
 
+        List<SaveCEventAttrInfo> ceventAttrList = new ArrayList<CollectionEventSaveAction.SaveCEventAttrInfo>();
+        for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
+            SaveCEventAttrInfo ceventAttr = new SaveCEventAttrInfo();
+            ceventAttr.studyEventAttrId = combinedPvInfo.getStudyEventAttrId();
+            ceventAttr.value = combinedPvInfo.getValue();
+            ceventAttr.type = combinedPvInfo.getType();
+            ceventAttrList.add(ceventAttr);
+        }
+
         // save the collection event
         Integer savedCeventId = SessionManager.getAppService().doAction(
             new CollectionEventSaveAction(ceventCopy.getId(), ceventCopy
                 .getPatient().getId(), ceventCopy.getVisitNumber(), ceventCopy
                 .getActivityStatus().getId(), ceventCopy.getComment(),
                 SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                cevents));
-        ((CollectionEventAdapter) adapter).setCollectionEventId(savedCeventId);
-        SessionManager.updateAllSimilarNodes(adapter, true);
-    }
-
-    private void savePvCustomInfo() throws Exception {
+                cevents, ceventAttrList));
         // FIXME
-        // for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
-        // savePvInfoValueFromControlType(combinedPvInfo);
-        // String value = combinedPvInfo.getValue();
-        // if (value == null)
-        // continue;
-        //
-        // cevent.setEventAttrValue(combinedPvInfo.getLabel(), value);
-        // }
+        // ((CollectionEventAdapter)
+        // adapter).setCollectionEventId(savedCeventId);
+        SessionManager.updateAllSimilarNodes(adapter, true);
     }
 
     private void savePvInfoValueFromControlType(FormPvCustomInfo pvCustomInfo) {

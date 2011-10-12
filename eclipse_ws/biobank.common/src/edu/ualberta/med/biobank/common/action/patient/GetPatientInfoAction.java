@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.action.patient;
 
-import java.util.Collections;
+import java.io.Serializable;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -9,12 +9,21 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionException;
 import edu.ualberta.med.biobank.common.action.cevent.GetPatientCollectionEventInfosAction;
+import edu.ualberta.med.biobank.common.action.cevent.GetPatientCollectionEventInfosAction.PatientCEventInfo;
+import edu.ualberta.med.biobank.common.action.patient.GetPatientInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.User;
 
+/**
+ * Retrieve a patient information using a patient id
+ * 
+ * @author delphine
+ * 
+ */
 public class GetPatientInfoAction implements Action<PatientInfo> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
@@ -31,6 +40,16 @@ public class GetPatientInfoAction implements Action<PatientInfo> {
     // @formatter:on
 
     private final Integer patientId;
+
+    public static class PatientInfo implements Serializable, NotAProxy {
+        private static final long serialVersionUID = 1L;
+
+        public Patient patient;
+        public List<PatientCEventInfo> cevents;
+        public Long sourceSpecimenCount;
+        public Long aliquotedSpecimenCount;
+
+    }
 
     public GetPatientInfoAction(Integer patientId) {
         this.patientId = patientId;
@@ -58,10 +77,9 @@ public class GetPatientInfoAction implements Action<PatientInfo> {
             pInfo.aliquotedSpecimenCount = (Long) row[2];
             pInfo.cevents = new GetPatientCollectionEventInfosAction(patientId)
                 .doAction(session);
-            Collections.sort(pInfo.cevents);
 
         } else {
-            // TODO: throw exception?
+            throw new ActionException("No patient found with id:" + patientId); //$NON-NLS-1$
         }
 
         return pInfo;

@@ -24,10 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
-import edu.ualberta.med.biobank.views.CollectionView;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicVisitInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -231,11 +228,13 @@ public class PatientMergeForm extends BiobankEntryForm {
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                PatientSearchedNode searcher = (PatientSearchedNode) CollectionView
-                    .getCurrent().getSearchedNode();
-                searcher.removeObject(Patient.class, patient2.getId());
-                searcher.performExpand();
-                closeEntryOpenView(false, true);
+                // FIXME use new node
+                // PatientSearchedNode searcher = (PatientSearchedNode)
+                // CollectionView
+                // .getCurrent().getSearchedNode();
+                // searcher.removeObject(Patient.class, patient2.getId());
+                // searcher.performExpand();
+                // closeEntryOpenView(false, true);
             }
         });
     }

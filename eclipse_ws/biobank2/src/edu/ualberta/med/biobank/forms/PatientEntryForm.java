@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.GetPatientInfoAction;
-import edu.ualberta.med.biobank.common.action.patient.PatientInfo;
+import edu.ualberta.med.biobank.common.action.patient.GetPatientInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -25,7 +25,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
-import edu.ualberta.med.biobank.views.CollectionView;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class PatientEntryForm extends BiobankEntryForm {
@@ -179,8 +178,8 @@ public class PatientEntryForm extends BiobankEntryForm {
             public void run() {
                 PatientInfo pinfo = new PatientInfo();
                 pinfo.patient = patient;
-                CollectionView.getCurrent().showSearchedObjectsInTree(pinfo,
-                    true);
+                // CollectionView.getCurrent().showSearchedObjectsInTree(pinfo,
+                // true);
             }
         });
     }

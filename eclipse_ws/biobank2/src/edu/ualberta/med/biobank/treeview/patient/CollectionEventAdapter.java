@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.patient;
 
-import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -8,24 +8,22 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.cevent.CollectionEventInfo;
-import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction;
+import edu.ualberta.med.biobank.common.action.cevent.GetSimplePatientCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
-    public CollectionEventInfo ceventInfo;
+    public SimpleCEventInfo ceventInfo;
 
     public CollectionEventAdapter(AbstractAdapterBase parent,
-        CollectionEventInfo ceventInfo) {
-        super(parent, CollectionEventInfo.class, ceventInfo == null ? null
+        SimpleCEventInfo ceventInfo) {
+        super(parent, SimpleCEventInfo.class, ceventInfo == null ? null
             : ceventInfo.cevent.getId(), null, null, false);
         this.ceventInfo = ceventInfo;
         setEditable(parent instanceof PatientAdapter || parent == null);
@@ -92,7 +90,7 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
     }
 
     @Override
-    protected List<?> getChildrenObjects() throws Exception {
+    protected Map<Integer, ?> getChildrenObjects() throws Exception {
         return null;
     }
 
@@ -116,22 +114,25 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
         return internalIsDeletable();
     }
 
-    @Override
-    protected List<Integer> getChildrenObjectIds() throws Exception {
+    public Patient getPatient() {
+        if (ceventInfo != null && ceventInfo.cevent != null)
+            return ceventInfo.cevent.getPatient();
         return null;
     }
 
-    public void setCollectionEventInfo(CollectionEventInfo ceventInfo) {
-        this.ceventInfo = ceventInfo;
-        if (ceventInfo != null)
-            setId(ceventInfo.cevent.id);
-    }
-
-    public void setCollectionEventId(Integer id) throws ApplicationException {
-        // TODO Auto-generated method stub
-        // FIXME set id and set retrieve new CollectionEventInfo
-        setCollectionEventInfo(SessionManager.getAppService().doAction(
-            new GetCollectionEventInfoAction(id)));
-    }
+    // FIXME?
+    // public void setCollectionEventInfo(SimpleCEventInfo ceventInfo) {
+    // this.ceventInfo = ceventInfo;
+    // if (ceventInfo != null)
+    // setId(ceventInfo.cevent.id);
+    // }
+    //
+    // public void setCollectionEventId(Integer id) throws ApplicationException
+    // {
+    // // TODO Auto-generated method stub
+    // // FIXME set id and set retrieve new CollectionEventInfo
+    // // setCollectionEventInfo(SessionManager.getAppService().doAction(
+    // // new GetCollectionEventInfoAction(id)));
+    // }
 
 }

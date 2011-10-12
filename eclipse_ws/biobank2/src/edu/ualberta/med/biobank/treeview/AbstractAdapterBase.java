@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.treeview;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -300,7 +301,7 @@ public abstract class AbstractAdapterBase {
      * 
      * @throws Exception
      */
-    protected abstract List<?> getChildrenObjects() throws Exception;
+    protected abstract Map<Integer, ?> getChildrenObjects() throws Exception;
 
     protected abstract int getChildrenCount() throws Exception;
 

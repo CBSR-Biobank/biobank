@@ -1,20 +1,24 @@
 package edu.ualberta.med.biobank.common.action.cevent;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionException;
+import edu.ualberta.med.biobank.common.action.cevent.GetCollectionEventInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.specimen.GetCEventSpecimenInfosAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.User;
 
-public class GetCollectionEventInfoAction implements
-    Action<CollectionEventWithFullInfo> {
+public class GetCollectionEventInfoAction implements Action<CEventInfo> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
     @SuppressWarnings("nls")
@@ -30,6 +34,19 @@ public class GetCollectionEventInfoAction implements
 
     private final Integer ceventId;
 
+    public static class CEventInfo implements Serializable, NotAProxy {
+
+        private static final long serialVersionUID = 1L;
+        public CollectionEvent cevent;
+        public List<SpecimenInfo> sourceSpecimenInfos;
+        public List<SpecimenInfo> aliquotedSpecimenInfos;
+        /**
+         * Key is the studyeventAttr key this eventAttr refers to
+         */
+        public Map<Integer, EventAttrInfo> eventAttrs;
+
+    }
+
     public GetCollectionEventInfoAction(Integer ceventId) {
         this.ceventId = ceventId;
     }
@@ -40,9 +57,8 @@ public class GetCollectionEventInfoAction implements
     }
 
     @Override
-    public CollectionEventWithFullInfo doAction(Session session)
-        throws ActionException {
-        CollectionEventWithFullInfo ceventInfo = new CollectionEventWithFullInfo();
+    public CEventInfo doAction(Session session) throws ActionException {
+        CEventInfo ceventInfo = new CEventInfo();
 
         Query query = session.createQuery(CEVENT_INFO_QRY);
         query.setParameter(0, ceventId);
@@ -53,16 +69,13 @@ public class GetCollectionEventInfoAction implements
             ceventInfo.cevent = rows.get(0);
             ceventInfo.sourceSpecimenInfos = new GetCEventSpecimenInfosAction(
                 ceventId, false).doAction(session);
-            ceventInfo.sourceSpecimenCount = (long) ceventInfo.sourceSpecimenInfos
-                .size();
             ceventInfo.aliquotedSpecimenInfos = new GetCEventSpecimenInfosAction(
                 ceventId, true).doAction(session);
-            ceventInfo.aliquotedSpecimenCount = (long) ceventInfo.aliquotedSpecimenInfos
-                .size();
             ceventInfo.eventAttrs = new GetEventAttrInfoAction(ceventId)
                 .doAction(session);
         } else {
-            // TODO: throw exception?
+            throw new ActionException("Cannot find a collection event with id=" //$NON-NLS-1$
+                + ceventId);
         }
 
         return ceventInfo;

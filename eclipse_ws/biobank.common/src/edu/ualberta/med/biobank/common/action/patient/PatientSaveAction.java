@@ -39,10 +39,7 @@ public class PatientSaveAction implements Action<Patient> {
         if (patientId == null) {
             patientToSave = new Patient();
         } else {
-            // retrieve original patient
-            PatientInfo pinfo = new GetPatientInfoAction(patientId)
-                .doAction(session);
-            patientToSave = pinfo.patient;
+            patientToSave = (Patient) session.get(Patient.class, patientId);
         }
         patientToSave.setPnumber(pnumber);
         patientToSave.setCreatedAt(createdAt);

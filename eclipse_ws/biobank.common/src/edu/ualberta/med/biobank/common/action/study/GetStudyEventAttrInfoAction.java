@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 
 public class GetStudyEventAttrInfoAction implements
-    Action<Map<String, StudyEventAttrInfo>> {
+    Action<Map<Integer, StudyEventAttrInfo>> {
 
     private static final long serialVersionUID = 1L;
     private Integer studyId;
@@ -29,7 +29,7 @@ public class GetStudyEventAttrInfoAction implements
         "select attr,"
         + " type." + EventAttrTypePeer.NAME.getName()
         + " from " + StudyEventAttr.class.getName() + " as attr"
-        + " left join attr." + StudyEventAttrPeer.EVENT_ATTR_TYPE.getName() + " as type"
+        + " left join fetch attr." + StudyEventAttrPeer.EVENT_ATTR_TYPE.getName() + " as type"
         + " where attr." + Property.concatNames(StudyEventAttrPeer.STUDY, StudyPeer.ID) + " =?"
         + " group by attr";
     // @formatter:on
@@ -44,10 +44,13 @@ public class GetStudyEventAttrInfoAction implements
         return true;
     }
 
+    /**
+     * Action that return a map of [label=StudyEventAttrInfo]
+     */
     @Override
-    public Map<String, StudyEventAttrInfo> doAction(Session session)
+    public Map<Integer, StudyEventAttrInfo> doAction(Session session)
         throws ActionException {
-        Map<String, StudyEventAttrInfo> attrInfos = new HashMap<String, StudyEventAttrInfo>();
+        Map<Integer, StudyEventAttrInfo> attrInfos = new HashMap<Integer, StudyEventAttrInfo>();
 
         Query query = session.createQuery(STUDY_EVENT_ATTR_QRY);
         query.setParameter(0, studyId);
@@ -59,7 +62,7 @@ public class GetStudyEventAttrInfoAction implements
             attrInfo.attr = (StudyEventAttr) row[0];
             // FIXME need status?
             attrInfo.type = EventAttrTypeEnum.getEventAttrType((String) row[1]);
-            attrInfos.put(attrInfo.attr.getLabel(), attrInfo);
+            attrInfos.put(attrInfo.attr.getId(), attrInfo);
         }
         return attrInfos;
     }

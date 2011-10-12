@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.action.cevent.CollectionEventInfo;
+import edu.ualberta.med.biobank.common.action.cevent.GetPatientCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -19,7 +19,7 @@ public class NewCollectionEventInfoTable extends InfoTableWidget {
         Messages.CollectionEventInfoTable_header_comment };
 
     public NewCollectionEventInfoTable(Composite parent,
-        List<CollectionEventInfo> collection) {
+        List<PatientCEventInfo> collection) {
         super(parent, collection, HEADINGS, 10, CollectionEvent.class);
     }
 
@@ -28,7 +28,7 @@ public class NewCollectionEventInfoTable extends InfoTableWidget {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                CollectionEventInfo info = (CollectionEventInfo) ((BiobankCollectionModel) element).o;
+                PatientCEventInfo info = (PatientCEventInfo) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -56,7 +56,7 @@ public class NewCollectionEventInfoTable extends InfoTableWidget {
     protected String getCollectionModelObjectToString(Object o) {
         if (o == null)
             return null;
-        return ((CollectionEventInfo) o).toString();
+        return ((PatientCEventInfo) o).toString();
     }
 
     @Override
@@ -64,7 +64,7 @@ public class NewCollectionEventInfoTable extends InfoTableWidget {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
-        CollectionEventInfo row = (CollectionEventInfo) item.o;
+        PatientCEventInfo row = (PatientCEventInfo) item.o;
         Assert.isNotNull(row);
         return row.cevent;
     }

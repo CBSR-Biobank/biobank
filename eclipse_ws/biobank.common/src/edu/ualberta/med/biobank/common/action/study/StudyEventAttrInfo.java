@@ -12,4 +12,11 @@ public class StudyEventAttrInfo implements Serializable, NotAProxy {
     public StudyEventAttr attr;
     public EventAttrTypeEnum type;
 
+    public String[] getStudyEventAttrPermissible() {
+        String joinedPossibleValues = attr.getPermissible();
+        if (joinedPossibleValues == null)
+            return null;
+        return joinedPossibleValues.split(";"); //$NON-NLS-1$
+    }
+
 }

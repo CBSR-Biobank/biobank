@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.treeview.patient;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -13,8 +13,9 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.cevent.CollectionEventInfo;
-import edu.ualberta.med.biobank.common.action.patient.PatientInfo;
+import edu.ualberta.med.biobank.common.action.cevent.GetSimplePatientCollectionEventInfosAction;
+import edu.ualberta.med.biobank.common.action.cevent.GetSimplePatientCollectionEventInfosAction.SimpleCEventInfo;
+import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
@@ -26,31 +27,32 @@ import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 
 public class PatientAdapter extends AbstractNewAdapterBase {
 
-    private PatientInfo pinfo;
+    private Patient patient;
+    private Study study;
+    private Long ceventsCount;
 
-    public PatientAdapter(AbstractAdapterBase parent, PatientInfo pinfo) {
+    public PatientAdapter(AbstractAdapterBase parent, SearchedPatientInfo pinfo) {
         super(parent, Patient.class, pinfo == null ? null : pinfo.patient
             .getId(), null, null,
-            (pinfo == null || pinfo.cevents == null) ? false : pinfo.cevents
-                .size() > 0);
-        this.pinfo = pinfo;
+            (pinfo == null || pinfo.ceventsCount == null) ? false
+                : pinfo.ceventsCount > 0);
+        this.patient = pinfo.patient;
+        this.study = pinfo.study;
+        this.ceventsCount = pinfo.ceventsCount;
     }
 
     @Override
     protected String getLabelInternal() {
-        if (pinfo == null)
+        if (patient == null)
             return "no patient - should not see this"; //$NON-NLS-1$
-        return pinfo.patient.getPnumber();
+        return patient.getPnumber();
     }
 
     @Override
     public String getTooltipTextInternal() {
-        if (pinfo != null) {
-            Study study = pinfo.patient.getStudy();
-            if (study != null)
-                return study.getName()
-                    + " - " + getTooltipText(Messages.PatientAdapter_patient_label); //$NON-NLS-1$
-        }
+        if (patient != null && study != null)
+            return study.getName()
+                + " - " + getTooltipText(Messages.PatientAdapter_patient_label); //$NON-NLS-1$
         return getTooltipText(Messages.PatientAdapter_patient_label);
     }
 
@@ -73,13 +75,16 @@ public class PatientAdapter extends AbstractNewAdapterBase {
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    CollectionEvent cevent = new CollectionEvent();
-                    cevent.setPatient(pinfo.patient);
-                    CollectionEventInfo ceventInfo = new CollectionEventInfo();
-                    ceventInfo.cevent = cevent;
-                    CollectionEventAdapter ceventAdapter = new CollectionEventAdapter(
-                        PatientAdapter.this, ceventInfo);
-                    ceventAdapter.openEntryForm();
+                    // FIXME
+                    // CollectionEvent cevent = new CollectionEvent();
+                    // cevent.setPatient(pinfo.patient);
+                    // CollectionEventInfo ceventInfo = new
+                    // CollectionEventInfo();
+                    // ceventInfo.cevent = cevent;
+                    // CollectionEventAdapter ceventAdapter = new
+                    // CollectionEventAdapter(
+                    // PatientAdapter.this, ceventInfo);
+                    // ceventAdapter.openEntryForm();
                 }
             });
         }
@@ -89,7 +94,7 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     public List<AbstractAdapterBase> search(Class<?> searchedClass,
         Integer objectId) {
         return findChildFromClass(searchedClass, objectId,
-            CollectionEventInfo.class);
+            CollectionEvent.class);
     }
 
     @Override
@@ -99,29 +104,19 @@ public class PatientAdapter extends AbstractNewAdapterBase {
 
     @Override
     protected CollectionEventAdapter createChildNode(Object child) {
-        Assert.isTrue(child instanceof CollectionEventInfo);
-        return new CollectionEventAdapter(this, (CollectionEventInfo) child);
+        Assert.isTrue(child instanceof SimpleCEventInfo);
+        return new CollectionEventAdapter(this, (SimpleCEventInfo) child);
     }
 
     @Override
-    protected List<CollectionEventInfo> getChildrenObjects() throws Exception {
-        return pinfo.cevents;
-    }
-
-    @Override
-    protected List<Integer> getChildrenObjectIds() throws Exception {
-        List<Integer> ids = new ArrayList<Integer>();
-        if (pinfo.cevents != null) {
-            for (CollectionEventInfo cevent : pinfo.cevents) {
-                ids.add(cevent.cevent.getId());
-            }
-        }
-        return ids;
+    protected Map<Integer, ?> getChildrenObjects() throws Exception {
+        return SessionManager.getAppService().doAction(
+            new GetSimplePatientCollectionEventInfosAction(patient.getId()));
     }
 
     @Override
     protected int getChildrenCount() throws Exception {
-        return (getChildrenObjects() == null) ? 0 : getChildrenObjects().size();
+        return ceventsCount.intValue();
     }
 
     @Override
@@ -142,11 +137,6 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     @Override
     public boolean isDeletable() {
         return internalIsDeletable();
-    }
-
-    // FIXME do we want to do this ?
-    public Patient getPatient() {
-        return pinfo.patient;
     }
 
 }

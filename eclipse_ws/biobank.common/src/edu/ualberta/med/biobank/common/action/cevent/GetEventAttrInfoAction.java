@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.User;
 
 public class GetEventAttrInfoAction implements
-    Action<Map<String, EventAttrInfo>> {
+    Action<Map<Integer, EventAttrInfo>> {
 
     private static final long serialVersionUID = 1L;
     private Integer ceventId;
@@ -28,10 +28,10 @@ public class GetEventAttrInfoAction implements
     @SuppressWarnings("nls")
     private static final String EVENT_ATTR_QRY = 
         "select attr,"
-        +" sAttr." + StudyEventAttrPeer.LABEL.getName() 
+        +" sAttr." + StudyEventAttrPeer.ID.getName() 
         + ", attrType." + EventAttrTypePeer.NAME.getName()
         + " from " + EventAttr.class.getName() + " as attr"
-        + " left join attr." + EventAttrPeer.STUDY_EVENT_ATTR.getName() + " as sAttr"
+        + " left join fetch attr." + EventAttrPeer.STUDY_EVENT_ATTR.getName() + " as sAttr"
         + " left join sAttr." + StudyEventAttrPeer.EVENT_ATTR_TYPE.getName() + " as attrType"
         + " where attr." + Property.concatNames(EventAttrPeer.COLLECTION_EVENT, CollectionEventPeer.ID) + " =?"
         + " group by attr";
@@ -48,9 +48,9 @@ public class GetEventAttrInfoAction implements
     }
 
     @Override
-    public Map<String, EventAttrInfo> doAction(Session session)
+    public Map<Integer, EventAttrInfo> doAction(Session session)
         throws ActionException {
-        Map<String, EventAttrInfo> attrInfos = new HashMap<String, EventAttrInfo>();
+        Map<Integer, EventAttrInfo> attrInfos = new HashMap<Integer, EventAttrInfo>();
 
         Query query = session.createQuery(EVENT_ATTR_QRY);
         query.setParameter(0, ceventId);
@@ -61,7 +61,7 @@ public class GetEventAttrInfoAction implements
             EventAttrInfo attrInfo = new EventAttrInfo();
             attrInfo.attr = (EventAttr) row[0];
             attrInfo.type = EventAttrTypeEnum.getEventAttrType((String) row[2]);
-            attrInfos.put((String) row[1], attrInfo);
+            attrInfos.put((Integer) row[1], attrInfo);
         }
         return attrInfos;
     }

@@ -1,32 +1,35 @@
 package edu.ualberta.med.biobank.treeview.patient;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import edu.ualberta.med.biobank.common.action.patient.SearchPatientAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
-import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.views.CollectionView;
+import edu.ualberta.med.biobank.treeview.NewAbstractSearchedNode;
 
-public class PatientSearchedNode extends AbstractSearchedNode {
+public class PatientSearchedNode extends NewAbstractSearchedNode {
+
+    /**
+     * map the id of a study to a list of patient infos
+     */
+    private Map<Integer, StudyNodeInfo> studyPatientsMap;
 
     public PatientSearchedNode(AdapterBase parent, int id) {
-        super(parent, id, false);
+        super(parent, id);
+        studyPatientsMap = new HashMap<Integer, StudyNodeInfo>();
     }
 
     @Override
-    protected AdapterBase createChildNode(Object child) {
-        return null;
+    protected StudyWithPatientAdapter createChildNode(Object child) {
+        return new StudyWithPatientAdapter(this, (StudyNodeInfo) child);
     }
 
     @Override
-    protected AdapterBase createChildNode() {
-        return null;
-    }
-
-    @Override
-    protected boolean isParentTo(Object parent, Object child) {
-        return false;
+    protected StudyWithPatientAdapter createChildNode() {
+        return new StudyWithPatientAdapter(this, null);
     }
 
     @Override
@@ -36,13 +39,36 @@ public class PatientSearchedNode extends AbstractSearchedNode {
     }
 
     @Override
-    protected void addNode(Object obj) {
-        CollectionView.addToNode(this, obj);
+    public void rebuild() {
+        performExpand();
+    }
+
+    public void addPatient(SearchedPatientInfo pinfo) {
+        StudyNodeInfo snodeInfo = studyPatientsMap.get(pinfo.study.getId());
+        if (snodeInfo == null) {
+            snodeInfo = new StudyNodeInfo();
+            snodeInfo.study = pinfo.study;
+            snodeInfo.patients = new HashMap<Integer, SearchedPatientInfo>();
+            studyPatientsMap.put(pinfo.study.getId(), snodeInfo);
+        }
+        snodeInfo.patients.put(pinfo.patient.getId(), pinfo);
+
     }
 
     @Override
-    public void rebuild() {
-        performExpand();
+    protected String getLabelInternal() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected Map<Integer, ?> getChildrenObjects() throws Exception {
+        return studyPatientsMap;
+    }
+
+    @Override
+    protected int getChildrenCount() throws Exception {
+        return studyPatientsMap.size();
     }
 
 }
