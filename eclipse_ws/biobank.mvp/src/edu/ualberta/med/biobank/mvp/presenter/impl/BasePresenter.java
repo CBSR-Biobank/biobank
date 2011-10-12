@@ -8,9 +8,9 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.mvp.presenter.Presenter;
-import edu.ualberta.med.biobank.mvp.view.View;
+import edu.ualberta.med.biobank.mvp.view.BaseView;
 
-public abstract class BasePresenter<D extends View> implements Presenter<D> {
+public abstract class BasePresenter<D extends BaseView> implements Presenter<D> {
     private final List<HandlerRegistration> handlerRegistrations =
         new ArrayList<HandlerRegistration>();
     protected Dispatcher dispatcher;
@@ -19,15 +19,22 @@ public abstract class BasePresenter<D extends View> implements Presenter<D> {
     private boolean bound = false;
 
     @Override
+    public void setDisplay(D display) {
+        this.display = display;
+    }
+
+    @Override
+    public void setEventBus(EventBus eventBus) {
+        this.eventBus = eventBus;
+    }
+
+    @Override
     public void setDispatcher(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
     }
 
     @Override
-    public void bind(D display, EventBus eventBus) {
-        this.display = display;
-        this.eventBus = eventBus;
-
+    public void bind() {
         if (!bound) {
             onBind();
             bound = true;
@@ -46,8 +53,8 @@ public abstract class BasePresenter<D extends View> implements Presenter<D> {
 
             onUnbind();
 
-            display = null;
-            eventBus = null;
+            // TODO: dispose of View?
+            // display.close();
         }
     }
 
@@ -68,7 +75,7 @@ public abstract class BasePresenter<D extends View> implements Presenter<D> {
      * @return The display.
      */
     @Override
-    public D getDisplay() {
+    public D getView() {
         return display;
     }
 

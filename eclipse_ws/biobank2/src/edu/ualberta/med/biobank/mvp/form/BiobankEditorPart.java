@@ -11,12 +11,12 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.mvp.presenter.Presenter;
-import edu.ualberta.med.biobank.mvp.view.View;
+import edu.ualberta.med.biobank.mvp.view.BaseView;
 
 // TODO: could have a single editorpart that fetches the view then adds it to the presenter. The presenter comes in the init method?
 public class BiobankEditorPart implements IEditorPart {
-    private Presenter<View> presenter;
-    private View view;
+    private Presenter<BaseView> presenter;
+    private BaseView view;
 
     @Override
     public void addPropertyListener(IPropertyListener listener) {

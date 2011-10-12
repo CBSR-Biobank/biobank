@@ -4,12 +4,10 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 
 import edu.ualberta.med.biobank.mvp.presenter.SaveablePresenter;
-import edu.ualberta.med.biobank.mvp.view.CloseableView;
-import edu.ualberta.med.biobank.mvp.view.ReloadableView;
-import edu.ualberta.med.biobank.mvp.view.SaveableView;
+import edu.ualberta.med.biobank.mvp.view.EntryView;
 
-public abstract class BaseEditPresenter<D extends SaveableView & ReloadableView & CloseableView>
-    extends BaseViewPresenter<D> implements SaveablePresenter<D> {
+public abstract class BaseEntryPresenter<D extends EntryView> extends
+    BaseViewPresenter<D> implements SaveablePresenter<D> {
 
     @Override
     public void save() {

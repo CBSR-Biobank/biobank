@@ -5,16 +5,24 @@ import java.util.ArrayList;
 import edu.ualberta.med.biobank.common.action.ActionCallback;
 import edu.ualberta.med.biobank.common.action.activityStatus.GetAllActivityStatusesAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.mvp.presenter.impl.SelectActivityStatusPresenter.Display;
+import edu.ualberta.med.biobank.mvp.presenter.impl.ActivityStatusComboPresenter.View;
 import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValue;
 import edu.ualberta.med.biobank.mvp.util.Converter;
-import edu.ualberta.med.biobank.mvp.view.View;
+import edu.ualberta.med.biobank.mvp.view.BaseView;
 
-public class SelectActivityStatusPresenter extends BasePresenter<Display> {
+public class ActivityStatusComboPresenter extends BasePresenter<View> {
     private final static OptionLabeller labeller = new OptionLabeller();
 
-    public interface Display extends View {
+    public interface View extends BaseView {
         HasSelectedValue<ActivityStatus> getActivityStatus();
+    }
+
+    public void setSelectedValue(ActivityStatus activityStatus) {
+        display.getActivityStatus().setValue(activityStatus);
+    }
+
+    public ActivityStatus getSelectedValue() {
+        return display.getActivityStatus().getValue();
     }
 
     @Override

@@ -14,7 +14,6 @@ import com.google.gwt.user.client.ui.HasValue;
 import edu.ualberta.med.biobank.mvp.event.SimpleValueChangeEvent;
 
 public class TextItem implements HasValue<String> {
-    private final Text text;
     private final HandlerManager handlerManager = new HandlerManager(this);
     private final ModifyListener modifyListener = new ModifyListener() {
         @Override
@@ -26,11 +25,12 @@ public class TextItem implements HasValue<String> {
             }
         }
     };
+    private Text text;
     private boolean fireEvents = true;
 
-    public TextItem(Text text) {
+    public void setText(Text text) {
+        removeText();
         this.text = text;
-
         text.addModifyListener(modifyListener);
     }
 
@@ -60,5 +60,11 @@ public class TextItem implements HasValue<String> {
         this.fireEvents = fireEvents;
         setValue(value);
         this.fireEvents = true;
+    }
+
+    private void removeText() {
+        if (text != null) {
+            this.text.removeModifyListener(modifyListener);
+        }
     }
 }

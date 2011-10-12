@@ -20,14 +20,6 @@ public class SiteEntryForm implements SiteEditPresenter.Display {
     private TextItem name;
     private TextItem nameShort;
     private TextItem comment;
-    private TextItem street1;
-    private TextItem street2;
-    private TextItem city;
-    private TextItem province;
-    private TextItem postalCode;
-    private TextItem phoneNumber;
-    private TextItem faxNumber;
-    private TextItem country;
     private ComboItem<ActivityStatus> activityStatus;
 
     @Override
