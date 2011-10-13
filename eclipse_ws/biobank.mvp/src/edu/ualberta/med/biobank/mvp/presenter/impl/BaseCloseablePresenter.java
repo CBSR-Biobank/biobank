@@ -11,13 +11,13 @@ public abstract class BaseCloseablePresenter<D extends CloseableView> extends
 
     @Override
     protected void onBind() {
-        registerHandler(display.getClose().addClickHandler(
+        registerHandler(view.getClose().addClickHandler(
             new CloseClickHandler()));
     }
 
     @Override
     public void close() {
-        display.close();
+        view.close();
     }
 
     private class CloseClickHandler implements ClickHandler {

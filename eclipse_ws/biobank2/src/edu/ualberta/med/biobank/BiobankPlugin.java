@@ -61,7 +61,6 @@ import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
 import edu.ualberta.med.biobank.treeview.request.ReceivingRequestGroup;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
-import edu.ualberta.med.biobank.views.SiteEditView;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**
@@ -178,7 +177,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
 
             @Override
             protected void configure() {
-                bind(SiteEditPresenter.Display.class).toInstance(
+                bind(SiteEditPresenter.View.class).toInstance(
                     new SiteEditView());
             }
 

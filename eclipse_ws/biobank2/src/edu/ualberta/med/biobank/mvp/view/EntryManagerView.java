@@ -12,12 +12,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.mvp.event.EclipseClickEvent;
-import edu.ualberta.med.biobank.mvp.presenter.impl.EntryManagerPresenter;
+import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
 
-public class EntryManagerView implements EntryManagerPresenter.View {
+public class EntryManagerView implements FormManagerPresenter.View {
 
     @Override
-    public void showView(Object object, EntryView view) {
+    public void openForm(Object object, FormView view) {
         // TODO: add component to determine uniqueness properly.
         IEditorInput input = new EntryViewEditorInput(view);
         String id = EntryViewEditorPart.ID;
@@ -32,13 +32,13 @@ public class EntryManagerView implements EntryManagerPresenter.View {
     }
 
     private static class EntryViewEditorInput implements IEditorInput {
-        private final EntryView entryView;
+        private final FormView entryView;
 
-        public EntryViewEditorInput(EntryView entryView) {
+        public EntryViewEditorInput(FormView entryView) {
             this.entryView = entryView;
         }
 
-        public EntryView getEntryView() {
+        public FormView getEntryView() {
             return entryView;
         }
 
@@ -76,7 +76,7 @@ public class EntryManagerView implements EntryManagerPresenter.View {
 
     public static class EntryViewEditorPart extends EditorPart {
         public static String ID = "edu.ualberta.med.biobank.mvp.view.EntryManagerView.EntryViewEditorPart";
-        private EntryView entryView;
+        private FormView entryView;
 
         @Override
         public void doSave(IProgressMonitor monitor) {

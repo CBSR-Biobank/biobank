@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.mvp.event.model;
+package edu.ualberta.med.biobank.mvp.event.model.site;
 
 import com.google.gwt.event.shared.GwtEvent;
 
@@ -10,27 +10,27 @@ import edu.ualberta.med.biobank.model.Site;
  * @author jferland
  * 
  */
-public class SiteChangeEvent extends GwtEvent<SiteChangeHandler> {
+public class SiteChangedEvent extends GwtEvent<SiteChangedHandler> {
     private final Integer id;
 
     /**
      * Handler type.
      */
-    private static Type<SiteChangeHandler> TYPE;
+    private static Type<SiteChangedHandler> TYPE;
 
     /**
      * Gets the type associated with this event.
      * 
      * @return returns the handler type
      */
-    public static Type<SiteChangeHandler> getType() {
+    public static Type<SiteChangedHandler> getType() {
         if (TYPE == null) {
-            TYPE = new Type<SiteChangeHandler>();
+            TYPE = new Type<SiteChangedHandler>();
         }
         return TYPE;
     }
 
-    public SiteChangeEvent(Integer id) {
+    public SiteChangedEvent(Integer id) {
         this.id = id;
     }
 
@@ -39,12 +39,12 @@ public class SiteChangeEvent extends GwtEvent<SiteChangeHandler> {
     }
 
     @Override
-    public Type<SiteChangeHandler> getAssociatedType() {
+    public Type<SiteChangedHandler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(SiteChangeHandler handler) {
-        handler.onSiteChange(this);
+    protected void dispatch(SiteChangedHandler handler) {
+        handler.onSiteChanged(this);
     }
 }

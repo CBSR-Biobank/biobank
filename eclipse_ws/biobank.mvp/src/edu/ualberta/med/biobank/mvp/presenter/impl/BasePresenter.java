@@ -15,12 +15,12 @@ public abstract class BasePresenter<D extends BaseView> implements Presenter<D> 
         new ArrayList<HandlerRegistration>();
     protected Dispatcher dispatcher;
     protected EventBus eventBus;
-    protected D display;
+    protected D view;
     private boolean bound = false;
 
     @Override
     public void setDisplay(D display) {
-        this.display = display;
+        this.view = display;
     }
 
     @Override
@@ -76,7 +76,7 @@ public abstract class BasePresenter<D extends BaseView> implements Presenter<D> 
      */
     @Override
     public D getView() {
-        return display;
+        return view;
     }
 
     /**

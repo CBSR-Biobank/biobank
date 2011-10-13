@@ -4,9 +4,9 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 
 import edu.ualberta.med.biobank.mvp.presenter.SaveablePresenter;
-import edu.ualberta.med.biobank.mvp.view.EntryView;
+import edu.ualberta.med.biobank.mvp.view.FormView;
 
-public abstract class BaseEntryPresenter<D extends EntryView> extends
+public abstract class BaseEntryPresenter<D extends FormView> extends
     BaseViewPresenter<D> implements SaveablePresenter<D> {
 
     @Override
@@ -18,7 +18,7 @@ public abstract class BaseEntryPresenter<D extends EntryView> extends
     protected void onBind() {
         super.onBind();
 
-        registerHandler(display.getSave().addClickHandler(
+        registerHandler(view.getSave().addClickHandler(
             new SaveClickHandler()));
     }
 

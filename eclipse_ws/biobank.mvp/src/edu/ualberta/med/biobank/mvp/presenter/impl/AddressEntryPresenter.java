@@ -30,25 +30,25 @@ public class AddressEntryPresenter extends BasePresenter<View> {
     public void editAddress(Address address) {
         this.address = address;
 
-        display.getStreet1().setValue(address.getStreet1());
-        display.getStreet2().setValue(address.getStreet2());
-        display.getCity().setValue(address.getCity());
-        display.getProvince().setValue(address.getProvince());
-        display.getPostalCode().setValue(address.getPostalCode());
-        display.getPhoneNumber().setValue(address.getPhoneNumber());
-        display.getFaxNumber().setValue(address.getFaxNumber());
-        display.getCountry().setValue(address.getCountry());
+        view.getStreet1().setValue(address.getStreet1());
+        view.getStreet2().setValue(address.getStreet2());
+        view.getCity().setValue(address.getCity());
+        view.getProvince().setValue(address.getProvince());
+        view.getPostalCode().setValue(address.getPostalCode());
+        view.getPhoneNumber().setValue(address.getPhoneNumber());
+        view.getFaxNumber().setValue(address.getFaxNumber());
+        view.getCountry().setValue(address.getCountry());
     }
 
     public Address getAddress() {
-        address.setStreet1(display.getStreet1().getValue());
-        address.setStreet2(display.getStreet2().getValue());
-        address.setCity(display.getCity().getValue());
-        address.setProvince(display.getProvince().getValue());
-        address.setPostalCode(display.getPostalCode().getValue());
-        address.setPhoneNumber(display.getPhoneNumber().getValue());
-        address.setFaxNumber(display.getFaxNumber().getValue());
-        address.setCountry(display.getCountry().getValue());
+        address.setStreet1(view.getStreet1().getValue());
+        address.setStreet2(view.getStreet2().getValue());
+        address.setCity(view.getCity().getValue());
+        address.setProvince(view.getProvince().getValue());
+        address.setPostalCode(view.getPostalCode().getValue());
+        address.setPhoneNumber(view.getPhoneNumber().getValue());
+        address.setFaxNumber(view.getFaxNumber().getValue());
+        address.setCountry(view.getCountry().getValue());
 
         return address;
     }

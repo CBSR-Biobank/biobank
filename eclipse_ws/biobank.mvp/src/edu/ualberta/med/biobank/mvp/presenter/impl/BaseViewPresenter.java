@@ -18,7 +18,7 @@ public abstract class BaseViewPresenter<D extends DisplayView> extends
 
     @Override
     protected void onBind() {
-        registerHandler(display.getReload().addClickHandler(
+        registerHandler(view.getReload().addClickHandler(
             new ReloadClickHandler()));
     }
 

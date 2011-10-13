@@ -18,11 +18,11 @@ public class ActivityStatusComboPresenter extends BasePresenter<View> {
     }
 
     public void setSelectedValue(ActivityStatus activityStatus) {
-        display.getActivityStatus().setValue(activityStatus);
+        view.getActivityStatus().setValue(activityStatus);
     }
 
     public ActivityStatus getSelectedValue() {
-        return display.getActivityStatus().getValue();
+        return view.getActivityStatus().getValue();
     }
 
     @Override
@@ -38,8 +38,8 @@ public class ActivityStatusComboPresenter extends BasePresenter<View> {
 
                 @Override
                 public void onSuccess(ArrayList<ActivityStatus> result) {
-                    display.getActivityStatus().setOptions(result);
-                    display.getActivityStatus().setOptionLabeller(labeller);
+                    view.getActivityStatus().setOptions(result);
+                    view.getActivityStatus().setOptionLabeller(labeller);
                 }
             });
     }

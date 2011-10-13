@@ -12,11 +12,11 @@ import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyI
 import edu.ualberta.med.biobank.common.action.site.SaveSiteAction;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.mvp.event.model.SiteChangeEvent;
+import edu.ualberta.med.biobank.mvp.event.model.site.SiteChangedEvent;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.util.ObjectCloner;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
-import edu.ualberta.med.biobank.mvp.view.EntryView;
+import edu.ualberta.med.biobank.mvp.view.FormView;
 
 // TODO: replace SiteEditPresenter with this class
 public class SiteEntryPresenter extends BaseEntryPresenter<View> {
@@ -24,7 +24,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     private final ActivityStatusComboPresenter aStatusComboPresenter;
     private SiteInfo siteInfo;
 
-    public interface View extends EntryView {
+    public interface View extends FormView {
         // TODO: have general validation errors
         void setGeneralErrors(Collection<Object> errors);
 
@@ -46,14 +46,14 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         this.addressEntryPresenter = addressEntryPresenter;
         this.aStatusComboPresenter = aStatusComboPresenter;
 
-        display.setAddressEntryView(addressEntryPresenter.getView());
-        display.setActivityStatusComboView(aStatusComboPresenter.getView());
+        view.setAddressEntryView(addressEntryPresenter.getView());
+        view.setActivityStatusComboView(aStatusComboPresenter.getView());
     }
 
     @Override
     public void onBind() {
         // TODO: listen to Display properties for validation purposes.
-        registerHandler(display.getName().addValueChangeHandler(
+        registerHandler(view.getName().addValueChangeHandler(
             new ValueChangeHandler<String>() {
                 @Override
                 public void onValueChange(ValueChangeEvent<String> event) {
@@ -78,11 +78,11 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     @Override
     public void doSave() {
         SaveSiteAction saveSite = new SaveSiteAction(siteInfo.site.getId());
-        saveSite.setComment(display.getComment().getValue());
+        saveSite.setComment(view.getComment().getValue());
 
-        saveSite.setName(display.getName().getValue());
-        saveSite.setNameShort(display.getNameShort().getValue());
-        saveSite.setComment(display.getComment().getValue());
+        saveSite.setName(view.getName().getValue());
+        saveSite.setNameShort(view.getNameShort().getValue());
+        saveSite.setComment(view.getComment().getValue());
 
         Integer aStatusId = aStatusComboPresenter.getSelectedValue().getId();
         saveSite.setActivityStatusId(aStatusId);
@@ -111,32 +111,38 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
                 // But wait, probably shouldn't open the view form on any site
                 // save event ... :-(
 
-                eventBus.fireEvent(new SiteChangeEvent(siteId));
+                eventBus.fireEvent(new SiteChangedEvent(siteId));
 
                 // TODO: fire event to open a view form for this site
             }
         });
     }
 
-    public void createSite() {
+    public View createSite() {
         siteInfo = new SiteInfo();
         siteInfo.site = new Site();
         siteInfo.site.setAddress(new Address());
         populateView();
+        return view;
     }
 
-    public void editSite(SiteInfo siteInfo) {
+    public View editSite(Integer siteId) {
+        return view;
+    }
+
+    public View editSite(SiteInfo siteInfo) {
         this.siteInfo = ObjectCloner.deepCopy(siteInfo);
 
         // TODO: another method with id to fetch data from database?
         populateView();
+        return view;
     }
 
     private void populateView() {
-        display.getName().setValue(siteInfo.site.getName());
-        display.getNameShort().setValue(siteInfo.site.getNameShort());
-        display.getComment().setValue(siteInfo.site.getComment());
-        display.getStudies().setValue(siteInfo.studies);
+        view.getName().setValue(siteInfo.site.getName());
+        view.getNameShort().setValue(siteInfo.site.getNameShort());
+        view.getComment().setValue(siteInfo.site.getComment());
+        view.getStudies().setValue(siteInfo.studies);
 
         addressEntryPresenter.editAddress(siteInfo.site.getAddress());
         aStatusComboPresenter.setSelectedValue(siteInfo.site

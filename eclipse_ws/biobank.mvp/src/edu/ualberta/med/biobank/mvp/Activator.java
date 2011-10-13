@@ -25,15 +25,13 @@ public class Activator implements BundleActivator {
     public void start(BundleContext context) throws Exception {
         plugin = this;
 
-        System.out.println("MVP Bundle activated");
-
         // create a Guice module
         Module module = new AbstractModule() {
 
             @Override
             protected void configure() {
-                bind(SiteEditPresenter.Display.class).toProvider(
-                    Peaberry.service(SiteEditPresenter.Display.class).single());
+                bind(SiteEditPresenter.View.class).toProvider(
+                    Peaberry.service(SiteEditPresenter.View.class).single());
                 bind(EventBus.class).to(SimpleEventBus.class).in(
                     Singleton.class);
             }
