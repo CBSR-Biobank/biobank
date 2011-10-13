@@ -5,10 +5,8 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.Session;
 
@@ -128,7 +126,11 @@ public class CollectionEventSaveAction implements Action<Integer> {
         OriginInfo oi = new OriginInfo();
         oi.setCenter((Center) session.get(Center.class, centerId));
         session.saveOrUpdate(oi);
-        Set<Specimen> newSourceSpecList = new HashSet<Specimen>();
+        DiffUtils<Specimen> originalSpec = new DiffUtils<Specimen>(
+            CollectionUtils.getCollection(ceventToSave,
+                CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION));
+        Collection<Specimen> allSpec = CollectionUtils.getCollection(
+            ceventToSave, CollectionEventPeer.ALL_SPECIMEN_COLLECTION);
         for (SaveCEventSpecimenInfo specInfo : sourceSpecimens) {
             Specimen specimen;
             if (specInfo.id == null) {
@@ -142,29 +144,20 @@ public class CollectionEventSaveAction implements Action<Integer> {
                 ActivityStatus.class, specInfo.statusId));
             specimen.setCollectionEvent(ceventToSave);
             // cascade will save-update the specimens from this list:
-            CollectionUtils.getCollection(ceventToSave,
-                CollectionEventPeer.ALL_SPECIMEN_COLLECTION).add(specimen);
+            allSpec.add(specimen);
             specimen.setOriginalCollectionEvent(ceventToSave);
-            CollectionUtils.getCollection(ceventToSave,
-                CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION).add(specimen);
+            originalSpec.add(specimen);
             specimen.setComment(specInfo.comment);
             specimen.setCreatedAt(specInfo.timeDrawn);
             specimen.setInventoryId(specInfo.inventoryId);
             specimen.setQuantity(specInfo.quantity);
             specimen.setSpecimenType((SpecimenType) session.get(
                 SpecimenType.class, specInfo.specimenTypeId));
-            newSourceSpecList.add(specimen);
         }
-        Collection<Specimen> removedSpecimens = DiffUtils.getRemoved(
-            ceventToSave.getOriginalSpecimenCollection(), newSourceSpecList);
         // need to remove from collections. the delete-orphan cascade on
         // allspecimencollection will delete orphans
-        CollectionUtils.getCollection(ceventToSave,
-            CollectionEventPeer.ALL_SPECIMEN_COLLECTION).removeAll(
-            removedSpecimens);
-        CollectionUtils.getCollection(ceventToSave,
-            CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION).removeAll(
-            removedSpecimens);
+        Collection<Specimen> removedSpecimens = originalSpec.pullRemoved();
+        allSpec.removeAll(removedSpecimens);
     }
 
     public void setEventAttrs(Session session, Study study,

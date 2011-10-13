@@ -103,7 +103,6 @@ public abstract class BiobankFormBase extends BgcFormBase {
             linkedForms.add(this);
         }
         super.init(editorSite, formInput);
-        getSite().setSelectionProvider(this);
     }
 
     protected Object getModelObject() throws Exception {

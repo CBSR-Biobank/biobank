@@ -108,6 +108,7 @@ public abstract class BgcFormBase extends EditorPart implements
         } catch (Exception e) {
             logger.error("BgcFormBase.createPartControl Error", e); //$NON-NLS-1$
         }
+        getSite().setSelectionProvider(this);
     }
 
     /**

@@ -112,7 +112,7 @@ public class SearchView extends ViewPart {
             }
         });
 
-        loggedIn = sessionSourceProvider.getCurrentState()
+        loggedIn = BgcPlugin.getSessionStateSourceProvider().getCurrentState()
             .get(BgcSessionState.SESSION_STATE_SOURCE_NAME)
             .equals(BgcSessionState.LOGGED_IN);
         setEnabled();

@@ -2,35 +2,42 @@ package edu.ualberta.med.biobank.common.action;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 
-public class DiffUtils {
+public class DiffUtils<T> {
+
+    private Collection<T> collection;
+
+    private HashSet<T> addOrKeep;
+
+    public DiffUtils(Collection<T> collection) {
+        this.collection = collection;
+        addOrKeep = new HashSet<T>();
+    }
+
+    public void add(T object) {
+        collection.add(object);
+        addOrKeep.add(object);
+    }
 
     /**
-     * return the list of removed objects from the origin list
+     * return the list of the removed object, and removed them from the
+     * collection as well.
      */
-    public static <T> Collection<T> getRemoved(Collection<T> originList,
-        Collection<T> newList) {
-        if (originList == null)
-            return new ArrayList<T>();
-        if (newList == null)
-            return originList;
-        List<T> removed = new ArrayList<T>(originList);
-        removed.removeAll(newList);
+    public Collection<T> pullRemoved() {
+        Collection<T> removed = getRemoved();
+        collection.removeAll(removed);
         return removed;
     }
 
     /**
-     * return the list of added objects to the origin list
+     * return the list of the removed object, the object will stil be in the
+     * original list
      */
-    public static <T> Collection<T> getAdded(Collection<T> originList,
-        Collection<T> newList) {
-        if (originList == null)
-            return newList;
-        if (newList == null)
-            return new ArrayList<T>();
-        List<T> added = new ArrayList<T>(newList);
-        added.removeAll(originList);
-        return added;
+    public Collection<T> getRemoved() {
+        Collection<T> removed = new ArrayList<T>(collection);
+        removed.removeAll(addOrKeep);
+        return removed;
     }
+
 }
