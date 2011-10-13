@@ -79,4 +79,8 @@ public class NewRootNode extends AbstractNewAdapterBase {
     public int compareTo(AbstractAdapterBase o) {
         return 0;
     }
+
+    @Override
+    public void setValue(Object value) {
+    }
 }

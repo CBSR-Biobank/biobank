@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
-public class PatientSaveAction implements Action<Patient> {
+public class PatientSaveAction implements Action<Integer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,7 +34,7 @@ public class PatientSaveAction implements Action<Patient> {
     }
 
     @Override
-    public Patient doAction(Session session) throws ActionException {
+    public Integer doAction(Session session) throws ActionException {
         Patient patientToSave;
         if (patientId == null) {
             patientToSave = new Patient();
@@ -47,6 +47,6 @@ public class PatientSaveAction implements Action<Patient> {
 
         session.saveOrUpdate(patientToSave);
 
-        return patientToSave;
+        return patientToSave.getId();
     }
 }

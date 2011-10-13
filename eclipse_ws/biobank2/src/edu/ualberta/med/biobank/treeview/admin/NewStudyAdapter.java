@@ -86,4 +86,8 @@ public class NewStudyAdapter extends AbstractNewAdapterBase {
                 ((NewStudyAdapter) o).study.getNameShort());
         return 0;
     }
+
+    @Override
+    public void setValue(Object value) {
+    }
 }

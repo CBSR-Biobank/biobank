@@ -28,34 +28,35 @@ public abstract class AbstractViewWithAdapterTree extends
 
     protected AbstractAdapterBase rootNode;
 
+    private ISourceProviderListener sourceListener;
+
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractViewWithAdapterTree.class.getName());
 
     protected AbstractViewWithAdapterTree() {
-        BgcPlugin.getSessionStateSourceProvider().addSourceProviderListener(
-            new ISourceProviderListener() {
-                @Override
-                public void sourceChanged(int sourcePriority,
-                    String sourceName, Object sourceValue) {
-                    if (sourceName
-                        .equals(BgcSessionState.SESSION_STATE_SOURCE_NAME)) {
-                        if (sourceValue != null) {
-                            if (sourceValue.equals(BgcSessionState.LOGGED_IN))
-                                reload();
-                            else if (sourceValue
-                                .equals(BgcSessionState.LOGGED_OUT))
-                                clear();
-                        }
+        sourceListener = new ISourceProviderListener() {
+            @Override
+            public void sourceChanged(int sourcePriority, String sourceName,
+                Object sourceValue) {
+                if (sourceName
+                    .equals(BgcSessionState.SESSION_STATE_SOURCE_NAME)) {
+                    if (sourceValue != null) {
+                        if (sourceValue.equals(BgcSessionState.LOGGED_IN))
+                            reload();
+                        else if (sourceValue.equals(BgcSessionState.LOGGED_OUT))
+                            clear();
                     }
                 }
+            }
 
-                @SuppressWarnings("rawtypes")
-                @Override
-                public void sourceChanged(int sourcePriority,
-                    Map sourceValuesByName) {
-                    //
-                }
-            });
+            @SuppressWarnings("rawtypes")
+            @Override
+            public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
+                //
+            }
+        };
+        BgcPlugin.getSessionStateSourceProvider().addSourceProviderListener(
+            sourceListener);
     }
 
     @Override
@@ -120,11 +121,12 @@ public abstract class AbstractViewWithAdapterTree extends
                         && selection instanceof IStructuredSelection) {
                         IStructuredSelection strucSel = (IStructuredSelection) selection;
                         if (!strucSel.isEmpty()) {
-                            if (strucSel.getFirstElement() instanceof AbstractAdapterBase)
+                            if (strucSel.getFirstElement() instanceof AbstractAdapterBase) {
                                 // if a form is selected, the corresponding
                                 // adapter is in strucSel
                                 setSelectedNode((AbstractAdapterBase) strucSel
                                     .getFirstElement());
+                            }
                         }
                     }
                 }
@@ -133,4 +135,12 @@ public abstract class AbstractViewWithAdapterTree extends
     }
 
     protected abstract void createPartControlInternal(Composite parent);
+
+    @Override
+    public void dispose() {
+        if (sourceListener != null)
+            BgcPlugin.getSessionStateSourceProvider()
+                .removeSourceProviderListener(sourceListener);
+        super.dispose();
+    }
 }

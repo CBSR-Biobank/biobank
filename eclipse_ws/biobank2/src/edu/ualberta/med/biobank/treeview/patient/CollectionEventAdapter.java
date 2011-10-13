@@ -146,4 +146,10 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
         return 0;
     }
 
+    @Override
+    public void setValue(Object value) {
+        if (value instanceof SimpleCEventInfo)
+            ceventInfo = (SimpleCEventInfo) value;
+    }
+
 }

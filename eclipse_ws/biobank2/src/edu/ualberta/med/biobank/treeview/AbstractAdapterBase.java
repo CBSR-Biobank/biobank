@@ -470,4 +470,34 @@ public abstract class AbstractAdapterBase implements
         notifyListeners(new AdapterChangedEvent(this));
     }
 
+    /**
+     * Used when searching inside the tree
+     */
+    @Override
+    public boolean equals(Object o) {
+        boolean same = this == o;
+        if (!same && o instanceof AbstractAdapterBase) {
+            Class<?> class1 = getClass();
+            Class<?> class2 = o.getClass();
+            if (class1.equals(class2)) {
+                Integer id1 = getId();
+                Integer id2 = ((AbstractAdapterBase) o).getId();
+                return id1 != null && id2 != null && id1.equals(id2);
+            }
+        }
+        return same;
+    }
+
+    /**
+     * Used when searching inside the tree
+     */
+    @Override
+    public int hashCode() {
+        if (id != null)
+            return id.hashCode();
+        return super.hashCode();
+    }
+
+    public abstract void setValue(Object value);
+
 }

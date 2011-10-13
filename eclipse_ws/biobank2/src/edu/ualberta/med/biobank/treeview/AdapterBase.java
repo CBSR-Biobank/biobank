@@ -492,4 +492,8 @@ public abstract class AdapterBase extends AbstractAdapterBase {
         return 0;
     }
 
+    @Override
+    public void setValue(Object value) {
+
+    }
 }
