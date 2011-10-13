@@ -47,5 +47,4 @@ public class SiteChangeEvent extends GwtEvent<SiteChangeHandler> {
     protected void dispatch(SiteChangeHandler handler) {
         handler.onSiteChange(this);
     }
-
 }

@@ -10,27 +10,27 @@ import edu.ualberta.med.biobank.model.Site;
  * @author jferland
  * 
  */
-public class SiteEditPresenterShownEvent extends GwtEvent<SiteEditPresenterShownHandler> {
+public class SiteEntryPresenterShownEvent extends GwtEvent<SiteEntryPresenterShownHandler> {
     private final Integer id;
 
     /**
      * Handler type.
      */
-    private static Type<SiteEditPresenterShownHandler> TYPE;
+    private static Type<SiteEntryPresenterShownHandler> TYPE;
 
     /**
      * Gets the type associated with this event.
      * 
      * @return returns the handler type
      */
-    public static Type<SiteEditPresenterShownHandler> getType() {
+    public static Type<SiteEntryPresenterShownHandler> getType() {
         if (TYPE == null) {
-            TYPE = new Type<SiteEditPresenterShownHandler>();
+            TYPE = new Type<SiteEntryPresenterShownHandler>();
         }
         return TYPE;
     }
 
-    public SiteEditPresenterShownEvent(Integer id) {
+    public SiteEntryPresenterShownEvent(Integer id) {
         this.id = id;
     }
 
@@ -39,13 +39,13 @@ public class SiteEditPresenterShownEvent extends GwtEvent<SiteEditPresenterShown
     }
 
     @Override
-    public Type<SiteEditPresenterShownHandler> getAssociatedType() {
+    public Type<SiteEntryPresenterShownHandler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(SiteEditPresenterShownHandler handler) {
-        handler.onSiteEditPresenterShown(this);
+    protected void dispatch(SiteEntryPresenterShownHandler handler) {
+        handler.onSiteEntryPresenterShown(this);
     }
 
 }

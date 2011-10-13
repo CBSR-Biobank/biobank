@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.mvp.form;
 
-import java.awt.Composite;
+import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.mvp.view.BaseView;
 

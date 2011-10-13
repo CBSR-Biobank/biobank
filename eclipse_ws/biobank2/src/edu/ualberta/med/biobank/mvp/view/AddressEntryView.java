@@ -71,6 +71,8 @@ public class AddressEntryView implements AddressEntryPresenter.View {
 
         public Widget(Composite parent, int style) {
             super(parent, style);
+
+            street1 = new Text(this, SWT.NONE);
         }
     }
 }

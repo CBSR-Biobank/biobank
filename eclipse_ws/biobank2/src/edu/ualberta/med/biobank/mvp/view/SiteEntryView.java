@@ -1,0 +1,104 @@
+package edu.ualberta.med.biobank.mvp.view;
+
+import java.util.Collection;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Text;
+
+import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.user.client.ui.HasValue;
+
+import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
+import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
+import edu.ualberta.med.biobank.mvp.view.item.ButtonItem;
+import edu.ualberta.med.biobank.mvp.view.item.TextItem;
+
+public class SiteEntryView implements SiteEntryPresenter.View {
+    private Widget widget;
+
+    private ButtonItem save;
+    private ButtonItem reload;
+    private ButtonItem close;
+    private TextItem name;
+    private TextItem nameShort;
+    private TextItem comment;
+
+    private BaseView addressEntryView;
+    private BaseView activityStatusComboView;
+
+    @Override
+    public HasClickHandlers getSave() {
+        return save;
+    }
+
+    @Override
+    public HasValue<String> getName() {
+        return name;
+    }
+
+    @Override
+    public HasValue<String> getNameShort() {
+        return nameShort;
+    }
+
+    @Override
+    public HasValue<String> getComment() {
+        return comment;
+    }
+
+    @Override
+    public HasValue<Collection<StudyInfo>> getStudies() {
+        return null;
+    }
+
+    @Override
+    public void close() {
+        widget.getParent().dispose();
+    }
+
+    @Override
+    public HasClickHandlers getClose() {
+        return close;
+    }
+
+    @Override
+    public HasClickHandlers getReload() {
+        return reload;
+    }
+
+    @Override
+    public void create(Composite parent) {
+        widget = new Widget(parent, SWT.NONE);
+
+        // create the inner widgets
+        addressEntryView.create(widget);
+        activityStatusComboView.create(widget);
+    }
+
+    @Override
+    public void setGeneralErrors(Collection<Object> errors) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void setAddressEntryView(BaseView view) {
+        this.addressEntryView = view;
+    }
+
+    @Override
+    public void setActivityStatusComboView(BaseView view) {
+        this.activityStatusComboView = view;
+    }
+
+    public static class Widget extends Composite {
+        public final Text name;
+
+        public Widget(Composite parent, int style) {
+            super(parent, style);
+
+            name = new Text(this, SWT.NONE);
+        }
+    }
+}

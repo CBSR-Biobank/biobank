@@ -30,7 +30,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
         void setAddressEntryView(BaseView view);
 
-        void setActivityStatusSelectView(BaseView view);
+        void setActivityStatusComboView(BaseView view);
 
         HasValue<String> getName();
 
@@ -47,7 +47,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         this.aStatusComboPresenter = aStatusComboPresenter;
 
         display.setAddressEntryView(addressEntryPresenter.getView());
-        display.setActivityStatusSelectView(aStatusComboPresenter.getView());
+        display.setActivityStatusComboView(aStatusComboPresenter.getView());
     }
 
     @Override
