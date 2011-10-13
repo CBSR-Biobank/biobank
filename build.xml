@@ -52,7 +52,7 @@
   <property name="biobank.gui.common.jar.files"
             value="commons-beanutils-1.8.0.jar,commons-io-1.4.jar,commons-digester-1.7.jar,commons-javaflow-20060411.jar,iText-2.1.7.jar,jasperreports-4.0.1.jar,jdt-compiler-3.1.1.jar,DynamicJasper-3.0.14.jar" />
   <property name="biobank.mvp.jar.files"
-            value="gwt-user.jar" />
+            value="gwt-user.jar,guice-3.0.jar,peaberry-1.2.jar,javax.inject.jar,aopalliance.jar" />
   <property name="biobank.jar.files"
             value="gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
   <property name="biobank.common.jar.files"
@@ -786,7 +786,7 @@
       <fileset dir="${cacore.sdk.dir}/${build.classes.dir}"/>
     </delete>
   	<!-- copy the interface that all model object should implements now (thanks to the hbmpostprocess) -->
-  	<copy todir="${cacore.sdk.dir}/${output.src.dir}/edu/ualberta/med/biobank/model" 
+  	<copy todir="${cacore.sdk.dir}/${output.src.dir}/edu/ualberta/med/biobank/model"
   		file="${eclipse.proj.dir.tools}/src/edu/ualberta/med/biobank/model/IBiobankModel.java"
   	    overwrite="true"/>
 
@@ -965,6 +965,7 @@
   <target name="clean-jars" description="deletes jars from eclipse projects">
     <delete>
       <fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
+      <fileset dir="${eclipse.proj.dir.mvp}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.gui.common}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.junit}/lib" includes="**/*.jar" />

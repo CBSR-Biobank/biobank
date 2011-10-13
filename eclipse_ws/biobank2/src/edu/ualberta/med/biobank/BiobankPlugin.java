@@ -14,10 +14,17 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.services.ISourceProviderService;
+import org.ops4j.peaberry.Peaberry;
 import org.osgi.framework.BundleContext;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEditPresenter;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
@@ -54,6 +61,7 @@ import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
 import edu.ualberta.med.biobank.treeview.request.ReceivingRequestGroup;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
+import edu.ualberta.med.biobank.views.SiteEditView;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**
@@ -142,6 +150,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
     // The shared instance
     private static BiobankPlugin plugin;
 
+    private Injector injector;
+
     /**
      * The constructor
      */
@@ -162,6 +172,20 @@ public class BiobankPlugin extends AbstractUIPlugin {
         bundleContext = context;
         plugin = this;
         SessionManager.getInstance();
+
+        // create a Guice module
+        Module module = new AbstractModule() {
+
+            @Override
+            protected void configure() {
+                bind(SiteEditPresenter.Display.class).toInstance(
+                    new SiteEditView());
+            }
+
+        };
+
+        // export service and inject handle into the activator
+        injector = Guice.createInjector(Peaberry.osgiModule(context), module);
     }
 
     /*
@@ -175,6 +199,19 @@ public class BiobankPlugin extends AbstractUIPlugin {
     public void stop(BundleContext context) throws Exception {
         plugin = null;
         super.stop(context);
+    }
+
+    protected Module getCustomModule() {
+        return new AbstractModule() {
+            @Override
+            protected void configure() {
+
+            }
+        };
+    }
+
+    public static Injector getInjector() {
+        return getDefault().injector;
     }
 
     /**

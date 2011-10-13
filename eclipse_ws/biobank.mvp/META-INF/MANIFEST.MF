@@ -1,23 +1,49 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Presenter
-Bundle-SymbolicName: biobank.mvp
+Bundle-SymbolicName: biobank.mvp;singleton:=true
+Bundle-ActivationPolicy: lazy
 Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: edu.ualberta.med.biobank.mvp.Activator
 Require-Bundle: org.eclipse.core.runtime,
  biobank.common;bundle-version="3.2.0",
  org.eclipse.swt
+ org.eclipse.ui;bundle-version="3.7.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: lib/gwt-user.jar,
+ lib/guice-3.0.jar,
+ lib/peaberry-1.2.jar,
+ lib/javax.inject.jar,
+ lib/aopalliance.jar,
  .
 Export-Package: com.google.gwt.event.dom.client,
  com.google.gwt.event.logical.shared,
  com.google.gwt.event.shared,
  com.google.gwt.user.client.ui,
  com.google.gwt.user.client.ui.impl,
+ com.google.inject,
+ com.google.inject.binder,
+ com.google.inject.internal,
+ com.google.inject.internal.asm,
+ com.google.inject.internal.cglib.core,
+ com.google.inject.internal.cglib.proxy,
+ com.google.inject.internal.cglib.reflect,
+ com.google.inject.matcher,
+ com.google.inject.name,
+ com.google.inject.spi,
+ com.google.inject.util,
  edu.ualberta.med.biobank.mvp.event,
+ edu.ualberta.med.biobank.mvp.event.presenter,
  edu.ualberta.med.biobank.mvp.presenter,
  edu.ualberta.med.biobank.mvp.presenter.impl,
  edu.ualberta.med.biobank.mvp.user.ui,
  edu.ualberta.med.biobank.mvp.util,
- edu.ualberta.med.biobank.mvp.view
+ edu.ualberta.med.biobank.mvp.view,
+ org.ops4j.peaberry,
+ org.ops4j.peaberry.builders,
+ org.ops4j.peaberry.internal,
+ org.ops4j.peaberry.osgi,
+ org.ops4j.peaberry.util,
+ org.ops4j.peaberry.util.decorators,
+ org.ops4j.peaberry.util.ldap
