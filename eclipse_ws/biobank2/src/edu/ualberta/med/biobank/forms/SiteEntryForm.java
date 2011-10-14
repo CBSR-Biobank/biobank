@@ -8,19 +8,19 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEditPresenter;
+import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
 
 public class SiteEntryForm extends EditorPart {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteEntryForm"; //$NON-NLS-1$
 
-    private SiteEditPresenter presenter;
+    private SiteEntryPresenter presenter;
 
     @Override
     public void init(IEditorSite site, IEditorInput input)
         throws PartInitException {
         presenter = BiobankPlugin.getInjector().getInstance(
-            SiteEditPresenter.class);
+            SiteEntryPresenter.class);
     }
 
     @Override
