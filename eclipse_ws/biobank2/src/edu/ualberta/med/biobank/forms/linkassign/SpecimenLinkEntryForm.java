@@ -551,7 +551,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                     .getSpecimenType().getName(), singleSpecimen
                     .getParentSpecimen().getInventoryId(), singleSpecimen
                     .getParentSpecimen().getSpecimenType().getNameShort(),
-                linkFormPatientManagement.getCurrentPatient().getPnumber(),
+                singleSpecimen.getCollectionEvent().getPatient().getPnumber(),
                 singleSpecimen.getCollectionEvent().getVisitNumber(),
                 singleSpecimen.getCurrentCenter().getNameShort(), posStr));
         } else {
