@@ -5,16 +5,9 @@ import com.google.web.bindery.event.shared.EventBus;
 import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
 
-// TODO: give Presenter-s a "Context" that they can use to bind a display, get the eventBus, whatever. Put it in the constructor? Because need to pass to inner presenters.
 public interface Presenter<D extends BaseView> {
-    public void setDispatcher(Dispatcher dispatcher);
-
-    public void setDisplay(D display);
-
-    public void setEventBus(EventBus eventBus);
-
     /**
-     * Called after the presenter is initialised (i.e. the {@link Dispatcher},
+     * Called after the presenter is initialized (i.e. the {@link Dispatcher},
      * display, and {@link EventBus} have been set). This should be called
      * before any other methods. Any event handlers and other setup should be
      * done here rather than in the constructor.

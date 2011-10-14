@@ -6,31 +6,19 @@ import java.util.List;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
-import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.mvp.presenter.Presenter;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
 
-public abstract class BasePresenter<D extends BaseView> implements Presenter<D> {
+public abstract class BasePresenter<V extends BaseView> implements Presenter<V> {
     private final List<HandlerRegistration> handlerRegistrations =
         new ArrayList<HandlerRegistration>();
-    protected Dispatcher dispatcher;
-    protected EventBus eventBus;
-    protected D view;
+    protected final V view;
+    protected final EventBus eventBus;
     private boolean bound = false;
 
-    @Override
-    public void setDisplay(D display) {
-        this.view = display;
-    }
-
-    @Override
-    public void setEventBus(EventBus eventBus) {
+    protected BasePresenter(V view, EventBus eventBus) {
+        this.view = view;
         this.eventBus = eventBus;
-    }
-
-    @Override
-    public void setDispatcher(Dispatcher dispatcher) {
-        this.dispatcher = dispatcher;
     }
 
     @Override
@@ -70,12 +58,12 @@ public abstract class BasePresenter<D extends BaseView> implements Presenter<D> 
     }
 
     /**
-     * Returns the display for the presenter.
+     * Returns the view for the presenter.
      * 
-     * @return The display.
+     * @return The view.
      */
     @Override
-    public D getView() {
+    public V getView() {
         return view;
     }
 

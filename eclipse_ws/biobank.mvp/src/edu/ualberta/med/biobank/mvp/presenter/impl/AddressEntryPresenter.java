@@ -1,11 +1,15 @@
 package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.inject.ImplementedBy;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.mvp.presenter.impl.AddressEntryPresenter.View;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
 
+@ImplementedBy(AddressEntryPresenter.class)
 public class AddressEntryPresenter extends BasePresenter<View> {
     private Address address;
 
@@ -25,6 +29,11 @@ public class AddressEntryPresenter extends BasePresenter<View> {
         HasValue<String> getFaxNumber();
 
         HasValue<String> getCountry();
+    }
+
+    @Inject
+    public AddressEntryPresenter(View view, EventBus eventBus) {
+        super(view, eventBus);
     }
 
     public void editAddress(Address address) {

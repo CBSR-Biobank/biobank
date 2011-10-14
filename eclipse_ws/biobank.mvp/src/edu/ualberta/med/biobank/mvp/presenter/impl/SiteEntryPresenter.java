@@ -5,8 +5,12 @@ import java.util.Collection;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.HasValue;
+import com.google.inject.ImplementedBy;
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.common.action.ActionCallback;
+import edu.ualberta.med.biobank.common.action.Dispatcher;
 import edu.ualberta.med.biobank.common.action.site.GetSiteInfoAction.SiteInfo;
 import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.common.action.site.SaveSiteAction;
@@ -18,8 +22,9 @@ import edu.ualberta.med.biobank.mvp.util.ObjectCloner;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
 import edu.ualberta.med.biobank.mvp.view.FormView;
 
-// TODO: replace SiteEditPresenter with this class
+@ImplementedBy(SiteEntryPresenter.class)
 public class SiteEntryPresenter extends BaseEntryPresenter<View> {
+    private final Dispatcher dispatcher;
     private final AddressEntryPresenter addressEntryPresenter;
     private final ActivityStatusComboPresenter aStatusComboPresenter;
     private SiteInfo siteInfo;
@@ -41,11 +46,17 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
         HasValue<Collection<StudyInfo>> getStudies();
     }
 
-    public SiteEntryPresenter(AddressEntryPresenter addressEntryPresenter,
+    @Inject
+    public SiteEntryPresenter(View view, EventBus eventBus,
+        Dispatcher dispatcher, AddressEntryPresenter addressEntryPresenter,
         ActivityStatusComboPresenter aStatusComboPresenter) {
+        super(view, eventBus);
+        this.dispatcher = dispatcher;
         this.addressEntryPresenter = addressEntryPresenter;
         this.aStatusComboPresenter = aStatusComboPresenter;
 
+        // Doesn't _NEED_ to be done here, can be done later, then the
+        // SiteEntryPresenter.View can create these sub-views when they're set.
         view.setAddressEntryView(addressEntryPresenter.getView());
         view.setActivityStatusComboView(aStatusComboPresenter.getView());
     }
