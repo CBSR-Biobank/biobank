@@ -138,6 +138,17 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     }
 
     public View editSite(Integer siteId) {
+        // final Holder<SiteInfo> siteInfoHolder = new Holder<SiteInfo>(null);
+        // GetSiteInfoAction getSiteInfo = new GetSiteInfoAction(siteId);
+        // dispatcher.exec(getSiteInfo, new ActionCallback<SiteInfo>() {
+        // @Override
+        // public void onFailure(Throwable caught) {
+        // // TODO: better error message and show or log exception?
+        // eventBus.fireEvent(new AlertEvent("FAIL!"));
+        // display.close();
+        // unbind();
+        // }
+
         return view;
     }
 

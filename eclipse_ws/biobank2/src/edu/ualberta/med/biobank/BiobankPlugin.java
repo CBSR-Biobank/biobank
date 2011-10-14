@@ -14,18 +14,16 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.services.ISourceProviderService;
-import org.ops4j.peaberry.Peaberry;
 import org.osgi.framework.BundleContext;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.Stage;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
-import edu.ualberta.med.biobank.mvp.view.SiteEntryView;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
@@ -173,19 +171,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
         plugin = this;
         SessionManager.getInstance();
 
-        // create a Guice module
-        Module module = new AbstractModule() {
-
-            @Override
-            protected void configure() {
-                bind(SiteEntryPresenter.View.class).toInstance(
-                    new SiteEntryView());
-            }
-
-        };
-
-        // export service and inject handle into the activator
-        injector = Guice.createInjector(Peaberry.osgiModule(context), module);
+        injector = Guice.createInjector(Stage.PRODUCTION, new GuiceModule());
     }
 
     /*
