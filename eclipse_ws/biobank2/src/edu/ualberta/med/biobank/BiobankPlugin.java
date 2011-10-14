@@ -24,7 +24,8 @@ import com.google.inject.Module;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEditPresenter;
+import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
+import edu.ualberta.med.biobank.mvp.view.SiteEntryView;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
@@ -177,8 +178,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
 
             @Override
             protected void configure() {
-                bind(SiteEditPresenter.View.class).toInstance(
-                    new SiteEditView());
+                bind(SiteEntryPresenter.View.class).toInstance(
+                    new SiteEntryView());
             }
 
         };
