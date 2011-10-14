@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.HasValue;
 import edu.ualberta.med.biobank.mvp.event.SimpleValueChangeEvent;
 
 public class TextItem implements HasValue<String> {
+    private final static String DEFAULT_VALUE = ""; //$NON-NLS-1$
     private final HandlerManager handlerManager = new HandlerManager(this);
     private final ModifyListener modifyListener = new ModifyListener() {
         @Override
@@ -26,11 +27,14 @@ public class TextItem implements HasValue<String> {
         }
     };
     private Text text;
+    private String value = DEFAULT_VALUE; // track value while Widget not bound
     private boolean fireEvents = true;
 
-    public void setText(Text text) {
-        removeText();
+    public synchronized void setText(Text text) {
+        unbindOldText();
+
         this.text = text;
+        setValue(value);
         text.addModifyListener(modifyListener);
     }
 
@@ -47,11 +51,12 @@ public class TextItem implements HasValue<String> {
 
     @Override
     public String getValue() {
-        return text.getText();
+        return text != null ? text.getText() : value;
     }
 
     @Override
     public void setValue(String value) {
+        this.value = value != null ? value : DEFAULT_VALUE;
         text.setText(value);
     }
 
@@ -62,9 +67,9 @@ public class TextItem implements HasValue<String> {
         this.fireEvents = true;
     }
 
-    private void removeText() {
+    private void unbindOldText() {
         if (text != null) {
-            this.text.removeModifyListener(modifyListener);
+            text.removeModifyListener(modifyListener);
         }
     }
 }

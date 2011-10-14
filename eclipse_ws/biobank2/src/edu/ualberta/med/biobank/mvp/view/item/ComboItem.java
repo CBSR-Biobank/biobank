@@ -30,7 +30,6 @@ public class ComboItem<T> implements HasSelectedValue<T> {
             event.doit = false;
         }
     };
-    private final ComboViewer comboViewer;
     private final HandlerManager handlerManager = new HandlerManager(this);
     private final ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
         @Override
@@ -41,12 +40,16 @@ public class ComboItem<T> implements HasSelectedValue<T> {
             }
         }
     };
-    private boolean fireEvents;
+    private ComboViewer comboViewer;
+    private T value = null; // track value while Widget not bound
     private Converter<T, String> optionLabeler;
+    private boolean fireEvents;
 
-    public ComboItem(ComboViewer comboViewer) {
+    public void setComboViewer(ComboViewer comboViewer) {
+        unbindOldComboViewer();
+
         this.comboViewer = comboViewer;
-
+        setValue(value);
         comboViewer.setLabelProvider(new CustomLabelProvider());
         comboViewer.addSelectionChangedListener(selectionChangedListener);
         disableMouseWheel();
@@ -65,21 +68,27 @@ public class ComboItem<T> implements HasSelectedValue<T> {
 
     @Override
     public T getValue() {
-        IStructuredSelection selection = (IStructuredSelection) comboViewer
-            .getSelection();
+        if (comboViewer != null) {
+            IStructuredSelection selection = (IStructuredSelection) comboViewer
+                .getSelection();
 
-        if ((selection != null) && !selection.isEmpty()) {
-            @SuppressWarnings("unchecked")
-            T tmp = (T) selection.getFirstElement();
-            return tmp;
+            if ((selection != null) && !selection.isEmpty()) {
+                @SuppressWarnings("unchecked")
+                T tmp = (T) selection.getFirstElement();
+                return tmp;
+            }
         }
 
-        return null;
+        return value;
     }
 
     @Override
     public void setValue(T value) {
-        comboViewer.setSelection(new StructuredSelection(value), true);
+        this.value = value;
+
+        IStructuredSelection selection = value != null ? new StructuredSelection(
+            value) : new StructuredSelection();
+        comboViewer.setSelection(selection, true);
     }
 
     @Override
@@ -97,6 +106,13 @@ public class ComboItem<T> implements HasSelectedValue<T> {
     @Override
     public void setOptionLabeller(Converter<T, String> labeler) {
         this.optionLabeler = labeler;
+    }
+
+    private void unbindOldComboViewer() {
+        if (comboViewer != null) {
+            comboViewer
+                .removeSelectionChangedListener(selectionChangedListener);
+        }
     }
 
     private void disableMouseWheel() {
