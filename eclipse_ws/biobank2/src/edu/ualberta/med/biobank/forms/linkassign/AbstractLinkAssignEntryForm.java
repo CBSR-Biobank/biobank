@@ -698,15 +698,14 @@ public abstract class AbstractLinkAssignEntryForm extends
                         return;
                     }
 
-                    ContainerWrapper container = parentContainers.get(0);
-
                     appendLog(NLS
                         .bind(
                             Messages.AbstractLinkAssignEntryForm_single_activitylog_checkingPosition,
                             positionString));
-
+                    ContainerWrapper container = parentContainers.get(0);
                     RowColPos position = container.getContainerType()
-                        .getRowColFromPositionString(positionString);
+                        .getRowColFromPositionString(
+                            positionString.replace(container.getLabel(), "")); //$NON-NLS-1$
 
                     if (container.isPositionFree(position)) {
                         singleSpecimen.setParent(container, position);
