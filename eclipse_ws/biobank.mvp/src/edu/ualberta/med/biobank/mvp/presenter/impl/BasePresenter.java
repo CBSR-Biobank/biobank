@@ -19,6 +19,11 @@ public abstract class BasePresenter<V extends BaseView> implements Presenter<V> 
     protected BasePresenter(V view, EventBus eventBus) {
         this.view = view;
         this.eventBus = eventBus;
+
+        // Automatically bind in the constructor since we already have the View
+        // and EventBus here, so do it to prevent specifically calling it. A
+        // programmer may want to unbind then rebind later.
+        bind();
     }
 
     @Override
@@ -40,9 +45,6 @@ public abstract class BasePresenter<V extends BaseView> implements Presenter<V> 
             handlerRegistrations.clear();
 
             onUnbind();
-
-            // TODO: dispose of View?
-            // display.close();
         }
     }
 
