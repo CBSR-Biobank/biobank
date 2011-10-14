@@ -103,4 +103,8 @@ public class PatientSearchedNode extends NewAbstractSearchedNode {
         studyPatientsMap.clear();
         rebuild();
     }
+
+    @Override
+    protected void runDelete() throws Exception {
+    }
 }

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -386,44 +385,8 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     }
 
     @Override
-    public void deleteWithConfirm() {
-        String msg = getConfirmDeleteMessage();
-        if (msg == null) {
-            throw new RuntimeException("adapter has no confirm delete msg: " //$NON-NLS-1$
-                + getClass().getName());
-        }
-        boolean doDelete = true;
-        if (msg != null)
-            doDelete = BgcPlugin.openConfirm(
-                Messages.AdapterBase_confirm_delete_title, msg);
-        if (doDelete) {
-            BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-                @Override
-                public void run() {
-                    // the order is very important
-                    if (getModelObject() != null) {
-                        IWorkbenchPage page = PlatformUI.getWorkbench()
-                            .getActiveWorkbenchWindow().getActivePage();
-                        IEditorPart part = page.findEditor(new FormInput(
-                            AdapterBase.this));
-                        getParent().removeChild(AdapterBase.this, false);
-                        try {
-                            getModelObject().delete();
-                            page.closeEditor(part, true);
-                        } catch (Exception e) {
-                            BgcPlugin.openAsyncError(
-                                Messages.AdapterBase_delete_error_title, e);
-                            getParent().addChild(AdapterBase.this);
-                            return;
-                        }
-                        getParent().rebuild();
-                        getParent().notifyListeners();
-                        notifyListeners();
-                        additionalRefreshAfterDelete();
-                    }
-                }
-            });
-        }
+    protected void runDelete() throws Exception {
+        getModelObject().delete();
     }
 
     @Override

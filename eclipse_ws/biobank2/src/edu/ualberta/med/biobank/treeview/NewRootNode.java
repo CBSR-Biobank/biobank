@@ -83,4 +83,8 @@ public class NewRootNode extends AbstractNewAdapterBase {
     @Override
     public void setValue(Object value) {
     }
+
+    @Override
+    protected void runDelete() throws Exception {
+    }
 }

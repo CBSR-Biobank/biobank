@@ -7,8 +7,10 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -20,6 +22,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 import edu.ualberta.med.biobank.treeview.util.DeltaEvent;
@@ -273,7 +276,48 @@ public abstract class AbstractAdapterBase implements
         }
     }
 
-    protected abstract void deleteWithConfirm();
+    public void deleteWithConfirm() {
+        String msg = getConfirmDeleteMessage();
+        if (msg == null) {
+            throw new RuntimeException("adapter has no confirm delete msg: " //$NON-NLS-1$
+                + getClass().getName());
+        }
+        boolean doDelete = true;
+        if (msg != null)
+            doDelete = BgcPlugin.openConfirm(
+                Messages.AdapterBase_confirm_delete_title, msg);
+        if (doDelete) {
+            BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                @Override
+                public void run() {
+                    // the order is very important
+                    if (getId() != null) {
+                        IWorkbenchPage page = PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage();
+                        IEditorPart part = page.findEditor(new FormInput(
+                            AbstractAdapterBase.this));
+                        getParent()
+                            .removeChild(AbstractAdapterBase.this, false);
+                        try {
+                            runDelete();
+                            page.closeEditor(part, true);
+                        } catch (Exception e) {
+                            BgcPlugin.openAsyncError(
+                                Messages.AdapterBase_delete_error_title, e);
+                            getParent().addChild(AbstractAdapterBase.this);
+                            return;
+                        }
+                        getParent().rebuild();
+                        getParent().notifyListeners();
+                        notifyListeners();
+                        additionalRefreshAfterDelete();
+                    }
+                }
+            });
+        }
+    }
+
+    protected abstract void runDelete() throws Exception;
 
     /**
      * Create a adequate child node for this node

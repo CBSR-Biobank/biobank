@@ -90,4 +90,8 @@ public class NewStudyAdapter extends AbstractNewAdapterBase {
     @Override
     public void setValue(Object value) {
     }
+
+    @Override
+    protected void runDelete() throws Exception {
+    }
 }

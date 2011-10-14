@@ -88,11 +88,6 @@ public abstract class AbstractNewAdapterBase extends AbstractAdapterBase {
     }
 
     @Override
-    public void deleteWithConfirm() {
-        // FIXME action ?
-    }
-
-    @Override
     public List<AbstractAdapterBase> search(Class<?> searchedClass,
         Integer objectId) {
         if (getClass().equals(searchedClass) && getId().equals(objectId))
