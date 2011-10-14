@@ -64,6 +64,8 @@ public class FormManagerPresenter extends BasePresenter<View> {
         FormView formView = siteEntryPresenterProvider.get().editSite(siteId);
 
         // TODO: think about unique object
+        // TODO: the view could implement a method that explains how it's
+        // unique?
         view.openForm(Arrays.asList(Site.class, siteId), formView);
     }
 
