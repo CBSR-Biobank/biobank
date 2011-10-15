@@ -34,6 +34,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.ContainerInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenInfo;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.scanprocess.data.AssignProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
@@ -950,23 +953,27 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             if (containerToRemove != null) {
                 containerToRemove.delete();
             }
-            currentMultipleContainer.persist();
-            String productBarcode = currentMultipleContainer
-                .getProductBarcode();
-            String containerType = currentMultipleContainer.getContainerType()
-                .getName();
-            String palletLabel = currentMultipleContainer.getLabel();
-            String siteName = currentMultipleContainer.getSite().getNameShort();
-            if (isNewMultipleContainer)
-                appendLog(Messages
-                    .format(
-                        Messages.SpecimenAssignEntryForm_multiple_activitylog_pallet_added,
-                        productBarcode, containerType, palletLabel, siteName));
+            // currentMultipleContainer.persist();
+            // FIXME logs?
+            // String productBarcode = currentMultipleContainer
+            // .getProductBarcode();
+            // String containerType =
+            // currentMultipleContainer.getContainerType()
+            // .getName();
+            // String palletLabel = currentMultipleContainer.getLabel();
+            // String siteName =
+            // currentMultipleContainer.getSite().getNameShort();
+            // if (isNewMultipleContainer)
+            // appendLog(Messages
+            // .format(
+            // Messages.SpecimenAssignEntryForm_multiple_activitylog_pallet_added,
+            // productBarcode, containerType, palletLabel, siteName));
             int totalNb = 0;
             StringBuffer sb = new StringBuffer(
                 Messages.SpecimenAssignEntryForm_multiple_activilylog_save_start);
             try {
                 Map<RowColPos, PalletCell> cells = getCells();
+                List<SpecimenInfo> specInfos = new ArrayList<SpecimenAssignSaveAction.SpecimenInfo>();
                 for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
                     RowColPos rcp = entry.getKey();
                     PalletCell cell = entry.getValue();
@@ -975,19 +982,50 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                             .getStatus() == UICellStatus.MOVED)) {
                         SpecimenWrapper specimen = cell.getSpecimen();
                         if (specimen != null) {
-                            specimen.setParent(currentMultipleContainer, rcp);
-                            specimen.persist();
-                            String posStr = specimen.getPositionString(true,
-                                false);
-                            if (posStr == null) {
-                                posStr = Messages.SpecimenAssignEntryForm_EntryForm_position_none;
-                            }
-                            computeActivityLogMessage(sb, cell, specimen,
-                                posStr);
+                            SpecimenInfo specInfo = new SpecimenInfo();
+                            specInfo.specimenId = specimen.getId();
+                            specInfo.position = rcp;
+                            specInfos.add(specInfo);
+                            // FIXME log
+                            // specimen.setParent(currentMultipleContainer,
+                            // rcp);
+                            // specimen.persist();
+                            // String posStr = specimen.getPositionString(true,
+                            // false);
+                            // if (posStr == null) {
+                            // posStr =
+                            // Messages.SpecimenAssignEntryForm_EntryForm_position_none;
+                            // }
+                            // computeActivityLogMessage(sb, cell, specimen,
+                            // posStr);
                             totalNb++;
                         }
                     }
                 }
+                List<Integer> resIds;
+                if (currentMultipleContainer.getId() == null) {
+                    ContainerInfo ci = new ContainerInfo();
+                    ci.label = currentMultipleContainer.getLabel();
+                    ci.parentId = currentMultipleContainer.getParentContainer()
+                        .getId();
+                    ci.position = currentMultipleContainer
+                        .getPositionAsRowCol();
+                    ci.productBarcode = currentMultipleContainer
+                        .getProductBarcode();
+                    ci.typeId = currentMultipleContainer.getContainerType()
+                        .getId();
+                    ci.statusId = currentMultipleContainer.getActivityStatus()
+                        .getId();
+                    ci.siteId = currentMultipleContainer.getSite().getId();
+                    resIds = SessionManager.getAppService().doAction(
+                        new SpecimenAssignSaveAction(ci, specInfos));
+                } else {
+                    resIds = SessionManager.getAppService().doAction(
+                        new SpecimenAssignSaveAction(currentMultipleContainer
+                            .getId(), specInfos));
+                }
+                System.out.println(resIds.size());
+
             } catch (Exception ex) {
                 setScanHasBeenLaunched(false, true);
                 throw ex;
@@ -1014,7 +1052,18 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     private void saveSingleSpecimen() throws Exception {
-        singleSpecimen.persist();
+        SpecimenInfo specInfo = new SpecimenInfo();
+        specInfo.specimenId = singleSpecimen.getId();
+        specInfo.position = singleSpecimen.getPosition();
+        List<Integer> resIds = SessionManager.getAppService().doAction(
+            new SpecimenAssignSaveAction(singleSpecimen.getParentContainer()
+                .getId(), Arrays.asList(specInfo)));
+
+        if (resIds.size() != 1) {
+            throw new Exception("result problem"); //$NON-NLS-1$
+        }
+        singleSpecimen.getWrappedObject().setId(resIds.get(0));
+        singleSpecimen.reload();
         appendLog(Messages.format(
             Messages.SpecimenAssignEntryForm_assigned_msg_single,
             singleSpecimen.getPositionString(true, false), singleSpecimen

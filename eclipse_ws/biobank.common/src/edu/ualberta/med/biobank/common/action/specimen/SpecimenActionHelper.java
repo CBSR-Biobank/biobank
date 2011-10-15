@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.common.action.ActionException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -45,22 +46,22 @@ public class SpecimenActionHelper {
     }
 
     public static void setPosition(Session session, Specimen specimen,
-        RowColPos rcp, Integer containerId) {
+        RowColPos rcp, Container container) {
         // FIXME check if a position exists?
         SpecimenPosition pos = specimen.getSpecimenPosition();
-        if (pos != null && rcp == null && containerId == null) {
+        if (pos != null && rcp == null && container == null) {
             specimen.setSpecimenPosition(null);
+            // FIXME not sure this will work. Needs to be tested.
             session.delete(pos);
         }
-        if (rcp != null && containerId != null) {
+        if (rcp != null && container != null) {
             if (pos == null) {
                 pos = new SpecimenPosition();
                 pos.setSpecimen(specimen);
                 specimen.setSpecimenPosition(pos);
             }
+            pos.setRow(rcp.getRow());
             pos.setCol(rcp.getCol());
-            Container container = (Container) session.get(Container.class,
-                containerId);
             pos.setContainer(container);
             ContainerType type = container.getContainerType();
             String positionString = ContainerLabelingSchemeWrapper
@@ -68,7 +69,10 @@ public class SpecimenActionHelper {
                     type.getCapacity().getRowCapacity(), type.getCapacity()
                         .getColCapacity());
             pos.setPositionString(positionString);
-            pos.setRow(rcp.getRow());
+        } else if ((rcp == null && container != null)
+            || (rcp != null && container == null)) {
+            throw new ActionException(
+                "Problem: position and parent container should be both null or both set"); //$NON-NLS-1$
         }
     }
 }

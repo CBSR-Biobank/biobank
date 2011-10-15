@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -57,6 +58,10 @@ public class SpecimenLinkSaveAction implements Action<List<Integer>> {
         Center currentCenter = (Center) session.get(Center.class, centerId);
         Date currentDate = new Date();
 
+        // FIXME permissions?
+        // FIXME Checks needed before saving the specimens? (see specimen
+        // persist checks)
+
         OriginInfo originInfo = new OriginInfo();
         originInfo.setCenter(currentCenter);
         session.saveOrUpdate(originInfo);
@@ -76,8 +81,10 @@ public class SpecimenLinkSaveAction implements Action<List<Integer>> {
 
             SpecimenActionHelper.setParent(session, specimen,
                 asi.parentSpecimenId);
-            SpecimenActionHelper.setPosition(session, specimen, asi.position,
+            Container container = (Container) session.get(Container.class,
                 asi.containerId);
+            SpecimenActionHelper.setPosition(session, specimen, asi.position,
+                container);
             SpecimenActionHelper.setQuantityFromType(specimen);
 
             session.save(specimen);
