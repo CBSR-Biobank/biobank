@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import java.util.Arrays;
 
-import com.google.inject.ImplementedBy;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.web.bindery.event.shared.EventBus;
@@ -16,7 +15,6 @@ import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter.View;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
 import edu.ualberta.med.biobank.mvp.view.FormView;
 
-@ImplementedBy(FormManagerPresenter.class)
 public class FormManagerPresenter extends BasePresenter<View> {
     private Provider<SiteEntryPresenter> siteEntryPresenterProvider;
 

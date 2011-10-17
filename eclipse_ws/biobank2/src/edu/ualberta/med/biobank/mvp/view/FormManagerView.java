@@ -14,7 +14,7 @@ import org.eclipse.ui.part.EditorPart;
 import edu.ualberta.med.biobank.mvp.event.EclipseClickEvent;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
 
-public class EntryManagerView implements FormManagerPresenter.View {
+public class FormManagerView implements FormManagerPresenter.View {
 
     @Override
     public void openForm(Object object, FormView view) {

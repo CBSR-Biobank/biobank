@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import java.util.ArrayList;
 
-import com.google.inject.ImplementedBy;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -15,7 +14,6 @@ import edu.ualberta.med.biobank.mvp.user.ui.HasSelectedValue;
 import edu.ualberta.med.biobank.mvp.util.Converter;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
 
-@ImplementedBy(ActivityStatusComboPresenter.class)
 public class ActivityStatusComboPresenter extends BasePresenter<View> {
     private final static OptionLabeller labeller = new OptionLabeller();
     private final Dispatcher dispatcher;

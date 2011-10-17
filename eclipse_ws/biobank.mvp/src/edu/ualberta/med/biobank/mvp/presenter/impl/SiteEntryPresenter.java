@@ -5,7 +5,6 @@ import java.util.Collection;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.HasValue;
-import com.google.inject.ImplementedBy;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -22,7 +21,6 @@ import edu.ualberta.med.biobank.mvp.util.ObjectCloner;
 import edu.ualberta.med.biobank.mvp.view.BaseView;
 import edu.ualberta.med.biobank.mvp.view.FormView;
 
-@ImplementedBy(SiteEntryPresenter.class)
 public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     private final Dispatcher dispatcher;
     private final AddressEntryPresenter addressEntryPresenter;

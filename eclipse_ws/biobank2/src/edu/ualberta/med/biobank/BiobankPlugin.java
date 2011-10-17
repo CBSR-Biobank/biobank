@@ -24,6 +24,7 @@ import com.google.inject.Stage;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
@@ -154,7 +155,6 @@ public class BiobankPlugin extends AbstractUIPlugin {
      * The constructor
      */
     public BiobankPlugin() {
-        //
     }
 
     /*
@@ -171,7 +171,16 @@ public class BiobankPlugin extends AbstractUIPlugin {
         plugin = this;
         SessionManager.getInstance();
 
-        injector = Guice.createInjector(Stage.PRODUCTION, new GuiceModule());
+        injector = Guice.createInjector(Stage.PRODUCTION, new BiobankModule());
+
+        // attach the FormManager
+        // TODO: this will have to be unbound/ destroyed on perspective changes?
+        // There will also have to be a perspective manager?
+        // TODO: FormManager is pretty specific to eclipse, take out of mvp
+        // plugin?
+        FormManagerPresenter formManagerPresenter = injector
+            .getInstance(FormManagerPresenter.class);
+
     }
 
     /*

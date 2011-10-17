@@ -4,6 +4,8 @@ import com.google.gwt.canvas.dom.client.Context2d.Composite;
 
 public interface BaseView {
     /**
+     * Creates the view.
+     * <p>
      * With Eclipse RCP, {@link BaseView}-s cannot extend {@link Composite} and
      * implement the view because the {@link Composite#setParent()} method does
      * not necessarily work on all operating systems. So, instead,
