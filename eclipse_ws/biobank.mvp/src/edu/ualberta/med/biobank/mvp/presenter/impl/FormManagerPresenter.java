@@ -59,7 +59,9 @@ public class FormManagerPresenter extends BasePresenter<View> {
     }
 
     private void doSiteEdit(Integer siteId) {
-        FormView formView = siteEntryPresenterProvider.get().editSite(siteId);
+        SiteEntryPresenter siteEntryPres = siteEntryPresenterProvider.get();
+        siteEntryPres.bind();
+        FormView formView = siteEntryPres.editSite(siteId);
 
         // TODO: think about unique object
         // TODO: the view could implement a method that explains how it's
@@ -68,7 +70,9 @@ public class FormManagerPresenter extends BasePresenter<View> {
     }
 
     private void doSiteCreate() {
-        FormView formView = siteEntryPresenterProvider.get().createSite();
+        SiteEntryPresenter siteEntryPres = siteEntryPresenterProvider.get();
+        siteEntryPres.bind();
+        FormView formView = siteEntryPres.createSite();
 
         // TODO: think about unique object
         view.openForm(new Object(), formView);

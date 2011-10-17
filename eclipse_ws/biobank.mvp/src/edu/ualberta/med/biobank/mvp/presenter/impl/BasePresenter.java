@@ -20,10 +20,9 @@ public abstract class BasePresenter<V extends BaseView> implements Presenter<V> 
         this.view = view;
         this.eventBus = eventBus;
 
-        // Automatically bind in the constructor since we already have the View
-        // and EventBus here, so do it to prevent specifically calling it. A
-        // programmer may want to unbind then rebind later.
-        bind();
+        // would call bind here, but don't call overridden methods from the
+        // constructor as the derived object may not have completed
+        // initialisation.
     }
 
     @Override
