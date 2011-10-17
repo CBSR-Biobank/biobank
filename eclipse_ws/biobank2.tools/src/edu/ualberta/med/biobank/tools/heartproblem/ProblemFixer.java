@@ -53,8 +53,8 @@ public class ProblemFixer {
     public static final String[] PNUMBERS = { "DB0026", "DB0074", "DB0093",
         "DB0094", "DB0095", "DB0102" };
 
-    public static final String CEVENTS_HQL_QUERY = "select cevents"
-        + " from edu.ualberta.med.biobank.model.CollectionEvent cevents"
+    public static final String CEVENTS_HQL_QUERY = "select cevents" + " from "
+        + CollectionEvent.class.getName() + " cevents"
         + " inner join cevents.patient patients "
         + " inner join fetch cevents.allSpecimenCollection as spcs"
         + " left outer join fetch spcs.processingEvent pevents "
