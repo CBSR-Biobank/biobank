@@ -14,7 +14,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import edu.ualberta.med.biobank.mvp.event.EclipseClickEvent;
 
 public class ButtonItem implements HasClickHandlers {
-    private final Button button;
     private final HandlerManager handlerManager = new HandlerManager(this);
     private final MouseListener mouseListener = new MouseListener() {
         @Override
@@ -31,10 +30,11 @@ public class ButtonItem implements HasClickHandlers {
             handlerManager.fireEvent(new EclipseClickEvent());
         }
     };
+    private Button button;
 
-    public ButtonItem(Button button) {
+    public synchronized void setButtonItem(Button button) {
+        unbindOldButton();
         this.button = button;
-
         button.addMouseListener(mouseListener);
     }
 
@@ -50,5 +50,11 @@ public class ButtonItem implements HasClickHandlers {
     @Override
     public void fireEvent(GwtEvent<?> event) {
         handlerManager.fireEvent(event);
+    }
+
+    private void unbindOldButton() {
+        if (button != null) {
+            button.removeMouseListener(mouseListener);
+        }
     }
 }

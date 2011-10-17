@@ -57,7 +57,10 @@ public class TextItem implements HasValue<String> {
     @Override
     public void setValue(String value) {
         this.value = value != null ? value : DEFAULT_VALUE;
-        text.setText(value);
+
+        if (text != null) {
+            text.setText(value);
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.mvp.view;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -12,17 +13,19 @@ import com.google.gwt.user.client.ui.HasValue;
 import edu.ualberta.med.biobank.common.action.site.GetSiteStudyInfoAction.StudyInfo;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
 import edu.ualberta.med.biobank.mvp.view.item.ButtonItem;
+import edu.ualberta.med.biobank.mvp.view.item.TableItem;
 import edu.ualberta.med.biobank.mvp.view.item.TextItem;
 
 public class SiteEntryView implements SiteEntryPresenter.View {
     private Widget widget;
 
-    private ButtonItem save;
-    private ButtonItem reload;
-    private ButtonItem close;
-    private TextItem name;
-    private TextItem nameShort;
-    private TextItem comment;
+    private final ButtonItem save = new ButtonItem();
+    private final ButtonItem reload = new ButtonItem();
+    private final ButtonItem close = new ButtonItem();
+    private final TextItem name = new TextItem();
+    private final TextItem nameShort = new TextItem();
+    private final TextItem comment = new TextItem();
+    private final TableItem<List<StudyInfo>> studies = new TableItem<List<StudyInfo>>();
 
     private BaseView addressEntryView;
     private BaseView activityStatusComboView;
@@ -48,8 +51,8 @@ public class SiteEntryView implements SiteEntryPresenter.View {
     }
 
     @Override
-    public HasValue<Collection<StudyInfo>> getStudies() {
-        return null;
+    public HasValue<List<StudyInfo>> getStudies() {
+        return studies;
     }
 
     @Override

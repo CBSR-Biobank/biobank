@@ -45,7 +45,7 @@ public class ComboItem<T> implements HasSelectedValue<T> {
     private Converter<T, String> optionLabeler;
     private boolean fireEvents;
 
-    public void setComboViewer(ComboViewer comboViewer) {
+    public synchronized void setComboViewer(ComboViewer comboViewer) {
         unbindOldComboViewer();
 
         this.comboViewer = comboViewer;
@@ -86,9 +86,11 @@ public class ComboItem<T> implements HasSelectedValue<T> {
     public void setValue(T value) {
         this.value = value;
 
-        IStructuredSelection selection = value != null ? new StructuredSelection(
-            value) : new StructuredSelection();
-        comboViewer.setSelection(selection, true);
+        if (comboViewer != null) {
+            IStructuredSelection selection = value != null ? new StructuredSelection(
+                value) : new StructuredSelection();
+            comboViewer.setSelection(selection, true);
+        }
     }
 
     @Override

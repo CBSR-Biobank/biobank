@@ -1,9 +1,8 @@
 package edu.ualberta.med.biobank.mvp.presenter.impl;
 
 import java.util.Collection;
+import java.util.List;
 
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -41,7 +40,7 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
 
         HasValue<String> getComment();
 
-        HasValue<Collection<StudyInfo>> getStudies();
+        HasValue<List<StudyInfo>> getStudies();
     }
 
     @Inject
@@ -62,13 +61,13 @@ public class SiteEntryPresenter extends BaseEntryPresenter<View> {
     @Override
     public void onBind() {
         // TODO: listen to Display properties for validation purposes.
-        registerHandler(view.getName().addValueChangeHandler(
-            new ValueChangeHandler<String>() {
-                @Override
-                public void onValueChange(ValueChangeEvent<String> event) {
-                    // display.getName().set
-                }
-            }));
+        // registerHandler(view.getName().addValueChangeHandler(
+        // new ValueChangeHandler<String>() {
+        // @Override
+        // public void onValueChange(ValueChangeEvent<String> event) {
+        // // display.getName().set
+        // }
+        // }));
 
         addressEntryPresenter.bind();
         aStatusComboPresenter.bind();

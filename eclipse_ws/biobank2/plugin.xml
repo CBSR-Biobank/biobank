@@ -1656,6 +1656,13 @@
             name="%SiteEntry.editor">
       </editor>
       <editor
+            class="edu.ualberta.med.biobank.mvp.view.EntryViewEditorPart"
+            default="false"
+            icon="icons/site.png"
+            id="edu.ualberta.med.biobank.mvp.view.EntryViewEditorPart"
+            name="%SiteEntry.editor">
+      </editor>
+      <editor
             class="edu.ualberta.med.biobank.forms.SiteViewForm"
             default="false"
             icon="icons/site.png"
