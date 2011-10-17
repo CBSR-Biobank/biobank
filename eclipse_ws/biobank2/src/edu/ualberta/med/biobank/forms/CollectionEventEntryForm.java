@@ -182,7 +182,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             CollectionEventPeer.VISIT_NUMBER.getName(),
             new IntegerNumberValidator(
                 Messages.CollectionEventEntryForm_field_visitNumber_validation_msg,
-                false));
+                false), false);
 
         visitNumberText.addSelectionChangedListener(listener);
         setFirstControl(visitNumberText);
@@ -214,7 +214,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
             Messages.label_comments, null, ceventCopy,
-            CollectionEventPeer.COMMENT.getName(), null);
+            CollectionEventPeer.COMMENT.getName(), null, false);
     }
 
     private void createSpecimensSection() {

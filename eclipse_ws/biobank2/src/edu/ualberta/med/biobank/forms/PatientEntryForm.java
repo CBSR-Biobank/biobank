@@ -145,7 +145,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
             Messages.PatientEntryForm_field_pNumber_label, null, patientCopy,
-            PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
+            PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator, false);
 
         createdAtLabel = widgetCreator.createLabel(client,
             Messages.PatientEntryForm_created_label);
@@ -157,7 +157,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         createDateTimeWidget(client, createdAtLabel,
             patientCopy.getCreatedAt(), patientCopy,
             PatientPeer.CREATED_AT.getName(), createdAtValidator, SWT.DATE
-                | SWT.TIME, CREATED_AT_BINDING);
+                | SWT.TIME, CREATED_AT_BINDING, false);
     }
 
     @Override
