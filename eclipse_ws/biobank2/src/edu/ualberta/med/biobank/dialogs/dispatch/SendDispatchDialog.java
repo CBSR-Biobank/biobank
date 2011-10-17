@@ -10,8 +10,10 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentTempLoggerPeer;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentTempLoggerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -53,6 +55,11 @@ public class SendDispatchDialog extends BgcBaseDialog {
         ShipmentInfoWrapper shipInfo = new ShipmentInfoWrapper(
             SessionManager.getAppService());
         shipment.setShipmentInfo(shipInfo);
+        ShipmentTempLoggerWrapper shipLogger = new ShipmentTempLoggerWrapper(
+            SessionManager.getAppService());
+        shipment.getShipmentInfo().setShipmentTempLogger(shipLogger);
+        shipment.getShipmentInfo().getShipmentTempLogger()
+            .setShipmentInfo(shipInfo);
 
         ShippingMethodWrapper selectedShippingMethod = shipInfo
             .getShippingMethod();
@@ -75,6 +82,10 @@ public class SendDispatchDialog extends BgcBaseDialog {
         createDateTimeWidget(contents, "Time Packed", date, shipInfo,
             ShipmentInfoPeer.PACKED_AT.getName(), new NotNullValidator(
                 "Packed should be set"));
-    }
 
+        createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.NONE,
+            "Logger Device ID", null, shipInfo.getShipmentTempLogger(),
+            ShipmentTempLoggerPeer.DEVICE_ID.getName(), null);
+
+    }
 }

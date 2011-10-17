@@ -21,6 +21,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentTempLoggerPeer;
 import edu.ualberta.med.biobank.common.scanprocess.Cell;
 import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
 import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
@@ -28,6 +29,7 @@ import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentTempLoggerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
@@ -68,6 +70,14 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 .getCurrentWorkingCenter());
         } else {
             shipmentInfo = dispatch.getShipmentInfo();
+            // If there is no temperature Logger
+            if (shipmentInfo.getShipmentTempLogger() == null) {
+                ShipmentTempLoggerWrapper shipLogger = new ShipmentTempLoggerWrapper(
+                    SessionManager.getAppService());
+                shipmentInfo.setShipmentTempLogger(shipLogger);
+                shipmentInfo.getShipmentTempLogger().setShipmentInfo(
+                    shipmentInfo);
+            }
         }
     }
 
@@ -116,6 +126,11 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
                 "Waybill", null, shipmentInfo,
                 ShipmentInfoPeer.WAYBILL.getName(), null);
+
+            createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
+                "Logger Device ID", null, shipmentInfo.getShipmentTempLogger(),
+                ShipmentTempLoggerPeer.DEVICE_ID.getName(), null);
+
         }
 
         createBoundWidgetWithLabel(

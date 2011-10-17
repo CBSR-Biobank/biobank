@@ -28,14 +28,21 @@ import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.util.ClassCache;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+//import org.apache.commons.io.*;
 
 /**
  * Implementation of the BiobankApplicationService interface. This class will be
@@ -301,5 +308,37 @@ public class BiobankApplicationServiceImpl extends
 
         }
         return result;
+    }
+
+    @Override
+    public String uploadFile(byte[] bytes, String deviceID)
+        throws ApplicationException {
+
+        System.out.printf("Came From Client: %s", deviceID);
+        String uploadDir = System.getProperty("upload.dir");
+
+        Calendar currentDate = Calendar.getInstance();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MMM_dd-HH_mm");
+        String dateNow = formatter.format(currentDate.getTime());
+
+        String newFile = uploadDir + "/" + dateNow + "_ID_" + deviceID + ".pdf";
+        File fl = new File(newFile);
+
+        try {
+            boolean success = fl.createNewFile();
+            if (success) {
+                // File did not exist and was created
+            } else {
+                // File already exists
+            }
+        } catch (IOException e) {
+        }
+        try {
+            FileUtils.writeByteArrayToFile(fl, bytes);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return newFile;
     }
 }

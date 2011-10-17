@@ -30,10 +30,10 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
@@ -65,6 +65,20 @@ public class DispatchViewForm extends BiobankViewForm {
     private BgcBaseText dateReceivedLabel;
 
     private BgcBaseText commentLabel;
+
+    private BgcBaseText shpTempLoggerIDLabel;
+
+    private BgcBaseText shpTempLoggerHiLabel;
+
+    private BgcBaseText shpTempLoggerLowLabel;
+
+    private BgcBaseText shpTempLoggerResultLabel;
+
+    private BgcBaseText shpTempLoggerAboveLabel;
+
+    private BgcBaseText shpTempLoggerBelowLabel;
+
+    private BgcBaseText shpTempLoggerReportabel;
 
     private DispatchSpecimensTreeTable specimensTree;
 
@@ -258,23 +272,31 @@ public class DispatchViewForm extends BiobankViewForm {
                                 monitor.beginTask("Saving...",
                                     IProgressMonitor.UNKNOWN);
                                 dispatch.setState(DispatchState.IN_TRANSIT);
+
                                 try {
+                                    // Make sure no record created if no device
+                                    // is entered
+                                    if (dispatch.getShipmentInfo()
+                                        .getShipmentTempLogger().getDeviceId() == null
+                                        || dispatch.getShipmentInfo()
+                                            .getShipmentTempLogger()
+                                            .getDeviceId().isEmpty()) {
+                                        dispatch.getShipmentInfo()
+                                            .setShipmentTempLogger(null);
+                                    }
                                     dispatch.persist();
                                 } catch (final RemoteConnectFailureException exp) {
                                     BgcPlugin
                                         .openRemoteConnectErrorMessage(exp);
                                     return;
                                 } catch (final RemoteAccessException exp) {
-                                    BgcPlugin
-                                        .openRemoteAccessErrorMessage(exp);
+                                    BgcPlugin.openRemoteAccessErrorMessage(exp);
                                     return;
                                 } catch (final AccessDeniedException ade) {
-                                    BgcPlugin
-                                        .openAccessDeniedErrorMessage(ade);
+                                    BgcPlugin.openAccessDeniedErrorMessage(ade);
                                     return;
                                 } catch (Exception ex) {
-                                    BgcPlugin.openAsyncError(
-                                        "Save error", ex);
+                                    BgcPlugin.openAsyncError("Save error", ex);
                                     return;
                                 }
                                 monitor.done();
@@ -320,6 +342,7 @@ public class DispatchViewForm extends BiobankViewForm {
         senderLabel = createReadOnlyLabelledField(client, SWT.NONE, "Sender");
         receiverLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Receiver");
+
         if (!dispatch.isInCreationState()) {
             departedLabel = createReadOnlyLabelledField(client, SWT.NONE,
                 "Packed at");
@@ -327,7 +350,34 @@ public class DispatchViewForm extends BiobankViewForm {
                 "Shipping Method");
             waybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
                 "Waybill");
+            if (dispatch.getShipmentInfo().getShipmentTempLogger() != null
+                && dispatch.getShipmentInfo().getShipmentTempLogger()
+                    .getDeviceId() != null) {
+                shpTempLoggerIDLabel = createReadOnlyLabelledField(client,
+                    SWT.NONE, "Logger Device ID");
+                if (!dispatch.isInTransitState()) {
+                    shpTempLoggerHiLabel = createReadOnlyLabelledField(client,
+                        SWT.NONE,
+                        "Highest temperature during transport (Celcius)");
+                    shpTempLoggerLowLabel = createReadOnlyLabelledField(client,
+                        SWT.NONE,
+                        "Lowest temperature during transport (Celcius)");
+                    shpTempLoggerResultLabel = createReadOnlyLabelledField(
+                        client, SWT.NONE, "Shipment temperature result");
+                    shpTempLoggerAboveLabel = createReadOnlyLabelledField(
+                        client, SWT.NONE,
+                        "Number of minutes above maximum threshold");
+                    shpTempLoggerBelowLabel = createReadOnlyLabelledField(
+                        client, SWT.NONE,
+                        "Number of minutes below maximum threshold");
+                    shpTempLoggerReportabel = createReadOnlyLabelledField(
+                        client, SWT.NONE, "Tempurature logger report");
+                }
+
+            }
+
         }
+
         if (dispatch.hasBeenReceived()) {
             dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
                 "Date received");
@@ -358,8 +408,50 @@ public class DispatchViewForm extends BiobankViewForm {
             if (dateReceivedLabel != null)
                 setTextValue(dateReceivedLabel,
                     shipInfo.getFormattedDateReceived());
+
+            if (shipInfo.getShipmentTempLogger() != null
+                && shipInfo.getShipmentTempLogger().getDeviceId() != null) {
+                if (shpTempLoggerIDLabel != null)
+                    setTextValue(shpTempLoggerIDLabel, shipInfo
+                        .getShipmentTempLogger().getDeviceId());
+
+                if (!dispatch.isInTransitState()) {
+                    if (shpTempLoggerHiLabel != null)
+                        setTextValue(shpTempLoggerHiLabel, shipInfo
+                            .getShipmentTempLogger().getHighTemperature());
+
+                    if (shpTempLoggerLowLabel != null)
+                        setTextValue(shpTempLoggerLowLabel, shipInfo
+                            .getShipmentTempLogger().getLowTemperature());
+
+                    if (shpTempLoggerResultLabel != null) {
+                        if (shipInfo.getShipmentTempLogger()
+                            .getTemperatureResult() != null) {
+                            if (shipInfo.getShipmentTempLogger()
+                                .getTemperatureResult()) {
+                                setTextValue(shpTempLoggerResultLabel, "Pass");
+                            } else {
+                                setTextValue(shpTempLoggerResultLabel, "Fail");
+                            }
+                        }
+                    }
+                    if (shpTempLoggerAboveLabel != null)
+                        setTextValue(shpTempLoggerAboveLabel, shipInfo
+                            .getShipmentTempLogger().getMinutesAboveMax());
+
+                    if (shpTempLoggerBelowLabel != null)
+                        setTextValue(shpTempLoggerBelowLabel, shipInfo
+                            .getShipmentTempLogger().getMinutesBelowMax());
+
+                    if (shpTempLoggerReportabel != null)
+                        setTextValue(shpTempLoggerReportabel, shipInfo
+                            .getShipmentTempLogger().getReport());
+                }
+            }
+
         }
         setTextValue(commentLabel, dispatch.getComment());
+
     }
 
 }

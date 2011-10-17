@@ -7,6 +7,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentTempLoggerPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ShipmentInfoBaseWrapper;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -22,6 +23,25 @@ public class ShipmentInfoWrapper extends ShipmentInfoBaseWrapper {
     public ShipmentInfoWrapper(WritableApplicationService appService,
         ShipmentInfo ship) {
         super(appService, ship);
+    }
+
+    private ShipmentTempLoggerWrapper initShipmentTempLogger() {
+        ShipmentTempLoggerWrapper dataLogger = getShipmentTempLogger();
+        if (dataLogger == null) {
+            dataLogger = new ShipmentTempLoggerWrapper(appService);
+            setShipmentTempLogger(dataLogger);
+        }
+        return dataLogger;
+    }
+
+    public String getDeviceID() {
+        return getProperty(getShipmentTempLogger(),
+            ShipmentTempLoggerPeer.DEVICE_ID);
+    }
+
+    public void setDeviceID(String deviceID) {
+        initShipmentTempLogger().setProperty(ShipmentTempLoggerPeer.DEVICE_ID,
+            deviceID);
     }
 
     public String getFormattedDateReceived() {

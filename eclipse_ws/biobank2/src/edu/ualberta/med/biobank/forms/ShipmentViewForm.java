@@ -40,6 +40,20 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private BgcBaseText boxNumberLabel;
 
+    private BgcBaseText deviceIDLabel;
+
+    private BgcBaseText highTempLabel;
+
+    private BgcBaseText lowTempLabel;
+
+    private BgcBaseText passFailLabel;
+
+    private BgcBaseText minAboveMaxLabel;
+
+    private BgcBaseText minBelowMaxLabel;
+
+    private BgcBaseText reportLabel;
+
     private SpecimenEntryWidget specimenWidget;
 
     @Override
@@ -107,6 +121,30 @@ public class ShipmentViewForm extends BiobankViewForm {
         dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Received");
 
+        if (originInfo.getShipmentInfo().getShipmentTempLogger() != null
+            && originInfo.getShipmentInfo().getShipmentTempLogger()
+                .getDeviceId() != null) {
+            deviceIDLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Logger Device ID");
+
+            highTempLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Highest temperature during transport (Celcius)");
+
+            lowTempLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Lowest temperature during transport (Celcius)");
+
+            passFailLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Pass or Fail");
+
+            minAboveMaxLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Number of minutes above maximum threshold");
+
+            minBelowMaxLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Number of minutes below maximum threshold");
+
+            reportLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Temperature logger report");
+        }
         setShipmentValues();
     }
 
@@ -128,6 +166,30 @@ public class ShipmentViewForm extends BiobankViewForm {
 
         setTextValue(boxNumberLabel, shipInfo.getBoxNumber());
         setTextValue(dateReceivedLabel, shipInfo.getFormattedDateReceived());
+
+        if (shipInfo.getShipmentTempLogger() != null
+            && shipInfo.getShipmentTempLogger().getDeviceId() != null) {
+            setTextValue(deviceIDLabel, shipInfo.getShipmentTempLogger()
+                .getDeviceId());
+            setTextValue(highTempLabel, shipInfo.getShipmentTempLogger()
+                .getHighTemperature());
+            setTextValue(lowTempLabel, shipInfo.getShipmentTempLogger()
+                .getLowTemperature());
+            if (shipInfo.getShipmentTempLogger().getTemperatureResult() == null) {
+                setTextValue(passFailLabel, "");
+            } else if (shipInfo.getShipmentTempLogger().getTemperatureResult()) {
+                setTextValue(passFailLabel, "Pass");
+            } else {
+                setTextValue(passFailLabel, "Fail");
+            }
+            setTextValue(minAboveMaxLabel, shipInfo.getShipmentTempLogger()
+                .getMinutesAboveMax());
+            setTextValue(minBelowMaxLabel, shipInfo.getShipmentTempLogger()
+                .getMinutesBelowMax());
+            setTextValue(reportLabel, shipInfo.getShipmentTempLogger()
+                .getReport());
+
+        }
     }
 
     @Override
